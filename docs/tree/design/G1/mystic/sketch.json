@@ -1,0 +1,93 @@
+{
+  "title": "Mystic G1b: clusters, rim roads, crossings, two moves",
+  "region": "mystic",
+  "clusters": [
+    { "id": "MY-1", "label": "spell dmg + spell crit multi", "at": [1000, -2960], "nodes": 5 },
+    { "id": "MY-2", "label": "spell dmg + life", "at": [-1300, -2960], "nodes": 4 },
+    {
+      "id": "MY-3",
+      "label": "spell dmg + mana regen (cast speed smalls)",
+      "at": [660, -4570],
+      "nodes": 4
+    },
+    { "id": "MY-4", "label": "ES + all res", "at": [-540, -4500], "nodes": 4 },
+    { "id": "MY-5", "label": "wand attack + ele attack", "at": [-650, -3760], "nodes": 4 },
+    { "id": "MY-6", "label": "wand attack + wand crit", "at": [1330, -4040], "nodes": 4 },
+    { "id": "MY-7", "label": "minion dmg + curse effect", "at": [-1330, -4440], "nodes": 4 },
+    { "id": "MY-8", "label": "ES + avoid stun", "at": [-540, -2500], "nodes": 4 },
+    { "id": "MY-9", "label": "life + mana", "at": [400, -2560], "nodes": 5 },
+    { "id": "MY-10", "label": "dagger spell + cast speed", "at": [1350, -3100], "nodes": 4 },
+    { "id": "MY-11", "label": "spell dmg + ele pen", "at": [-140, -3790], "nodes": 4 }
+  ],
+  "roads": [
+    {
+      "label": "north-east rim road",
+      "points": [
+        "spire.frost.toHarsh.a",
+        [520, -4330],
+        [850, -4470],
+        [1230, -4470],
+        [1520, -4170],
+        [1950, -3900],
+        "knife.roofs.ridge.y1"
+      ],
+      "nodes": 5
+    },
+    {
+      "label": "north-west rim road",
+      "points": [
+        "MY-4",
+        [-850, -4500],
+        [-1120, -4390],
+        [-1380, -4150],
+        [-1470, -3870],
+        "cathedral.crypt.rite.n"
+      ],
+      "nodes": 4
+    },
+    {
+      "label": "curse crossing",
+      "points": ["spire.craft.hexwright.n", [1470, -2760], "knife.hex.j4.a"],
+      "nodes": 1
+    }
+  ],
+  "links": [
+    { "from": "spire.craft.toVolley.r2", "to": "MY-1" },
+    { "from": "MY-1", "to": "spire.craft.toDev2.a" },
+    { "from": "spire.well.toCrypt.r2", "to": "MY-2" },
+    { "from": "MY-2", "to": "cathedral.crypt.toSpire.b", "label": "crossing: spell + life" },
+    { "from": [520, -4330], "to": "MY-3" },
+    { "from": "MY-3", "to": [850, -4470] },
+    { "from": "spire.frost.stream.n", "to": "MY-4" },
+    { "from": "spire.fire.jArm.a", "to": "MY-5" },
+    { "from": "MY-5", "to": "spire.frost.jFire.a" },
+    { "from": "spire.storm.overcharge.c", "to": "MY-6" },
+    { "from": "MY-6", "to": [1520, -4170] },
+    { "from": [-1120, -4390], "to": "MY-7" },
+    { "from": "MY-7", "to": [-1380, -4150] },
+    { "from": "spire.fire.cinder.b", "to": [-1380, -4150] },
+    { "from": "spire.frost.snare.n", "to": [1230, -4470] },
+    { "from": "spire.well.toPulse.a", "to": "MY-8" },
+    { "from": "MY-8", "to": "spire.column.broadWeave.a" },
+    { "from": "spire.craft.roadN.a", "to": "MY-9" },
+    { "from": "MY-9", "to": "spire.craft.wandVolley.a" },
+    { "from": "spire.craft.mistWalk.n", "to": "MY-10" },
+    { "from": "MY-10", "to": "knife.hex.toSpire.a", "label": "crossing: dagger caster" },
+    { "from": "spire.frost.toShatter.r1", "to": "MY-11" },
+    { "from": "MY-11", "to": "spire.frost.jArm.a" },
+    { "from": "spire.frost.jStorm.a", "to": [190, -3770] },
+    { "from": [190, -3770], "to": "spire.frost.jArm.a" },
+    { "from": "spire.well.toTap.a", "to": [-950, -2640] },
+    { "from": [-950, -2640], "to": "spire.well.toCrypt.r2" }
+  ],
+  "cuts": [
+    ["spire.well.deepWell.d", "spire.well.recharge.a"],
+    ["spire.well.recharge.b", "spire.well.siphon.a"],
+    ["spire.column.broadWeave.a", "spire.well.siphon.n"],
+    ["spire.well.siphon.a", "spire.well.toPulse.a"]
+  ],
+  "moves": [
+    { "id": "spire.well.recharge.n", "to": [-950, -2640] },
+    { "id": "spire.well.siphon.n", "to": [190, -3770] }
+  ]
+}

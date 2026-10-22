@@ -1,0 +1,234 @@
+{
+  "title": "Strider: the outer road, its spokes and clusters (G1b sketch)",
+  "region": "strider",
+  "clusters": [
+    {
+      "id": "ST-6",
+      "label": "ST-6 traps | mines wheel",
+      "at": [4150, 470],
+      "nodes": 6
+    },
+    {
+      "id": "ST-9",
+      "label": "ST-9 life + resistances",
+      "at": [3420, 400],
+      "nodes": 6
+    },
+    {
+      "id": "ST-1",
+      "label": "ST-1 bow + bow crit",
+      "at": [4060, 1020],
+      "nodes": 7
+    },
+    {
+      "id": "ST-5",
+      "label": "ST-5 fervour + attack speed",
+      "at": [3720, 1960],
+      "nodes": 4
+    },
+    {
+      "id": "ST-3",
+      "label": "ST-3 evasion + life regen",
+      "at": [3450, 2450],
+      "nodes": 6
+    },
+    {
+      "id": "ST-2",
+      "label": "ST-2 bow + elemental attacks",
+      "at": [3010, 2960],
+      "nodes": 4
+    },
+    {
+      "id": "ST-7",
+      "label": "ST-7 evasion + flask effect",
+      "at": [1850, 2830],
+      "nodes": 6
+    },
+    {
+      "id": "ST-4",
+      "label": "ST-4 lightning attacks + shock",
+      "at": [2110, 3520],
+      "nodes": 4
+    },
+    {
+      "id": "ST-10",
+      "label": "ST-10 poison + bow damage over time",
+      "at": [1560, 3080],
+      "nodes": 4
+    }
+  ],
+  "roads": [
+    {
+      "label": "",
+      "points": [
+        [3800, 150],
+        [3700, 820],
+        [3480, 1480],
+        [3150, 2100],
+        [2720, 2640],
+        [2220, 3060],
+        [1680, 3390],
+        [1180, 3600]
+      ],
+      "nodes": 15
+    },
+    {
+      "label": "X1",
+      "points": ["bow.flight.ricochet.b", [2972, 585], "bow.steel.wheel.n2"],
+      "nodes": 1
+    },
+    {
+      "label": "north spoke",
+      "points": [
+        [2972, 585],
+        [3330, 700],
+        [3700, 820]
+      ],
+      "nodes": 1
+    },
+    {
+      "label": "X2",
+      "points": ["bow.flight.wheel.n2", [2790, 1610], "bow.quiver.skewer.a"],
+      "nodes": 1
+    },
+    {
+      "label": "middle spoke",
+      "points": [
+        [2790, 1610],
+        [3480, 1480]
+      ],
+      "nodes": 1
+    },
+    {
+      "label": "X3",
+      "points": ["bow.quiver.skewer.n", [2670, 2045], "bow.quiver.quickSip.a"],
+      "nodes": 1
+    },
+    {
+      "label": "",
+      "points": [
+        [2670, 2045],
+        [2720, 2640]
+      ],
+      "nodes": 1
+    },
+    {
+      "label": "dear crossing to the Rooftops (Shade side)",
+      "points": [[3800, 150], [3720, -300], [3580, -680], "knife.roofs.walk.r8"],
+      "nodes": 2
+    },
+    {
+      "label": "",
+      "points": ["ST-5", [3640, 2260], "ST-3"],
+      "nodes": 1
+    }
+  ],
+  "links": [
+    {
+      "from": "ST-6",
+      "to": [3750, 485]
+    },
+    {
+      "from": "ST-9",
+      "to": [3800, 150]
+    },
+    {
+      "from": "ST-1",
+      "to": [3700, 820]
+    },
+    {
+      "from": "ST-1",
+      "to": [3480, 1480],
+      "label": "crit chance smalls"
+    },
+    {
+      "from": "ST-5",
+      "to": [3315, 1790]
+    },
+    {
+      "from": "ST-3",
+      "to": [3150, 2100]
+    },
+    {
+      "from": "ST-2",
+      "to": [2720, 2640]
+    },
+    {
+      "from": "ST-7",
+      "to": "bow.steel.sentryPost.n"
+    },
+    {
+      "from": "ST-7",
+      "to": [2220, 3060]
+    },
+    {
+      "from": "ST-4",
+      "to": [1950, 3225]
+    },
+    {
+      "from": [1180, 3600],
+      "to": "yard.fosse.storm.n",
+      "label": "crossing: lightning attacks (Stormstruck a bridge)"
+    },
+    {
+      "from": "ST-10",
+      "to": [1680, 3390]
+    },
+    {
+      "from": [3150, 1250],
+      "to": [3150, 1250],
+      "label": "THE OUTER ROAD"
+    },
+    {
+      "from": "bow.flight.added.n432",
+      "to": "bow.flight.added.n432",
+      "label": "re-line: shield block + stun with a shield"
+    },
+    {
+      "from": "bow.steel.added.n416",
+      "to": "bow.steel.added.n416",
+      "label": "re-price: 3 units"
+    },
+    {
+      "from": [1950, 980],
+      "to": [1950, 980],
+      "label": "mana smalls re-lined"
+    },
+    {
+      "from": "ST-9",
+      "to": "knife.snares.toRicochet.r4",
+      "label": "crossing: life for the Shade, the outer road for Shade builds"
+    },
+    {
+      "from": "bow.steel.toBlood.a",
+      "to": "yard.dual.sidestep.n",
+      "label": "Ford crossing: evasion and dodge (or RE-6 lands here)"
+    },
+    {
+      "from": "bow.steel.hub.t",
+      "to": "bow.steel.hub.t",
+      "label": "RE-1 lands here"
+    },
+    {
+      "from": "bow.bows.road.jb3",
+      "to": "bow.bows.road.jb3",
+      "label": "SH-15 lands here"
+    },
+    {
+      "from": [1668, -150],
+      "to": [1668, -150],
+      "label": "SH-6 lands here"
+    },
+    {
+      "from": "ST-10",
+      "to": "bow.steel.pitch.n",
+      "label": "Pitch Arrows a bridge"
+    }
+  ],
+  "cuts": [
+    ["bow.flight.ricochet.b", "bow.steel.wheel.n2"],
+    ["bow.flight.wheel.n2", "bow.quiver.skewer.a"],
+    ["bow.quiver.skewer.n", "bow.quiver.quickSip.a"],
+    ["bow.home.added.n414", "yard.dual.j2.a"]
+  ]
+}

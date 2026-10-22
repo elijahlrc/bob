@@ -1,0 +1,200 @@
+{
+  "title": "Vanguard G1b: new clusters, roads, crossings and moves",
+  "region": "vanguard",
+  "clusters": [
+    {
+      "id": "VA-2",
+      "label": "armour + shield block",
+      "at": [-2990, 864],
+      "nodes": 5
+    },
+    {
+      "id": "VA-3",
+      "label": "armour + warcry effect",
+      "at": [-1900, 2830],
+      "nodes": 5
+    },
+    {
+      "id": "VA-4",
+      "label": "mace + mace attack speed",
+      "at": [-2450, 2320],
+      "nodes": 4
+    },
+    {
+      "id": "VA-5",
+      "label": "mace + life",
+      "at": [-1830, 1420],
+      "nodes": 4
+    },
+    {
+      "id": "VA-6",
+      "label": "fire attacks + stun",
+      "at": [-3900, 620],
+      "nodes": 4
+    },
+    {
+      "id": "VA-7",
+      "label": "totem speed + duration",
+      "at": [-2935, 2017],
+      "nodes": 4
+    },
+    {
+      "id": "VA-8",
+      "label": "shield attacks + stun",
+      "at": [-1560, 560],
+      "nodes": 4
+    }
+  ],
+  "roads": [
+    {
+      "label": "west rim road",
+      "points": [
+        "wall.maces.oath.n",
+        [-4000, 320],
+        "VA-6",
+        [-3960, 860],
+        [-3830, 1150],
+        "wall.maces.j2.a"
+      ],
+      "nodes": 3
+    },
+    {
+      "label": "to Censer",
+      "points": ["wall.maces.oath.n", [-3990, -300], "cathedral.ambulatory.censer.n"],
+      "nodes": 1
+    },
+    {
+      "label": "quarry floor",
+      "points": [
+        "wall.slams.j1.a",
+        [-1610, 1490],
+        "VA-5",
+        [-2100, 1500],
+        [-2260, 1540],
+        "wall.slams.groundShaker.b"
+      ],
+      "nodes": 2
+    },
+    {
+      "points": [[-1650, 2070], "wall.grit.ward.n"],
+      "nodes": 1
+    },
+    {
+      "label": "Barrows middle",
+      "points": ["wall.grit.ward.n", [-1830, 2580], "VA-3"],
+      "nodes": 1
+    },
+    {
+      "label": "crossing: regeneration or leech",
+      "points": [[-1650, 2070], "yard.blades.thirst.n"],
+      "nodes": 1
+    }
+  ],
+  "links": [
+    {
+      "from": "VA-3",
+      "to": "wall.grit.east.e2"
+    },
+    {
+      "from": "VA-4",
+      "to": "wall.grit.north.a"
+    },
+    {
+      "from": "VA-4",
+      "to": "wall.grit.southWest.b"
+    },
+    {
+      "from": "VA-6",
+      "to": "wall.maces.toHymn.r2"
+    },
+    {
+      "from": "VA-7",
+      "to": "wall.grit.west.c"
+    },
+    {
+      "from": "VA-7",
+      "to": "wall.grit.reach.a"
+    },
+    {
+      "from": "VA-8",
+      "to": "wall.home.roadR.b"
+    },
+    {
+      "from": "VA-8",
+      "to": "wall.home.roadM.b"
+    },
+    {
+      "from": "wall.slams.unbloodied.n",
+      "to": [-1650, 2070]
+    },
+    {
+      "from": [-2540, -20],
+      "to": "cathedral.rods.toWall.a",
+      "label": "crossing: mace and sceptre"
+    },
+    {
+      "from": "wall.rampart.j1.a",
+      "to": [-2540, -20]
+    },
+    {
+      "from": "wall.resists.star.c",
+      "to": "wall.rampart.toWind.a",
+      "label": "chaos spoke re-landed"
+    },
+    {
+      "from": "wall.rampart.bulwark.b",
+      "to": "wall.rampart.toWind.a"
+    },
+    {
+      "from": "wall.grit.east.e6",
+      "to": [-1160, 3420]
+    },
+    {
+      "from": [-1160, 3420],
+      "to": "yard.fosse.road.f7",
+      "label": "crossing: axes by the Fosse"
+    }
+  ],
+  "cuts": [
+    ["wall.rampart.secondWind.n", "wall.resists.star.c"],
+    ["wall.rampart.secondWind.b", "wall.rampart.toWind.a"],
+    ["wall.rampart.bulwark.b", "wall.rampart.secondWind.a"]
+  ],
+  "moves": [
+    {
+      "id": "wall.maces.cleaver.n",
+      "to": [-1160, 3420],
+      "label": "Cleaver"
+    },
+    {
+      "id": "wall.maces.hammer.n",
+      "to": [-2540, -20],
+      "label": "Hallowed Hammer"
+    },
+    {
+      "id": "wall.rampart.thickSkin.n",
+      "to": [-3830, 1150],
+      "label": "Thick Skin"
+    },
+    {
+      "id": "wall.rampart.bulwark.n1",
+      "to": [-1931, 880],
+      "label": "Stone Heart"
+    },
+    {
+      "id": "wall.rampart.ironLungs.n",
+      "to": [-2179, 380],
+      "label": "Iron Lungs"
+    },
+    {
+      "id": "wall.rampart.secondWind.n",
+      "to": [-1650, 2070],
+      "label": "Second Wind"
+    },
+    {
+      "id": "wall.rampart.unerring.k",
+      "to": [-2860, 175],
+      "label": "Unerring Discipline"
+    }
+  ]
+}

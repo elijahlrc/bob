@@ -1,0 +1,293 @@
+{
+  "title": "Shade (G1b): new clusters, the east rim road, the north crossroad and the crossings",
+  "region": "shade",
+  "clusters": [
+    {
+      "id": "SH-1",
+      "label": "SH-1 ES + spell dodge",
+      "at": [2120, -3000],
+      "nodes": 4
+    },
+    {
+      "id": "SH-2",
+      "label": "SH-2 spell dmg + vs cursed",
+      "at": [3000, -650],
+      "nodes": 5
+    },
+    {
+      "id": "SH-3",
+      "label": "SH-3 spell crit + insight",
+      "at": [3900, -2350],
+      "nodes": 4
+    },
+    {
+      "id": "SH-4",
+      "label": "SH-4 dagger + poison",
+      "at": [2650, -280],
+      "nodes": 4
+    },
+    {
+      "id": "SH-6",
+      "label": "SH-6 claw + claw attack speed",
+      "at": [2230, -170],
+      "nodes": 4
+    },
+    {
+      "id": "SH-7",
+      "label": "SH-7 poison + attack speed",
+      "at": [3950, -850],
+      "nodes": 4
+    },
+    {
+      "id": "SH-8",
+      "label": "SH-8 curse + chaos DoT",
+      "at": [2800, -2720],
+      "nodes": 4
+    },
+    {
+      "id": "SH-9",
+      "label": "SH-9 dual wield + dodge",
+      "at": [3250, -1450],
+      "nodes": 4
+    },
+    {
+      "id": "SH-10",
+      "label": "SH-10 life + dodge",
+      "at": [3750, -380],
+      "nodes": 5
+    },
+    {
+      "id": "SH-11",
+      "label": "SH-11 spell dmg + cast speed",
+      "at": [2780, -3300],
+      "nodes": 5
+    },
+    {
+      "id": "SH-12",
+      "label": "SH-12 cold attacks + crit",
+      "at": [3150, 80],
+      "nodes": 4
+    },
+    {
+      "id": "SH-13",
+      "label": "SH-13 ES + mana",
+      "at": [2380, -1980],
+      "nodes": 4
+    },
+    {
+      "id": "SH-14",
+      "label": "SH-14 evasion + ES",
+      "at": [1480, -790],
+      "nodes": 5
+    },
+    {
+      "id": "SH-15",
+      "label": "SH-15 life + evasion",
+      "at": [1780, -2420],
+      "nodes": 6
+    },
+    {
+      "id": "SH-16",
+      "label": "SH-16 dagger + crit multi",
+      "at": [3150, -3330],
+      "nodes": 4
+    }
+  ],
+  "roads": [
+    {
+      "label": "east rim road",
+      "points": [
+        "knife.roofs.walk.r5",
+        [3600, -2250],
+        [3950, -1950],
+        [4150, -1500],
+        [4250, -1050],
+        [4250, -600],
+        [4100, -150],
+        [3800, 150]
+      ],
+      "nodes": 7
+    },
+    {
+      "label": "north crossroad",
+      "points": ["knife.roofs.ridge.y3", [2780, -3020], [3080, -3010], "knife.roofs.carrion.a"],
+      "nodes": 2
+    },
+    {
+      "label": "rung to SH-6",
+      "points": ["knife.edge.j1.a", [1990, -370], "SH-6"],
+      "nodes": 1
+    },
+    {
+      "label": "dear crossing to the Mystic north rim road",
+      "points": ["knife.hex.powder.n", [1700, -4000], [1400, -4150]],
+      "nodes": 2
+    }
+  ],
+  "links": [
+    {
+      "from": "SH-1",
+      "to": "knife.hex.static.b"
+    },
+    {
+      "from": "SH-1",
+      "to": "knife.roofs.ridge.y2"
+    },
+    {
+      "from": "SH-2",
+      "to": "knife.roofs.walk.r9"
+    },
+    {
+      "from": "SH-2",
+      "to": "knife.snares.toRicochet.r1"
+    },
+    {
+      "from": "SH-3",
+      "to": [3600, -2250]
+    },
+    {
+      "from": "SH-3",
+      "to": [3950, -1950]
+    },
+    {
+      "from": "SH-4",
+      "to": "knife.snares.toBow.b"
+    },
+    {
+      "from": "SH-4",
+      "to": "knife.snares.toRicochet.r2"
+    },
+    {
+      "from": "SH-6",
+      "to": "knife.snares.toBow.a"
+    },
+    {
+      "from": "SH-7",
+      "to": [4250, -1050]
+    },
+    {
+      "from": "SH-7",
+      "to": [4250, -600]
+    },
+    {
+      "from": "SH-8",
+      "to": "knife.roofs.ridge.y4"
+    },
+    {
+      "from": "SH-8",
+      "to": "knife.roofs.walk.r3"
+    },
+    {
+      "from": "SH-9",
+      "to": "knife.snares.quietShot.a"
+    },
+    {
+      "from": "SH-9",
+      "to": "knife.roofs.walk.r7"
+    },
+    {
+      "from": "SH-10",
+      "to": [4100, -150]
+    },
+    {
+      "from": "SH-10",
+      "to": "knife.snares.herald.n"
+    },
+    {
+      "from": "SH-11",
+      "to": [2780, -3020]
+    },
+    {
+      "from": "SH-13",
+      "to": "knife.venom.jN.a"
+    },
+    {
+      "from": "SH-13",
+      "to": "knife.venom.j5.a"
+    },
+    {
+      "from": "SH-14",
+      "to": "knife.home.roadB.c"
+    },
+    {
+      "from": "SH-14",
+      "to": "knife.edge.j1.a"
+    },
+    {
+      "from": "SH-16",
+      "to": [3080, -3010]
+    },
+    {
+      "from": "SH-16",
+      "to": "knife.roofs.carrion.n"
+    },
+    {
+      "from": "knife.roofs.sleet.n",
+      "to": [4150, -1500]
+    },
+    {
+      "from": "knife.roofs.whet.n",
+      "to": [4250, -1050]
+    },
+    {
+      "from": "knife.hex.climb.a",
+      "to": "spire.craft.toDevotion.a",
+      "label": "crossing: Stair to Scriptorium"
+    },
+    {
+      "from": "knife.hex.toSpire.a",
+      "to": [1250, -3050],
+      "label": "crossing: MY-10 (Mystic side)"
+    },
+    {
+      "from": "knife.snares.mercy.n",
+      "to": "bow.flight.venom.a",
+      "label": "crossing: Mercy Stroke to Venom Fletching"
+    },
+    {
+      "from": "SH-15",
+      "to": "knife.hex.climb.a"
+    },
+    {
+      "from": "SH-15",
+      "to": "knife.hex.static.a"
+    },
+    {
+      "from": "SH-12",
+      "to": "knife.snares.toRicochet.r4"
+    },
+    {
+      "from": "SH-12",
+      "to": "knife.snares.herald.n"
+    },
+    {
+      "from": [1990, -370],
+      "to": "bow.bows.toKnife.a",
+      "label": "crossing: claws and the Strider near home"
+    },
+    {
+      "from": "knife.snares.toRicochet.r4",
+      "to": [3420, 400],
+      "label": "crossing: ST-9 life + res (Strider)"
+    }
+  ],
+  "cuts": [],
+  "moves": [
+    {
+      "id": "knife.hex.static.n",
+      "to": [2110, -2560]
+    },
+    {
+      "id": "knife.roofs.sleet.a",
+      "to": [3700, -1665]
+    },
+    {
+      "id": "knife.roofs.sleet.b",
+      "to": [3765, -1675]
+    },
+    {
+      "id": "knife.roofs.sleet.n",
+      "to": [3840, -1690]
+    }
+  ]
+}
