@@ -66,7 +66,8 @@
     "passives:edit": "tsx scripts/passives/edit.ts",
     "passives:bake": "tsx scripts/passives/bake.ts",
     "passives:builds": "tsx scripts/passives/builds.ts",
-    "passives:supply": "tsx scripts/passives/supply.ts"
+    "passives:supply": "tsx scripts/passives/supply.ts",
+    "passives:sketch": "tsx scripts/passives/sketch.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.3",
