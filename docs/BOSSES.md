@@ -135,8 +135,9 @@ floor, and the toll count burns on the bell.
 
 **The fight.**
 
-- **Tolls.** Every **12 s** the bell swings back (a 2 s tell: the bell rises, a ring of runes fills on the floor), then
-  tolls: **Toll waves**, the existing pattern, as expanding lightning rings with gaps, cast as a spell. Each toll also
+- **Tolls.** Every **12 s** the bell swings back (a 2 s tell: the bell rises, a ring of runes fills on the floor; since
+  2026-10-21 the body shows it too, the bell hoisted over his head, its lip glowing, and brought down mouth-first in front
+  of him on the toll), then tolls: **Toll waves**, the existing pattern, as expanding lightning rings with gaps, cast as a spell. Each toll also
   **shocks** whatever it hits.
 - **It starts weak, and each toll adds a stack, for good.** It opens at **half** its usual damage; each toll adds +25% of the usual damage, +6% attack speed, and one more ring in the next toll's waves. The
   first few tolls are easy to step through; by the sixth the rings are close together and the swings come fast. (Until 2026-10-13

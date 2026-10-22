@@ -34,7 +34,8 @@ set). If headless Chromium gets no GPU, `TRAILER_HEADED=1` films in a visible wi
 
 **1440p:** `TRAILER_SCALE=2 npm run trailer:capture` films every clip at twice the pixels (2560×1440, the same layout; the
 end screen at 3× that), and `TRAILER_SCALE=2 npm run trailer:render -- --cut` writes `cut-1440p.mp4` (about 40 MB, not
-committed). The footage folder holds one scale at a time.
+committed). Each clip's footage is at the scale it was last filmed at, so before a render re-film every clip whose scale
+differs from it.
 
 **Re-rendering:** `npm run trailer:render` (`scripts/trailer/render.ts`) runs the score script, renders every frame in
 headless Chromium and joins them with ffmpeg. It needs Python 3 with numpy, ffmpeg on PATH and
