@@ -254,6 +254,12 @@ The core of section 1, made concrete.
    - 3% attack speed against 2% attack speed with 5% accuracy.
    - Two bow notables on opposite sides of one circle. "If I'm playing a bow character I obviously want both."
 
+   **Not every choice must be interesting for every build.** [user, 10-22] On Deep Well's wheel (cast speed or
+   energy shield), which a classic caster takes both sides of: "some builds want non-es, some want wand attacks. Not
+   every single choice needs to be interesting for every single build, It's more about All builds make interesting
+   choices most of the time." A wheel is fake when the builds of its theme all want both sides; one build taking both
+   is not a fault if others choose.
+
 4. **Cluster shapes are flexible.** [user, 10-19] Small four-node clusters of the same shape are fine, as long as they
    are not the only kind of cluster and are placed with care. [user, 10-20]
 5. **Forks inside an area are good.** [user, 10-19] They let an area hold two variants of one idea, such as shield or
