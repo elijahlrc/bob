@@ -6,13 +6,16 @@
  * from the Devotion chain to the east arm's junction along the Knife border, so the craft reaches the arms without the
  * column. Round 3 (2026-10-20): Hexwright and Devotion traded places, so the curse notable is not three steps from the
  * Stair's chaos-spell notable and seven from Second Curse. G3 round 1 (2026-10-22): Keen Verse (spell damage with the
- * spell crit multiplier) bridges the road to Wand Volley and the road between Mist Walk and Hexwright.
+ * spell crit multiplier) bridges the road to Wand Volley and the road between Mist Walk and Hexwright. G3 round 2:
+ * Hale Scribe (life with mana) bridges the scriptorium stair and Wand Volley, and Sharp Tongue (dagger spells with
+ * cast speed) bridges Mist Walk and the Shade's crossing road below the Stair.
  */
 import {
   castSpeed,
   costReduction,
   curseArea,
   curseEffect,
+  daggerSpellDamage,
   dex,
   dodgeAttack,
   dodgeSpell,
@@ -20,6 +23,7 @@ import {
   insightDuration,
   insightOnCrit,
   int,
+  life,
   mana,
   manaRegen,
   maxInsight,
@@ -39,7 +43,7 @@ export const craft: AreaSpec = {
   region: 'mystic',
   name: 'The Scriptorium',
   why: 'The busy side of the Spire, toward the Knife: spell damage and cast speed on the wheel with a shield on its other side, cost, wand attacks, the insight charges, the curses and an aura pocket on the Knife border, and Mana Bastion.',
-  at: [960, -2240], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [1170, -2240], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved 210 east in G3 round 2 off Frugal.
   clusters: [
     {
       id: 'focus',
@@ -391,8 +395,104 @@ export const craft: AreaSpec = {
         ['c', 'd'],
       ],
     },
+    {
+      id: 'haleScribe',
+      name: 'Hale Scribe',
+      why: "Life with mana (G3 round 2, 2026-10-22; G1/mystic.md MY-9, the ledger's near life section MY-s6 moved into it): life for the caster on the east, the offence side, so the Scriptorium is not a corridor of spell damage, crit and cost (CONSTRAINTS §4.8), and the Mystic's life lies in three directions with three partners (Warm Blood shield at home, Quiet Pulse regeneration west, mana here; Living Verse's spell damage far west). A bridge from the scriptorium stair to Wand Volley across the gap between the column junction, Darting Bolts, Wand Volley and Frugal, with the bend at the notable so it meets Wand Volley's entrance clear of Frugal's link. Two life smalls each side. 12 steps from the Mystic start: the nearest of the new clusters, and life, which no Mystic build collected too much of.",
+      at: [420, -2560],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          at: [313, -2495],
+          why: 'The entrance from the scriptorium stair, on the straight line to the notable.',
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [360, -2524] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hale Scribe',
+          lines: [life(12), mana(10)],
+          at: [420, -2560],
+          why: '2.4 + 1.25 units. The bend of the bridge is here, at the notable.',
+        },
+        { id: 'c', kind: 'small', lines: [life(5)], at: [490, -2567] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [life(5)],
+          at: [544, -2573],
+          why: "The exit, on the straight line to Wand Volley's entrance.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+      ],
+    },
+    {
+      id: 'sharpTongue',
+      name: 'Sharp Tongue',
+      why: "Spell damage with a dagger and cast speed (G3 round 2, 2026-10-22; G1/mystic.md MY-10): the dagger caster's cluster on the Mystic side of the border, a bridge from Mist Walk's notable to the Shade's crossing road below the Stair (the dagger caster's bridge, G2/borders.md §4). A dagger asks for intelligence and dexterity, so it sits on the int-int border where the Shade's dexterity is a step away. The Shade's dagger caster reaches it, Mist Walk's spell dodge and Keen Verse; the Mystic caster reaches the Stair. A V with the bend at the notable: the Shade side arrives at the crossing road from due west, square to the road, and the Mystic side runs straight to Mist Walk. Two dagger smalls on the Mystic side, one on the Shade side. 18 steps from the Mystic start and 16 from the Shade's; Keen Verse (spell damage, crit) is 9 away.",
+      at: [1350, -3010],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [daggerSpellDamage(8)],
+          at: [1274, -3109],
+          why: "The entrance from Mist Walk's notable, on the straight line to the notable.",
+        },
+        { id: 'b', kind: 'small', lines: [daggerSpellDamage(8)], at: [1307, -3066] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Sharp Tongue',
+          lines: [daggerSpellDamage(20), castSpeed(6)],
+          at: [1350, -3010],
+          why: '2.5 + 1.5 units. The tip of the V.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [daggerSpellDamage(8)],
+          at: [1420, -3005],
+          why: 'The Shade side, to the crossing road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'roadN.a',
+      to: 'haleScribe.a',
+      why: 'The scriptorium stair onto Hale Scribe (MY-9): the stair is a junction now, not a bare run.',
+    },
+    {
+      from: 'haleScribe.d',
+      to: 'wandVolley.a',
+      why: "Hale Scribe onto Wand Volley's entrance: a bridge, so the column junction reaches the fast wand without the wheel and Frugal.",
+    },
+    {
+      from: 'mistWalk.n',
+      to: 'sharpTongue.a',
+      why: "Mist Walk onto Sharp Tongue (MY-10): the spell dodge notable becomes a junction toward the Shade's Stair.",
+    },
+    {
+      from: 'sharpTongue.c',
+      to: 'knife.hex.toSpire.a',
+      why: "The dagger caster's bridge (G2/borders.md §4, laid in G3 round 2): Sharp Tongue onto the Shade's crossing road below the Stair's junction, so the Shade's dagger caster reaches the Mystic's dagger spells and Mist Walk, and the Mystic caster the Stair.",
+    },
     {
       from: 'toVolley.r2',
       to: 'keenVerse.a',

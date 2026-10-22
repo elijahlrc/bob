@@ -7,7 +7,8 @@
  * Re-lined on 2026-10-20 (PHILOSOPHY §2a): Thick Skin and Unbloodied came here, Iron Lungs and Stagger went north. Round
  * 3 (2026-10-20): Bracing and Thick Skin traded places, so the shield leaves the start south-east, toward the Yard's
  * shields, and the mace west. G2 (2026-10-22): Second Wind came here from the Rampart, below Unbloodied, with a road node
- * toward the Yard's Thirsting Blade; the Quarry floor road runs from the slam junction toward Ground Shaker.
+ * toward the Yard's Thirsting Blade; the Quarry floor road runs from the slam junction toward Ground Shaker. G3 round 2:
+ * Sledge and Sinew (mace with life) on the Quarry floor.
  */
 import {
   aoe,
@@ -32,6 +33,7 @@ import {
   stunThreshold,
   totemDamage,
   twoHandDamage,
+  weaponDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -318,14 +320,52 @@ export const slams: AreaSpec = {
     {
       id: 'floor',
       name: 'The Quarry floor',
-      why: 'Strength across the empty Quarry floor, from the slam junction west toward Ground Shaker (G2, 2026-10-22): a third way between the Quarry and the Barbican. The mace-and-life cluster joins the two nodes.',
+      why: 'Strength across the empty Quarry floor, from the slam junction west toward Ground Shaker (G2, 2026-10-22): a third way between the Quarry and the Barbican. Sledge and Sinew (mace with life) joins the two nodes since G3 round 2.',
       at: [-1850, 1455],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-1580, 1458] },
-        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-2113, 1459] },
+        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-1590, 1480] },
+        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-2113, 1475] },
       ],
       links: [],
+    },
+    {
+      id: 'sledge',
+      name: 'Sledge and Sinew',
+      why: "Mace damage three times on the Quarry floor, with the notable of mace damage and life in a triangle off the road: the slammer's mace with the body to swing it (G3 round 2, 2026-10-22; the ledger's VA-5). The smalls lie on the straight line between the floor's two road nodes, so the road is whole; the notable is a step north of it. South of the Gate by the slam road, where Weight of Iron (the stun) is west by the tower road: two plain maces, two directions, two partners. A mace build passing through takes the smalls; anyone else crossing the floor pays them as road.",
+      at: [-1846, 1436],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [weaponDamage('mace', 10)],
+          at: [-1780, 1458],
+          why: 'The east end, from the slam junction side.',
+        },
+        { id: 'b', kind: 'small', lines: [weaponDamage('mace', 10)], at: [-1837, 1458] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Sledge and Sinew',
+          lines: [weaponDamage('mace', 20), life(8)],
+          at: [-1875, 1393],
+          why: "2 + 1.6 units: 3.6. Mace damage with life, a weapon with a defence (the ledger's good kind of pair). The triangle's apex, north of the road.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [weaponDamage('mace', 10)],
+          at: [-1912, 1459],
+          why: 'The west end, toward Ground Shaker.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
     },
     {
       id: 'toCairns',
@@ -386,6 +426,12 @@ export const slams: AreaSpec = {
     },
     { from: 'j1.a', to: 'floor.a', why: 'The slam junction onto the Quarry floor, west.' },
     { from: 'groundShaker.b', to: 'floor.b', why: 'Ground Shaker onto the Quarry floor, east.' },
+    { from: 'floor.a', to: 'sledge.a', why: 'The Quarry floor west onto the mace smalls.' },
+    {
+      from: 'sledge.c',
+      to: 'floor.b',
+      why: 'And on west to the floor road: the floor is whole, the slam junction to Ground Shaker.',
+    },
     {
       from: 'wall.slams.j1.a',
       to: 'wall.slams.toCairns.a',

@@ -37,7 +37,7 @@ export const home: AreaSpec = {
   region: 'mystic',
   name: 'The Spire gate',
   why: 'Two stat nodes off the start (shield west, crit east), the signature between them, two hubs one step out with a pocket each, and two intelligence highways: the well up the left, the craft up the right, bridged by Warm Blood.',
-  at: [-40, -890], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-40, -860], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved 30 down in G3 round 2 off the start.
   clusters: [
     {
       id: 'sig',

@@ -30,7 +30,6 @@ import {
   oneHandMelee,
   resOne,
   shieldBlock,
-  shieldDef,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -226,16 +225,16 @@ export const home: AreaSpec = {
         {
           id: 'n437',
           kind: 'small',
-          lines: [shieldBlock(4), shieldDef(10)],
+          lines: [shieldBlock(2)],
           at: P(856, -162),
-          why: 'Added in the editor (2026-10-19).',
+          why: "Added in the editor (2026-10-19). G3 round 2 (2026-10-22, approved after round 1): +4% block and 10% shield defences → +2% block with a shield, one stat at a small's size (CONSTRAINTS §8.1), the same as Round Shield's north small, so the shield chain is one section.",
         },
         {
           id: 'n438',
           kind: 'small',
-          lines: [shieldBlock(4), shieldDef(10)],
+          lines: [shieldBlock(2)],
           at: P(914, -163),
-          why: 'Added in the editor (2026-10-19).',
+          why: 'Added in the editor (2026-10-19). G3 round 2 (2026-10-22): as n437, +2% block with a shield.',
         },
       ],
       links: [

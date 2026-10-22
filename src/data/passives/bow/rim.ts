@@ -11,7 +11,20 @@
  * right angle to its pocket link would meet the arc 20 to 24 degrees off, since the old edge does not face the same way
  * as the arc). Road nodes sit about 250 to 380 units apart on the arc, turning 4 to 6 degrees at each.
  */
-import { bowDamage, dex, int, life, resAll, str, weaponCrit, weaponCritMulti } from '../lines';
+import {
+  attackSpeed,
+  bowDamage,
+  dex,
+  evasion,
+  fervourOnKill,
+  int,
+  life,
+  lifeRegen,
+  resAll,
+  str,
+  weaponCrit,
+  weaponCritMulti,
+} from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
 
@@ -25,7 +38,7 @@ export const farPasture: AreaSpec = {
     {
       id: 'road',
       name: 'The outer road',
-      why: "Sixteen attribute nodes on an arc at radius about 3,800, north to south. The junctions are where the brief's clusters hang (G1/strider.md §2, G1-brief.md §2.5–2.6): j1 the Shade's rim road and Hardy Stock (ST-9), m12 ST-6, j2 the north spoke, m23a Kill Shot (ST-1), j3 the middle spoke, m34 ST-5, j4 ST-3, j5 the south spoke, m56a ST-2, j6 Field Kit (ST-7), m67 ST-4, m78 Fouled Tips (ST-10), j8 the Fosse (G3 round 1 moved ST-1 and ST-10 one node each, for square junctions). Dexterity and intelligence on the two nodes nearest the Shade, strength and dexterity on the two nearest the Fosse (CONSTRAINTS §7.4: the hybrid ends serve both neighbours' gear), dexterity between.",
+      why: "Sixteen attribute nodes on an arc at radius about 3,800, north to south. The junctions are where the brief's clusters hang (G1/strider.md §2, G1-brief.md §2.5–2.6): j1 the Shade's rim road and Hardy Stock (ST-9), m12 ST-6, j2 the north spoke, m23a Kill Shot (ST-1), j3 the middle spoke, m34 Hot Pursuit (ST-5), j4 Tall Grass (ST-3), j5 the south spoke, m56a Bright Shafts (ST-2), j6 Field Kit (ST-7), m67 ST-4, m78 Fouled Tips (ST-10), j8 the Fosse (G3 round 1 moved ST-1 and ST-10 one node each, for square junctions). Dexterity and intelligence on the two nodes nearest the Shade, strength and dexterity on the two nearest the Fosse (CONSTRAINTS §7.4: the hybrid ends serve both neighbours' gear), dexterity between.",
       at: P(2600, 0),
       shape: { kind: 'hand' },
       nodes: [
@@ -76,14 +89,14 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(7)],
           at: P(2799, 88),
-          why: 'Fervour with attack speed (ST-5) hangs outward.',
+          why: 'Hot Pursuit (ST-5, fervour with attack speed) hangs straight outward, square to the road (G3 round 2).',
         },
         {
           id: 'j4',
           kind: 'attribute',
           lines: [dex(7)],
           at: P(2785, 339),
-          why: 'Evasion with regeneration (ST-3) hangs outward.',
+          why: 'Tall Grass (ST-3, evasion with regeneration) hangs straight outward, square to the road; with Hot Pursuit and the road node between their tips it makes a loop off m34 and j4 (G3 round 2).',
         },
         {
           id: 'j5',
@@ -97,7 +110,7 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(7)],
           at: P(2682, 915),
-          why: "The elemental bow (ST-2) hangs outward: the brief's spot for it, straight out from here.",
+          why: "Bright Shafts (ST-2, the elemental bow) hangs straight outward, square to the road, toward the brief's spot for it (G3 round 2; in the Water Meadows' file).",
         },
         {
           id: 'm56b',
@@ -163,18 +176,18 @@ export const farPasture: AreaSpec = {
     {
       id: 'hardyStock',
       name: 'Hardy Stock',
-      why: "ST-9 (G1/strider.md §1, G3 round 1, 2026-10-22): life with all elemental resistances, a straight bridge from the Shade's road into Ricochet to the outer road's north end. The crit archer who walks out for Kill Shot is the region's glass cannon, and life is what both bow builds leave behind; its partner is neither Wayfarer's (evasion with resistances) nor Hard Target's (evasion with life). It is also the Shade's way onto the outer road, with the life the Shade's south lacks (CONSTRAINTS §4.5, §3.5, §3.7). Five life smalls, two on the Shade side and three on the road side, so the notable is reached from either end for two or three points of life. Laid on the straight line between its two landings (the brief drew its centre about 250 units south; a straight bridge needs no bend at its notable).",
+      why: "ST-9 (G1/strider.md §1, G3 round 1, 2026-10-22): life with all elemental resistances, a straight bridge from the Shade's road into Ricochet to the outer road's north end. The crit archer who walks out for Kill Shot is the region's glass cannon, and life is what both bow builds leave behind; its partner is neither Wayfarer's (evasion with resistances) nor Hard Target's (evasion with life). It is also the Shade's way onto the outer road, with the life the Shade's south lacks (CONSTRAINTS §4.5, §3.5, §3.7). G3 round 2 (2026-10-22, the user's hot-spot fix): bow-crit took it at 60 points, four past Ricochet, for seven units of life in six nodes, so it became four smalls in two sections, as Field Kit's: two resistance smalls on the Shade side (the cheap approach from Ricochet now pays the partner before the life) and two life smalls on the road side; the fifth small (d) went. Laid on the straight line between its two landings (the brief drew its centre about 250 units south; a straight bridge needs no bend at its notable).",
       at: P(1983, -1558),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [life(5)],
+          lines: [resAll(4)],
           at: P(1873, -1497),
-          why: "The Shade side's door, from the road into Ricochet.",
+          why: "The Shade side's door, from the road into Ricochet. G3 round 2 (2026-10-22): life → resistances, so the cheap approach from Ricochet pays the notable's partner before its life.",
         },
-        { id: 'b', kind: 'small', lines: [life(5)], at: P(1922, -1524) },
+        { id: 'b', kind: 'small', lines: [resAll(4)], at: P(1922, -1524) },
         {
           id: 'n',
           kind: 'notable',
@@ -184,21 +197,19 @@ export const farPasture: AreaSpec = {
           why: '2 + 2 units.',
         },
         { id: 'c', kind: 'small', lines: [life(5)], at: P(2044, -1592) },
-        { id: 'd', kind: 'small', lines: [life(5)], at: P(2092, -1618) },
         {
           id: 'e',
           kind: 'small',
           lines: [life(5)],
-          at: P(2140, -1645),
-          why: "The road side's door, toward j1.",
+          at: P(2092, -1618),
+          why: "The road side's door, toward j1 (G3 round 2: moved in beside c when d went).",
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
         ['n', 'c'],
-        ['c', 'd'],
-        ['d', 'e'],
+        ['c', 'e'],
       ],
     },
     {
@@ -231,6 +242,93 @@ export const farPasture: AreaSpec = {
         ['b', 'a'],
         ['a', 'n'],
       ],
+    },
+    {
+      id: 'hotPursuit',
+      name: 'Hot Pursuit',
+      why: "ST-5 (G1/strider.md §1, G3 round 2, 2026-10-22): fervour with attack speed, fervour's second home (Hot Blood, in the Reaver's Lists, sells the charges themselves: more of them, on kill, longer). This one makes its own charges on kill and pairs them with plain attack speed, so a dexterity attacker can take fervour without the Lists, far out on the middle of the outer road rather than beside home, where attack speed is already the cheapest want (the brief: ST-5 adds a direction, not more speed by home). Three attack speed smalls (the ledger's attack speed section, folded in). Straight out from m34, square to the road; with Tall Grass and the road node between their tips it is a loop off the road (a house shape: two walls square to the road, the roof meeting at the road node), so each has two ways in.",
+      at: P(3139, 96),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a1',
+          kind: 'small',
+          lines: [attackSpeed(5)],
+          at: P(2959, 92),
+          why: 'The entrance, facing the road.',
+        },
+        { id: 'a2', kind: 'small', lines: [attackSpeed(5)], at: P(3014, 93) },
+        { id: 'a3', kind: 'small', lines: [attackSpeed(5)], at: P(3069, 94) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hot Pursuit',
+          lines: [fervourOnKill(20), attackSpeed(10)],
+          at: P(3139, 96),
+          why: '2 + 2 units. A corner of the loop: the chain turns here toward the road node and Tall Grass.',
+        },
+      ],
+      links: [
+        ['a1', 'a2'],
+        ['a2', 'a3'],
+        ['a3', 'n'],
+      ],
+    },
+    {
+      id: 'tallGrass',
+      name: 'Tall Grass',
+      why: "ST-3 (G1/strider.md §1, G3 round 2, 2026-10-22): evasion with life regeneration, the evasive archer's recovery, far from Long Breath (life with regeneration, by home) and Hard Target (evasion with life). Two sections, as Field Kit's: two evasion smalls on the road side (from j4) and two regeneration smalls on the far side (toward the road node and Hot Pursuit). The brief gave it five evasion smalls (folding the ledger's evasion section ST-s1); round 2 built two, with the user's hot-spot guidance of 2026-10-22: seven units of evasion in one place, two road nodes past the middle spoke every bow build already pays for, would hand the main stat over in one walk (as Hardy Stock did life). The cheap approach from j4 buys the notable and four units of evasion; the regeneration is the far side's.",
+      at: P(3123, 370),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'e1',
+          kind: 'small',
+          lines: [evasion(10)],
+          at: P(2999, 359),
+          why: 'The entrance, facing the road.',
+        },
+        { id: 'e2', kind: 'small', lines: [evasion(10)], at: P(3054, 363) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Tall Grass',
+          lines: [evasion(20), lifeRegen(0.8)],
+          at: P(3123, 370),
+          why: '2 + 2 units. A corner of the loop: the chain turns here toward the road node.',
+        },
+        { id: 'r1', kind: 'small', lines: [lifeRegen(0.4)], at: P(3179, 327) },
+        {
+          id: 'r2',
+          kind: 'small',
+          lines: [lifeRegen(0.4)],
+          at: P(3223, 294),
+          why: "The far side's door, toward the road node and Hot Pursuit.",
+        },
+      ],
+      links: [
+        ['e1', 'e2'],
+        ['e2', 'n'],
+        ['n', 'r1'],
+        ['r1', 'r2'],
+      ],
+    },
+    {
+      id: 'roof',
+      name: 'Between Hot Pursuit and Tall Grass',
+      why: "The brief's one road node joining ST-5's tip to ST-3's (G1/strider.md §3; G2 left it for G3, since it joins two clusters that did not exist): the apex of the loop, so each of the two has a second way in, and passing from one to the other costs a road node rather than being free (CONSTRAINTS §3.4).",
+      at: P(3291, 242),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'x',
+          kind: 'attribute',
+          lines: [dex(7)],
+          at: P(3291, 242),
+          why: 'The apex of the loop, outward of the midpoint between the two notables.',
+        },
+      ],
+      links: [],
     },
     {
       id: 'northSpoke',
@@ -350,5 +448,17 @@ export const farPasture: AreaSpec = {
       why: "Hardy Stock reaches the outer road's north end (G2/borders.md §4): j1 becomes a three-way junction.",
     },
     { from: 'killShot.c', to: 'road.m23a', why: 'The crit bow hangs straight out from the road.' },
+    {
+      from: 'hotPursuit.a1',
+      to: 'road.m34',
+      why: 'Fervour with attack speed hangs straight out from the road, square to it.',
+    },
+    {
+      from: 'tallGrass.e1',
+      to: 'road.j4',
+      why: 'Evasion with regeneration hangs straight out from the road, square to it, one node south.',
+    },
+    { from: 'hotPursuit.n', to: 'roof.x', why: "Hot Pursuit's tip onto the loop's road node." },
+    { from: 'roof.x', to: 'tallGrass.r2', why: "The loop's road node onto Tall Grass's far side." },
   ],
 };

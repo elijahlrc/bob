@@ -5,20 +5,24 @@
  * east rim junction. Since G2 (2026-10-22) its roads: the spine (the middle road carried down from the shield wheel
  * between the two diamonds to the Fosse), the rim road (from the west junction to the east one, under the diamonds), the
  * leg from the Pits' west junction down to the Fosse, and Spellsword moved under the rim road, bridging the spine and
- * the Fosse.
+ * the Fosse. Since G3 round 2 the leg carries the wheel of the fighter without a shield (Full Swing two-handed with life,
+ * Paired Steel dual wield with leech).
  */
 import {
   bleedChance,
   bleedDamage,
   castSpeed,
   dex,
+  dualDamage,
   leechLife,
+  life,
   leechRate,
   manaRegen,
   poisonChance,
   poisonDamage,
   spellDamage,
   str,
+  twoHandDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -26,7 +30,7 @@ export const blood: AreaSpec = {
   id: 'yard.blood',
   region: 'reaver',
   name: 'The Pits',
-  why: "The Yard's south rim: bleed, leech, poison, Spellsword, Wound Dance and Crimson Pact, the dear crossings to the Wall and the Bow, and since G2 three roads south to the Fosse (the spine, the leg, and the east junction's road).",
+  why: "The Yard's south rim: bleed, leech, poison, Spellsword, Wound Dance and Crimson Pact, the dear crossings to the Wall and the Bow, since G2 three roads south to the Fosse (the spine, the leg, and the east junction's road), and on the leg the wheel of the fighter without a shield (G3 round 2). The leg's wheel has no area name of its own over it; it is the Pits' (the nearest name, below the rim road).",
   at: [170, 3330], // Where the area's name is drawn: clear of every other area's name; moved below the rim road in G2.
   clusters: [
     {
@@ -280,7 +284,7 @@ export const blood: AreaSpec = {
     {
       id: 'leg',
       name: 'The leg to the Fosse',
-      why: "The west road carried on south (G2, 2026-10-22), from the Pits' west junction down to the Fosse's sixth node, which had nothing coming off it: the Fosse's third way in. Shield Bash leaves at the first node. The two nodes are where the fighter-without-a-shield wheel (RE-7 two-handed, RE-9 dual wield) will hang in G3, one side each way, replacing the plain link between them.",
+      why: "The west road carried on south (G2, 2026-10-22), from the Pits' west junction down to the Fosse's sixth node, which had nothing coming off it: the Fosse's third way in. Shield Bash leaves at the first node. Since G3 round 2 the fighter-without-a-shield wheel (Full Swing, Paired Steel) stands between the two nodes, so the route down the leg takes one of its sides.",
       at: [-755, 3650],
       shape: { kind: 'hand' },
       nodes: [
@@ -289,17 +293,66 @@ export const blood: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [-745, 3450],
-          why: "Shield Bash leaves east; the wheel's top.",
+          why: 'Shield Bash leaves east; the wheel hangs below.',
         },
         {
           id: 'l2',
           kind: 'attribute',
           lines: [str(7)],
           at: [-765, 3850],
-          why: "The wheel's bottom. Strength only, as the Fosse's nodes on the Wall's side are.",
+          why: "Below the wheel, on the way to the Fosse. Strength only, as the Fosse's nodes on the Wall's side are.",
         },
       ],
       links: [],
+    },
+    {
+      id: 'swing',
+      name: 'Full Swing',
+      why: "The fighter without a shield (RE-7 and RE-9, G3 round 2, 2026-10-22): a wheel on the leg, two-handed with life on the west side (toward the Wall's two-handers, Greatblade and Headsman, 9 and 10 steps away), two weapons with leech on the east side. Two variants of one theme a build rarely takes both of (§8.3): the route down the leg takes one side, and each way in pays one small of the other side, as the Steel Rim wheel does. Far from the Lists' dual wield (Twin Fangs, Crossed Blades) and from every other two-handed cluster, so the third dual-wield direction and the Yard's first two-handed one are both a walk south-west.",
+      at: [-745, 3640],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [twoHandDamage(12)],
+          at: [-745, 3540],
+          why: 'The top, from the leg: the two-handed side begins here.',
+        },
+        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-832, 3590] },
+        {
+          id: 'n1',
+          kind: 'notable',
+          name: 'Full Swing',
+          lines: [twoHandDamage(24), life(10)],
+          at: [-832, 3690],
+          why: 'A big weapon swung from the shoulders, by a body that can take the hits back: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [dualDamage(10)],
+          at: [-745, 3740],
+          why: 'The bottom, to the leg below: the dual side begins here.',
+        },
+        { id: 'd', kind: 'small', lines: [dualDamage(10)], at: [-658, 3690] },
+        {
+          id: 'n2',
+          kind: 'notable',
+          name: 'Paired Steel',
+          lines: [dualDamage(20), leechLife(0.8, ['attack'])],
+          at: [-658, 3590],
+          why: "A blade in each hand, and twice the hits to drink from: 2 + 2 units. Leech, not life as the brief had it: with life on both sides, the allocator's axe, mace and two-handed fire builds took both notables for their life alone (§8.3: a build should rarely want both sides). The Yard's other leech notables are a walk away: Thirsting Blade (the far west, with attack speed), Red Harvest (the Pits, with leech rate), Bloodied Edge (the Fosse, with swords).",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n1'],
+        ['n1', 'c'],
+        ['c', 'd'],
+        ['d', 'n2'],
+        ['n2', 'a'],
+      ],
     },
   ],
   links: [
@@ -352,8 +405,13 @@ export const blood: AreaSpec = {
     { from: 'toWall.a', to: 'leg.l1', why: 'The leg leaves the Pits junction south.' },
     {
       from: 'leg.l1',
+      to: 'swing.a',
+      why: "The leg onto the wheel's top (G3 round 2; it replaced the plain link from l1 to l2).",
+    },
+    {
+      from: 'swing.c',
       to: 'leg.l2',
-      why: 'For now the leg runs straight through where the RE-7/RE-9 wheel will stand; in G3 the wheel replaces this link, so the route down the leg takes one of its sides.',
+      why: "The wheel's bottom back onto the leg, on to the Fosse.",
     },
     {
       from: 'leg.l2',

@@ -22,6 +22,7 @@ import {
   meleePhys,
   shieldBlock,
   str,
+  warcryEffect,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -36,8 +37,8 @@ export const home: AreaSpec = {
   id: 'yard.home',
   region: 'reaver',
   name: 'The Yard Gate',
-  why: 'Two stat nodes off the start (melee damage west, attack speed east), the signature between them, two hubs one step out with a pocket each, and three roads: the blades highway west, the second-hand highway east, the middle road (life) straight down; and the mana pocket between the middle road and the second-hand road.',
-  at: [-80, 1347], // Where the area's name is drawn: clear of every other area's name; 9 up in G2, off Buckler's frame.
+  why: 'Two stat nodes off the start (melee damage west, attack speed east), the signature between them, two hubs one step out with a pocket each, and three roads: the blades highway west, the second-hand highway east, the middle road (life) straight down; and between the middle road and the second-hand road the warcry chain (Drill Call, G3 round 2) and the mana pocket.',
+  at: [-30, 1575], // Where the area's name is drawn: clear of every other area's name; moved down over the home's roads in G3 round 2, off Drill Call (it was at (-80, 1347)).
   clusters: [
     {
       id: 'sig',
@@ -169,6 +170,43 @@ export const home: AreaSpec = {
       links: [
         ['a', 'b'],
         ['b', 'n'],
+      ],
+    },
+    {
+      id: 'drill',
+      name: 'Drill Call',
+      why: "Warcry effect twice, then the notable with warcry effect and attack speed, then warcry effect once more (RE-5, G3 round 2, 2026-10-22): the shout on the training ground, a bridge from the middle road's first node to the second-hand road's first, so the home's middle is not a corridor of life alone (CONSTRAINTS §4.8: the signature, three life smalls and the shield wheel ran straight down from the start). Warcry-led, not attack-speed-led as the brief had it: stop 2 (question B) said to flip it back if the sword build's attack speed stopped climbing, and at 120 points it was near flat (21 to 22 units); attack speed is the notable's partner, so the Reaver's speed stays a direction (the Strider's Meadow, Darting Steel) and not a pocket five steps from the start. Warcries' third home, with its own partner: War Drums (the Wall) sells duration, the Wall's armoured shout armour, Battle Hymn (the Cathedral) auras.",
+      at: [174, 1393],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: [70, 1345],
+          why: 'The entrance, from the middle road.',
+        },
+        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: [122, 1369] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Drill Call',
+          lines: [warcryEffect(20), attackSpeed(8)],
+          at: [174, 1393],
+          why: 'The shout that sets the pace: 2 + 1.6 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: [226, 1416],
+          why: 'The exit, to the second-hand road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -307,9 +345,19 @@ export const home: AreaSpec = {
     {
       from: 'roadS.c',
       to: 'fightingBreath.a',
-      why: "The middle road's third node onto the mana pocket (G2, 2026-10-22; it was the second): the first node is left free for the attack-speed cluster that will bridge the middle road and the second-hand road (RE-5), whose link would otherwise cross this one.",
+      why: "The middle road's third node onto the mana pocket (G2, 2026-10-22; it was the second): the first node is left free for the warcry chain that bridges the middle road and the second-hand road (Drill Call, G3 round 2), whose link would otherwise cross this one.",
     },
     { from: 'life.n', to: 'fieldDressing.a', why: 'Stout Heart onto the flask pocket.' },
+    {
+      from: 'roadS.a',
+      to: 'drill.a',
+      why: "The middle road's first node onto the warcry chain (G3 round 2, RE-5): the home's middle offers a shout beside the life.",
+    },
+    {
+      from: 'drill.c',
+      to: 'roadE.a',
+      why: 'The warcry chain lands on the second-hand road: the middle and east roads are a loop at the home, above the mana pocket.',
+    },
     {
       from: 'fieldDressing.b',
       to: 'wall.slams.bracing.b',

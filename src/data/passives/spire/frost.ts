@@ -6,6 +6,8 @@
  * Harsh Weather is a dead-end chain off Shatter, and the Prismatic spur is a spur (both 2026-10-20). Since 2026-10-20 the arm
  * is a place, not the cold arm (see `fire.ts`); the id `spire.frost` is kept. G2 (2026-10-22): Siphon moved here from
  * the Cloister as a bridge from the east join to the arm's junction, and Snare Line became a bridge onto the Eaves (`rim.ts`).
+ * G3 round 2 (2026-10-22): Piercing Word left the west climb for a chain from the east join to Harsh Weather, and High
+ * Veil is reached from the north-west rim road only, so the climb is no longer one destination for the cold shield caster.
  */
 import {
   ailmentEffect,
@@ -160,7 +162,7 @@ export const frost: AreaSpec = {
     {
       id: 'harshWeather',
       name: 'Harsh Weather',
-      why: "Effect of non-damaging ailments twice, then the notable with effect, freeze duration and shock duration: the chill, freeze and shock caster, as a dead-end chain off the shatter room's east side. Until 2026-10-20 it ran on to Overcharge, which put two notables a shock caster wants both of a step apart.",
+      why: "Effect of non-damaging ailments twice, then the notable with effect, freeze duration and shock duration: the chill, freeze and shock caster, as a chain off the shatter room's east side. Until 2026-10-20 it ran on to Overcharge, which put two notables a shock caster wants both of a step apart; since G3 round 2 its notable leads on to Piercing Word (spell damage), down to the east join.",
       at: [480, -4000],
       shape: { kind: 'ring', r: 90, a0: 180 },
       nodes: [
@@ -177,7 +179,7 @@ export const frost: AreaSpec = {
           kind: 'notable',
           name: 'Harsh Weather',
           lines: [ailmentEffect(20), freezeDuration(15), shockDuration(15)],
-          why: '2 + 1 + 1 units. The tip of the chain.',
+          why: '2 + 1 + 1 units. The far end of the chain, onto Piercing Word.',
         },
       ],
       links: [
@@ -304,7 +306,7 @@ export const frost: AreaSpec = {
           name: 'Steady Stream',
           lines: [channelDamage(20), costReduction(6)],
           at: [-404, -4294],
-          why: '2 + 1.5 units. Since G3 it leads on to High Veil, so the pocket is a bridge to the north-west rim road.',
+          why: '2 + 1.5 units. The tip of the pocket: it led on to High Veil in G3 round 1, which made the far shield a step off the climb; the link went in round 2.',
         },
       ],
       links: [
@@ -315,51 +317,44 @@ export const frost: AreaSpec = {
     {
       id: 'piercing',
       name: 'Piercing Word',
-      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went): the spine's spell cluster, a caster walking up to Shatter or over the top passes it. A four-node ring like the Belfry's others (Thunderhead, Shatter), bridging the west climb to Shatter and the arm's junction, which it enters from due west so the junction is a clean cross (Thunderhead south, Shatter north, Siphon east, this west). The road through takes the notable side or the small side. Spell damage's partners now differ by direction: cast speed (Arcane Focus), crit (Keen Verse), penetration here. 19 steps from the Mystic start.",
-      at: [-128, -3790],
+      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went). Moved in G3 round 2 (2026-10-22, the user's ask) off the west climb to Shatter, where Hoarfrost, this, Shatter and High Veil lay 4 to 10 steps apart and read as one destination for a cold caster. Now a chain from the east join up to Harsh Weather's notable, in the open ground between Siphon, Harsh Weather and the Gallery: a cold caster at the top of the column chooses between the cold of the climb (Hoarfrost west, Shatter north) and spell damage north-east, 10 and 7 steps away, and Harsh Weather stops being a dead end. Measured against three other places (the west climb, the north-west rim road beside High Veil): this one left the casters hungriest for both spell damage and shield at 120 points without raising their tax. Spell damage's partners by direction: cast speed (Arcane Focus), crit (Keen Verse), life (Living Verse), penetration here, mana regeneration on the Eaves (later). Two smalls on the join's side, one on Harsh Weather's.",
+      at: [444, -3796],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [spellDamage(8)],
-          at: [-184, -3790],
-          why: 'The west side, from the climb to Shatter.',
+          at: [376, -3691],
+          why: 'The entrance from the east join, on the straight line to the notable.',
         },
+        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [406, -3738] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Piercing Word',
           lines: [spellDamage(20), elePenetration(3)],
-          at: [-128, -3846],
-          why: '2.5 + 2 units. The north side of the ring.',
+          at: [444, -3796],
+          why: '2.5 + 2 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [spellDamage(8)],
-          at: [-72, -3790],
-          why: "The east side, to the arm's junction.",
-        },
-        {
-          id: 'c',
-          kind: 'small',
-          lines: [spellDamage(8)],
-          at: [-128, -3734],
-          why: 'The south side.',
+          at: [482, -3855],
+          why: "The exit, on the straight line to Harsh Weather's notable.",
         },
       ],
       links: [
-        ['a', 'n'],
+        ['a', 'c'],
+        ['c', 'n'],
         ['n', 'b'],
-        ['b', 'c'],
-        ['c', 'a'],
       ],
     },
     {
       id: 'highVeil',
       name: 'High Veil',
-      why: "Energy shield with all elemental resistances (G3 round 1, 2026-10-22; G1/mystic.md MY-4, the ledger's shield section MY-s4 folded in): the far shield cluster at the top left, paired with resistances, not offence, so going north for both the far spell damage (the Eaves, later) and this costs the walk across the top. A four-node ring: Steady Stream's chain runs on straight into its south-east side, and the north-west rim road lands on its west side, so the road walks its three shield smalls and the notable, on the outer side, is a step off the road (G1/mystic.md: the rim roads land on smalls, never on notables). Steady Stream stops being a dead end, and the rim road gets its second way in. 23 steps from the Mystic start; a caster who does not channel pays Steady Stream's three nodes to reach it, or comes round by Cinder.",
+      why: "Energy shield with all elemental resistances (G3 round 1, 2026-10-22; G1/mystic.md MY-4, the ledger's shield section MY-s4 folded in): the far shield cluster at the top left, paired with resistances, not offence. A four-node ring at the head of the north-west rim road, which lands on its west side, so the notable, on the outer side, is a step off the road (G1/mystic.md: the rim roads land on smalls, never on notables). Reached only from the rim road since G3 round 2 (2026-10-22, the user's ask): round 1 also joined it to Steady Stream, and the classic caster took it in its 60-point plan through Steady Stream and finished its energy shield by 120 points. Now it is the far tip of the road, 27 steps from the Mystic start (through the Lantern and Cinder) and 24 from the Zealot's (the far loop): a commitment, not a step off the climb.",
       at: [-706, -4531],
       shape: { kind: 'hand' },
       nodes: [
@@ -368,7 +363,7 @@ export const frost: AreaSpec = {
           kind: 'small',
           lines: [es(5)],
           at: [-662, -4497],
-          why: 'The south-east side, from Steady Stream, on the line of its chain.',
+          why: 'The south-east side (Steady Stream arrived here in G3 round 1; the link went in round 2).',
         },
         {
           id: 'n',
@@ -402,19 +397,14 @@ export const frost: AreaSpec = {
       why: 'The road to Shatter onto the channelled spells.',
     },
     {
-      from: 'toShatter.r1',
+      from: 'jStorm.a',
       to: 'piercing.a',
-      why: 'The west climb to Shatter onto Piercing Word (MY-11): the climb is a junction now, not a bare run.',
+      why: 'The east join onto Piercing Word (G3 round 2): the join is a four-way now, Thunderhead, Flashpoint, Siphon and this.',
     },
     {
       from: 'piercing.b',
-      to: 'jArm.a',
-      why: "Piercing Word onto the arm's junction from due west: a bridge, so the spine's spell damage is on the way from the Lantern to the top.",
-    },
-    {
-      from: 'stream.n',
-      to: 'highVeil.a',
-      why: 'Steady Stream onto High Veil (MY-4): the channelling pocket becomes a bridge, a notable of a different kind on the way to the far shield (CONSTRAINTS §5.5).',
+      to: 'harshWeather.n',
+      why: "Piercing Word onto Harsh Weather's notable: a bridge, so the chill-and-shock chain is no longer a dead end and the east join has a second way to the top that is not Shatter.",
     },
     {
       from: 'highVeil.b',

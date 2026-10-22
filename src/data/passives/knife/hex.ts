@@ -33,7 +33,7 @@ export const hex: AreaSpec = {
   region: 'shade',
   name: 'The Stair',
   why: "The Knife's north barb, climbing toward the Spire: chaos spells or mines on one wheel, the climb to Spellslip, and the dear road to the Spire.",
-  at: [1760, -2880], // Where the area's name is drawn: clear of every other area's name (label pass, round 4; nudged west in G2 for Static Edge; moved up to the Stair's top in G3 round 1, off Wiry Frame).
+  at: [1880, -2790], // Where the area's name is drawn: clear of every other area's name (label pass, round 4; nudged west in G2 for Static Edge; moved up to the Stair's top in G3 round 1, off Wiry Frame; moved down and east in G3 round 2, off Shifting Ward and the Spire's Hexwright).
   clusters: [
     {
       id: 'jH',
@@ -205,6 +205,45 @@ export const hex: AreaSpec = {
       ],
     },
     {
+      id: 'ward',
+      name: 'Shifting Ward',
+      why: "Energy shield with the chance to dodge spells, at the top of the Stair beside Spellslip (G3 round 2, 2026-10-22; the ledger's SH-1): a bridge north from the lightning pocket's second small to the ridge road's second node, so the Stair's top has a second way onto the Rooftops besides the rooftop road. Shield twice from the Stair, the notable, spell dodge twice toward the ridge. A fork with the keystone a few steps west, which dodges spells at the cost of shield: the shield Shade takes this, the dodger takes the keystone, and a build that wants both pays twice. The Shade's third shield direction, each with its own partner: Shroud on the blade (stun, recharge), Hoarded Breath over the Rookery (mana), and this one north, where a caster who comes for it gives up the Rookery and the Knife's middle. Ritual Blade (spells with a dagger, a little shield) is six steps on along the ridge.",
+      at: [2156, -2990],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'e2',
+          kind: 'small',
+          lines: [es(5)],
+          at: [2113, -2873],
+          why: 'The entrance, from the lightning pocket.',
+        },
+        { id: 'e1', kind: 'small', lines: [es(5)], at: [2132, -2924] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Shifting Ward',
+          lines: [es(12), dodgeSpell(6)],
+          at: [2156, -2990],
+          why: '2.4 + 2 units.',
+        },
+        { id: 's1', kind: 'small', lines: [dodgeSpell(3)], at: [2180, -3056] },
+        {
+          id: 's2',
+          kind: 'small',
+          lines: [dodgeSpell(3)],
+          at: [2199, -3108],
+          why: 'The exit, to the ridge road.',
+        },
+      ],
+      links: [
+        ['e2', 'e1'],
+        ['e1', 'n'],
+        ['n', 's1'],
+        ['s1', 's2'],
+      ],
+    },
+    {
       id: 'powder',
       name: 'Black Powder',
       why: 'A pocket at the top of the Stair, on the Spire border: mine damage twice, then mines with area damage. The second mine cluster, eight steps from Sapper.',
@@ -275,6 +314,16 @@ export const hex: AreaSpec = {
       why: "The evasion side lands on the lightning pocket's first small: the Stair's middle becomes a loop, and Wiry Frame a bridge rather than a dead end (G1/shade.md §3.3).",
     },
     { from: 'toSpire.b', to: 'powder.a', why: 'The road onto Black Powder.' },
+    {
+      from: 'static.b',
+      to: 'ward.e2',
+      why: "The lightning pocket's second small north onto the shield-and-spell-dodge bridge, square to its road (G3 round 2).",
+    },
+    {
+      from: 'ward.s2',
+      to: 'knife.roofs.ridge.y2',
+      why: "The bridge lands on the ridge road's second node: the Stair's top and the ridge are joined a second way (G1/shade.md §3.3).",
+    },
     { from: 'j4.a', to: 'static.a', why: 'The Spellslip junction onto the lightning pocket.' },
     { from: 'jH.a', to: 'road.a', why: 'The junction to the barb road.' },
     { from: 'road.a', to: 'wheel.s', why: 'The barb road to the wheel.' },

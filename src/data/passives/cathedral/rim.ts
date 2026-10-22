@@ -5,7 +5,7 @@
  * two junctions, where G3 hangs energy shield with life (ZE-10) and sceptre with burning (ZE-6) inward; the leg into
  * Thunder Peal is the pocket's own line carried on. The export keeps the name index.ts imports.
  */
-import { int, str } from '../lines';
+import { es, int, life, str } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
 
@@ -35,7 +35,7 @@ export const outerWalk: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3300, -1250),
-          why: 'The outer corner: in G3 energy shield with life (ZE-10) hangs inward from here, between Censer and Searing Avatar.',
+          why: 'The outer corner: Wake (energy shield with life, G3 round 2) hangs inward from here, between Censer and Searing Avatar.',
         },
         {
           id: 'o3',
@@ -58,12 +58,48 @@ export const outerWalk: AreaSpec = {
         ['o3', 'o4'],
       ],
     },
+    {
+      id: 'wake',
+      name: 'Wake',
+      why: "G3 round 2 (2026-10-22; ledger ZE-10, folding ZE-s2): a pocket inward off the outer corner, on the corner's bisector, between Censer and the Searing Avatar spur: energy shield three times, then the notable with energy shield and life. The hybrid caster's defence where the fire caster goes (Censer's burning, Searing Avatar): a fire caster who comes west for its burning finds its two pools here, and gives up the Mystic's east, where its spell damage is. ES-led because the inside's energy shield is spread thin and far (Vigil, Litany, Tomb Dust, Rood Screen); Warm Blood, in the Spire, is the life-led twin. No spell damage here (the convergence rule). A dead-end pocket: the Churchyard it hangs from has two ways in.",
+      at: P(3113, -1042),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [es(5)],
+          at: P(3233, -1176),
+          why: 'The entrance from the outer corner.',
+        },
+        { id: 'b', kind: 'small', lines: [es(5)], at: P(3196, -1135) },
+        { id: 'c', kind: 'small', lines: [es(5)], at: P(3159, -1094) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Wake',
+          lines: [es(10), life(10)],
+          at: P(3113, -1042),
+          why: 'Energy shield and life: 2 + 2 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+      ],
+    },
   ],
   links: [
     {
       from: 'cathedral.ambulatory.censer.n',
       to: 'walk.o1',
       why: 'Censer onto the outer walk: the burning pocket becomes a bridge.',
+    },
+    {
+      from: 'walk.o2',
+      to: 'wake.a',
+      why: "The outer corner onto the fire caster's two pools (G3 round 2), on the corner's bisector.",
     },
     {
       from: 'walk.o4',

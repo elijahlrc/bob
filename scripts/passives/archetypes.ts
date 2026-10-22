@@ -53,7 +53,15 @@ const SPELL = {
   costReduction: 0.3,
   'manaLeech:spell': 0.3,
 };
-const ATTACK = { attackSpeed: 0.8, accuracy: 0.4, attackDamage: 0.8 };
+// Fervour charges grant speed and more damage (src/calc/charges.ts), so attackers want their lines a little.
+const ATTACK = {
+  attackSpeed: 0.8,
+  accuracy: 0.4,
+  attackDamage: 0.8,
+  fervourOnKill: 0.3,
+  maxFervour: 0.3,
+  fervourDuration: 0.2,
+};
 const MELEE = { meleeDamage: 0.8, meleePhys: 1, physAttack: 1, 'critChance:melee': 0.3 };
 const SHIELD = {
   shieldBlock: 1,
@@ -246,7 +254,7 @@ export const ARCHETYPES: Archetype[] = [
     },
     main: {
       life: F.life,
-      'totem damage': ['totemDamage'],
+      'totem damage': ['totemDamage', 'totemSpeed'],
       warcries: ['warcryEffect', 'warcryDuration'],
     },
     pair: ['totem damage', 'life'],

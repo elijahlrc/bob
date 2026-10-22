@@ -8,18 +8,18 @@
  * middle road leaves from it straight out: life three times to the block wheel. The west and east roads leaving the hubs
  * are strength-and-intelligence highways (2026-10-20). The west hub's pocket is the Wall's Warlord's Banner, one step away across the border (the aura
  * class's reservation, bought from the neighbour who wrote it first); the east hub has a mana pocket of its own; a
- * flask pocket hangs off the west road. The hubs carry both attributes and join the ring one node to either side.
+ * pocket of elemental attacks hangs off the west road (a flask pocket until G3 round 2). The hubs carry both attributes and join the ring one node to either side.
  */
 import {
+  accuracy,
   armour,
+  attackSpeed,
+  eleAttack,
   eleDamageAll,
   es,
-  flaskDuration,
-  flaskEffect,
   globalDefences,
   int,
   life,
-  lifeRegen,
   mana,
   manaRegen,
   str,
@@ -124,24 +124,24 @@ export const home: AreaSpec = {
       ],
     },
     {
-      id: 'alms',
-      name: 'Alms',
-      why: "Flask effect, then the notable with flask effect, duration and a little regeneration: the Cathedral's flasks, off the west road's first node and back onto its second, on the Wall side where the Banner already is. The west hub's pocket, one step removed.",
+      id: 'ardour',
+      name: 'Ardour',
+      why: "Elemental damage with attacks, then the notable with elemental attacks, attack speed and accuracy: the striking Zealot's first offence, off the west road's first node and back onto its second. The west hub's pocket, one step removed. G3 round 2 (2026-10-22, CONSTRAINTS §4.8): it was Alms (flask effect, duration and regeneration), and the west of the home read as one kind: armour, flasks, block, then Verger's armour, with the first offence notable seven steps out (Hearthfire). Now point four or five may be a strike: the east has the elements for any build and Hearthfire's fire spell, the west the attack. No weapon is named. The home's flasks are now the ring's Provisions, six steps from the start by the west hub's ring road.",
       at: P(580, -510),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [flaskEffect(5)],
+          lines: [eleAttack(10)],
           at: P(605, -480),
           why: 'The entrance, from the west road.',
         },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Alms',
-          lines: [flaskEffect(10), flaskDuration(10), lifeRegen(0.4)],
+          name: 'Ardour',
+          lines: [eleAttack(20), attackSpeed(5), accuracy(10)],
           at: P(640, -540),
           why: '2 + 1 + 1 units. The exit, back onto the west road.',
         },
@@ -167,7 +167,7 @@ export const home: AreaSpec = {
     {
       id: 'roadW',
       name: 'The west road',
-      why: "Strength and intelligence twice: the highway from the west hub to the nave wheel's block side, with Alms off its foot.",
+      why: "Strength and intelligence twice: the highway from the west hub to the nave wheel's block side, with Ardour off its foot.",
       at: P(565, -300),
       shape: { kind: 'hand' },
       nodes: [
@@ -255,8 +255,8 @@ export const home: AreaSpec = {
       to: 'roadE.a',
       why: 'The mana pocket is also a way onto the east road: a pocket as a bridge.',
     },
-    { from: 'roadW.a', to: 'alms.a', why: "The west road's first node onto the flask pocket." },
-    { from: 'alms.n', to: 'roadW.b', why: 'The flask pocket back onto the west road: a loop.' },
+    { from: 'roadW.a', to: 'ardour.a', why: "The west road's first node onto the attack pocket." },
+    { from: 'ardour.n', to: 'roadW.b', why: 'The attack pocket back onto the west road: a loop.' },
     {
       from: 'roadM.c',
       to: 'cathedral.nave.wheel.n1',

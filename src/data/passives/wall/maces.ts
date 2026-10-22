@@ -5,10 +5,12 @@
  * Stance spur, and the west rim road from Grim Oath down to Thick Skin. Re-lined on 2026-10-20 (PHILOSOPHY §2a). G2
  * (2026-10-22): Cleaver went to the Barrows road and Hallowed Hammer to the rampart's junction; Thick Skin came here
  * from the tower road, onto the new west rim road. G3 (2026-10-22): Locked Shields (armour, shield block) in Cleaver's
- * old square, and Hot Iron (fire attacks, stun) on the west rim road.
+ * old square, and Hot Iron (fire attacks, stun) on the west rim road. G3 round 2: Broad Back and Grim Oath gave up
+ * their armour lines (the west tower held four armour notables within nine steps of each other).
  */
 import {
   armour,
+  castSpeed,
   critChance,
   curseEffect,
   doubleDamage,
@@ -18,6 +20,7 @@ import {
   life,
   maceDamage,
   shieldBlock,
+  shieldDef,
   str,
   stunDuration,
   stunThreshold,
@@ -94,7 +97,7 @@ export const maces: AreaSpec = {
     {
       id: 'greatweight',
       name: 'Greatweight',
-      why: "The tower's landmark: a wheel of six with two notables, two-handed damage and strength on one side, life on the other, so the two-hander picks the bigger hit or the bigger body. Stun belongs to Weight of Iron (with a mace) and Headsman (with a two-hander); Greatweight sold stun too until round 4. Two-handed speed is far south (Heavy Hands, by the grit) and the slam with a two-hander is Thunderstep: three places, three partners. Passed through toward the keystone.",
+      why: "The tower's landmark: a wheel of six with two notables, two-handed damage on one side, life on the other, strength on both, so the two-hander picks the bigger hit or the bigger body. Stun belongs to Weight of Iron (with a mace) and Headsman (with a two-hander); Greatweight sold stun too until round 4. Two-handed speed is far south (Heavy Hands, by the grit) and the slam with a two-hander is Thunderstep: three places, three partners. Passed through toward the keystone.",
       at: [-3315, 1254],
       shape: { kind: 'ring', r: 78, a0: -30 },
       nodes: [
@@ -113,8 +116,8 @@ export const maces: AreaSpec = {
           id: 'n2',
           kind: 'notable',
           name: 'Broad Back',
-          lines: [life(12), armour(16)],
-          why: '2.4 + 1.3 units: the body that carries the weapon. Second Wind sells life with regeneration.',
+          lines: [life(12), str(16)],
+          why: "2.4 + 1.1 units: the body that carries the weapon, life and the strength to lift it. Its armour went in G3 round 2 (2026-10-22): life with armour 13 steps from the start was the far hybrid every strength build took at 60 points, beside Mortar and Stone, Locked Shields and Thick Skin (the west tower's armour hot spot). Second Wind sells life with regeneration, Stone Heart with stun threshold.",
         },
       ],
       links: [
@@ -195,44 +198,45 @@ export const maces: AreaSpec = {
     {
       id: 'hotIron',
       name: 'Hot Iron',
-      why: "Fire damage with attacks either side of the notable with fire attacks and stun duration: the heavy burning blow that staggers, for the two-handed fire build (G3, 2026-10-22; the ledger's VA-6). On the west rim road between Grim Oath and Thick Skin, in Hallowed Hammer's old place, with a third small toward the road to Battle Hymn: the far west's fire, where the Cathedral's burning (Censer, Searing Avatar) comes in by the rim. Stun's other homes sell it with a mace (Weight of Iron), a two-hander (Headsman) and any weapon (Stagger); this one sells it with fire.",
-      at: [-3897, 617],
+      why: "Fire damage with attacks three times beside the notable with fire attacks and stun duration: the heavy burning blow that staggers, for the two-handed fire build (G3, 2026-10-22; the ledger's VA-6). On the west rim road between Grim Oath and Thick Skin, in Hallowed Hammer's old place, with a third small toward the road to Battle Hymn: the far west's fire, where the Cathedral's burning (Censer, Searing Avatar) comes in by the rim. Stun's other homes sell it with a mace (Weight of Iron), a two-hander (Headsman) and any weapon (Stagger); this one sells it with fire. Since G3 round 2 the rim road and the door from the tower pass by the two north smalls and the notable sits a step outside them, on the rim (the notable sat in the road's line, so the rim road and the tower's door both bought it).",
+      at: [-3920, 600],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [eleAttackOne('fire', 12)],
-          at: [-3906, 547],
-          why: 'North, on the rim road from Grim Oath.',
+          at: [-3902, 579],
+          why: 'North, on the rim road from Grim Oath; the door from the tower lands here.',
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Hot Iron',
           lines: [eleAttackOne('fire', 24), stunDuration(25)],
-          at: [-3897, 617],
-          why: '2 + 1.7 units: 3.7.',
+          at: [-3962, 624],
+          why: "2 + 1.7 units: 3.7. The triangle's apex, outside the rim road.",
         },
         {
           id: 'b',
           kind: 'small',
           lines: [eleAttackOne('fire', 12)],
-          at: [-3889, 686],
+          at: [-3893, 654],
           why: 'South, on the rim road to Thick Skin.',
         },
         {
           id: 'c',
           kind: 'small',
           lines: [eleAttackOne('fire', 12)],
-          at: [-3837, 580],
+          at: [-3840, 546],
           why: 'East, toward the road to Battle Hymn.',
         },
       ],
       links: [
+        ['a', 'b'],
         ['a', 'n'],
         ['n', 'b'],
-        ['n', 'c'],
+        ['a', 'c'],
       ],
     },
     {
@@ -277,23 +281,23 @@ export const maces: AreaSpec = {
     {
       id: 'locked',
       name: 'Locked Shields',
-      why: "Armour four times round the notable with armour and block with a shield: the shield wall's armour, deep west between the Rampart and the Barbican (G3, 2026-10-22; the ledger's VA-2, with the armour section VA-s1 folded in). A regular pentagon in Cleaver's old square, three corners facing the three roads that reach it (Steady Hands north-east, the tower junction east, Crushing Blow west); the notable is the far corner, so the way across takes armour smalls and the notable is a step's detour. For one-handers with a shield, mace or sword: Bracing (block with block recovery) leaves the start south-east, this is the far one. The strength defence's west direction: Mortar and Stone is north-east by the road to the tower, Thick Skin on the west rim, Iron Voice in the Barrows.",
+      why: "The shield's own defences four times round the notable with armour and block with a shield: the shield wall's armour, deep west between the Rampart and the Barbican (G3, 2026-10-22; the ledger's VA-2, with the armour section VA-s1 folded in). The smalls were plain armour until G3 round 2: the two-handed builds took the pentagon at 60 points for its armour smalls alone, the fourth armour cluster of the west tower; defences from a shield keep it the shield wall's and nobody else's. A regular pentagon in Cleaver's old square, three corners facing the three roads that reach it (Steady Hands north-east, the tower junction east, Crushing Blow west); the notable is the far corner, so the way across takes smalls and the notable is a step's detour. For one-handers with a shield, mace or sword: Bracing (block with block recovery) leaves the start south-east, this is the far one. The strength defence's west direction: Mortar and Stone is north-east by the road to the tower, Thick Skin on the west rim, Iron Voice in the Barrows.",
       at: [-2990, 860],
       shape: { kind: 'ring', r: 66, a0: -66 },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [shieldDef(15)],
           why: 'The north-east corner, the door from Steady Hands.',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [shieldDef(15)],
           why: 'The east corner, the door from the tower junction.',
         },
-        { id: 'c', kind: 'small', lines: [armour(12)] },
+        { id: 'c', kind: 'small', lines: [shieldDef(15)] },
         {
           id: 'n',
           kind: 'notable',
@@ -304,7 +308,7 @@ export const maces: AreaSpec = {
         {
           id: 'd',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [shieldDef(15)],
           why: 'The west corner, the door from Crushing Blow.',
         },
       ],
@@ -346,7 +350,7 @@ export const maces: AreaSpec = {
     {
       id: 'oath',
       name: 'Grim Oath',
-      why: "A pocket west off the road to Battle Hymn: curse effect twice, then curse effect with armour. The strength curser's cluster, for the warlord's curses and a curse on hit; the other three sell curses with area and duration (Hexwright, in the Spire), a second curse (Second Curse, in the Knife) and damage against the cursed (Marked Prey, on the Yard's Fosse). Round 4 (2026-10-20). The head of the west rim road since G2 (2026-10-22).",
+      why: "A pocket west off the road to Battle Hymn: curse effect twice, then curse effect with cast speed (with armour until G3 round 2). The strength curser's cluster, for the warlord's curses and a curse on hit; the other three sell curses with area and duration (Hexwright, in the Spire), a second curse (Second Curse, in the Knife) and damage against the cursed (Marked Prey, on the Yard's Fosse). Round 4 (2026-10-20). The head of the west rim road since G2 (2026-10-22).",
       at: [-3820, 25],
       shape: { kind: 'hand' },
       nodes: [
@@ -356,9 +360,9 @@ export const maces: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Grim Oath',
-          lines: [curseEffect(16), armour(20)],
+          lines: [curseEffect(16), castSpeed(6)],
           at: [-3960, 80],
-          why: '2 + 1.7 units.',
+          why: "2 + 1.5 units: the curse laid stronger and sooner (a curse is a spell). Its armour went in G3 round 2 (2026-10-22): the two-handed fire build bought it for the armour beside Hot Iron and Thick Skin, the west tower's armour hot spot. The other curse clusters sell area and duration (Hexwright), a second curse (Second Curse) and damage against the cursed (Marked Prey).",
         },
       ],
       links: [
@@ -437,7 +441,7 @@ export const maces: AreaSpec = {
     {
       from: 'hotIron.c',
       to: 'toHymn.r2',
-      why: "Hot Iron's third door, east onto the road to Battle Hymn (where Hallowed Hammer hung until G2): the fire is reached from the tower without walking the rim.",
+      why: "Hot Iron's third door, east onto the road to Battle Hymn (where Hallowed Hammer hung until G2): the fire is reached from the tower without walking the rim. It lands on the north small (G3 round 2), so the door does not buy the notable.",
     },
     {
       from: 'oath.n',

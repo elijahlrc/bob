@@ -31,7 +31,7 @@ export const bows: AreaSpec = {
   region: 'strider',
   name: 'The Hedgerows',
   why: "Everything that is only for a bow, on the Shade side of the region, reached by the north hub's road or by the accuracy short cut from the string.",
-  at: [1620, 140], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [1570, 180], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); G3 round 2 nudged it off Hedge Magic and Steady Draw.
   clusters: [
     {
       id: 'road',

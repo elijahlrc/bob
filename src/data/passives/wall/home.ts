@@ -6,18 +6,19 @@
  * North side: armour, toward the rampart and the Zealot. South side: melee physical damage, toward the slams and the
  * Reaver. The signature (life, melee damage, strength) is the loop's tip, and the tower road (life) leaves from it west;
  * the rampart and slam roads leaving the hubs are strength highways (2026-10-20). Off the
- * north hub, a stun-threshold pocket and, farther north, the reservation chain that points at the Zealot; off the south
+ * north hub, a melee damage pocket (stun threshold until G3 round 2) and, farther north, the reservation chain that
+ * points at the Zealot; off the south
  * hub, a flask pocket. The hubs carry strength and join the ring one node to either side.
  */
 import {
   armour,
+  enemyStunThreshold,
   flaskEffect,
   flaskRecovery,
   life,
+  meleeDamage,
   meleePhys,
   str,
-  stunRecovery,
-  stunThreshold,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -83,26 +84,26 @@ export const home: AreaSpec = {
       links: [],
     },
     {
-      id: 'unshakable',
-      name: 'Unshakable',
-      why: "The north hub's pocket, a tight orbit: two stun threshold nodes and a notable with threshold and stun recovery. The Vanguard who stands in the hit, three points after the hub.",
+      id: 'ringing',
+      name: 'Ringing Blows',
+      why: "The north hub's pocket, a tight orbit: melee damage twice and a notable with melee damage and the blow that rocks them (lower enemy stun threshold): the Vanguard's first offence on the north side, for any melee weapon, named for none, two to four points out. It was Unshakable (stun threshold, stun recovery) until G3 round 2 (2026-10-22): within six steps of the start every notable but Oathbound and the Banner was defence or utility, and the north side ran stun threshold, resistances, mana and armour before any offence (CONSTRAINTS §4.8). Stun threshold is still sold by Stone Heart (with life, west) and Thick Skin (with armour, the far west), and as lines on Bracing and Unhurried.",
       at: [-1180, 160],
       shape: { kind: 'ring', r: 75, a0: 28 },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [stunThreshold(8)],
+          lines: [meleeDamage(8)],
           why: 'The entrance, facing the hub.',
           at: [-1090, 173],
         },
-        { id: 'b', kind: 'small', lines: [stunThreshold(8)], at: [-1132, 133] },
+        { id: 'b', kind: 'small', lines: [meleeDamage(8)], at: [-1132, 133] },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Unshakable',
-          lines: [stunThreshold(16), stunRecovery(20)],
-          why: '2 + 1.3 units.',
+          name: 'Ringing Blows',
+          lines: [meleeDamage(16), enemyStunThreshold(12)],
+          why: '2 + 1.5 units: harder blows, and stuns that come sooner. The stun clusters farther out sell it with a weapon (Weight of Iron, the mace; Headsman, the two-hander) or with duration (Stagger, Hot Iron).',
         },
       ],
       links: [
@@ -193,7 +194,7 @@ export const home: AreaSpec = {
     { from: 'start.vanguard', to: 'sig.b', why: 'Point one, the south side.' },
     { from: 'sig.a', to: 'hubs.n', why: 'The north side to the north hub.' },
     { from: 'sig.b', to: 'hubs.s', why: 'The south side to the south hub.' },
-    { from: 'hubs.n', to: 'unshakable.a', why: "The north hub's pocket." },
+    { from: 'hubs.n', to: 'ringing.a', why: "The north hub's pocket." },
     { from: 'hubs.s', to: 'quartermaster.a', why: "The south hub's pocket." },
     {
       from: 'hubs.n',
@@ -228,9 +229,9 @@ export const home: AreaSpec = {
     { from: 'wall.maces.toHome.b', to: 'wall.home.roadM.c', why: 'The far end of the road.' },
     { from: 'roadS.b', to: 'wall.slams.thunderstep.a', why: 'The slam road reaches the slams.' },
     {
-      from: 'unshakable.n',
+      from: 'ringing.n',
       to: 'roadR.a',
-      why: 'The stun pocket is also a way onto the rampart road: a pocket as a bridge.',
+      why: 'The melee pocket is also a way onto the rampart road: a pocket as a bridge.',
     },
     {
       from: 'quartermaster.n',
@@ -243,9 +244,9 @@ export const home: AreaSpec = {
       why: 'And straight on to the slams: the pocket is a loop with the slam road.',
     },
     {
-      from: 'unshakable.n',
+      from: 'ringing.n',
       to: 'wall.resists.banner.a',
-      why: 'The stun pocket to the Banner chain: a loop with the north hub.',
+      why: 'The melee pocket to the Banner chain: a loop with the north hub.',
     },
   ],
 };

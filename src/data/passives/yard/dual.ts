@@ -2,9 +2,11 @@
  * The Lists (the Yard's east, on the border with the Bow): the dual-wield wheel as the landmark, the east gate the
  * Strider's links land on, the dodge chain from the gate down to the east junction, and since G2 (2026-10-22) two roads:
  * the east half of the crossroad (the Muster's hub to the east junction, the heavy bow below it) and the east road (the
- * east junction south to the Pits' east junction, with the fervour charges and the dual crit beside it).
+ * east junction south to the Pits' east junction, with the fervour charges and the dual crit beside it). G3 added the
+ * fast sword (Darting Steel) off the east road and Footwork from the gate to the Strider's Ford hub.
  */
 import {
+  accuracy,
   attackSpeed,
   bowDamage,
   critMulti,
@@ -32,7 +34,7 @@ export const dual: AreaSpec = {
   id: 'yard.dual',
   region: 'reaver',
   name: 'The Lists',
-  why: "The Yard's east, on the Bow border: the dual-wield wheel with evasion on its other side, dodge, the fervour charges, the heavy bow, and the dual crit chain, hung from the crossroad and the east road (G2).",
+  why: "The Yard's east, on the Bow border: the dual-wield wheel with evasion on its other side, dodge, footwork from the gate to the Ford, the fervour charges, the heavy bow, the dual crit chain and the fast sword, hung from the crossroad and the east road (G2).",
   at: [635, 2150], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -266,6 +268,43 @@ export const dual: AreaSpec = {
       ],
     },
     {
+      id: 'footwork',
+      name: 'Footwork',
+      why: "Accuracy twice, then the notable with evasion and accuracy, then accuracy once more (RE-6, G3 round 2, 2026-10-22): feet that slip a blow and land one, the Lists' outer side between the east gate and the Strider's Ford hub (a near crossing). Accuracy leads, not evasion as the brief had it: the gate is 4 steps from the Strider start, so three evasion smalls here would be cheap evasion for the Strider's own builds (whose evasion is near flat at 120 points), and the Reaver's dual-wield evasion already climbs; the evasion is on the notable. Six steps from Weaving, the wheel's evasion, and from Sidestep. Laid as an L with the notable at the corner: the straight line from the gate would reach the hub 18 degrees from the Strider's own link into it.",
+      at: [898, 1742],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [accuracy(10)],
+          at: [825, 1654],
+          why: 'The entrance, from the east gate.',
+        },
+        { id: 'b', kind: 'small', lines: [accuracy(10)], at: [862, 1698] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Footwork',
+          lines: [evasion(25), accuracy(15)],
+          at: [898, 1742],
+          why: 'Slip the blow, land the next: 2.5 + 1.5 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [accuracy(10)],
+          at: [965, 1751],
+          why: "The exit, east to the Ford hub, arriving in the open angle between the hub's road down to the Pits and the Strider's link from the gate's chain.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'hotBlood',
       name: 'Hot Blood',
       why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs).",
@@ -342,6 +381,16 @@ export const dual: AreaSpec = {
       why: 'A near bridge to the Strider road into the Yard: Hot Blood has a second way in, and the dual-wield Strider reaches fervour without crossing the Lists.',
     },
     { from: 'twinFangs.c', to: 'j2.a', why: "The wheel's east side to the gate." },
+    {
+      from: 'j2.a',
+      to: 'footwork.a',
+      why: 'The east gate onto the footwork chain (G3 round 2, RE-6), south-east.',
+    },
+    {
+      from: 'footwork.c',
+      to: 'bow.steel.hub.t',
+      why: "Evasion and accuracy (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Footwork lands on the Strider's Ford hub, re-aimed from the gate's old direct link, so the kiting Reaver walks on into the Ford and the Strider comes in for accuracy.",
+    },
     { from: 'twinFangs.d', to: 'j1.a', why: "The wheel's south side to the junction." },
     { from: 'twinFangs.c', to: 'sidestep.a', why: "The wheel's east side onto the dodge chain." },
     {

@@ -4,9 +4,11 @@
  * shield with avoid stun, a bridge from Quiet Pulse's road up to Broad Weave), the wand chain from the mana notable west to the flask chain that points at
  * the Cathedral (both swapped in from the east side on 2026-10-20), the junction, the Mind Bulwark spur, and the west road
  * (2026-10-19): a life pocket and a mana-leech pocket climbing from the junction to the fire arm's junction, so the well
- * reaches the arms without the column and the Spire sells life and mana leech at all.
+ * reaches the arms without the column and the Spire sells life and mana leech at all. G3 round 2 (2026-10-22): Living
+ * Verse (spell damage with life) bridges the road to the Undercroft and the Zealot's crossing road.
  */
 import {
+  castSpeed,
   es,
   esRecharge,
   esRechargeDelay,
@@ -22,6 +24,7 @@ import {
   manaRegen,
   shieldDef,
   shieldSpellBlock,
+  spellDamage,
   str,
   stunAvoid,
   wandCastSpeed,
@@ -39,7 +42,7 @@ export const well: AreaSpec = {
     {
       id: 'deepWell',
       name: 'Deep Well',
-      why: 'The wheel: entered from the well road on the south-east, left to the junction on the west and to the column through the shield notable. Mana on the south side, shield on the north.',
+      why: 'The wheel: entered from the well road on the south-east, left to the junction on the west and to the column through the shield notable. Mana and cast speed on the south side, shield on the north (since G3 round 2: speed or shield).',
       at: [-469, -2000],
       shape: { kind: 'ring', r: 80, a0: 30 },
       nodes: [
@@ -49,8 +52,8 @@ export const well: AreaSpec = {
           id: 'n1',
           kind: 'notable',
           name: 'Deep Well',
-          lines: [mana(20), manaRegen(20)],
-          why: 'Mana and its regeneration: 2.5 + 2 units. The Frugal chain leaves here.',
+          lines: [mana(16), castSpeed(8)],
+          why: "Mana and the cast speed it pays for: 2 + 2 units. Mana and its regeneration (4.5) until G3 round 2 (2026-10-22, CONSTRAINTS §4.8): the Cloister within 14 steps of the start held 6 units of offence against 42 of defence and sustain (shield, life, block, flasks, mana), the wand caster's cluster its only offence, so a caster's first points west were a corridor of one kind. Now the wheel's two sides are speed or shield, as the east wheel's are spell damage or chaos resistance. The regeneration stays at home (Still Mind) and in Frugal, Draught and Warded Mind. The wand chain leaves here.",
         },
         { id: 'c', kind: 'small', lines: [es(5)], why: 'The north-west exit, to the junction.' },
         { id: 'd', kind: 'small', lines: [es(5)] },
@@ -349,8 +352,55 @@ export const well: AreaSpec = {
         ['n', 'c'],
       ],
     },
+    {
+      id: 'livingVerse',
+      name: 'Living Verse',
+      why: "Spell damage with life (G3 round 2, 2026-10-22; G1/mystic.md MY-2): the life caster's own pair, kept far from both homes as the convergence rule asks of such pairs. A bridge from the second node of the road to the Undercroft over to the Zealot's crossing road (the Undercroft bridge, G2/borders.md §4), laid straight on the line between the two, so the wedge between the two crossing roads becomes a loop. Its two sides differ on purpose, each uniform: spell damage on the Mystic side, life on the Zealot side, so each start's caster pays in its own coin to reach the notable. Spell damage in the west at last: the Cloister was shield, mana and life with only the wand caster's cluster for offence. 20 steps from the Mystic start, about 18 from the Zealot's; Quiet Pulse (life) is 8 away and Keen Verse (spell) the far side of the map.",
+      at: [-1321, -2947],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [-1242, -2849],
+          why: 'The entrance from the road to the Undercroft, on the straight line to the notable.',
+        },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [-1277, -2892] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Living Verse',
+          lines: [spellDamage(20), life(8)],
+          at: [-1321, -2947],
+          why: '2.5 + 1.6 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [life(5)],
+          at: [-1365, -3001],
+          why: "The Zealot side: life, the life caster's coin from that start. On the straight line to the crossing road.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'toCrypt.r2',
+      to: 'livingVerse.a',
+      why: "The road to the Undercroft onto Living Verse (MY-2): the road's second branch, beside Quickening.",
+    },
+    {
+      from: 'livingVerse.c',
+      to: 'cathedral.crypt.toSpire.b',
+      why: "The Undercroft bridge (G2/borders.md §4, laid in G3 round 2): Living Verse onto the Zealot's crossing road from the Undercroft to Familiars, so a Zealot life caster reaches spell damage with life and the Mystic caster reaches Glass Wall, Homily and the crypt's spells. It joins the two crossing roads into a loop.",
+    },
     {
       from: 'toPulse.a',
       to: 'composure.a',

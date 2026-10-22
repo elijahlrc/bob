@@ -13,6 +13,7 @@ import {
   life,
   lifeRegen,
   maxResOne,
+  minionDamage,
   resAll,
   resOne,
   shieldBlock,
@@ -250,7 +251,7 @@ export const nave: AreaSpec = {
     {
       id: 'aisle',
       name: 'The aisle',
-      why: "G2 (2026-10-22, G1/zealot.md §3): three attribute nodes in a straight line from the road node under Choirmaster through the empty inside to Consecrated Plate, and on through it to the Ambulatory's walk: the Nave joined to the Ambulatory's middle, where before the only ways out were the two ends of the walk. Lone Vow's spur leaves its middle node northward; G3 hangs a minion cluster south of the middle node; Lectern (G3 round 1) leaves north of the last.",
+      why: "G2 (2026-10-22, G1/zealot.md §3): three attribute nodes in a straight line from the road node under Choirmaster through the empty inside to Consecrated Plate, and on through it to the Ambulatory's walk: the Nave joined to the Ambulatory's middle, where before the only ways out were the two ends of the walk. Lone Vow's spur leaves its middle node northward; Sexton (G3 round 2) leaves it southward; Lectern (G3 round 1) leaves north of the last.",
       at: P(1808, 288),
       shape: { kind: 'hand' },
       nodes: [
@@ -266,7 +267,7 @@ export const nave: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(1808, 288),
-          why: "The aisle's crossing: Lone Vow's spur north; in G3 the minion-and-life cluster (ZE-2) south, as a bridge to the Vestry's junction.",
+          why: "The aisle's crossing: Lone Vow's spur north; Sexton (minions with life, G3 round 2) south, as a bridge to the Vestry's junction.",
         },
         {
           id: 'a3',
@@ -282,9 +283,46 @@ export const nave: AreaSpec = {
       ],
     },
     {
+      id: 'sexton',
+      name: 'Sexton',
+      why: "G3 round 2 (2026-10-22; ledger ZE-2, G1/zealot.md §2): a straight bridge south from the aisle's middle node to the Vestry's junction, minion damage twice, the notable with minion damage and the summoner's own life, minion damage once more. The summoner on life (Ossuary, far out on the walk, is the summoner on energy shield; Shepherd, at the Choir, minions that last): the aisle's cross is Lone Vow north and this south, and the caster's Lectern one node on, so each pays for the other's in passing. Life is on the notable only, so the aisle does not become a life stop for every build. The bridge runs on in the line of the tower wheel's link through the junction, a straight cross there.",
+      at: P(1908, 48),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [minionDamage(12)],
+          at: P(1860, 163),
+          why: 'The entrance from the aisle, on the straight line to the Vestry junction.',
+        },
+        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: P(1881, 112) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Sexton',
+          lines: [minionDamage(24), life(10)],
+          at: P(1908, 48),
+          why: "Minion damage and the summoner's life: 2 + 2 units.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [minionDamage(12)],
+          at: P(1935, -17),
+          why: 'The far node, onto the Vestry junction.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'lectern',
       name: 'Lectern',
-      why: "G3 round 1 (2026-10-22; ledger ZE-1, folding ZE-s3): a straight bridge north from the aisle's last node to Brandwright, spell damage twice either side of the notable with spell damage and less reservation. The aura caster's spell damage, and the Zealot casters' spell damage at home instead of in the Mystic. It and Lone Vow leave the aisle side by side, one node apart: take the reservation, or the keystone that makes reservation moot. Brandwright stops being a dead end. Spell damage's other Zealot homes face other ways with other partners (Homily north-east with the elements and cast speed, Crozier west with a staff).",
+      why: "G3 round 1 (2026-10-22; ledger ZE-1, folding ZE-s3): a straight bridge north from the aisle's last node to Brandwright, spell damage twice, then the notable with spell damage and less reservation (G3 round 2: the two smalls on to Brandwright carry brand damage and are Brandwright's now, so this stop holds 4 units of spell damage, not 6). The aura caster's spell damage, and the Zealot casters' spell damage at home instead of in the Mystic. It and Lone Vow leave the aisle side by side, one node apart: take the reservation, or the keystone that makes reservation moot. Brandwright stops being a dead end. Spell damage's other Zealot homes face other ways with other partners (Homily north-east with the elements and cast speed, Crozier west with a staff).",
       at: P(2164, 472),
       shape: { kind: 'hand' },
       nodes: [
@@ -304,20 +342,10 @@ export const nave: AreaSpec = {
           at: P(2164, 472),
           why: 'Spell damage and less reservation: 2 + 2 units.',
         },
-        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: P(2191, 536) },
-        {
-          id: 'd',
-          kind: 'small',
-          lines: [spellDamage(8)],
-          at: P(2211, 588),
-          why: 'The far node, onto Brandwright.',
-        },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
-        ['n', 'c'],
-        ['c', 'd'],
       ],
     },
   ],
@@ -333,14 +361,24 @@ export const nave: AreaSpec = {
       why: 'The aisle lands on Consecrated Plate, in line with its chain to the walk: the armour bridge becomes a crossroads.',
     },
     {
+      from: 'aisle.a2',
+      to: 'sexton.a',
+      why: "The aisle's middle node onto the summoner's life (G3 round 2): Lone Vow north, Sexton south.",
+    },
+    {
+      from: 'sexton.c',
+      to: 'cathedral.rods.jR.a',
+      why: "Sexton lands on the Vestry junction, in line with the tower wheel's link: the aisle and the Vestry are joined, and the summoner has a way in from either.",
+    },
+    {
       from: 'aisle.a3',
       to: 'lectern.a',
       why: 'The aisle onto the spell-and-reservation bridge (G3).',
     },
     {
-      from: 'lectern.d',
-      to: 'cathedral.ambulatory.brand.n',
-      why: 'Lectern lands on Brandwright: the brand pocket becomes a bridge, and the brand caster has a way in from the Nave.',
+      from: 'lectern.n',
+      to: 'cathedral.ambulatory.brand.d',
+      why: "Lectern onto Brandwright's inner brand smalls: the brand pocket is a bridge, and the brand caster has a way in from the Nave. Since G3 round 2 the two smalls between the notables are Brandwright's (brand damage), not Lectern's.",
     },
     {
       from: 'wall.resists.j.a',

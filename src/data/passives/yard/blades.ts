@@ -23,6 +23,7 @@ import {
   lifeRegen,
   moveSpeed,
   oneHandMelee,
+  shieldBlock,
   str,
   swordDamage,
 } from '../lines';
@@ -32,7 +33,7 @@ export const blades: AreaSpec = {
   id: 'yard.blades',
   region: 'reaver',
   name: 'The Practice Ground',
-  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Executioner chain, Killing Pace, armour on the Wall side (Guarded) and a second armour chain between the one-handed diamond and the elements (Mended Mail, G3), hung from the west road and the crossroad (G2). The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
+  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Executioner chain, Killing Pace, armour on the Wall side (Guarded) and a second armour chain between the one-handed diamond and the elements (Mended Mail, G3), hung from the west road and the crossroad (G2); past the west road, the sword with a shield (Sword and Board, G3 round 2) on the way to the Wall. The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
   at: [-785, 1990], // Where the area's name is drawn: clear of every other area's name; nudged in G2 off Light Blades and the Wall's moved Second Wind.
   clusters: [
     {
@@ -366,7 +367,13 @@ export const blades: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: 'r1', kind: 'attribute', lines: [str(6), dex(6)], at: [-935, 2655] },
-        { id: 'r2', kind: 'attribute', lines: [str(6), dex(6)], at: [-1150, 2670] },
+        {
+          id: 'r2',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [-1150, 2670],
+          why: 'Sword and Board leaves south (G3 round 2).',
+        },
         {
           id: 'r3',
           kind: 'attribute',
@@ -378,6 +385,43 @@ export const blades: AreaSpec = {
       links: [
         ['r1', 'r2'],
         ['r2', 'r3'],
+      ],
+    },
+    {
+      id: 'board',
+      name: 'Sword and Board',
+      why: "Sword damage twice, then the notable with sword damage and block with a shield, then sword damage once more (RE-2, G3 round 2, 2026-10-22): the sword for the Reaver who holds a shield, the Yard's fourth sword direction and its farthest from home. A straight bridge south from the road to Headsman's second node to the Wall's east road (a near crossing): the Wall's shield builds reach a sword here, and the Reaver's walk on to the Wall's shields and the Barrows. It sits past the west road, away from the armour (Guarded, Mended Mail, the Rampart), the speed (the east) and the leech (the Pits): a sword build that wants it walks the far side of the Practice Ground for it. Seven and more steps from Keen Edge and from the Muster's shields (Steel Rim, Buckler); beside the Shieldwall keystone, whose block cap is its pull.",
+      at: [-1169, 2853],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [swordDamage(10)],
+          at: [-1157, 2740],
+          why: 'The entrance, from the road to Headsman.',
+        },
+        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [-1163, 2796] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Sword and Board',
+          lines: [swordDamage(20), shieldBlock(4)],
+          at: [-1169, 2853],
+          why: 'A sword behind a shield: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [swordDamage(10)],
+          at: [-1174, 2910],
+          why: "The exit, to the Wall's east road.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -406,6 +450,16 @@ export const blades: AreaSpec = {
   ],
   links: [
     { from: 'toHeadsman.r3', to: 'thirst.a', why: 'The road onto the leech pocket.' },
+    {
+      from: 'toHeadsman.r2',
+      to: 'board.a',
+      why: "The road to Headsman's second node onto the sword and shield (G3 round 2, RE-2), south.",
+    },
+    {
+      from: 'board.c',
+      to: 'wall.grit.east.e6',
+      why: "Sword and board (a near crossing; G1-brief.md §2.4, deferred to G3 by the G2 border pass): Sword and Board lands on the Wall's east road, so the Wall's shield builds reach a sword cluster and the Reaver's reach the Wall's shields and the Barrows.",
+    },
     {
       from: 'toHeadsman.r3',
       to: 'wall.grit.headsman.b',

@@ -5,8 +5,11 @@
 import {
   areaDamage,
   blockAttack,
+  chillEffect,
+  eleDamage,
   eleDamageAll,
   int,
+  shieldBlock,
   spellBlock,
   staffDamage,
   str,
@@ -170,6 +173,43 @@ export const rods: AreaSpec = {
       ],
     },
     {
+      id: 'font',
+      name: 'Frozen Font',
+      why: "G3 round 2 (2026-10-22; ledger ZE-4, G1/zealot.md §2): a straight bridge across the Vestry's inside, from the nave junction to the dear road's last node: block with a shield twice, the notable with cold damage, block with a shield and chill, block once more. The shield's third direction (Iron Faith south of the Nave wheel, six steps back; Glass Wall in the Undercroft, north-east), and the first cold outside the Spire and the Knife that is not an attack (Rimed Steel, on the tower wheel, is cold strikes that chill). The smalls carry the block, not the cold, because block is the flat want (the shield caster's block stood at 5 units from 60 to 120 points) and cold has one taker in the Zealot; the cold shield caster gets its element on the notable. It costs the shield caster the north (Lectern, Homily), where its spell damage is.",
+      at: P(1668, -488),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [shieldBlock(2)],
+          at: P(1580, -398),
+          why: 'The entrance from the nave junction, on the straight line to the dear road.',
+        },
+        { id: 'b', kind: 'small', lines: [shieldBlock(2)], at: P(1619, -437) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Frozen Font',
+          lines: [eleDamage('cold', 20), shieldBlock(2), chillEffect(10)],
+          at: P(1668, -488),
+          why: 'Cold damage, block with a shield and chill: 2 + 1 + 1 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [shieldBlock(2)],
+          at: P(1716, -538),
+          why: "The far node, onto the dear road's last node.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'idleHands',
       name: 'Idle Hands',
       why: 'Two nodes of totem damage, then the trade: your own skills deal no damage, but totems, traps, mines, brands and minions still do, and one more totem. On the Wall crossing (brief §6), for the totem Vanguard and the summoner Zealot alike.',
@@ -212,6 +252,16 @@ export const rods: AreaSpec = {
       from: 'warding.c',
       to: 'toWall.b',
       why: "Warding Staff back onto the road's middle node: a loop beside the road, reached from either of its first two nodes.",
+    },
+    {
+      from: 'cathedral.nave.jN.a',
+      to: 'font.a',
+      why: "The nave junction onto the cold shield bridge (G3 round 2). It leaves on the straight line to the dear road, between the junction's road east and the empty south: a corner there instead (straight south, then a turn at the notable) would put the notable a short step from Verger and bend it by 60°.",
+    },
+    {
+      from: 'font.c',
+      to: 'toWall.c',
+      why: "Frozen Font lands on the dear road's last node: the Vestry's inside is crossed, and the shield caster reaches the tower and Tithe without the wheel.",
     },
     {
       from: 'toWall.b',

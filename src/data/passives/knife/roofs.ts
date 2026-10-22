@@ -8,8 +8,10 @@
 import {
   castSpeed,
   chaosAttack,
+  chaosDot,
   clawDamage,
   critChance,
+  curseEffect,
   daggerDamage,
   daggerSpellCrit,
   daggerSpellDamage,
@@ -24,6 +26,7 @@ import {
   spellDamage,
   spellProjectile,
   weaponAccuracy,
+  weaponCritMulti,
   weaponSpeed,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -90,7 +93,7 @@ export const roofs: AreaSpec = {
     {
       id: 'carrion',
       name: 'Carrion Claws',
-      why: "A pocket outward off the rooftop road (since G2, 2026-10-22, its first small is also where the crossroad from the ridge lands, so the pocket is on a way through): claw damage twice, then claws with chaos that bite harder on the poisoned. The claw's second cluster, far from its first: Talon, by the start on the Alleys wheel, sells claws with recovery on hit. It was on the Docks wheel until round 3 (2026-10-20), where it put both claws, both poisons and Cruel Agony within six steps of one junction; now the poison claw takes its core near the start and then chooses between this, Venom Fletching in the Strider and Festering in the Yard.",
+      why: "A pocket outward off the rooftop road (since G2, 2026-10-22, its first small is also where the crossroad from the ridge lands, so the pocket is on a way through): claw damage twice, then claws with chaos that bite harder on the poisoned. The claw's second cluster, far from its first: Talon, by the start on the Alleys wheel, sells claws with recovery on hit. It was on the Docks wheel until round 3 (2026-10-20), where it put both claws, both poisons and Cruel Agony within six steps of one junction; now the poison claw takes its core near the start and then chooses between this, Venom Fletching in the Strider and Festering in the Yard. Since G3 round 2 the notable is also where Between Ribs (dagger with crit multiplier) lands from the crossroad, so the pocket is a loop: dagger on one side, claw on the other.",
       at: [3200, -2900],
       shape: { kind: 'hand' },
       nodes: [
@@ -297,6 +300,82 @@ export const roofs: AreaSpec = {
       ],
     },
     {
+      id: 'wish',
+      name: 'Ill Wish',
+      why: "Curse effect with the chaos damage-over-time multiplier (G3 round 2, 2026-10-22; the ledger's SH-8): a bridge straight across the Rooftops' empty inside, from the crossroad's first node (which becomes a cross: the ridge west, Carrion Claws east, Hasty Words north, this south) down to the rooftop road's third node. Chaos over time twice on the crossroad side, the notable, curse effect twice on the road side. The curser's far curse cluster: Second Curse (one more curse) is ten steps from the start on the north barb, the Spire's Hexwright (curses with area) across the curse crossing, and this one is the far north-east, about twenty steps out, where the curser gives up the Mystic's shield and spells to come (G1/shade.md §1.2: in the Rookery it was a one-stop with Second Curse, Rotting Word and Hexwright). Hasty Words, the spell damage a curser also wants, is seven steps round the crossroad from here: a pair a far trip buys, not a one-stop near home. A poison claw coming from Carrion Claws reaches the chaos side only through the two curse smalls.",
+      at: [2866, -2733],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'k2',
+          kind: 'small',
+          lines: [chaosDot(6)],
+          at: [2830, -2852],
+          why: 'The entrance, from the crossroad.',
+        },
+        { id: 'k1', kind: 'small', lines: [chaosDot(6)], at: [2846, -2800] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Ill Wish',
+          lines: [curseEffect(16), chaosDot(12)],
+          at: [2866, -2733],
+          why: '2 + 2 units: the curse that makes them weaker and the rot that eats them while they are.',
+        },
+        { id: 'u1', kind: 'small', lines: [curseEffect(8)], at: [2886, -2665] },
+        {
+          id: 'u2',
+          kind: 'small',
+          lines: [curseEffect(8)],
+          at: [2901, -2613],
+          why: 'The exit, to the rooftop road.',
+        },
+      ],
+      links: [
+        ['k2', 'k1'],
+        ['k1', 'n'],
+        ['n', 'u1'],
+        ['u1', 'u2'],
+      ],
+    },
+    {
+      id: 'ribs',
+      name: 'Between Ribs',
+      why: "Dagger damage with the crit multiplier with daggers (G3 round 2, 2026-10-22; the ledger's SH-16): a bridge north off the crossroad's second node, turning at the notable down onto Carrion Claws, so the claw pocket becomes a loop (the crossroad's node, this, Carrion Claws, its two smalls). Dagger damage twice from the crossroad, the notable, the crit multiplier with daggers once toward Carrion Claws. The crit dagger's far cluster: Fine Point by the start sells dagger crit chance, Long Knives in the middle speed and accuracy, Smeared Edge in the south poison; here the dagger's crits land harder. Dagger or claw: Carrion Claws, the claw's far cluster, is the other notable of the loop, and a build rarely wants both. The turn at the notable is the loop's corner; a straight bridge from the crossroad to Carrion Claws would have no room for the cluster.",
+      at: [3170, -3270],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'd2',
+          kind: 'small',
+          lines: [daggerDamage(10)],
+          at: [3129, -3152],
+          why: 'The entrance, from the crossroad.',
+        },
+        { id: 'd1', kind: 'small', lines: [daggerDamage(10)], at: [3147, -3204] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Between Ribs',
+          lines: [daggerDamage(16), weaponCritMulti('dagger', 24)],
+          at: [3170, -3270],
+          why: '1.6 + 2 units.',
+        },
+        {
+          id: 'm',
+          kind: 'small',
+          lines: [weaponCritMulti('dagger', 12)],
+          at: [3218, -3219],
+          why: 'The exit, to Carrion Claws.',
+        },
+      ],
+      links: [
+        ['d2', 'd1'],
+        ['d1', 'n'],
+        ['n', 'm'],
+      ],
+    },
+    {
       id: 'ritual',
       name: 'Ritual Blade',
       why: "A pocket north-east off the ridge road: spell damage with a dagger twice, then spells with a dagger and energy shield, the warded caster. The dagger caster's third cluster: Quiet Knife by the start sells it with cast speed, Athame in the centre with spell crit. Round 4 (the user asked for a third, 2026-10-20).",
@@ -366,6 +445,26 @@ export const roofs: AreaSpec = {
       why: "The crossroad's east end lands on the claw pocket's first small: Carrion Claws is a way through between the ridge and the rooftop road.",
     },
     { from: 'walk.r6', to: 'sleet.a', why: 'The road onto the cold darts.' },
+    {
+      from: 'cross.c1',
+      to: 'wish.k2',
+      why: "The crossroad's first node south onto the curse bridge (G3 round 2): with Hasty Words north the node is a cross.",
+    },
+    {
+      from: 'wish.u2',
+      to: 'walk.r3',
+      why: "The curse bridge lands on the rooftop road's third node in the gap between the road west and the claw pocket's link (G3 round 2): the Rooftops' inside has a second way across.",
+    },
+    {
+      from: 'cross.c2',
+      to: 'ribs.d2',
+      why: "The crossroad's second node north onto the crit dagger (G3 round 2).",
+    },
+    {
+      from: 'ribs.m',
+      to: 'carrion.n',
+      why: 'The crit dagger lands on Carrion Claws: the claw pocket becomes a loop, dagger on one side, claw on the other (G3 round 2).',
+    },
     {
       from: 'cross.c1',
       to: 'hasty.a',

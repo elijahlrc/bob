@@ -31,7 +31,7 @@ export const quiver: AreaSpec = {
   region: 'strider',
   name: 'The Thicket',
   why: 'Attack speed and bleeding on attacks, on the road between the projectiles and the physical end.',
-  at: [2181, 1800], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [2130, 1800], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); G3 round 2 nudged it off Arrow Weave.
   clusters: [
     {
       id: 'road',

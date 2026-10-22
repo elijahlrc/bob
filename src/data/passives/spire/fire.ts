@@ -144,7 +144,7 @@ export const fire: AreaSpec = {
     {
       id: 'rim',
       name: 'The north-west rim road',
-      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4) beside Steady Stream, past the minion-and-curse pocket (MY-7, G3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop, written by the border pass). Cinder stops being a dead end. The north-east rim road is the Eaves (`rim.ts`); the two are joined across the top by the road through Shatter.",
+      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4), past the minion-and-curse pocket (MY-7, G3 round 3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop). Cinder stops being a dead end. Since G3 round 2 the road is a spur with a far tip: Steady Stream no longer leads onto High Veil, so the far shield is reached from the Lantern through Cinder or from the Zealot, never a step off the climb to Shatter. The north-east rim road is the Eaves (`rim.ts`).",
       at: [-1115, -4325],
       shape: { kind: 'hand' },
       nodes: [
@@ -160,7 +160,7 @@ export const fire: AreaSpec = {
           kind: 'attribute',
           lines: [int(7)],
           at: [-1115, -4325],
-          why: 'Halfway; the near end of the MY-7 pocket (G3), outward.',
+          why: 'Halfway; the near end of the MY-7 pocket (G3 round 3), outward.',
         },
         {
           id: 'c',

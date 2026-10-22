@@ -230,19 +230,17 @@ export const edge: AreaSpec = {
     {
       id: 'thickBlood',
       name: 'Thick Blood',
-      why: "Life three times, then the notable with life, flat life and a little shield: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction. G3 (2026-10-22, the ledger's SH-s1): two more life smalls on the chain, so it reads as a cluster and the Shade's thin life has a second section; the far life is the Stair's Wiry Frame.",
+      why: "Life once on the way, the notable with life, flat life and a little shield, and two more life in a pocket behind it: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction. G3 (2026-10-22, the ledger's SH-s1): two more life smalls, so it reads as a cluster and the Shade's thin life has a second section; the far life is the Stair's Wiry Frame. G3 round 2: the two new smalls hang as a pocket off the notable instead of lengthening the chain, so the Stair foot is as near the start as before round 1 (Thick Blood 7 steps, the Stair foot 8, Second Curse 10).",
       at: P(1090, -420),
       shape: { kind: 'hand' },
       nodes: [
         {
-          id: 'c',
+          id: 'a',
           kind: 'small',
           lines: [life(5)],
-          at: P(979, -291),
+          at: P(979, -401),
           why: 'The entrance, from the claw side.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)], at: P(979, -346) },
-        { id: 'a', kind: 'small', lines: [life(5)], at: P(979, -401) },
         {
           id: 'n',
           kind: 'notable',
@@ -251,11 +249,19 @@ export const edge: AreaSpec = {
           at: P(979, -471),
           why: '2 + 1 + 1 units. The exit, to the curse junction.',
         },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(909, -465),
+          why: "The pocket behind the notable, in the widest gap of its fan (between the chain from the wheel and the Spire's road): life a Shade can take more of without walking further north.",
+        },
+        { id: 'c', kind: 'small', lines: [life(5)], at: P(854, -460) },
       ],
       links: [
-        ['c', 'b'],
-        ['b', 'a'],
         ['a', 'n'],
+        ['n', 'b'],
+        ['b', 'c'],
       ],
     },
   ],
@@ -299,7 +305,7 @@ export const edge: AreaSpec = {
       why: "The chaos spoke lands on the Bow's dear road: a poison bow walks in through the resistances.",
     },
     { from: 'wheel.w4', to: 'knife.venom.j2.a', why: 'Through the wheel to the venom junction.' },
-    { from: 'wheel.w2', to: 'thickBlood.c', why: 'The claw side onto the life chain.' },
+    { from: 'wheel.w2', to: 'thickBlood.a', why: 'The claw side onto the life chain.' },
     {
       from: 'thickBlood.n',
       to: 'knife.hex.jH.a',

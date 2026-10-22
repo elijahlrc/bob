@@ -2,7 +2,8 @@
  * The Undercroft (the deep end, toward the Spire): the wheel (minion damage on its north side, spell block and energy
  * shield on its south since 2026-10-20), the junction with Volatile Servants, the shrine (totems one side, brands the
  * other) with Sigil Warden, and the dear road of two attribute nodes to the Spire's minion notable. The id
- * `cathedral.crypt` predates the change and is kept.
+ * `cathedral.crypt` predates the change and is kept. The north walk and Rood Screen moved to `walk.ts` (the Lychway) in
+ * G3 round 2.
  */
 import {
   areaDamage,
@@ -32,7 +33,7 @@ export const crypt: AreaSpec = {
   id: 'cathedral.crypt',
   region: 'zealot',
   name: 'The Undercroft',
-  why: 'The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, the dear road to the Spire, and the north walk round its back (G2).',
+  why: 'The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, and the dear road to the Spire with Tomb Dust and Shattering Rite off it. The north walk round its back (G2) is its own place since G3 round 2, the Lychway (`walk.ts`).',
   at: [-1976, -2996], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -253,108 +254,8 @@ export const crypt: AreaSpec = {
         ['b', 'n'],
       ],
     },
-    {
-      id: 'north',
-      name: 'The north walk',
-      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. In G3: Rood Screen (ZE-11, round 1) hangs inward off the third node, ZE-9 off the fourth, and ZE-3 bridges Shattering Rite to the east end.",
-      at: P(3057, 1916),
-      shape: { kind: 'hand' },
-      nodes: [
-        {
-          id: 'n1',
-          kind: 'attribute',
-          lines: [str(6), int(6)],
-          at: P(3510, 728),
-          why: "The corner where Kindled Steel's line meets the rim.",
-        },
-        {
-          id: 'n2',
-          kind: 'attribute',
-          lines: [str(6), int(6)],
-          at: P(3396, 1140),
-          why: 'Outside the Sigil Warden keystone.',
-        },
-        {
-          id: 'n3',
-          kind: 'attribute',
-          lines: [str(6), int(6)],
-          at: P(3244, 1537),
-          why: 'Where Rood Screen (energy shield with spell block, G3) hangs inward.',
-        },
-        {
-          id: 'n4',
-          kind: 'attribute',
-          lines: [str(6), int(6)],
-          at: P(3057, 1916),
-          why: 'Where, in G3, spell damage with duration (ZE-9) hangs inward.',
-        },
-        {
-          id: 'n5',
-          kind: 'attribute',
-          lines: [str(6), int(6)],
-          at: P(2836, 2274),
-          why: 'Outside the Volatile Servants keystone, toward the east end.',
-        },
-        {
-          id: 'n6',
-          kind: 'attribute',
-          lines: [str(6), int(6)],
-          at: P(2584, 2607),
-          why: "The east end: Tomb Dust arrives, ZE-3 bridges in from Shattering Rite (G3), and the far loop runs on in the same line to the Mystic's north-west rim road (the border pass).",
-        },
-      ],
-      links: [
-        ['n1', 'n2'],
-        ['n2', 'n3'],
-        ['n3', 'n4'],
-        ['n4', 'n5'],
-        ['n5', 'n6'],
-      ],
-    },
-    {
-      id: 'rood',
-      name: 'Rood Screen',
-      why: "G3 round 1 (2026-10-22; ledger ZE-11): a pocket inward off the north walk's third node, square to the walk: energy shield three times, then the notable with energy shield and spell block. The block caster's shield without a shield (Glass Wall needs one), and the energy shield a Zealot or Mystic caster finds far out on the casters' loop, in a different direction from the Cloister's. A dead-end tip on purpose (§13.5): the walk it hangs from has three ways in. It lives in the Undercroft's file because no area name covers the north walk yet (G2 flagged that the walk wants its own area).",
-      at: P(2978, 1419),
-      shape: { kind: 'hand' },
-      nodes: [
-        {
-          id: 'a',
-          kind: 'small',
-          lines: [es(5)],
-          at: P(3143, 1492),
-          why: 'The entrance from the walk.',
-        },
-        { id: 'b', kind: 'small', lines: [es(5)], at: P(3093, 1469) },
-        { id: 'c', kind: 'small', lines: [es(5)], at: P(3042, 1448) },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Rood Screen',
-          lines: [es(10), spellBlock(4)],
-          at: P(2978, 1419),
-          why: 'Energy shield and spell block: 2 + 2 units.',
-        },
-      ],
-      links: [
-        ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'n'],
-      ],
-    },
   ],
   links: [
-    {
-      from: 'cathedral.ambulatory.kindled.n',
-      to: 'north.n1',
-      why: "Kindled Steel's chain carried straight on to the rim: the fire-strike pocket becomes a bridge onto the north walk.",
-    },
-    {
-      from: 'tomb.n',
-      to: 'north.n6',
-      why: "Tomb Dust's chain carried on to the north walk's east end: the chaos pocket becomes a bridge, and the walk's second way in.",
-    },
-    { from: 'north.n3', to: 'rood.a', why: "The north walk's third node onto Rood Screen (G3)." },
     { from: 'toSpire.b', to: 'rite.a', why: 'The crossing road onto the physical spells.' },
     { from: 'toSpire.a', to: 'tomb.a', why: 'The crossing road onto the chaos pocket.' },
     { from: 'toSpire.a', to: 'stair.a', why: 'The Spire crossing onto the crypt stair.' },
@@ -365,10 +266,5 @@ export const crypt: AreaSpec = {
     { from: 'shrine.e', to: 'sigilWarden.a', why: "The shrine's brand side to the keystone spur." },
     { from: 'wheel.m5', to: 'toSpire.a', why: 'Glass Wall onto the dear road.' },
     { from: 'toSpire.b', to: 'spire.fire.familiars.n', why: 'The dear road lands on Familiars.' },
-    {
-      from: 'north.n6',
-      to: 'spire.fire.rim.c',
-      why: "The far loop (a dear crossing; G1-brief.md §2.2, laid in the G2 border pass): the north walk runs on in its own line (a turn of about 10°) to the corner of the Mystic's north-west rim road, so the two rim roads read as one road over the top of the map. The casters' far loop: Tomb Dust, Shattering Rite and the Zealot's far casters (G3) with Cinder, Steady Stream and the Mystic's far shield. 19 steps from the Zealot start and 23 from the Mystic's, so it is a late build's road.",
-    },
   ],
 };
