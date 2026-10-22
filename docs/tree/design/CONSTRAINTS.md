@@ -25,6 +25,12 @@ Each item states the rule or the workflow, not how it was learned. History lives
    "bow" area and a "physical attack" area holding most of what it wants makes no decision by going there. That is just
    what the build requires, and then there is no reason to have a tree. The tree is worth having only when a build has
    to give something up to get something.
+   - **Measured as what more points would still buy.** [user, 10-22] A finished build that 40 more points would barely
+     help has everything it wanted, so the tree made no decision for it. The measure and its targets are in
+     `G0-baseline.md` (stop 1), and `npm run passives:builds` reports them.
+   - **It is one constraint among all the others, never at their expense.** [user, 10-22] "This is one more of many,
+     many constraints that all must be fulfilled." More tension never excuses a worse start, a thinner vocabulary, a
+     region without varied defences, filler roads, or a messier picture.
 2. **It must serve tens of archetypes and tens of thousands of specific builds.** [user, 10-18] Builds cannot be
    enumerated: the combinatorics make that impossible, and there is no bot that plays like a decent player. [user, 10-19]
    So the design is about what the tree supplies and the choices it offers, never about a list of builds it supports.
@@ -345,6 +351,9 @@ The core of section 1, made concrete.
      big pass. [user, 10-20]
 2. **The node count is not final.** [user, 10-20] New nodes will keep being added, so a specialization that needs another
    home can get a new cluster rather than re-lining an old one.
+   - **Growing may move, remove or change existing clusters.** [user, 10-22] "Feel free to move, remove, or otherwise
+     modify existing clusters as you balance the added clusters." No existing cluster is fixed because it was there
+     first.
 3. **Balance is a property of what the tree supplies, not of bot results.** [adopted, after the user's note that no bot
    plays like a decent player] Each axis value a start is meant to reach should buy comparable power per point. Price
    every node in units.

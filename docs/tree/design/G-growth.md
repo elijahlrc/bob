@@ -187,6 +187,10 @@ against the baseline, and the gave-up lists.
 
 ## 3. How the work keeps its intent
 
+- **Tension is one constraint among all of CONSTRAINTS.md** (the user, 2026-10-22): "not at the expense of all the
+  other goals in the constraints doc. This is one more of many, many constraints that all must be fulfilled." And:
+  "feel free to move, remove, or otherwise modify existing clusters as you balance the added clusters." Every brief,
+  round and audit weighs moving, removing or re-lining existing clusters alongside adding new ones.
 - **CONSTRAINTS.md in every prompt.** Every agent reads it in full before starting and gets the user's words of
   2026-10-22 verbatim; every report ends with the sections it checked.
 - **One region per agent, one folder per agent,** as in the layout pass; border work is done together afterwards.
