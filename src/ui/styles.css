@@ -30,6 +30,11 @@ button {
   font: inherit;
   color: inherit;
 }
+input,
+select,
+textarea {
+  font-family: inherit;
+}
 .screen {
   position: absolute;
   inset: 0;

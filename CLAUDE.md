@@ -121,7 +121,9 @@
 ## Visual style
 
 The map is rendered as isometric Grimdark: crunchy pixel art, a diagonal 2:1 camera, real-time lights and
-particles (`src/render/styles/grim/`, shared figure rig in `src/render/style/`). Three other styles were
+particles (`src/render/styles/grim/`, shared figure rig in `src/render/style/`). Fonts (2026-10-22): Grenze for
+interface text and Jacquard 24 for headings and names (`@fontsource`, imported in `src/main.ts`, set in `skins.css`);
+text on the map is a bitmap font of our own (`src/render/style/pixelGlyphs.ts`). Three other styles were
 explored and removed; see `docs/VISUAL_STYLES.md`. _Showcase_ mode on the Title screen auto-plays a demo
 (N = next class). Uncaught errors are saved to `localStorage['bob.crashlog']` and shown as a copyable report
 (`src/crashlog.ts`). Known bugs to revisit are in `docs/BUGS.md`.
