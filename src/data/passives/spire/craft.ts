@@ -116,7 +116,7 @@ export const craft: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Wand Volley',
-          lines: [wandAttack(24), weaponSpeed('wand', 5), weaponCrit('wand', 20)],
+          lines: [wandAttack(24), weaponSpeed('wand', 8), weaponCrit('wand', 15)],
           at: [680, -2650],
           why: '2 + 1.7 + 1 units.',
         },

@@ -133,16 +133,16 @@ export const grit: AreaSpec = {
       at: [-2496, 3386],
       shape: { kind: 'ring', r: 55, a0: -135 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
-        { id: 'b', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
+        { id: 'a', kind: 'small', lines: [attackSpeed(7, ['twoHand'])] },
+        { id: 'b', kind: 'small', lines: [attackSpeed(7, ['twoHand'])] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Heavy Hands',
-          lines: [attackSpeed(8, ['twoHand', 'melee']), accuracy(15)],
+          lines: [attackSpeed(13, ['twoHand', 'melee']), accuracy(15)],
           why: '2.7 + 1.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
+        { id: 'c', kind: 'small', lines: [attackSpeed(7, ['twoHand'])] },
       ],
       links: [
         ['a', 'b'],

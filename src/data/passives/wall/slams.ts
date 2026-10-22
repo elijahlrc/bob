@@ -151,7 +151,7 @@ export const slams: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Unbloodied',
-          lines: [damageOnFullLife(16), critOnFullLife(25), lifeOnKill(10)],
+          lines: [damageOnFullLife(16), critOnFullLife(19), lifeOnKill(10)],
           at: [-1580, 1745],
           why: '2 + 1 + 1 units.',
         },

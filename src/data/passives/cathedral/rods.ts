@@ -48,7 +48,7 @@ export const rods: AreaSpec = {
           id: 'r3',
           kind: 'notable',
           name: 'Gilded Rod',
-          lines: [weaponDamage('sceptre', 20), weaponCrit('sceptre', 20), eleDamageAll(10)],
+          lines: [weaponDamage('sceptre', 20), weaponCrit('sceptre', 15), eleDamageAll(10)],
           at: P(1700, -250),
           why: 'Sceptre damage, sceptre crit, and elemental damage for the spells a sceptre also casts: 2 + 1 + 1 units.',
         },

@@ -199,7 +199,7 @@ export const quiver: AreaSpec = {
         {
           id: 'n439',
           kind: 'small',
-          lines: [critChance(20)],
+          lines: [critChance(15)],
           at: P(1725, 720),
           why: 'Added in the editor (2026-10-19).',
         },
@@ -214,7 +214,7 @@ export const quiver: AreaSpec = {
         {
           id: 'n441',
           kind: 'small',
-          lines: [critChance(20)],
+          lines: [critChance(15)],
           at: P(1666, 692),
           why: 'Added in the editor (2026-10-19).',
         },

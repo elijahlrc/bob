@@ -73,16 +73,16 @@ export const maces: AreaSpec = {
       at: [-3408, 706],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [critChance(20, ['melee'])], at: [-3338, 706] },
+        { id: 'a', kind: 'small', lines: [critChance(15, ['melee'])], at: [-3338, 706] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Crushing Blow',
-          lines: [weaponCrit('mace', 20), weaponCritMulti('mace', 20), doubleDamage(5)],
+          lines: [weaponCrit('mace', 15), weaponCritMulti('mace', 20), doubleDamage(5)],
           at: [-3408, 706],
           why: '1 + 1.7 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [critChance(20, ['melee'])], at: [-3466, 706] },
+        { id: 'b', kind: 'small', lines: [critChance(15, ['melee'])], at: [-3466, 706] },
       ],
       links: [
         ['a', 'n'],
@@ -101,7 +101,7 @@ export const maces: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Cleaver',
-          lines: [axeDamage(24), attackSpeed(6, ['axe'])],
+          lines: [axeDamage(24), attackSpeed(10, ['axe'])],
           why: 'Axe damage and axe speed: 2 + 2 units.',
         },
         { id: 'b', kind: 'small', lines: [axeDamage(12)] },

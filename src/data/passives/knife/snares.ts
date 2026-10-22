@@ -179,13 +179,13 @@ export const snares: AreaSpec = {
       at: [3211, -164],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(1903, 1473) },
-        { id: 'b', kind: 'small', lines: [evasion(12)], at: P(1960, 1487) },
+        { id: 'a', kind: 'small', lines: [evasion(10)], at: P(1903, 1473) },
+        { id: 'b', kind: 'small', lines: [evasion(10)], at: P(1960, 1487) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Veiled Herald',
-          lines: [reducedReservation(5), evasion(16)],
+          lines: [reducedReservation(5), evasion(13)],
           at: [3374, -211],
           why: '1.7 + 1.3 units.',
         },

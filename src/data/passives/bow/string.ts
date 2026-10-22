@@ -61,12 +61,12 @@ export const string: AreaSpec = {
       at: P(1607, 135),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(1587, 141) },
+        { id: 'a', kind: 'small', lines: [attackSpeed(8)], at: P(1587, 141) },
         {
           id: 'n',
           kind: 'notable',
           name: 'True Aim',
-          lines: [accuracy(15), attackSpeed(5), dex(20)],
+          lines: [accuracy(15), attackSpeed(8), dex(20)],
           at: P(1529, 180),
           why: '1.5 + 1.7 + 1.3 units.',
         },
@@ -80,12 +80,12 @@ export const string: AreaSpec = {
       at: P(1285, -9),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(1600, -11) },
+        { id: 'a', kind: 'small', lines: [evasion(10)], at: P(1600, -11) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Hard Target',
-          lines: [evasion(20), life(10), stunAvoid(10)],
+          lines: [evasion(17), life(10), stunAvoid(10)],
           at: P(1297, -21),
           why: '1.7 + 2 + 0.5 units.',
         },
@@ -104,12 +104,12 @@ export const string: AreaSpec = {
       at: P(1317, 108),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(1100, 175) },
+        { id: 'a', kind: 'small', lines: [attackSpeed(8)], at: P(1100, 175) },
         {
           id: 'qh',
           kind: 'notable',
           name: 'Quick Hands',
-          lines: [attackSpeed(6), castSpeed(5)],
+          lines: [attackSpeed(10), castSpeed(5)],
           at: P(1167, 193),
           why: "2 + 1.3 units: quick with the bow and the spell. Round 4 (approved 2026-10-20): it sold accuracy, attack speed and dexterity, True Aim's lines, two steps from it.",
         },
@@ -124,11 +124,11 @@ export const string: AreaSpec = {
           id: 'ff',
           kind: 'notable',
           name: 'Fleet Foot',
-          lines: [moveSpeed(8), evasion(16), attackSpeed(3)],
+          lines: [moveSpeed(8), evasion(13), attackSpeed(5)],
           at: P(1472, -18),
           why: '2 + 1.3 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [evasion(10)], at: P(1542, -16) },
+        { id: 'b', kind: 'small', lines: [evasion(8)], at: P(1542, -16) },
       ],
       links: [
         ['a', 'qh'],
@@ -143,7 +143,7 @@ export const string: AreaSpec = {
       at: P(2110, 127),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(12)], at: P(2127, 138) },
+        { id: 'a', kind: 'small', lines: [evasion(10)], at: P(2127, 138) },
         { id: 'k', kind: 'keystone', name: 'Arrow Weave', lines: [], at: P(2205, 171) },
       ],
       links: [['a', 'k']],

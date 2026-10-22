@@ -64,7 +64,7 @@ export const home: AreaSpec = {
         {
           id: 'b',
           kind: 'small',
-          lines: [critChance(20)],
+          lines: [critChance(15)],
           at: [70, -1242],
           why: 'The east side: offence, for any hit, spell or wand.',
         },

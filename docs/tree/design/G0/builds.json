@@ -645,16 +645,16 @@
             },
             {
               "label": "attack speed",
-              "units": 4.666666666666667,
+              "units": 4.6,
               "amounts": {
-                "attackSpeed": 9,
-                "attackSpeed:oneHand": 5
+                "attackSpeed": 15,
+                "attackSpeed:oneHand": 8
               }
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9988502842703727],
-          "searchGain": 0.010920237563062596,
+          "nearScores": [1, 0.9980401082366033],
+          "searchGain": 0.010929171300379625,
           "tax": {
             "points": 16,
             "share": 0.26666666666666666,
@@ -719,10 +719,10 @@
             },
             {
               "label": "attack speed",
-              "units": 4.666666666666667,
+              "units": 4.6,
               "amounts": {
-                "attackSpeed": 9,
-                "attackSpeed:oneHand": 5
+                "attackSpeed": 15,
+                "attackSpeed:oneHand": 8
               }
             }
           ],
@@ -797,10 +797,10 @@
             },
             {
               "label": "attack speed",
-              "units": 6.333333333333334,
+              "units": 6.199999999999999,
               "amounts": {
-                "attackSpeed": 14,
-                "attackSpeed:oneHand": 5
+                "attackSpeed": 23,
+                "attackSpeed:oneHand": 8
               }
             }
           ],
@@ -882,16 +882,16 @@
             },
             {
               "label": "attack speed",
-              "units": 19,
+              "units": 18.599999999999998,
               "amounts": {
-                "attackSpeed": 49,
-                "attackSpeed:oneHand": 5,
-                "weaponSpeed:sword": 3
+                "attackSpeed": 80,
+                "attackSpeed:oneHand": 8,
+                "weaponSpeed:sword": 5
               }
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9662430223979286],
+          "nearScores": [1, 0.9665992044106361],
           "searchGain": 0,
           "tax": {
             "points": 39,
@@ -974,11 +974,11 @@
             },
             {
               "label": "attack speed",
-              "units": 20,
+              "units": 19.599999999999998,
               "amounts": {
-                "attackSpeed": 52,
-                "attackSpeed:oneHand": 5,
-                "weaponSpeed:sword": 3
+                "attackSpeed": 85,
+                "attackSpeed:oneHand": 8,
+                "weaponSpeed:sword": 5
               }
             }
           ],
@@ -1070,11 +1070,11 @@
             },
             {
               "label": "attack speed",
-              "units": 21,
+              "units": 20.599999999999998,
               "amounts": {
-                "attackSpeed": 55,
-                "attackSpeed:oneHand": 5,
-                "weaponSpeed:sword": 3
+                "attackSpeed": 90,
+                "attackSpeed:oneHand": 8,
+                "weaponSpeed:sword": 5
               }
             }
           ],
@@ -1161,7 +1161,7 @@
             },
             {
               "name": "Steady Hands",
-              "value": 2.1333333333333337
+              "value": 2.08
             },
             {
               "name": "Red Harvest",
@@ -1240,8 +1240,8 @@
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9698776703233258],
-          "searchGain": 0.045765446191873504,
+          "nearScores": [1, 0.9690943377177801],
+          "searchGain": 0.04661075313452279,
           "tax": {
             "points": 18,
             "share": 0.3,
@@ -1453,8 +1453,8 @@
               }
             }
           ],
-          "choice": 2,
-          "nearScores": [1, 0.9573891412980412],
+          "choice": 1,
+          "nearScores": [1],
           "searchGain": 0,
           "tax": {
             "points": 38,
@@ -1704,7 +1704,7 @@
             },
             {
               "name": "Steady Hands",
-              "value": 2.1333333333333337
+              "value": 2.08
             },
             {
               "name": "Elemental Ward",
@@ -1725,7 +1725,7 @@
             },
             {
               "name": "Heavy Hands",
-              "value": 2.7333333333333334
+              "value": 2.68
             },
             {
               "name": "Headsman",
@@ -1737,7 +1737,7 @@
             },
             {
               "name": "Light Hand",
-              "value": 1.3333333333333335
+              "value": 1.2800000000000002
             },
             {
               "name": "Weathered",
@@ -2016,7 +2016,7 @@
             }
           ],
           "choice": 3,
-          "nearScores": [1, 0.9924115459901403, 0.9542244871018138],
+          "nearScores": [1, 0.9931841922996433, 0.9545449371350317],
           "searchGain": 0,
           "tax": {
             "points": 35,
@@ -2305,7 +2305,7 @@
             },
             {
               "name": "Shield Bash",
-              "value": 2.7
+              "value": 2.66
             },
             {
               "name": "Iron Draw",
@@ -2313,7 +2313,7 @@
             },
             {
               "name": "Steady Hands",
-              "value": 2.1333333333333337
+              "value": 2.08
             },
             {
               "name": "Unshakable",
@@ -2825,9 +2825,9 @@
             },
             {
               "label": "evasion",
-              "units": 13.5,
+              "units": 13.4,
               "amounts": {
-                "evasion": 162
+                "evasion": 134
               }
             },
             {
@@ -2844,12 +2844,12 @@
               "units": 5.5,
               "amounts": {
                 "critMulti": 30,
-                "critChance": 60
+                "critChance": 45
               }
             }
           ],
           "choice": 3,
-          "nearScores": [1, 0.9875005040119352, 0.9733881698318616],
+          "nearScores": [1, 0.9880793090864856, 0.9756720593601752],
           "searchGain": 0,
           "tax": {
             "points": 14,
@@ -2864,8 +2864,8 @@
           "taken": [
             "Hawk's Eye",
             "Long Breath",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Hard Target",
             "Steady Draw",
             "Wanderer",
@@ -2900,9 +2900,9 @@
             },
             {
               "label": "evasion",
-              "units": 15.5,
+              "units": 15.4,
               "amounts": {
-                "evasion": 186
+                "evasion": 154
               }
             },
             {
@@ -2919,7 +2919,7 @@
               "units": 5.5,
               "amounts": {
                 "critMulti": 30,
-                "critChance": 60
+                "critChance": 45
               }
             }
           ],
@@ -2939,8 +2939,8 @@
           "taken": [
             "Hawk's Eye",
             "Long Breath",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Quick Hands",
             "Hard Target",
             "Steady Draw",
@@ -2982,9 +2982,9 @@
             },
             {
               "label": "evasion",
-              "units": 21.166666666666668,
+              "units": 21.099999999999998,
               "amounts": {
-                "evasion": 254
+                "evasion": 211
               }
             },
             {
@@ -3001,7 +3001,7 @@
               "units": 8.5,
               "amounts": {
                 "critMulti": 30,
-                "critChance": 120
+                "critChance": 90
               }
             }
           ],
@@ -3021,8 +3021,8 @@
           "taken": [
             "Hawk's Eye",
             "Long Breath",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Quick Hands",
             "Soft Step",
             "Hard Target",
@@ -3070,9 +3070,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.83333333333333,
+              "units": 25.6,
               "amounts": {
-                "evasion": 310
+                "evasion": 256
               }
             },
             {
@@ -3089,7 +3089,7 @@
               "units": 14.5,
               "amounts": {
                 "critMulti": 54,
-                "critChance": 200
+                "critChance": 150
               }
             }
           ],
@@ -3109,8 +3109,8 @@
           "taken": [
             "Hawk's Eye",
             "Long Breath",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Quick Hands",
             "Soft Step",
             "Hard Target",
@@ -3164,9 +3164,9 @@
             },
             {
               "label": "evasion",
-              "units": 29.16666666666666,
+              "units": 28.900000000000002,
               "amounts": {
-                "evasion": 350
+                "evasion": 289
               }
             },
             {
@@ -3183,7 +3183,7 @@
               "units": 16.166666666666668,
               "amounts": {
                 "critMulti": 74,
-                "critChance": 200
+                "critChance": 150
               }
             }
           ],
@@ -3203,8 +3203,8 @@
           "taken": [
             "Hawk's Eye",
             "Long Breath",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Quick Hands",
             "Soft Step",
             "Hard Target",
@@ -3264,9 +3264,9 @@
             },
             {
               "label": "evasion",
-              "units": 30.16666666666666,
+              "units": 29.900000000000002,
               "amounts": {
-                "evasion": 362
+                "evasion": 299
               }
             },
             {
@@ -3283,7 +3283,7 @@
               "units": 25.333333333333332,
               "amounts": {
                 "critMulti": 172,
-                "critChance": 220
+                "critChance": 165
               }
             }
           ],
@@ -3303,8 +3303,8 @@
           "taken": [
             "Hawk's Eye",
             "Long Breath",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Quick Hands",
             "Soft Step",
             "Hard Target",
@@ -3371,7 +3371,7 @@
             },
             {
               "name": "Quickened Steel",
-              "value": 2.2666666666666666
+              "value": 2.32
             },
             {
               "name": "Scarred Hide",
@@ -3387,7 +3387,7 @@
             },
             {
               "name": "Light Hand",
-              "value": 1.3333333333333335
+              "value": 1.2800000000000002
             }
           ]
         },
@@ -3437,17 +3437,16 @@
           "families": [
             {
               "label": "life",
-              "units": 12,
+              "units": 10,
               "amounts": {
-                "life": 55,
-                "lifeFlat": 20
+                "life": 50
               }
             },
             {
               "label": "evasion",
-              "units": 15.333333333333332,
+              "units": 17.3,
               "amounts": {
-                "evasion": 184
+                "evasion": 173
               }
             },
             {
@@ -3459,48 +3458,49 @@
             },
             {
               "label": "bow damage",
-              "units": 12,
+              "units": 14.6,
               "amounts": {
-                "bowDamage": 52,
+                "bowDamage": 78,
                 "projectileDamage": 68
               }
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9896384677491702],
-          "searchGain": 0.01024107304694577,
+          "nearScores": [1, 0.9933105802047782],
+          "searchGain": 0,
           "tax": {
-            "points": 12,
-            "share": 0.2,
-            "road": 9
+            "points": 13,
+            "share": 0.21666666666666667,
+            "road": 11
           },
           "attrs": {
-            "str": 0,
-            "dex": 154,
-            "int": 25
+            "str": 12,
+            "dex": 148,
+            "int": 0
           },
           "taken": [
             "Hawk's Eye",
             "Long Breath",
             "Wayfarer",
+            "Vital Aim",
             "Elemental Fletching",
             "Quick Hands",
             "Soft Step",
             "Hard Target",
+            "Weaving",
             "Fleet Foot",
             "Longbow",
             "True Aim",
-            "Keen Instinct",
+            "Iron Draw",
             "Rapid Fire",
             "Split Volley",
-            "Far Flight",
-            "Thick Blood"
+            "Far Flight"
           ],
           "plan": [
-            2, 204, 205, 206, 207, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228,
-            229, 231, 235, 237, 241, 242, 243, 244, 245, 246, 247, 254, 257, 258, 259, 260, 261,
-            268, 273, 274, 275, 280, 281, 282, 288, 289, 290, 291, 412, 413, 630, 631, 633, 637,
-            638, 639, 640, 641, 642, 647, 648, 662, 663
+            2, 154, 155, 156, 157, 158, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219,
+            220, 223, 224, 225, 226, 227, 228, 229, 231, 235, 237, 241, 242, 243, 244, 245, 246,
+            247, 254, 257, 258, 259, 260, 261, 268, 273, 274, 275, 280, 281, 282, 283, 288, 289,
+            290, 291, 412, 413, 637, 638, 639, 849, 850
           ]
         },
         {
@@ -3509,17 +3509,17 @@
           "families": [
             {
               "label": "life",
-              "units": 16.4,
+              "units": 18,
               "amounts": {
-                "life": 77,
+                "life": 85,
                 "lifeFlat": 20
               }
             },
             {
               "label": "evasion",
-              "units": 23.66666666666666,
+              "units": 21.1,
               "amounts": {
-                "evasion": 284
+                "evasion": 211
               }
             },
             {
@@ -3542,14 +3542,14 @@
           "nearScores": [],
           "searchGain": 0,
           "tax": {
-            "points": 16,
-            "share": 0.2,
+            "points": 18,
+            "share": 0.225,
             "road": 12
           },
           "attrs": {
-            "str": 22,
-            "dex": 173,
-            "int": 25
+            "str": 32,
+            "dex": 183,
+            "int": 35
           },
           "taken": [
             "Hawk's Eye",
@@ -3561,7 +3561,7 @@
             "Soft Step",
             "Hard Target",
             "Weaving",
-            "Sidestep",
+            "Wanderer",
             "Fleet Foot",
             "Longbow",
             "True Aim",
@@ -3574,10 +3574,10 @@
             "Heavy Draw"
           ],
           "plan": [
-            2, 154, 155, 156, 157, 158, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219,
-            220, 221, 223, 224, 225, 226, 227, 228, 229, 230, 231, 235, 237, 241, 242, 243, 244,
+            2, 151, 154, 155, 156, 157, 158, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215,
+            219, 220, 221, 223, 224, 225, 226, 227, 228, 229, 231, 235, 237, 241, 242, 243, 244,
             245, 246, 247, 254, 257, 258, 259, 260, 261, 268, 273, 274, 275, 280, 281, 282, 283,
-            288, 289, 290, 291, 296, 297, 298, 412, 413, 423, 424, 491, 616, 629, 630, 631, 633,
+            288, 289, 290, 291, 296, 297, 298, 411, 412, 413, 415, 416, 616, 629, 630, 631, 633,
             637, 638, 639, 640, 641, 642, 647, 648, 662, 663, 849, 850
           ]
         },
@@ -3595,9 +3595,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.833333333333325,
+              "units": 24.800000000000004,
               "amounts": {
-                "evasion": 310
+                "evasion": 248
               }
             },
             {
@@ -3625,8 +3625,8 @@
             "road": 15
           },
           "attrs": {
-            "str": 69,
-            "dex": 220,
+            "str": 60,
+            "dex": 211,
             "int": 35
           },
           "taken": [
@@ -3639,7 +3639,6 @@
             "Soft Step",
             "Hard Target",
             "Weaving",
-            "Sidestep",
             "Wanderer",
             "Fleet Foot",
             "Longbow",
@@ -3657,11 +3656,11 @@
             "Four Winds"
           ],
           "plan": [
-            2, 154, 155, 156, 157, 158, 167, 168, 171, 172, 173, 204, 205, 206, 207, 208, 209, 210,
-            211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228, 229, 230, 231, 235,
-            237, 241, 242, 243, 244, 245, 246, 247, 254, 257, 258, 259, 260, 261, 268, 273, 274,
-            275, 280, 281, 282, 283, 288, 289, 290, 291, 296, 297, 298, 411, 412, 413, 415, 416,
-            423, 424, 468, 469, 471, 477, 480, 482, 483, 484, 491, 492, 493, 616, 629, 630, 631,
+            2, 151, 154, 155, 156, 157, 158, 167, 168, 171, 172, 173, 204, 205, 206, 207, 208, 209,
+            210, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228, 229, 230, 231,
+            235, 237, 241, 242, 243, 244, 245, 246, 247, 254, 257, 258, 259, 260, 261, 268, 273,
+            274, 275, 280, 281, 282, 283, 288, 289, 290, 291, 296, 297, 298, 411, 412, 413, 415,
+            416, 423, 424, 468, 469, 477, 480, 481, 482, 483, 484, 492, 493, 616, 629, 630, 631,
             633, 637, 638, 639, 640, 641, 642, 647, 648, 662, 663, 849, 850, 851, 852
           ]
         },
@@ -3679,9 +3678,9 @@
             },
             {
               "label": "evasion",
-              "units": 26.833333333333325,
+              "units": 26.600000000000005,
               "amounts": {
-                "evasion": 322
+                "evasion": 266
               }
             },
             {
@@ -3723,8 +3722,8 @@
             "Soft Step",
             "Hard Target",
             "Weaving",
-            "Sidestep",
             "Wanderer",
+            "Sidestep",
             "Light Hand",
             "Fleet Foot",
             "Longbow",
@@ -3768,9 +3767,9 @@
             },
             {
               "label": "evasion",
-              "units": 30.166666666666657,
+              "units": 29.900000000000006,
               "amounts": {
-                "evasion": 362
+                "evasion": 299
               }
             },
             {
@@ -3812,8 +3811,8 @@
             "Soft Step",
             "Hard Target",
             "Weaving",
-            "Sidestep",
             "Wanderer",
+            "Sidestep",
             "Light Hand",
             "Fleet Foot",
             "Longbow",
@@ -3865,9 +3864,9 @@
             },
             {
               "label": "evasion",
-              "units": 31.166666666666657,
+              "units": 30.900000000000006,
               "amounts": {
-                "evasion": 374
+                "evasion": 309
               }
             },
             {
@@ -3910,8 +3909,8 @@
             "Soft Step",
             "Hard Target",
             "Weaving",
-            "Sidestep",
             "Wanderer",
+            "Sidestep",
             "Light Hand",
             "Weathered",
             "Fleet Foot",
@@ -3960,24 +3959,16 @@
           "budget": 60,
           "gaveUp": [
             {
-              "name": "Weaving",
+              "name": "Thick Blood",
               "value": 3
             },
             {
-              "name": "Iron Draw",
-              "value": 2.2800000000000002
-            },
-            {
               "name": "Quickened Steel",
-              "value": 2.2666666666666666
+              "value": 2.32
             },
             {
               "name": "Scarred Hide",
               "value": 2
-            },
-            {
-              "name": "Vital Aim",
-              "value": 1.75
             },
             {
               "name": "Four Winds",
@@ -4044,7 +4035,7 @@
           ],
           "choice": 1,
           "nearScores": [1],
-          "searchGain": 0.008816975099312119,
+          "searchGain": 0.0064365125804566325,
           "tax": {
             "points": 15,
             "share": 0.25,
@@ -4069,8 +4060,8 @@
             "Longbow",
             "True Aim",
             "Venom Fletching",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath"
           ],
           "plan": [
@@ -4138,8 +4129,8 @@
             "True Aim",
             "Keen Instinct",
             "Venom Fletching",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Iron Draw",
             "Fighting Breath",
             "Thick Blood",
@@ -4214,8 +4205,8 @@
             "True Aim",
             "Keen Instinct",
             "Venom Fletching",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Iron Draw",
             "Snakeskin",
             "Fighting Breath",
@@ -4296,8 +4287,8 @@
             "Keen Instinct",
             "Venom Fletching",
             "Iron Draw",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Snakeskin",
             "Fighting Breath",
             "Ricochet",
@@ -4382,8 +4373,8 @@
             "Keen Instinct",
             "Venom Fletching",
             "Iron Draw",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Snakeskin",
             "Fighting Breath",
             "Ricochet",
@@ -4474,8 +4465,8 @@
             "Keen Instinct",
             "Venom Fletching",
             "Iron Draw",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Snakeskin",
             "Fighting Breath",
             "Ricochet",
@@ -5719,10 +5710,10 @@
             },
             {
               "label": "attack speed",
-              "units": 6.666666666666667,
+              "units": 6.4,
               "amounts": {
-                "weaponSpeed:wand": 5,
-                "attackSpeed": 15
+                "weaponSpeed:wand": 8,
+                "attackSpeed": 24
               }
             }
           ],
@@ -5781,10 +5772,10 @@
             },
             {
               "label": "attack speed",
-              "units": 15.666666666666666,
+              "units": 15.2,
               "amounts": {
-                "weaponSpeed:wand": 5,
-                "attackSpeed": 42
+                "weaponSpeed:wand": 8,
+                "attackSpeed": 68
               }
             }
           ],
@@ -5849,10 +5840,10 @@
             },
             {
               "label": "attack speed",
-              "units": 16.666666666666664,
+              "units": 16.2,
               "amounts": {
-                "weaponSpeed:wand": 5,
-                "attackSpeed": 45
+                "weaponSpeed:wand": 8,
+                "attackSpeed": 73
               }
             }
           ],
@@ -5923,25 +5914,25 @@
             },
             {
               "label": "attack speed",
-              "units": 18.333333333333332,
+              "units": 19.2,
               "amounts": {
-                "weaponSpeed:wand": 5,
-                "attackSpeed": 50
+                "weaponSpeed:wand": 8,
+                "attackSpeed": 88
               }
             }
           ],
-          "choice": 2,
-          "nearScores": [1, 0.9816914564920602],
+          "choice": 1,
+          "nearScores": [1],
           "searchGain": 0,
           "tax": {
-            "points": 39,
-            "share": 0.325,
-            "road": 23
+            "points": 41,
+            "share": 0.3416666666666667,
+            "road": 27
           },
           "attrs": {
-            "str": 0,
-            "dex": 200,
-            "int": 168
+            "str": 43,
+            "dex": 244,
+            "int": 162
           },
           "taken": [
             "First Light",
@@ -5960,26 +5951,25 @@
             "Hawk's Eye",
             "Long Breath",
             "Elemental Fletching",
-            "Snakeskin",
             "Vital Aim",
-            "Light Hand",
             "Quick Hands",
             "Shroud",
             "Hard Target",
             "Weathered",
+            "Quickened Steel",
             "True Aim",
             "Fleet Foot",
             "Far Flight",
             "Quiet Shot"
           ],
           "plan": [
-            0, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 219, 220, 223, 224,
-            225, 226, 227, 228, 229, 241, 242, 243, 258, 259, 260, 261, 314, 317, 318, 319, 320,
-            321, 322, 323, 331, 332, 333, 337, 340, 342, 343, 346, 351, 354, 400, 401, 402, 403,
-            407, 408, 412, 413, 414, 418, 425, 502, 503, 504, 505, 513, 514, 515, 529, 532, 538,
-            539, 540, 611, 620, 622, 623, 624, 625, 630, 631, 633, 640, 641, 642, 647, 648, 650,
-            657, 660, 662, 663, 664, 665, 668, 669, 670, 677, 678, 679, 681, 682, 684, 685, 696,
-            697, 807, 808, 809, 810, 854, 872, 875, 876, 877, 945, 946, 947, 1024, 1077, 1078, 1079,
+            0, 15, 16, 17, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 219,
+            220, 223, 224, 225, 226, 227, 228, 229, 241, 242, 243, 258, 259, 260, 261, 314, 317,
+            318, 319, 320, 321, 322, 323, 331, 332, 333, 337, 340, 342, 343, 346, 351, 354, 400,
+            401, 407, 408, 412, 413, 425, 468, 469, 471, 482, 502, 503, 504, 505, 513, 514, 515,
+            529, 532, 538, 539, 540, 611, 620, 622, 623, 624, 625, 630, 631, 633, 640, 641, 642,
+            647, 648, 650, 662, 663, 664, 665, 668, 669, 670, 677, 678, 679, 681, 682, 696, 697,
+            807, 808, 809, 810, 854, 859, 872, 875, 876, 877, 945, 946, 947, 1024, 1077, 1078, 1079,
             1121
           ]
         },
@@ -6003,10 +5993,10 @@
             },
             {
               "label": "attack speed",
-              "units": 21.333333333333332,
+              "units": 19.2,
               "amounts": {
-                "weaponSpeed:wand": 5,
-                "attackSpeed": 59
+                "weaponSpeed:wand": 8,
+                "attackSpeed": 88
               }
             }
           ],
@@ -6014,8 +6004,8 @@
           "nearScores": [],
           "searchGain": 0,
           "tax": {
-            "points": 48,
-            "share": 0.34285714285714286,
+            "points": 46,
+            "share": 0.32857142857142857,
             "road": 31
           },
           "attrs": {
@@ -6042,7 +6032,6 @@
             "Elemental Fletching",
             "Snakeskin",
             "Vital Aim",
-            "Light Hand",
             "Quick Hands",
             "Shroud",
             "Hard Target",
@@ -6057,10 +6046,10 @@
             "Scarred Hide"
           ],
           "plan": [
-            0, 15, 16, 17, 167, 168, 173, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213,
-            214, 215, 219, 220, 223, 224, 225, 226, 227, 228, 229, 241, 242, 243, 258, 259, 260,
-            261, 314, 317, 318, 319, 320, 321, 322, 323, 331, 332, 333, 337, 340, 342, 343, 346,
-            351, 354, 400, 401, 402, 403, 407, 408, 412, 413, 414, 418, 425, 468, 469, 471, 482,
+            0, 15, 16, 17, 167, 168, 171, 172, 173, 203, 204, 205, 206, 207, 208, 209, 210, 211,
+            212, 213, 214, 215, 219, 220, 223, 224, 225, 226, 227, 228, 229, 241, 242, 243, 258,
+            259, 260, 261, 314, 317, 318, 319, 320, 321, 322, 323, 331, 332, 333, 337, 340, 342,
+            343, 346, 351, 354, 400, 401, 407, 408, 412, 413, 425, 426, 427, 468, 469, 471, 482,
             483, 484, 492, 493, 502, 503, 504, 505, 513, 514, 515, 529, 532, 538, 539, 540, 611,
             620, 622, 623, 624, 625, 630, 631, 633, 640, 641, 642, 647, 648, 650, 657, 660, 662,
             663, 664, 665, 668, 669, 670, 677, 678, 679, 681, 682, 684, 685, 694, 695, 696, 697,
@@ -6088,10 +6077,10 @@
             },
             {
               "label": "attack speed",
-              "units": 21.333333333333332,
+              "units": 20.8,
               "amounts": {
-                "weaponSpeed:wand": 5,
-                "attackSpeed": 59
+                "weaponSpeed:wand": 8,
+                "attackSpeed": 96
               }
             }
           ],
@@ -6168,12 +6157,12 @@
               "value": 2.1
             },
             {
-              "name": "True Aim",
-              "value": 1.9333333333333336
-            },
-            {
               "name": "Hawk's Eye",
               "value": 1.92
+            },
+            {
+              "name": "True Aim",
+              "value": 1.8800000000000003
             },
             {
               "name": "Quick Hands",
@@ -6201,16 +6190,16 @@
               "value": 1.8399999999999999
             },
             {
-              "name": "Quickened Steel",
-              "value": 1.6666666666666665
-            },
-            {
               "name": "Four Winds",
               "value": 1.6
             },
             {
               "name": "Shelter",
               "value": 1.3
+            },
+            {
+              "name": "Light Hand",
+              "value": 1.2800000000000002
             },
             {
               "name": "Mercy Stroke",
@@ -6222,6 +6211,10 @@
             },
             {
               "name": "Scarred Hide",
+              "value": 1
+            },
+            {
+              "name": "Snakeskin",
               "value": 1
             }
           ]
@@ -6472,7 +6465,7 @@
           ],
           "choice": 5,
           "nearScores": [
-            1, 0.9806906572641653, 0.9707460458171978, 0.9677599962674379, 0.9529630543021108
+            1, 0.9802303455182773, 0.9711233516942079, 0.9677048906693372, 0.9528826573193122
           ],
           "searchGain": 0,
           "tax": {
@@ -6729,7 +6722,7 @@
             },
             {
               "name": "Steady Hands",
-              "value": 2.1333333333333337
+              "value": 2.08
             },
             {
               "name": "Red Harvest",
@@ -6762,7 +6755,7 @@
             },
             {
               "name": "Light Hand",
-              "value": 1.3333333333333335
+              "value": 1.2800000000000002
             },
             {
               "name": "Greatweight",
@@ -6787,9 +6780,9 @@
           "families": [
             {
               "label": "life",
-              "units": 23.200000000000003,
+              "units": 22.200000000000003,
               "amounts": {
-                "life": 116
+                "life": 111
               }
             },
             {
@@ -6798,14 +6791,14 @@
               "amounts": {
                 "oneHandMelee": 95,
                 "dualDamage": 30,
-                "dualSpeed": 3
+                "dualSpeed": 5
               }
             },
             {
               "label": "evasion",
-              "units": 14.833333333333334,
+              "units": 14.7,
               "amounts": {
-                "evasion": 178
+                "evasion": 147
               }
             }
           ],
@@ -6831,6 +6824,7 @@
             "Twin Fangs",
             "Light Blades",
             "Scarred Hide",
+            "Four Winds",
             "Hawk's Eye",
             "Wayfarer",
             "Long Breath",
@@ -6843,10 +6837,10 @@
             "Heavy Draw"
           ],
           "plan": [
-            3, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 158, 167, 168, 171, 172, 173, 204,
-            205, 206, 207, 211, 212, 213, 215, 219, 220, 223, 224, 225, 226, 227, 228, 229, 255,
-            256, 257, 283, 290, 291, 296, 297, 298, 403, 414, 415, 418, 423, 424, 467, 468, 469,
-            471, 477, 480, 481, 482, 483, 484, 561, 604
+            3, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 158, 167, 168, 172, 173, 204, 205,
+            206, 207, 211, 212, 213, 215, 220, 223, 224, 225, 226, 227, 228, 229, 255, 256, 257,
+            283, 290, 291, 296, 297, 298, 403, 414, 415, 418, 423, 424, 467, 468, 469, 471, 477,
+            480, 481, 482, 483, 484, 492, 493, 561, 604
           ]
         },
         {
@@ -6855,25 +6849,26 @@
           "families": [
             {
               "label": "life",
-              "units": 28.200000000000003,
+              "units": 27.200000000000003,
               "amounts": {
-                "life": 141
+                "life": 136
               }
             },
             {
               "label": "dual wield",
-              "units": 13.5,
+              "units": 15.966666666666667,
               "amounts": {
                 "oneHandMelee": 95,
                 "dualDamage": 30,
-                "dualSpeed": 3
+                "dualSpeed": 5,
+                "dualCrit": 37
               }
             },
             {
               "label": "evasion",
-              "units": 19.666666666666664,
+              "units": 16.3,
               "amounts": {
-                "evasion": 236
+                "evasion": 163
               }
             }
           ],
@@ -6883,11 +6878,11 @@
           "tax": {
             "points": 18,
             "share": 0.225,
-            "road": 14
+            "road": 16
           },
           "attrs": {
-            "str": 106,
-            "dex": 181,
+            "str": 118,
+            "dex": 193,
             "int": 10
           },
           "taken": [
@@ -6903,10 +6898,11 @@
             "Scarred Hide",
             "Four Winds",
             "Hawk's Eye",
-            "Guarded",
             "Wayfarer",
             "Long Breath",
             "Quick Hands",
+            "Red Harvest",
+            "Crossed Blades",
             "Light Hand",
             "Hard Target",
             "Wanderer",
@@ -6916,10 +6912,10 @@
           ],
           "plan": [
             3, 135, 136, 137, 138, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 158, 167, 168,
-            171, 172, 173, 204, 205, 206, 207, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225,
-            226, 227, 228, 229, 230, 255, 256, 257, 283, 288, 289, 290, 291, 296, 297, 298, 403,
+            171, 172, 173, 182, 187, 189, 204, 205, 206, 207, 211, 212, 213, 215, 220, 223, 224,
+            225, 226, 227, 228, 229, 255, 256, 257, 283, 288, 289, 290, 291, 296, 297, 298, 403,
             414, 415, 418, 423, 424, 467, 468, 469, 470, 471, 472, 473, 474, 477, 478, 479, 480,
-            481, 482, 483, 484, 492, 493, 561, 603, 604, 841, 842, 843
+            481, 482, 483, 484, 492, 493, 561, 563, 564, 603, 604, 1008
           ]
         },
         {
@@ -6935,19 +6931,19 @@
             },
             {
               "label": "dual wield",
-              "units": 17,
+              "units": 16.96666666666667,
               "amounts": {
                 "oneHandMelee": 95,
                 "dualDamage": 30,
-                "dualSpeed": 3,
-                "dualCrit": 70
+                "dualSpeed": 5,
+                "dualCrit": 52
               }
             },
             {
               "label": "evasion",
-              "units": 25.333333333333332,
+              "units": 25.1,
               "amounts": {
-                "evasion": 304
+                "evasion": 251
               }
             }
           ],
@@ -7015,24 +7011,24 @@
             },
             {
               "label": "dual wield",
-              "units": 18,
+              "units": 17.96666666666667,
               "amounts": {
                 "oneHandMelee": 95,
                 "dualDamage": 30,
-                "dualSpeed": 3,
-                "dualCrit": 90
+                "dualSpeed": 5,
+                "dualCrit": 67
               }
             },
             {
               "label": "evasion",
-              "units": 27.333333333333332,
+              "units": 27.1,
               "amounts": {
-                "evasion": 328
+                "evasion": 271
               }
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9713546781902705],
+          "nearScores": [1, 0.9652264918447139],
           "searchGain": 0,
           "tax": {
             "points": 33,
@@ -7103,19 +7099,19 @@
             },
             {
               "label": "dual wield",
-              "units": 18,
+              "units": 17.96666666666667,
               "amounts": {
                 "oneHandMelee": 95,
                 "dualDamage": 30,
-                "dualSpeed": 3,
-                "dualCrit": 90
+                "dualSpeed": 5,
+                "dualCrit": 67
               }
             },
             {
               "label": "evasion",
-              "units": 27.333333333333332,
+              "units": 27.1,
               "amounts": {
-                "evasion": 328
+                "evasion": 271
               }
             }
           ],
@@ -7123,8 +7119,8 @@
           "nearScores": [],
           "searchGain": 0,
           "tax": {
-            "points": 40,
-            "share": 0.2857142857142857,
+            "points": 39,
+            "share": 0.2785714285714286,
             "road": 27
           },
           "attrs": {
@@ -7167,18 +7163,17 @@
             "Fleet Blade",
             "Snakeskin",
             "Fine Point",
-            "Deep Cuts",
             "Heavy Draw",
             "Thick Blood"
           ],
           "plan": [
             3, 90, 91, 135, 136, 137, 138, 139, 140, 141, 142, 147, 148, 149, 150, 151, 152, 153,
-            154, 155, 156, 158, 167, 168, 171, 172, 173, 182, 187, 189, 204, 205, 206, 207, 211,
-            212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228, 229, 230, 235, 236, 237,
-            244, 249, 250, 251, 254, 255, 256, 257, 277, 278, 283, 286, 287, 288, 289, 290, 291,
-            296, 297, 298, 403, 414, 415, 418, 421, 422, 423, 424, 433, 435, 436, 438, 444, 447,
-            448, 449, 450, 467, 468, 469, 470, 471, 472, 473, 474, 477, 478, 479, 480, 481, 482,
-            483, 484, 492, 493, 561, 562, 563, 564, 583, 584, 585, 604, 629, 630, 631, 633, 637,
+            154, 155, 156, 158, 167, 168, 171, 172, 173, 182, 187, 188, 189, 204, 205, 206, 207,
+            211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226, 227, 228, 229, 230, 235, 236,
+            237, 244, 249, 250, 251, 254, 255, 256, 257, 283, 286, 287, 288, 289, 290, 291, 296,
+            297, 298, 403, 414, 415, 418, 421, 422, 423, 424, 433, 435, 436, 438, 444, 447, 448,
+            449, 450, 467, 468, 469, 470, 471, 472, 473, 474, 477, 478, 479, 480, 481, 482, 483,
+            484, 492, 493, 561, 562, 563, 564, 583, 584, 585, 603, 604, 629, 630, 631, 633, 637,
             638, 639, 640, 641, 642, 647, 648, 651, 652, 657, 659, 662, 663, 841, 842, 843, 850,
             851, 852, 907, 1008
           ]
@@ -7197,19 +7192,19 @@
             },
             {
               "label": "dual wield",
-              "units": 18,
+              "units": 17.96666666666667,
               "amounts": {
                 "oneHandMelee": 95,
                 "dualDamage": 30,
-                "dualSpeed": 3,
-                "dualCrit": 90
+                "dualSpeed": 5,
+                "dualCrit": 67
               }
             },
             {
               "label": "evasion",
-              "units": 27.333333333333332,
+              "units": 27.1,
               "amounts": {
-                "evasion": 328
+                "evasion": 271
               }
             }
           ],
@@ -7263,8 +7258,8 @@
             "Stone Heart",
             "Snakeskin",
             "Fine Point",
-            "Deep Cuts",
             "Elemental Ward",
+            "Deep Cuts",
             "Heavy Draw",
             "Thick Blood",
             "Steady Hands"
@@ -7297,7 +7292,7 @@
             },
             {
               "name": "Guarded",
-              "value": 2.333333333333333
+              "value": 2.3
             },
             {
               "name": "Keen Edge",
@@ -7305,15 +7300,11 @@
             },
             {
               "name": "Crossed Blades",
-              "value": 2.25
+              "value": 2.216666666666667
             },
             {
               "name": "Red Harvest",
               "value": 1.7999999999999998
-            },
-            {
-              "name": "Four Winds",
-              "value": 1.6
             }
           ]
         },
@@ -7334,7 +7325,7 @@
             },
             {
               "name": "Steady Hands",
-              "value": 2.1333333333333337
+              "value": 2.08
             },
             {
               "name": "Elemental Ward",
@@ -9041,8 +9032,8 @@
               "label": "crit",
               "units": 12.5,
               "amounts": {
-                "critChance": 180,
-                "weaponCrit:dagger": 20,
+                "critChance": 135,
+                "weaponCrit:dagger": 15,
                 "critMulti": 30
               }
             },
@@ -9055,9 +9046,9 @@
             },
             {
               "label": "evasion",
-              "units": 20.166666666666668,
+              "units": 20.1,
               "amounts": {
-                "evasion": 242
+                "evasion": 201
               }
             }
           ],
@@ -9116,8 +9107,8 @@
               "label": "crit",
               "units": 12.5,
               "amounts": {
-                "critChance": 180,
-                "weaponCrit:dagger": 20,
+                "critChance": 135,
+                "weaponCrit:dagger": 15,
                 "critMulti": 30
               }
             },
@@ -9130,9 +9121,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.83333333333333,
+              "units": 25.600000000000005,
               "amounts": {
-                "evasion": 310
+                "evasion": 256
               }
             }
           ],
@@ -9169,8 +9160,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath"
           ],
           "plan": [
@@ -9197,8 +9188,8 @@
               "label": "crit",
               "units": 17.583333333333336,
               "amounts": {
-                "critChance": 180,
-                "weaponCrit:dagger": 20,
+                "critChance": 135,
+                "weaponCrit:dagger": 15,
                 "critMulti": 91
               }
             },
@@ -9211,9 +9202,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.83333333333333,
+              "units": 25.600000000000005,
               "amounts": {
-                "evasion": 310
+                "evasion": 256
               }
             }
           ],
@@ -9251,8 +9242,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Crossed Blades",
             "Scarred Hide",
@@ -9274,9 +9265,9 @@
           "families": [
             {
               "label": "life",
-              "units": 24.8,
+              "units": 27.8,
               "amounts": {
-                "life": 119,
+                "life": 134,
                 "lifeFlat": 20
               }
             },
@@ -9284,8 +9275,8 @@
               "label": "crit",
               "units": 25.333333333333336,
               "amounts": {
-                "critChance": 220,
-                "weaponCrit:dagger": 20,
+                "critChance": 165,
+                "weaponCrit:dagger": 15,
                 "critMulti": 160
               }
             },
@@ -9298,23 +9289,23 @@
             },
             {
               "label": "evasion",
-              "units": 27.999999999999996,
+              "units": 26.800000000000004,
               "amounts": {
-                "evasion": 336
+                "evasion": 268
               }
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9871529465016738],
+          "nearScores": [1, 0.9806318252211652],
           "searchGain": 0,
           "tax": {
-            "points": 32,
-            "share": 0.26666666666666666,
+            "points": 33,
+            "share": 0.275,
             "road": 24
           },
           "attrs": {
-            "str": 77,
-            "dex": 257,
+            "str": 108,
+            "dex": 264,
             "int": 68
           },
           "taken": [
@@ -9327,7 +9318,6 @@
             "Hawk's Eye",
             "Long Breath",
             "Wanderer",
-            "Light Hand",
             "Vital Aim",
             "Wayfarer",
             "Quick Hands",
@@ -9339,10 +9329,11 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Quiet Shot",
+            "Stout Heart",
             "Long Knives",
             "Crossed Blades",
             "Scarred Hide",
@@ -9351,10 +9342,10 @@
             "Fencer's Eye"
           ],
           "plan": [
-            1, 151, 152, 153, 154, 155, 156, 158, 167, 168, 171, 172, 173, 174, 182, 187, 189, 203,
-            204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225,
-            226, 227, 228, 229, 230, 231, 235, 254, 255, 258, 283, 288, 289, 290, 400, 401, 411,
-            414, 415, 416, 423, 424, 468, 469, 471, 477, 480, 481, 482, 483, 484, 490, 491, 492,
+            1, 151, 153, 154, 155, 156, 158, 167, 168, 171, 172, 173, 174, 182, 187, 189, 203, 204,
+            205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219, 220, 221, 223, 224, 225, 226,
+            227, 228, 229, 230, 235, 254, 283, 288, 289, 290, 400, 401, 411, 415, 416, 423, 424,
+            467, 468, 469, 470, 471, 472, 474, 477, 478, 480, 481, 482, 483, 484, 490, 491, 492,
             495, 561, 562, 563, 564, 629, 630, 631, 637, 638, 639, 640, 641, 642, 646, 647, 648,
             650, 651, 652, 653, 654, 655, 656, 657, 659, 661, 662, 663, 664, 665, 668, 669, 670,
             677, 678, 679, 694, 695, 844, 845, 854, 1008, 1022, 1024, 1030, 1031, 1032, 1118, 1121,
@@ -9375,11 +9366,11 @@
             },
             {
               "label": "crit",
-              "units": 29.333333333333336,
+              "units": 25.333333333333336,
               "amounts": {
-                "critChance": 260,
-                "weaponCrit:dagger": 20,
-                "critMulti": 184
+                "critChance": 165,
+                "weaponCrit:dagger": 15,
+                "critMulti": 160
               }
             },
             {
@@ -9391,9 +9382,9 @@
             },
             {
               "label": "evasion",
-              "units": 27.999999999999996,
+              "units": 30.100000000000005,
               "amounts": {
-                "evasion": 336
+                "evasion": 301
               }
             }
           ],
@@ -9401,14 +9392,14 @@
           "nearScores": [],
           "searchGain": 0,
           "tax": {
-            "points": 41,
-            "share": 0.29285714285714287,
-            "road": 30
+            "points": 39,
+            "share": 0.2785714285714286,
+            "road": 29
           },
           "attrs": {
             "str": 108,
-            "dex": 304,
-            "int": 80
+            "dex": 296,
+            "int": 86
           },
           "taken": [
             "Keen Instinct",
@@ -9428,18 +9419,19 @@
             "Hard Target",
             "Twin Fangs",
             "Mercy Stroke",
+            "Weathered",
             "Fleet Foot",
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Tumble",
             "Quiet Shot",
             "Stout Heart",
             "Long Knives",
-            "Killing Eye",
+            "Veiled Herald",
             "Crossed Blades",
             "Scarred Hide",
             "Four Winds",
@@ -9449,12 +9441,12 @@
           "plan": [
             1, 151, 152, 153, 154, 155, 156, 158, 167, 168, 171, 172, 173, 174, 182, 187, 188, 189,
             203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 215, 219, 220, 221, 223, 224,
-            225, 226, 227, 228, 229, 230, 231, 235, 254, 255, 258, 268, 271, 272, 283, 288, 289,
-            290, 400, 401, 411, 414, 415, 416, 419, 420, 423, 424, 432, 467, 468, 469, 470, 471,
-            472, 473, 474, 477, 478, 480, 481, 482, 483, 484, 490, 491, 492, 495, 561, 562, 563,
-            564, 629, 630, 631, 637, 638, 639, 640, 641, 642, 646, 647, 648, 650, 651, 652, 653,
-            654, 655, 656, 657, 659, 661, 662, 663, 664, 665, 668, 669, 670, 677, 678, 679, 684,
-            685, 690, 694, 695, 844, 845, 854, 948, 1008, 1022, 1024, 1027, 1028, 1029, 1030, 1031,
+            225, 226, 227, 228, 229, 230, 235, 254, 255, 283, 288, 289, 290, 400, 401, 407, 408,
+            411, 414, 415, 416, 423, 424, 425, 467, 468, 469, 470, 471, 472, 473, 474, 477, 478,
+            480, 481, 482, 483, 484, 490, 491, 492, 495, 561, 562, 563, 564, 629, 630, 631, 637,
+            638, 639, 640, 641, 642, 646, 647, 648, 650, 651, 652, 653, 654, 655, 656, 657, 659,
+            661, 662, 663, 664, 665, 668, 669, 670, 677, 678, 679, 684, 685, 690, 694, 695, 844,
+            845, 854, 948, 949, 950, 952, 953, 954, 1008, 1022, 1024, 1027, 1028, 1029, 1030, 1031,
             1032, 1118, 1121, 1122, 1123
           ]
         },
@@ -9474,8 +9466,8 @@
               "label": "crit",
               "units": 30.333333333333336,
               "amounts": {
-                "critChance": 280,
-                "weaponCrit:dagger": 20,
+                "critChance": 210,
+                "weaponCrit:dagger": 15,
                 "critMulti": 184
               }
             },
@@ -9488,9 +9480,9 @@
             },
             {
               "label": "evasion",
-              "units": 31.33333333333333,
+              "units": 31.100000000000005,
               "amounts": {
-                "evasion": 376
+                "evasion": 311
               }
             }
           ],
@@ -9531,8 +9523,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Tumble",
             "Quiet Shot",
@@ -9567,11 +9559,11 @@
           "gaveUp": [
             {
               "name": "Quickened Steel",
-              "value": 2.2666666666666666
+              "value": 2.32
             },
             {
               "name": "Crossed Blades",
-              "value": 2.2
+              "value": 2.1733333333333333
             },
             {
               "name": "Mercy Stroke",
@@ -9591,17 +9583,13 @@
             },
             {
               "name": "Light Hand",
-              "value": 1.3333333333333335
+              "value": 1.2800000000000002
             }
           ]
         },
         {
           "budget": 120,
           "gaveUp": [
-            {
-              "name": "Stout Heart",
-              "value": 2.6
-            },
             {
               "name": "Killing Eye",
               "value": 2
@@ -9613,6 +9601,10 @@
             {
               "name": "Thirsty Quiver",
               "value": 1.3
+            },
+            {
+              "name": "Light Hand",
+              "value": 1.2800000000000002
             },
             {
               "name": "Weathered",
@@ -9658,7 +9650,7 @@
           ],
           "choice": 1,
           "nearScores": [1],
-          "searchGain": 0.04672958276691408,
+          "searchGain": 0.04732472324723269,
           "tax": {
             "points": 18,
             "share": 0.3,
@@ -9756,8 +9748,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
-            "Quickened Steel"
+            "Quickened Steel",
+            "Buckler"
           ],
           "plan": [
             1, 151, 154, 155, 156, 158, 204, 205, 206, 207, 211, 212, 213, 214, 215, 219, 220, 221,
@@ -9829,8 +9821,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Scarred Hide",
             "Four Winds",
@@ -9909,8 +9901,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Stout Heart",
             "Heavy Draw",
@@ -9993,8 +9985,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Ricochet",
             "Stout Heart",
@@ -10083,8 +10075,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Ricochet",
             "Stout Heart",
@@ -10124,11 +10116,11 @@
             },
             {
               "name": "Quickened Steel",
-              "value": 2.2666666666666666
+              "value": 2.32
             },
             {
               "name": "Soft Step",
-              "value": 2.166666666666667
+              "value": 2.2
             },
             {
               "name": "Scarred Hide",
@@ -10189,14 +10181,14 @@
             },
             {
               "label": "evasion",
-              "units": 24.833333333333336,
+              "units": 24.700000000000006,
               "amounts": {
-                "evasion": 298
+                "evasion": 247
               }
             }
           ],
           "choice": 3,
-          "nearScores": [1, 0.9845765140659177, 0.9690248133343391],
+          "nearScores": [1, 0.9939895667951918, 0.9719739925909127],
           "searchGain": 0,
           "tax": {
             "points": 22,
@@ -10253,9 +10245,9 @@
             },
             {
               "label": "evasion",
-              "units": 24.833333333333336,
+              "units": 24.700000000000006,
               "amounts": {
-                "evasion": 298
+                "evasion": 247
               }
             }
           ],
@@ -10323,9 +10315,9 @@
             },
             {
               "label": "evasion",
-              "units": 24.833333333333336,
+              "units": 24.700000000000006,
               "amounts": {
-                "evasion": 298
+                "evasion": 247
               }
             }
           ],
@@ -10399,9 +10391,9 @@
             },
             {
               "label": "evasion",
-              "units": 24.833333333333336,
+              "units": 24.700000000000006,
               "amounts": {
-                "evasion": 298
+                "evasion": 247
               }
             }
           ],
@@ -10481,9 +10473,9 @@
             },
             {
               "label": "evasion",
-              "units": 24.833333333333336,
+              "units": 24.700000000000006,
               "amounts": {
-                "evasion": 298
+                "evasion": 247
               }
             }
           ],
@@ -10567,9 +10559,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.833333333333336,
+              "units": 25.700000000000006,
               "amounts": {
-                "evasion": 310
+                "evasion": 257
               }
             }
           ],
@@ -11493,8 +11485,8 @@
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9719275093912382],
-          "searchGain": 0.02888331726133031,
+          "nearScores": [1, 0.9742774935581053],
+          "searchGain": 0.02640162234268062,
           "tax": {
             "points": 35,
             "share": 0.2916666666666667,
@@ -11758,11 +11750,11 @@
             },
             {
               "name": "Quickened Steel",
-              "value": 2.2666666666666666
+              "value": 2.32
             },
             {
               "name": "Steady Hands",
-              "value": 2.1333333333333337
+              "value": 2.08
             },
             {
               "name": "Four Winds",
@@ -11787,7 +11779,7 @@
             },
             {
               "name": "Heavy Hands",
-              "value": 2.7333333333333334
+              "value": 2.68
             },
             {
               "name": "Tempered",
@@ -13596,7 +13588,7 @@
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9779128115871222],
+          "nearScores": [1, 0.9788054695825276],
           "searchGain": 0,
           "tax": {
             "points": 15,
@@ -13827,8 +13819,8 @@
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9899413045802689],
-          "searchGain": 0.017032869546304896,
+          "nearScores": [1, 0.9884227796814775],
+          "searchGain": 0.017041608782842,
           "tax": {
             "points": 38,
             "share": 0.31666666666666665,
@@ -14120,19 +14112,19 @@
             },
             {
               "name": "Light Hand",
-              "value": 2.5333333333333337
+              "value": 2.4800000000000004
             },
             {
               "name": "Elemental Fletching",
               "value": 2
             },
             {
-              "name": "True Aim",
-              "value": 1.9333333333333336
-            },
-            {
               "name": "Hawk's Eye",
               "value": 1.92
+            },
+            {
+              "name": "True Aim",
+              "value": 1.8800000000000003
             },
             {
               "name": "Quick Hands",
@@ -14731,9 +14723,9 @@
             },
             {
               "label": "evasion",
-              "units": 22,
+              "units": 21.900000000000006,
               "amounts": {
-                "evasion": 264
+                "evasion": 219
               }
             },
             {
@@ -14777,8 +14769,8 @@
             "Hawk's Eye",
             "Long Breath",
             "Quick Hands",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Hard Target",
             "Twin Fangs",
             "Fleet Foot",
@@ -14806,9 +14798,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.83333333333333,
+              "units": 25.60000000000001,
               "amounts": {
-                "evasion": 310
+                "evasion": 256
               }
             },
             {
@@ -14853,16 +14845,16 @@
             "Long Breath",
             "Wanderer",
             "Quick Hands",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Hard Target",
             "Twin Fangs",
             "Fleet Foot",
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
-            "Quickened Steel"
+            "Quickened Steel",
+            "Buckler"
           ],
           "plan": [
             1, 151, 153, 154, 155, 156, 158, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214,
@@ -14886,9 +14878,9 @@
             },
             {
               "label": "evasion",
-              "units": 25.83333333333333,
+              "units": 25.60000000000001,
               "amounts": {
-                "evasion": 310
+                "evasion": 256
               }
             },
             {
@@ -14933,16 +14925,16 @@
             "Long Breath",
             "Wanderer",
             "Quick Hands",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Hard Target",
             "Twin Fangs",
             "Fleet Foot",
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Tumble",
             "Scarred Hide",
@@ -14972,9 +14964,9 @@
             },
             {
               "label": "evasion",
-              "units": 29.16666666666666,
+              "units": 28.90000000000001,
               "amounts": {
-                "evasion": 350
+                "evasion": 289
               }
             },
             {
@@ -14995,7 +14987,7 @@
             }
           ],
           "choice": 2,
-          "nearScores": [1, 0.9736405869471789],
+          "nearScores": [1, 0.9747635800056232],
           "searchGain": 0,
           "tax": {
             "points": 30,
@@ -15020,8 +15012,8 @@
             "Wanderer",
             "Light Hand",
             "Quick Hands",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Hard Target",
             "Twin Fangs",
             "Mercy Stroke",
@@ -15029,8 +15021,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Tumble",
             "Stout Heart",
@@ -15064,9 +15056,9 @@
             },
             {
               "label": "evasion",
-              "units": 29.16666666666666,
+              "units": 28.90000000000001,
               "amounts": {
-                "evasion": 350
+                "evasion": 289
               }
             },
             {
@@ -15112,8 +15104,8 @@
             "Wanderer",
             "Light Hand",
             "Quick Hands",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Black Flock",
             "Hard Target",
             "Twin Fangs",
@@ -15122,8 +15114,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Tumble",
             "Stout Heart",
@@ -15162,9 +15154,9 @@
             },
             {
               "label": "evasion",
-              "units": 29.16666666666666,
+              "units": 28.90000000000001,
               "amounts": {
-                "evasion": 350
+                "evasion": 289
               }
             },
             {
@@ -15210,8 +15202,8 @@
             "Wanderer",
             "Light Hand",
             "Quick Hands",
-            "Wayfarer",
             "Vital Aim",
+            "Wayfarer",
             "Black Flock",
             "Hard Target",
             "Twin Fangs",
@@ -15220,8 +15212,8 @@
             "True Aim",
             "Weaving",
             "Sidestep",
-            "Buckler",
             "Quickened Steel",
+            "Buckler",
             "Fighting Breath",
             "Tumble",
             "Bloodletter",
@@ -15263,7 +15255,7 @@
             },
             {
               "name": "Quickened Steel",
-              "value": 2.2666666666666666
+              "value": 2.32
             },
             {
               "name": "Scarred Hide",

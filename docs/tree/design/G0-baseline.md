@@ -209,23 +209,27 @@ How to read a cell: for the classic caster, "spell damage 15 → 21 · 21 → 23
 
 **The measure** was agreed by the user on 2026-10-22: tension is what more points would still buy.
 
+**Re-measured after the unit sizes changed** (the user, 2026-10-22: a small node is 5% attack speed, 15% crit, 10%
+evasion; every such line was re-priced to keep its worth). The headline barely moved; the tables above are from the
+first measurement, and [G0/builds.txt](G0/builds.txt) holds the current numbers, which the "today" figures below use.
+
 **The targets**, agreed by the user on 2026-10-22. They are judged at the end of G4 on the same 27 archetypes. Each is a direction with a
 rough size, not a gate: a walk by eye still decides (CONSTRAINTS §15.2). For scale, if a stat grew evenly with points,
 40 more points at 120 would add about a third.
 
 1. **A finished build is still hungry.** At 120 points, 40 more points should raise the typical main stat by about 30%
    or more (today 16%).
-   - At most about one main stat in ten should gain 10% or less (today 36%).
+   - At most about one main stat in ten should gain 10% or less (today 37%).
    - Most archetypes, about two in three, should have every main stat gain at least 20% (today 1 of 27).
 2. **A mid-run build keeps its appetite.** At 60 points, 40 more points should still raise the typical main stat by
-   about half (today 49%), with few that are already flat (today 20% gain 10% or less).
+   about half (today 45%), with few that are already flat (today 20% gain 10% or less).
 3. **What it gave up is something it wanted.** At 120 points, what 40 more points would add should include at least
-   two notables worth 2.5 units or more to the build, for most builds. Today it is 0 to 3, typically 1, and seven
+   two notables worth 2.5 units or more to the build, for most builds. Today it is 0 to 3, typically 1, and eight
    builds have none.
 4. **A real choice.** At 120 points, at least two near-equal distinct plans for every build and three for about half
-   (today 1 to 7; six builds have only one).
+   (today 1 to 7; eight builds have only one).
 5. **Tension from wanted nodes, not distance.** Tax at 120 points at or under about a third for most builds (today 22
-   to 45%, 13 of 27 above a third). Points spent on roads must not rise to make the numbers above.
+   to 45%, 14 of 27 above a third). Points spent on roads must not rise to make the numbers above.
 6. **One stat at a time:** reported before and after, with no target. The aspiration (G-growth §0) is that a finished
    build's main stats end up roughly where they are, while being a smaller share of what it wanted.
 

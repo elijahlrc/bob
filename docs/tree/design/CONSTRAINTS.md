@@ -230,7 +230,8 @@ The core of section 1, made concrete.
 
 ## 8. Clusters, notables and small nodes
 
-1. **A small node is one stat at the reference's size:** 5% life, 10% evasion, 5% attack speed, 15% crit. [derived]
+1. **A small node is one stat at the reference's size:** 5% life, 10% evasion, 5% attack speed, 15% crit. [derived;
+   the user confirmed these sizes, 10-22, and `UNIT` in `lines.ts` follows them]
 2. **Within a section, every small carries the same modifier.** [user, 10-20, "sections of small nodes are mixing
    different modifiers when they should be the same"] A section is a road, a wheel's side, a pocket's smalls or a keystone
    spur. Mixes live on notables. The exceptions are the two sides of a start loop and clusters whose point is variety,
@@ -252,6 +253,9 @@ The core of section 1, made concrete.
 5. **Forks inside an area are good.** [user, 10-19] They let an area hold two variants of one idea, such as shield or
    two-hander in a melee area. Forks between nodes that belong to no named area are fine too.
 6. **A notable is worth 3 to 5 units,** where a unit is the reference small node of that stat. [ref; adopted]
+7. **Almost every small belongs to a notable.** [user, 10-22] "Almost all small nodes should have associated notables,
+   but it's not a hard rule": a run of smalls with no notable is for when another constraint needs it (a bridge, a
+   road's character), not a cheap way to add supply. Road nodes are attributes (§7).
 
 ## 9. Keystones and the late game
 
@@ -341,7 +345,8 @@ The core of section 1, made concrete.
 
 ## 12. Size and balance
 
-1. **Size falls out of the constraints.** [user, 10-19] Quality always beats count. If removing nodes improves the tree,
+1. **Size falls out of the constraints.** Any agent may add nodes where another constraint needs them, beyond what a
+   plan or ledger assigns (the user, 10-22). [user, 10-19] Quality always beats count. If removing nodes improves the tree,
    remove them. If adding nodes improves it, add them. For balance, the network will probably end up around 1,500
    nodes. [user, 10-20]
    - A network too small for that has too few kinds of node, or high-value nodes packed too densely with too few
@@ -494,8 +499,6 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   and Mist Walk / Tumble (Tumble re-lined). Grave Host stays every summoner's farthest minion notable (user, 10-20).
 - **Keystone costs.** Pain Conduit and Volatile Servants have none, and Mind Bulwark has none the sheet shows. Their
   effects live in `src/data/tree/keystones.ts`, which has other uncommitted work.
-- **The unit table.** `UNIT` in `lines.ts` sets the reference small at 3% attack speed, 20% crit and 12% evasion; §8.1
-  says 5%, 15% and 10%. Both trace to the user's Strider. Which one stands is the user's call.
 - **The Strider's one-stop shops** (the user's region): the projectile notables along one rim, and the Far Flight /
   Split Volley fork. The audit's proposals are in `audit/audit-tradeoffs.md`. Round 3 added: Close Quarters' spur is a
   road, the same pairings True Aim / Quick Hands, Vital Aim / Killing Eye and Hatchet Work / Hewing, and a fire-attack

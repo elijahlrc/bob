@@ -13,6 +13,19 @@ below say where to look, and every cluster has a player's reason.
 
 ## 0. The user's guidance this ledger answers
 
+**The user's answers to §9 (2026-10-22), which override the ledger where they differ:**
+
+- **Size:** start at about 1,480, and add more only where the measures show a build still takes everything. Every
+  agent may also add nodes wherever another constraint needs them (CONSTRAINTS §12.1).
+- **Small sections:** "almost all small nodes should have associated notables, but it's not a hard rule" (CONSTRAINTS
+  §8.7). The 30 sections of §3.2 are therefore not to be built as notable-less pockets by default. Each region brief
+  folds a section's supply into a notable cluster (a new one, or more smalls on one of the ledger's) and keeps a
+  notable-less run only where another constraint needs it, saying which.
+- **Unit sizes:** a small node is 5% attack speed, 15% crit, 10% evasion (CONSTRAINTS §8.1). Every such line in the
+  network was re-priced to keep its worth in units, so the ledger's unit counts still hold.
+- **Changes to the user's nodes** (§9 item 4): already covered by "feel free to move, remove, or otherwise modify
+  existing clusters". First Light stays as the Mystic start's signature; the ring's inside holds only the four arches.
+
 - The ask (2026-10-22): grow the network to about 1,500 to 2,000 nodes, so that a build cannot reach every node it
   wants. "All the spell damage and energy shield for a classic caster build, all hp, armor, and sword damage for a
   strength sword build." The way there is more desirable nodes, not more distance.

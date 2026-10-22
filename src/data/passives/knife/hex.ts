@@ -151,7 +151,7 @@ export const hex: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Static Edge',
-          lines: [eleDamage('lightning', 16), critChance(20), shockChance(10)],
+          lines: [eleDamage('lightning', 16), critChance(15), shockChance(10)],
           at: [2044, -2721],
           why: '1.6 + 1 + 1 units.',
         },

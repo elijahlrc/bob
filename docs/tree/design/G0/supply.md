@@ -10,12 +10,12 @@ A unit is the small node of the stat (`lines.ts`); attributes are in points. Sor
 | resistances           |      15 |   7.5 |     11 |    9.0 |       13 |    9.0 |    4.0 |    68 |
 | block and shields     |     7.3 |     . |    6.0 |     12 |       13 |     26 |      . |    63 |
 | energy shield         |       . |    11 |     31 |     16 |        . |      . |      . |    57 |
-| attacks               |      24 |   5.0 |      . |      . |       10 |     16 |      . |    55 |
+| attacks               |      24 |   4.8 |      . |      . |       10 |     16 |      . |    54 |
 | leech                 |     5.0 |   7.0 |      . |    5.0 |      5.5 |     15 |      . |    38 |
 | melee                 |     8.0 |     . |      . |      . |       17 |     11 |      . |    35 |
 | armour                |       . |     . |      . |    6.7 |       23 |    5.3 |      . |    35 |
 | fire                  |     4.0 |     . |     14 |     17 |        . |      . |      . |    35 |
-| evasion               |      16 |    11 |      . |      . |        . |    7.5 |      . |    35 |
+| evasion               |      16 |    11 |      . |      . |        . |    7.4 |      . |    34 |
 | crit                  |      12 |    17 |    1.0 |      . |      2.0 |    3.1 |      . |    34 |
 | projectiles           |      27 |   2.0 |    2.0 |      . |      2.0 |      . |      . |    33 |
 | flasks                |     5.0 |   1.0 |    5.0 |    4.0 |      5.1 |    4.5 |    4.6 |    29 |
@@ -29,14 +29,14 @@ A unit is the small node of the stat (`lines.ts`); attributes are in points. Sor
 | dagger                |       . |    21 |      . |      . |        . |      . |      . |    21 |
 | curses                |       . |   6.0 |    5.0 |      . |      4.0 |    6.0 |      . |    21 |
 | bow                   |      12 |   2.6 |      . |      . |        . |    4.6 |      . |    19 |
-| wand                  |       . |     . |     18 |      . |        . |      . |      . |    18 |
 | two-handed            |       . |     . |      . |      . |       18 |      . |      . |    18 |
+| wand                  |       . |     . |     18 |      . |        . |      . |      . |    18 |
 | movement              |     5.3 |   2.0 |    1.0 |      . |      3.0 |    2.0 |    4.0 |    17 |
 | dodge                 |       . |   9.7 |    4.7 |      . |        . |    2.7 |      . |    17 |
 | stun (self)           |     0.5 |   2.0 |      . |      . |       13 |    0.8 |      . |    17 |
 | totems                |     6.1 |     . |      . |    5.0 |      5.0 |      . |      . |    16 |
 | traps                 |     6.0 |   6.0 |    4.0 |      . |        . |      . |      . |    16 |
-| dual wield            |       . |   1.0 |      . |      . |      4.0 |     11 |      . |    16 |
+| dual wield            |       . |   1.0 |      . |      . |      4.0 |     10 |      . |    15 |
 | sword                 |     5.0 |     . |      . |      . |      3.6 |    6.4 |      . |    15 |
 | conditional damage    |     2.0 |   1.3 |    2.0 |      . |      6.0 |    3.0 |      . |    14 |
 | axe                   |     1.3 |     . |      . |      . |      7.0 |    5.7 |      . |    14 |
@@ -47,7 +47,7 @@ A unit is the small node of the stat (`lines.ts`); attributes are in points. Sor
 | mace                  |       . |     . |      . |      . |       11 |      . |      . |    11 |
 | warcries              |       . |     . |      . |    3.5 |      6.8 |      . |      . |    10 |
 | damage over time      |       . |   1.0 |    8.6 |      . |        . |      . |      . |   9.6 |
-| channelling           |       . |     . |    4.0 |      . |        . |    5.3 |      . |   9.3 |
+| channelling           |       . |     . |    4.0 |      . |        . |    5.4 |      . |   9.4 |
 | brands                |       . |     . |      . |    7.7 |        . |      . |      . |   7.7 |
 | claw                  |       . |   7.6 |      . |      . |        . |      . |      . |   7.6 |
 | staff                 |       . |     . |      . |    7.3 |        . |      . |      . |   7.3 |

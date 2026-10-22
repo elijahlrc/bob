@@ -135,7 +135,7 @@ export const roofs: AreaSpec = {
         {
           id: 't',
           kind: 'small',
-          lines: [critChance(20)],
+          lines: [critChance(15)],
           at: [2950, -2165],
           why: 'The top, from the rooftop road.',
         },
@@ -157,7 +157,7 @@ export const roofs: AreaSpec = {
         {
           id: 'b',
           kind: 'small',
-          lines: [critChance(20)],
+          lines: [critChance(15)],
           at: [2950, -1995],
           why: 'The bottom, to the Rookery.',
         },
@@ -165,7 +165,7 @@ export const roofs: AreaSpec = {
           id: 'eN',
           kind: 'notable',
           name: 'Long Knives',
-          lines: [daggerDamage(16), weaponSpeed('dagger', 4), weaponAccuracy('dagger', 10)],
+          lines: [daggerDamage(16), weaponSpeed('dagger', 7), weaponAccuracy('dagger', 10)],
           at: [3024, -2038],
           why: "1.6 + 1.3 + 1 units. The dagger attacker's late notable: the build used to be done with daggers at point 17.",
         },
