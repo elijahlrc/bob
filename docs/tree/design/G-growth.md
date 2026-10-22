@@ -180,6 +180,7 @@ against the baseline, and the gave-up lists.
 
 ## 3. How the work keeps its intent
 
+- **Area labels are ignored during the growth** (the user, 2026-10-22): "don't worry about region labels. Those are not gameplay relevant portions of the map and they can be adjusted or figured out later in the process. For now, you should probably ignore them entirely." No agent moves, renames or checks labels; a label pass comes at the end (G5 or later).
 - **Tension is one constraint among all of CONSTRAINTS.md** (the user, 2026-10-22): "not at the expense of all the
   other goals in the constraints doc. This is one more of many, many constraints that all must be fulfilled." And:
   "feel free to move, remove, or otherwise modify existing clusters as you balance the added clusters." Every brief,
