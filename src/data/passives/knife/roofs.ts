@@ -50,7 +50,13 @@ export const roofs: AreaSpec = {
           why: 'The claw pocket leaves north.',
         },
         { id: 'r4', kind: 'attribute', lines: [dex(6), int(6)], at: [3230, -2240] },
-        { id: 'r5', kind: 'attribute', lines: [dex(6), int(6)], at: [3430, -1960] },
+        {
+          id: 'r5',
+          kind: 'attribute',
+          lines: [dex(6), int(6)],
+          at: [3430, -1960],
+          why: 'The seawall road leaves straight out to the rim (G2, 2026-10-22).',
+        },
         {
           id: 'r6',
           kind: 'attribute',
@@ -82,7 +88,7 @@ export const roofs: AreaSpec = {
     {
       id: 'carrion',
       name: 'Carrion Claws',
-      why: "A pocket outward off the rooftop road: claw damage twice, then claws with chaos that bite harder on the poisoned. The claw's second cluster, far from its first: Talon, by the start on the Alleys wheel, sells claws with recovery on hit. It was on the Docks wheel until round 3 (2026-10-20), where it put both claws, both poisons and Cruel Agony within six steps of one junction; now the poison claw takes its core near the start and then chooses between this, Venom Fletching in the Strider and Festering in the Yard.",
+      why: "A pocket outward off the rooftop road (since G2, 2026-10-22, its first small is also where the crossroad from the ridge lands, so the pocket is on a way through): claw damage twice, then claws with chaos that bite harder on the poisoned. The claw's second cluster, far from its first: Talon, by the start on the Alleys wheel, sells claws with recovery on hit. It was on the Docks wheel until round 3 (2026-10-20), where it put both claws, both poisons and Cruel Agony within six steps of one junction; now the poison claw takes its core near the start and then chooses between this, Venom Fletching in the Strider and Festering in the Yard.",
       at: [3200, -2900],
       shape: { kind: 'hand' },
       nodes: [
@@ -105,18 +111,18 @@ export const roofs: AreaSpec = {
     {
       id: 'sleet',
       name: 'Sleet',
-      why: "A pocket outward off the rooftop road: cold twice, then cold with spell projectiles. The cold caster's late cluster, far from the Spire's two (Hoarfrost sells cold with chill, Shatter cold with freeze): here cold comes with darts, for the ice-shard spells.",
-      at: [4000, -1720],
+      why: "A bridge outward from the rooftop road to the seawall road: cold twice, then cold with spell projectiles. The cold caster's late cluster, far from the Spire's two (Hoarfrost sells cold with chill, Shatter cold with freeze): here cold comes with darts, for the ice-shard spells. G2 (2026-10-22): moved in onto the straight line from the rooftop road's sixth node to the seawall road's third, which passes outside it.",
+      at: [3800, -1580],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('cold', 10)], at: [4073, -1721] },
-        { id: 'b', kind: 'small', lines: [eleDamage('cold', 10)], at: [4131, -1730] },
+        { id: 'a', kind: 'small', lines: [eleDamage('cold', 10)], at: [3740, -1594] },
+        { id: 'b', kind: 'small', lines: [eleDamage('cold', 10)], at: [3793, -1582] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Sleet',
           lines: [eleDamage('cold', 16), spellProjectile(12), projectileSpeed(10)],
-          at: [4200, -1740],
+          at: [3862, -1566],
           why: '1.6 + 1.2 + 1 units.',
         },
       ],
@@ -189,18 +195,18 @@ export const roofs: AreaSpec = {
     {
       id: 'whet',
       name: 'Whetted Will',
-      why: "A pocket east off the rooftop road: physical damage with spells twice, then physical spells with duration. The physical caster's cluster for the thrown and summoned blades, most of which last a while; the Crypt's Shattering Rite sells physical spells with the elements, for the spells that turn part of their damage. Round 4 (2026-10-20: there was no physical-spell line).",
-      at: [3830, -1275],
+      why: "A bridge east from the rooftop road to the seawall road: physical damage with spells twice, then physical spells with duration. The physical caster's cluster for the thrown and summoned blades, most of which last a while; the Crypt's Shattering Rite sells physical spells with the elements, for the spells that turn part of their damage. Round 4 (2026-10-20: there was no physical-spell line). G2 (2026-10-22): laid on the straight line from the rooftop road's seventh node to the seawall road's fourth.",
+      at: [3890, -1180],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [physSpell(12)], at: [3853, -1274] },
-        { id: 'b', kind: 'small', lines: [physSpell(12)], at: [3910, -1268] },
+        { id: 'a', kind: 'small', lines: [physSpell(12)], at: [3836, -1202] },
+        { id: 'b', kind: 'small', lines: [physSpell(12)], at: [3887, -1183] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Whetted Will',
           lines: [physSpell(20), skillDuration(10)],
-          at: [3980, -1260],
+          at: [3953, -1159],
           why: '1.7 + 1 units.',
         },
       ],
@@ -232,6 +238,30 @@ export const roofs: AreaSpec = {
         ['y2', 'y3'],
         ['y3', 'y4'],
       ],
+    },
+    {
+      id: 'cross',
+      name: 'The crossroad',
+      why: "Two attribute nodes straight across the Rooftops' empty north, from the ridge road's third node to Carrion Claws (G1/shade.md §3.2, phase G2, 2026-10-22): the claw pocket stops being a dead end, and the far north-east's new clusters hang off it (the quick caster north of the first node, the dagger crit cluster north-east of the second).",
+      at: [2930, -3015],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'c1',
+          kind: 'attribute',
+          lines: [dex(6), int(6)],
+          at: [2780, -3020],
+          why: 'The quick caster (SH-11) hangs north of here.',
+        },
+        {
+          id: 'c2',
+          kind: 'attribute',
+          lines: [dex(6), int(6)],
+          at: [3080, -3010],
+          why: 'The dagger crit cluster (SH-16) hangs north-east of here, toward Carrion Claws.',
+        },
+      ],
+      links: [['c1', 'c2']],
     },
     {
       id: 'ritual',
@@ -292,6 +322,16 @@ export const roofs: AreaSpec = {
       why: "The middle way in: the Quiet Shot pocket's small onto the road.",
     },
     { from: 'walk.r3', to: 'carrion.a', why: 'The road onto the claw pocket.' },
+    {
+      from: 'ridge.y3',
+      to: 'cross.c1',
+      why: "The ridge road onto the crossroad, straight east across the Rooftops' north.",
+    },
+    {
+      from: 'cross.c2',
+      to: 'carrion.a',
+      why: "The crossroad's east end lands on the claw pocket's first small: Carrion Claws is a way through between the ridge and the rooftop road.",
+    },
     { from: 'walk.r6', to: 'sleet.a', why: 'The road onto the cold darts.' },
   ],
 };

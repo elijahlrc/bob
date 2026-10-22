@@ -1,7 +1,8 @@
 /**
  * The Lists (the Yard's east, on the border with the Bow): the dual-wield wheel as the landmark, the east gate the
- * Strider's four links land on, the dodge chain from the gate down to the charges, the fervour charges, and the speed
- * cluster that joins the hub through an attack-speed-on-kill node.
+ * Strider's links land on, the dodge chain from the gate down to the east junction, and since G2 (2026-10-22) two roads:
+ * the east half of the crossroad (the Muster's hub to the east junction, the heavy bow below it) and the east road (the
+ * east junction south to the Pits' east junction, with the fervour charges and the dual crit beside it).
  */
 import {
   attackSpeed,
@@ -29,7 +30,7 @@ export const dual: AreaSpec = {
   id: 'yard.dual',
   region: 'reaver',
   name: 'The Lists',
-  why: "The Yard's east, on the Bow border: the dual-wield wheel with block on its other side, dodge, the fervour charges, speed, and the dual crit chain.",
+  why: "The Yard's east, on the Bow border: the dual-wield wheel with evasion on its other side, dodge, the fervour charges, the heavy bow, and the dual crit chain, hung from the crossroad and the east road (G2).",
   at: [635, 2150], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -107,16 +108,74 @@ export const dual: AreaSpec = {
     {
       id: 'j1',
       name: 'Junction',
-      why: 'The fork below the wheel: the charges south-east, the bow chain south-west, the dodge chain east.',
+      why: 'The east junction, a crossing of four (G2): the wheel above, the dodge chain east, the crossroad west, the east road south.',
       at: [640, 2080],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [640, 2080] }],
       links: [],
     },
     {
+      id: 'crossroad',
+      name: 'The crossroad',
+      why: "The east half of the road across the Yard (G2, 2026-10-22), from the Muster's hub to the east junction: the heavy bow hangs below it between its two nodes. It replaces the hub's and the junction's direct links into that cluster.",
+      at: [300, 2043],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'c3',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [180, 2029],
+          why: 'The heavy bow leaves here.',
+        },
+        {
+          id: 'c4',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [420, 2056],
+          why: 'The heavy bow lands here.',
+        },
+      ],
+      links: [['c3', 'c4']],
+    },
+    {
+      id: 'east',
+      name: 'The east road',
+      why: "The second-hand highway carried on south (G2, 2026-10-22): from the east junction down the Lists to the Pits' east junction, strength and dexterity on every node. The fervour charges leave east at the first node, the dual crit west at the second and third; the second is where the fast sword (RE-1) will hang, east toward the Strider's road.",
+      at: [600, 2590],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'e1',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [640, 2330],
+          why: 'The fervour charges leave east.',
+        },
+        {
+          id: 'e2',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [620, 2580],
+          why: 'The dual crit leaves west; the fast sword (RE-1) will leave east.',
+        },
+        {
+          id: 'e3',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [540, 2850],
+          why: 'The dual crit lands here.',
+        },
+      ],
+      links: [
+        ['e1', 'e2'],
+        ['e2', 'e3'],
+      ],
+    },
+    {
       id: 'sidestep',
       name: 'Sidestep',
-      why: "Dodge: a node, then the notable with movement and evasion, between the wheel's east side and the junction and the charges. The Reaver who kites, and the Strider who came through the gate for a defence it knows.",
+      why: "Dodge: a node, then the notable with movement and evasion, between the wheel's east side and the east junction. The Reaver who kites, and the Strider who came through the gate for a defence it knows.",
       at: [890, 1940],
       shape: { kind: 'hand' },
       nodes: [
@@ -135,30 +194,31 @@ export const dual: AreaSpec = {
     {
       id: 'crossedBlades',
       name: 'Crossed Blades',
-      why: "Crit while dual wielding twice, then the notable with dual crit, dual accuracy and crit multiplier: the two-sword Reaver's crit, which Fencer's Eye in the south does not sell. A tight orbit south of the charges, passed through to the leech and to Steel Rim: the dual area's own way to the rim, without the hub.",
-      at: [470, 2640],
-      shape: { kind: 'ring', r: 75, a0: -60 },
+      why: "Crit while dual wielding twice, then the notable with dual crit, dual accuracy and crit multiplier: the two-sword Reaver's crit, which Fencer's Eye in the south does not sell. A tight orbit west of the east road, entered from its second node and left from its third (G2; road nodes from the charges and the leech joined it before).",
+      at: [475, 2684],
+      shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [dualCrit(15)],
-          why: 'The entrance, facing the charges.',
-          at: [528, 2638],
+          why: "The entrance, from the east road's second node.",
+          at: [532, 2643],
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Crossed Blades',
           lines: [dualCrit(22), dualAccuracy(15), critMulti(12)],
-          why: '1.5 + 1.5 + 1 units.',
+          at: [475, 2684],
+          why: '1.5 + 1.5 + 1 units. The tip of the pocket, west of the road.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [dualCrit(15)],
-          why: 'The exit, to the leech and to Steel Rim.',
-          at: [452, 2747],
+          why: "The exit, to the east road's third node.",
+          at: [501, 2749],
         },
       ],
       links: [
@@ -169,27 +229,27 @@ export const dual: AreaSpec = {
     {
       id: 'hotBlood',
       name: 'Hot Blood',
-      why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room between the junction and the dodge chain.",
-      at: [730, 2360],
+      why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs).",
+      at: [830, 2340],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [fervourDuration(15)],
-          at: [680, 2290],
-          why: 'The entrance, from the junction and the dodge chain.',
+          at: [780, 2290],
+          why: 'The entrance, from the east road.',
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Hot Blood',
           lines: [maxFervour(1), fervourOnKill(10)],
-          at: [780, 2290],
+          at: [880, 2290],
           why: 'A fourth fervour charge (3 units by the table) and a way to gain them: 4.',
         },
-        { id: 'b', kind: 'small', lines: [fervourDuration(15)], at: [780, 2390] },
-        { id: 'c', kind: 'small', lines: [fervourDuration(15)], at: [680, 2390] },
+        { id: 'b', kind: 'small', lines: [fervourDuration(15)], at: [880, 2390] },
+        { id: 'c', kind: 'small', lines: [fervourDuration(15)], at: [780, 2390] },
       ],
       links: [
         ['a', 'n'],
@@ -201,7 +261,7 @@ export const dual: AreaSpec = {
     {
       id: 'ironDraw',
       name: 'Iron Draw',
-      why: "Bow damage three times, then the notable with bow damage, physical attack damage and life: the heavy bow, for the Reaver who draws one and the Strider who comes for the strength side. Passed through between the junction and the hub. The Strider's own bow wheel sells speed and crit instead; the Knife's bow sells crit multiplier. (It was Quickstep, generic speed, until 2026-10-20.)",
+      why: "Bow damage three times, then the notable with bow damage, physical attack damage and life: the heavy bow, for the Reaver who draws one and the Strider who comes for the strength side. Hung below the crossroad's east half, between its two nodes (G2; it joined the hub and the east junction before). The Strider's own bow wheel sells speed and crit instead; the Knife's bow sells crit multiplier. (It was Quickstep, generic speed, until 2026-10-20.)",
       at: [340, 2250],
       shape: { kind: 'hand' },
       nodes: [
@@ -209,24 +269,24 @@ export const dual: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [bowDamage(10)],
-          at: [417, 2239],
-          why: 'The entrance from the junction.',
+          at: [355, 2225],
+          why: "The exit, to the crossroad's east node.",
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Iron Draw',
           lines: [bowDamage(16), physAttack(12), life(5)],
-          at: [360, 2280],
-          why: '1.6 + 1.2 + 1 units.',
+          at: [330, 2290],
+          why: '1.6 + 1.2 + 1 units. The bottom of the U below the crossroad.',
         },
-        { id: 'b', kind: 'small', lines: [bowDamage(10)], at: [301, 2242] },
+        { id: 'b', kind: 'small', lines: [bowDamage(10)], at: [295, 2229] },
         {
           id: 'c',
           kind: 'small',
           lines: [bowDamage(10)],
-          at: [252, 2211],
-          why: 'The exit to the hub.',
+          at: [266, 2179],
+          why: "The entrance, from the crossroad's west node.",
         },
       ],
       links: [
@@ -234,24 +294,6 @@ export const dual: AreaSpec = {
         ['n', 'b'],
         ['b', 'c'],
       ],
-    },
-    {
-      id: 'toSidestep',
-      name: 'A road',
-      why: 'A road node between Hot Blood and Sidestep.',
-      at: [790, 2155],
-      shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [790, 2155] }],
-      links: [],
-    },
-    {
-      id: 'toCrossed',
-      name: 'A road',
-      why: 'A road node between Hot Blood and Crossed Blades.',
-      at: [604, 2514],
-      shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [604, 2514] }],
-      links: [],
     },
   ],
   links: [
@@ -269,37 +311,33 @@ export const dual: AreaSpec = {
       why: 'The dodge chain to the junction: a loop with the wheel.',
     },
     {
-      from: 'yard.dual.hotBlood.a',
-      to: 'yard.dual.toSidestep.a',
-      why: 'A road node between Hot Blood and Sidestep.',
+      from: 'yard.shield.hub.a',
+      to: 'crossroad.c3',
+      why: "The crossroad's east half leaves the Muster's hub.",
     },
-    { from: 'yard.dual.toSidestep.a', to: 'yard.dual.sidestep.n', why: 'The far end of the road.' },
+    { from: 'crossroad.c4', to: 'j1.a', why: 'The crossroad reaches the east junction.' },
     {
-      from: 'yard.dual.hotBlood.c',
-      to: 'yard.dual.toCrossed.a',
-      why: 'A road node between Hot Blood and Crossed Blades.',
+      from: 'crossroad.c3',
+      to: 'ironDraw.c',
+      why: "The crossroad's west node onto the heavy bow.",
+    },
+    { from: 'ironDraw.a', to: 'crossroad.c4', why: 'The heavy bow back onto the crossroad.' },
+    { from: 'j1.a', to: 'east.e1', why: 'The east road leaves the east junction south.' },
+    {
+      from: 'east.e3',
+      to: 'yard.blood.j2.a',
+      why: "The east road reaches the Pits' east junction, where the Strider's road and the Fosse also meet.",
+    },
+    { from: 'east.e1', to: 'hotBlood.a', why: "The east road's first node onto the charges." },
+    {
+      from: 'east.e2',
+      to: 'crossedBlades.a',
+      why: "The east road's second node onto the dual crit.",
     },
     {
-      from: 'yard.dual.toCrossed.a',
-      to: 'yard.dual.crossedBlades.a',
-      why: 'The far end of the road.',
-    },
-    {
-      from: 'yard.blood.redHarvest.a',
-      to: 'yard.blood.toCrossed.a',
-      why: 'A road node between Red Harvest and Crossed Blades: the triangle with Steel Rim is one road now.',
-    },
-    {
-      from: 'yard.blood.toCrossed.a',
-      to: 'yard.dual.crossedBlades.b',
-      why: 'The far end of the road.',
-    },
-    { from: 'j1.a', to: 'hotBlood.a', why: 'Junction to the charges.' },
-    { from: 'j1.a', to: 'ironDraw.a', why: 'Junction to the bow chain.' },
-    {
-      from: 'ironDraw.c',
-      to: 'yard.shield.hub.a',
-      why: 'The speed cluster joins the hub: a shield Reaver reaches the bow without the wheel.',
+      from: 'crossedBlades.b',
+      to: 'east.e3',
+      why: "The dual crit back onto the east road's third node: a pocket that bridges two road nodes.",
     },
   ],
 };

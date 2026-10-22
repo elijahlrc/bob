@@ -25,7 +25,7 @@ export const nave: AreaSpec = {
   id: 'cathedral.nave',
   region: 'zealot',
   name: 'The Nave',
-  why: "Where the gate's roads meet: block or the fire spell on one wheel, Vigil, and the resist star Litany.",
+  why: "Where the gate's roads meet: block or the fire spell on one wheel, Vigil, the resist star Litany, and the aisle out to the Ambulatory (G2).",
   at: [-1846, -1214], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -205,8 +205,52 @@ export const nave: AreaSpec = {
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(1245, 295) }],
       links: [],
     },
+    {
+      id: 'aisle',
+      name: 'The aisle',
+      why: "G2 (2026-10-22, G1/zealot.md §3): three attribute nodes in a straight line from the road node under Choirmaster through the empty inside to Consecrated Plate, and on through it to the Ambulatory's walk: the Nave joined to the Ambulatory's middle, where before the only ways out were the two ends of the walk. Lone Vow's spur leaves its middle node northward; G3 hangs a minion cluster south of the middle node and a spell cluster north of the last.",
+      at: P(1808, 288),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a1',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(1526, 291),
+          why: 'The first step in from the Nave.',
+        },
+        {
+          id: 'a2',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(1808, 288),
+          why: "The aisle's crossing: Lone Vow's spur north; in G3 the minion-and-life cluster (ZE-2) south, as a bridge to the Vestry's junction.",
+        },
+        {
+          id: 'a3',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(2089, 284),
+          why: 'Where, in G3, the spell-and-reservation cluster (ZE-1) leaves north as a bridge to Brandwright.',
+        },
+      ],
+      links: [
+        ['a1', 'a2'],
+        ['a2', 'a3'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'toChoir.a',
+      to: 'aisle.a1',
+      why: 'The aisle leaves the road node under Choirmaster.',
+    },
+    {
+      from: 'aisle.a3',
+      to: 'cathedral.ambulatory.plate.n',
+      why: 'The aisle lands on Consecrated Plate, in line with its chain to the walk: the armour bridge becomes a crossroads.',
+    },
     {
       from: 'wall.resists.j.a',
       to: 'toWall.a',

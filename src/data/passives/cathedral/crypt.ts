@@ -32,7 +32,7 @@ export const crypt: AreaSpec = {
   id: 'cathedral.crypt',
   region: 'zealot',
   name: 'The Undercroft',
-  why: 'The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, and the dear road to the Spire.',
+  why: 'The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, the dear road to the Spire, and the north walk round its back (G2).',
   at: [-1976, -2996], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -253,8 +253,76 @@ export const crypt: AreaSpec = {
         ['b', 'n'],
       ],
     },
+    {
+      id: 'north',
+      name: 'The north walk',
+      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. In G3: ZE-11 hangs inward off the third node, ZE-9 off the fourth, and ZE-3 bridges Shattering Rite to the east end.",
+      at: P(3057, 1916),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'n1',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(3510, 728),
+          why: "The corner where Kindled Steel's line meets the rim.",
+        },
+        {
+          id: 'n2',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(3396, 1140),
+          why: 'Outside the Sigil Warden keystone.',
+        },
+        {
+          id: 'n3',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(3244, 1537),
+          why: 'Where, in G3, energy shield with spell block (ZE-11) hangs inward.',
+        },
+        {
+          id: 'n4',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(3057, 1916),
+          why: 'Where, in G3, spell damage with duration (ZE-9) hangs inward.',
+        },
+        {
+          id: 'n5',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(2836, 2274),
+          why: 'Outside the Volatile Servants keystone, toward the east end.',
+        },
+        {
+          id: 'n6',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: P(2584, 2607),
+          why: "The east end: Tomb Dust arrives, ZE-3 bridges in from Shattering Rite (G3), and the far loop runs on in the same line to the Mystic's north-west rim road (the border pass).",
+        },
+      ],
+      links: [
+        ['n1', 'n2'],
+        ['n2', 'n3'],
+        ['n3', 'n4'],
+        ['n4', 'n5'],
+        ['n5', 'n6'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'cathedral.ambulatory.kindled.n',
+      to: 'north.n1',
+      why: "Kindled Steel's chain carried straight on to the rim: the fire-strike pocket becomes a bridge onto the north walk.",
+    },
+    {
+      from: 'tomb.n',
+      to: 'north.n6',
+      why: "Tomb Dust's chain carried on to the north walk's east end: the chaos pocket becomes a bridge, and the walk's second way in.",
+    },
     { from: 'toSpire.b', to: 'rite.a', why: 'The crossing road onto the physical spells.' },
     { from: 'toSpire.a', to: 'tomb.a', why: 'The crossing road onto the chaos pocket.' },
     { from: 'toSpire.a', to: 'stair.a', why: 'The Spire crossing onto the crypt stair.' },

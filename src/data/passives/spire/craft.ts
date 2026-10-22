@@ -329,6 +329,15 @@ export const craft: AreaSpec = {
       links: [],
     },
     {
+      id: 'toStair',
+      name: 'The curse crossing',
+      why: "One attribute node from Hexwright's notable toward the Shade's Stair junction (G2, 2026-10-22; G1/mystic.md §3, kept in the join, G1-brief.md §2.1): the curser from either start reaches Hexwright and the Shade's curse home. On the straight line between the two; the last node before the Shade, so half dexterity. The link onward to the Stair is the border pass's.",
+      at: [1465, -2755],
+      shape: { kind: 'hand' },
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: [1465, -2755] }],
+      links: [],
+    },
+    {
       id: 'toDev2',
       name: 'A road',
       why: 'Intelligence once between Mist Walk and Hexwright.',
@@ -430,6 +439,11 @@ export const craft: AreaSpec = {
       from: 'spire.craft.toDev2.a',
       to: 'spire.craft.hexwright.n',
       why: 'The far end of the road.',
+    },
+    {
+      from: 'hexwright.n',
+      to: 'toStair.a',
+      why: 'Hexwright onto the curse crossing: the curse notable is on the way to the Stair, so a curser coming from the Shade pays for it and one from the Mystic walks on to the Shade curses.',
     },
     {
       from: 'spire.storm.jArm.a',

@@ -17,6 +17,7 @@ import {
   minionDamage,
   minionLife,
   spellDamage,
+  str,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -116,7 +117,7 @@ export const fire: AreaSpec = {
     {
       id: 'cinder',
       name: 'Cinder',
-      why: "Ignite: chance, burning damage, faster burning. Fire as a burn, at the arm's end beside the two-element keystone; the fire caster who wants the hit instead goes east to Flashpoint. The arm's end: a dead end since 2026-10-20, when its link to the Prismatic spur went so the keystone sits on a spur.",
+      why: "Ignite: chance, burning damage, faster burning. Fire as a burn, at the arm's end beside the two-element keystone; the fire caster who wants the hit instead goes east to Flashpoint. The arm's end: a dead end since 2026-10-20, when its link to the Prismatic spur went so the keystone sits on a spur; a bridge again since G2 (2026-10-22), its far side leading on to the north-west rim road.",
       at: [-1150, -3850],
       shape: { kind: 'ring', r: 56, a0: 60 },
       nodes: [
@@ -139,6 +140,40 @@ export const fire: AreaSpec = {
       ],
     },
     {
+      id: 'rim',
+      name: 'The north-west rim road',
+      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from where the shield and resistance cluster (G1/mystic.md MY-4) will hang beside Steady Stream, past the minion-and-curse pocket (MY-7, G3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop, written by the border pass). Cinder stops being a dead end. The north-east rim road is the Eaves (`rim.ts`); the two are joined across the top by the road through Shatter.",
+      at: [-1115, -4325],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'attribute',
+          lines: [int(7)],
+          at: [-850, -4500],
+          why: 'The head of the road, where MY-4 hangs (G3), between it and the road.',
+        },
+        {
+          id: 'b',
+          kind: 'attribute',
+          lines: [int(7)],
+          at: [-1115, -4325],
+          why: 'Halfway; the near end of the MY-7 pocket (G3), outward.',
+        },
+        {
+          id: 'c',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: [-1380, -4150],
+          why: "The corner over Cinder, the last node before the Zealot, so half strength: the far loop leaves here for the Zealot's north walk, and the MY-7 pocket's far end lands here.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+      ],
+    },
+    {
       id: 'roadS',
       name: 'The lantern stair',
       why: 'Intelligence twice: the road down from the Lantern junction to the well.',
@@ -154,6 +189,11 @@ export const fire: AreaSpec = {
   links: [
     { from: 'hoarfrost.b', to: 'jArm.a', why: "Through the cold cluster to the arm's junction." },
     { from: 'jArm.a', to: 'cinder.a', why: 'Junction to the ignite room.' },
+    {
+      from: 'cinder.b',
+      to: 'rim.c',
+      why: "The ignite room's far side onto the north-west rim road: Cinder is a bridge from the Lantern to the rim, not the arm's dead end.",
+    },
     {
       from: 'spire.well.manaTap.b',
       to: 'familiars.a',

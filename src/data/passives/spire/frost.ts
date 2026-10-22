@@ -4,7 +4,8 @@
  * after a critical strike), the farthest keystone of the region. The two inter-arm junctions hang off the first cluster,
  * and Prismatic Balance (the two-element keystone) runs from the west one toward the burning room.
  * Harsh Weather is a dead-end chain off Shatter, and the Prismatic spur is a spur (both 2026-10-20). Since 2026-10-20 the arm
- * is a place, not the cold arm (see `fire.ts`); the id `spire.frost` is kept.
+ * is a place, not the cold arm (see `fire.ts`); the id `spire.frost` is kept. G2 (2026-10-22): Siphon moved here from
+ * the Cloister as a bridge from the east join to the arm's junction, and Snare Line became a bridge onto the Eaves (`rim.ts`).
  */
 import {
   ailmentEffect,
@@ -13,9 +14,12 @@ import {
   costReduction,
   eleDamage,
   eleDamageAll,
+  esLeech,
+  esOnHit,
   freezeChance,
   freezeDuration,
   int,
+  manaOnKill,
   penetration,
   shockChance,
   shockDuration,
@@ -226,7 +230,7 @@ export const frost: AreaSpec = {
     {
       id: 'snare',
       name: 'Snare Line',
-      why: "A pocket outward off the north-east rim road: trap damage twice, then traps with duration. The caster's trap, for a spell set as a trap and the traps that last; the Docks' Trapper sells traps with area and the Strider's Tripwire traps with throwing speed and cooldown. Round 4 (2026-10-20).",
+      why: "A chain outward off Harsh Weather's climb to Overcharge: trap damage twice, then traps with duration. The caster's trap, for a spell set as a trap and the traps that last; the Docks' Trapper sells traps with area and the Strider's Tripwire traps with throwing speed and cooldown. Round 4 (2026-10-20). Since G2 (2026-10-22) its notable leads on to the Eaves road (`rim.ts`), so the chain is a bridge from Harsh Weather's climb to the rim.",
       at: [960, -4225],
       shape: { kind: 'hand' },
       nodes: [
@@ -245,6 +249,31 @@ export const frost: AreaSpec = {
         ['a', 'b'],
         ['b', 'n'],
       ],
+    },
+    {
+      id: 'siphon',
+      name: 'Siphon',
+      why: "Energy shield on hit, then the notable with shield leech, shield on hit and mana on kill: the caster's recovery from hitting, which no other Spire node sells. Moved here from the Cloister in G2 (2026-10-22, G1/mystic.md MY-m2): it sat three steps from Glass Skin and Quickening, a one-stop for the shield caster; here it is a bridge from the east join to the Belfry's junction, beside Thunderhead's cast speed and under the shock and freeze: the casters who hit often. Laid on the straight line between its two ends, the notable in the middle, so the small G3 adds on the junction side mirrors this one.",
+      at: [165, -3710],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [esOnHit(4)],
+          at: [226, -3676],
+          why: 'The entrance, from the east join.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Siphon',
+          lines: [esLeech(0.8), esOnHit(6), manaOnKill(10)],
+          at: [165, -3710],
+          why: "2 + 1.5 + 1 units. The exit, to the arm's junction.",
+        },
+      ],
+      links: [['a', 'n']],
     },
     {
       id: 'stream',
@@ -276,7 +305,11 @@ export const frost: AreaSpec = {
       to: 'stream.a',
       why: 'The road to Shatter onto the channelled spells.',
     },
-    { from: 'toOvercharge.r1', to: 'snare.a', why: "The rim road onto the caster's trap." },
+    {
+      from: 'toOvercharge.r1',
+      to: 'snare.a',
+      why: "Harsh Weather's climb onto the caster's trap.",
+    },
     {
       from: 'feverPitch.a',
       to: 'toHarsh.a',
@@ -319,6 +352,16 @@ export const frost: AreaSpec = {
       why: 'The inter-arm link to the east arm.',
     },
     { from: 'thunderhead.n', to: 'jArm.a', why: "Up through the notable to the arm's junction." },
+    {
+      from: 'jStorm.a',
+      to: 'siphon.a',
+      why: 'The east join onto Siphon (G2, MY-m2): the quick caster coming up the east arm reaches the recovery from hitting without Thunderhead.',
+    },
+    {
+      from: 'siphon.n',
+      to: 'jArm.a',
+      why: "Siphon onto the arm's junction: a bridge, so the junction has a way in from the east join that is not Thunderhead's notable.",
+    },
     { from: 'jArm.a', to: 'shatter.a', why: 'Junction to the shatter room.' },
     {
       from: 'spire.frost.shatter.c',

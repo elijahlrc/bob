@@ -31,7 +31,7 @@ export const hex: AreaSpec = {
   region: 'shade',
   name: 'The Stair',
   why: "The Knife's north barb, climbing toward the Spire: chaos spells or mines on one wheel, the climb to Spellslip, and the dear road to the Spire.",
-  at: [1700, -2560], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [1610, -2580], // Where the area's name is drawn: clear of every other area's name (label pass, round 4; nudged west in G2 for Static Edge).
   clusters: [
     {
       id: 'jH',
@@ -152,8 +152,8 @@ export const hex: AreaSpec = {
           kind: 'notable',
           name: 'Static Edge',
           lines: [eleDamage('lightning', 16), critChance(15), shockChance(10)],
-          at: [2044, -2721],
-          why: '1.6 + 1 + 1 units.',
+          at: [2090, -2585],
+          why: "1.6 + 1 + 1 units. G2 (2026-10-22): moved below the static road (G1/shade.md §3.6), clear of the line north-east from the second small, where the energy shield cluster at the Stair's top (SH-1) will join it.",
         },
       ],
       links: [

@@ -8,6 +8,7 @@ import {
   aoe,
   armour,
   attackSpeed,
+  axeDamage,
   castSpeed,
   critMulti,
   dex,
@@ -39,7 +40,7 @@ export const grit: AreaSpec = {
   id: 'wall.grit',
   region: 'vanguard',
   name: 'The Barrows',
-  why: "The Wall's south rim: the warcries, the grit wheel with maximum resistances on its other side, the fast two-hander, and Blood Rite, the biggest trade in the region.",
+  why: "The Wall's south rim: the warcries, the grit wheel with maximum resistances on its other side, the fast two-hander, Cleaver by the Fosse, the middle road through Stone Ward, and Blood Rite, the biggest trade in the region.",
   at: [-2330, 2886], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -195,7 +196,7 @@ export const grit: AreaSpec = {
     {
       id: 'east',
       name: 'The Barrows road',
-      why: "Eight attribute nodes from Heavy Hands east to the west side of the Yard's Pits: the Barrows had one way in, through War Drums, and the Wall and the Yard met only near home. Strength on the Wall half, strength and dexterity on the Yard half. The big axe leaves north from the third node, the regeneration pocket south from the fifth.",
+      why: "Eight attribute nodes from Heavy Hands east to the west side of the Yard's Pits: the Barrows had one way in, through War Drums, and the Wall and the Yard met only near home. Strength on the Wall half, strength and dexterity on the Yard half. The big axe leaves north from the third node, the regeneration pocket south from the fifth, Cleaver south from the sixth (G2, 2026-10-22).",
       at: [-1600, 3150],
       shape: { kind: 'hand' },
       nodes: [
@@ -368,6 +369,55 @@ export const grit: AreaSpec = {
       ],
     },
     {
+      id: 'cleaver',
+      name: 'Cleaver',
+      why: "Axe damage twice, then axe damage with axe speed: a chain south off the Barrows road where it turns strength-and-dexterity, facing the Yard's Fosse, so an axe build finds both its attributes on the way (G2, 2026-10-22; it was in the Barbican's west, the side farthest from any dexterity). The Yard's Hewing is the other axe, about ten steps east.",
+      at: [-1160, 3420],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [axeDamage(12)],
+          at: [-1179, 3296],
+          why: 'The entrance, from the Barrows road.',
+        },
+        { id: 'b', kind: 'small', lines: [axeDamage(12)], at: [-1171, 3351] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Cleaver',
+          lines: [axeDamage(24), attackSpeed(10, ['axe'])],
+          at: [-1160, 3420],
+          why: 'Axe damage and axe speed: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [axeDamage(12)],
+          at: [-1149, 3489],
+          why: "The far small, facing the Yard's Fosse road.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
+      id: 'middle',
+      name: "The Barrows' middle road",
+      why: 'Strength twice on a line through Stone Ward (G2, 2026-10-22): north to Second Wind, south toward the warcry armour cluster that will hang between it and the Barrows road. Today the only ways between the Quarry and the Barrows road go round by War Drums or the Pits.',
+      at: [-1810, 2400],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-1730, 2188] },
+        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-1856, 2571] },
+      ],
+      links: [],
+    },
+    {
       id: 'host',
       name: 'Grave Host',
       why: "A pocket south off the Barrows road: minion life twice, then minion life with the summoner's armour. The strength summoner's cluster and every summoner's farthest: the other minion notables are in the Cathedral (Shepherd, Ossuary), on the Spire's Cathedral side (Familiars) and on the Knife's Docks wheel (Black Flock). Round 3 (2026-10-20).",
@@ -393,7 +443,7 @@ export const grit: AreaSpec = {
     {
       id: 'ward',
       name: 'Stone Ward',
-      why: "A pocket east off the Barrows' north road, under War Drums: spell block twice, then spell block with life on block. Spell block for any build, shield or none, on the strength side: the tree's other two are shield-only and on the intelligence side (Spirit Ward in the Spire, Glass Wall in the Crypt). Round 4 (2026-10-20).",
+      why: "A pocket east off the Barrows' north road, under War Drums: spell block twice, then spell block with life on block. Spell block for any build, shield or none, on the strength side: the tree's other two are shield-only and on the intelligence side (Spirit Ward in the Spire, Glass Wall in the Crypt). Round 4 (2026-10-20). Since G2 (2026-10-22) the Barrows' middle road runs through the notable, so the pocket is a bridge.",
       at: [-1960, 2315],
       shape: { kind: 'hand' },
       nodes: [
@@ -442,6 +492,22 @@ export const grit: AreaSpec = {
     { from: 'west.b', to: 'fists.a', why: 'The west road onto the strength dual wield.' },
     { from: 'east.e1', to: 'host.a', why: 'The Barrows road onto the minion pocket.' },
     { from: 'east.e7', to: 'greatblade.a', why: 'The Barrows road onto the two-handed sword.' },
+    {
+      from: 'east.e6',
+      to: 'cleaver.a',
+      why: 'The Barrows road onto the axe, south toward the Fosse.',
+    },
+    {
+      from: 'wall.slams.secondWind.n',
+      to: 'middle.a',
+      why: "Second Wind onto the Barrows' middle road.",
+    },
+    {
+      from: 'middle.a',
+      to: 'ward.n',
+      why: 'The middle road through Stone Ward: the pocket becomes a bridge.',
+    },
+    { from: 'ward.n', to: 'middle.b', why: 'And on south, toward the Barrows road.' },
     {
       from: 'wall.maces.greatweight.b',
       to: 'west.a',

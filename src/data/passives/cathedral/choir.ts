@@ -91,7 +91,7 @@ export const choir: AreaSpec = {
     {
       id: 'jC',
       name: 'Choir junction',
-      why: 'East of the wheel: the minions ahead, the Lone Vow spur out along the tower, the Living Ward spur toward the Spire.',
+      why: 'East of the wheel: the minions ahead and the Living Ward spur toward the Spire. (The Lone Vow spur left here until G2, 2026-10-22; it hangs off the aisle now.)',
       at: P(1480, 850),
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(1480, 850) }],
@@ -100,12 +100,12 @@ export const choir: AreaSpec = {
     {
       id: 'loneVow',
       name: 'Lone Vow',
-      why: 'Two nodes of aura effect, then the trade: only the first aura is active, and it reserves nothing. The one-aura build with every point of mana free; the approach says what the keystone asks.',
-      at: P(1760, 600),
+      why: "Two nodes of aura effect, then the trade: only the first aura is active, and it reserves nothing. The one-aura build with every point of mana free; the approach says what the keystone asks. Since G2 (2026-10-22) the spur leaves the aisle's middle node, on a straight line from it to the keystone, which did not move.",
+      at: P(1860, 400),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [auraEffect(6)], at: P(1789, 591) },
-        { id: 'b', kind: 'small', lines: [auraEffect(6)], at: P(1834, 554) },
+        { id: 'a', kind: 'small', lines: [auraEffect(6)], at: P(1840, 361) },
+        { id: 'b', kind: 'small', lines: [auraEffect(6)], at: P(1864, 418) },
         { id: 'k', kind: 'keystone', name: 'Lone Vow', lines: [], at: P(1900, 500) },
       ],
       links: [
@@ -146,7 +146,11 @@ export const choir: AreaSpec = {
       to: 'cathedral.choir.toSpire.a',
       why: "A road node on the near crossing from Shepherd to the Spire's Draught: two notables were joined directly across the border.",
     },
-    { from: 'jC.a', to: 'loneVow.a', why: 'Junction to the Lone Vow spur.' },
+    {
+      from: 'cathedral.nave.aisle.a2',
+      to: 'loneVow.a',
+      why: "G2 (2026-10-22): the Lone Vow spur hangs off the aisle's middle node (it left the choir junction before), so the keystone that makes reservation moot and the reservation cluster ZE-1 (G3, one node on) are a fork off one road.",
+    },
     { from: 'jC.a', to: 'livingWard.a', why: 'Junction to the Living Ward spur.' },
     {
       from: 'jC.a',

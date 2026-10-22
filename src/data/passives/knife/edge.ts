@@ -181,6 +181,15 @@ export const edge: AreaSpec = {
       ],
     },
     {
+      id: 'rung',
+      name: 'The claw rung',
+      why: "One attribute node straight across from the dodge junction toward the Strider border (square to the blade, which leaves the junction's fan evenly spaced) (G1/shade.md §3.3, phase G2, 2026-10-22): the fast claw cluster (SH-6) hangs here, and the Strider's near stub at its home will land here too, so claws sit where the Strider's dexterity meets the Shade's intelligence (CONSTRAINTS §5.4).",
+      at: P(820, 690),
+      shape: { kind: 'hand' },
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(820, 690) }],
+      links: [],
+    },
+    {
       id: 'thickBlood',
       name: 'Thick Blood',
       why: "Life, then the notable with life, flat life and a little shield: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction.",
@@ -214,6 +223,11 @@ export const edge: AreaSpec = {
     },
     { from: 'j1.a', to: 'wheel.w6', why: "The dodge junction to the wheel's dagger side." },
     { from: 'j1.a', to: 'nimble.a', why: 'Junction to the keystone spur.' },
+    {
+      from: 'j1.a',
+      to: 'rung.a',
+      why: 'The dodge junction onto the claw rung, toward the Strider border.',
+    },
     { from: 'star.f', to: 'wheel.w5', why: 'The fire spoke lands on Fine Point.' },
     {
       from: 'star.e',

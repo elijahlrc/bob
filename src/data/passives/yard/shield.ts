@@ -1,9 +1,9 @@
 /**
- * The Muster (the Yard's south-centre): the hub below the home where the shield road, the one-handed diamond and
- * the bow chain meet; the resist star beside it, a notable with four single-node spokes landing in four different
- * places; the shield wheel; the crit pocket (Fencer's Eye, moved here from the sword diamond on 2026-10-20), which the
- * Executioner chain also reaches; the Shieldwall spur, joined to the elements beside it; the Standard Bearer chain from
- * the crit pocket down to the west rim; and Shield Bash.
+ * The Muster (the Yard's south-centre): the hub below the home where the middle road, the crossroad and the spine
+ * meet (G2, 2026-10-22); the resist star beside it, a notable with four single-node spokes landing in four different
+ * places; the shield wheel on the spine; the crit pocket (Fencer's Eye, moved here from the sword diamond on
+ * 2026-10-20); the block run from the west junction to the west road, with the Shieldwall spur off the road; the
+ * Standard Bearer chain from the crit pocket down to the Pits' west junction, which Executioner joins; and Shield Bash.
  */
 import {
   armour,
@@ -32,12 +32,12 @@ export const shield: AreaSpec = {
   region: 'reaver',
   name: 'The Muster',
   why: "The Yard's south-centre: the hub, the resist star, the shield wheel, the crit pocket (Fencer's Eye, 2026-10-20), Standard Bearer, Shield Bash and the Shieldwall spur.",
-  at: [-270, 2750], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-200, 2650], // Where the area's name is drawn: clear of every other area's name; moved off Fencer's Eye in G2.
   clusters: [
     {
       id: 'hub',
       name: 'The hub',
-      why: 'An attribute node joined four ways: the shield road above, the one-handed diamond west, the bow chain east, the star and the shield wheel below.',
+      why: "The Yard's crossing of roads (G2, 2026-10-22): the middle road from the home above, the crossroad west and east, the spine down through the shield wheel, and the star's fire spoke. It joined four clusters' chains directly before.",
       at: [-80, 2000],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [-80, 2000] }],
@@ -161,7 +161,7 @@ export const shield: AreaSpec = {
     {
       id: 'fencer',
       name: "Fencer's Eye",
-      why: "Melee crit twice round the notable with crit multiplier, sword crit and axe crit: the crit Reaver's pocket, four or five steps from the sword and axe damage (it sat a step off the sword diamond until 2026-10-20). Reached from the junction, from the Executioner chain, and on to the Standard Bearer chain below.",
+      why: "Melee crit twice round the notable with crit multiplier, sword crit and axe crit: the crit Reaver's pocket, four or five steps from the sword and axe damage (it sat a step off the sword diamond until 2026-10-20). Reached from the junction, and on to the Standard Bearer chain below, which Executioner joins from the west road.",
       at: [-500, 2800],
       shape: { kind: 'hand' },
       nodes: [
@@ -196,7 +196,7 @@ export const shield: AreaSpec = {
     {
       id: 'standard',
       name: 'Standard Bearer',
-      why: "Reduced mana reservation, then the notable with aura effect: for the Reaver who runs a standard or a herald, between the crit pocket and the west rim junction. The Yard's only reservation lines; a Vanguard crossing from the grit comes for them.",
+      why: "Reduced mana reservation, then the notable with aura effect: for the Reaver who runs a standard or a herald, between the crit pocket and the Pits' west junction, with Executioner joining its small from the west road (G2). The Yard's only reservation lines; a Vanguard crossing from the grit comes for them.",
       at: [-520, 3100],
       shape: { kind: 'hand' },
       nodes: [
@@ -215,7 +215,7 @@ export const shield: AreaSpec = {
     {
       id: 'shieldwall',
       name: 'Shieldwall',
-      why: 'Three nodes of shield block west from the junction, then a spur of one more to the trade: block cap +10%, 30% less evasion. The elements and the Executioner chain join the third node, so the keystone has two ways in; the spur small beyond it is a dead end (round 4: the keystone hung straight off the third node, so the road between the elements and the Executioner ran through its spur).',
+      why: "Three nodes of shield block from the west junction to the west road's last node, a bridge between the Muster and the west road; and off that road node, a spur of one small to the trade: block cap +10%, 30% less evasion. G2 (2026-10-22) unhooked the spur from the run, so no road passes through it (§9.1): the keystone is a dead end one small off a junction, and the run is a uniform block bridge with no notable of its own.",
       at: [-680, 2500],
       shape: { kind: 'hand' },
       nodes: [
@@ -226,28 +226,27 @@ export const shield: AreaSpec = {
           kind: 'small',
           lines: [shieldBlock(3)],
           at: [-740, 2780],
-          why: 'Joined to the elements beside it, and to the Executioner chain.',
+          why: 'The run lands on the west road.',
         },
         {
           id: 'd',
           kind: 'small',
           lines: [shieldBlock(3)],
-          at: [-887, 2809],
-          why: 'The spur: one small off the third node, a dead end.',
+          at: [-1010, 2970],
+          why: "The spur: one small off the west road's last node, a dead end.",
         },
-        { id: 'k', kind: 'keystone', name: 'Shieldwall', lines: [], at: [-1040, 2840] },
+        { id: 'k', kind: 'keystone', name: 'Shieldwall', lines: [], at: [-1095, 3000] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'c'],
-        ['c', 'd'],
         ['d', 'k'],
       ],
     },
     {
       id: 'j1',
       name: 'Junction',
-      why: 'Below the wheel: the fork between the bleed (west) and the leech (east).',
+      why: 'Below the wheel, on the spine: the fork between the bleed (west) and the leech (east), and the spine on down between them.',
       at: [0, 2720],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [0, 2720] }],
@@ -256,46 +255,37 @@ export const shield: AreaSpec = {
     {
       id: 'shieldBash',
       name: 'Shield Bash',
-      why: "The shield as a weapon: attack damage and attack speed with a shield, and life on block. Three gems need a shield to attack with and the Reaver starts with one; the Yard sold only the block. A chain from the dear Wall crossing's first node south to the Wound Dance spur's third node, at the rim below Standard Bearer, where the shield build already is.",
-      at: [-760, 3480],
+      why: "The shield as a weapon: attack damage and attack speed with a shield, and life on block. Three gems need a shield to attack with and the Reaver starts with one; the Yard sold only the block. A straight chain from the Fosse leg's first node up to the road node above the Pits' west junction, at the rim below Standard Bearer, where the shield build already is (G2: it hung off the Pits' west junction, which the west road and the leg now meet at).",
+      at: [-618, 3327],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [shieldAttack(10)],
-          at: [-618, 3292],
-          why: 'The entrance, from the Wall road.',
+          at: [-668, 3376],
+          why: 'The entrance, from the Fosse leg.',
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Shield Bash',
           lines: [shieldAttack(20), shieldSpeed(8), lifeOnBlock(15)],
-          at: [-600, 3360],
+          at: [-618, 3327],
           why: '2 + 1.7 + 1 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [shieldAttack(10)],
-          at: [-560, 3302],
-          why: 'The exit, to the keystone spur.',
+          at: [-568, 3278],
+          why: 'The exit, to the Pits.',
         },
       ],
       links: [
         ['a', 'n'],
         ['n', 'b'],
       ],
-    },
-    {
-      id: 'toIronDraw',
-      name: 'A road',
-      why: 'A road node between Steel Rim and Iron Draw.',
-      at: [172, 2320],
-      shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [172, 2320] }],
-      links: [],
     },
     {
       id: 'toPits',
@@ -315,9 +305,19 @@ export const shield: AreaSpec = {
     },
     { from: 'yard.shield.toPits.r1', to: 'yard.blood.j3.a', why: 'The far end of the road.' },
     {
-      from: 'yard.blood.toWall.a',
+      from: 'yard.blood.leg.l1',
       to: 'shieldBash.a',
-      why: "The Wall road's first node onto the shield attack chain.",
+      why: "The Fosse leg's first node onto the shield attack chain (G2; it was the Pits' west junction, which now carries the west road and the leg).",
+    },
+    {
+      from: 'yard.blades.west.w4',
+      to: 'shieldwall.c',
+      why: "The block run lands on the west road's last node: a bridge between the Muster's west junction and the west road.",
+    },
+    {
+      from: 'yard.blades.west.w4',
+      to: 'shieldwall.d',
+      why: "The keystone spur, one small off the west road's last node, a dead end (§9.1).",
     },
     { from: 'hub.a', to: 'star.f', why: "The hub to the star's fire spoke." },
     {
@@ -326,7 +326,11 @@ export const shield: AreaSpec = {
       why: "The star's lightning spoke to the shield wheel: a second way onto it.",
     },
     { from: 'star.s', to: 'j2.a', why: "The star's chaos spoke to the west junction." },
-    { from: 'hub.a', to: 'steelRim.a', why: 'Hub to the shield wheel.' },
+    {
+      from: 'hub.a',
+      to: 'steelRim.a',
+      why: "The spine leaves the hub straight into the shield wheel, which it passes through (one side: shield or hide). G2 kept this a direct link rather than a road node, which would have put Scarred Hide, a home build's first defence, a step further out with nothing coming off the node.",
+    },
     { from: 'steelRim.d', to: 'j2.a', why: "The wheel's west side to the west junction." },
     { from: 'j2.a', to: 'fencer.a', why: 'Junction to the crit pocket.' },
     { from: 'j2.a', to: 'shieldwall.a', why: 'Junction to the keystone spur.' },
@@ -335,16 +339,6 @@ export const shield: AreaSpec = {
       from: 'standard.n',
       to: 'yard.blood.toWall.a',
       why: "The reservation chain lands on the dear crossing's first node: a second way to the west rim and the Wall.",
-    },
-    {
-      from: 'yard.shield.steelRim.b',
-      to: 'yard.shield.toIronDraw.a',
-      why: 'A road node between Steel Rim and Iron Draw.',
-    },
-    {
-      from: 'yard.shield.toIronDraw.a',
-      to: 'yard.dual.ironDraw.c',
-      why: 'The far end of the road.',
     },
     { from: 'steelRim.c', to: 'j1.a', why: "The wheel's bottom to the junction below." },
   ],

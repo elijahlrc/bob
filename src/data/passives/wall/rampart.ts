@@ -1,12 +1,13 @@
 /**
- * The Rampart (the Wall's north-west): the Bulwark wheel off the rampart road (armour one side, life and armour the other),
- * Second Wind and Iron Lungs (mana on hit; it opens onto the tower's junction, a second loop between the rampart and the
- * tower) as side rooms, the junction with the Unerring Discipline spur, Steady Hands (the accuracy pocket, passed through
- * to the axes), the Stagger chain at the tower's top, the resist star's fire spoke arriving from the north, and Thick
- * Skin (armour, stun threshold) as a pocket off the tower road. Re-lined on 2026-10-20 (PHILOSOPHY §2a): Thick Skin and
- * Unbloodied moved south, Iron Lungs and Stagger came here. Round 3 (2026-10-20): Bracing and Thick Skin traded places,
- * so the shield is south-east of the start and the mace west, and Iron Lungs no longer joins the armour notable to the
- * maces; Bracing, Mortar and Stone, Iron Lungs and Weight of Iron had been one chain.
+ * The Rampart (the Wall's north-west): the Bulwark wheel off the rampart road (armour one side, mana on hit the other),
+ * the junction with the Unerring Discipline spur and Hallowed Hammer, Steady Hands (the accuracy pocket), the Stagger
+ * chain at the tower's top, the resist star's fire and chaos spokes arriving from the north, Stone Heart (life, stun
+ * threshold) as a pocket off the tower road, and the road from Mortar and Stone to the tower's junction. Re-lined on
+ * 2026-10-20 (PHILOSOPHY §2a): Thick Skin and Unbloodied moved south, Iron Lungs and Stagger came here. Round 3
+ * (2026-10-20): Bracing and Thick Skin traded places. G2 (2026-10-22): the Bulwark's two sides were life and armour,
+ * which every strength build wants both of, on the home's road; Iron Lungs took the life notable's place, Stone Heart
+ * went to the tower road's pocket, Thick Skin to the west rim, Second Wind south to the Quarry, and the keystone spur
+ * turned away from the Zealot's.
  */
 import {
   accuracy,
@@ -14,7 +15,6 @@ import {
   attackSpeed,
   enemyStunThreshold,
   life,
-  lifeRegen,
   mana,
   manaLeech,
   manaOnHit,
@@ -30,69 +30,93 @@ export const rampart: AreaSpec = {
   id: 'wall.rampart',
   region: 'vanguard',
   name: 'The Rampart',
-  why: "The Wall's north-west, under the battlements: the Bulwark wheel (armour, life), Second Wind, Thick Skin, the accuracy pocket and Unerring Discipline, with mana on hit and the stun room among them since 2026-10-20.",
-  at: [-2312, 409], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  why: "The Wall's north-west, under the battlements: the Bulwark wheel (armour or mana on hit), Stone Heart off the tower road, the accuracy pocket, Stagger and Unerring Discipline.",
+  at: [-2312, 720], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved down off the Bulwark's notables in G2 (2026-10-22).
   clusters: [
     {
       id: 'bulwark',
       name: 'The Bulwark',
-      why: "The rampart's landmark: a wheel of seven with two notables, life on the north side and armour on the south. Entered from the rampart road on the east, left to the junction from the life notable on the north-west; the armour notable on the south-west opens the stun room.",
+      why: "The rampart's landmark: a wheel of eight off the rampart road, armour (Mortar and Stone) on the south-west side and mana on hit (Iron Lungs, its own cluster) on the north-west. Entered from the rampart road on the east; the way on to the junction runs through Iron Lungs, so the armour is the detour (G2, 2026-10-22: it was life one side and armour the other, a choice every strength build took both sides of).",
       at: [-2145, 474],
-      shape: { kind: 'ring', r: 100, a0: -20 },
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], why: 'The entrance.' },
-        { id: 'c', kind: 'small', lines: [armour(12)] },
-        { id: 'd', kind: 'small', lines: [armour(12)] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-2051, 440], why: 'The entrance.' },
+        { id: 'c', kind: 'small', lines: [armour(12)], at: [-2054, 516] },
+        { id: 'd', kind: 'small', lines: [armour(12)], at: [-2111, 568] },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Mortar and Stone',
           lines: [armour(30), physReduction(2)],
-          why: 'The armour notable: a flat 2% physical reduction on top, which armour alone never gives against a big hit. 4.5 units.',
+          at: [-2187, 565],
+          why: 'The armour notable: a flat 2% physical reduction on top, which armour alone never gives against a big hit. 4.5 units. The road to the tower leaves from it.',
         },
-        { id: 'e', kind: 'small', lines: [armour(12)] },
-        {
-          id: 'f',
-          kind: 'small',
-          lines: [life(5)],
-          why: 'The life side, between the armour side and Stone Heart.',
-        },
-        {
-          id: 'n1',
-          kind: 'notable',
-          name: 'Stone Heart',
-          lines: [life(12), stunThreshold(16)],
-          why: 'The life notable, with the stun threshold life is for: 2.4 + 2 units, nothing conditional; the way out is through it. The armour is all on the other side.',
-        },
-        { id: 'b', kind: 'small', lines: [life(5)] },
+        { id: 'e', kind: 'small', lines: [armour(12)], at: [-2239, 508] },
       ],
       links: [
         ['a', 'c'],
         ['c', 'd'],
         ['d', 'n2'],
         ['n2', 'e'],
-        ['e', 'f'],
-        ['f', 'n1'],
-        ['n1', 'b'],
-        ['b', 'a'],
       ],
     },
     {
-      id: 'secondWind',
-      name: 'Second Wind',
-      why: "Life regeneration, off the wheel's north small, and the landing of the resist star's chaos spoke: a recovery decision that is also a way between the rampart and the resistances.",
-      at: [-1900, 150],
+      id: 'ironLungs',
+      name: 'Iron Lungs',
+      why: "Mana on hit with melee attacks either side of the notable with mana on hit, mana leech and mana: the melee Vanguard who runs dry by map five. The Bulwark's north-west side since G2 (2026-10-22), on the way from the rampart road to the junction, so the wheel asks for sustain on the way or armour as the detour (it was a pocket off the armour notable until then).",
+      at: [-2179, 380],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-1942, 199] },
-        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1904, 154] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [manaOnHit(4, ['melee'])],
+          at: [-2103, 383],
+          why: "The wheel's north small: the rampart road's second door.",
+        },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Second Wind',
-          lines: [lifeRegen(1), life(8)],
-          at: [-1859, 101],
-          why: '2.5 units of regeneration and a little life: 4.1 units.',
+          name: 'Iron Lungs',
+          lines: [manaOnHit(8, ['melee']), manaLeech(0.4), mana(8)],
+          at: [-2179, 380],
+          why: '2 + 1 + 1 units. The way out to the junction.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [manaOnHit(4, ['melee'])],
+          at: [-2236, 432],
+          why: 'Between Iron Lungs and the armour side.',
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
+    },
+    {
+      id: 'stoneHeart',
+      name: 'Stone Heart',
+      why: "Life twice, then the life notable with stun threshold: a pocket off the tower road, whose life smalls lead to it, so west of the Gate is the life direction and north-west (the Bulwark) the armour (G2, 2026-10-22: it was the Bulwark's life side, and Thick Skin, which was here, went to the west rim).",
+      at: [-1931, 880],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          at: [-1808, 846],
+          why: 'The entrance, from the road.',
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-1864, 861] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Stone Heart',
+          lines: [life(12), stunThreshold(16)],
+          at: [-1931, 880],
+          why: 'Life with the stun threshold life is for: 2.4 + 2 units, nothing conditional. The tip.',
         },
       ],
       links: [
@@ -126,61 +150,9 @@ export const rampart: AreaSpec = {
       links: [['a', 'n']],
     },
     {
-      id: 'ironLungs',
-      name: 'Iron Lungs',
-      why: "Mana on hit with melee attacks twice, then the notable with mana on hit, mana leech and mana: the melee Vanguard who runs dry by map five. Among the weapons (it was by the slam road until 2026-10-20), off the armour notable; the two smalls run on to the tower's first junction and the notable hangs off the second, so the road between the rampart and the tower costs no notable (round 3: it had run through the notable, and the second small went on to the mace wheel, which made the armour, mana and mace notables one chain).",
-      at: [-2397, 830],
-      shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'small', lines: [manaOnHit(4, ['melee'])], at: [-2361, 784] },
-        { id: 'b', kind: 'small', lines: [manaOnHit(4, ['melee'])], at: [-2397, 830] },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Iron Lungs',
-          lines: [manaOnHit(8, ['melee']), manaLeech(0.4), mana(8)],
-          at: [-2342, 874],
-          why: '2 + 1 + 1 units.',
-        },
-      ],
-      links: [
-        ['a', 'b'],
-        ['b', 'n'],
-      ],
-    },
-    {
-      id: 'thickSkin',
-      name: 'Thick Skin',
-      why: "Armour twice, then the notable with armour and stun threshold: the Vanguard who wants to stand in the hit. A pocket off the tower road two steps out of the start, on the way to the maces; the Bulwark's armour is eleven steps round by the rampart road. Bracing was here until round 3 (2026-10-20), when it went to the slam road so the shield and the mace leave the start in different directions.",
-      at: [-1931, 880],
-      shape: { kind: 'hand' },
-      nodes: [
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Thick Skin',
-          lines: [armour(20), stunThreshold(16)],
-          at: [-1931, 880],
-          why: 'Armour and twice the stun threshold of a small: 3.7 units. The tip.',
-        },
-        { id: 'b', kind: 'small', lines: [armour(12)], at: [-1864, 861] },
-        {
-          id: 'a',
-          kind: 'small',
-          lines: [armour(12)],
-          why: 'The entrance, from the road.',
-          at: [-1808, 846],
-        },
-      ],
-      links: [
-        ['a', 'b'],
-        ['b', 'n'],
-      ],
-    },
-    {
       id: 'j1',
       name: 'Junction',
-      why: "The rampart's junction, off the life notable: the keystone spur west, the accuracy pocket south-west, the resist star's fire spoke north.",
+      why: "The rampart's junction, off Iron Lungs: the keystone spur west, the accuracy pocket south-west, the resist star's fire spoke east, Hallowed Hammer north.",
       at: [-2509, 279],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-2509, 279] }],
@@ -189,13 +161,13 @@ export const rampart: AreaSpec = {
     {
       id: 'unerring',
       name: 'Unerring Discipline',
-      why: 'The spur to the first keystone: two nodes about hitting, then the trade (attacks always hit; never a critical strike). Dead-ended, off the junction, as the reference places its keystones.',
+      why: "The spur to the first keystone: two nodes about hitting, then the trade (attacks always hit; never a critical strike). Dead-ended, off the junction, as the reference places its keystones. Turned west in G2 (2026-10-22), so the keystone stands about 320 units from the Zealot's Idle Hands instead of 130.",
       at: [-2756, 110],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [accuracy(10)], at: [-2828, 61] },
-        { id: 'b', kind: 'small', lines: [accuracy(10)], at: [-2876, 28] },
-        { id: 'k', kind: 'keystone', name: 'Unerring Discipline', lines: [], at: [-2946, -20] },
+        { id: 'a', kind: 'small', lines: [accuracy(10)], at: [-2680, 230] },
+        { id: 'b', kind: 'small', lines: [accuracy(10)], at: [-2760, 205] },
+        { id: 'k', kind: 'keystone', name: 'Unerring Discipline', lines: [], at: [-2860, 175] },
       ],
       links: [
         ['a', 'b'],
@@ -205,7 +177,7 @@ export const rampart: AreaSpec = {
     {
       id: 'steadyHands',
       name: 'Steady Hands',
-      why: "Accuracy is a melee Vanguard's problem (strength gives none); this is the cheap answer beside the keystone that is the permanent one. Passed through, from the junction to the axes: the first loop that joins the rampart to the tower.",
+      why: "Accuracy is a melee Vanguard's problem (strength gives none); this is the cheap answer beside the keystone that is the permanent one. Entered from the junction, left by the road to Stagger; its far small faces the Barbican's deep west.",
       at: [-2847, 539],
       shape: { kind: 'ring', r: 55, a0: -45 },
       nodes: [
@@ -217,7 +189,12 @@ export const rampart: AreaSpec = {
           lines: [accuracy(20), attackSpeed(8)],
           why: '2 units of accuracy and 1.7 of speed: 3.7.',
         },
-        { id: 'b', kind: 'small', lines: [accuracy(10)], why: 'The exit to the axes.' },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [accuracy(10)],
+          why: 'The far side, facing the deep west.',
+        },
         { id: 'c', kind: 'small', lines: [accuracy(10)] },
       ],
       links: [
@@ -257,7 +234,7 @@ export const rampart: AreaSpec = {
     {
       id: 'toWind',
       name: 'A road',
-      why: 'Strength once between the rampart highway and Second Wind.',
+      why: "Strength once off the rampart highway, where the resist star's chaos spoke and the Bulwark's north small land: the wheel's second door and the star's landing (it led to Second Wind until G2, 2026-10-22).",
       at: [-1677, 270],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-1677, 270] }],
@@ -275,41 +252,51 @@ export const rampart: AreaSpec = {
     {
       id: 'toThickSkin',
       name: 'A road',
-      why: 'Strength once between the tower road and Thick Skin.',
+      why: 'Strength once between the tower road and Stone Heart (the pocket was Thick Skin until G2, 2026-10-22).',
       at: [-1669, 808],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-1669, 808] }],
       links: [],
     },
+    {
+      id: 'toTower',
+      name: 'A road',
+      why: "Strength twice from Mortar and Stone straight to the tower's first junction, where Iron Lungs' pocket ran until G2 (2026-10-22): the rampart and the Barbican stay joined a second time.",
+      at: [-2394, 825],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-2325, 738] },
+        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-2462, 912] },
+      ],
+      links: [['a', 'b']],
+    },
   ],
   links: [
     {
-      from: 'bulwark.b',
-      to: 'secondWind.a',
-      why: "The recovery room opens off the wheel's north small.",
-    },
-    {
       from: 'wall.home.roadM.b',
       to: 'wall.rampart.toThickSkin.a',
-      why: 'Strength once between the tower road and Thick Skin.',
+      why: 'Strength once between the tower road and Stone Heart.',
+    },
+    { from: 'toThickSkin.a', to: 'stoneHeart.a', why: 'The far end of the road.' },
+    { from: 'bulwark.a', to: 'ironLungs.a', why: "The wheel's entrance onto the sustain side." },
+    { from: 'ironLungs.b', to: 'bulwark.e', why: 'The sustain side meets the armour side.' },
+    {
+      from: 'ironLungs.n',
+      to: 'j1.a',
+      why: 'Out of the wheel through Iron Lungs to the junction: the armour is the detour.',
     },
     {
-      from: 'wall.rampart.toThickSkin.a',
-      to: 'wall.rampart.thickSkin.a',
-      why: 'The far end of the road.',
-    },
-    { from: 'bulwark.n2', to: 'ironLungs.a', why: 'The mana pocket opens off the armour notable.' },
-    {
-      from: 'ironLungs.b',
-      to: 'wall.maces.j1.a',
-      why: "The mana pocket's second small on to the tower's junction: the rampart and the tower joined a second time, with the notable a step off the road.",
-    },
-    {
-      from: 'wall.rampart.secondWind.b',
-      to: 'wall.rampart.toWind.a',
-      why: 'Strength once between the rampart highway and Second Wind.',
+      from: 'ironLungs.a',
+      to: 'toWind.a',
+      why: "The wheel's north small onto the rampart road's second node: a second door.",
     },
     { from: 'wall.rampart.toWind.a', to: 'wall.home.roadR.b', why: 'The far end of the road.' },
+    { from: 'bulwark.n2', to: 'toTower.a', why: 'Mortar and Stone onto the road to the tower.' },
+    {
+      from: 'toTower.b',
+      to: 'wall.maces.j1.a',
+      why: "The road lands on the tower's first junction.",
+    },
     {
       from: 'wall.rampart.steadyHands.c',
       to: 'wall.rampart.toStagger.a',
@@ -330,11 +317,6 @@ export const rampart: AreaSpec = {
       to: 'wall.rampart.stagger.a',
       why: 'The far end of the road.',
     },
-    {
-      from: 'bulwark.n1',
-      to: 'j1.a',
-      why: 'Out of the wheel through the life notable to the junction.',
-    },
     { from: 'j1.a', to: 'unerring.a', why: 'Junction to the keystone spur.' },
     {
       from: 'wall.rampart.j1.a',
@@ -345,11 +327,6 @@ export const rampart: AreaSpec = {
       from: 'wall.rampart.toHands.a',
       to: 'wall.rampart.steadyHands.a',
       why: 'The far end of the road.',
-    },
-    {
-      from: 'wall.rampart.steadyHands.b',
-      to: 'wall.maces.cleaver.c',
-      why: 'Strength once between Steady Hands and Cleaver.',
     },
   ],
 };

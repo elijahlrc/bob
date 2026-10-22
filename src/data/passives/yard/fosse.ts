@@ -22,12 +22,12 @@ export const fosse: AreaSpec = {
   region: 'reaver',
   name: 'The Fosse',
   why: "An outer road round the Yard's south rim, from the Pits to the Barrows: lightning strikes near the Strider's side, the hunter's curse at the bottom.",
-  at: [180, 4120], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [180, 4175], // Where the area's name is drawn: clear of every other area's name; moved below the spine's landing in G2.
   clusters: [
     {
       id: 'road',
       name: 'The fosse road',
-      why: "Seven attribute nodes from the Pits' east junction south and west under Wound Dance to Barrow Ward. The lightning pocket leaves east at the second node and the curse pocket south at the fifth; the far end joins the Barrows, so the road is a way between the Yard and the Wall, not a path to two leaves.",
+      why: "Seven attribute nodes from the Pits' east junction south and west under Wound Dance to Barrow Ward. Spellsword lands on the first node, the lightning pocket leaves east at the second, the channelling pocket south at the third, the spine lands on the fourth, the curse pocket leaves south at the fifth and the leg from the Pits' west junction lands on the sixth (G2); the far end joins the Barrows, so the road is a way between the Yard and the Wall with four ways in from the Yard, not a path to leaves.",
       at: [-140, 4120],
       shape: { kind: 'hand' },
       nodes: [
@@ -141,7 +141,7 @@ export const fosse: AreaSpec = {
     {
       from: 'yard.blood.j2.a',
       to: 'road.f1',
-      why: "The Pits' east junction onto the fosse road, between Spellsword and Festering.",
+      why: "The Pits' east junction onto the fosse road, between the rim road and Festering.",
     },
     {
       from: 'road.f7',

@@ -91,7 +91,7 @@ export const column: AreaSpec = {
     {
       id: 'broadWeave',
       name: 'Broad Weave',
-      why: "Spell area: radius and area damage, tagged spell so the Wall's slams do not shop here. West of the column, reached from the junction, the star's cold spoke and the Siphon chain; passed through to the fork and onto the Withering chain.",
+      why: "Spell area: radius and area damage, tagged spell so the Wall's slams do not shop here. West of the column, reached from the junction and the star's cold spoke; passed through to the fork and onto the Withering chain.",
       at: [-300, -2899],
       shape: { kind: 'ring', r: 56, a0: 60 },
       nodes: [
@@ -99,7 +99,7 @@ export const column: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [spellArea(8)],
-          why: "The entrance, south-east, where the Siphon chain and the star's spoke also arrive.",
+          why: "The entrance, south-east, where the star's spoke also arrives.",
         },
         {
           id: 'n',

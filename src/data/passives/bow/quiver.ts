@@ -134,7 +134,7 @@ export const quiver: AreaSpec = {
     {
       id: 'skewer',
       name: 'Skewer',
-      why: 'Projectile damage twice, then the notable with an extra pierce and projectile damage: pierce is the projectile line no small sells and the one a thrown or bow build reshapes itself around. Passed through to the flask pocket, so the rim is a road. Split Volley was beside it until round 4.',
+      why: 'Projectile damage twice, then the notable with an extra pierce and projectile damage: pierce is the projectile line no small sells and the one a thrown or bow build reshapes itself around. Passed through to the flask pocket, so the rim is a road; since G2 (2026-10-22) both its doors are road nodes of the middle and south spokes. Split Volley was beside it until round 4.',
       at: P(2400, 190),
       shape: { kind: 'hand' },
       nodes: [
@@ -143,7 +143,7 @@ export const quiver: AreaSpec = {
           kind: 'small',
           lines: [projectileDamage(10)],
           at: P(2337, 208),
-          why: 'The entrance, facing the landmark wheel.',
+          why: 'The entrance, from the middle spoke and the landmark wheel.',
         },
         { id: 'b', kind: 'small', lines: [projectileDamage(10)], at: P(2365, 259) },
         {
@@ -152,7 +152,7 @@ export const quiver: AreaSpec = {
           name: 'Skewer',
           lines: [pierce(1), projectileDamage(10)],
           at: P(2400, 320),
-          why: '3 + 1 units. The exit, to the flask pocket.',
+          why: '3 + 1 units. The exit, to the south spoke and the flask pocket.',
         },
       ],
       links: [
@@ -172,7 +172,7 @@ export const quiver: AreaSpec = {
           kind: 'small',
           lines: [flaskEffect(5)],
           at: P(2265, 550),
-          why: 'The entrance from Skewer and from Rapid Fire.',
+          why: 'The entrance, from the south spoke and Skewer.',
         },
         { id: 'b', kind: 'small', lines: [flaskEffect(5)], at: P(2235, 600) },
         {
@@ -227,12 +227,6 @@ export const quiver: AreaSpec = {
   ],
   links: [
     { from: 'road.jq3', to: 'rapid.a', why: 'The attack-speed pocket.' },
-    {
-      from: 'bow.flight.wheel.n2',
-      to: 'skewer.a',
-      why: 'Barbed Arrows onto the pierce pocket: the rim is a road on from the landmark wheel.',
-    },
-    { from: 'skewer.n', to: 'quickSip.a', why: 'Pierce on to the flask pocket.' },
     {
       from: 'quickSip.n',
       to: 'added.n440',

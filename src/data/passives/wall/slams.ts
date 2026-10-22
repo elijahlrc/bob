@@ -6,7 +6,8 @@
  * near crossing from the Yard, and Bracing (shield block) as a bridge from the slam road to the slam wheel and the Yard.
  * Re-lined on 2026-10-20 (PHILOSOPHY §2a): Thick Skin and Unbloodied came here, Iron Lungs and Stagger went north. Round
  * 3 (2026-10-20): Bracing and Thick Skin traded places, so the shield leaves the start south-east, toward the Yard's
- * shields, and the mace west.
+ * shields, and the mace west. G2 (2026-10-22): Second Wind came here from the Rampart, below Unbloodied, with a road node
+ * toward the Yard's Thirsting Blade; the Quarry floor road runs from the slam junction toward Ground Shaker.
  */
 import {
   aoe,
@@ -17,8 +18,10 @@ import {
   dex,
   knockback,
   leechLife,
+  life,
   lifeOnHit,
   lifeOnKill,
+  lifeRegen,
   manaLeech,
   meleeArea,
   meleeRange,
@@ -36,7 +39,7 @@ export const slams: AreaSpec = {
   id: 'wall.slams',
   region: 'vanguard',
   name: 'The Quarry',
-  why: "The Wall's south-west: the two-handed slam, armour by the slam road, the full-life diamond, pace, leech, area damage, the totems and Strongarm. Every cluster here has two doors.",
+  why: "The Wall's south-west: the two-handed slam, armour by the slam road, the full-life diamond, pace, leech and regeneration, area damage, the totems and Strongarm, with the Quarry floor road across the middle. Every cluster here has two doors.",
   at: [-1250, 1600], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -275,6 +278,56 @@ export const slams: AreaSpec = {
       ],
     },
     {
+      id: 'secondWind',
+      name: 'Second Wind',
+      why: "Regeneration twice, then the notable with regeneration and life: the recovery decision, south of Unbloodied between the Quarry and the Barrows (G2, 2026-10-22; it was in the Rampart, a step off the home's road). With Vampiric Strikes and the Yard's Thirsting Blade beside it, regeneration or leech is a fork: one of them is enough for most builds.",
+      at: [-1650, 2070],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [lifeRegen(0.4)],
+          at: [-1624, 1948],
+          why: 'The entrance, from Unbloodied.',
+        },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1635, 2002] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Second Wind',
+          lines: [lifeRegen(1), life(8)],
+          at: [-1650, 2070],
+          why: "2.5 units of regeneration and a little life: 4.1 units. The Barrows' middle road leaves south-west, the road to the Yard east.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+      ],
+    },
+    {
+      id: 'toThirst',
+      name: 'A road',
+      why: "Strength and dexterity once east of Second Wind, where the near crossing to the Yard's Thirsting Blade lands (G2, 2026-10-22).",
+      at: [-1460, 2140],
+      shape: { kind: 'hand' },
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [-1460, 2140] }],
+      links: [],
+    },
+    {
+      id: 'floor',
+      name: 'The Quarry floor',
+      why: 'Strength across the empty Quarry floor, from the slam junction west toward Ground Shaker (G2, 2026-10-22): a third way between the Quarry and the Barbican. The mace-and-life cluster joins the two nodes.',
+      at: [-1850, 1455],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-1580, 1458] },
+        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-2113, 1459] },
+      ],
+      links: [],
+    },
+    {
       id: 'toCairns',
       name: 'A road',
       why: 'Strength once between the slam junction and the totems.',
@@ -320,6 +373,14 @@ export const slams: AreaSpec = {
       why: "The slams' radius node onto the pace chain.",
     },
     { from: 'j1.a', to: 'unbloodied.a', why: 'Junction to the full-life diamond.' },
+    {
+      from: 'unbloodied.n',
+      to: 'secondWind.a',
+      why: "The full-life diamond's tip onto Second Wind: a third way into Unbloodied.",
+    },
+    { from: 'secondWind.n', to: 'toThirst.a', why: "Second Wind east, toward the Yard's leech." },
+    { from: 'j1.a', to: 'floor.a', why: 'The slam junction onto the Quarry floor, west.' },
+    { from: 'groundShaker.b', to: 'floor.b', why: 'Ground Shaker onto the Quarry floor, east.' },
     {
       from: 'wall.slams.j1.a',
       to: 'wall.slams.toCairns.a',

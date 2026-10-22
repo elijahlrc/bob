@@ -37,7 +37,7 @@ export const home: AreaSpec = {
   region: 'reaver',
   name: 'The Yard Gate',
   why: 'Two stat nodes off the start (melee damage west, attack speed east), the signature between them, two hubs one step out with a pocket each, and three roads: the blades highway west, the second-hand highway east, the middle road (life) straight down; and the mana pocket between the middle road and the second-hand road.',
-  at: [-80, 1356], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-80, 1347], // Where the area's name is drawn: clear of every other area's name; 9 up in G2, off Buckler's frame.
   clusters: [
     {
       id: 'sig',
@@ -145,7 +145,7 @@ export const home: AreaSpec = {
     {
       id: 'fightingBreath',
       name: 'Fighting Breath',
-      why: "Mana on hit with attacks twice, then the notable with mana on hit, mana leech and life: the Yard's only mana notable, for a Reaver with three gems who runs dry by map five. A tight orbit between the middle road's second node and the second-hand road's second node: a bridge, so the two roads are a loop before the hub.",
+      why: "Mana on hit with attacks twice, then the notable with mana on hit, mana leech and life: the Yard's only mana notable, for a Reaver with three gems who runs dry by map five. A tight orbit between the middle road's third node and the second-hand road's second node: a bridge, so the two roads are a loop before the hub.",
       at: [170, 1640],
       shape: { kind: 'hand' },
       nodes: [
@@ -233,7 +233,7 @@ export const home: AreaSpec = {
     {
       id: 'roadS',
       name: 'The middle road',
-      why: 'Life three times: the road straight down from the signature to the hub, where the blades, the bow chain and the shield wheel meet again. It was block, and a two-sword Reaver paid three block nodes for the generic way down; life is what every Reaver wants on the way.',
+      why: 'Life three times: the road straight down from the signature to the hub, where the crossroad and the spine meet it (G2). It was block, and a two-sword Reaver paid three block nodes for the generic way down; life is what every Reaver wants on the way.',
       at: [-50, 1560],
       shape: { kind: 'hand' },
       nodes: [
@@ -304,7 +304,11 @@ export const home: AreaSpec = {
       to: 'roadE.a',
       why: 'The block pocket is also a way onto the second-hand road.',
     },
-    { from: 'roadS.b', to: 'fightingBreath.a', why: 'The middle road onto the mana pocket.' },
+    {
+      from: 'roadS.c',
+      to: 'fightingBreath.a',
+      why: "The middle road's third node onto the mana pocket (G2, 2026-10-22; it was the second): the first node is left free for the attack-speed cluster that will bridge the middle road and the second-hand road (RE-5), whose link would otherwise cross this one.",
+    },
     { from: 'life.n', to: 'fieldDressing.a', why: 'Stout Heart onto the flask pocket.' },
     {
       from: 'fieldDressing.b',

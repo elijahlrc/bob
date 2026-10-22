@@ -1,14 +1,12 @@
 /**
- * The Spire's left (the well road): the wheel off the well road, the recharge room (now also the foot of the Siphon
- * chain up to the column's area cluster), the wand chain from the mana notable west to the flask chain that points at
+ * The Spire's left (the well road): the wheel off the well road, the recharge room (since G2, 2026-10-22, a pocket
+ * between the Quiet Pulse road and the Undercroft road; Siphon moved to the Belfry, `frost.ts`), the wand chain from the mana notable west to the flask chain that points at
  * the Cathedral (both swapped in from the east side on 2026-10-20), the junction, the Mind Bulwark spur, and the west road
  * (2026-10-19): a life pocket and a mana-leech pocket climbing from the junction to the fire arm's junction, so the well
  * reaches the arms without the column and the Spire sells life and mana leech at all.
  */
 import {
   es,
-  esLeech,
-  esOnHit,
   esRecharge,
   esRechargeDelay,
   flaskDuration,
@@ -20,7 +18,6 @@ import {
   manaLeech,
   manaOnBlock,
   manaOnHit,
-  manaOnKill,
   manaRegen,
   shieldDef,
   shieldSpellBlock,
@@ -54,7 +51,7 @@ export const well: AreaSpec = {
           why: 'Mana and its regeneration: 2.5 + 2 units. The Frugal chain leaves here.',
         },
         { id: 'c', kind: 'small', lines: [es(5)], why: 'The north-west exit, to the junction.' },
-        { id: 'd', kind: 'small', lines: [es(5)], why: 'Where the recharge room opens.' },
+        { id: 'd', kind: 'small', lines: [es(5)] },
         {
           id: 'n2',
           kind: 'notable',
@@ -75,50 +72,37 @@ export const well: AreaSpec = {
     {
       id: 'recharge',
       name: 'Quickening',
-      why: "Recharge rate and a faster start of recharge: the energy-shield build's decision, off the wheel's shield small, and the foot of the Siphon chain.",
-      at: [-481, -2357],
+      why: "Recharge rate and a faster start of recharge: the energy-shield build's decision. Moved in G2 (2026-10-22, G1/mystic.md MY-m1) from the wheel's shield small, where Glass Skin, Quickening and Siphon sat three steps apart (a one-stop for the shield caster), to a pocket hanging as a bridge between the Quiet Pulse road and the Undercroft road: the recharge now lies west, past life. Each small sits on the straight line from the notable to the road node it leads to, so the pocket's tip, the notable, faces away from both roads.",
+      at: [-950, -2640],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [esRecharge(15)], at: [-478, -2287] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [esRecharge(15)],
+          at: [-886, -2669],
+          why: 'The entrance, from the Quiet Pulse road.',
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Quickening',
           lines: [esRechargeDelay(30), esRecharge(20), es(5)],
-          at: [-481, -2357],
+          at: [-950, -2640],
           why: '3 + 1.3 + 1 units; the faster start is the half the sheet shows least and the fight feels most.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [esRecharge(15)],
-          why: 'Where the Siphon chain leaves.',
-          at: [-484, -2427],
+          why: 'The exit, to the Undercroft road.',
+          at: [-1011, -2674],
         },
       ],
       links: [
         ['a', 'n'],
         ['n', 'b'],
       ],
-    },
-    {
-      id: 'siphon',
-      name: 'Siphon',
-      why: "Energy shield on hit, then the notable with shield leech, shield on hit and mana on kill: the caster's recovery from hitting, which no other Spire node sells, as a chain from the recharge room up to the column's area cluster. The well's own way up, without the wheel's notable.",
-      at: [-480, -2600],
-      shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'small', lines: [esOnHit(4)], at: [-493, -2634] },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Siphon',
-          lines: [esLeech(0.8), esOnHit(6), manaOnKill(10)],
-          at: [-440, -2680],
-          why: '2 + 1.5 + 1 units.',
-        },
-      ],
-      links: [['a', 'n']],
     },
     {
       id: 'wandwork',
@@ -174,7 +158,7 @@ export const well: AreaSpec = {
     {
       id: 'quietPulse',
       name: 'Quiet Pulse',
-      why: 'Life: the Spire had none. Two life nodes and a notable with life, regeneration and a little shield, a tight orbit above the junction and the first step of the west road; its far node also reaches the Siphon chain.',
+      why: 'Life: the Spire had none. Two life nodes and a notable with life, regeneration and a little shield, a tight orbit above the junction and the first step of the west road; its notable also leads toward the Column (`toPulse`).',
       at: [-800, -2480],
       shape: { kind: 'ring', r: 80, a0: 90 },
       nodes: [
@@ -320,7 +304,7 @@ export const well: AreaSpec = {
     {
       id: 'toPulse',
       name: 'A road',
-      why: 'Intelligence once between Siphon and Quiet Pulse.',
+      why: "Intelligence once off Quiet Pulse toward the Column. It led to Siphon until G2 (2026-10-22), when Siphon moved to the Belfry; it is where G3's energy shield cluster (G1/mystic.md MY-8) hangs, the Cloister's way up to Broad Weave.",
       at: [-612, -2577],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-612, -2577] }],
@@ -360,15 +344,14 @@ export const well: AreaSpec = {
       why: 'The crossing lands on the Hymn pocket of the Narthex.',
     },
     {
-      from: 'deepWell.d',
+      from: 'toTap.a',
       to: 'recharge.a',
-      why: "The recharge room opens off the wheel's shield small.",
+      why: 'The Quiet Pulse road onto the recharge pocket (G2, MY-m1): the shield caster who wants the faster recharge walks west past life to get it.',
     },
-    { from: 'recharge.b', to: 'siphon.a', why: 'The recharge room onto the Siphon chain.' },
     {
-      from: 'spire.column.broadWeave.a',
-      to: 'siphon.n',
-      why: 'Broad Weave and Siphon, joined directly.',
+      from: 'recharge.b',
+      to: 'toCrypt.r2',
+      why: 'The recharge pocket onto the Undercroft road, so it is a bridge and the road to the Undercroft has something coming off it (it had nothing for four nodes).',
     },
     { from: 'deepWell.n1', to: 'wandwork.a', why: 'The mana notable onto the wand chain.' },
     { from: 'wandwork.n', to: 'draught.a', why: 'The wand chain lands on the flask chain.' },
@@ -392,14 +375,9 @@ export const well: AreaSpec = {
     },
     { from: 'j1.a', to: 'quietPulse.a', why: 'The junction onto the west road: life first.' },
     {
-      from: 'spire.well.siphon.a',
-      to: 'spire.well.toPulse.a',
-      why: 'Intelligence once between Siphon and Quiet Pulse.',
-    },
-    {
       from: 'spire.well.toPulse.a',
       to: 'spire.well.quietPulse.n',
-      why: 'The far end of the road.',
+      why: "Quiet Pulse's road node toward the Column; the new cluster between it and Broad Weave (G1/mystic.md MY-8) is G3's.",
     },
     {
       from: 'spire.well.quietPulse.n',
