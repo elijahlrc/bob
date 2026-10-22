@@ -470,3 +470,10 @@
                         daggerDamage     30     40     40     40     66     66
   gave up at 60 (what 40 more points would add): Tumble (2.7), Quickened Steel (2.3), Scarred Hide (2), Red Harvest (1.8), Four Winds (1.6)
   gave up at 120 (what 40 more points would add): Mist Walk (3.1), Spellslip (3), Bloodletter (1.8), Fencer's Eye (1.7)
+
+== Against the targets (27 archetypes)
+  1. at 120, what 40 more points add to the typical main stat: 16% (target about 30%+); main stats gaining 10% or less: 36% (target about 10%); archetypes whose every main stat gains 20%+: 1 (target about two in three)
+  2. at 60, the typical main stat: 49% (target about 50%); gaining 10% or less: 20%
+  3. at 120, notables worth 2.5+ units that 40 more points add: typically 1, 7 builds with none (target two or more for most)
+  4. at 120, choice: 6 builds with one plan, 12 with three or more (target two or more for all, three for about half)
+  5. at 120, tax: typically 33%, 13 builds above a third (target a third or less for most)

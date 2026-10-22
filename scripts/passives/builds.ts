@@ -509,6 +509,42 @@ for (const a of ARCHETYPES) {
     picture(a, res, join(picDir, `${a.id}.png`));
   }
 }
+
+// ---- Against the targets of stop 1 (docs/tree/design/G0-baseline.md): directions, not gates.
+const median = (xs: number[]) => {
+  const s = [...xs].sort((x, y) => x - y);
+  return s.length ? s[Math.floor(s.length / 2)] : 0;
+};
+const growth = (r: Result, b: number) => {
+  const now = r.curve.find((s) => s.budget === b)!,
+    later = r.curve.find((s) => s.budget === b + NEXT)!;
+  return now.families
+    .map((f, i) => (f.units > 0 ? (later.families[i].units - f.units) / f.units : NaN))
+    .filter((g) => !Number.isNaN(g));
+};
+const at120 = all.map((r) => r.curve.find((s) => s.budget === 120)!);
+const g120 = all.flatMap((r) => growth(r, 120)),
+  g60 = all.flatMap((r) => growth(r, 60));
+const share = (xs: boolean[]) => pct(xs.filter(Boolean).length / (xs.length || 1));
+console.log(`\n== Against the targets (${all.length} archetypes)`);
+console.log(
+  `  1. at 120, what ${NEXT} more points add to the typical main stat: ${pct(median(g120))} (target about 30%+); main stats gaining 10% or less: ${share(g120.map((g) => g <= 0.1))} (target about 10%); archetypes whose every main stat gains 20%+: ${all.filter((r) => growth(r, 120).every((g) => g >= 0.2)).length} (target about two in three)`,
+);
+console.log(
+  `  2. at 60, the typical main stat: ${pct(median(g60))} (target about 50%); gaining 10% or less: ${share(g60.map((g) => g <= 0.1))}`,
+);
+const wanted = all.map(
+  (r) => r.judged.find((j) => j.budget === 120)!.gaveUp.filter((g) => g.value >= 2.5).length,
+);
+console.log(
+  `  3. at 120, notables worth 2.5+ units that ${NEXT} more points add: typically ${median(wanted)}, ${wanted.filter((n) => n === 0).length} builds with none (target two or more for most)`,
+);
+console.log(
+  `  4. at 120, choice: ${at120.filter((s) => s.choice <= 1).length} builds with one plan, ${at120.filter((s) => s.choice >= 3).length} with three or more (target two or more for all, three for about half)`,
+);
+console.log(
+  `  5. at 120, tax: typically ${pct(median(at120.map((s) => s.tax.share)))}, ${at120.filter((s) => s.tax.share > 1 / 3).length} builds above a third (target a third or less for most)`,
+);
 if (jsonOut)
   writeFileSync(
     jsonOut,
