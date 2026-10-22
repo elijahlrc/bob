@@ -1,9 +1,19 @@
 /**
  * The Water Meadows (G3 round 2, 2026-10-22): the band between the Ford and the Fosse, outside the old edge and along the
  * south half of the outer road. Field Kit and Fouled Tips (round 1, moved here from the Ford's file) bridge the Ford's
- * far pockets (Sentry Post, Pitch Arrows) out to the road; the elemental bow hangs outward from the road's m56a.
+ * far pockets (Sentry Post, Pitch Arrows) out to the road; the elemental bow hangs outward from the road's m56a, and
+ * lightning attacks with shock from m67 (round 3).
  */
-import { bowDamage, eleAttack, evasion, flaskEffect, poisonChance, poisonDamage } from '../lines';
+import {
+  bowDamage,
+  eleAttack,
+  eleAttackOne,
+  evasion,
+  flaskEffect,
+  poisonChance,
+  poisonDamage,
+  shockChance,
+} from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
 
@@ -11,7 +21,7 @@ export const waterMeadows: AreaSpec = {
   id: 'bow.south',
   region: 'strider',
   name: 'The Water Meadows',
-  why: "The band between the Ford and the Fosse, along the outer road's south half: evasion with flasks, the poison bow and the elemental bow, each a different direction for a bow build that has spent the inside.",
+  why: "The band between the Ford and the Fosse, along the outer road's south half: evasion with flasks, the poison bow, the elemental bow and lightning attacks with shock, each a different direction for a bow build that has spent the inside.",
   at: [2400, 3120], // Where the area's name is drawn (G3 round 2): over the outer road between Field Kit and Bright Shafts, clear of every notable and of the Thicket's and the Ford's names.
   clusters: [
     {
@@ -123,6 +133,37 @@ export const waterMeadows: AreaSpec = {
         ['q1', 'q2'],
       ],
     },
+    {
+      id: 'liveWire',
+      name: 'Live Wire',
+      why: "ST-4 (G1/strider.md §1, G3 round 3, 2026-10-22): lightning damage with attacks and chance to shock, lightning attacks' second home. Stormstruck (the Reaver's Fosse, eight steps away by j8 and the Fosse crossing) pairs them with attack speed; this one with shock. A lightning archer reaches both, each with its own partner. On m67, up the road from the Fosse, not at the junction, where it would sit three or four steps from Stormstruck (the brief). Three lightning attack smalls, so the elemental archer collects its want here; about eleven steps from Bright Shafts (all elements, with the bow) and from Pitch Arrows (fire, with area). A pocket straight out from m67, square to the road: one of the far tips left as dead ends.",
+      at: P(2603, 1982),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 's1',
+          kind: 'small',
+          lines: [eleAttackOne('lightning', 12)],
+          at: P(2445, 1896),
+          why: 'The entrance, facing the road.',
+        },
+        { id: 's2', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: P(2493, 1922) },
+        { id: 's3', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: P(2541, 1948) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Live Wire',
+          lines: [eleAttackOne('lightning', 24), shockChance(20)],
+          at: P(2603, 1982),
+          why: '2 + 2 units.',
+        },
+      ],
+      links: [
+        ['s1', 's2'],
+        ['s2', 's3'],
+        ['s3', 'n'],
+      ],
+    },
   ],
   links: [
     {
@@ -149,6 +190,11 @@ export const waterMeadows: AreaSpec = {
       from: 'fouledTips.q2',
       to: 'bow.rim.road.m78',
       why: 'Fouled Tips reaches the outer road at m78.',
+    },
+    {
+      from: 'liveWire.s1',
+      to: 'bow.rim.road.m67',
+      why: 'Lightning attacks with shock hang straight out from the road (G3 round 3).',
     },
   ],
 };

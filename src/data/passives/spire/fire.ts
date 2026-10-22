@@ -3,7 +3,8 @@
  * element appears twice in the Spire, in two different arms and with a different partner, so an element build picks
  * which partner it wants and pays to cross for the other. Here: cold with energy shield (Hoarfrost), the minion chain
  * from the well, and fire as burning (Cinder) at the arm's end beside the two-element keystone. The other fire cluster
- * (Flashpoint, fire with crit) is in the east arm; the other cold one (Shatter) is at the top.
+ * (Flashpoint, fire with crit) is in the east arm; the other cold one (Shatter) is at the top. Since G3: the elemental wand
+ * (Bright Wand), the north-west rim road with High Veil at its tip, and Cold Light (spell crit with cold, round 3) on it.
  * The id `spire.fire` predates the change and is kept (ids are stable).
  */
 import {
@@ -16,6 +17,7 @@ import {
   int,
   minionDamage,
   minionLife,
+  spellCrit,
   spellDamage,
   eleAttack,
   str,
@@ -144,7 +146,7 @@ export const fire: AreaSpec = {
     {
       id: 'rim',
       name: 'The north-west rim road',
-      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4), past the minion-and-curse pocket (MY-7, G3 round 3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop). Cinder stops being a dead end. Since G3 round 2 the road is a spur with a far tip: Steady Stream no longer leads onto High Veil, so the far shield is reached from the Lantern through Cinder or from the Zealot, never a step off the climb to Shatter. The north-east rim road is the Eaves (`rim.ts`).",
+      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4), past Cold Light's pocket (spell crit with cold, G3 round 3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop). Cinder stops being a dead end. Since G3 round 2 the road is a spur with a far tip: Steady Stream no longer leads onto High Veil, so the far shield is reached from the Lantern through Cinder or from the Zealot, never a step off the climb to Shatter. The north-east rim road is the Eaves (`rim.ts`).",
       at: [-1115, -4325],
       shape: { kind: 'hand' },
       nodes: [
@@ -160,19 +162,62 @@ export const fire: AreaSpec = {
           kind: 'attribute',
           lines: [int(7)],
           at: [-1115, -4325],
-          why: 'Halfway; the near end of the MY-7 pocket (G3 round 3), outward.',
+          why: "Halfway; the end of Cold Light's short leg (G3 round 3).",
         },
         {
           id: 'c',
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: [-1380, -4150],
-          why: "The corner over Cinder, the last node before the Zealot, so half strength: the far loop leaves here for the Zealot's north walk, and the MY-7 pocket's far end lands here.",
+          why: "The corner over Cinder, the last node before the Zealot, so half strength: the far loop leaves here for the Zealot's north walk, and Cold Light's longer leg leaves here.",
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'c'],
+      ],
+    },
+    {
+      id: 'coldLight',
+      name: 'Cold Light',
+      why: "Spell crit with cold damage (G3 round 3, 2026-10-22; new beyond the brief, CONSTRAINTS §1.1 and §5.1): the cold caster's crit, the Spire's fourth spell crit cluster and its first away from the east. Spell crit had three homes, all on the east side and all near (Sharp Mind at home, Flashpoint, Keen Verse), so a crit caster had all of it by 60 points and 40 more points bought none (G3 round 2: the life caster's spell crit 8.4 units from 60 to 160). Here it is far and in the other direction, and its partner is cold: the fire and lightning caster pays for a cold line it does not use, the cold caster for crit it half wants. Cold's third cluster too, each with its own partner (the shield at Hoarfrost, freeze and penetration at Shatter, crit here), nine steps from Hoarfrost through Cinder. Laid where round 3 first put the minion-and-curse cluster (moved to the Eaves: it made the north-west a summoner's one-stop beside High Veil and Familiars). A V pocket outward of the north-west rim road, the notable at the tip under the rim: two crit smalls on the corner's side, where a caster arrives from Cinder or the Zealot's north walk, one on the side toward High Veil. Walking the road costs none of it.",
+      at: [-1402, -4471],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellCrit(15)],
+          at: [-1393, -4346],
+          why: 'The entrance from the corner over Cinder, on the straight line to the notable.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [spellCrit(15)],
+          at: [-1397, -4401],
+          why: 'Beside the notable, on the same leg.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Cold Light',
+          lines: [spellCrit(30), eleDamage('cold', 16)],
+          at: [-1402, -4471],
+          why: '2 + 1.6 units. The tip of the V.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [spellCrit(15)],
+          at: [-1340, -4439],
+          why: "The exit to the road's middle node, on the straight line from the notable.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -249,6 +294,16 @@ export const fire: AreaSpec = {
       from: 'cinder.b',
       to: 'rim.c',
       why: "The ignite room's far side onto the north-west rim road: Cinder is a bridge from the Lantern to the rim, not the arm's dead end.",
+    },
+    {
+      from: 'rim.c',
+      to: 'coldLight.a',
+      why: "The corner over Cinder onto Cold Light's longer leg, up into the open side between the Zealot's road and the rim road (the corner becomes a four-way: Cinder, the Zealot, the road, the pocket).",
+    },
+    {
+      from: 'coldLight.c',
+      to: 'rim.b',
+      why: "Cold Light's short leg onto the road's middle node: the pocket is a bridge, two ways in.",
     },
     {
       from: 'spire.well.manaTap.b',

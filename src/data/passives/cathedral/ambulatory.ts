@@ -335,7 +335,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'censer',
       name: 'Censer',
-      why: 'A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20).',
+      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with life, `rim.ts`) bridges it to the Vanguard's Grim Oath, so it is a junction of three; Brazier, off the far end of the outer walk, is burning with the sceptre.",
       at: [-3554, -638],
       shape: { kind: 'hand' },
       nodes: [

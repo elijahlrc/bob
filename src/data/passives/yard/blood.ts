@@ -6,11 +6,13 @@
  * between the two diamonds to the Fosse), the rim road (from the west junction to the east one, under the diamonds), the
  * leg from the Pits' west junction down to the Fosse, and Spellsword moved under the rim road, bridging the spine and
  * the Fosse. Since G3 round 2 the leg carries the wheel of the fighter without a shield (Full Swing two-handed with life,
- * Paired Steel dual wield with leech).
+ * Paired Steel dual wield with leech), and since round 3 the lasting bleed (Lasting Wounds) bridges the spine's end and
+ * the Fosse below Wound Dance.
  */
 import {
   bleedChance,
   bleedDamage,
+  bleedDuration,
   castSpeed,
   dex,
   dualDamage,
@@ -30,7 +32,7 @@ export const blood: AreaSpec = {
   id: 'yard.blood',
   region: 'reaver',
   name: 'The Pits',
-  why: "The Yard's south rim: bleed, leech, poison, Spellsword, Wound Dance and Crimson Pact, the dear crossings to the Wall and the Bow, since G2 three roads south to the Fosse (the spine, the leg, and the east junction's road), and on the leg the wheel of the fighter without a shield (G3 round 2). The leg's wheel has no area name of its own over it; it is the Pits' (the nearest name, below the rim road).",
+  why: "The Yard's south rim: bleed, leech, poison, Spellsword, Wound Dance and Crimson Pact, the dear crossings to the Wall and the Bow, since G2 three roads south to the Fosse (the spine, the leg, and the east junction's road), and on the leg the wheel of the fighter without a shield (G3 round 2), below Wound Dance the lasting bleed (G3 round 3). The leg's wheel and the lasting bleed have no area name of their own over them; they are the Pits' (the nearest name, below the rim road).",
   at: [170, 3330], // Where the area's name is drawn: clear of every other area's name; moved below the rim road in G2.
   clusters: [
     {
@@ -112,12 +114,12 @@ export const blood: AreaSpec = {
     {
       id: 'festering',
       name: 'Festering',
-      why: "Poison twice, then the notable with poison and bleeding: wounds that fester, for the Reaver who poisons with a sword or a dagger and the Strider who poisons with a bow. A chain from the east rim junction, under the Crimson Pact spur (since G3 its second small also takes Bloodied Edge's chain up from the Fosse, so it is no longer a dead end), where a Strider coming up the dear road from the Bow finds it first. Here since round 3 (2026-10-20): it was on the Knife's Stair, where the poison claw found every claw and poison notable within six steps. The other poison notables are Barbed Point (with crit) in the Knife and Venom Fletching (with chaos attacks) in the Strider.",
-      at: [720, 3360],
+      why: "Poison twice, then the notable with poison and bleeding: wounds that fester, for the Reaver who poisons with a sword or a dagger and the Strider who poisons with a bow. A straight chain east from the Fosse's first node, under the Crimson Pact spur; its first small also takes Bloodied Edge's chain up from the Fosse (G3; it landed on the second small until round 3, and the first lies on that chain's straight line), so it is reached two ways, not a dead end. It left the east rim junction in G3 round 3: its link and the Crimson Pact spur's left that junction 17 degrees apart, and from the Fosse's first node it makes that node a clean cross (the junction north, the Fosse south, Spellsword west, Festering east). Here since round 3 (2026-10-20): it was on the Knife's Stair, where the poison claw found every claw and poison notable within six steps. The other poison notables are Barbed Point (with crit) in the Knife and Venom Fletching (with chaos attacks) in the Strider.",
+      at: [818, 3420],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [poisonDamage(12)], at: [775, 3347] },
-        { id: 'b', kind: 'small', lines: [poisonDamage(12)], at: [823, 3380] },
+        { id: 'a', kind: 'small', lines: [poisonDamage(12)], at: [755, 3420] },
+        { id: 'b', kind: 'small', lines: [poisonDamage(12)], at: [810, 3420] },
         {
           id: 'n',
           kind: 'notable',
@@ -160,7 +162,7 @@ export const blood: AreaSpec = {
     {
       id: 'j2',
       name: 'Junction',
-      why: "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the rim road from the west, the Bow's dear road from the east; the Crimson Pact spur, Festering and the Fosse leave it.",
+      why: "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the rim road from the west, the Bow's dear road from the east; the Crimson Pact spur and the Fosse leave it (Festering left it for the Fosse's first node in G3 round 3).",
       at: [420, 3100],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [420, 3100] }],
@@ -260,7 +262,7 @@ export const blood: AreaSpec = {
     {
       id: 'spine',
       name: 'The spine',
-      why: "The middle road's last stretch (G2, 2026-10-22): from where the rim road crosses it straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the bleed with duration (RE-8) will hang, west toward the Fosse's fifth node.",
+      why: "The middle road's last stretch (G2, 2026-10-22): from where the rim road crosses it straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the lasting bleed (Lasting Wounds, RE-8, G3 round 3) leaves west for the Fosse's fifth node.",
       at: [-80, 3660],
       shape: { kind: 'hand' },
       nodes: [
@@ -276,10 +278,47 @@ export const blood: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [-104, 3800],
-          why: 'The bleed with duration (RE-8) will leave west.',
+          why: 'The lasting bleed (Lasting Wounds) leaves west.',
         },
       ],
       links: [['s1', 's2']],
+    },
+    {
+      id: 'lasting',
+      name: 'Lasting Wounds',
+      why: "Bleed damage twice, then the notable with bleed damage and bleed duration, then bleed damage once more (RE-8, G3 round 3, 2026-10-22): wounds that stay open, below Wound Dance, whose eight stacks are worth more the longer each bleed lasts. A bridge from the spine's last node to the Fosse's fifth node, so the spine, the Fosse and this chain make a loop. Open Veins (bleed with bleed chance, the Pits above) is its twin, 9 steps away by the spine; Hewing (axes with bleed chance) and Executioner (against the bleeding) are farther west, and the Strider's bow bleeds farther east. Laid as an L with the notable at the corner: the straight line from the spine would reach the Fosse's fifth node 29 degrees from the road east to the fourth, so the last small comes down onto it from above.",
+      at: [-470, 3980],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [bleedDamage(12)],
+          at: [-356, 3924],
+          why: 'The entrance, from the spine.',
+        },
+        { id: 'b', kind: 'small', lines: [bleedDamage(12)], at: [-407, 3949] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Lasting Wounds',
+          lines: [bleedDamage(24), bleedDuration(30)],
+          at: [-470, 3980],
+          why: 'A cut that will not close: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [bleedDamage(12)],
+          at: [-475, 4050],
+          why: "The exit, straight down onto the Fosse's fifth node, between its road east and west.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
     },
     {
       id: 'leg',
@@ -367,9 +406,9 @@ export const blood: AreaSpec = {
     { from: 'j3.a', to: 'woundDance.a', why: 'Junction to the keystone spur.' },
     { from: 'redHarvest.b', to: 'j2.a', why: 'Through the leech to the east rim junction.' },
     {
-      from: 'j2.a',
+      from: 'yard.fosse.road.f1',
       to: 'festering.a',
-      why: 'The east rim junction on to the poison chain, below the keystone spur.',
+      why: "The Fosse's first node east onto the poison chain (G3 round 3; it left the east rim junction, where it ran 17 degrees from the Crimson Pact spur).",
     },
     {
       from: 'yard.blood.openVeins.c',
@@ -417,6 +456,16 @@ export const blood: AreaSpec = {
       from: 'leg.l2',
       to: 'yard.fosse.road.f6',
       why: "The leg lands on the Fosse's sixth node.",
+    },
+    {
+      from: 'spine.s2',
+      to: 'lasting.a',
+      why: "The spine's last node onto the lasting bleed (G3 round 3, RE-8), west, below Wound Dance.",
+    },
+    {
+      from: 'lasting.c',
+      to: 'yard.fosse.road.f5',
+      why: "The lasting bleed lands on the Fosse's fifth node: a loop with the spine and the Fosse, and a way from the leg's end (the sixth node) up to the bleed.",
     },
   ],
 };

@@ -3,10 +3,19 @@
  * of the Undercroft to Tomb Dust and on to the Mystic's north-west rim road, the casters' far loop, with what hangs off it.
  * Laid in G2 (2026-10-22) as a cluster of the Undercroft; its own place since G3 round 2 (2026-10-22), when the road and
  * Rood Screen moved here from `crypt.ts` (their ids changed from `cathedral.crypt.north.*` and `cathedral.crypt.rood.*`).
- * In G3 round 3 spell damage with duration (ZE-9) hangs off the fourth node and channelling (ZE-3) bridges Shattering Rite
- * to the east end.
+ * G3 round 3 (2026-10-22): spell damage with duration (Vespers) hangs off the fourth node, and channelling (Plainsong)
+ * bridges Shattering Rite to the east end.
  */
-import { es, int, spellBlock, str } from '../lines';
+import {
+  channelDamage,
+  eleDamageAll,
+  es,
+  int,
+  skillDuration,
+  spellBlock,
+  spellDamage,
+  str,
+} from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
 
@@ -14,13 +23,13 @@ export const lychway: AreaSpec = {
   id: 'cathedral.walk',
   region: 'zealot',
   name: 'The Lychway',
-  why: "The north walk over the Undercroft: the casters' far loop between the Zealot's north rim and the Mystic's, and the clusters off it (Rood Screen; in round 3 spell damage with duration and channelling).",
+  why: "The north walk over the Undercroft: the casters' far loop between the Zealot's north rim and the Mystic's, and the clusters off it (Rood Screen, Vespers, Plainsong).",
   at: [-2700, -3650], // Where the area's name is drawn: over the walk's middle, clear of Rood Screen, Sigil Warden and every other area's name.
   clusters: [
     {
       id: 'road',
       name: 'The north walk',
-      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. Rood Screen (G3 round 1) hangs inward off the third node; in round 3 ZE-9 hangs off the fourth and ZE-3 bridges Shattering Rite to the east end.",
+      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. Rood Screen (G3 round 1) hangs inward off the third node, Vespers (round 3) off the fourth, and Plainsong (round 3) bridges Shattering Rite to the east end.",
       at: P(3057, 1916),
       shape: { kind: 'hand' },
       nodes: [
@@ -50,7 +59,7 @@ export const lychway: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3057, 1916),
-          why: 'Where, in G3 round 3, spell damage with duration (ZE-9) hangs inward.',
+          why: 'Where Vespers (spell damage with duration, G3 round 3) hangs inward.',
         },
         {
           id: 'n5',
@@ -64,7 +73,7 @@ export const lychway: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(2584, 2607),
-          why: "The east end: Tomb Dust arrives, ZE-3 bridges in from Shattering Rite (G3 round 3), and the far loop runs on in the same line to the Mystic's north-west rim road.",
+          why: "The east end: Tomb Dust arrives, Plainsong bridges in from Shattering Rite (G3 round 3), and the far loop runs on in the same line to the Mystic's north-west rim road.",
         },
       ],
       links: [
@@ -106,6 +115,74 @@ export const lychway: AreaSpec = {
         ['c', 'n'],
       ],
     },
+    {
+      id: 'vespers',
+      name: 'Vespers',
+      why: "G3 round 3 (2026-10-22; ledger ZE-9): a pocket inward off the north walk's fourth node, on the bisector of the walk, into the empty ground between Rood Screen and Volatile Servants: spell damage three times, then the notable with spell damage and skill duration. The Zealot's far spell cluster, for the spells, brands and totems that last; its other spell homes face other ways with other partners (Lectern with reservation on the aisle, Homily with the elements and cast speed in the Undercroft, Crozier with a staff on the Ambulatory). A caster who comes this far gives up the Mystic's east for it. Rood Screen's energy shield is one road node back: spell damage and energy shield near each other, which the convergence rule allows only far out, as a destination (25 steps from the Zealot start). A dead-end tip: the walk has three ways in.",
+      at: P(2812, 1781),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: P(2970, 1867),
+          why: 'The entrance from the walk.',
+        },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: P(2921, 1841) },
+        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: P(2873, 1815) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Vespers',
+          lines: [spellDamage(16), skillDuration(20)],
+          at: P(2812, 1781),
+          why: 'Spell damage and skill duration: 2 + 2 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+      ],
+    },
+    {
+      id: 'plainsong',
+      name: 'Plainsong',
+      why: "G3 round 3 (2026-10-22; ledger ZE-3): a bridge from Shattering Rite to the north walk's east end, channelling twice in the line of Shattering Rite's chain, the notable with channelling and the elements, channelling once more onto the walk. Channelling's third home and the one between the other two (Steady Stream with cheaper mana in the Mystic's far north, Ceaseless Blades with attacks in the Yard's Fosse), on the Mystic border where the far loop crosses. Channelled spells are mostly elemental. Shattering Rite stops being a dead end. The chain runs straight on from Shattering Rite and turns at the notable, so it reaches the walk's east end between the far loop and Tomb Dust at an even fan, not a few degrees off Tomb Dust's link.",
+      at: P(2292, 2580),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [channelDamage(10)],
+          at: P(2218, 2479),
+          why: 'The entrance from Shattering Rite, in the line of its chain.',
+        },
+        { id: 'b', kind: 'small', lines: [channelDamage(10)], at: P(2250, 2523) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Plainsong',
+          lines: [channelDamage(20), eleDamageAll(20)],
+          at: P(2292, 2580),
+          why: 'Channelling and elemental damage: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [channelDamage(10)],
+          at: P(2362, 2587),
+          why: "The far node, onto the walk's east end.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
     {
@@ -119,6 +196,21 @@ export const lychway: AreaSpec = {
       why: "Tomb Dust's chain carried on to the north walk's east end: the chaos pocket becomes a bridge, and the walk's second way in.",
     },
     { from: 'road.n3', to: 'rood.a', why: "The north walk's third node onto Rood Screen." },
+    {
+      from: 'road.n4',
+      to: 'vespers.a',
+      why: "The north walk's fourth node onto the far spell cluster (G3 round 3).",
+    },
+    {
+      from: 'cathedral.crypt.rite.n',
+      to: 'plainsong.a',
+      why: 'Shattering Rite onto channelling (G3 round 3), straight on from its chain: the physical-spell pocket becomes a bridge.',
+    },
+    {
+      from: 'plainsong.c',
+      to: 'road.n6',
+      why: "Channelling lands on the north walk's east end, between the far loop and Tomb Dust's link.",
+    },
     {
       from: 'road.n6',
       to: 'spire.fire.rim.c',

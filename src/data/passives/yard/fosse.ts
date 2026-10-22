@@ -29,11 +29,17 @@ export const fosse: AreaSpec = {
     {
       id: 'road',
       name: 'The fosse road',
-      why: "Seven attribute nodes from the Pits' east junction south and west under Wound Dance to Barrow Ward. Spellsword lands on the first node, the lightning pocket leaves east at the second, the channelling pocket south at the third, the spine lands on the fourth, the curse pocket leaves south at the fifth and the leg from the Pits' west junction lands on the sixth (G2); the far end joins the Barrows, so the road is a way between the Yard and the Wall with four ways in from the Yard, not a path to leaves.",
+      why: "Seven attribute nodes from the Pits' east junction south and west under Wound Dance to Barrow Ward. Spellsword lands on the first node and Festering leaves it east (G3 round 3), the lightning pocket leaves east at the second, the channelling pocket south at the third, the spine lands on the fourth, the curse pocket leaves south at the fifth (and the lasting bleed comes down onto it from the spine, G3 round 3) and the leg from the Pits' west junction lands on the sixth (G2); the far end joins the Barrows, so the road is a way between the Yard and the Wall with four ways in from the Yard, not a path to leaves.",
       at: [-140, 4120],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'f1', kind: 'attribute', lines: [str(6), dex(6)], at: [415, 3421] },
+        {
+          id: 'f1',
+          kind: 'attribute',
+          lines: [str(6), dex(6)],
+          at: [415, 3421],
+          why: "A cross: the Pits' east junction north, the road on south, Spellsword west, Festering east.",
+        },
         {
           id: 'f2',
           kind: 'attribute',
@@ -48,7 +54,7 @@ export const fosse: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [-480, 4130],
-          why: 'The curse pocket leaves south.',
+          why: 'The curse pocket leaves south; the lasting bleed (Lasting Wounds) lands from above.',
         },
         { id: 'f6', kind: 'attribute', lines: [str(7)], at: [-785, 4005] },
         {
@@ -94,7 +100,7 @@ export const fosse: AreaSpec = {
     {
       id: 'bloodied',
       name: 'Bloodied Edge',
-      why: "Sword damage twice, then the notable with sword damage and life leech, then sword damage once more (RE-3, G3 2026-10-22): the sword that drinks, in the band between the Pits and the Fosse, beside Crimson Pact. A straight bridge from the fosse road's second node up to Festering's chain, which stops being a dead end. The Yard's sword sits in three directions with three partners (accuracy at Keen Edge in the west, speed at Darting Steel in the east, leech here); the Yard's other leech notables, Red Harvest (the Pits) and Thirsting Blade (the far west), do not sell sword damage.",
+      why: "Sword damage twice, then the notable with sword damage and life leech, then sword damage once more (RE-3, G3 2026-10-22): the sword that drinks, in the band between the Pits and the Fosse, beside Crimson Pact. A straight bridge from the fosse road's second node up to Festering's chain, which stops being a dead end. The Yard's sword sits in four directions with four partners (accuracy at Keen Edge in the west, speed at Darting Steel in the east, block at Sword and Board in the south-west, leech here); the Yard's other leech notables, Red Harvest (the Pits) and Thirsting Blade (the far west), do not sell sword damage.",
       at: [637, 3546],
       shape: { kind: 'hand' },
       nodes: [
@@ -180,7 +186,7 @@ export const fosse: AreaSpec = {
     {
       from: 'yard.blood.j2.a',
       to: 'road.f1',
-      why: "The Pits' east junction onto the fosse road, between the rim road and Festering.",
+      why: "The Pits' east junction onto the fosse road, between the rim road and the Crimson Pact spur.",
     },
     {
       from: 'road.f7',
@@ -201,7 +207,7 @@ export const fosse: AreaSpec = {
     },
     {
       from: 'bloodied.c',
-      to: 'yard.blood.festering.b',
+      to: 'yard.blood.festering.a',
       why: "The leeching sword lands on Festering's chain: Festering gets a second way in, and a sword-and-poison or sword-and-bleed build finds both in one walk from the Fosse.",
     },
   ],

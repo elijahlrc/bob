@@ -4,7 +4,8 @@
  * Heavy Hands (two-handed speed, 2026-10-20); and Blood Rite at the rim. G3 (2026-10-22): Iron Voice (armour, warcry
  * effect) on the middle road between Stone Ward and the Barrows road. G3 round 2: Hammer Rhythm (the fast mace) between
  * the north road and the barrow stair, Long Watch (totem speed, duration) between the west road and Long Reach; the
- * middle road passes Stone Ward and Iron Voice beside their notables; Tempered took Elemental Ward's armour.
+ * middle road passes Stone Ward and Iron Voice beside their notables; Tempered took Elemental Ward's armour. G3 round
+ * 3: Bellows (fire attacks, melee area) south of the Barrows road, on to Grave Host's chain.
  */
 import {
   accuracy,
@@ -16,6 +17,7 @@ import {
   critMulti,
   dex,
   dualDamage,
+  eleAttackOne,
   enemyStunThreshold,
   gritDuration,
   life,
@@ -541,9 +543,47 @@ export const grit: AreaSpec = {
       ],
     },
     {
+      id: 'bellows',
+      name: 'Bellows',
+      why: "Fire damage with attacks three times on a straight chain south from the Barrows road to Grave Host's chain, with the notable of fire attacks and melee area in a triangle off it: the swing that throws a sheet of fire, below the Barrows road in its empty south (G3 round 3, 2026-10-22; added beyond the brief because the two-handed fire build held the strength side's only fire-attack cluster, Hot Iron, by 60 points and its fire attacks were flat after 120: out of supply). The second fire-attack direction: Hot Iron (fire with stun) is on the far west rim beside the Cathedral's burning (Censer, Brazier, Searing Avatar), this one is south, a build that wants both crosses the region; the Cathedral's Kindled Steel sells fire attacks with ignite. Six steps from Headsman by the road, so the two-hander's stun and this are not one stop. Grave Host stops being a dead end.",
+      at: [-1990, 3440],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [eleAttackOne('fire', 12)],
+          at: [-1955, 3389],
+          why: 'The north end, from the Barrows road.',
+        },
+        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: [-1987, 3433] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Bellows',
+          lines: [eleAttackOne('fire', 24), meleeArea(16)],
+          at: [-1952, 3494],
+          why: "2 + 2 units: 4. Fire with the swing's reach, for the slam and the cleave alike (Hot Iron's partner is stun, Kindled Steel's ignite, Elemental Edge's accuracy). The triangle's apex, south-east of the chain.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [eleAttackOne('fire', 12)],
+          at: [-2020, 3477],
+          why: "The south end, toward Grave Host's chain.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'host',
       name: 'Grave Host',
-      why: "A pocket south off the Barrows road: minion life twice, then minion life with the summoner's armour. The strength summoner's cluster and every summoner's farthest: the other minion notables are in the Cathedral (Shepherd, Ossuary), on the Spire's Cathedral side (Familiars) and on the Knife's Docks wheel (Black Flock). Round 3 (2026-10-20).",
+      why: "A pocket south off the Barrows road: minion life twice, then minion life with the summoner's armour. The strength summoner's cluster and every summoner's farthest: the other minion notables are in the Cathedral (Shepherd, Ossuary), on the Spire's Cathedral side (Familiars) and on the Knife's Docks wheel (Black Flock). Round 3 (2026-10-20). Since G3 round 3 (2026-10-22) Bellows' chain lands on its second small, so the pocket is a loop with the Barrows road, no longer a dead end.",
       at: [-2200, 3620],
       shape: { kind: 'hand' },
       nodes: [
@@ -620,6 +660,16 @@ export const grit: AreaSpec = {
     { from: 'north.a', to: 'ward.a', why: 'The north road onto spell block.' },
     { from: 'west.b', to: 'fists.a', why: 'The west road onto the strength dual wield.' },
     { from: 'east.e1', to: 'host.a', why: 'The Barrows road onto the minion pocket.' },
+    {
+      from: 'east.e3',
+      to: 'bellows.a',
+      why: "The Barrows road's third node south onto Bellows (Headsman leaves it north): the node is a cross.",
+    },
+    {
+      from: 'bellows.c',
+      to: 'host.b',
+      why: "Bellows on to Grave Host's second small, in the chain's own line: the fire and the minions are a loop with the Barrows road, and neither is a dead end.",
+    },
     { from: 'east.e7', to: 'greatblade.a', why: 'The Barrows road onto the two-handed sword.' },
     {
       from: 'east.e6',

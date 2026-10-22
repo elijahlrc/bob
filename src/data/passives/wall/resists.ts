@@ -5,6 +5,7 @@
  * dear crossing from the fire tower; the crossing junction; the Warlord's Banner chain (reservation, aura effect, mana)
  * from the north hub toward the Zealot; and, since G2 (2026-10-22), Hallowed Hammer off the rampart's junction. G3
  * (2026-10-22): the Banner traded its armour for aura effect, so it is the standard its name says and nothing more.
+ * G3 round 3: Graven Posts (totem damage, resistances), a chain from Hallowed Hammer's middle small west to Stagger.
  */
 import {
   auraEffect,
@@ -18,6 +19,7 @@ import {
   resAll,
   resOne,
   str,
+  totemDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -145,6 +147,35 @@ export const resists: AreaSpec = {
       ],
     },
     {
+      id: 'posts',
+      name: 'Graven Posts',
+      why: "Totem damage twice, then the notable with totem damage and all resistances: a chain west off Hallowed Hammer's middle small, under the battlements, that goes on to Stagger at the tower's top (G3 round 3, 2026-10-22; added beyond the brief because the warcry and totem build held both Vanguard totem clusters by 120 points: the specialization ran out of supply, not of reach). The third direction for the Vanguard's totems: Standing Cairns (damage with area) is south-east by the Quarry, Long Watch (speed and duration) west-south-west by Iron Liturgy, and this is north-west, on the side of the Cathedral's totem keystone across the border, so a totem build that comes here leaves the Barrows' warcries behind. The way from the home passes Iron Lungs or Elemental Ward, notables of other kinds. The partner is the totem player's ward, standing back while the posts fight.",
+      at: [-2670, 70],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [totemDamage(12)],
+          at: [-2610, 63],
+          why: "The entrance, from Hallowed Hammer's middle small.",
+        },
+        { id: 'b', kind: 'small', lines: [totemDamage(12)], at: [-2664, 72] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Graven Posts',
+          lines: [totemDamage(24), resAll(6)],
+          at: [-2733, 83],
+          why: "2 + 1.5 units: 3.5. On the straight line from Hallowed Hammer's small to Stagger's, so the chain is a bridge between the mace chain and the tower's top.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+      ],
+    },
+    {
       id: 'banner',
       name: "Warlord's Banner",
       why: "Reduced mana reservation twice, then the notable with reservation, aura effect and mana: the Vanguard's standards, as a chain from the north hub toward the Zealot. The Wall's only reservation lines, and the Cathedral's way in. Its armour went in G3 (2026-10-22): a notable three steps from the Zealot start and five from the Vanguard's sold reservation, armour and mana, three themes, and armour this near two starts is strength by the back door.",
@@ -185,6 +216,16 @@ export const resists: AreaSpec = {
       why: 'Strength once between the rampart junction and the resist star.',
     },
     { from: 'wall.rampart.toStar.a', to: 'wall.resists.star.f', why: 'The far end of the road.' },
+    {
+      from: 'hammer.b',
+      to: 'posts.a',
+      why: "Hallowed Hammer's middle small west onto the totem chain, near a right angle to the mace chain: the totems are reached through a mace small, not through the mace notable.",
+    },
+    {
+      from: 'posts.n',
+      to: 'wall.rampart.stagger.a',
+      why: "Graven Posts on west to Stagger's first small, in the chain's own line: the totems are a bridge, not a dead end, and the tower's top meets Hallowed Hammer without the rampart's junction. Stagger stays 14 steps from the Vanguard start.",
+    },
     { from: 'star.w', to: 'scarTissue.a', why: 'The cold spoke lands on Scar Tissue.' },
     { from: 'star.l', to: 'j.a', why: 'The lightning spoke lands on the crossing junction.' },
     {

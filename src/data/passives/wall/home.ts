@@ -8,7 +8,8 @@
  * the rampart and slam roads leaving the hubs are strength highways (2026-10-20). Off the
  * north hub, a melee damage pocket (stun threshold until G3 round 2) and, farther north, the reservation chain that
  * points at the Zealot; off the south
- * hub, a flask pocket. The hubs carry strength and join the ring one node to either side.
+ * hub, a flask pocket. The hubs carry strength and join the ring one node to either side. G3 round 3 (2026-10-22):
+ * Shield Ram (shield attacks, stun duration), a diamond pocket off the rampart road.
  */
 import {
   armour,
@@ -18,7 +19,9 @@ import {
   life,
   meleeDamage,
   meleePhys,
+  shieldAttack,
   str,
+  stunDuration,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -168,6 +171,38 @@ export const home: AreaSpec = {
       ],
     },
     {
+      id: 'ram',
+      name: 'Shield Ram',
+      why: "Attack damage with a shield three times round the notable with shield attack damage and stun duration: the shield used as a weapon, a diamond pocket off the rampart road's second node, in the room between the rampart road and the tower road (G3 round 3, 2026-10-22; the ledger's VA-8). An optional porch for the shield Vanguard, five or six points out: Bracing (block with a shield) leaves the start south-east, this leaves it north-west, so the shield's offence and its block are two directions. Its twin is the Yard's Shield Bash (shield attacks with shield speed and life on block), far east in the Muster. A pocket, not the bridge the brief drew: as a bridge to the tower road its three smalls let a build on the tower road join the rampart highway without the north hub, a stat connector standing in for the highway beside the start (CONSTRAINTS §7.1), and the allocator found one mace-and-shield plan far ahead of every other at 120 points. A shield is not a weapon, so nothing within three steps of the start names one (§6.3). Ringing Blows, round the north hub, lowers the enemy's stun threshold for any melee weapon; this lengthens the stun for a shield: a build that wants both stuns may take both (§8.3).",
+      at: [-1506, 498],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [shieldAttack(10)],
+          at: [-1511, 443],
+          why: 'The north corner, the entrance from the rampart road.',
+        },
+        { id: 'b', kind: 'small', lines: [shieldAttack(10)], at: [-1451, 493] },
+        { id: 'c', kind: 'small', lines: [shieldAttack(10)], at: [-1501, 553] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Shield Ram',
+          lines: [shieldAttack(20), stunDuration(25)],
+          at: [-1561, 503],
+          why: '2 + 1.7 units: 3.7. The rim of the shield brought down: harder blows with it, and the stun they leave lasts longer. The west corner, a step from the entrance either way round.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+        ['n', 'a'],
+      ],
+    },
+    {
       id: 'roadS',
       name: 'The slam road',
       why: 'Strength twice: the highway from the south hub to Thunderstep.',
@@ -228,6 +263,11 @@ export const home: AreaSpec = {
     },
     { from: 'wall.maces.toHome.b', to: 'wall.home.roadM.c', why: 'The far end of the road.' },
     { from: 'roadS.b', to: 'wall.slams.thunderstep.a', why: 'The slam road reaches the slams.' },
+    {
+      from: 'roadR.b',
+      to: 'ram.a',
+      why: "The rampart road's second node south onto Shield Ram's entrance: the shield pocket.",
+    },
     {
       from: 'ringing.n',
       to: 'roadR.a',

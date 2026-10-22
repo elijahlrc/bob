@@ -234,7 +234,7 @@ export const crypt: AreaSpec = {
     {
       id: 'rite',
       name: 'Shattering Rite',
-      why: "A pocket north off the crossing road to the Spire, beside Tomb Dust: physical damage with spells twice, then physical spells with the elements. For the spells that turn part of their physical damage into an element (physical increases follow the part that turns), and the earthen spells. The Rooftops' Whetted Will sells physical spells with duration. Round 4 (2026-10-20).",
+      why: "A pocket north off the crossing road to the Spire, beside Tomb Dust: physical damage with spells twice, then physical spells with the elements. For the spells that turn part of their physical damage into an element (physical increases follow the part that turns), and the earthen spells. The Rooftops' Whetted Will sells physical spells with duration. Round 4 (2026-10-20). Since G3 round 3 (2026-10-22) a bridge: Plainsong (channelling, `walk.ts`) carries its chain on to the north walk.",
       at: [-1505, -3420],
       shape: { kind: 'hand' },
       nodes: [

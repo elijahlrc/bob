@@ -142,7 +142,7 @@ export const rampart: AreaSpec = {
           kind: 'small',
           lines: [stunDuration(15)],
           at: [-3253, 169],
-          why: 'The entrance, from the accuracy pocket; also the bridge to the crit chain.',
+          why: 'The entrance, from the accuracy pocket; also the bridge to the crit chain, and since G3 round 3 the landing of Graven Posts (the totems) from Hallowed Hammer.',
         },
         {
           id: 'n',
@@ -167,13 +167,13 @@ export const rampart: AreaSpec = {
     {
       id: 'unerring',
       name: 'Unerring Discipline',
-      why: "The spur to the first keystone: two nodes about hitting, then the trade (attacks always hit; never a critical strike). Dead-ended, off the junction, as the reference places its keystones. Turned west in G2 (2026-10-22), so the keystone stands about 320 units from the Zealot's Idle Hands instead of 130.",
+      why: "The spur to the first keystone: two nodes about hitting, then the trade (attacks always hit; never a critical strike). Dead-ended, off the junction, as the reference places its keystones. Turned west in G2 (2026-10-22), so the keystone stands about 320 units from the Zealot's Idle Hands instead of 130; lowered a little in G3 round 3 (about 360 from Idle Hands), so the new totem chain from Hallowed Hammer to Stagger passes clear above it.",
       at: [-2756, 110],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [accuracy(10)], at: [-2680, 230] },
-        { id: 'b', kind: 'small', lines: [accuracy(10)], at: [-2760, 205] },
-        { id: 'k', kind: 'keystone', name: 'Unerring Discipline', lines: [], at: [-2860, 175] },
+        { id: 'a', kind: 'small', lines: [accuracy(10)], at: [-2688, 257] },
+        { id: 'b', kind: 'small', lines: [accuracy(10)], at: [-2765, 248] },
+        { id: 'k', kind: 'keystone', name: 'Unerring Discipline', lines: [], at: [-2870, 235] },
       ],
       links: [
         ['a', 'b'],
