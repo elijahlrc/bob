@@ -8,6 +8,8 @@ change, and our own names only. Dash bullets under plain headings.
 
 - The passive tree grows by more than a third, with new clusters in every class region; its clusters sit tighter and some existing nodes change.
 - Zoomed in on the passive tree, every node shows its stat lines.
+- Saved characters get their spent passive points back to spend on the new tree.
+- The high score list starts over with this version; a checkbox on its screen shows the older versions' scores, whose characters can no longer be fought.
 - Collapse maps no longer appear in new offers; they were far deadlier than the other map types.
 - Skills that convert or add damage, such as Storm Quill, Venom Cut and Searing Lance, are drawn in the element they deal.
 - Rime Rebuke is renamed Iron Rebuke, as it deals physical damage.

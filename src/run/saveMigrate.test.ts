@@ -28,8 +28,8 @@ describe('migrating a save of the passive tree before the district layout (docs/
     }
   });
 
-  it('hands them back from a save of the generated tree, before the hand-written one (docs/PASSIVE-TREE.md)', () => {
-    for (const v of [18, 19]) {
+  it('hands them back from a save of the generated tree, before the hand-written one, or of it before its growth (docs/PASSIVE-TREE.md)', () => {
+    for (const v of [18, 19, 20]) {
       const run = newRun('zealot', 1);
       run.build.allocated = getTree().nodes[getTree().starts[run.classId]].links.slice(0, 2);
       run.bonusPoints = 1;
