@@ -85,7 +85,8 @@ export type FigureKind =
   | 'hero_wand'
   | 'hero_dagger';
 
-export type AnimName = 'idle' | 'walk' | 'attack' | 'stun' | 'death';
+/** `windup` is a boss's big move held over its tell, `release` the blow when it lands (anim.ts). */
+export type AnimName = 'idle' | 'walk' | 'attack' | 'stun' | 'death' | 'windup' | 'release';
 
 export type Pose = {
   bob: number;
@@ -148,6 +149,12 @@ export function poseFor(
   stance: Stance = stanceOfKind(kind),
   style: BodyStyle = 'bone',
 ): Pose {
+  // A boss's big move: the two halves of its attack, the wind-up drawn out over the tell and the blow played when it lands. A
+  // rig may pose them its own way (rigPose).
+  if (anim === 'windup' || anim === 'release') {
+    const half = anim === 'windup' ? 0.4 * clamp01(t) : 0.4 + 0.6 * clamp01(t);
+    return rigPose(kind, anim, t, poseFor(kind, 'attack', half, stance, style));
+  }
   const p: Pose = {
     bob: 0,
     lean: 0,
@@ -408,6 +415,29 @@ function rigPose(kind: FigureKind, anim: AnimName, t: number, p: Pose): Pose {
         p.legA = s;
         p.legB = -s;
         p.bob = -Math.abs(Math.cos(t * TAU)) * 0.8;
+      }
+      break;
+    case 'tollkeeper':
+      // The toll: the bell hoisted over its head through the tell, rising on its legs, then brought down mouth-first on the
+      // floor in front of it. `charge` is how high the bell is, `armB` how far it has come down (1 on the floor).
+      p.charge = 0;
+      p.armB = 0;
+      if (anim === 'windup') {
+        const up = ease(clamp01(t));
+        p.charge = up;
+        p.armA = 0.2 + 0.6 * up;
+        p.bob = -1.5 * up;
+        p.head = -1.2 * up;
+        p.legA = 0.3 * up;
+      } else if (anim === 'release') {
+        const down = ease(clamp01(t / 0.2));
+        const back = ease(clamp01((t - 0.55) / 0.45));
+        p.charge = 1 - down;
+        p.armB = down * (1 - back);
+        p.armA = 0.25;
+        p.bob = 2 * p.armB;
+        p.head = p.armB;
+        p.legA = 0.3 * (1 - back);
       }
       break;
     default:
@@ -983,26 +1013,40 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
     }
     case 'tollkeeper': {
       // A hunched bronze warden: two thick legs, a cowled head thrust forward, a yoke on its shoulders and a great bell
-      // hung behind it that swings back when it tolls; a flail in its near hand.
+      // hung behind it; a flail in its near hand. To toll it hoists the bell over its head (charge), then brings it down
+      // mouth-first on the floor in front of it (armB); the lip glows as it rises and when it lands.
       const ph = pose.legA;
-      const toll = pose.charge;
+      const raise = pose.charge;
+      const down = pose.armB;
       cap(b, -4, -10 + lift, -4 + ph * 3, 0, 2.6, 'clothShade');
       cap(b, 4, -10 + lift, 4 - ph * 3, 0, 2.6, 'cloth');
-      // The bell, behind: it swings back with the toll and glows at the lip.
-      const bx = -8 - toll * 3;
-      const by = -26 + lift;
-      if (toll > 0.05) circ(b, bx, by + 9, 6 + toll * 8, 'glow');
-      b.prims.push({
-        k: 'tri',
-        pts: [bx - 9, by + 9, bx + 9, by + 9, bx, by - 8],
-        role: 'metalShade',
-      });
-      b.prims.push({
-        k: 'tri',
-        pts: [bx - 6, by + 9, bx + 7, by + 9, bx + 0.5, by - 6],
-        role: 'metal',
-      });
-      box(b, bx, by + 9.5, 19, 2.4, 0, 'metalShade');
+      // Where the bell hangs from (its crown) and how far it is tipped (mouth back): behind the yoke, high over the head, and
+      // over the top and down on the floor in front.
+      const arc = (down * Math.PI) / 2;
+      const cx = lerp(lerp(-8, -4, raise), 13, Math.sin(arc));
+      const cy = lerp(lerp(-34, -54, raise), -17, 1 - Math.cos(arc)) + lift;
+      const tilt = 0.55 * raise * (1 - down) - Math.sin(down * Math.PI) * 0.9;
+      const tc = Math.cos(tilt);
+      const ts = Math.sin(tilt);
+      const at = (x: number, y: number): [number, number] => [
+        cx + x * tc - y * ts,
+        cy + x * ts + y * tc,
+      ];
+      const bellTri = (p: [number, number][], role: Role) =>
+        b.prims.push({ k: 'tri', pts: [...p[0], ...p[1], ...p[2]], role });
+      const bell = () => {
+        const glow = Math.max(raise, down);
+        const mouth = at(0, 17);
+        if (glow > 0.05) circ(b, mouth[0], mouth[1], 3 + glow * 7, 'glow');
+        bellTri([at(-9, 17), at(9, 17), at(0, 0)], 'metalShade');
+        bellTri([at(-6, 17), at(7, 17), at(0.5, 2)], 'metal');
+        const lip = at(0, 17.5);
+        box(b, lip[0], lip[1], 19, 2.4, tilt, 'metalShade');
+        // Off the yoke, its far arm holds it by the crown.
+        if (glow > 0.1) cap(b, -2, -24 + lift, cx, cy + 1, 1.6, 'clothShade');
+      };
+      // Behind the body, until it comes down in front.
+      if (down < 0.5) bell();
       cap(b, -14, -30 + lift, 8, -27 + lift, 1.6, 'wood');
       // The body under the yoke.
       circ(b, 0, -18 + lift, 9, 'clothShade');
@@ -1011,6 +1055,7 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
       // A cowled head, low and forward.
       circ(b, 7, -26 + lift + pose.head * 2, 4.6, 'clothShade');
       circ(b, 8.4, -25.5 + lift, 1, 'eye');
+      if (down >= 0.5) bell();
       // The flail.
       const swing = pose.armA * 6;
       cap(b, 6, -20 + lift, 13, -12 - swing + lift, 2, 'cloth');

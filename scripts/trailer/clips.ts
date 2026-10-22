@@ -407,7 +407,7 @@ export const CLIPS: Clip[] = [
     { viewport: PHONE, css: PHONE_UI },
   ),
 
-  /* 6. The climb: six builds, six places, a half second each; the last, the build that falls, is held for a second. */
+  /* 6. The climb: five builds, five places, a half second each; then level 72, the boss fight (7). */
   mapClip(
     'climb1',
     { classId: 'reaver', level: 12, body: ['reapingArc', 'bruteForce'] },
@@ -449,18 +449,12 @@ export const CLIPS: Clip[] = [
     { theme: 'giltHall', biome: 'shrine' },
     45,
   ),
-  mapClip(
-    'climb7',
-    { classId: 'shade', level: 72, body: ['orbitingBlades'] },
-    63,
-    { theme: 'kilnHall', biome: 'warren' },
-    75,
-  ),
-
-  /* 7. The fall: the Magistrate's Sentence lands on the Shade at map 63, and the body is held. */
+  /* 7. The fall, level 72: the Shade fights the Tollkeeper, and his whole toll runs: the bell hoisted over his head through the
+        tell, brought down, and the rings of lightning going out from it, the first of which kills. The body is held. The shot
+        opens on blows a moment before the tell; the frames the tell starts on and the ring lands on are printed, for the cut. */
   {
     name: 'fall',
-    zoom: 2.5,
+    zoom: 3.2,
     css: BARE,
     async film(t) {
       await t.stage((S, c, game) => {
@@ -469,26 +463,37 @@ export const CLIPS: Clip[] = [
           63,
         );
         S.pastMaps(run);
-        S.bossFight(c, run, 'magistrate', { biome: 'warren', dist: 5 });
+        S.bossFight(c, run, 'tollkeeper', { biome: 'warren', dist: 5 });
         S.holdEnd(c);
-        // The Sentence, with 0.6 s of its countdown left: the shot opens there.
         S.warmUntil(
           c,
           (w: any) => {
-            const e = S.effect(w, 'Sentence');
-            return !!e && e.t <= 0.6;
+            const b = S.boss(w);
+            return !!b && b.st.begun && b.st.clock <= 0.3;
           },
-          2000,
+          1200,
         );
         S.settle(game, c);
+        // The blades hit him many times a second: his flash is kept to a flicker, so the bell can be seen rising.
+        S.calmFlash(game, S.boss(c.world).m.id);
       });
-      await t.rec(64, {
-        each: (S, c) => {
+      await t.rec(150, {
+        each: (S, c, i) => {
           const w = c.world;
-          const e = S.effect(w, 'Sentence');
-          if (e && e.t < 0.1) S.mortal(w);
+          const win = window as any;
+          const b = S.boss(w);
+          if (b && b.st.tellT > 0 && win.__tell == null) win.__tell = i;
+          // Deathless until a ring that will catch it lands.
+          if (S.blastDue(w, 'Toll')) {
+            S.mortal(w);
+            if (win.__ring == null) win.__ring = i;
+          }
         },
       });
+      const at = await t.page.evaluate(() => [(window as any).__tell, (window as any).__ring]);
+      console.log(
+        `  the tell starts on frame ${at[0]}; the ring that kills lands on frame ${at[1]}`,
+      );
     },
   },
 
@@ -505,15 +510,9 @@ export const CLIPS: Clip[] = [
           63,
         );
         S.pastMaps(run);
-        S.bossFight(c, run, 'magistrate', { biome: 'warren', dist: 5 });
-        S.warmUntil(
-          c,
-          (w: any) => {
-            const e = S.effect(w, 'Sentence');
-            return !!e && e.t <= 0.1;
-          },
-          3000,
-        );
+        S.bossFight(c, run, 'tollkeeper', { biome: 'warren', dist: 5 });
+        if (S.warmUntil(c, (w: any) => S.blastDue(w, 'Toll'), 3000) < 0)
+          throw new Error('no toll caught the Shade');
         S.mortal(c.world);
         for (let i = 0; i < 300 && c.screen === 'map'; i++) c.bus.emit('frame', { dtMs: 33 });
       });

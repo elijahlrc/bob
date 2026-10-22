@@ -1,6 +1,21 @@
+import { TOLL_TELL } from '../../data/bosses';
 import { ECHO_GAP, HIT_AT } from '../../data/constants';
+import { bossState } from '../../sim/bosses';
 import type { Action, Actor } from '../../sim/types';
 import type { AnimName } from './figure';
+
+/** How long a boss's blow plays once its big move lands. */
+const RELEASE_SECONDS = 0.7;
+
+/**
+ * A boss whose body shows its big move (the Tollkeeper hoisting its bell through a toll's tell): how far through the wind-up
+ * it is, 0 to 1 (null when it is not winding up), and how many of the moves it has made, so the blow plays when one lands.
+ */
+function bigMove(a: Actor): { windup: number | null; made: number } | null {
+  const st = bossState(a);
+  if (st?.id !== 'tollkeeper') return null;
+  return { windup: st.tellT > 0 ? 1 - st.tellT / TOLL_TELL : null, made: st.tolls };
+}
 
 /**
  * The attack animation's time for an action. A repeating skill (Echoing Cast) plays a second, shorter wind-up and strike
@@ -48,8 +63,17 @@ export class AnimTrack {
   lastAttackElapsed = 0;
   attackSeen = false;
   crit = false;
+  /** Seconds since a boss's big move landed (its blow plays for RELEASE_SECONDS), and how many it had made by the last update. */
+  releaseT = 99;
+  private moves = -1;
 
   update(a: Actor, dt: number): void {
+    const big = bigMove(a);
+    if (big) {
+      if (this.moves >= 0 && big.made > this.moves) this.releaseT = 0;
+      this.moves = big.made;
+    }
+    this.releaseT += dt;
     if (Number.isNaN(this.px)) {
       this.px = this.rx = a.x;
       this.py = this.ry = a.y;
@@ -103,6 +127,10 @@ export class AnimTrack {
   state(a: Actor): { anim: AnimName; t: number } {
     if (!a.alive) return { anim: 'death', t: Math.min(1, this.deathT / 0.7) };
     if (a.stunT > 0 || a.ail.freezeT > 0) return { anim: 'stun', t: (this.idlePhase * 2) % 1 };
+    const big = bigMove(a);
+    if (big?.windup != null) return { anim: 'windup', t: big.windup };
+    if (this.releaseT < RELEASE_SECONDS)
+      return { anim: 'release', t: this.releaseT / RELEASE_SECONDS };
     if (a.action) return { anim: 'attack', t: attackTime(a.action) };
     if (this.speed > 0.6) return { anim: 'walk', t: this.walkPhase % 1 };
     return { anim: 'idle', t: this.idlePhase };

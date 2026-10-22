@@ -201,9 +201,9 @@
     <button id="play" type="button">▶ Play</button>
     <div class="scrub">
       <div class="marks" id="marks"></div>
-      <input id="scrub" type="range" min="0" max="30" step="0.01" value="0" aria-label="Position" />
+      <input id="scrub" type="range" min="0" max="31" step="0.01" value="0" aria-label="Position" />
     </div>
-    <div class="time" id="time">0:00.0 / 0:30</div>
+    <div class="time" id="time">0:00.0 / 0:31</div>
   </div>
   <div class="now" aria-live="polite">
     <h2 id="nowname"></h2>
@@ -342,6 +342,8 @@
 
   /* ---------- footage (docs/trailer/footage, filmed by scripts/trailer/capture.ts) ---------- */
   const FPS = 30;
+  /* the length of the cut, in seconds */
+  const DUR = 31;
   /* frames filmed of each clip (the last is held past the end) */
   const LEN = {
     endgame: 150,
@@ -359,8 +361,7 @@
     climb4: 45,
     climb5: 45,
     climb6: 45,
-    climb7: 75,
-    fall: 64,
+    fall: 150,
     summary: 36,
     duel: 106,
     result: 30,
@@ -380,7 +381,7 @@
     climb4: 0,
     climb5: 0,
     climb6: 2,
-    climb7: 28,
+    fall: 29.5,
     duel: 0,
     auto: 0,
   };
@@ -460,29 +461,29 @@
       },
     },
     {
-      t: [12.5, 16],
+      t: [12.5, 15],
       name: 'Level 1 to 100',
-      what: 'Half-second cuts, each a different build in a different place against different monsters, the level in large type; the last, the Shade that falls, is held for a second.',
+      what: 'Half-second cuts, each a different build in a different place against different monsters, the level in large type.',
       draw(lt) {
-        const i = Math.min(5, Math.floor(lt / 0.5));
+        const i = Math.min(4, Math.floor(lt / 0.5));
         const l = lt - i * 0.5;
-        const level = [12, 20, 42, 52, 62, 72][i];
-        const names = ['Crypt', 'Forge', 'Ruins', 'Marsh', 'Shrine', 'Warren'];
-        const clip = ['climb1', 'climb2', 'climb4', 'climb5', 'climb6', 'climb7'][i];
+        const level = [12, 20, 42, 52, 62][i];
+        const names = ['Crypt', 'Forge', 'Ruins', 'Marsh', 'Shrine'];
+        const clip = ['climb1', 'climb2', 'climb4', 'climb5', 'climb6'][i];
         let s = img(at(clip, l));
         s += levelTag(level, names[i]);
         return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 150, 17);
       },
     },
     {
-      t: [16, 19],
+      t: [15, 20],
       name: 'The fall',
-      what: 'Map 63: the Magistrate’s Sentence closes on the Shade and lands on 16.5; the body held; the end screen, the duel button pressed.',
+      what: 'Level 72, the Shade against the Tollkeeper, one shot: the bell rises over his head from 15.25, comes down on 17.25, and its first ring of lightning kills the Shade on 18.05; the body held; the end screen, the duel button pressed.',
       draw(lt) {
-        if (lt < 1.85) {
-          let s = img(at('fall', lt, 0));
+        if (lt < 3.85) {
+          let s = img(at('fall', lt));
           /* the room goes dark while the body is held */
-          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 0.8) / 1.0) * 0.55}"/>`;
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 3.3) / 0.55) * 0.55}"/>`;
           /* the level stays on screen, as in the climb (the boss's bar keeps the middle of the top clear) */
           return (
             s +
@@ -492,30 +493,30 @@
             ])
           );
         }
-        /* zoomed in so the last line shown is "Killed by the Magistrate" */
-        return crop(at('summary', lt - 1.85, 0), [107, 95, 1067, 600]);
+        /* zoomed in so the last line shown is "Killed by the Tollkeeper" */
+        return crop(at('summary', lt - 3.85, 0), [107, 95, 1067, 600]);
       },
     },
     {
-      t: [19, 22.5],
+      t: [20, 23.5],
       name: 'The duel',
-      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 22.25, with no hold.',
+      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 23.25, with no hold.',
       draw: (lt) => img(at('duel', lt, 0)) + caption('Duel their builds.', lt, 0.1, 150, 16),
     },
     {
-      t: [22.5, 23.5],
+      t: [23.5, 24.5],
       name: 'The rating',
       what: 'The result screen: the rating counts up, 712 to 748.',
       draw: (lt) => crop(at('result', lt, 0), [400, 0, 480, 270]),
     },
     {
-      t: [23.5, 25],
+      t: [24.5, 26],
       name: 'The board',
       what: 'The high scores, Sin on top; our row climbs past two players.',
       draw: (lt) => img(at('board', lt, 0)) + caption('Take the top spot.', lt, 0.35, 150, 16),
     },
     {
-      t: [25, 27],
+      t: [26, 28],
       name: 'The genres',
       what: 'All four words on screen at once, appearing one per beat, each over footage that proves it.',
       draw(lt) {
@@ -552,7 +553,7 @@
       },
     },
     {
-      t: [27, 30],
+      t: [28, 31],
       name: 'Battle of Builds',
       what: 'The title and “Free on itch.io” over the dimmed genre grid, held; the torch gutters out.',
       draw(lt) {
@@ -579,11 +580,11 @@
   ];
 
   /* hard cuts that land on a hit get a short flash */
-  const FLASH = [1.5, 5.0, 16.5, 22.25, 25.0, 25.5, 26.0, 26.5, 27.0];
+  const FLASH = [1.5, 5.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
 
   const svg = document.getElementById('svg');
   function draw(t) {
-    t = clamp(t, 0, 29.999);
+    t = clamp(t, 0, DUR - 0.001);
     const i = SHOTS.findIndex((s) => t >= s.t[0] && t < s.t[1]);
     const shot = SHOTS[i];
     const lt = t - shot.t[0],
@@ -630,7 +631,7 @@
   const nowText = document.getElementById('nowtext');
   const fmt = (s) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`;
   marks.innerHTML = SHOTS.map(
-    (s, i) => `<div class="mark" style="width:${((s.t[1] - s.t[0]) / 30) * 100}%">${i + 1}</div>`,
+    (s, i) => `<div class="mark" style="width:${((s.t[1] - s.t[0]) / DUR) * 100}%">${i + 1}</div>`,
   ).join('');
 
   let playing = false,
@@ -642,7 +643,7 @@
   function show(tt) {
     const i = draw(tt);
     scrub.value = tt;
-    time.textContent = `${fmt(tt)} / 0:30`;
+    time.textContent = `${fmt(tt)} / ${fmt(DUR).slice(0, -2)}`;
     if (i !== lastShot) {
       lastShot = i;
       const s = SHOTS[i];
@@ -658,17 +659,17 @@
   function tick() {
     if (!playing) return;
     t = clock();
-    if (t >= 30) {
+    if (t >= DUR) {
       pause();
-      t = 30;
-      show(29.999);
+      t = DUR;
+      show(DUR - 0.001);
       return;
     }
     show(t);
     requestAnimationFrame(tick);
   }
   function play() {
-    if (t >= 29.99) t = 0;
+    if (t >= DUR - 0.01) t = 0;
     playing = true;
     big.hidden = true;
     playBtn.textContent = '❚❚ Pause';
@@ -702,7 +703,7 @@
         audio.currentTime = t;
       } catch (e) {}
     }
-    show(Math.min(t, 29.999));
+    show(Math.min(t, DUR - 0.001));
   });
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' && e.key !== ' ') return;
@@ -711,7 +712,7 @@
       playing ? pause() : play();
     } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       e.preventDefault();
-      t = clamp(t + (e.key === 'ArrowRight' ? 0.5 : -0.5), 0, 29.999);
+      t = clamp(t + (e.key === 'ArrowRight' ? 0.5 : -0.5), 0, DUR - 0.001);
       if (playing) {
         t0 = t;
         t0Wall = performance.now();
@@ -727,5 +728,5 @@
   t = 0;
   show(3.5);
   scrub.value = 0;
-  time.textContent = `${fmt(0)} / 0:30`;
+  time.textContent = `${fmt(0)} / ${fmt(DUR).slice(0, -2)}`;
 </script>

@@ -10,6 +10,8 @@ import { itemLines } from '../ui/ItemCard';
 import { forceBiome, type BiomeId } from '../data/biomes';
 import { forceDensity, type DensityId } from '../data/density';
 import type { Difficulty } from '../data/difficulty';
+import { inBlast, pending } from '../sim/blasts';
+import { bossState } from '../sim/bosses';
 import type { Build, Item } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { botAllocate } from '../run/bot';
@@ -382,6 +384,56 @@ export function mortal(w: World, life = 1): void {
   side.opts.freeResources = false;
   side.player.life = Math.min(side.player.life, life);
   side.player.es = 0;
+}
+
+/** The boss on the map and its fight's state (its clocks: when its next move is due), if one is alive. */
+export function boss(
+  w: World,
+): { m: World['actors'][number]; st: NonNullable<ReturnType<typeof bossState>> } | null {
+  for (const m of w.actors) {
+    const st = m.alive ? bossState(m) : undefined;
+    if (st) return { m, st };
+  }
+  return null;
+}
+
+/**
+ * Let actor `id`'s figure flash white when hit at most once every `gap` seconds. A boss under a stream of hits is otherwise
+ * white from end to end and its wind-up cannot be seen. Only the drawing changes: the hits land as ever.
+ */
+export function calmFlash(
+  game: { scene: { getScene(key: string): unknown } },
+  id: number,
+  gap = 0.8,
+): void {
+  const style = (
+    game.scene.getScene('map') as {
+      style: { views: Map<number, { track: { hitT: number } }> } | null;
+    }
+  ).style;
+  const tr = style?.views.get(id)?.track;
+  if (!tr) throw new Error(`no figure for actor ${id}`);
+  let t = tr.hitT;
+  let since = 99;
+  Object.defineProperty(tr, 'hitT', {
+    get: () => t,
+    set: (v: number) => {
+      // A new hit sets it to 0; the frames add their time to it.
+      if (v === 0) {
+        if (since < gap) return;
+        since = 0;
+      } else since += v - t;
+      t = v;
+    },
+  });
+}
+
+/** Whether a blast labelled `label` (a toll's ring) lands on the character within two frames: the moment to let it die. */
+export function blastDue(w: World, label: string): boolean {
+  const p = w.sides[0].player;
+  return w.effects.some(
+    (e) => e.label === label && !pending(e) && e.t < 0.07 && inBlast(e, p.x, p.y, p.r),
+  );
 }
 
 /** The labelled ground effect (a boss's move, e.g. 'Sentence') now on the floor, if any. */

@@ -1,6 +1,6 @@
 # Trailer
 
-The 30-second trailer, planned with the owner on 2026-10-21. Nothing here ships with the game.
+The trailer, 31 seconds, planned with the owner on 2026-10-21. Nothing here ships with the game.
 
 - `storyboard.html`: the storyboard, shot by shot (timing, on-screen text, picture, sound, how to capture it from the
   game). Open it in a browser. It is the plan for the real trailer, cut from gameplay footage.
@@ -9,7 +9,8 @@ The 30-second trailer, planned with the owner on 2026-10-21. Nothing here ships 
 - `animatic.mp3`, `animatic.mp4`: the score and the rendered animatic (1280×720, 30 fps).
 - `audio/chip_score.py`: writes the score and the sound effects (the game has no sound yet): one crunchy chiptune
   groove in D minor at 120 bpm, a pulsing bass on D, a noise kit and one quiet four-note phrase, with chip sound
-  effects on their own layer. Cue times are in seconds and must match the animatic's shot times.
+  effects on their own layer. Cue times are in seconds and must match the cut's shot times (the animatic is 30 s and
+  older than the cut: it no longer lines up with the score after 15 s).
 
 - `cut.html`, `cut.mp4`: the first cut with real footage: the animatic's timing, captions and score over clips filmed from the
   game. Each clip is staged by `src/trailer/stage.ts` (a dev-only module the game never imports: a character with chosen gems,
@@ -24,7 +25,8 @@ The 30-second trailer, planned with the owner on 2026-10-21. Nothing here ships 
 3. In another, `npm run trailer:capture` films every clip; name clips to film only those, e.g.
    `npm run trailer:capture -- climb2 duel`. Don't edit `src/` while it runs: the dev server reloads the page and the clip
    fails.
-4. `npm run trailer:render -- --cut` writes `cut.mp4` from the footage and the score.
+4. `npm run trailer:render -- --cut` writes `cut.mp4` from the footage and the score. Add `--from 14 --to 20.5` to render
+   that part alone, to `cut-section.mp4` (to look at one section while it is worked on).
 
 Every frame is stepped by hand with the game's loop stopped, so a clip is the same on every run. On a GPU the whole set takes
 minutes. `TRAILER_SOFTWARE_GL=1` draws on the CPU, for a machine with no GPU (about a second a frame, half an hour for the
@@ -48,10 +50,12 @@ deterministic: an unchanged page and score give byte-identical files.
 - Shots: endgame cold open (a Skyfall in a mixed pack); the tree, one build growing from level 1 to 100 zoomed out and
   kept in frame (no class screen, no text); the Vanguard's slam on 5 s and the Shade (gem link, traps, a drop for the
   build);
-  three more classes side by side in phone-shaped panels; the climb, ending at map 63; a boss's signature attack kills
-  the character there, a pause, the end screen zoomed in on the "Killed by" line; the duel with Sin; the rating; the high scores (Sin first, as the first
+  three more classes side by side in phone-shaped panels; the climb, five half-second cuts; then level 72 is one shot of a
+  boss fight, the Shade against the Tollkeeper on map 63: he hoists his bell over his head through the tell (the game's
+  own animation, added for this), brings it down, and its first ring of lightning kills the Shade; a pause; the end screen
+  zoomed in on the "Killed by" line; the duel with Sin; the rating; the high scores (Sin first, as the first
   to beat the game; oostin and Eli are real players, the other names made up); the genre grid; the title over it.
-- Music: rhythm first, simple, one groove that only stops for the fall; a heavy bass (a clean sine and its saturated
+- Music: rhythm first, simple, one groove that stops dead when the bell tolls and comes back for the duel; a heavy bass (a clean sine and its saturated
   harmonics under the gritty triangle, about 8 dB up from the first score) and a melody crushed hard (a very low sample
   rate, hard clipping, wavefolding, 2 and 3 bits, a short metallic comb). No silence before the duel's deciding blow, a
   restrained crash. The genre hits are set up by a drop-out and a tom fill, not a riser. The mix is cut at 14 kHz and
