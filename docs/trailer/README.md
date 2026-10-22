@@ -30,6 +30,10 @@ Every frame is stepped by hand with the game's loop stopped, so a clip is the sa
 minutes. `TRAILER_SOFTWARE_GL=1` draws on the CPU, for a machine with no GPU (about a second a frame, half an hour for the
 set). If headless Chromium gets no GPU, `TRAILER_HEADED=1` films in a visible window (PowerShell: `$env:TRAILER_HEADED=1`).
 
+**1440p:** `TRAILER_SCALE=2 npm run trailer:capture` films every clip at twice the pixels (2560×1440, the same layout; the
+end screen at 3× that), and `TRAILER_SCALE=2 npm run trailer:render -- --cut` writes `cut-1440p.mp4` (about 40 MB, not
+committed). The footage folder holds one scale at a time.
+
 **Re-rendering:** `npm run trailer:render` (`scripts/trailer/render.ts`) runs the score script, renders every frame in
 headless Chromium and joins them with ffmpeg. It needs Python 3 with numpy, ffmpeg on PATH and
 `npm i --no-save playwright-core` (with `npx playwright install chromium`, or `CHROME_PATH` set). Output is

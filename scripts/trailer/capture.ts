@@ -17,6 +17,8 @@ import { CLIPS, type Clip } from './clips';
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const OUT = path.join(ROOT, 'docs/trailer/footage');
 const DEV = process.env.BOB_DEV ?? 'http://localhost:5173/';
+/** Filming at `TRAILER_SCALE=2` draws each clip at twice the pixels (2560×1440 for a 1280×720 clip) with the same layout. */
+const QUALITY = Number(process.env.TRAILER_SCALE ?? 1);
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Page = any;
@@ -25,7 +27,7 @@ async function open(browser: any, clip: Clip): Promise<{ page: Page; cdp: any }>
   const phone = clip.viewport?.phone ?? false;
   const ctx = await browser.newContext({
     viewport: { width: clip.viewport?.w ?? 1280, height: clip.viewport?.h ?? 720 },
-    deviceScaleFactor: clip.viewport?.scale ?? 1,
+    deviceScaleFactor: (clip.viewport?.scale ?? 1) * QUALITY,
     isMobile: phone,
     hasTouch: phone,
   });
@@ -93,7 +95,16 @@ async function film(browser: any, clip: Clip, peek: boolean): Promise<void> {
   };
   begin(clip.name);
   const shoot = async () => {
-    const r = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 92 });
+    // At a device scale other than 1 the screenshot is asked for at that scale (it comes back in CSS pixels otherwise).
+    const dpr = (clip.viewport?.scale ?? 1) * QUALITY;
+    const vp = page.viewportSize();
+    const r = await cdp.send('Page.captureScreenshot', {
+      format: 'jpeg',
+      quality: 92,
+      ...(dpr !== 1
+        ? { clip: { x: 0, y: 0, width: vp.width, height: vp.height, scale: dpr } }
+        : {}),
+    });
     const file = peek ? `${name}-${frame}.jpg` : `f${String(frame).padStart(4, '0')}.jpg`;
     writeFileSync(path.join(dir, file), Buffer.from(r.data, 'base64'));
   };

@@ -159,32 +159,41 @@ export const CLIPS: Clip[] = [
           });
           return { x0, y0, x1, y1, l: r.left, t: r.top, w: r.width, h: r.height };
         });
-      await t.page.mouse.move(cx, cy);
-      await t.page.mouse.wheel(0, 700);
-      await t.page.waitForTimeout(150);
-      for (let pass = 0; pass < 4; pass++) {
+      // Zoom out with the tree's own button (a fixed step of 1.4, about the middle of the view; a wheel step depends on the device
+      // scale) until the build fills at most 80% of the view, then drag it to the middle. Measured on screen each time.
+      const zoomOut = () =>
+        t.page.evaluate(() =>
+          (
+            document.querySelector('.tree-zoom button[aria-label="Zoom out"]') as HTMLElement
+          ).click(),
+        );
+      for (let pass = 0; pass < 12; pass++) {
         const m = await lit();
         const w = m.x1 - m.x0;
         const h = m.y1 - m.y0;
-        // The build should fill at most 75% of the view, and its middle should be the view's middle.
-        const f = Math.min(1, (m.w * 0.75) / w, (m.h * 0.75) / h);
         const dx = m.l + m.w / 2 - (m.x0 + m.x1) / 2;
         const dy = m.t + m.h / 2 - (m.y0 + m.y1) / 2;
-        if (f > 0.97 && Math.abs(dx) < 6 && Math.abs(dy) < 6) break;
-        if (f <= 0.97) {
-          await t.page.mouse.move((m.x0 + m.x1) / 2, (m.y0 + m.y1) / 2);
-          await t.page.mouse.wheel(0, -Math.log(f) / 0.0015);
-          await t.page.waitForTimeout(120);
+        const tooBig = w > m.w * 0.8 || h > m.h * 0.8;
+        if (!tooBig && Math.abs(dx) < 6 && Math.abs(dy) < 6) break;
+        if (tooBig) {
+          await zoomOut();
+          await t.page.waitForTimeout(150);
+          continue;
         }
-        const m2 = await lit();
-        const ddx = m2.l + m2.w / 2 - (m2.x0 + m2.x1) / 2;
-        const ddy = m2.t + m2.h / 2 - (m2.y0 + m2.y1) / 2;
         await t.page.mouse.move(cx, cy);
         await t.page.mouse.down();
-        await t.page.mouse.move(cx + ddx, cy + ddy, { steps: 6 });
+        await t.page.mouse.move(cx + dx, cy + dy, { steps: 6 });
         await t.page.mouse.up();
-        await t.page.waitForTimeout(120);
+        await t.page.waitForTimeout(150);
       }
+      const done = await lit();
+      if (
+        done.x0 < done.l ||
+        done.y0 < done.t ||
+        done.x1 > done.l + done.w ||
+        done.y1 > done.t + done.h
+      )
+        throw new Error('the build is not in frame');
       await t.stage((S, c, _g, ids) => S.setAllocated(c, ids), order.slice(0, 3));
       await t.page.mouse.move(5, 470);
       const N = 90;

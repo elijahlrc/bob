@@ -25,6 +25,9 @@ const ROOT = path.resolve(import.meta.dirname, '../..');
 const DIR = path.join(ROOT, 'docs/trailer');
 const FPS = 30;
 const SECONDS = 30;
+/** `TRAILER_SCALE=2` renders 2560×1440 (and reads footage filmed with the same setting): the layout is the same, the pixels twice as many. */
+const Q = Number(process.env.TRAILER_SCALE ?? 1);
+const EXT = Q > 1 ? 'jpg' : 'png';
 
 function run(cmd: string, args: string[]): void {
   const r = spawnSync(cmd, args, { stdio: 'inherit' });
@@ -36,6 +39,7 @@ async function main(): Promise<void> {
   const cut = process.argv.includes('--cut');
   const framesOnly = cut || process.argv.includes('--frames-only');
   const name = cut ? 'cut' : 'animatic';
+  const outName = Q > 1 ? `${name}-${720 * Q}p` : name;
   const work = mkdtempSync(path.join(tmpdir(), 'bob-trailer-'));
   const wav = path.join(work, 'score.wav');
   try {
@@ -60,7 +64,10 @@ async function main(): Promise<void> {
     const browser = await chromium.launch(
       process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {},
     );
-    const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+    const page = await browser.newPage({
+      viewport: { width: 1280, height: 720 },
+      deviceScaleFactor: Q,
+    });
     const errors: string[] = [];
     page.on('pageerror', (e: Error) => errors.push(String(e)));
     await page.goto('file://' + path.join(DIR, `${name}.html`) + '?render');
@@ -72,7 +79,10 @@ async function main(): Promise<void> {
         (t: number) => (window as unknown as { seek: (t: number) => unknown }).seek(t),
         i / FPS,
       );
-      await stage.screenshot({ path: path.join(work, `f${String(i).padStart(4, '0')}.png`) });
+      await stage.screenshot({
+        path: path.join(work, `f${String(i).padStart(4, '0')}.${EXT}`),
+        ...(EXT === 'jpg' ? { type: 'jpeg', quality: 97 } : {}),
+      });
       if (i % FPS === 0) process.stdout.write(`\r${i / FPS} s`);
     }
     await browser.close();
@@ -83,11 +93,11 @@ async function main(): Promise<void> {
     if (!existsSync(audio)) throw new Error('no score: run without --frames-only first');
     // prettier-ignore
     run('ffmpeg', [
-      '-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(work, 'f%04d.png'), '-i', audio,
-      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', '-preset', 'medium',
-      '-c:a', 'aac', '-b:a', '320k', '-shortest', '-movflags', '+faststart', path.join(DIR, `${name}.mp4`),
+      '-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(work, `f%04d.${EXT}`), '-i', audio,
+      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', Q > 1 ? '18' : '20', '-preset', 'medium',
+      '-c:a', 'aac', '-b:a', '320k', '-shortest', '-movflags', '+faststart', path.join(DIR, `${outName}.mp4`),
     ]);
-    console.log(`wrote docs/trailer/${name}.mp4`);
+    console.log(`wrote docs/trailer/${outName}.mp4`);
   } finally {
     rmSync(work, { recursive: true, force: true });
   }
