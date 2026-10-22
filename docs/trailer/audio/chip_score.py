@@ -16,7 +16,7 @@ BEAT = 0.5
 S16 = BEAT / 4
 
 # separate buses so the kick can duck the music and the lead can get its echo
-bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx')}
+bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx', 'wub')}
 
 
 def midi(m):
@@ -293,6 +293,34 @@ crash(27.0, 0.6, 2.5)
 bassnote(27.0, D2, 2.2, 0.6)
 lead(27.0, 62, 1.8, 0.3, duty=0.125)
 
+# ================= the wub =================
+# The crushed riff is all edges, so it does not read as bass. Under it sits a wobbling low note: a sine that modulates itself
+# (the feedback-FM wobble), its modulation index swinging up and down on the eighth notes, so it opens and closes like a filter
+# sweep, with the volume following the same swing and a clean sine an octave below for weight.
+
+
+def wub(at, dur, midis, rate=4.0, g=1.0, depth=4.2):
+    """`midis` is the pitch for each sixteenth of the note (a list), `rate` the swing in Hz (4 Hz is eighth notes at 120 bpm)."""
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    step = np.minimum((t / S16).astype(int), len(midis) - 1)
+    f = np.array([midi(m) for m in midis])[step]
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    swing = 0.5 - 0.5 * np.cos(2 * np.pi * rate * t)  # 0 on the beat, 1 half way through the eighth
+    x = np.sin(ph + (0.35 + depth * swing) * np.sin(ph))
+    x = np.tanh(x * 2.0) * (0.45 + 0.55 * swing)
+    sub = np.sin(ph / 2) * 0.55  # the octave below: D1
+    env_ = adsr(n, a=0.006, d=0.05, s=0.92, r=0.03)
+    place('wub', at, (x + sub) * env_, 0.95 * g)
+
+
+for b in range(8):  # the groove, bars 0-7: D, lifting to Eb on the last eighth of every second bar
+    wub(b * 2.0, 2.0, [38] * 14 + [39 if b % 2 else 38] * 2)
+for t0 in (19.0, 21.0):
+    wub(t0, 2.0, [38] * 14 + [39 if round(t0 / 2.0) % 2 else 38] * 2)
+wub(23.0, 1.0, [38] * 8)
+wub(27.0, 2.6, [38] * 16, rate=2.0, g=1.1, depth=3.0)  # the title: a slower swing under the last hit
+
 # ================= sound effects =================
 # The game has no sound yet, so the trailer's effects are made here: short chip sounds on their own bus, laid over
 # the groove and never ducked by it. The music stays the same underneath.
@@ -328,32 +356,31 @@ for at in (0.0, 0.5, 1.0):
     zap(at)
 thud(1.5, 1.2)
 whoosh(1.5, 0.4, 0.8)
-# 2-3: a tick per class card, a confirm on the Vanguard
-for k in range(6):
-    tick(2.0 + k * 0.125, 86 + k)
-blip(2.75, 79, 0.08, 0.8, 0.5)
-blip(2.82, 86, 0.12, 0.7, 0.5)
-# 3-6: four node chimes up the tree, the wind-up and the slam
-for k, m in enumerate((74, 77, 81)):  # a chime per node, on the eighth notes; the keystone's is fuller
-    blip(3.25 + k * 0.25, m, 0.14 if k < 2 else 0.3, 0.8 if k < 2 else 1.0, 0.125)
-blip(3.75, 86, 0.3, 0.5, 0.25)
+# 2-5: the tree grows: a chime per eighth note, climbing a pentatonic scale, the last ones fuller
+SCALE = (74, 77, 79, 81, 84, 86, 89, 91, 93, 96, 98)
+for k in range(11):
+    at = 2.25 + k * 0.25
+    blip(at, SCALE[k], 0.14 if k < 9 else 0.3, 0.7 + 0.03 * k, 0.125)
+blip(4.5, 98, 0.4, 0.5, 0.25)
 whoosh(4.6, 0.4, 0.8)
 thud(5.0, 1.5)
 place('sfx', 5.0, noise(0.6, 3000) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.15), 0.25)  # the floor cracking
-# 6-10.5: the gem drops into its socket, the number climbs, the traps are thrown and spring, the amulet drops, Equip
-blip(6.0, 81, 0.25, 0.4, 0.5, slide=-2)
-click(6.4, 1.3)
+# 6-10.5: the gem is picked up (6.4) and dropped into its socket (7.0), the number climbs, the traps spring, the amulet drops
+# (8.5), the card (9.0) and Swap (10.0)
+blip(6.4, 81, 0.25, 0.4, 0.5, slide=-2)
+click(7.0, 1.3)
 for k in range(8):
-    tick(6.5 + k * 0.05, 76 + k * 2, 0.8)
-for at in (7.0, 7.2, 7.4):
+    tick(7.05 + k * 0.05, 76 + k * 2, 0.8)
+for at in (7.5, 7.7):
     whoosh(at, 0.15, 0.6)
-for at in (7.5, 8.0, 8.5):
+for at in (8.0, 8.25):
     zap(at, 96)
 for k, m in enumerate((81, 86, 89, 93)):
-    blip(9.02 + k * 0.06, m, 0.1, 0.7, 0.5)
-blip(9.26, 98, 0.3, 0.5, 0.25)
-click(10.2, 1.2)
-blip(10.24, 86, 0.08, 0.6, 0.5)
+    blip(8.52 + k * 0.06, m, 0.1, 0.7, 0.5)
+blip(8.76, 98, 0.3, 0.5, 0.25)
+tick(9.7, 88, 0.8)
+click(10.0, 1.2)
+blip(10.04, 86, 0.08, 0.6, 0.5)
 # 10.5-12.5: three panels: arrows loosed, heavy sweeps, a totem's bell
 for n in range(11):
     tick(10.65 + n * 0.18, 95, 0.6)
@@ -424,7 +451,7 @@ _b = bus['bass']
 _sub = lowpass(_b, 110)
 _grit = degrade(_b, 6000, 3, 4.5)
 _harm = np.tanh(_sub * 7.0) * 0.5
-bus['bass'] = (_grit * 0.6 * 1.2 + _sub * 1.5 + _harm * 0.7) * 1.0
+bus['bass'] = (_grit * 0.6 * 1.2 + _sub * 0.6 + _harm * 0.45) * 1.0
 
 # The lead, crushed hard: held to a very low sample rate (aliasing), pushed into a hard clip, wavefolded, cut to 2 and 3 bits and
 # the two blended, then a short metallic comb (a 1.7 ms delay fed back) and a copy that is crushed harder still.
@@ -450,8 +477,10 @@ for at in duck_points:
     curve = 1 - 0.55 * np.exp(-np.arange(j - i) / SR / 0.06)
     duck[i:j] = np.minimum(duck[i:j], curve)
 
+if len(sys.argv) > 2:  # `chip_score.py out.wav --stems`: how loud each voice is, before the mix
+    print(' '.join(f'{k} {20 * np.log10(np.sqrt(np.mean(v ** 2)) + 1e-9):.1f}' for k, v in bus.items()))
 mono = bus['drums'] + bus['sfx'] * 0.9
-music = (bus['pad'] + bus['bass']) * duck
+music = (bus['pad'] + bus['bass'] + bus['wub']) * duck
 L += mono + music
 R += mono + music
 # the chip chord a little wide: a short offset on one side

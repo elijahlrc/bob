@@ -112,76 +112,7 @@ export const CLIPS: Clip[] = [
     { zoom: 3, pack: 6 },
   ),
 
-  /* 2. The class screen, the highlight stepping across the cards on the eighth notes. */
-  {
-    name: 'classes',
-    viewport: UI,
-    css: `.class-card.on { background: var(--panel2) !important; box-shadow: 0 0 0 2px #d98a3a, 0 0 28px rgba(217,138,58,.45); transform: translateY(-3px); }`,
-    async film(t) {
-      await t.stage((_S, c) => c.goTo('classSelect'));
-      await t.page.waitForTimeout(300);
-      for (let i = 0; i < 30; i++) {
-        const on = [1, 2, 3, 4, 5, 0][Math.min(5, Math.floor(i / 3.75))];
-        await t.page.evaluate((k: number) => {
-          document
-            .querySelectorAll('.class-card')
-            .forEach((el, j) => el.classList.toggle('on', j === k));
-        }, on);
-        await t.still(1);
-      }
-    },
-  },
-
-  /* 3a. The Vanguard's tree: a path to a keystone, a node on each eighth note. */
-  {
-    name: 'tree',
-    viewport: UI,
-    css: `.tree-wrap .tooltip, svg.tree g.preview { display: none !important; }`,
-    async film(t) {
-      const shot = await t.stage((S, c) => {
-        const run = S.stagedRun({ classId: 'vanguard', level: 40, seed: 3 }, 20);
-        const s = S.treeShot(run, 4);
-        S.toCamp(c, run);
-        return s;
-      });
-      if (!shot) throw new Error('no keystone path');
-      await tab(t, 'Passive tree');
-      await t.page.waitForTimeout(200);
-      await t.page.fill('.tree-search input', shot.name);
-      await t.page.press('.tree-search input', 'Enter');
-      await t.page.fill('.tree-search input', '');
-      // Zoom in a little on the keystone, then pan so the whole path is in the middle of the view.
-      const at = async (id: number) =>
-        (await t.page.locator(`.ring[data-id="${id}"]`).first().boundingBox()) as {
-          x: number;
-          y: number;
-          width: number;
-          height: number;
-        };
-      const key = await at(shot.path[3]);
-      await t.page.mouse.move(key.x + key.width / 2, key.y + key.height / 2);
-      await t.page.mouse.wheel(0, -150);
-      await t.page.waitForTimeout(100);
-      const a = await at(shot.path[0]);
-      const b = await at(shot.path[3]);
-      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
-      const svg = (await t.page.locator('svg.tree').first().boundingBox())!;
-      const cx = svg.x + svg.width / 2;
-      const cy = svg.y + svg.height / 2;
-      await t.page.mouse.move(cx, cy);
-      await t.page.mouse.down();
-      await t.page.mouse.move(cx + (cx - mid.x), cy + (cy - mid.y), { steps: 8 });
-      await t.page.mouse.up();
-      await t.page.mouse.move(5, 470);
-      for (let i = 0; i < 30; i++) {
-        const k = [0, 8, 15, 23].indexOf(i);
-        if (k >= 0) await t.stage((S, c, _g, node) => S.take(c, node), shot.path[k]);
-        await t.still(1);
-      }
-    },
-  },
-
-  /* 3x. TRY: a whole build growing, level 5 to 100, the tree zoomed out so it reads as big. Its own clip, to be judged first. */
+  /* 2. The tree: a whole build growing, level 5 to 100, zoomed out so that it reads as big, and kept in frame. */
   {
     name: 'tree3',
     viewport: UI,
@@ -190,12 +121,12 @@ export const CLIPS: Clip[] = [
       #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 600 40px/1 'IM Fell English SC', Georgia, serif;
         color: #d98a3a; text-shadow: 0 2px 6px #000, 0 0 14px #000; pointer-events: none; }`,
     async film(t) {
-      const { order, box } = await t.stage((S, c) => {
+      const { order } = await t.stage((S, c) => {
         const run = S.stagedRun({ classId: 'vanguard', level: 100, seed: 3 }, 60);
         const ids = S.growBuild('vanguard', 99);
         S.toCamp(c, run);
         S.setAllocated(c, ids.slice(0, 3));
-        return { order: ids, box: S.boxOf('vanguard', ids) };
+        return { order: ids };
       });
       await tab(t, 'Passive tree');
       await t.page.waitForTimeout(300);
@@ -204,26 +135,57 @@ export const CLIPS: Clip[] = [
         el.id = 'trailer-level';
         document.body.appendChild(el);
       });
-      // Zoomed out until the finished build fills about two thirds of the view, and moved to put it in the middle (the tree opens at
-      // a fifth of a pixel a unit, centred on the class start; a wheel step scales by exp(-dy * 0.0015)).
+      // Zoomed out until the finished build sits inside the view with a margin, and centred (the tree opens at a fifth of a pixel
+      // a unit, centred on the class start; a wheel step scales by exp(-dy * 0.0015)). The lit edges are measured on screen, so
+      // the fit is what the viewer sees, not a sum.
+      await t.stage((S, c, _g, ids) => S.setAllocated(c, ids), order);
+      await t.page.waitForTimeout(250);
       const svg = (await t.page.locator('svg.tree').first().boundingBox())!;
       const cx = svg.x + svg.width / 2;
       const cy = svg.y + svg.height / 2;
-      const k = Math.min(
-        (svg.width * 0.7) / (box.maxX - box.minX),
-        (svg.height * 0.7) / (box.maxY - box.minY),
-        0.22,
-      );
+      const lit = async () =>
+        t.page.evaluate(() => {
+          const r = (document.querySelector('svg.tree') as Element).getBoundingClientRect();
+          let x0 = Infinity,
+            y0 = Infinity,
+            x1 = -Infinity,
+            y1 = -Infinity;
+          document.querySelectorAll('svg.tree .tn.on .ring, svg.tree .edge.on').forEach((e) => {
+            const b = e.getBoundingClientRect();
+            x0 = Math.min(x0, b.left);
+            y0 = Math.min(y0, b.top);
+            x1 = Math.max(x1, b.right);
+            y1 = Math.max(y1, b.bottom);
+          });
+          return { x0, y0, x1, y1, l: r.left, t: r.top, w: r.width, h: r.height };
+        });
       await t.page.mouse.move(cx, cy);
-      await t.page.mouse.wheel(0, -Math.log(k / 0.22) / 0.0015);
+      await t.page.mouse.wheel(0, 700);
       await t.page.waitForTimeout(150);
-      await t.page.mouse.down();
-      await t.page.mouse.move(
-        cx + (box.startX - (box.minX + box.maxX) / 2) * k,
-        cy + (box.startY - (box.minY + box.maxY) / 2) * k,
-        { steps: 6 },
-      );
-      await t.page.mouse.up();
+      for (let pass = 0; pass < 4; pass++) {
+        const m = await lit();
+        const w = m.x1 - m.x0;
+        const h = m.y1 - m.y0;
+        // The build should fill at most 75% of the view, and its middle should be the view's middle.
+        const f = Math.min(1, (m.w * 0.75) / w, (m.h * 0.75) / h);
+        const dx = m.l + m.w / 2 - (m.x0 + m.x1) / 2;
+        const dy = m.t + m.h / 2 - (m.y0 + m.y1) / 2;
+        if (f > 0.97 && Math.abs(dx) < 6 && Math.abs(dy) < 6) break;
+        if (f <= 0.97) {
+          await t.page.mouse.move((m.x0 + m.x1) / 2, (m.y0 + m.y1) / 2);
+          await t.page.mouse.wheel(0, -Math.log(f) / 0.0015);
+          await t.page.waitForTimeout(120);
+        }
+        const m2 = await lit();
+        const ddx = m2.l + m2.w / 2 - (m2.x0 + m2.x1) / 2;
+        const ddy = m2.t + m2.h / 2 - (m2.y0 + m2.y1) / 2;
+        await t.page.mouse.move(cx, cy);
+        await t.page.mouse.down();
+        await t.page.mouse.move(cx + ddx, cy + ddy, { steps: 6 });
+        await t.page.mouse.up();
+        await t.page.waitForTimeout(120);
+      }
+      await t.stage((S, c, _g, ids) => S.setAllocated(c, ids), order.slice(0, 3));
       await t.page.mouse.move(5, 470);
       const N = 90;
       for (let i = 0; i < N; i++) {
@@ -486,11 +448,11 @@ export const CLIPS: Clip[] = [
     75,
   ),
 
-  /* 7. The fall: the Magistrate's Sentence lands on the Shade at map 63; the body held; the end screen. */
+  /* 7. The fall: the Magistrate's Sentence lands on the Shade at map 63, and the body is held. */
   {
     name: 'fall',
     zoom: 2.5,
-    css: BARE + ` .duel-cta.trailer-press { filter: brightness(1.5); transform: scale(0.97); }`,
+    css: BARE,
     async film(t) {
       await t.stage((S, c, game) => {
         const run = S.stagedRun(
@@ -518,10 +480,33 @@ export const CLIPS: Clip[] = [
           if (e && e.t < 0.1) S.mortal(w);
         },
       });
-      t.cut('summary');
+    },
+  },
+
+  /* 7b. The end screen of that fall, filmed on its own at 3× (854×480 drawn at 1.5× and sampled at 2×, so the cut can zoom in
+        on the text), the duel button pressed. */
+  {
+    name: 'summary',
+    viewport: { w: 854, h: 480, scale: 3 },
+    css: `.duel-cta.trailer-press { filter: brightness(1.5); transform: scale(0.97); }`,
+    async film(t) {
       await t.stage((S, c) => {
-        S.releaseEnd(c);
-        c.bus.emit('frame', { dtMs: 33 });
+        const run = S.stagedRun(
+          { classId: 'shade', level: 72, body: ['orbitingBlades'], seed: 9 },
+          63,
+        );
+        S.pastMaps(run);
+        S.bossFight(c, run, 'magistrate', { biome: 'warren', dist: 5 });
+        S.warmUntil(
+          c,
+          (w: any) => {
+            const e = S.effect(w, 'Sentence');
+            return !!e && e.t <= 0.1;
+          },
+          3000,
+        );
+        S.mortal(c.world);
+        for (let i = 0; i < 300 && c.screen === 'map'; i++) c.bus.emit('frame', { dtMs: 33 });
       });
       await t.page.waitForTimeout(400);
       for (let i = 0; i < 36; i++) {

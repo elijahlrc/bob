@@ -304,7 +304,7 @@
     });
   };
   /* a text card that stamps in from t0 */
-  const caption = (t, lt, t0 = 0.05, y = 170, size = 17) => {
+  const caption = (t, lt, t0 = 0.05, y = 150, size = 17) => {
     const k = clamp((lt - t0) / 0.18);
     if (k <= 0) return '';
     return (
@@ -345,8 +345,7 @@
   /* frames filmed of each clip (the last is held past the end) */
   const LEN = {
     endgame: 150,
-    classes: 30,
-    tree: 30,
+    tree3: 90,
     vanguard: 150,
     skills: 60,
     shade: 150,
@@ -371,7 +370,7 @@
   /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame; picked by eye from the events */
   const IN = {
     endgame: 65,
-    vanguard: 17,
+    vanguard: 24,
     shade: 135,
     strider: 0,
     reaver: 0,
@@ -410,19 +409,16 @@
       draw: (lt) => img(at('endgame', lt)),
     },
     {
-      t: [2, 3],
-      name: 'Pick a class',
-      what: 'The class screen; the highlight steps across the cards and lands on the Vanguard.',
-      draw: (lt) => img(at('classes', lt)) + caption('New run. New build.', lt, 0.05),
+      t: [2, 5],
+      name: 'The tree',
+      what: 'One build growing from level 1 to 100 on the passive tree, zoomed out so the whole constellation reads as big; the level counts up in large type.',
+      draw: (lt) => img(at('tree3', lt, 0)),
     },
     {
-      t: [3, 6],
+      t: [5, 6],
       name: 'Run one: the Vanguard',
-      what: 'The passive tree lights a path to a keystone, a node on each eighth note; then Magma Crack in a Forge, a slam on 5 s.',
-      draw(lt) {
-        if (lt < 1) return crop(at('tree', lt), [0, 60, 1280, 720 - 120]);
-        return img(at('vanguard', lt - 1));
-      },
+      what: 'Magma Crack in a Forge: the slam lands on the cut, on 5 s.',
+      draw: (lt) => img(at('vanguard', lt)),
     },
     {
       t: [6, 10.5],
@@ -470,7 +466,7 @@
           `<rect width="320" height="38" fill="#000" opacity=".5"/>` +
           txt(12, 28, `Level ${level}`, { size: 26, col: C.torch, weight: 600, font: 'display' }) +
           txt(308, 25, names[i], { size: 12, col: C.bone, anchor: 'end', font: 'display' });
-        return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 170, 17);
+        return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 150, 17);
       },
     },
     {
@@ -484,14 +480,15 @@
           s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 0.8) / 1.0) * 0.55}"/>`;
           return s;
         }
-        return img(at('summary', lt - 1.85, 0));
+        /* zoomed in so the last line shown is "Killed by the Magistrate" */
+        return crop(at('summary', lt - 1.85, 0), [107, 95, 1067, 600]);
       },
     },
     {
       t: [19, 22.5],
       name: 'The duel',
       what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 22.25, with no hold.',
-      draw: (lt) => img(at('duel', lt, 0)) + caption('Duel their builds.', lt, 0.1, 170, 16),
+      draw: (lt) => img(at('duel', lt, 0)) + caption('Duel their builds.', lt, 0.1, 150, 16),
     },
     {
       t: [22.5, 23.5],
@@ -503,7 +500,7 @@
       t: [23.5, 25],
       name: 'The board',
       what: 'The high scores, Sin on top; our row climbs past two players.',
-      draw: (lt) => img(at('board', lt, 0)) + caption('Take the top spot.', lt, 0.35, 170, 16),
+      draw: (lt) => img(at('board', lt, 0)) + caption('Take the top spot.', lt, 0.35, 150, 16),
     },
     {
       t: [25, 27],
@@ -512,7 +509,7 @@
       draw(lt) {
         const cells = [
           ['Arcade.', () => src('board', LEN.board - 1)],
-          ['ARPG.', () => src('tree', LEN.tree - 1)],
+          ['ARPG.', () => src('tree3', LEN.tree3 - 1)],
           ['Roguelike.', () => src('summary', 6)],
           ['Autobattler.', (l) => at('auto', l)],
         ];
@@ -716,7 +713,7 @@
   if (/[?&]render/.test(location.search)) document.body.classList.add('render');
   /* open on a frame that shows what this is */
   t = 0;
-  show(2.15);
+  show(3.5);
   scrub.value = 0;
   time.textContent = `${fmt(0)} / 0:30`;
 </script>

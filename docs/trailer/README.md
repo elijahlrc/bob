@@ -39,11 +39,13 @@ deterministic: an unchanged page and score give byte-identical files.
 
 - Audience: ARPG and roguelike players who lack the hours for a full ARPG; the pitch is a new build every run, level 1
   to 100 in a sitting, then duels and the high scores. The reference game is never named, here or in the trailer.
-- Text, in order: "New run. New build." / "Grind to level 100 in a sitting." / "Duel their builds." / "Take the top
+- Text, in order: "Grind to level 100 in a sitting." / "Duel their builds." / "Take the top
   spot." / "Arcade. ARPG. Roguelike. Autobattler." / "Battle of Builds · Free on itch.io".
-- Shots: endgame cold open; class pick; the Vanguard (tree) and the Shade (gem link, traps, a drop for the build);
+- Shots: endgame cold open (a Skyfall in a mixed pack); the tree, one build growing from level 1 to 100 zoomed out and
+  kept in frame (no class screen, no text); the Vanguard's slam on 5 s and the Shade (gem link, traps, a drop for the
+  build);
   three more classes side by side in phone-shaped panels; the climb, ending at map 63; a boss's signature attack kills
-  the character there, a pause, the end screen; the duel with Sin; the rating; the high scores (Sin first, as the first
+  the character there, a pause, the end screen zoomed in on the "Killed by" line; the duel with Sin; the rating; the high scores (Sin first, as the first
   to beat the game; oostin and Eli are real players, the other names made up); the genre grid; the title over it.
 - Music: rhythm first, simple, one groove that only stops for the fall; a heavy bass (a clean sine and its saturated
   harmonics under the gritty triangle, about 8 dB up from the first score) and a melody crushed hard (a very low sample
@@ -51,4 +53,5 @@ deterministic: an unchanged page and score give byte-identical files.
   restrained crash. The genre hits are set up by a drop-out and a tom fill, not a riser. The mix is cut at 14 kHz and
   peaks at -3 dB, and the video's audio is 320 kb/s AAC: a crushed, clipped signal otherwise rings in the encoder and
   clips on playback.
+- Captions sit just above the flasks, clear of the screen's own UI.
 - Cuts land on the beat (120 bpm: a beat is 0.5 s, a bar 2 s); any timing change keeps to the grid.
