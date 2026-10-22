@@ -1,6 +1,6 @@
 
 == caster-es (mystic): Classic caster: cold spells, all the spell damage and all the energy shield it can find.
-  60 pts: reach 38% (r18; 12:54% 15:40% 18:38% 21:42% 24:37%), choice 5 [100% 100% 99% 98% 96%], tax 35% (21; roads 14), depth max 23 p90 20, attrs str 12 dex 0 int 139
+  60 pts: reach 38% (r18; 12:54% 15:40% 18:38% 21:42% 24:37%), choice 3 [100% 98% 96%], tax 35% (21; roads 14), depth max 23 p90 20, attrs str 12 dex 0 int 139
     spell damage: 65% of the 17 units within reach; 15 units in all (spellDamage 78, spellAreaDamage 12, wandSpellDamage 30)
     cold damage: 67% of the 9.2 units within reach; 9.2 units in all (eleDamageAll 34, eleDamage:cold 58)
     energy shield: 46% of the 30.2 units within reach; 17.6 units in all (es 83, esFlat 15)
@@ -8,7 +8,7 @@
     pair spell damage + energy shield: 15 + 17.6 units, of 17 + 30.2 within reach
     took: First Light, Still Mind, Glass Skin, Warded Mind, Deep Well, Arcane Focus, Quickening, Wandwork, Broad Weave, Siphon, Withering, Hoarfrost, Familiars, Homily, Glass Wall, Shatter, Tomb Dust
     gave up: Hedge Magic (3.5, +12), Quiet Knife (3, +12), Litany (2, +7), Devotion (1.9, +5), Hymn (1.9, +4), Elemental Fletching (1.6, +15), Vigil (1.5, +6), Hearthfire (1.4, +8), Clear Head (1.4, +16), Sharp Mind (1.3, +4), Snakeskin (1, +12), Elemental Ward (1, +13), and 7 more
-  120 pts: reach 68% (r18; 12:79% 15:75% 18:68% 21:68% 24:63%), choice 7 [100% 99% 98% 98% 97% 96% 96%], tax 38% (46; roads 31), depth max 24 p90 20, attrs str 36 dex 67 int 247
+  120 pts: reach 68% (r18; 12:79% 15:75% 18:68% 21:68% 24:63%), choice 3 [100% 97% 96%], tax 38% (46; roads 31), depth max 24 p90 20, attrs str 36 dex 67 int 247
     spell damage: 100% of the 17 units within reach; 21 units in all (spellDamage 126, spellAreaDamage 12, wandSpellDamage 30)
     cold damage: 67% of the 9.2 units within reach; 9.2 units in all (eleDamageAll 34, eleDamage:cold 58)
     energy shield: 85% of the 30.2 units within reach; 32.4 units in all (es 157, esFlat 15)
@@ -18,7 +18,7 @@
     gave up: Elemental Fletching (1.6, +4), Vigil (1.5, +2), Clear Head (1.4, +6), Sharp Mind (1.3, +4), Elemental Ward (1, +6), Weathered (1, +8), Shelter (0.8, +4), Wayfarer (0.8, +8), Choirmaster (0.6, +3), Mana Tap (0.6, +3)
 
 == sword-str (reaver): Strength sword build: all the life, all the armour and all the sword damage.
-  60 pts: reach 42% (r18; 12:61% 15:44% 18:42% 21:35% 24:31%), choice 3 [100% 100% 96%], tax 27% (16; roads 13), depth max 17 p90 15, attrs str 161 dex 49 int 0
+  60 pts: reach 42% (r18; 12:61% 15:44% 18:42% 21:35% 24:31%), choice 2 [100% 100%], tax 27% (16; roads 13), depth max 17 p90 15, attrs str 161 dex 49 int 0
     life: 46% of the 51.2 units within reach; 23.8 units in all (life 119)
     armour: 85% of the 20.5 units within reach; 17.5 units in all (armour 174, physReduction 3)
     sword damage: 48% of the 30.3 units within reach; 14.4 units in all (swordDamage 54, oneHandMelee 50, meleePhys 40)
@@ -26,7 +26,7 @@
     pair life + armour: 23.8 + 17.5 units, of 51.2 + 20.5 within reach
     took: Quickened Steel, Stout Heart, Keen Edge, Light Blades, Scarred Hide, Four Winds, Guarded, Oathbound, Quartermaster, Second Wind, Stone Heart, Thick Skin, Mortar and Stone, Elemental Ward
     gave up: Fleet Blade (3, +14), Long Breath (2.8, +11), Light Hand (2.7, +13), Iron Draw (2.2, +3), True Aim (1.9, +14), Hawk's Eye (1.9, +8), Shelter (1.8, +9), Red Harvest (1.8, +4), Quick Hands (1.6, +12), Vampiric Strikes (1.4, +6), Thirsty Quiver (1.3, +13), Weathered (1, +11), and 3 more
-  120 pts: reach 72% (r18; 12:82% 15:78% 18:72% 21:63% 24:57%), choice 3 [100% 97% 95%], tax 33% (39; roads 30), depth max 19 p90 16, attrs str 259 dex 214 int 35
+  120 pts: reach 72% (r18; 12:82% 15:78% 18:72% 21:63% 24:57%), choice 2 [100% 97%], tax 33% (39; roads 30), depth max 19 p90 16, attrs str 259 dex 214 int 35
     life: 80% of the 51.2 units within reach; 42.8 units in all (life 214)
     armour: 97% of the 20.5 units within reach; 19.8 units in all (armour 202, physReduction 3)
     sword damage: 89% of the 30.3 units within reach; 29.1 units in all (swordDamage 94, oneHandMelee 95, physAttack 62, meleePhys 40)
@@ -36,14 +36,14 @@
     gave up: Shelter (1.8, +8), Vampiric Strikes (1.4, +6), Thirsty Quiver (1.3, +6), Weathered (1, +3), Snakeskin (1, +6), Wayfarer (0.8, +3), Unshakable (0.4, +1)
 
 == mace-slam (vanguard): Two-handed mace slams: big hits, area, stun, life and armour.
-  60 pts: reach 40% (r18; 12:62% 15:56% 18:40% 21:32% 24:30%), choice 3 [100% 97% 96%], tax 30% (18; roads 14), depth max 15 p90 13, attrs str 186 dex 37 int 0
+  60 pts: reach 40% (r18; 12:62% 15:56% 18:40% 21:32% 24:30%), choice 2 [100% 97%], tax 30% (18; roads 14), depth max 15 p90 13, attrs str 186 dex 37 int 0
     life: 45% of the 63.2 units within reach; 28.2 units in all (life 141)
     armour: 57% of the 24.8 units within reach; 14.2 units in all (armour 134, physReduction 3)
     two-handed mace damage: 81% of the 23.4 units within reach; 19 units in all (maceDamage 66, twoHandDamage 70, meleeArea 36, meleePhys 40)
     pair life + armour: 28.2 + 14.2 units, of 63.2 + 24.8 within reach
     took: Oathbound, Quartermaster, Thunderstep, Second Wind, Stone Heart, Guarded, Mortar and Stone, Weight of Iron, Stout Heart, Quickened Steel, Broad Back, Greatweight, Scarred Hide
     gave up: Rooted Stance (3, +4), Long Breath (2.8, +12), Quiet Pulse (2.6, +16), Warm Blood (2.4, +13), Iron Draw (2.2, +3), Steady Hands (2.1, +4), Elemental Ward (2, +2), Hawk's Eye (1.9, +9), Hatchet Work (1.9, +13), Shelter (1.8, +9), Four Winds (1.6, +2), Quick Hands (1.6, +13), and 8 more
-  120 pts: reach 66% (r18; 12:86% 15:77% 18:66% 21:55% 24:53%), choice 3 [100% 98% 96%], tax 32% (38; roads 30), depth max 23 p90 17, attrs str 275 dex 179 int 25
+  120 pts: reach 66% (r18; 12:86% 15:77% 18:66% 21:55% 24:53%), choice 2 [100% 96%], tax 32% (38; roads 30), depth max 23 p90 17, attrs str 275 dex 179 int 25
     life: 72% of the 63.2 units within reach; 47.6 units in all (life 238)
     armour: 85% of the 24.8 units within reach; 21.2 units in all (armour 218, physReduction 3)
     two-handed mace damage: 96% of the 23.4 units within reach; 22.5 units in all (maceDamage 66, twoHandDamage 70, meleeArea 48, meleePhys 60)
@@ -52,7 +52,7 @@
     gave up: Rooted Stance (3, +4), Quiet Pulse (2.6, +11), Warm Blood (2.4, +12), Iron Draw (2.2, +3), Shelter (1.8, +8), Light Hand (1.3, +3), Stagger (1, +4), Weathered (1, +3), Litany (1, +4), Wayfarer (0.8, +3), Vigil (0.8, +4), Crushing Blow (0.8, +5), and 1 more
 
 == mace-shield (vanguard): Mace and shield: block, armour and life first, mace damage after.
-  60 pts: reach 36% (r18; 12:53% 15:47% 18:36% 21:33% 24:31%), choice 3 [100% 98% 96%], tax 27% (16; roads 14), depth max 20 p90 17, attrs str 176 dex 64 int 0
+  60 pts: reach 36% (r18; 12:53% 15:47% 18:36% 21:33% 24:31%), choice 2 [100% 98%], tax 27% (16; roads 14), depth max 20 p90 17, attrs str 176 dex 64 int 0
     life: 37% of the 63.2 units within reach; 23.2 units in all (life 116)
     armour: 53% of the 24.8 units within reach; 13.2 units in all (armour 122, physReduction 3)
     block: 62% of the 31.5 units within reach; 22.5 units in all (shieldBlock 45)
@@ -60,7 +60,7 @@
     pair life + block: 23.2 + 22.5 units, of 63.2 + 31.5 within reach
     took: Oathbound, Bracing, Thick Skin, Stone Heart, Field Dressing, Mortar and Stone, Quickened Steel, Stout Heart, Buckler, Scarred Hide, Light Blades, Steel Rim, Shieldwall
     gave up: Broad Back (3.7, +6), Long Breath (2.8, +10), Iron Faith (2.7, +8), Second Wind (2.6, +3), Quiet Pulse (2.6, +16), Light Hand (2.5, +12), Warm Blood (2.4, +13), Guarded (2.3, +4), Iron Draw (2.2, +3), Stone Ward (2.2, +13), Steady Hands (2.1, +4), Elemental Ward (2, +4), and 10 more
-  120 pts: reach 62% (r18; 12:77% 15:68% 18:62% 21:57% 24:55%), choice 6 [100% 99% 99% 97% 96% 95%], tax 29% (35; roads 31), depth max 23 p90 18, attrs str 254 dex 207 int 16
+  120 pts: reach 62% (r18; 12:77% 15:68% 18:62% 21:57% 24:55%), choice 3 [100% 99% 95%], tax 29% (35; roads 31), depth max 23 p90 18, attrs str 254 dex 207 int 16
     life: 59% of the 63.2 units within reach; 39.8 units in all (life 199)
     armour: 69% of the 24.8 units within reach; 17.2 units in all (armour 162, physReduction 3, armourFlat 40)
     block: 90% of the 31.5 units within reach; 31.5 units in all (shieldBlock 63)
@@ -70,7 +70,7 @@
     gave up: Broad Back (3.7, +4), Quiet Pulse (2.6, +12), Warm Blood (2.4, +13), Iron Draw (2.2, +3), Stone Ward (2.2, +13), Steady Hands (2.1, +4), Shelter (1.8, +9), Spirit Ward (1.8, +14), Weathered (1, +3), Litany (1, +4), Wayfarer (0.8, +3), Vigil (0.8, +4), and 1 more
 
 == warcry-totem (vanguard): Totems and warcries: totem damage, warcry effect, life and regeneration.
-  60 pts: reach 39% (r18; 12:59% 15:52% 18:39% 21:32% 24:30%), choice 3 [100% 97% 96%], tax 30% (18; roads 12), depth max 16 p90 14, attrs str 135 dex 0 int 25
+  60 pts: reach 39% (r18; 12:59% 15:52% 18:39% 21:32% 24:30%), choice 1 [100%], tax 30% (18; roads 12), depth max 16 p90 14, attrs str 135 dex 0 int 25
     life: 36% of the 63.2 units within reach; 23 units in all (life 115)
     totem damage: 0% of the 8 units within reach; 0 units in all ()
     warcries: 0% of the 6.8 units within reach; 0 units in all ()
@@ -86,7 +86,7 @@
     gave up: Broad Back (3.7, +6), War Drums (2.7, +10), Iron Liturgy (2.5, +9), Warm Blood (2.4, +8), Shelter (1.8, +6), Wayfarer (0.8, +4)
 
 == bow-crit (strider): Physical bow: bow damage, attack speed, crit, evasion and life.
-  60 pts: reach 38% (r18; 12:53% 15:44% 18:38% 21:34% 24:33%), choice 7 [100% 99% 99% 97% 97% 96% 95%], tax 23% (14; roads 14), depth max 12 p90 11, attrs str 32 dex 192 int 10
+  60 pts: reach 38% (r18; 12:53% 15:44% 18:38% 21:34% 24:33%), choice 3 [100% 99% 97%], tax 23% (14; roads 14), depth max 12 p90 11, attrs str 32 dex 192 int 10
     life: 25% of the 56.2 units within reach; 14 units in all (life 70)
     evasion: 39% of the 34.7 units within reach; 13.5 units in all (evasion 162)
     bow damage: 64% of the 35.6 units within reach; 22.8 units in all (bowDamage 88, projectileDamage 78, physAttack 62)
@@ -94,7 +94,7 @@
     pair bow damage + life: 22.8 + 14 units, of 35.6 + 56.2 within reach
     took: Hawk's Eye, Long Breath, Wayfarer, Vital Aim, Hard Target, Steady Draw, Wanderer, Weaving, Fleet Foot, Longbow, True Aim, Iron Draw, Ricochet, Rapid Fire, Heavy Draw, Split Volley, Far Flight
     gave up: Quiet Shot (3.2, +10), Thick Blood (3, +8), Skewer (2.8, +5), Stout Heart (2.6, +8), Second Wind (2.6, +15), Warm Blood (2.4, +13), Stone Heart (2.4, +16), Guarded (2.3, +11), Quickened Steel (2.3, +6), Scarred Hide (2, +5), Snakeskin (2, +6), Shelter (1.8, +9), and 14 more
-  120 pts: reach 64% (r18; 12:83% 15:75% 18:64% 21:58% 24:55%), choice 4 [100% 97% 97% 96%], tax 22% (26; roads 21), depth max 15 p90 12, attrs str 100 dex 282 int 35
+  120 pts: reach 64% (r18; 12:83% 15:75% 18:64% 21:58% 24:55%), choice 1 [100%], tax 22% (26; roads 21), depth max 15 p90 12, attrs str 100 dex 282 int 35
     life: 52% of the 56.2 units within reach; 29.2 units in all (life 141, lifeFlat 20)
     evasion: 75% of the 34.7 units within reach; 25.8 units in all (evasion 310)
     bow damage: 84% of the 35.6 units within reach; 29.8 units in all (bowDamage 108, projectileDamage 128, physAttack 62)
@@ -104,7 +104,7 @@
     gave up: Quiet Shot (3.2, +9), Second Wind (2.6, +12), Warm Blood (2.4, +11), Stone Heart (2.4, +13), Guarded (2.3, +6), Snakeskin (2, +4), Shelter (1.8, +7), Quartermaster (1.8, +6), Fencer's Eye (1.7, +3), Mercy Stroke (1.7, +6), Field Dressing (1.6, +3), Red Harvest (1.2, +3), and 4 more
 
 == bow-elemental (strider): Elemental bow: elemental damage with attacks, penetration, attack speed, evasion.
-  60 pts: reach 39% (r18; 12:53% 15:45% 18:39% 21:35% 24:32%), choice 3 [100% 100% 99%], tax 20% (12; roads 9), depth max 12 p90 11, attrs str 0 dex 154 int 25
+  60 pts: reach 39% (r18; 12:53% 15:45% 18:39% 21:35% 24:32%), choice 2 [100% 99%], tax 20% (12; roads 9), depth max 12 p90 11, attrs str 0 dex 154 int 25
     life: 21% of the 56.2 units within reach; 12 units in all (life 55, lifeFlat 20)
     evasion: 44% of the 34.7 units within reach; 15.3 units in all (evasion 184)
     elemental attack damage: 43% of the 14 units within reach; 6 units in all (eleAttack 60)
@@ -112,7 +112,7 @@
     pair elemental attack damage + life: 6 + 12 units, of 14 + 56.2 within reach
     took: Hawk's Eye, Long Breath, Wayfarer, Elemental Fletching, Quick Hands, Soft Step, Hard Target, Fleet Foot, Longbow, True Aim, Keen Instinct, Rapid Fire, Split Volley, Far Flight, Thick Blood
     gave up: Weaving (3, +5), Stormstruck (2.9, +14), Stout Heart (2.6, +9), Second Wind (2.6, +15), Warm Blood (2.4, +12), Stone Heart (2.4, +16), Guarded (2.3, +14), Iron Draw (2.3, +7), Quickened Steel (2.3, +7), Quiet Shot (2.1, +9), Snakeskin (2, +4), Scarred Hide (2, +12), and 10 more
-  120 pts: reach 63% (r18; 12:82% 15:73% 18:63% 21:59% 24:55%), choice 5 [100% 99% 98% 98% 97%], tax 27% (32; roads 21), depth max 20 p90 13, attrs str 106 dex 266 int 47
+  120 pts: reach 63% (r18; 12:82% 15:73% 18:63% 21:59% 24:55%), choice 1 [100%], tax 27% (32; roads 21), depth max 20 p90 13, attrs str 106 dex 266 int 47
     life: 56% of the 56.2 units within reach; 31.2 units in all (life 151, lifeFlat 20)
     evasion: 77% of the 34.7 units within reach; 26.8 units in all (evasion 322)
     elemental attack damage: 43% of the 14 units within reach; 10.4 units in all (eleAttack 104)
@@ -122,14 +122,14 @@
     gave up: Stormstruck (2.9, +10), Second Wind (2.6, +12), Warm Blood (2.4, +11), Stone Heart (2.4, +13), Guarded (2.3, +6), Quiet Shot (2.1, +9), Zeal (2, +12), Shelter (1.8, +7), Pitch Arrows (1.8, +7), Fencer's Eye (1, +2), Mercy Stroke (1, +6), Weathered (1, +3), and 1 more
 
 == bow-poison (strider): Poison bow, across the map: poison and chaos with bow attacks, evasion and life.
-  60 pts: reach 41% (r18; 12:60% 15:48% 18:41% 21:38% 24:34%), choice 4 [100% 99% 98% 95%], tax 25% (15; roads 14), depth max 12 p90 9, attrs str 53 dex 189 int 10
+  60 pts: reach 41% (r18; 12:60% 15:48% 18:41% 21:38% 24:34%), choice 1 [100%], tax 25% (15; roads 14), depth max 12 p90 9, attrs str 53 dex 189 int 10
     life: 30% of the 56.2 units within reach; 16.8 units in all (life 84)
     poison: 37% of the 16.3 units within reach; 6 units in all (chaosAttack 48, poisonChance 10, poisonDamage 12)
     bow damage: 10% of the 26.2 units within reach; 2.6 units in all (bowDamage 16, projectileDamage 10)
     pair poison + life: 6 + 16.8 units, of 16.3 + 56.2 within reach
     took: Hawk's Eye, Long Breath, Wayfarer, Quick Hands, Soft Step, Hard Target, Weaving, Wanderer, Light Hand, Fleet Foot, Longbow, True Aim, Venom Fletching, Buckler, Quickened Steel, Fighting Breath
     gave up: Thick Blood (3, +7), Barbed Point (3, +9), Stout Heart (2.6, +4), Second Wind (2.6, +14), Warm Blood (2.4, +13), Stone Heart (2.4, +15), Guarded (2.3, +9), Festering (2.3, +10), Scarred Hide (2, +3), Snakeskin (2, +4), Iron Draw (2, +3), Shelter (1.8, +9), and 3 more
-  120 pts: reach 69% (r18; 12:88% 15:79% 18:69% 21:63% 24:58%), choice 3 [100% 99% 96%], tax 28% (34; roads 27), depth max 16 p90 13, attrs str 106 dex 299 int 59
+  120 pts: reach 69% (r18; 12:88% 15:79% 18:69% 21:63% 24:58%), choice 1 [100%], tax 28% (34; roads 27), depth max 16 p90 13, attrs str 106 dex 299 int 59
     life: 59% of the 56.2 units within reach; 33.2 units in all (life 161, lifeFlat 20)
     poison: 67% of the 16.3 units within reach; 11 units in all (chaosAttack 48, poisonChance 20, poisonDamage 60)
     bow damage: 53% of the 26.2 units within reach; 13.8 units in all (bowDamage 98, projectileDamage 40)
@@ -138,7 +138,7 @@
     gave up: Second Wind (2.6, +12), Warm Blood (2.4, +11), Stone Heart (2.4, +13), Guarded (2.3, +6), Festering (2.3, +8), Shelter (1.8, +7)
 
 == caster-life (mystic): Fire and lightning caster on life: spell damage, crit, life, mana.
-  60 pts: reach 34% (r18; 12:58% 15:45% 18:34% 21:31% 24:27%), choice 4 [100% 98% 98% 96%], tax 42% (25; roads 23), depth max 21 p90 17, attrs str 0 dex 89 int 196
+  60 pts: reach 34% (r18; 12:58% 15:45% 18:34% 21:31% 24:27%), choice 4 [100% 98% 97% 96%], tax 42% (25; roads 23), depth max 21 p90 17, attrs str 0 dex 89 int 196
     spell damage: 94% of the 16.8 units within reach; 15.8 units in all (spellDamage 86, spellProjectile 50)
     elemental damage: 42% of the 21.2 units within reach; 10.2 units in all (eleDamage:lightning 58, eleDamage:fire 44)
     life: 16% of the 51.8 units within reach; 8.4 units in all (life 42)
@@ -146,7 +146,7 @@
     pair spell damage + life: 15.8 + 8.4 units, of 16.8 + 51.8 within reach
     took: First Light, Sharp Mind, Warm Blood, Shelter, Arcane Focus, Darting Bolts, Hedge Magic, Quiet Knife, Long Breath, Thunderhead, Flashpoint, Overcharge
     gave up: Hearthfire (3.5, +11), Thick Blood (3, +3), Quiet Pulse (2.6, +5), Stout Heart (2.6, +11), Second Wind (2.6, +14), Stone Heart (2.4, +15), Elemental Ward (2, +15), Clear Head (1.4, +4), Deep Well (1.4, +5), Vital Aim (1.3, +6), Weathered (1, +5), Snakeskin (1, +6), and 9 more
-  120 pts: reach 65% (r18; 12:77% 15:78% 18:65% 21:59% 24:53%), choice 7 [100% 99% 98% 96% 96% 96% 95%], tax 37% (44; roads 33), depth max 21 p90 18, attrs str 41 dex 96 int 258
+  120 pts: reach 65% (r18; 12:77% 15:78% 18:65% 21:59% 24:53%), choice 3 [100% 96% 96%], tax 37% (44; roads 33), depth max 21 p90 18, attrs str 41 dex 96 int 258
     spell damage: 94% of the 16.8 units within reach; 19.8 units in all (spellDamage 118, spellProjectile 50)
     elemental damage: 71% of the 21.2 units within reach; 17.2 units in all (eleDamage:lightning 58, eleDamageAll 30, eleDamage:fire 84)
     life: 68% of the 51.8 units within reach; 35.4 units in all (life 172, lifeFlat 20)
@@ -156,14 +156,14 @@
     gave up: Stout Heart (2.6, +11), Deep Well (1.4, +3), Vital Aim (1.3, +6), Weathered (1, +3), Snakeskin (1, +5), Frugal (0.9, +1), Hymn (0.9, +3), Prism Ward (0.8, +2), Wayfarer (0.8, +6), Warded Mind (0.8, +1), Mana Tap (0.6, +2), Still Mind (0.6, +3)
 
 == summoner (mystic): Summoner: minion damage, minion life and speed, auras, energy shield or life.
-  60 pts: reach 44% (r18; 12:65% 15:59% 18:44% 21:40% 24:37%), choice 3 [100% 100% 96%], tax 38% (23; roads 15), depth max 25 p90 20, attrs str 36 dex 0 int 132
+  60 pts: reach 44% (r18; 12:65% 15:59% 18:44% 21:40% 24:37%), choice 1 [100%], tax 38% (23; roads 15), depth max 25 p90 20, attrs str 36 dex 0 int 132
     minions: 91% of the 11 units within reach; 13 units in all (minionDamage 60, minionLife 84, minionSpeed 5)
     energy shield: 63% of the 30.2 units within reach; 21 units in all (es 100, esFlat 15)
     life: 16% of the 51.8 units within reach; 8.4 units in all (life 42)
     pair minions + energy shield: 13 + 21 units, of 11 + 30.2 within reach
     took: First Light, Warm Blood, Glass Skin, Warded Mind, Quickening, Quiet Pulse, Devotion, Choirmaster, Shepherd, Vigil, Litany, Familiars, Glass Wall, Volatile Servants
     gave up: Thick Blood (2.2, +4), Elemental Ward (1.6, +9), Stone Heart (1.4, +13), Shelter (1.4, +4), Long Breath (1.2, +14), Snakeskin (1, +8), Weathered (1, +18), Prism Ward (0.8, +5), Wayfarer (0.8, +16), Hearthfire (0.8, +2)
-  120 pts: reach 63% (r18; 12:74% 15:76% 18:63% 21:62% 24:58%), choice 5 [100% 98% 98% 96% 95%], tax 39% (47; roads 29), depth max 30 p90 24, attrs str 76 dex 48 int 227
+  120 pts: reach 63% (r18; 12:74% 15:76% 18:63% 21:62% 24:58%), choice 3 [100% 98% 98%], tax 39% (47; roads 29), depth max 30 p90 24, attrs str 76 dex 48 int 227
     minions: 100% of the 11 units within reach; 21.5 units in all (minionDamage 148, minionLife 84, minionSpeed 11)
     energy shield: 93% of the 30.2 units within reach; 38.8 units in all (es 189, esFlat 15)
     life: 37% of the 51.8 units within reach; 20.4 units in all (life 97, lifeFlat 20)
@@ -172,14 +172,14 @@
     gave up: Elemental Ward (1.6, +5), Stone Heart (1.4, +9), Shelter (1.4, +4), Long Breath (1.2, +8), Weathered (1, +13), Prism Ward (0.8, +5), Wayfarer (0.8, +13)
 
 == wand-attack (mystic): Wand attacks: wand damage, attack speed, crit, energy shield.
-  60 pts: reach 44% (r18; 12:80% 15:62% 18:44% 21:36% 24:32%), choice 2 [100% 96%], tax 38% (23; roads 12), depth max 19 p90 14, attrs str 0 dex 34 int 123
+  60 pts: reach 44% (r18; 12:80% 15:62% 18:44% 21:36% 24:32%), choice 1 [100%], tax 38% (23; roads 12), depth max 19 p90 14, attrs str 0 dex 34 int 123
     wand damage: 100% of the 7.7 units within reach; 7.7 units in all (wandAttack 92)
     energy shield: 76% of the 30.2 units within reach; 24 units in all (es 120)
     attack speed: 37% of the 18 units within reach; 6.7 units in all (weaponSpeed:wand 5, attackSpeed 15)
     pair wand damage + energy shield: 7.7 + 24 units, of 7.7 + 30.2 within reach
     took: First Light, Deft Wand, Warm Blood, Glass Skin, Warded Mind, Quickening, Keen Instinct, Flashes of Insight, Wand Volley, Quiet Pulse, Thick Blood, Devotion, Shroud
     gave up: Vital Aim (2.1, +11), Litany (2, +11), Hawk's Eye (1.9, +7), Quickened Steel (1.7, +13), Quick Hands (1.6, +11), Vigil (1.5, +8), Elemental Ward (1.5, +14), Light Hand (1.3, +7), Shelter (1.3, +4), Elemental Fletching (1.2, +9), Stone Heart (1.2, +15), Snakeskin (1, +3), and 4 more
-  120 pts: reach 66% (r18; 12:87% 15:78% 18:66% 21:59% 24:54%), choice 5 [100% 100% 98% 97% 96%], tax 33% (39; roads 23), depth max 23 p90 19, attrs str 0 dex 200 int 168
+  120 pts: reach 66% (r18; 12:87% 15:78% 18:66% 21:59% 24:54%), choice 2 [100% 98%], tax 33% (39; roads 23), depth max 23 p90 19, attrs str 0 dex 200 int 168
     wand damage: 100% of the 7.7 units within reach; 7.7 units in all (wandAttack 92)
     energy shield: 76% of the 30.2 units within reach; 26 units in all (es 130)
     attack speed: 78% of the 18 units within reach; 18.3 units in all (attackSpeed 50, weaponSpeed:wand 5)
@@ -195,7 +195,7 @@
     pair bleed + life: 11.5 + 22.8 units, of 26.6 + 51.2 within reach
     took: Quickened Steel, Stout Heart, Keen Edge, Scarred Hide, Guarded, Hewing, Oathbound, Quartermaster, Open Veins, Second Wind, Stone Heart, Mortar and Stone, Elemental Ward, Wound Dance
     gave up: Barbed Arrows (4.8, +16), Deep Cuts (4.3, +13), Long Breath (2.8, +11), Iron Draw (2, +3), True Aim (1.9, +14), Hawk's Eye (1.9, +8), Shelter (1.8, +9), Red Harvest (1.8, +2), Hatchet Work (1.7, +13), Four Winds (1.6, +2), Quick Hands (1.6, +12), Vampiric Strikes (1.4, +6), and 5 more
-  120 pts: reach 62% (r18; 12:69% 15:64% 18:62% 21:59% 24:54%), choice 8 [100% 98% 98% 97% 97% 96% 95% 95%], tax 34% (41; roads 29), depth max 22 p90 18, attrs str 234 dex 173 int 0
+  120 pts: reach 62% (r18; 12:69% 15:64% 18:62% 21:59% 24:54%), choice 5 [100% 98% 97% 97% 95%], tax 34% (41; roads 29), depth max 22 p90 18, attrs str 234 dex 173 int 0
     life: 66% of the 51.2 units within reach; 37.6 units in all (life 188)
     bleed: 83% of the 26.6 units within reach; 22 units in all (bleedChance 65, bleedDamage 186)
     axe damage: 61% of the 11 units within reach; 11.7 units in all (axeDamage 92, meleePhys 40)
@@ -204,14 +204,14 @@
     gave up: Iron Draw (2, +3), Shelter (1.8, +9), Hatchet Work (1.7, +4), Four Winds (1.6, +2), Vampiric Strikes (1.4, +6), Light Hand (1.3, +3), Weathered (1, +3), Snakeskin (1, +8), Wayfarer (0.8, +5)
 
 == dual-wield (reaver): Dual-wielding swords or axes: dual wield damage, speed and crit, life, evasion.
-  60 pts: reach 42% (r18; 12:57% 15:47% 18:42% 21:37% 24:33%), choice 2 [100% 98%], tax 22% (13; roads 11), depth max 19 p90 15, attrs str 69 dex 154 int 10
+  60 pts: reach 42% (r18; 12:57% 15:47% 18:42% 21:37% 24:33%), choice 1 [100%], tax 22% (13; roads 11), depth max 19 p90 15, attrs str 69 dex 154 int 10
     life: 42% of the 51.2 units within reach; 23.2 units in all (life 116)
     dual wield: 75% of the 18 units within reach; 13.5 units in all (oneHandMelee 95, dualDamage 30, dualSpeed 3)
     evasion: 49% of the 30.2 units within reach; 14.8 units in all (evasion 178)
     pair dual wield + life: 13.5 + 23.2 units, of 18 + 51.2 within reach
     took: Quickened Steel, Buckler, Fighting Breath, Killing Pace, Weaving, Twin Fangs, Light Blades, Scarred Hide, Hawk's Eye, Wayfarer, Long Breath, Quick Hands, Light Hand, Hard Target, Wanderer, Fleet Foot, True Aim, Heavy Draw
     gave up: Stout Heart (2.6, +3), Oathbound (2.6, +9), Second Wind (2.6, +13), Fleet Blade (2.4, +6), Stone Heart (2.4, +14), Guarded (2.3, +7), Keen Edge (2.3, +5), Crossed Blades (2.3, +5), Iron Draw (2.2, +3), Snakeskin (2, +6), Elemental Ward (2, +15), Shelter (1.8, +10), and 6 more
-  120 pts: reach 68% (r18; 12:81% 15:73% 18:68% 21:61% 24:55%), choice 4 [100% 98% 98% 97%], tax 28% (33; roads 23), depth max 19 p90 16, attrs str 118 dex 260 int 35
+  120 pts: reach 68% (r18; 12:81% 15:73% 18:68% 21:61% 24:55%), choice 2 [100% 97%], tax 28% (33; roads 23), depth max 19 p90 16, attrs str 118 dex 260 int 35
     life: 56% of the 51.2 units within reach; 33.2 units in all (life 161, lifeFlat 20)
     dual wield: 100% of the 18 units within reach; 18 units in all (oneHandMelee 95, dualDamage 30, dualSpeed 3, dualCrit 90)
     evasion: 91% of the 30.2 units within reach; 27.3 units in all (evasion 328)
@@ -220,14 +220,14 @@
     gave up: Oathbound (2.6, +8), Second Wind (2.6, +12), Stone Heart (2.4, +13), Elemental Ward (2, +14), Shelter (1.8, +7), Vampiric Strikes (1.4, +9), Thirsty Quiver (1.3, +3), Weathered (1, +2)
 
 == fire-burn (zealot): Burning fire caster: fire damage, burning, ignite, life and energy shield.
-  60 pts: reach 34% (r18; 12:48% 15:46% 18:34% 21:30% 24:27%), choice 5 [100% 99% 98% 97% 96%], tax 37% (22; roads 10), depth max 21 p90 19, attrs str 28 dex 0 int 77
+  60 pts: reach 34% (r18; 12:48% 15:46% 18:34% 21:30% 24:27%), choice 4 [100% 99% 97% 96%], tax 37% (22; roads 10), depth max 21 p90 19, attrs str 28 dex 0 int 77
     fire damage: 39% of the 18 units within reach; 14.5 units in all (burnDamage 66, dotDamage 20, eleDamageAll 30, eleDamage:fire 40)
     spell damage: 54% of the 15.8 units within reach; 8.5 units in all (spellDamage 68)
     life: 27% of the 50.2 units within reach; 13.4 units in all (life 67)
     pair fire damage + life: 14.5 + 13.4 units, of 18 + 50.2 within reach
     took: Zeal, Hearthfire, Vigil, Choirmaster, Litany, Quiet Pulse, Glass Skin, Warm Blood, Homily, Glass Wall, Warded Mind, Familiars, Arcane Focus, Withering, Cinder, Hoarfrost
     gave up: Thick Blood (3.6, +7), Hedge Magic (3.5, +12), Quiet Knife (3, +12), Censer (2.8, +13), Long Breath (2.8, +14), Second Wind (2.6, +7), Stout Heart (2.6, +14), Stone Heart (2.4, +9), Elemental Ward (2, +5), Shelter (1.8, +6), Benediction (1.4, +10), Sharp Mind (1.3, +2), and 5 more
-  120 pts: reach 64% (r18; 12:75% 15:68% 18:64% 21:53% 24:49%), choice 8 [100% 100% 99% 99% 99% 98% 95% 95%], tax 39% (47; roads 24), depth max 22 p90 19, attrs str 41 dex 64 int 184
+  120 pts: reach 64% (r18; 12:75% 15:68% 18:64% 21:53% 24:49%), choice 6 [100% 100% 99% 99% 98% 95%], tax 39% (47; roads 24), depth max 22 p90 19, attrs str 41 dex 64 int 184
     fire damage: 44% of the 18 units within reach; 16.5 units in all (burnDamage 66, dotDamage 40, eleDamageAll 30, eleDamage:fire 40)
     spell damage: 100% of the 15.8 units within reach; 15.8 units in all (spellDamage 126)
     life: 59% of the 50.2 units within reach; 34.4 units in all (life 167, lifeFlat 20)
@@ -236,14 +236,14 @@
     gave up: Censer (2.8, +10), Stout Heart (2.6, +11), Shelter (1.8, +4), Benediction (1.4, +8), Consecrated Plate (1.2, +10), Prism Ward (0.8, +5), Wayfarer (0.8, +6), Frugal (0.6, +2)
 
 == staff-block (zealot): Staff caster who blocks: staff and spell damage, spell block, life and energy shield.
-  60 pts: reach 41% (r18; 12:71% 15:55% 18:41% 21:31% 24:28%), choice 3 [100% 97% 96%], tax 33% (20; roads 14), depth max 16 p90 13, attrs str 56 dex 0 int 138
+  60 pts: reach 41% (r18; 12:71% 15:55% 18:41% 21:31% 24:28%), choice 2 [100% 97%], tax 33% (20; roads 14), depth max 16 p90 13, attrs str 56 dex 0 int 138
     spell damage: 28% of the 23.8 units within reach; 6.8 units in all (spellDamage 38, eleDamageAll 20)
     block: 43% of the 3.5 units within reach; 1.5 units in all (blockAttack 3)
     life: 43% of the 50.2 units within reach; 21.4 units in all (life 107)
     pair block + life: 1.5 + 21.4 units, of 3.5 + 50.2 within reach
     took: Zeal, Iron Faith, Hearthfire, Vigil, Litany, Elemental Ward, First Light, Second Wind, Quiet Pulse, Glass Skin, Quarterstaff, Stone Heart, Warm Blood, Warded Mind, Arcane Focus
     gave up: Homily (3.8, +8), Thick Blood (3.7, +7), Hedge Magic (3.5, +12), Quiet Knife (3, +12), Long Breath (2.8, +14), Stout Heart (2.6, +13), Shelter (1.8, +4), Benediction (1.5, +5), Consecrated Plate (1.4, +6), Sharp Mind (1.3, +2), Prism Ward (0.8, +5), Wayfarer (0.8, +16), and 2 more
-  120 pts: reach 68% (r18; 12:74% 15:72% 18:68% 21:56% 24:51%), choice 11 [100% 98% 98% 97% 97% 97% 96% 96% 96% 95% 95%], tax 41% (49; roads 30), depth max 22 p90 18, attrs str 77 dex 58 int 221
+  120 pts: reach 68% (r18; 12:74% 15:72% 18:68% 21:56% 24:51%), choice 6 [100% 97% 96% 96% 96% 95%], tax 41% (49; roads 30), depth max 22 p90 18, attrs str 77 dex 58 int 221
     spell damage: 87% of the 23.8 units within reach; 22.8 units in all (spellDamage 134, eleDamageAll 60)
     block: 100% of the 3.5 units within reach; 3.5 units in all (blockAttack 3, spellBlock 4)
     life: 57% of the 50.2 units within reach; 33.4 units in all (life 162, lifeFlat 20)
@@ -259,7 +259,7 @@
     pair auras + life: 4 + 13.4 units, of 16.7 + 50.2 within reach
     took: Zeal, Hearthfire, Vigil, Shepherd, Litany, Glass Skin, Quiet Pulse, Quickening, Warm Blood, Homily, Lone Vow, Runecarver, Reliquary, Sigil Warden, Brandwright
     gave up: Benediction (4, +8), Thick Blood (4, +12), Choirmaster (3.3, +1), Arcane Focus (2.9, +5), Warded Mind (2.9, +4), Long Breath (2.8, +15), Second Wind (2.6, +7), Stout Heart (2.6, +14), Hedge Magic (2.5, +13), Stone Heart (2.4, +9), Quiet Knife (2.2, +14), Consecrated Plate (2, +3), and 5 more
-  120 pts: reach 64% (r18; 12:82% 15:74% 18:64% 21:56% 24:55%), choice 6 [100% 99% 97% 96% 96% 95%], tax 36% (43; roads 24), depth max 23 p90 20, attrs str 150 dex 6 int 158
+  120 pts: reach 64% (r18; 12:82% 15:74% 18:64% 21:56% 24:55%), choice 4 [100% 97% 96% 95%], tax 36% (43; roads 24), depth max 23 p90 20, attrs str 150 dex 6 int 158
     auras: 90% of the 16.7 units within reach; 18.7 units in all (reducedReservation 33, auraEffect 46)
     brand damage: 41% of the 15.8 units within reach; 17.2 units in all (spellDamage 76, brandDamage 92)
     life: 60% of the 50.2 units within reach; 30 units in all (life 145, lifeFlat 20)
@@ -268,7 +268,7 @@
     gave up: Long Breath (2.8, +11), Stout Heart (2.6, +9), Hedge Magic (2.5, +9), Quiet Knife (2.2, +5), Shelter (1.8, +6), Battle Hymn (1.7, +8), Prism Ward (0.8, +5), Wayfarer (0.8, +13)
 
 == dagger-crit (shade): Dagger crit attacker: dagger damage, crit, attack speed, evasion and dodge.
-  60 pts: reach 43% (r18; 12:70% 15:56% 18:43% 21:35% 24:34%), choice 2 [100% 96%], tax 18% (11; roads 9), depth max 14 p90 13, attrs str 6 dex 136 int 22
+  60 pts: reach 43% (r18; 12:70% 15:56% 18:43% 21:35% 24:34%), choice 1 [100%], tax 18% (11; roads 9), depth max 14 p90 13, attrs str 6 dex 136 int 22
     life: 29% of the 45.2 units within reach; 13 units in all (life 60, lifeFlat 20)
     crit: 43% of the 29.3 units within reach; 12.5 units in all (critChance 180, critMulti 30, weaponCrit:dagger 20)
     dagger damage: 49% of the 8.2 units within reach; 4 units in all (daggerDamage 40)
@@ -293,7 +293,7 @@
     pair poison + life: 11 + 15.6 units, of 13.6 + 45.2 within reach
     took: Keen Instinct, Talon, Thick Blood, Snakeskin, Hawk's Eye, Long Breath, Wanderer, Light Hand, Barbed Point, Wayfarer, Quick Hands, Venom Fletching, Hard Target, Fleet Foot, True Aim, Weaving, Sidestep
     gave up: Stout Heart (2.6, +9), Warm Blood (2.4, +11), Quickened Steel (2.3, +6), Soft Step (2.2, +4), Shelter (1.8, +7), Thirsty Quiver (1.3, +5), Lingering (1.3, +12), Weathered (1, +3), Bloodletter (1, +7), Prism Ward (0.8, +13), Vigil (0.8, +17)
-  120 pts: reach 69% (r18; 12:79% 15:77% 18:69% 21:58% 24:57%), choice 4 [100% 98% 97% 97%], tax 29% (35; roads 24), depth max 22 p90 20, attrs str 112 dex 264 int 59
+  120 pts: reach 69% (r18; 12:79% 15:77% 18:69% 21:58% 24:57%), choice 1 [100%], tax 29% (35; roads 24), depth max 22 p90 20, attrs str 112 dex 264 int 59
     life: 62% of the 45.2 units within reach; 32.2 units in all (life 156, lifeFlat 20)
     poison: 81% of the 13.6 units within reach; 15.3 units in all (chaosAttack 48, poisonChance 30, poisonDamage 100)
     claw damage: 100% of the 4 units within reach; 4 units in all (clawDamage 40)
@@ -309,7 +309,7 @@
     pair trap and mine damage + energy shield: 10 + 7 units, of 13.7 + 28.8 within reach
     took: Keen Instinct, Soft Step, Snakeskin, Thick Blood, Hawk's Eye, Long Breath, Wanderer, Sapper, Tripwire, Wayfarer, Trapper, Shroud, Hard Target, Fleet Foot, Weaving
     gave up: Glass Skin (3.9, +13), Quickening (3.2, +15), Warded Mind (2.9, +7), Black Powder (2.6, +8), Warm Blood (2.4, +11), Arcane Focus (1.5, +6), Vigil (1.5, +17), Static Edge (1.5, +6), Shelter (1.3, +7), Weathered (1, +3), Prism Ward (0.8, +12)
-  120 pts: reach 66% (r18; 12:82% 15:73% 18:66% 21:59% 24:55%), choice 3 [100% 99% 95%], tax 38% (46; roads 36), depth max 22 p90 18, attrs str 16 dex 228 int 240
+  120 pts: reach 66% (r18; 12:82% 15:73% 18:66% 21:59% 24:55%), choice 1 [100%], tax 38% (46; roads 36), depth max 22 p90 18, attrs str 16 dex 228 int 240
     trap and mine damage: 100% of the 13.7 units within reach; 13.7 units in all (trapDamage 96, mineDamage 68)
     energy shield: 81% of the 28.8 units within reach; 25.6 units in all (es 128)
     evasion: 75% of the 33.3 units within reach; 24.8 units in all (evasion 298)
@@ -325,7 +325,7 @@
     pair spell damage + energy shield: 10.5 + 23.8 units, of 13.8 + 28.8 within reach
     took: Keen Instinct, Quiet Knife, Thick Blood, Flashes of Insight, Arcane Focus, Devotion, Shroud, Warded Mind, Glass Skin, Quiet Shot, Darting Bolts, Athame, Quickening, Thunderhead, Hoarfrost
     gave up: Hedge Magic (3.5, +6), Sharp Mind (2.5, +5), Vigil (1.5, +9), Vital Aim (1.5, +12), Hearthfire (1.4, +10), Mercy Stroke (1.3, +6), Killing Eye (1.2, +15), Snakeskin (1, +3), Weathered (1, +13), Prism Ward (0.8, +2), Shelter (0.8, +6), Wayfarer (0.8, +12), and 1 more
-  120 pts: reach 68% (r18; 12:77% 15:69% 18:68% 21:61% 24:63%), choice 5 [100% 98% 97% 96% 95%], tax 45% (54; roads 33), depth max 28 p90 23, attrs str 12 dex 136 int 282
+  120 pts: reach 68% (r18; 12:77% 15:69% 18:68% 21:61% 24:63%), choice 3 [100% 97% 95%], tax 45% (54; roads 33), depth max 28 p90 23, attrs str 12 dex 136 int 282
     spell damage: 100% of the 13.8 units within reach; 23.3 units in all (spellDamage 126, daggerSpellDamage 60)
     spell crit: 100% of the 7.3 units within reach; 8.9 units in all (spellCrit 85, spellCritMulti 15, daggerSpellCrit 30)
     energy shield: 88% of the 28.8 units within reach; 33 units in all (es 160, esFlat 15)
@@ -334,7 +334,7 @@
     gave up: Vigil (1.5, +6), Vital Aim (1.5, +8), Hearthfire (1.4, +8), Mercy Stroke (1.3, +6), Killing Eye (1.2, +14), Snakeskin (1, +3), Weathered (1, +8), Shelter (0.8, +4), Wayfarer (0.8, +8), Frugal (0.6, +2)
 
 == two-hand-fire (vanguard): Two-handed fire melee: fire damage with attacks, two-handed damage, life, armour.
-  60 pts: reach 37% (r18; 12:64% 15:54% 18:37% 21:30% 24:27%), choice 3 [100% 99% 98%], tax 28% (17; roads 12), depth max 15 p90 13, attrs str 163 dex 6 int 25
+  60 pts: reach 37% (r18; 12:64% 15:54% 18:37% 21:30% 24:27%), choice 1 [100%], tax 28% (17; roads 12), depth max 15 p90 13, attrs str 163 dex 6 int 25
     life: 36% of the 63.2 units within reach; 23 units in all (life 115)
     armour: 73% of the 24.8 units within reach; 18.2 units in all (armour 194, physReduction 2)
     fire attack damage: 19% of the 15.4 units within reach; 3 units in all (eleDamage:fire 30)
@@ -352,7 +352,7 @@
     gave up: Elemental Edge (2.8, +5), Quiet Pulse (2.6, +10), Warm Blood (2.4, +11), Shelter (1.8, +7), Light Hand (1.3, +3), Hatchet Work (1.3, +7), Weathered (1, +3), Wayfarer (0.8, +3)
 
 == block-caster (zealot): Shield caster: spell block and attack block, spell damage, energy shield and life.
-  60 pts: reach 43% (r18; 12:62% 15:55% 18:43% 21:32% 24:28%), choice 2 [100% 99%], tax 32% (19; roads 9), depth max 16 p90 15, attrs str 22 dex 0 int 71
+  60 pts: reach 43% (r18; 12:62% 15:55% 18:43% 21:32% 24:28%), choice 1 [100%], tax 32% (19; roads 9), depth max 16 p90 15, attrs str 22 dex 0 int 71
     block: 26% of the 19 units within reach; 5 units in all (shieldBlock 10)
     spell block: 83% of the 6 units within reach; 5 units in all (shieldSpellBlock 8, spellBlock 2)
     spell damage: 48% of the 15.8 units within reach; 7.5 units in all (spellDamage 60)
@@ -360,7 +360,7 @@
     pair block + energy shield: 5 + 18.2 units, of 19 + 28.2 within reach
     took: Zeal, Iron Faith, Hearthfire, Vigil, Choirmaster, Shepherd, Litany, Glass Skin, Quiet Pulse, Quickening, Warm Blood, Sharp Mind, Spirit Ward, Homily, Glass Wall, Warded Mind, Arcane Focus
     gave up: Hedge Magic (3.5, +11), Buckler (3.2, +16), Quiet Knife (3, +12), Bracing (2.8, +14), Thick Blood (2.4, +7), Consecrated Plate (2, +10), Elemental Ward (1.7, +4), Stone Heart (1.7, +8), Shelter (1.5, +5), Long Breath (1.4, +13), Prism Ward (0.8, +2), Wayfarer (0.8, +15), and 2 more
-  120 pts: reach 55% (r18; 12:52% 15:53% 18:55% 21:50% 24:47%), choice 3 [100% 98% 96%], tax 40% (48; roads 34), depth max 26 p90 20, attrs str 83 dex 166 int 186
+  120 pts: reach 55% (r18; 12:52% 15:53% 18:55% 21:50% 24:47%), choice 2 [100% 98%], tax 40% (48; roads 34), depth max 26 p90 20, attrs str 83 dex 166 int 186
     block: 47% of the 19 units within reach; 23 units in all (shieldBlock 46)
     spell block: 100% of the 6 units within reach; 6 units in all (shieldSpellBlock 8, spellBlock 4)
     spell damage: 86% of the 15.8 units within reach; 13.5 units in all (spellDamage 108)

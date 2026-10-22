@@ -28,7 +28,7 @@ export const REACH_RADIUS = 18;
 /** A plan within this share of the best counts as a near-equal choice. */
 const NEAR = 0.05;
 /** Two plans are different choices when each takes at least this many notables or keystones the other does not. */
-const DIFFER = 2;
+const DIFFER = 3;
 
 const argv = process.argv.slice(2);
 const arg = (k: string) => {

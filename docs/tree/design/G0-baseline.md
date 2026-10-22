@@ -12,8 +12,9 @@ accept, change or strike.
   allocator. They never decide where a node goes (CONSTRAINTS §14).
 - **`scripts/passives/builds.ts`**: the allocator and the report.
   `npx tsx scripts/passives/builds.ts [--only id,id] [--budgets 60,120] [--radius 18] [--json out.json] [--pics dir]`.
-  The output of this run is in [G0/builds.txt](G0/builds.txt) and [G0/builds.json](G0/builds.json), with a picture of
-  each archetype's plans in [G0/builds/](G0/builds/).
+  The output of this run is in [G0/builds.txt](G0/builds.txt) and [G0/builds.json](G0/builds.json) (run prettier on the
+  JSON after writing it, or `npm run check` fails), with a picture of each archetype's plans in [G0/builds/](G0/builds/).
+  `npm run passives:builds` and `npm run passives:supply` run the two scripts.
 - **`scripts/passives/supply.ts`**: the supply map.
   `npx tsx scripts/passives/supply.ts [--md out.md] [--pic empty.png]`. It writes [G0/supply.md](G0/supply.md) (units by
   stat family and region, nodes by area, every specialization's notables with their partners and nearest twin, and the
@@ -33,14 +34,17 @@ accept, change or strike.
 - **Checks.** The swaps and bans improved on the first greedy plan by 0 to 10%. After a restart, no ban found anything
   better.
 - It is deterministic, so a later round means the same thing as this one.
-- The 60-point plan is the best for 60 points, not the first 60 points of the 120-point plan. In most pictures the
-  two overlap almost entirely.
+- The 60-point plan is the best for 60 points, not the first 60 points of the 120-point plan. Even so, 14 of the 22
+  60-point plans lie wholly inside their 120-point plan, and the rest at least three quarters (warcry-totem 75%, staff
+  block 85%, block caster 89%, claw poison 90%, the others 97 to 98%).
 
 **What it reports**, at 60 and 120 points:
 
 - **Reach:** the share of the value within 18 steps of the start that the best plan takes. All the build's wants count,
   generic ones (resistances, mana) included, so this number is diluted. The main stats below are sharper.
-- **Choice:** distinct plans within 5% of the best, where each plan takes at least two notables the others do not.
+- **Choice:** distinct plans within 5% of the best, where each takes at least three notables or keystones the others
+  do not (two was tried first: with about thirty notables in a 120-point plan, swapping two is nearly free, and almost
+  every build counted three or more).
 - **Tax:** the share of points spent on nodes worth nothing to the build (mostly attribute roads).
 - **Main stats, one at a time:** for each main stat family, the share of what lies within reach that the plan takes,
   plus the amount in the stat's own terms (spell damage 126%, energy shield 157% and +15).
@@ -78,37 +82,38 @@ Across all 22 archetypes:
 
 | archetype     | start    | reach 60 / 120 | choice 60 / 120 | tax 60 / 120 | main stats: share of what lies within reach, 60 / 120                                     |
 | ------------- | -------- | -------------- | --------------- | ------------ | ----------------------------------------------------------------------------------------- |
-| caster-es     | Mystic   | 38 / 68%       | 5 / 7           | 35 / 38%     | spell damage 65 / 100%; cold damage 67 / 67%; energy shield 46 / 85%; cast speed 26 / 83% |
-| sword-str     | Reaver   | 42 / 72%       | 3 / 3           | 27 / 32%     | life 46 / 80%; armour 85 / 97%; sword damage 48 / 89%; attack speed 18 / 68%              |
-| mace-slam     | Vanguard | 40 / 66%       | 3 / 3           | 30 / 32%     | life 45 / 72%; armour 57 / 85%; two-handed mace damage 81 / 96%                           |
-| mace-shield   | Vanguard | 36 / 62%       | 3 / 6           | 27 / 29%     | life 37 / 59%; armour 53 / 69%; block 62 / 90%; mace damage 20 / 94%                      |
-| warcry-totem  | Vanguard | 39 / 66%       | 3 / 3           | 30 / 38%     | life 36 / 72%; totem damage 0 / 75%; warcries 0 / 0%                                      |
-| bow-crit      | Strider  | 38 / 64%       | 7 / 4           | 23 / 22%     | life 25 / 52%; evasion 39 / 75%; bow damage 64 / 84%; crit 21 / 55%                       |
-| bow-elemental | Strider  | 39 / 63%       | 3 / 5           | 20 / 27%     | life 21 / 56%; evasion 44 / 77%; elemental attack damage 43 / 43%; bow damage 46 / 67%    |
-| bow-poison    | Strider  | 41 / 69%       | 4 / 3           | 25 / 28%     | life 30 / 59%; poison 37 / 67%; bow damage 10 / 53%                                       |
-| caster-life   | Mystic   | 34 / 65%       | 4 / 7           | 42 / 37%     | spell damage 94 / 94%; elemental damage 42 / 71%; life 16 / 68%; spell crit 100 / 100%    |
-| summoner      | Mystic   | 44 / 63%       | 3 / 5           | 38 / 39%     | minions 91 / 100%; energy shield 63 / 93%; life 16 / 37%                                  |
-| wand-attack   | Mystic   | 44 / 66%       | 2 / 5           | 38 / 32%     | wand damage 100 / 100%; energy shield 76 / 76%; attack speed 37 / 78%                     |
-| axe-bleed     | Reaver   | 36 / 62%       | 3 / 8           | 32 / 34%     | life 45 / 66%; bleed 43 / 83%; axe damage 61 / 61%                                        |
-| dual-wield    | Reaver   | 42 / 68%       | 2 / 4           | 22 / 28%     | life 42 / 56%; dual wield 75 / 100%; evasion 49 / 91%                                     |
-| fire-burn     | Zealot   | 34 / 64%       | 5 / 8           | 37 / 39%     | fire damage 39 / 44%; spell damage 54 / 100%; life 27 / 59%                               |
-| staff-block   | Zealot   | 41 / 68%       | 3 / 11          | 33 / 41%     | spell damage 28 / 87%; block 43 / 100%; life 43 / 57%                                     |
-| aura-brand    | Zealot   | 33 / 64%       | 2 / 6           | 30 / 36%     | auras 24 / 90%; brand damage 25 / 41%; life 27 / 60%                                      |
-| dagger-crit   | Shade    | 43 / 63%       | 2 / 2           | 18 / 27%     | life 29 / 46%; crit 43 / 73%; dagger damage 49 / 80%; evasion 61 / 84%                    |
-| claw-poison   | Shade    | 47 / 69%       | 1 / 4           | 30 / 29%     | life 35 / 62%; poison 81 / 81%; claw damage 100 / 100%                                    |
-| trap-mine     | Shade    | 40 / 66%       | 3 / 3           | 37 / 38%     | trap and mine damage 73 / 100%; energy shield 24 / 81%; evasion 75 / 75%                  |
-| dagger-caster | Shade    | 47 / 68%       | 2 / 5           | 45 / 45%     | spell damage 76 / 100%; spell crit 28 / 100%; energy shield 77 / 88%                      |
-| two-hand-fire | Vanguard | 37 / 69%       | 3 / 2           | 28 / 29%     | life 36 / 73%; armour 73 / 85%; fire attack damage 19 / 65%; two-handed damage 100 / 100% |
-| block-caster  | Zealot   | 43 / 55%       | 2 / 3           | 32 / 40%     | block 26 / 47%; spell block 83 / 100%; spell damage 48 / 86%; energy shield 65 / 58%      |
+| caster-es     | Mystic   | 38 / 68%       | 3 / 3           | 35 / 38%     | spell damage 65 / 100%; cold damage 67 / 67%; energy shield 46 / 85%; cast speed 26 / 83% |
+| sword-str     | Reaver   | 42 / 72%       | 2 / 2           | 27 / 32%     | life 46 / 80%; armour 85 / 97%; sword damage 48 / 89%; attack speed 18 / 68%              |
+| mace-slam     | Vanguard | 40 / 66%       | 2 / 2           | 30 / 32%     | life 45 / 72%; armour 57 / 85%; two-handed mace damage 81 / 96%                           |
+| mace-shield   | Vanguard | 36 / 62%       | 2 / 3           | 27 / 29%     | life 37 / 59%; armour 53 / 69%; block 62 / 90%; mace damage 20 / 94%                      |
+| warcry-totem  | Vanguard | 39 / 66%       | 1 / 3           | 30 / 38%     | life 36 / 72%; totem damage 0 / 75%; warcries 0 / 0%                                      |
+| bow-crit      | Strider  | 38 / 64%       | 3 / 1           | 23 / 22%     | life 25 / 52%; evasion 39 / 75%; bow damage 64 / 84%; crit 21 / 55%                       |
+| bow-elemental | Strider  | 39 / 63%       | 2 / 1           | 20 / 27%     | life 21 / 56%; evasion 44 / 77%; elemental attack damage 43 / 43%; bow damage 46 / 67%    |
+| bow-poison    | Strider  | 41 / 69%       | 1 / 1           | 25 / 28%     | life 30 / 59%; poison 37 / 67%; bow damage 10 / 53%                                       |
+| caster-life   | Mystic   | 34 / 65%       | 4 / 3           | 42 / 37%     | spell damage 94 / 94%; elemental damage 42 / 71%; life 16 / 68%; spell crit 100 / 100%    |
+| summoner      | Mystic   | 44 / 63%       | 1 / 3           | 38 / 39%     | minions 91 / 100%; energy shield 63 / 93%; life 16 / 37%                                  |
+| wand-attack   | Mystic   | 44 / 66%       | 1 / 2           | 38 / 32%     | wand damage 100 / 100%; energy shield 76 / 76%; attack speed 37 / 78%                     |
+| axe-bleed     | Reaver   | 36 / 62%       | 3 / 5           | 32 / 34%     | life 45 / 66%; bleed 43 / 83%; axe damage 61 / 61%                                        |
+| dual-wield    | Reaver   | 42 / 68%       | 1 / 2           | 22 / 28%     | life 42 / 56%; dual wield 75 / 100%; evasion 49 / 91%                                     |
+| fire-burn     | Zealot   | 34 / 64%       | 4 / 6           | 37 / 39%     | fire damage 39 / 44%; spell damage 54 / 100%; life 27 / 59%                               |
+| staff-block   | Zealot   | 41 / 68%       | 2 / 6           | 33 / 41%     | spell damage 28 / 87%; block 43 / 100%; life 43 / 57%                                     |
+| aura-brand    | Zealot   | 33 / 64%       | 2 / 4           | 30 / 36%     | auras 24 / 90%; brand damage 25 / 41%; life 27 / 60%                                      |
+| dagger-crit   | Shade    | 43 / 63%       | 1 / 2           | 18 / 27%     | life 29 / 46%; crit 43 / 73%; dagger damage 49 / 80%; evasion 61 / 84%                    |
+| claw-poison   | Shade    | 47 / 69%       | 1 / 1           | 30 / 29%     | life 35 / 62%; poison 81 / 81%; claw damage 100 / 100%                                    |
+| trap-mine     | Shade    | 40 / 66%       | 3 / 1           | 37 / 38%     | trap and mine damage 73 / 100%; energy shield 24 / 81%; evasion 75 / 75%                  |
+| dagger-caster | Shade    | 47 / 68%       | 2 / 3           | 45 / 45%     | spell damage 76 / 100%; spell crit 28 / 100%; energy shield 77 / 88%                      |
+| two-hand-fire | Vanguard | 37 / 69%       | 1 / 2           | 28 / 29%     | life 36 / 73%; armour 73 / 85%; fire attack damage 19 / 65%; two-handed damage 100 / 100% |
+| block-caster  | Zealot   | 43 / 55%       | 1 / 2           | 32 / 40%     | block 26 / 47%; spell block 83 / 100%; spell damage 48 / 86%; energy shield 65 / 58%      |
 
 How to read a row: the strength sword build at 120 points takes 97% of all the armour that lies within 18 steps of
 the Reaver's start.
 
 ## One stat at a time, across the builds that share it (120 points)
 
-- **Life.** Strength builds take about 200 to 240%: mace slam 238%, two-handed fire 231%, warcry-totem 229%, sword
-  214%, mace and shield 199%, axe bleed 188%. Dexterity and intelligence builds take about 140 to 190%, counting +20
-  flat as part of the total. The summoner, which only half wants life, takes 97% and +20.
+- **Life.** Strength builds take about 190 to 240%: mace slam 238%, two-handed fire 231%, warcry-totem 229%, sword
+  214%, mace and shield 199%, axe bleed 188%. The others take about 120 to 170%, most with +20 flat besides (dagger
+  crit 119%, bow crit 141%, aura and brand 145%, bow poison and dual wield 161%, staff block 162%, fire burn 167%,
+  caster on life 172%). The summoner, which only half wants life, takes 97% and +20.
 - **Energy shield.** Five builds take 128 to 189% (summoner 189%, dagger caster 160%, classic caster 157%, wand 130%,
   traps 128%). The block caster takes only 77%, since block pulls it elsewhere.
 - **Spell damage.** Every caster that puts it first lands on 108 to 134% (the aura and brand build, which puts it
@@ -193,9 +198,12 @@ Whether the map grows is G1's question, not this one's.
 2. **Targets, all measured at the end of G4 against this baseline:**
    - **Main stats at 120 points.** For most archetypes, no main stat above about two thirds of what lies within reach,
      and never both stats of the pair above two thirds. Today most are at 80 to 100%.
-   - **Main stats at 60 points.** No main stat above about half (today 20 to 100%).
+   - **Main stats at 60 points.** No main stat above about half (today 20 to 100%). The radius is the same 18 steps,
+     so part of what a 60-point build leaves is simply too far for 60 points; this number matters less than the one
+     at 120.
    - **Weighted reach at 120:** under about 55% for most (today 55 to 72%).
-   - **Choice:** at least 3 at 120 points for most and at least 2 at 60 for all (today 2 to 11, and 1 to 7).
+   - **Choice:** at least 3 at 120 points for most and at least 2 at 60 for most. Today it is 1 to 6 at 120 (ten
+     archetypes at 3 or more) and 1 to 4 at 60 (thirteen at 2 or more, nine at 1).
    - **Tax:** at or under about a third at 120 for most (today 22 to 45%), so the new tension comes from wanted nodes,
      not from distance.
    - **One stat at a time:** shown before and after, with no target, since the absolute numbers are balance (the user,
