@@ -28,6 +28,14 @@ const PHONE = { w: 390, h: 844, phone: true };
 const PHONE_UI = `.biome-banner { display: none !important; }`;
 /** The camp and title screens: 1280×720 drawn at 1.5× (the text reads at trailer size). */
 const UI = { w: 854, h: 480, scale: 1.5 };
+/** The Shade that falls at level 72 (the fall and its end screen): two daggers and no skill, so its blows are plain stabs. */
+const FALLEN = {
+  classId: 'shade',
+  level: 72,
+  weapon: 'dagger_l70',
+  offHand: 'dagger_l70',
+  seed: 9,
+};
 
 type Where = { theme: string; biome: string; density?: string };
 
@@ -451,17 +459,16 @@ export const CLIPS: Clip[] = [
   ),
   /* 7. The fall, level 72: the Shade fights the Tollkeeper, and his whole toll runs: the bell hoisted over his head through the
         tell, brought down, and the rings of lightning going out from it, the first of which kills. The body is held. The shot
-        opens on blows a moment before the tell; the frames the tell starts on and the ring lands on are printed, for the cut. */
+        is kept plain so the bell is what is seen: the Shade only stabs with its daggers (no skill and its effects), and no
+        damage numbers are drawn. It opens on blows a moment before the tell; the frames the tell starts on and the ring lands
+        on are printed, for the cut. */
   {
     name: 'fall',
     zoom: 3.2,
     css: BARE,
     async film(t) {
-      await t.stage((S, c, game) => {
-        const run = S.stagedRun(
-          { classId: 'shade', level: 72, body: ['orbitingBlades'], seed: 9 },
-          63,
-        );
+      await t.stage((S, c, game, fallen) => {
+        const run = S.stagedRun(fallen, 63);
         S.pastMaps(run);
         S.bossFight(c, run, 'tollkeeper', { biome: 'warren', dist: 5 });
         S.holdEnd(c);
@@ -474,9 +481,10 @@ export const CLIPS: Clip[] = [
           1200,
         );
         S.settle(game, c);
-        // The blades hit him many times a second: his flash is kept to a flicker, so the bell can be seen rising.
+        // Hit after hit, he would flash white end to end: his flash is kept to a flicker, so the bell can be seen rising.
         S.calmFlash(game, S.boss(c.world).m.id);
-      });
+        S.quietNumbers(game);
+      }, FALLEN);
       await t.rec(150, {
         each: (S, c, i) => {
           const w = c.world;
@@ -504,18 +512,15 @@ export const CLIPS: Clip[] = [
     viewport: { w: 854, h: 480, scale: 3 },
     css: `.duel-cta.trailer-press { filter: brightness(1.5); transform: scale(0.97); }`,
     async film(t) {
-      await t.stage((S, c) => {
-        const run = S.stagedRun(
-          { classId: 'shade', level: 72, body: ['orbitingBlades'], seed: 9 },
-          63,
-        );
+      await t.stage((S, c, _game, fallen) => {
+        const run = S.stagedRun(fallen, 63);
         S.pastMaps(run);
         S.bossFight(c, run, 'tollkeeper', { biome: 'warren', dist: 5 });
         if (S.warmUntil(c, (w: any) => S.blastDue(w, 'Toll'), 3000) < 0)
           throw new Error('no toll caught the Shade');
         S.mortal(c.world);
         for (let i = 0; i < 300 && c.screen === 'map'; i++) c.bus.emit('frame', { dtMs: 33 });
-      });
+      }, FALLEN);
       await t.page.waitForTimeout(400);
       for (let i = 0; i < 36; i++) {
         if (i === 12)

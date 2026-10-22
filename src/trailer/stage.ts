@@ -428,6 +428,21 @@ export function calmFlash(
   });
 }
 
+/**
+ * Draw no damage numbers, misses or blocks from now on (the boss's own call-outs still show), for a shot about one move of
+ * the boss's.
+ */
+export function quietNumbers(game: { scene: { getScene(key: string): unknown } }): void {
+  type Floater = (x: number, y: number, text: string, color: number, big: boolean) => void;
+  const style = (game.scene.getScene('map') as { style: { floater: Floater } | null }).style;
+  if (!style) throw new Error('no map style');
+  const draw = style.floater.bind(style);
+  style.floater = (x, y, text, color, big) => {
+    if (/^\d+$/.test(text) || ['miss', 'blocked', 'Immune'].includes(text)) return;
+    draw(x, y, text, color, big);
+  };
+}
+
 /** Whether a blast labelled `label` (a toll's ring) lands on the character within two frames: the moment to let it die. */
 export function blastDue(w: World, label: string): boolean {
   const p = w.sides[0].player;
