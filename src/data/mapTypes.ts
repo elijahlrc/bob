@@ -18,6 +18,8 @@ export type MapTypeDef = {
   loot?: string;
   /** How much harder the map is in ways the monsters' mods do not show (the threat model's multiplier). */
   pressure: number;
+  /** Built but not offered for now. */
+  withheld?: boolean;
 };
 
 export const MAP_TYPES: MapTypeDef[] = [
@@ -73,6 +75,8 @@ export const MAP_TYPES: MapTypeDef[] = [
     from: 30,
     reward: { quantity: 0.3, experience: 0.1 },
     pressure: 1.35,
+    // Out of the offers while it is so much deadlier than the other types (the owner, 2026-10-22).
+    withheld: true,
   },
   {
     id: 'crawl',
@@ -94,7 +98,7 @@ export function mapTypeDef(id: MapTypeId): MapTypeDef {
 /** The types that can be offered on a map (not on a mini-boss or boss map). */
 export function typesFor(map: number): MapTypeDef[] {
   if (map % 10 === 0) return [];
-  return MAP_TYPES.filter((t) => t.id !== 'plain' && t.from <= map);
+  return MAP_TYPES.filter((t) => t.id !== 'plain' && !t.withheld && t.from <= map);
 }
 
 /** Crescendo (docs/MAPS.md 9.1). */
