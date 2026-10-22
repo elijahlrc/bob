@@ -141,21 +141,19 @@ export const steel: AreaSpec = {
     {
       id: 'toBlood',
       name: "To the Yard's blood",
-      why: "The dear crossing to the Yard's bleed and leech (brief §4): five attribute nodes from the physical corner down the Reaver border to the Yard's east rim junction, beside Crimson Pact. Dexterity first, then strength and dexterity as the Yard nears. A bleed or leech Strider pays the road and gets the attributes the Yard's gear asks for.",
+      why: "The dear crossing to the Yard's bleed and leech (brief §4): four attribute nodes from the physical corner down the Reaver border to the last node of the Yard's east road, one step above the Pits' east rim junction. Dexterity first, then strength and dexterity as the Yard nears. A bleed or leech Strider pays the road and gets the attributes the Yard's gear asks for. G2 border pass (2026-10-22): the fifth node went and the road lands on the east road's end instead of the rim junction, which had seven links (the east road and this road both ended on it, 36° apart); the last node lies on the straight line from the third to the landing.",
       at: P(1040, 1794),
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'attribute', lines: [dex(7)], at: P(911, 1229) },
         { id: 'b', kind: 'attribute', lines: [dex(7)], at: P(1026, 1509) },
         { id: 'c', kind: 'attribute', lines: [str(6), dex(6)], at: P(1121, 1893) },
-        { id: 'd', kind: 'attribute', lines: [str(6), dex(6)], at: P(1104, 2064) },
-        { id: 'e', kind: 'attribute', lines: [str(6), dex(6)], at: P(1041, 2274) },
+        { id: 'd', kind: 'attribute', lines: [str(6), dex(6)], at: P(1007, 2046) },
       ],
       links: [
         ['a', 'b'],
         ['b', 'c'],
         ['c', 'd'],
-        ['d', 'e'],
       ],
     },
     {
@@ -351,7 +349,6 @@ export const steel: AreaSpec = {
       why: "The leech pocket lands on the bleed wheel's damage side: the physical row reaches the bleed without the hub, and Deep Cuts has a second way in.",
     },
     { from: 'hub.t', to: 'toBlood.a', why: 'The dear road starts at the corner.' },
-    { from: 'hub.t', to: 'yard.dual.j2.a', why: 'Added in the editor (2026-10-19).' },
     { from: 'hub.t', to: 'added.n442', why: 'Added in the editor (2026-10-19).' },
     { from: 'wayfarer.n', to: 'added.n408', why: 'Added in the editor (2026-10-19).' },
     {
@@ -360,9 +357,9 @@ export const steel: AreaSpec = {
       why: "The keystone, one node off the dear road: the corridor's one choice point.",
     },
     {
-      from: 'toBlood.e',
-      to: 'yard.blood.j2.a',
-      why: "It lands on the Yard's east rim junction, beside Crimson Pact.",
+      from: 'toBlood.d',
+      to: 'yard.dual.east.e3',
+      why: "The Pits' east crossing (a near crossing, kept from before; re-aimed in the G2 border pass, 2026-10-22): it lands on the last node of the Yard's east road, one step from the Pits' east rim junction, Crimson Pact, Festering and Red Harvest, and one from Crossed Blades. It used to land on the rim junction itself, the seventh link there.",
     },
     { from: 'added.n409', to: 'yard.dual.j2.a', why: 'Added in the editor (2026-10-19).' },
     { from: 'added.n416', to: 'bow.string.added.n417', why: 'Added in the editor (2026-10-19).' },

@@ -56,8 +56,8 @@ export const parapet: AreaSpec = {
           id: 'r5',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          at: [1950, -3900],
-          why: "The last node before the Shade, so half dexterity. The border pass links it to the Rooftops' ridge road beside Black Powder.",
+          at: [2080, -3900],
+          why: "The last node before the Shade, so half dexterity, and the corner where the eaves road drops onto the Rooftops' ridge road beside Black Powder. Nudged east in the border pass (G2, 2026-10-22) so the run from r4 stays straight (8°) and the ridge node takes it as a clean T (75° and 120° from its two road links); on the straight line from r4 it would have met the ridge 31° from Black Powder's link. The turn is here, at the corner between two roads.",
         },
       ],
       links: [
@@ -78,6 +78,11 @@ export const parapet: AreaSpec = {
       from: 'spire.frost.snare.n',
       to: 'road.r3',
       why: "Snare Line onto the eaves road: a dead-end pocket until G2, now a bridge from Harsh Weather's climb to the rim (G1/mystic.md §4).",
+    },
+    {
+      from: 'road.r5',
+      to: 'knife.roofs.ridge.y1',
+      why: "The Rooftops road (a dear crossing; G1-brief.md §2.1, laid in the G2 border pass): the eaves road comes down onto the Shade's ridge road one step from Black Powder. Traps and mines (Snare Line, Black Powder), cold (Shatter, Sleet) and the crit wand for an intelligence-and-dexterity Shade; the Mystic's trapper and the far casters reach the Rooftops. Far from both starts (about 20 to 25 steps), so it is a late build's road, not a shortcut.",
     },
   ],
 };

@@ -326,7 +326,7 @@ export const dual: AreaSpec = {
     {
       from: 'east.e3',
       to: 'yard.blood.j2.a',
-      why: "The east road reaches the Pits' east junction, where the Strider's road and the Fosse also meet.",
+      why: "The east road reaches the Pits' east junction, where the Fosse also meets it. The Strider's road lands one node up, on the east road's last node (the G2 border pass).",
     },
     { from: 'east.e1', to: 'hotBlood.a', why: "The east road's first node onto the charges." },
     {

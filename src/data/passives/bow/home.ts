@@ -275,7 +275,6 @@ export const home: AreaSpec = {
     { from: 'life.a', to: 'added.n435', why: 'Added in the editor (2026-10-19).' },
     { from: 'life.a', to: 'added.n437', why: 'Added in the editor (2026-10-19).' },
     { from: 'life.n', to: 'bow.bows.elements.a', why: 'Added in the editor (2026-10-19).' },
-    { from: 'added.n414', to: 'yard.dual.j2.a', why: 'Added in the editor (2026-10-19).' },
     { from: 'added.n400', to: 'bow.string.added.n402', why: 'Added in the editor (2026-10-19).' },
   ],
 };

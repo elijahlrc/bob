@@ -379,6 +379,11 @@ export const slams: AreaSpec = {
       why: "The full-life diamond's tip onto Second Wind: a third way into Unbloodied.",
     },
     { from: 'secondWind.n', to: 'toThirst.a', why: "Second Wind east, toward the Yard's leech." },
+    {
+      from: 'toThirst.a',
+      to: 'yard.blades.thirst.n',
+      why: 'Regeneration or leech (a near crossing; G1-brief.md §2.4, laid in the G2 border pass): Second Wind through one node onto Thirsting Blade, in one straight line. One of the two is enough for most builds, so they sit a fork apart, and the route from the Quarry to the Pits passes through one or the other, not both. Thirsting Blade stops being a dead end, and the leech is 15 steps from the Vanguard start by this road (it was 19).',
+    },
     { from: 'j1.a', to: 'floor.a', why: 'The slam junction onto the Quarry floor, west.' },
     { from: 'groundShaker.b', to: 'floor.b', why: 'Ground Shaker onto the Quarry floor, east.' },
     {

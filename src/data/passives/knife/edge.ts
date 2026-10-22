@@ -228,6 +228,11 @@ export const edge: AreaSpec = {
       to: 'rung.a',
       why: 'The dodge junction onto the claw rung, toward the Strider border.',
     },
+    {
+      from: 'rung.a',
+      to: 'bow.bows.toKnife.a',
+      why: "Fast claws (a near crossing; G1-brief.md §2.6, laid in the G2 border pass): the claw rung onto the Strider's near Knife node, so claws sit where the Strider's dexterity meets the Shade's intelligence (CONSTRAINTS §5.4) and a Strider who picks up a claw finds the Shade's claw cluster (G3) a few steps in. The rung turns here toward the Strider; it becomes a junction when the claw cluster lands on it.",
+    },
     { from: 'star.f', to: 'wheel.w5', why: 'The fire spoke lands on Fine Point.' },
     {
       from: 'star.e',

@@ -244,6 +244,11 @@ export const snares: AreaSpec = {
   ],
   links: [
     { from: 'toBow.b', to: 'mercy.a', why: 'The road onto Mercy Stroke.' },
+    {
+      from: 'mercy.n',
+      to: 'bow.flight.venom.a',
+      why: "Crit poison (a near crossing; G1-brief.md §2.6, laid in the G2 border pass): Mercy Stroke onto Venom Fletching's first small, so Mercy Stroke stops being a dead end. The crit poison bow takes Mercy Stroke's crit multiplier beside Venom Fletching, and a Shade with a bow finds the poison arrows; it costs the Strider the pocket's small to pass, and the two notables stay three steps apart, a pairing rather than one cluster.",
+    },
     { from: 'toRicochet.r1', to: 'tumble.a', why: 'The road onto Tumble.' },
     {
       from: 'knife.snares.wheel.t6',

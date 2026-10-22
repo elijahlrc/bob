@@ -191,5 +191,10 @@ export const resists: AreaSpec = {
       to: 'scarTissue.a',
       why: 'Junction to the maximum-resistance room: its second door.',
     },
+    {
+      from: 'hammer.c',
+      to: 'cathedral.rods.toWall.a',
+      why: "Maces and sceptres (a near crossing; G1-brief.md §2.3, laid in the G2 border pass): Hallowed Hammer's far small onto the Cathedral's Vestry road, in the chain's own line. The sceptre fighter reaches Hallowed Hammer's elemental attacks; the mace player reaches the Vestry road and Gilded Rod. Hallowed Hammer stops being a dead-end pocket. It is 6 steps from the Zealot's armoured sceptre cluster (G3), which lands on the Battlements junction instead.",
+    },
   ],
 };

@@ -331,7 +331,7 @@ export const craft: AreaSpec = {
     {
       id: 'toStair',
       name: 'The curse crossing',
-      why: "One attribute node from Hexwright's notable toward the Shade's Stair junction (G2, 2026-10-22; G1/mystic.md §3, kept in the join, G1-brief.md §2.1): the curser from either start reaches Hexwright and the Shade's curse home. On the straight line between the two; the last node before the Shade, so half dexterity. The link onward to the Stair is the border pass's.",
+      why: "One attribute node from Hexwright's notable toward the Shade's Stair junction (G2, 2026-10-22; G1/mystic.md §3, kept in the join, G1-brief.md §2.1): the curser from either start reaches Hexwright and the Shade's curse home. On the straight line between the two; the last node before the Shade, so half dexterity. Its link onward to the Stair's junction was laid by the border pass.",
       at: [1465, -2755],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: [1465, -2755] }],
@@ -444,6 +444,11 @@ export const craft: AreaSpec = {
       from: 'hexwright.n',
       to: 'toStair.a',
       why: 'Hexwright onto the curse crossing: the curse notable is on the way to the Stair, so a curser coming from the Shade pays for it and one from the Mystic walks on to the Shade curses.',
+    },
+    {
+      from: 'toStair.a',
+      to: 'knife.hex.j4.a',
+      why: "The curse crossing (a near crossing; G1-brief.md §2.1, laid in the G2 border pass): Hexwright through one node to the Stair's junction, so the curser from either start has the other's curses (Hexwright with Second Curse and the Shade's curse cluster). The Stair's west becomes a loop: the junction, Hexwright, Devotion, the hex wheel, the climb.",
     },
     {
       from: 'spire.storm.jArm.a',

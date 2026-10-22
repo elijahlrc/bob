@@ -149,6 +149,11 @@ export const fosse: AreaSpec = {
       why: "The fosse road's west end lands on Barrow Ward, which becomes a way through rather than a leaf.",
     },
     { from: 'road.f2', to: 'storm.a', why: 'The road onto the lightning strikes.' },
+    {
+      from: 'storm.n',
+      to: 'bow.rim.road.j8',
+      why: "Lightning strikes (a dear crossing; G1-brief.md §2.5, laid in the G2 border pass): Stormstruck onto the south end of the Strider's outer road, so the east of the map's outer ring closes from the Seawall to the Fosse. The Strider's shock cluster (G3, on the outer road) and Stormstruck's attack speed are about 6 steps apart, a pairing either side can buy late; Stormstruck stops being a dead end.",
+    },
     { from: 'road.f5', to: 'marked.a', why: "The road onto the hunter's curse." },
   ],
 };

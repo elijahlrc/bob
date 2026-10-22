@@ -333,5 +333,10 @@ export const crypt: AreaSpec = {
     { from: 'shrine.e', to: 'sigilWarden.a', why: "The shrine's brand side to the keystone spur." },
     { from: 'wheel.m5', to: 'toSpire.a', why: 'Glass Wall onto the dear road.' },
     { from: 'toSpire.b', to: 'spire.fire.familiars.n', why: 'The dear road lands on Familiars.' },
+    {
+      from: 'north.n6',
+      to: 'spire.fire.rim.c',
+      why: "The far loop (a dear crossing; G1-brief.md §2.2, laid in the G2 border pass): the north walk runs on in its own line (a turn of about 10°) to the corner of the Mystic's north-west rim road, so the two rim roads read as one road over the top of the map. The casters' far loop: Tomb Dust, Shattering Rite and the Zealot's far casters (G3) with Cinder, Steady Stream and the Mystic's far shield. 19 steps from the Zealot start and 23 from the Mystic's, so it is a late build's road.",
+    },
   ],
 };

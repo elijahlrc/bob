@@ -77,5 +77,10 @@ export const seawall: AreaSpec = {
       to: 'wall.s4',
       why: 'Whetted Will becomes a bridge between the rooftop road and the seawall road (G1/shade.md §3.1).',
     },
+    {
+      from: 'wall.s6',
+      to: 'bow.rim.road.j1',
+      why: "The east rim highway (a dear crossing; G1-brief.md §2.6, laid in the G2 border pass): the seawall road runs on into the Strider's outer road, one rim road from the Rooftops to the Fosse. Bows reach Quiet Shot and the Shade's far east; the Shade reaches the Strider's outer road. Both ends turn here (27° and 40°), and both become junctions in G3, where the life-and-dodge cluster (SH-10) and the life-and-resistances cluster (ST-9) hang.",
+    },
   ],
 };
