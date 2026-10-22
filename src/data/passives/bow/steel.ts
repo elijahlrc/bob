@@ -362,6 +362,11 @@ export const steel: AreaSpec = {
       why: "The Pits' east crossing (a near crossing, kept from before; re-aimed in the G2 border pass, 2026-10-22): it lands on the last node of the Yard's east road, one step from the Pits' east rim junction, Crimson Pact, Festering and Red Harvest, and one from Crossed Blades. It used to land on the rim junction itself, the seventh link there.",
     },
     { from: 'added.n409', to: 'yard.dual.j2.a', why: 'Added in the editor (2026-10-19).' },
+    {
+      from: 'added.n409',
+      to: 'hub.t',
+      why: "The Strider's own way to its Ford hub (the user, stop 3, 2026-10-22): the G2 border pass cut the hub's link through the Reaver's east gate, which had put the Ford four steps farther out; this keeps the cut and brings the Ford back to one step farther than before.",
+    },
     { from: 'added.n416', to: 'bow.string.added.n417', why: 'Added in the editor (2026-10-19).' },
     { from: 'added.n416', to: 'bow.string.added.n419', why: 'Added in the editor (2026-10-19).' },
   ],

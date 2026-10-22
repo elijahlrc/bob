@@ -34,15 +34,7 @@ single-stat power added. **G0 is done and stop 1 passed (2026-10-22):** the user
 more points would still buy; the first version's step-count radius was rejected, see §1 and CONSTRAINTS §14) and the
 five targets in [G0-baseline.md](G0-baseline.md) ("Stop 1"). **G1a, the specialization ledger, is written**
 ([G1-ledger.md](G1-ledger.md): 66 new clusters, 30 small sections, 13 changes to existing clusters, about 27 crossings,
-about 1,480 nodes); G1b is written too: six region briefs in `G1/` and the joined brief [G1-brief.md](G1-brief.md) (about 1,373 nodes, borders 6 to 9 links). **Stop 2 passed (2026-10-22):** the user accepted the brief as it stands, the size (add from the named reserves later, where the measures show a build still takes everything) and asked for 1 to 2 more crossings per border in G2's border pass. **G2, the skeleton, is laid (2026-10-22) and waits at user stop 3:** the six region reports and the border pass are in `G2/` (`G2/borders.md` lists the links G3 must lay onto new clusters); 1,082 live nodes, 37 border links (45 once G3 lays its deferred links), 0 crossings, baked. Open for the user: the Ford's distance after the east-gate cut (`G2/borders.md` §0), Elemental Ward at 7 steps before it gains armour (`G2/vanguard.md`), and the extra crossings per border the pass did not find worth laying (`G2/borders.md` §3). The tools are
-`scripts/passives/archetypes.ts` (27 archetypes), `scripts/passives/builds.ts` (`npm run passives:builds`: the
-allocator and report; `--pics`, `--json`) and `scripts/passives/supply.ts` (`npm run passives:supply`: supply map and
-empty space); their output is in `G0/`. `builds.ts` ends with a summary against the targets. Tools already
-in the repo: `passives:pic` (`--region`, `--box`, `--text`, `--ids`), `passives:list`, `passives:audit`,
-`scripts/passives/geometry.ts` (crossings, overlaps, bends), `tighten.ts` (layout first pass), `fold.ts` (editor
-patches), `passives:register`, `passives:bake`. Node units come from `lines.ts` (`Line.units`); the built network from
-`buildAll({ allowNew: true })` in `src/data/passives`. Layout rules for new nodes: CONSTRAINTS §11 item 5; the layout
-process: §15 item 10.
+about 1,480 nodes); G1b is written too: six region briefs in `G1/` and the joined brief [G1-brief.md](G1-brief.md) (about 1,373 nodes, borders 6 to 9 links). **Stop 2 passed (2026-10-22):** the user accepted the brief as it stands, the size (add from the named reserves later, where the measures show a build still takes everything) and asked for 1 to 2 more crossings per border in G2's border pass. **G2, the skeleton, is laid (2026-10-22) and stop 3 passed:** the six region reports and the border pass are in `G2/` (`G2/borders.md` lists the links G3 must lay onto new clusters); 1,082 live nodes, 37 border links (45 once G3 lays its deferred links), 0 crossings, baked. The user's answers at stop 3: the Ford gets an inner Strider link (`bow.steel.added.n409`–`hub.t`), keeping the east-gate cut, so it is one step farther than before; **Elemental Ward keeps its resistances and life** (no armour line in G3; the armour it was to carry goes to a farther cluster); **extra crossings per border are revisited after G3**, Reaver–Strider first (`G2/borders.md` §3). **G3 is next:** clusters in three rounds.
 
 ## 1. What "tension" means, so it can be measured
 

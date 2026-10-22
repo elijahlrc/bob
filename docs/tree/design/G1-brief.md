@@ -1,5 +1,7 @@
 # G1b joined: the whole-map growth brief
 
+**Stop 3 (the user, 2026-10-22), overriding this brief:** Elemental Ward keeps its resistances and life and gets no armour line (G2 left it 7 steps from the Vanguard start); its armour goes to a farther cluster. The Ford keeps an inner Strider link. Extra crossings per border are revisited after G3.
+
 **Stop 2 (the user, 2026-10-22):** accepted as it stands. Size: accept about 1,373 and add from the reserves later where the measures call for it. Borders: add 1 to 2 crossings per border in G2's border pass, each for a named combination.
 
 Written 2026-10-22 for phase G1b of [G-growth.md](G-growth.md): the six region briefs ([G1/mystic.md](G1/mystic.md),
