@@ -20,10 +20,24 @@ Answered before writing (2026-10-22):
 - **Power is not a target or a measure** (the user, 2026-10-22). A build's strength has too many moving parts to judge
   from a few stats, and today's power levels are not balanced anyway. The aspiration is that growth adds choice rather
   than strength: new nodes are priced like the old ones (a small is one unit, a notable 3 to 5; CONSTRAINTS §8.1, §8.6),
-  and more desirable nodes compete for the same points. Balance is a separate job, not this plan's.
+  and more desirable nodes compete for the same points. Balance is a separate job, not this plan's. What is meaningful
+  is power in **one stat at a time, or a pair** (the user, 2026-10-22): how much spell damage, or life and armour
+  together, a build's best plan collects. That is reported (below), never totalled into one number for a build.
 - **Saves:** the expansion ships with one refund of everyone's passives (a save version bump), so the plan may rewire
   anything.
 - **The Strider** is grown and rewired like every other region, with no special deference to the user's hand edit of it.
+
+## Start here (state on 2026-10-22)
+
+Plan approved by the user on 2026-10-22, with the two edits above (no power target; no deference to the Strider) and
+single-stat power added. Nothing of G0 is built yet. The next step is G0: write `scripts/passives/builds.ts` (the
+allocator, a prize-collecting connected-subgraph search from a start: greedy by value per point with path costs, then
+local swaps, and a search for distinct near-best plans), the archetype file, the supply map and `G0-baseline.md`, then
+stop for the user (stop 1). Tools already in the repo: `passives:pic` (`--region`, `--box`, `--text`, `--ids`),
+`passives:list`, `passives:audit`, `scripts/passives/geometry.ts` (crossings, overlaps, bends), `tighten.ts` (layout
+first pass), `fold.ts` (editor patches), `passives:register`, `passives:bake`. Node units come from `lines.ts`
+(`Line.units`); the built network from `buildAll({ allowNew: true })` in `src/data/passives`. Layout rules for new
+nodes: CONSTRAINTS §11 item 5; the layout process: §15 item 10.
 
 ## 1. What "tension" means, so it can be measured
 
@@ -47,6 +61,10 @@ A walk by eye is still the judge (CONSTRAINTS §15.2), but the walks need a comm
     the price of a choice; a lot is filler.
   - **What it gave up:** the named notables of its own kind it could not afford, at 60 and at 120. This is the list the
     user reads.
+  - **Per-stat totals:** for each of the archetype's main stats, and for its main pair (spell damage with energy shield,
+    life with armour), the total its best plan collects (in the stat's own terms: 120% spell damage, +45% armour) and
+    how much of that stat lies within its radius. Compared before and after, and between archetypes that share a stat,
+    one stat or pair at a time.
 
 Targets are set from the baseline once it is measured (G0) and agreed with the user. As a first guess: reach at 120
 points well under two thirds for every archetype, at least three near-equal plans for most, tax under about a third. The allocator is a static tool over the network and the units, not the bot simulation, so
@@ -60,7 +78,7 @@ Each phase ends with something the user can look at. Stops for the user's review
 ### G0. Baseline and tools (no change to the network)
 
 1. **The allocator** (`scripts/passives/builds.ts`): archetype definitions in one file, best plan and near-alternatives
-   at 60 and 120 points, the four numbers above, and a picture of each plan on the network (`pic.ts` with the plan
+   at 60 and 120 points, the numbers above, and a picture of each plan on the network (`pic.ts` with the plan
    highlighted).
 2. **The archetype set:** about 20, chosen to cover the axes of A1-axes.md rather than to enumerate builds. It starts
    with the user's two examples, the classic caster (spell damage and energy shield) and the strength sword build
@@ -70,7 +88,7 @@ Each phase ends with something the user can look at. Stops for the user's review
 3. **The supply map:** for each stat family, units per region and area; for each specialization, its clusters, their
    partners and the steps between twins (CONSTRAINTS §5.1–2); a density map of the empty space the network could grow
    into without moving anything.
-4. **The baseline report** (`G0-baseline.md`): every archetype's four numbers today, which ones already take nearly
+4. **The baseline report** (`G0-baseline.md`): every archetype's numbers today, which ones already take nearly
    everything they want (where tension is missing first), and where the empty space is.
 
 **User stop 1:** the baseline, the archetype set and the targets.
