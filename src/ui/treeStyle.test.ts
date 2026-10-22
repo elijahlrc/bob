@@ -8,8 +8,11 @@ import {
   LABEL_K_NOTABLE,
   MIN_SCREEN_R,
   NODE_RADIUS,
+  NODE_TEXT,
   shapeScale,
+  textZoom,
   toneOf,
+  wrapLine,
 } from './treeStyle';
 
 describe('how the passive tree is drawn', () => {
@@ -63,5 +66,22 @@ describe('how the passive tree is drawn', () => {
     expect(AREA_K_GONE).toBeLessThan(LABEL_K_NOTABLE);
     for (let k = 0.1; k < 0.4; k += 0.01)
       expect(areaLabelAlpha(k + 0.01)).toBeLessThanOrEqual(areaLabelAlpha(k));
+  });
+
+  it("wraps a node's lines at spaces and shows them once they fit beside its nearest neighbour", () => {
+    expect(wrapLine('12% increased Armour')).toEqual(['12% increased Armour']);
+    const rows = wrapLine('15% increased Critical Strike Chance with Spells');
+    expect(rows).toEqual(['15% increased Critical', 'Strike Chance with', 'Spells']);
+    expect(Math.max(...rows.map((r) => r.length))).toBeLessThanOrEqual(NODE_TEXT.wrap);
+    expect(wrapLine('Unbreakablewordthatislongerthanarow x')).toEqual([
+      'Unbreakablewordthatislongerthanarow',
+      'x',
+    ]);
+    // 120 px of text beside a neighbour 150 tree units away fits from a zoom of 0.8; a close neighbour waits longer,
+    // and the closest zoom shows every node's lines.
+    expect(textZoom(120, 150, 2)).toBeCloseTo(0.8);
+    expect(textZoom(120, 100, 2)).toBeCloseTo(1.2);
+    expect(textZoom(120, 400, 2)).toBeCloseTo(120 / NODE_TEXT.fit);
+    expect(textZoom(120, 20, 2)).toBe(2);
   });
 });
