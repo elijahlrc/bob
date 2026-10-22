@@ -185,9 +185,9 @@ export const snares: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Veiled Herald',
-          lines: [reducedReservation(5), evasion(13)],
+          lines: [reducedReservation(5), evasion(14)],
           at: [3374, -211],
-          why: '1.7 + 1.3 units.',
+          why: '1.7 + 1.4 units (G3: evasion 13 → 14, so it is not under the 3 units a notable is worth, CONSTRAINTS §8.6).',
         },
       ],
       links: [

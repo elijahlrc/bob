@@ -19,8 +19,8 @@ import {
   eleAttack,
   evasion,
   leechLife,
-  life,
   lifeOnKill,
+  lifeRegen,
   moveSpeed,
   oneHandMelee,
   str,
@@ -32,7 +32,7 @@ export const blades: AreaSpec = {
   id: 'yard.blades',
   region: 'reaver',
   name: 'The Practice Ground',
-  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Executioner chain, Killing Pace, and armour on the Wall side, hung from the west road and the crossroad (G2). The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
+  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Executioner chain, Killing Pace, armour on the Wall side (Guarded) and a second armour chain between the one-handed diamond and the elements (Mended Mail, G3), hung from the west road and the crossroad (G2). The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
   at: [-785, 1990], // Where the area's name is drawn: clear of every other area's name; nudged in G2 off Light Blades and the Wall's moved Second Wind.
   clusters: [
     {
@@ -135,28 +135,30 @@ export const blades: AreaSpec = {
     {
       id: 'guarded',
       name: 'Guarded',
-      why: "Armour twice, then the notable with armour, evasion and life: the Reaver who holds the line, a short chain north off the west road's first node, on the border with the Wall's slams. It sat in the shield area until 2026-10-20 and hung off the sword diamond until G2.",
+      why: "Armour three times, then the notable with armour and evasion: the Reaver who holds the line, a short chain north off the west road's first node, on the border with the Wall's slams. It sat in the shield area until 2026-10-20 and hung off the sword diamond until G2. Since G3 (2026-10-22) it has no life and a third armour small: life with armour 8 steps from the start handed a strength build two of its main wants at once (the ledger's convergence rule), and the Yard's other armour (Mended Mail, with regeneration) is a few steps further south.",
       at: [-765, 1530],
       shape: { kind: 'hand' },
       nodes: [
         {
-          id: 'a',
+          id: 'c',
           kind: 'small',
           lines: [armour(12)],
-          why: 'The entrance, facing the west road.',
-          at: [-761, 1586],
+          why: 'The entrance, facing the west road (G3: the third armour small).',
+          at: [-756, 1644],
         },
+        { id: 'a', kind: 'small', lines: [armour(12)], at: [-761, 1586] },
         { id: 'b', kind: 'small', lines: [armour(12)], at: [-767, 1528] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Guarded',
-          lines: [armour(16), evasion(13), life(5)],
-          why: "Both of the Reaver's defences: 1.3 + 1.3 + 1 units. The Wall's armour-and-stun is Thick Skin, off the tower road.",
+          lines: [armour(20), evasion(20)],
+          why: "Both of the Reaver's defences, the two-defence notable only a strength-dexterity region sells: 1.7 + 2 units. The Wall's armour-and-stun is Thick Skin, off the tower road.",
           at: [-775, 1458],
         },
       ],
       links: [
+        ['c', 'a'],
         ['a', 'b'],
         ['b', 'n'],
       ],
@@ -227,6 +229,43 @@ export const blades: AreaSpec = {
       ],
     },
     {
+      id: 'mail',
+      name: 'Mended Mail',
+      why: "Armour twice, then the notable with armour and life regeneration, then armour once more (RE-4, G3 2026-10-22): the Yard's second armour, a straight chain across the open cell between the one-handed diamond and the elements, so the Practice Ground holds armour in two places with two partners (evasion at Guarded, regeneration here) and a strength build takes one, the other, or walks on to the Wall's Rampart for the rest. Regeneration is recovery, not maximum life, so it is not the life-with-armour pairing the ledger keeps away from the homes. A bridge: from Light Blades' south small down to Elemental Edge, a new loop between the crossroad and the west road.",
+      at: [-589, 2430],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [armour(12)],
+          at: [-561, 2318],
+          why: 'The entrance from the one-handed diamond.',
+        },
+        { id: 'b', kind: 'small', lines: [armour(12)], at: [-575, 2374] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Mended Mail',
+          lines: [armour(24), lifeRegen(0.8)],
+          at: [-589, 2430],
+          why: 'Armour that is patched between fights: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [armour(12)],
+          at: [-603, 2486],
+          why: 'The exit, to Elemental Edge.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'lightBlades',
       name: 'Light Blades',
       why: "One-handed melee: a diamond of damage, speed and the notable, for a sword or an axe in either hand. Below the crossroad's second node, left toward the resist star.",
@@ -259,7 +298,7 @@ export const blades: AreaSpec = {
           kind: 'small',
           lines: [oneHandMelee(10)],
           at: [-527, 2185],
-          why: "The exit to the resist star's cold spoke.",
+          why: "The exits to the resist star's cold spoke and, since G3, down to Mended Mail's armour.",
         },
       ],
       links: [
@@ -395,7 +434,7 @@ export const blades: AreaSpec = {
       to: 'yard.blood.toWall.a',
       why: "The west road's last leg, to the Pits' west junction: the Fosse leg and the Pits rim road go on from there.",
     },
-    { from: 'west.w1', to: 'guarded.a', why: "The west road's first node onto the armour pocket." },
+    { from: 'west.w1', to: 'guarded.c', why: "The west road's first node onto the armour pocket." },
     { from: 'west.w2', to: 'hewing.a', why: "The west road's second node onto the axes." },
     {
       from: 'west.w4',
@@ -434,6 +473,16 @@ export const blades: AreaSpec = {
       why: "The near crossing to the Wall's stun and slams: an axe Vanguard or a two-hand Reaver walks it (C-brief §4).",
     },
     { from: 'hewing.b', to: 'elementalEdge.a', why: 'Beyond the axes, the elements.' },
+    {
+      from: 'lightBlades.c',
+      to: 'mail.a',
+      why: "The one-handed diamond's south small onto the armour chain (G3, RE-4): the crossroad reaches the Yard's second armour through a one-handed notable's nodes, a fair price for a sword-and-armour build.",
+    },
+    {
+      from: 'mail.c',
+      to: 'elementalEdge.b',
+      why: 'The armour chain lands on the elements: Mended Mail is a bridge, so the crossroad and the west road meet a second time below the axes.',
+    },
     {
       from: 'lightBlades.b',
       to: 'crossroad.c2',

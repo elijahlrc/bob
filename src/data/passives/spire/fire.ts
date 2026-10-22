@@ -17,7 +17,9 @@ import {
   minionDamage,
   minionLife,
   spellDamage,
+  eleAttack,
   str,
+  wandAttack,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -26,9 +28,9 @@ export const fire: AreaSpec = {
   region: 'mystic',
   name: 'The Lantern',
   why:
-    "The arm toward the Cathedral: a careful cold caster's shield, the Spire's minions, and the slow fire of the burn. " +
+    "The arm toward the Cathedral: a careful cold caster's shield, the elemental wand, the Spire's minions, and the slow fire of the burn. " +
     "The dear crossing from the Cathedral's crypt lands on the minion notable.",
-  at: [-950, -3630], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-950, -3530], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved 100 down in G3 round 1 off Bright Wand.
   clusters: [
     {
       id: 'hoarfrost',
@@ -142,7 +144,7 @@ export const fire: AreaSpec = {
     {
       id: 'rim',
       name: 'The north-west rim road',
-      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from where the shield and resistance cluster (G1/mystic.md MY-4) will hang beside Steady Stream, past the minion-and-curse pocket (MY-7, G3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop, written by the border pass). Cinder stops being a dead end. The north-east rim road is the Eaves (`rim.ts`); the two are joined across the top by the road through Shatter.",
+      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4) beside Steady Stream, past the minion-and-curse pocket (MY-7, G3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop, written by the border pass). Cinder stops being a dead end. The north-east rim road is the Eaves (`rim.ts`); the two are joined across the top by the road through Shatter.",
       at: [-1115, -4325],
       shape: { kind: 'hand' },
       nodes: [
@@ -150,8 +152,8 @@ export const fire: AreaSpec = {
           id: 'a',
           kind: 'attribute',
           lines: [int(7)],
-          at: [-850, -4500],
-          why: 'The head of the road, where MY-4 hangs (G3), between it and the road.',
+          at: [-932, -4446],
+          why: 'The head of the road: High Veil (G3) lands here on a small, on the straight line of the road. Moved in G3 from (-850,-4500) to the middle of the run, clear of the ring.',
         },
         {
           id: 'b',
@@ -185,8 +187,62 @@ export const fire: AreaSpec = {
       ],
       links: [['a', 'b']],
     },
+    {
+      id: 'brightWand',
+      name: 'Bright Wand',
+      why: "Wand attacks with elemental damage with attacks (G3 round 1, 2026-10-22; G1/mystic.md MY-5): the elemental wand, the third of four wand-attack clusters, each with its own partner and direction (accuracy at home, speed on the east, elements here, crit on the Eaves later). Brought into the first round because the wand attacker was flat at every point count and Wand Volley's re-line (crit to speed) took supply from it (CONSTRAINTS §5.7, §1.1). A four-node ring in the triangle between the Lantern junction, the west join and the Prismatic spur, a bridge parallel to Hoarfrost, so the Lantern and the Belfry's west join are joined twice: through the cold or through the wand. It arrives at the west join from due west, between Hoarfrost's link and the Prismatic spur. 18 steps from the Mystic start, 10 from Wand Volley.",
+      at: [-639, -3647],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [wandAttack(12)],
+          at: [-695, -3647],
+          why: "The west side, from the Lantern's junction.",
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Bright Wand',
+          lines: [wandAttack(24), eleAttack(20)],
+          at: [-639, -3703],
+          why: '2 + 2 units. The north side of the ring.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [wandAttack(12)],
+          at: [-583, -3647],
+          why: 'The east side, to the west join.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [wandAttack(12)],
+          at: [-639, -3591],
+          why: 'The south side.',
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+        ['b', 'c'],
+        ['c', 'a'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'jArm.a',
+      to: 'brightWand.a',
+      why: 'The Lantern junction onto Bright Wand (MY-5), east, into the gap between the cold cluster and the ignite room.',
+    },
+    {
+      from: 'brightWand.b',
+      to: 'spire.frost.jFire.a',
+      why: "Bright Wand onto the Belfry's west join, arriving from due west: a second link between the Lantern and the Belfry beside Hoarfrost's.",
+    },
     { from: 'hoarfrost.b', to: 'jArm.a', why: "Through the cold cluster to the arm's junction." },
     { from: 'jArm.a', to: 'cinder.a', why: 'Junction to the ignite room.' },
     {

@@ -1,10 +1,10 @@
 /**
- * The Nave (the home's continuation): the wheel where the three roads meet (block and armour on its north side, the
+ * The Nave (the home's continuation): the wheel where the three roads meet (a shield on its north side, the
  * fire spell on its south since 2026-10-20), the dear road from the Wall's resistances, Vigil (regeneration and recharge)
  * toward the choir, the nave junction, and Litany, the resist star.
  */
 import {
-  armourFlat,
+  armour,
   castSpeed,
   eleDamage,
   es,
@@ -16,7 +16,12 @@ import {
   resAll,
   resOne,
   shieldBlock,
+  shieldDef,
+  shieldStunAvoid,
+  spellDamage,
   str,
+  reducedReservation,
+  weaponDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -26,12 +31,12 @@ export const nave: AreaSpec = {
   region: 'zealot',
   name: 'The Nave',
   why: "Where the gate's roads meet: block or the fire spell on one wheel, Vigil, the resist star Litany, and the aisle out to the Ambulatory (G2).",
-  at: [-1846, -1214], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-1966, -1374], // Where the area's name is drawn: clear of every other area's name and every notable (moved in G3 round 1, 2026-10-22: it lay over Vigil and Litany).
   clusters: [
     {
       id: 'wheel',
       name: 'Iron Faith',
-      why: "The wheel of eight where the gate's roads meet: block and armour on the north side (Iron Faith), the fire spell on the south (Hearthfire), life at the ends. The fire caster and the shield Zealot pass the same wheel and pick a side; the other fire cluster (Kindled Steel, on the Ambulatory) is for attacks.",
+      why: "The wheel of eight where the gate's roads meet: block with a shield on the north side (Iron Faith), the fire spell on the south (Hearthfire), life at the ends. The fire caster and the shield Zealot pass the same wheel and pick a side; the other fire cluster (Kindled Steel, on the Ambulatory) is for attacks.",
       at: P(1000, -150),
       shape: { kind: 'hand' },
       nodes: [
@@ -53,9 +58,9 @@ export const nave: AreaSpec = {
           id: 'n3',
           kind: 'notable',
           name: 'Iron Faith',
-          lines: [shieldBlock(4), es(8), armourFlat(40)],
+          lines: [shieldBlock(4), shieldDef(15), shieldStunAvoid(20)],
           at: P(1000, -250),
-          why: "Block with both of the Zealot's pools behind it: 2 + 1.6 + 0.7 units. Bracing, in the Wall, is block with recovery and footing.",
+          why: "A shield notable and nothing else: block, the shield's own defences, and the footing it gives: 2 + 1 + 1 units. G3 (2026-10-22, G1/zealot.md §4): it lost its energy shield and armour, which made every Zealot take it whatever it held, so the wheel's two sides are a real choice now (a shield or the fire spell). Bracing, in the Wall, is block with recovery and stun threshold.",
         },
         {
           id: 'n4',
@@ -101,6 +106,43 @@ export const nave: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(913, -468) }],
       links: [],
+    },
+    {
+      id: 'verger',
+      name: 'Verger',
+      why: "G3 round 1 (2026-10-22; ledger ZE-5, G1/zealot.md §2, G1-brief.md §2.3): armour twice off the Nave's crossing node, then the notable with armour and sceptre damage, then a third armour node onto the Wall's Battlements junction. The armoured sceptre fighter's armour at home (the Zealot sold 6.7 units of armour, so the sceptre build got all of it from the Vanguard), and a crossing of its own: the mace player walks past it too. It carries no life (the convergence rule). Sceptre twins: Hallowed Hammer (elemental attacks) and Gilded Rod (crit), each a different partner.",
+      at: P(1203, -544),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [armour(12)],
+          at: P(1083, -513),
+          why: 'The entrance from the crossing node, which it leaves at about a right angle to the road.',
+        },
+        { id: 'b', kind: 'small', lines: [armour(12)], at: P(1136, -527) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Verger',
+          lines: [armour(24), weaponDamage('sceptre', 20)],
+          at: P(1203, -544),
+          why: 'Armour and sceptre damage: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [armour(12)],
+          at: P(1142, -578),
+          why: "The far node, onto the Wall's Battlements junction.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
     },
     {
       id: 'vigil',
@@ -208,7 +250,7 @@ export const nave: AreaSpec = {
     {
       id: 'aisle',
       name: 'The aisle',
-      why: "G2 (2026-10-22, G1/zealot.md §3): three attribute nodes in a straight line from the road node under Choirmaster through the empty inside to Consecrated Plate, and on through it to the Ambulatory's walk: the Nave joined to the Ambulatory's middle, where before the only ways out were the two ends of the walk. Lone Vow's spur leaves its middle node northward; G3 hangs a minion cluster south of the middle node and a spell cluster north of the last.",
+      why: "G2 (2026-10-22, G1/zealot.md §3): three attribute nodes in a straight line from the road node under Choirmaster through the empty inside to Consecrated Plate, and on through it to the Ambulatory's walk: the Nave joined to the Ambulatory's middle, where before the only ways out were the two ends of the walk. Lone Vow's spur leaves its middle node northward; G3 hangs a minion cluster south of the middle node; Lectern (G3 round 1) leaves north of the last.",
       at: P(1808, 288),
       shape: { kind: 'hand' },
       nodes: [
@@ -231,12 +273,51 @@ export const nave: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(2089, 284),
-          why: 'Where, in G3, the spell-and-reservation cluster (ZE-1) leaves north as a bridge to Brandwright.',
+          why: 'Where Lectern (spell damage and reservation, G3) leaves north as a bridge to Brandwright.',
         },
       ],
       links: [
         ['a1', 'a2'],
         ['a2', 'a3'],
+      ],
+    },
+    {
+      id: 'lectern',
+      name: 'Lectern',
+      why: "G3 round 1 (2026-10-22; ledger ZE-1, folding ZE-s3): a straight bridge north from the aisle's last node to Brandwright, spell damage twice either side of the notable with spell damage and less reservation. The aura caster's spell damage, and the Zealot casters' spell damage at home instead of in the Mystic. It and Lone Vow leave the aisle side by side, one node apart: take the reservation, or the keystone that makes reservation moot. Brandwright stops being a dead end. Spell damage's other Zealot homes face other ways with other partners (Homily north-east with the elements and cast speed, Crozier west with a staff).",
+      at: P(2164, 472),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: P(2118, 356),
+          why: "The entrance from the aisle, on the straight line to Brandwright, parallel to Lone Vow's spur.",
+        },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: P(2138, 407) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Lectern',
+          lines: [spellDamage(16), reducedReservation(6)],
+          at: P(2164, 472),
+          why: 'Spell damage and less reservation: 2 + 2 units.',
+        },
+        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: P(2191, 536) },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: P(2211, 588),
+          why: 'The far node, onto Brandwright.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
       ],
     },
   ],
@@ -252,11 +333,31 @@ export const nave: AreaSpec = {
       why: 'The aisle lands on Consecrated Plate, in line with its chain to the walk: the armour bridge becomes a crossroads.',
     },
     {
+      from: 'aisle.a3',
+      to: 'lectern.a',
+      why: 'The aisle onto the spell-and-reservation bridge (G3).',
+    },
+    {
+      from: 'lectern.d',
+      to: 'cathedral.ambulatory.brand.n',
+      why: 'Lectern lands on Brandwright: the brand pocket becomes a bridge, and the brand caster has a way in from the Nave.',
+    },
+    {
       from: 'wall.resists.j.a',
       to: 'toWall.a',
       why: "The Wall's crossing junction onto the Cathedral's crossing node.",
     },
     { from: 'toWall.a', to: 'wheel.n2', why: "The crossing node lands on the wheel's block side." },
+    {
+      from: 'toWall.a',
+      to: 'verger.a',
+      why: 'The crossing node onto the armoured sceptre (G3).',
+    },
+    {
+      from: 'verger.c',
+      to: 'wall.resists.j.a',
+      why: "The armoured sceptre (a near crossing; G1-brief.md §2.3, deferred to G3 by G2/borders.md §4): Verger's far armour node lands on the Wall's Battlements junction, so the cluster is a crossing of its own beside the Nave road. The Vanguard's mace player reaches Verger's armour and sceptre; the Zealot reaches the Battlements. Verger is 7 steps from Hallowed Hammer.",
+    },
     { from: 'wheel.n5', to: 'vigil.a', why: 'Hearthfire onto the recovery chain.' },
     {
       from: 'vigil.n',

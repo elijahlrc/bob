@@ -6,6 +6,7 @@
  * the cold caster's late one (Hoarfrost and Shatter are in the Spire).
  */
 import {
+  castSpeed,
   chaosAttack,
   clawDamage,
   critChance,
@@ -20,6 +21,7 @@ import {
   physSpell,
   projectileSpeed,
   skillDuration,
+  spellDamage,
   spellProjectile,
   weaponAccuracy,
   weaponSpeed,
@@ -31,7 +33,7 @@ export const roofs: AreaSpec = {
   region: 'shade',
   name: 'The Rooftops',
   why: "An outer road round the Knife's north-east, joining the Stair's top to the Docks over the Rookery's spurs: claws with chaos to the north, cold darts to the east.",
-  at: [3080, -2115], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [3150, -2350], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved in G3 round 1 off Athame and Long Knives, over the rooftop road's middle.
   clusters: [
     {
       id: 'walk',
@@ -205,9 +207,9 @@ export const roofs: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Whetted Will',
-          lines: [physSpell(20), skillDuration(10)],
+          lines: [physSpell(24), skillDuration(12)],
           at: [3953, -1159],
-          why: '1.7 + 1 units.',
+          why: "2 + 1.2 units. G3 (2026-10-22, the ledger's SH-p1): raised from 2.7 units to the 3 a notable is worth at least (CONSTRAINTS §8.6).",
         },
       ],
       links: [
@@ -251,7 +253,7 @@ export const roofs: AreaSpec = {
           kind: 'attribute',
           lines: [dex(6), int(6)],
           at: [2780, -3020],
-          why: 'The quick caster (SH-11) hangs north of here.',
+          why: 'The quick caster (Hasty Words, G3) leaves north of here.',
         },
         {
           id: 'c2',
@@ -262,6 +264,37 @@ export const roofs: AreaSpec = {
         },
       ],
       links: [['c1', 'c2']],
+    },
+    {
+      id: 'hasty',
+      name: 'Hasty Words',
+      why: "The quick caster (G3 round 1, 2026-10-22; the ledger's SH-11 with the folded spell damage section SH-s5): a pocket straight north off the crossroad's first node, spell damage three times, then spell damage with cast speed. The Shade's plain spell damage had one notable, Quiet Knife by the start; this is its far one, the tip of the north-east, and its partner (speed) is not Quiet Knife's dagger. A dead end on purpose (G1/shade.md §7 item 5): the far tip a caster commits to, rather than a road. Ritual Blade (spells with a dagger) is nine steps west along the ridge, Athame ten; the Spire's Arcane Focus sells this pairing for the Mystic start, far away.",
+      at: [2780, -3290],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [2780, -3110],
+          why: 'The entrance, from the crossroad.',
+        },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [2780, -3165] },
+        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [2780, -3220] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hasty Words',
+          lines: [spellDamage(20), castSpeed(6)],
+          at: [2780, -3290],
+          why: '2.5 + 1.5 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+      ],
     },
     {
       id: 'ritual',
@@ -333,5 +366,10 @@ export const roofs: AreaSpec = {
       why: "The crossroad's east end lands on the claw pocket's first small: Carrion Claws is a way through between the ridge and the rooftop road.",
     },
     { from: 'walk.r6', to: 'sleet.a', why: 'The road onto the cold darts.' },
+    {
+      from: 'cross.c1',
+      to: 'hasty.a',
+      why: "The crossroad's first node onto the quick caster, square to the road (G3): the node becomes a T.",
+    },
   ],
 };

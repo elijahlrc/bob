@@ -13,7 +13,7 @@ export const storm: AreaSpec = {
   why:
     'The arm toward the Knife, the sharp end of the Spire: fire for the crit caster, lightning for the shocker, and Pain Conduit for the ' +
     "caster who lives on low life. The Shade borrows its root; the dear crossing from the Knife's curses lands on the keystone spur.",
-  at: [880, -3719], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [820, -3740], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); nudged in G3 round 1 off Pain Conduit.
   clusters: [
     {
       id: 'flashpoint',

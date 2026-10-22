@@ -40,7 +40,7 @@ export const slams: AreaSpec = {
   region: 'vanguard',
   name: 'The Quarry',
   why: "The Wall's south-west: the two-handed slam, armour by the slam road, the full-life diamond, pace, leech and regeneration, area damage, the totems and Strongarm, with the Quarry floor road across the middle. Every cluster here has two doors.",
-  at: [-1250, 1600], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-1250, 1575], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); nudged up in G3 (2026-10-22) off Unhurried.
   clusters: [
     {
       id: 'thunderstep',

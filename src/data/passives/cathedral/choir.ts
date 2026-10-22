@@ -21,7 +21,7 @@ export const choir: AreaSpec = {
   region: 'zealot',
   name: 'The Choir',
   why: 'Off the transept toward the Spire: auras or minions on one wheel, Lone Vow and Living Ward.',
-  at: [-1592, -1670], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-1662, -1830], // Where the area's name is drawn: clear of every other area's name and every notable (moved in G3 round 1, 2026-10-22: it lay over Shepherd).
   clusters: [
     {
       id: 'wheel',
@@ -149,7 +149,7 @@ export const choir: AreaSpec = {
     {
       from: 'cathedral.nave.aisle.a2',
       to: 'loneVow.a',
-      why: "G2 (2026-10-22): the Lone Vow spur hangs off the aisle's middle node (it left the choir junction before), so the keystone that makes reservation moot and the reservation cluster ZE-1 (G3, one node on) are a fork off one road.",
+      why: "G2 (2026-10-22): the Lone Vow spur hangs off the aisle's middle node (it left the choir junction before), so the keystone that makes reservation moot and the reservation cluster Lectern (G3, one node on) are a fork off one road.",
     },
     { from: 'jC.a', to: 'livingWard.a', why: 'Junction to the Living Ward spur.' },
     {

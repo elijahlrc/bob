@@ -22,6 +22,7 @@ import {
   resAll,
   resOne,
   weaponCrit,
+  weaponSpeed,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -31,7 +32,7 @@ export const edge: AreaSpec = {
   region: 'shade',
   name: 'The Alleys',
   why: 'The Knife nearest the start: the dagger and claw wheel (crit on the dagger side, recovery on the claw side), the dodge junction with Nimble Gambit, the resist star, and Thick Blood.',
-  at: [1858, -1025], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [1640, -1230], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved in G3 round 1 off Talon and Fine Point, between the wheel and Thick Blood.
   clusters: [
     {
       id: 'wheel',
@@ -190,19 +191,58 @@ export const edge: AreaSpec = {
       links: [],
     },
     {
-      id: 'thickBlood',
-      name: 'Thick Blood',
-      why: "Life, then the notable with life, flat life and a little shield: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction.",
-      at: P(1090, -420),
+      id: 'rake',
+      name: 'Raking Hand',
+      why: "The fast claw (G3 round 1, 2026-10-22; the ledger's SH-6): claw damage twice from the claw rung, the notable with claw damage and attack speed with claws, then attack speed with claws once on the way to the Docks' road to the Bow. A bridge from the rung to the Bow's dear road, on the Strider side of the Knife, where the Strider's dexterity meets the Shade's intelligence (CONSTRAINTS §5.4). The claw's three homes, each with its own partner and direction: Talon by the start (recovery on hit), this one south toward the Strider (speed), Carrion Claws far north-east on the Rooftops (chaos against the poisoned). Talon is eight steps from here, Carrion Claws nineteen.",
+      at: P(1005, 952),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
+          lines: [clawDamage(10)],
+          at: P(932, 850),
+          why: 'The entrance, from the claw rung.',
+        },
+        { id: 'b', kind: 'small', lines: [clawDamage(10)], at: P(964, 895) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Raking Hand',
+          lines: [clawDamage(20), weaponSpeed('claw', 10)],
+          at: P(1005, 952),
+          why: '2 + 2 units: the claw that strikes often, for the leech-on-hit and poison-on-hit builds that want more hits.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [weaponSpeed('claw', 5)],
+          at: P(1046, 1009),
+          why: "The exit, toward the Bow's dear road.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
+      id: 'thickBlood',
+      name: 'Thick Blood',
+      why: "Life three times, then the notable with life, flat life and a little shield: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction. G3 (2026-10-22, the ledger's SH-s1): two more life smalls on the chain, so it reads as a cluster and the Shade's thin life has a second section; the far life is the Stair's Wiry Frame.",
+      at: P(1090, -420),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'c',
+          kind: 'small',
           lines: [life(5)],
-          at: P(979, -401),
+          at: P(979, -291),
           why: 'The entrance, from the claw side.',
         },
+        { id: 'b', kind: 'small', lines: [life(5)], at: P(979, -346) },
+        { id: 'a', kind: 'small', lines: [life(5)], at: P(979, -401) },
         {
           id: 'n',
           kind: 'notable',
@@ -212,7 +252,11 @@ export const edge: AreaSpec = {
           why: '2 + 1 + 1 units. The exit, to the curse junction.',
         },
       ],
-      links: [['a', 'n']],
+      links: [
+        ['c', 'b'],
+        ['b', 'a'],
+        ['a', 'n'],
+      ],
     },
   ],
   links: [
@@ -233,6 +277,16 @@ export const edge: AreaSpec = {
       to: 'bow.bows.toKnife.a',
       why: "Fast claws (a near crossing; G1-brief.md §2.6, laid in the G2 border pass): the claw rung onto the Strider's near Knife node, so claws sit where the Strider's dexterity meets the Shade's intelligence (CONSTRAINTS §5.4) and a Strider who picks up a claw finds the Shade's claw cluster (G3) a few steps in. The rung turns here toward the Strider; it becomes a junction when the claw cluster lands on it.",
     },
+    {
+      from: 'rung.a',
+      to: 'rake.a',
+      why: 'The claw rung onto the fast claw (G3): the rung becomes a junction, the dodge junction behind it, the Strider ahead.',
+    },
+    {
+      from: 'rake.c',
+      to: 'knife.snares.toBow.a',
+      why: "The fast claw lands on the Bow's dear road where the Strider's stub arrives: the claw cluster is a bridge between the Alleys and the Docks' south, so a claw Shade reaches Mercy Stroke and the Strider's poison without walking back to the trap junction.",
+    },
     { from: 'star.f', to: 'wheel.w5', why: 'The fire spoke lands on Fine Point.' },
     {
       from: 'star.e',
@@ -245,7 +299,7 @@ export const edge: AreaSpec = {
       why: "The chaos spoke lands on the Bow's dear road: a poison bow walks in through the resistances.",
     },
     { from: 'wheel.w4', to: 'knife.venom.j2.a', why: 'Through the wheel to the venom junction.' },
-    { from: 'wheel.w2', to: 'thickBlood.a', why: 'The claw side onto the life chain.' },
+    { from: 'wheel.w2', to: 'thickBlood.c', why: 'The claw side onto the life chain.' },
     {
       from: 'thickBlood.n',
       to: 'knife.hex.jH.a',

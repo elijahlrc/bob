@@ -1,6 +1,7 @@
 /**
  * The Spire's left (the well road): the wheel off the well road, the recharge room (since G2, 2026-10-22, a pocket
- * between the Quiet Pulse road and the Undercroft road; Siphon moved to the Belfry, `frost.ts`), the wand chain from the mana notable west to the flask chain that points at
+ * between the Quiet Pulse road and the Undercroft road; Siphon moved to the Belfry, `frost.ts`), Composure (G3: energy
+ * shield with avoid stun, a bridge from Quiet Pulse's road up to Broad Weave), the wand chain from the mana notable west to the flask chain that points at
  * the Cathedral (both swapped in from the east side on 2026-10-20), the junction, the Mind Bulwark spur, and the west road
  * (2026-10-19): a life pocket and a mana-leech pocket climbing from the junction to the fire arm's junction, so the well
  * reaches the arms without the column and the Spire sells life and mana leech at all.
@@ -22,6 +23,7 @@ import {
   shieldDef,
   shieldSpellBlock,
   str,
+  stunAvoid,
   wandCastSpeed,
   wandSpellDamage,
 } from '../lines';
@@ -56,8 +58,8 @@ export const well: AreaSpec = {
           id: 'n2',
           kind: 'notable',
           name: 'Glass Skin',
-          lines: [es(16), esRecharge(20)],
-          why: 'Shield and its recharge: 3.2 + 1.3 units. The north-east exit, to the column.',
+          lines: [es(16), mana(10)],
+          why: "Shield and the mana it sits beside: 3.2 + 1.25 units. The north-east exit, to the column. ES with recharge until G3 (2026-10-22, G1/mystic.md MY-r2): with Quickening moved west, the two would have been one pairing twice; Glass Skin is now the wheel's shield with mana, beside both mana keystones, and Quickening keeps the recharge.",
         },
       ],
       links: [
@@ -87,9 +89,9 @@ export const well: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Quickening',
-          lines: [esRechargeDelay(30), esRecharge(20), es(5)],
+          lines: [esRechargeDelay(30), esRecharge(15), es(5)],
           at: [-950, -2640],
-          why: '3 + 1.3 + 1 units; the faster start is the half the sheet shows least and the fight feels most.',
+          why: '3 + 1 + 1 units (trimmed from 5.3 in G3, MY-m1); the faster start is the half the sheet shows least and the fight feels most.',
         },
         {
           id: 'b',
@@ -304,14 +306,61 @@ export const well: AreaSpec = {
     {
       id: 'toPulse',
       name: 'A road',
-      why: "Intelligence once off Quiet Pulse toward the Column. It led to Siphon until G2 (2026-10-22), when Siphon moved to the Belfry; it is where G3's energy shield cluster (G1/mystic.md MY-8) hangs, the Cloister's way up to Broad Weave.",
+      why: "Intelligence once off Quiet Pulse toward the Column. It led to Siphon until G2 (2026-10-22), when Siphon moved to the Belfry; since G3 it leads on to Composure (G1/mystic.md MY-8), the Cloister's way up to Broad Weave.",
       at: [-612, -2577],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-612, -2577] }],
       links: [],
     },
+    {
+      id: 'composure',
+      name: 'Composure',
+      why: "Energy shield with avoid stun (G3 round 1, 2026-10-22; G1/mystic.md MY-8, the ledger's shield section MY-s3 folded in): the shield for the caster who gets knocked out of its casts. A bridge from Quiet Pulse's road node up to Broad Weave, laid straight on the line between them, two shield smalls before the notable and one after, so it is the Cloister's way up to the Column now that Siphon has moved north. Not linked to the Deep Well wheel: Glass Skin is six steps away and Quickening seven, so the shield caster's three near shield notables lie in three places with three partners (mana, stun, recharge). 13 steps from the Mystic start.",
+      at: [-442, -2714],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [es(5)],
+          at: [-540, -2635],
+          why: "The entrance, from Quiet Pulse's road node.",
+        },
+        { id: 'b', kind: 'small', lines: [es(5)], at: [-497, -2670] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Composure',
+          lines: [es(15), stunAvoid(20)],
+          at: [-442, -2714],
+          why: '3 + 1 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [es(5)],
+          at: [-388, -2758],
+          why: "The exit, on the straight line to Broad Weave's entrance.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'toPulse.a',
+      to: 'composure.a',
+      why: "Quiet Pulse's road node onto Composure (MY-8): the road toward the Column stops being a stub.",
+    },
+    {
+      from: 'composure.c',
+      to: 'spire.column.broadWeave.a',
+      why: "Composure lands on Broad Weave's entrance: the Cloister's way up to the Column (it was Siphon's until G2), so Quiet Pulse and the Column are a loop again.",
+    },
     {
       from: 'toCathedral.a',
       to: 'draught.a',
@@ -377,7 +426,7 @@ export const well: AreaSpec = {
     {
       from: 'spire.well.toPulse.a',
       to: 'spire.well.quietPulse.n',
-      why: "Quiet Pulse's road node toward the Column; the new cluster between it and Broad Weave (G1/mystic.md MY-8) is G3's.",
+      why: "Quiet Pulse's road node toward the Column, on to Composure and Broad Weave (G3).",
     },
     {
       from: 'spire.well.quietPulse.n',

@@ -220,7 +220,7 @@ export const home: AreaSpec = {
     {
       id: 'deftWand',
       name: 'Deft Wand',
-      why: "A pocket east off the west road's first node, into the ground between the signature and Warm Blood: wand attacks twice, then wand attacks with accuracy and projectile speed. The second wand-attack cluster, six steps from the start, so the Mystic who starts with a wand attack has one near home; Wand Volley, thirteen out on the east side, sells wand attacks with speed and crit. Round 3 (2026-10-20); it also breaks the home's mirror.",
+      why: "A pocket east off the west road's first node, into the ground between the signature and Warm Blood: wand attacks twice, then wand attacks with accuracy and projectile speed. The second wand-attack cluster, six steps from the start, so the Mystic who starts with a wand attack has one near home; Wand Volley, thirteen out on the east side, sells wand attacks with speed (its crit went in G3), and Bright Wand in the Lantern wand attacks with elements. Round 3 (2026-10-20); it also breaks the home's mirror.",
       at: [-42, -1400],
       shape: { kind: 'hand' },
       nodes: [

@@ -1,11 +1,12 @@
 /**
- * The Spire's right (the craft road): the wheel off the craft road (spell damage one side, energy shield the other), the
+ * The Spire's right (the craft road): the wheel off the craft road (spell damage one side, chaos resistance the other since G3), the
  * cost room (swapped in from the west on 2026-10-20), the wand attack chain, the junction, the insight room, the
  * Mana Bastion spur, and the Devotion chain (reservation, energy shield) from the junction east toward the Knife, the
  * near Spire-Knife crossing's Spire half. The east road: the curse pocket (Hexwright) and a spell-dodge pocket climbing
  * from the Devotion chain to the east arm's junction along the Knife border, so the craft reaches the arms without the
  * column. Round 3 (2026-10-20): Hexwright and Devotion traded places, so the curse notable is not three steps from the
- * Stair's chaos-spell notable and seven from Second Curse.
+ * Stair's chaos-spell notable and seven from Second Curse. G3 round 1 (2026-10-22): Keen Verse (spell damage with the
+ * spell crit multiplier) bridges the road to Wand Volley and the road between Mist Walk and Hexwright.
  */
 import {
   castSpeed,
@@ -26,9 +27,9 @@ import {
   reducedReservation,
   resOne,
   skillDuration,
+  spellCritMulti,
   spellDamage,
   wandAttack,
-  weaponCrit,
   weaponSpeed,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -43,7 +44,7 @@ export const craft: AreaSpec = {
     {
       id: 'focus',
       name: 'Arcane Focus',
-      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Mana at both ends, which every caster uses. Damage and cast speed on the north side (Arcane Focus); energy shield and its recharge on the south (Warded Mind), for the caster who wants to live through the cast. The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms.",
+      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Mana at both ends, which every caster uses. Damage and cast speed on the north side (Arcane Focus); chaos resistance and mana on the south (Warded Mind), the defence a caster forgets until a poisoner finds it. Until G3 (2026-10-22, G1/mystic.md MY-r1) the south side was energy shield, so the wheel handed a caster spell damage and energy shield on its two sides seven steps out; the near energy shield is west now (Glass Skin). The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms, Keen Verse on the east road.",
       at: [469, -2000],
       shape: { kind: 'ring', r: 80, a0: 150 },
       nodes: [
@@ -57,13 +58,18 @@ export const craft: AreaSpec = {
           why: '2.5 + 1.5 units.',
         },
         { id: 'c', kind: 'small', lines: [mana(8)], why: 'The north-east exit, to the junction.' },
-        { id: 'd', kind: 'small', lines: [es(5)] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [resOne('chaos', 8)],
+          why: "Chaos resistance, the south side's stat (energy shield until G3, MY-r1).",
+        },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Warded Mind',
-          lines: [es(12), resOne('chaos', 15), mana(8)],
-          why: 'Shield, and the chaos resistance a shield build lacks: 2.4 + 1.9 + 1 units. Glass Skin, in the well, is the shield with its recharge.',
+          lines: [resOne('chaos', 16), mana(8), manaRegen(10)],
+          why: 'The chaos resistance a caster lacks, with mana and a little regeneration: 2 + 1 + 1 units. No energy shield since G3 (MY-r1): the east wheel is spell damage or chaos resistance, not spell damage and energy shield.',
         },
       ],
       links: [
@@ -101,7 +107,7 @@ export const craft: AreaSpec = {
     {
       id: 'wandVolley',
       name: 'Wand Volley',
-      why: "The wand as a weapon, not a stat stick: wand attack damage twice, then the notable with wand attack damage, attack speed and crit with wands. Four attack gems take a wand and the kit is one; the Spire sold nothing for them. A chain from the wand room's far node up to the projectile cluster's east side, so the wand attacker reaches the projectiles without the column's junction.",
+      why: "The wand as a weapon, not a stat stick: wand attack damage twice, then the notable with wand attack damage and attack speed with wands, the fast wand. Four attack gems take a wand and the kit is one; the Spire sold nothing for them. A chain from the wand room's far node up to the projectile cluster's east side, so the wand attacker reaches the projectiles without the column's junction. Its crit went in G3 (2026-10-22, G1/mystic.md MY-r3): the crit wand is a cluster of its own on the Eaves, and the elemental wand (Bright Wand) is in the Lantern, so the four wand clusters have four partners.",
       at: [600, -2640],
       shape: { kind: 'hand' },
       nodes: [
@@ -116,9 +122,9 @@ export const craft: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Wand Volley',
-          lines: [wandAttack(24), weaponSpeed('wand', 8), weaponCrit('wand', 15)],
+          lines: [wandAttack(24), weaponSpeed('wand', 12)],
           at: [680, -2650],
-          why: '2 + 1.7 + 1 units.',
+          why: '2 + 2.4 units.',
         },
         {
           id: 'b',
@@ -346,8 +352,57 @@ export const craft: AreaSpec = {
       nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [1225, -2945] }],
       links: [],
     },
+    {
+      id: 'keenVerse',
+      name: 'Keen Verse',
+      why: "Spell damage with the spell crit multiplier (G3 round 1, 2026-10-22; G1/mystic.md MY-1): the crit caster's spell damage, on the east, the Mystic's crit side. A bridge across the gap between Wand Volley, Hexwright and Mist Walk, from the road to Wand Volley up to the road between Mist Walk and Hexwright, laid as a V with the notable at its tip and two spell damage smalls on each leg (the ledger's spell section MY-s2 folded in). Spell damage is the flattest stat of every caster; this is its east direction, with crit as the partner, where Arcane Focus (8 steps) sells it with cast speed, the spine's Piercing Word with penetration, and the Eaves (G3, later round) with regeneration. Steps from the Mystic start: 17.",
+      at: [1000, -2930],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [957, -2813],
+          why: 'The entrance from the road to Wand Volley, on the straight line to the notable.',
+        },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [976, -2864] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Keen Verse',
+          lines: [spellDamage(20), spellCritMulti(18)],
+          at: [1000, -2930],
+          why: '2.5 + 1.5 units. The tip of the V; the bend is here, at the notable.',
+        },
+        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [1070, -2935] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [1125, -2938],
+          why: 'The exit, on the straight line to the road node between Mist Walk and Hexwright.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'toVolley.r2',
+      to: 'keenVerse.a',
+      why: 'The road to Wand Volley onto Keen Verse (MY-1): the road had nothing coming off it between Hexwright and Wand Volley.',
+    },
+    {
+      from: 'keenVerse.d',
+      to: 'toDev2.a',
+      why: 'Keen Verse onto the road between Mist Walk and Hexwright: a bridge, so the gap is crossed through spell damage, and the east road has a second way from Wand Volley to Mist Walk.',
+    },
     {
       from: 'wandVolley.a',
       to: 'frugal.b',

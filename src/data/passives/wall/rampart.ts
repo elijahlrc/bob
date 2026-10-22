@@ -40,7 +40,13 @@ export const rampart: AreaSpec = {
       at: [-2145, 474],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-2051, 440], why: 'The entrance.' },
+        {
+          id: 'a',
+          kind: 'attribute',
+          lines: [str(7)],
+          at: [-2051, 440],
+          why: "The entrance: a strength road node where the rampart road meets the wheel and forks to its two sides (G3, 2026-10-22; a life small until then, the last of the wheel's old life side, which left the armour side's section mixed).",
+        },
         { id: 'c', kind: 'small', lines: [armour(12)], at: [-2054, 516] },
         { id: 'd', kind: 'small', lines: [armour(12)], at: [-2111, 568] },
         {

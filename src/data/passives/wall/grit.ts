@@ -1,7 +1,8 @@
 /**
  * The Barrows (the Wall's south rim): the warcries, reached from the Unbloodied diamond and from the Vampiric Strikes
  * chain; the junction where the Yard's dear crossing lands; the grit wheel (a grit charge one side, Tempered the other);
- * Heavy Hands (two-handed speed, 2026-10-20); and Blood Rite at the rim.
+ * Heavy Hands (two-handed speed, 2026-10-20); and Blood Rite at the rim. G3 (2026-10-22): Iron Voice (armour, warcry
+ * effect) on the middle road between Stone Ward and the Barrows road.
  */
 import {
   accuracy,
@@ -41,7 +42,7 @@ export const grit: AreaSpec = {
   region: 'vanguard',
   name: 'The Barrows',
   why: "The Wall's south rim: the warcries, the grit wheel with maximum resistances on its other side, the fast two-hander, Cleaver by the Fosse, the middle road through Stone Ward, and Blood Rite, the biggest trade in the region.",
-  at: [-2330, 2886], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-2405, 2761], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved in G3 (2026-10-22) off Tempered and Iron Voice.
   clusters: [
     {
       id: 'drums',
@@ -408,7 +409,7 @@ export const grit: AreaSpec = {
     {
       id: 'middle',
       name: "The Barrows' middle road",
-      why: 'Strength twice on a line through Stone Ward (G2, 2026-10-22): north to Second Wind, south toward the warcry armour cluster that will hang between it and the Barrows road. Today the only ways between the Quarry and the Barrows road go round by War Drums or the Pits.',
+      why: 'Strength twice on a line through Stone Ward (G2, 2026-10-22): north to Second Wind, south to Iron Voice (G3) and on to the Barrows road. Before it, the only ways between the Quarry and the Barrows road went round by War Drums or the Pits.',
       at: [-1810, 2400],
       shape: { kind: 'hand' },
       nodes: [
@@ -416,6 +417,45 @@ export const grit: AreaSpec = {
         { id: 'b', kind: 'attribute', lines: [str(7)], at: [-1856, 2571] },
       ],
       links: [],
+    },
+    {
+      id: 'ironVoice',
+      name: 'Iron Voice',
+      why: "Armour twice either side of the notable with armour and warcry buff effect: the shouting Vanguard in plate, for the warcry and totem build and any strength build passing south (G3, 2026-10-22; the ledger's VA-3, with the armour section VA-s2 folded in). A straight chain on the Barrows' middle road from Stone Ward down to the Barrows road, so the road is whole and the Quarry reaches the Barrows through the middle. The strength defence's south-west direction, far from both strength starts; War Drums (warcry duration and effect) is the warcry twin, seven steps west by the junction.",
+      at: [-1924, 2884],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [armour(12)],
+          at: [-1898, 2762],
+          why: 'The north end, from the middle road.',
+        },
+        { id: 'b', kind: 'small', lines: [armour(12)], at: [-1909, 2815] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Iron Voice',
+          lines: [armour(24), warcryEffect(20)],
+          at: [-1924, 2884],
+          why: "2 + 2 units: 4. Armour and the warcry in even measure (the round-1 allocator showed the strength builds' armour doubling at 120 points with a heavier armour line).",
+        },
+        { id: 'c', kind: 'small', lines: [armour(12)], at: [-1939, 2952] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [armour(12)],
+          at: [-1951, 3006],
+          why: 'The south end, toward the Barrows road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+      ],
     },
     {
       id: 'host',
@@ -513,6 +553,12 @@ export const grit: AreaSpec = {
       why: 'The middle road through Stone Ward: the pocket becomes a bridge.',
     },
     { from: 'ward.n', to: 'middle.b', why: 'And on south, toward the Barrows road.' },
+    { from: 'middle.b', to: 'ironVoice.a', why: 'The middle road onto Iron Voice, straight on.' },
+    {
+      from: 'ironVoice.d',
+      to: 'east.e2',
+      why: "Iron Voice onto the Barrows road: the middle road is whole, Second Wind to the Barrows' second road node.",
+    },
     {
       from: 'wall.maces.greatweight.b',
       to: 'west.a',

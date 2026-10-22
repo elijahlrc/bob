@@ -12,8 +12,10 @@ import {
   damageVsCursed,
   dex,
   eleAttackOne,
+  leechLife,
   str,
   stunAvoid,
+  swordDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -21,7 +23,7 @@ export const fosse: AreaSpec = {
   id: 'yard.fosse',
   region: 'reaver',
   name: 'The Fosse',
-  why: "An outer road round the Yard's south rim, from the Pits to the Barrows: lightning strikes near the Strider's side, the hunter's curse at the bottom.",
+  why: "An outer road round the Yard's south rim, from the Pits to the Barrows: lightning strikes and the leeching sword (Bloodied Edge, G3) near the Strider's side, the hunter's curse at the bottom.",
   at: [180, 4175], // Where the area's name is drawn: clear of every other area's name; moved below the spine's landing in G2.
   clusters: [
     {
@@ -37,7 +39,7 @@ export const fosse: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [410, 3750],
-          why: 'The lightning strikes leave east.',
+          why: 'The lightning strikes leave east, the leeching sword (Bloodied Edge, G3) north-east.',
         },
         { id: 'f3', kind: 'attribute', lines: [str(6), dex(6)], at: [180, 3990] },
         { id: 'f4', kind: 'attribute', lines: [str(6), dex(6)], at: [-150, 4060] },
@@ -87,6 +89,43 @@ export const fosse: AreaSpec = {
       links: [
         ['a', 'b'],
         ['b', 'n'],
+      ],
+    },
+    {
+      id: 'bloodied',
+      name: 'Bloodied Edge',
+      why: "Sword damage twice, then the notable with sword damage and life leech, then sword damage once more (RE-3, G3 2026-10-22): the sword that drinks, in the band between the Pits and the Fosse, beside Crimson Pact. A straight bridge from the fosse road's second node up to Festering's chain, which stops being a dead end. The Yard's sword sits in three directions with three partners (accuracy at Keen Edge in the west, speed at Darting Steel in the east, leech here); the Yard's other leech notables, Red Harvest (the Pits) and Thirsting Blade (the far west), do not sell sword damage.",
+      at: [637, 3546],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [swordDamage(10)],
+          at: [551, 3624],
+          why: 'The entrance, from the fosse road.',
+        },
+        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [594, 3585] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Bloodied Edge',
+          lines: [swordDamage(20), leechLife(0.8, ['attack'])],
+          at: [637, 3546],
+          why: '2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [swordDamage(10)],
+          at: [680, 3508],
+          why: "The exit, to Festering's chain.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -155,5 +194,15 @@ export const fosse: AreaSpec = {
       why: "Lightning strikes (a dear crossing; G1-brief.md §2.5, laid in the G2 border pass): Stormstruck onto the south end of the Strider's outer road, so the east of the map's outer ring closes from the Seawall to the Fosse. The Strider's shock cluster (G3, on the outer road) and Stormstruck's attack speed are about 6 steps apart, a pairing either side can buy late; Stormstruck stops being a dead end.",
     },
     { from: 'road.f5', to: 'marked.a', why: "The road onto the hunter's curse." },
+    {
+      from: 'road.f2',
+      to: 'bloodied.a',
+      why: "The road's second node onto the leeching sword (G3, RE-3), north-east, between the road up to the Pits and the lightning pocket.",
+    },
+    {
+      from: 'bloodied.c',
+      to: 'yard.blood.festering.b',
+      why: "The leeching sword lands on Festering's chain: Festering gets a second way in, and a sword-and-poison or sword-and-bleed build finds both in one walk from the Fosse.",
+    },
   ],
 };

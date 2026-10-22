@@ -6,7 +6,6 @@
  * Standard Bearer chain from the crit pocket down to the Pits' west junction, which Executioner joins; and Shield Bash.
  */
 import {
-  armour,
   attackSpeed,
   critChance,
   critMulti,
@@ -14,7 +13,6 @@ import {
   life,
   lifeOnBlock,
   maxResAll,
-  physReduction,
   reducedReservation,
   resAll,
   resOne,
@@ -23,6 +21,7 @@ import {
   shieldDef,
   shieldSpeed,
   str,
+  stunThreshold,
   weaponCrit,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -97,7 +96,7 @@ export const shield: AreaSpec = {
     {
       id: 'steelRim',
       name: 'Steel Rim',
-      why: 'The wheel below the hub: the shield on one side (Steel Rim: block and shield defences), the hide on the other (Scarred Hide: life, armour and less physical damage taken). Life smalls on the hide side, so the road from the hub down to the Pits does not sell spell block to everyone who passes (build audit 2026-10-20: the sword-and-shield Reaver found both shield notables on one wheel).',
+      why: 'The wheel below the hub: the shield on one side (Steel Rim: block and shield defences), the hide on the other (Scarred Hide: life and stun threshold, since G3). Life smalls on the hide side, so the road from the hub down to the Pits does not sell spell block to everyone who passes (build audit 2026-10-20: the sword-and-shield Reaver found both shield notables on one wheel).',
       at: [0, 2480],
       shape: { kind: 'hand' },
       nodes: [
@@ -135,9 +134,9 @@ export const shield: AreaSpec = {
           id: 'n2',
           kind: 'notable',
           name: 'Scarred Hide',
-          lines: [life(10), armour(12), physReduction(1)],
+          lines: [life(10), stunThreshold(16)],
           at: [-91, 2428],
-          why: '2 + 1 + 1 units: what a fighter without a shield wears.',
+          why: "2 + 2 units: what a fighter without a shield wears. Life with stun threshold since G3 (2026-10-22): it was life with armour and less physical damage taken, 8 steps from the start, which handed a strength build two of its main wants on one node (the ledger's convergence rule); the armour went to the Practice Ground's Mended Mail and to Guarded.",
         },
       ],
       links: [

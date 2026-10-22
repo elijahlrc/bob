@@ -108,7 +108,7 @@ export const blood: AreaSpec = {
     {
       id: 'festering',
       name: 'Festering',
-      why: "Poison twice, then the notable with poison and bleeding: wounds that fester, for the Reaver who poisons with a sword or a dagger and the Strider who poisons with a bow. A dead-end chain from the east rim junction, under the Crimson Pact spur, where a Strider coming up the dear road from the Bow finds it first. Here since round 3 (2026-10-20): it was on the Knife's Stair, where the poison claw found every claw and poison notable within six steps. The other poison notables are Barbed Point (with crit) in the Knife and Venom Fletching (with chaos attacks) in the Strider.",
+      why: "Poison twice, then the notable with poison and bleeding: wounds that fester, for the Reaver who poisons with a sword or a dagger and the Strider who poisons with a bow. A chain from the east rim junction, under the Crimson Pact spur (since G3 its second small also takes Bloodied Edge's chain up from the Fosse, so it is no longer a dead end), where a Strider coming up the dear road from the Bow finds it first. Here since round 3 (2026-10-20): it was on the Knife's Stair, where the poison claw found every claw and poison notable within six steps. The other poison notables are Barbed Point (with crit) in the Knife and Venom Fletching (with chaos attacks) in the Strider.",
       at: [720, 3360],
       shape: { kind: 'hand' },
       nodes: [

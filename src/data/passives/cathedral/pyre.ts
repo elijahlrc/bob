@@ -24,7 +24,7 @@ export const pyre: AreaSpec = {
   region: 'zealot',
   name: 'The Bell Tower',
   why: 'The tip toward the Wall: cold attacks or an aura on one wheel, and Searing Avatar.',
-  at: [-3321, -1139], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-3301, -1359], // Where the area's name is drawn: clear of every other area's name and every notable (moved in G3 round 1, 2026-10-22: it lay over Rimed Steel and Benediction).
   clusters: [
     {
       id: 'wheel',

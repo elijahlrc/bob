@@ -3,10 +3,11 @@
  * that land in four different places (the rampart's junction, the rampart road, Scar Tissue, the Cathedral crossing
  * junction); Scar Tissue (grit when hit; it swapped with Tempered on 2026-10-20) at the end of a short chain beside the
  * dear crossing from the fire tower; the crossing junction; the Warlord's Banner chain (reservation, aura effect, mana)
- * from the north hub toward the Zealot; and, since G2 (2026-10-22), Hallowed Hammer off the rampart's junction.
+ * from the north hub toward the Zealot; and, since G2 (2026-10-22), Hallowed Hammer off the rampart's junction. G3
+ * (2026-10-22): the Banner traded its armour for aura effect, so it is the standard its name says and nothing more.
  */
 import {
-  armour,
+  auraEffect,
   eleAttack,
   gritOnHitTaken,
   life,
@@ -25,7 +26,7 @@ export const resists: AreaSpec = {
   region: 'vanguard',
   name: 'The Battlements',
   why: "The Wall's north, on the Cathedral border: the resist star as the connector, the Warlord's Banner chain toward the Zealot, Scar Tissue at the tip where the Cathedral's fire two-hander arrives, and Hallowed Hammer on the west, where maces meet the Cathedral's sceptres.",
-  at: [-2000, -140], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-2000, 110], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved south in G3 (2026-10-22) off Elemental Ward and Scar Tissue, between the star's south spokes and the Rampart.
   clusters: [
     {
       id: 'star',
@@ -146,7 +147,7 @@ export const resists: AreaSpec = {
     {
       id: 'banner',
       name: "Warlord's Banner",
-      why: "Reduced mana reservation twice, then the notable with reservation, armour and mana: the Vanguard's standards, as a chain from the north hub toward the Zealot. The Wall's only reservation lines, and the Cathedral's way in.",
+      why: "Reduced mana reservation twice, then the notable with reservation, aura effect and mana: the Vanguard's standards, as a chain from the north hub toward the Zealot. The Wall's only reservation lines, and the Cathedral's way in. Its armour went in G3 (2026-10-22): a notable three steps from the Zealot start and five from the Vanguard's sold reservation, armour and mana, three themes, and armour this near two starts is strength by the back door.",
       at: [-1170, -60],
       shape: { kind: 'hand' },
       nodes: [
@@ -156,9 +157,9 @@ export const resists: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: "Warlord's Banner",
-          lines: [reducedReservation(5), armour(16), manaFlat(30)],
+          lines: [reducedReservation(5), auraEffect(8), manaFlat(30)],
           at: [-1250, -230],
-          why: '1.7 + 1.3 + 1.5 units.',
+          why: '1.7 + 1.3 + 1.5 units: what an aura carrier wants from a banner, reserving less and the aura stronger.',
         },
       ],
       links: [

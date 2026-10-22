@@ -115,9 +115,9 @@ export const bows: AreaSpec = {
           id: 'n1',
           kind: 'notable',
           name: 'Longbow',
-          lines: [bowDamage(16), bowSpeed(13), accuracy(10)],
+          lines: [bowDamage(16), bowSpeed(12), accuracy(10)],
           at: P(603, -1051),
-          why: '1.6 + 2.7 + 1 units.',
+          why: "1.6 + 2.4 + 1 units. G3 round 1 (2026-10-22, the brief's ST-p2): bow attack speed 13 → 12, so it is 5 units, not 5.3.",
         },
         {
           id: 'n2',

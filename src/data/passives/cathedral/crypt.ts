@@ -243,9 +243,9 @@ export const crypt: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Shattering Rite',
-          lines: [physSpell(16), eleDamageAll(16)],
+          lines: [physSpell(20), eleDamageAll(16)],
           at: [-1525, -3570],
-          why: '1.3 + 1.6 units.',
+          why: '1.7 + 1.6 units (G3, 2026-10-22: physical spells raised from 16%, so the notable is worth 3 units; ledger ZE-p1).',
         },
       ],
       links: [
@@ -256,7 +256,7 @@ export const crypt: AreaSpec = {
     {
       id: 'north',
       name: 'The north walk',
-      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. In G3: ZE-11 hangs inward off the third node, ZE-9 off the fourth, and ZE-3 bridges Shattering Rite to the east end.",
+      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. In G3: Rood Screen (ZE-11, round 1) hangs inward off the third node, ZE-9 off the fourth, and ZE-3 bridges Shattering Rite to the east end.",
       at: P(3057, 1916),
       shape: { kind: 'hand' },
       nodes: [
@@ -279,7 +279,7 @@ export const crypt: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3244, 1537),
-          why: 'Where, in G3, energy shield with spell block (ZE-11) hangs inward.',
+          why: 'Where Rood Screen (energy shield with spell block, G3) hangs inward.',
         },
         {
           id: 'n4',
@@ -311,6 +311,37 @@ export const crypt: AreaSpec = {
         ['n5', 'n6'],
       ],
     },
+    {
+      id: 'rood',
+      name: 'Rood Screen',
+      why: "G3 round 1 (2026-10-22; ledger ZE-11): a pocket inward off the north walk's third node, square to the walk: energy shield three times, then the notable with energy shield and spell block. The block caster's shield without a shield (Glass Wall needs one), and the energy shield a Zealot or Mystic caster finds far out on the casters' loop, in a different direction from the Cloister's. A dead-end tip on purpose (§13.5): the walk it hangs from has three ways in. It lives in the Undercroft's file because no area name covers the north walk yet (G2 flagged that the walk wants its own area).",
+      at: P(2978, 1419),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [es(5)],
+          at: P(3143, 1492),
+          why: 'The entrance from the walk.',
+        },
+        { id: 'b', kind: 'small', lines: [es(5)], at: P(3093, 1469) },
+        { id: 'c', kind: 'small', lines: [es(5)], at: P(3042, 1448) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Rood Screen',
+          lines: [es(10), spellBlock(4)],
+          at: P(2978, 1419),
+          why: 'Energy shield and spell block: 2 + 2 units.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+      ],
+    },
   ],
   links: [
     {
@@ -323,6 +354,7 @@ export const crypt: AreaSpec = {
       to: 'north.n6',
       why: "Tomb Dust's chain carried on to the north walk's east end: the chaos pocket becomes a bridge, and the walk's second way in.",
     },
+    { from: 'north.n3', to: 'rood.a', why: "The north walk's third node onto Rood Screen (G3)." },
     { from: 'toSpire.b', to: 'rite.a', why: 'The crossing road onto the physical spells.' },
     { from: 'toSpire.a', to: 'tomb.a', why: 'The crossing road onto the chaos pocket.' },
     { from: 'toSpire.a', to: 'stair.a', why: 'The Spire crossing onto the crypt stair.' },

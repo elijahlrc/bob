@@ -14,6 +14,8 @@ import {
   costReduction,
   eleDamage,
   eleDamageAll,
+  elePenetration,
+  es,
   esLeech,
   esOnHit,
   freezeChance,
@@ -21,9 +23,11 @@ import {
   int,
   manaOnKill,
   penetration,
+  resAll,
   shockChance,
   shockDuration,
   skillDuration,
+  spellDamage,
   trapDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -35,7 +39,7 @@ export const frost: AreaSpec = {
   why:
     'The middle arm, the one both others are joined to, and the top of the Spire: lightning for the quick caster first, cold as the big ' +
     'frozen hit second, and the crit keystone above them. The two-element keystone sits on the west join.',
-  at: [-120, -3920], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-120, -3980], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved 60 up in G3 round 1 off Piercing Word.
   clusters: [
     {
       id: 'thunderhead',
@@ -253,7 +257,7 @@ export const frost: AreaSpec = {
     {
       id: 'siphon',
       name: 'Siphon',
-      why: "Energy shield on hit, then the notable with shield leech, shield on hit and mana on kill: the caster's recovery from hitting, which no other Spire node sells. Moved here from the Cloister in G2 (2026-10-22, G1/mystic.md MY-m2): it sat three steps from Glass Skin and Quickening, a one-stop for the shield caster; here it is a bridge from the east join to the Belfry's junction, beside Thunderhead's cast speed and under the shock and freeze: the casters who hit often. Laid on the straight line between its two ends, the notable in the middle, so the small G3 adds on the junction side mirrors this one.",
+      why: "Energy shield on hit, then the notable with shield leech, shield on hit and mana on kill: the caster's recovery from hitting, which no other Spire node sells. Moved here from the Cloister in G2 (2026-10-22, G1/mystic.md MY-m2): it sat three steps from Glass Skin and Quickening, a one-stop for the shield caster; here it is a bridge from the east join to the Belfry's junction, beside Thunderhead's cast speed and under the shock and freeze: the casters who hit often. Laid on the straight line between its two ends, the notable in the middle, with a shield-on-hit small either side (the second added in G3).",
       at: [165, -3710],
       shape: { kind: 'hand' },
       nodes: [
@@ -270,10 +274,20 @@ export const frost: AreaSpec = {
           name: 'Siphon',
           lines: [esLeech(0.8), esOnHit(6), manaOnKill(10)],
           at: [165, -3710],
-          why: "2 + 1.5 + 1 units. The exit, to the arm's junction.",
+          why: '2 + 1.5 + 1 units.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [esOnHit(4)],
+          at: [104, -3744],
+          why: "The exit, to the arm's junction: the second shield-on-hit small (G3, MY-m2), mirroring the first across the notable.",
         },
       ],
-      links: [['a', 'n']],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
     },
     {
       id: 'stream',
@@ -290,12 +304,94 @@ export const frost: AreaSpec = {
           name: 'Steady Stream',
           lines: [channelDamage(20), costReduction(6)],
           at: [-404, -4294],
-          why: '2 + 1.5 units.',
+          why: '2 + 1.5 units. Since G3 it leads on to High Veil, so the pocket is a bridge to the north-west rim road.',
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
+      ],
+    },
+    {
+      id: 'piercing',
+      name: 'Piercing Word',
+      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went): the spine's spell cluster, a caster walking up to Shatter or over the top passes it. A four-node ring like the Belfry's others (Thunderhead, Shatter), bridging the west climb to Shatter and the arm's junction, which it enters from due west so the junction is a clean cross (Thunderhead south, Shatter north, Siphon east, this west). The road through takes the notable side or the small side. Spell damage's partners now differ by direction: cast speed (Arcane Focus), crit (Keen Verse), penetration here. 19 steps from the Mystic start.",
+      at: [-128, -3790],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [-184, -3790],
+          why: 'The west side, from the climb to Shatter.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Piercing Word',
+          lines: [spellDamage(20), elePenetration(3)],
+          at: [-128, -3846],
+          why: '2.5 + 2 units. The north side of the ring.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [-72, -3790],
+          why: "The east side, to the arm's junction.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [-128, -3734],
+          why: 'The south side.',
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+        ['b', 'c'],
+        ['c', 'a'],
+      ],
+    },
+    {
+      id: 'highVeil',
+      name: 'High Veil',
+      why: "Energy shield with all elemental resistances (G3 round 1, 2026-10-22; G1/mystic.md MY-4, the ledger's shield section MY-s4 folded in): the far shield cluster at the top left, paired with resistances, not offence, so going north for both the far spell damage (the Eaves, later) and this costs the walk across the top. A four-node ring: Steady Stream's chain runs on straight into its south-east side, and the north-west rim road lands on its west side, so the road walks its three shield smalls and the notable, on the outer side, is a step off the road (G1/mystic.md: the rim roads land on smalls, never on notables). Steady Stream stops being a dead end, and the rim road gets its second way in. 23 steps from the Mystic start; a caster who does not channel pays Steady Stream's three nodes to reach it, or comes round by Cinder.",
+      at: [-706, -4531],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [es(5)],
+          at: [-662, -4497],
+          why: 'The south-east side, from Steady Stream, on the line of its chain.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'High Veil',
+          lines: [es(15), resAll(6)],
+          at: [-671, -4575],
+          why: '3 + 1.5 units. The outer side of the ring.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [es(5)],
+          at: [-750, -4566],
+          why: 'The north-west side, on the straight line of the rim road.',
+        },
+        { id: 'c', kind: 'small', lines: [es(5)], at: [-741, -4487], why: 'The inner side.' },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+        ['b', 'c'],
+        ['c', 'a'],
       ],
     },
   ],
@@ -304,6 +400,26 @@ export const frost: AreaSpec = {
       from: 'toShatter.r2',
       to: 'stream.a',
       why: 'The road to Shatter onto the channelled spells.',
+    },
+    {
+      from: 'toShatter.r1',
+      to: 'piercing.a',
+      why: 'The west climb to Shatter onto Piercing Word (MY-11): the climb is a junction now, not a bare run.',
+    },
+    {
+      from: 'piercing.b',
+      to: 'jArm.a',
+      why: "Piercing Word onto the arm's junction from due west: a bridge, so the spine's spell damage is on the way from the Lantern to the top.",
+    },
+    {
+      from: 'stream.n',
+      to: 'highVeil.a',
+      why: 'Steady Stream onto High Veil (MY-4): the channelling pocket becomes a bridge, a notable of a different kind on the way to the far shield (CONSTRAINTS §5.5).',
+    },
+    {
+      from: 'highVeil.b',
+      to: 'spire.fire.rim.a',
+      why: "High Veil's west side onto the head of the north-west rim road, on the road's straight line: the road walks onto the cluster's smalls, not its notable.",
     },
     {
       from: 'toOvercharge.r1',
@@ -358,9 +474,9 @@ export const frost: AreaSpec = {
       why: 'The east join onto Siphon (G2, MY-m2): the quick caster coming up the east arm reaches the recovery from hitting without Thunderhead.',
     },
     {
-      from: 'siphon.n',
+      from: 'siphon.b',
       to: 'jArm.a',
-      why: "Siphon onto the arm's junction: a bridge, so the junction has a way in from the east join that is not Thunderhead's notable.",
+      why: "Siphon onto the arm's junction through its second small: a bridge, so the junction has a way in from the east join that is not Thunderhead's notable.",
     },
     { from: 'jArm.a', to: 'shatter.a', why: 'Junction to the shatter room.' },
     {

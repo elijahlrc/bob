@@ -23,6 +23,8 @@ import {
   moveSpeed,
   physAttack,
   str,
+  swordDamage,
+  weaponSpeed,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -141,7 +143,7 @@ export const dual: AreaSpec = {
     {
       id: 'east',
       name: 'The east road',
-      why: "The second-hand highway carried on south (G2, 2026-10-22): from the east junction down the Lists to the Pits' east junction, strength and dexterity on every node. The fervour charges leave east at the first node, the dual crit west at the second and third; the second is where the fast sword (RE-1) will hang, east toward the Strider's road.",
+      why: "The second-hand highway carried on south (G2, 2026-10-22): from the east junction down the Lists to the Pits' east junction, strength and dexterity on every node. The fervour charges leave east at the first node, the dual crit west at the second and third; the fast sword (Darting Steel, G3) leaves the second east, toward the Strider's road.",
       at: [600, 2590],
       shape: { kind: 'hand' },
       nodes: [
@@ -157,7 +159,7 @@ export const dual: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [620, 2580],
-          why: 'The dual crit leaves west; the fast sword (RE-1) will leave east.',
+          why: 'The dual crit leaves west, the fast sword (Darting Steel) east.',
         },
         {
           id: 'e3',
@@ -224,6 +226,43 @@ export const dual: AreaSpec = {
       links: [
         ['a', 'n'],
         ['n', 'b'],
+      ],
+    },
+    {
+      id: 'darting',
+      name: 'Darting Steel',
+      why: "Sword damage twice, then the notable with sword damage and attack speed with swords, then sword damage once more (RE-1, G3 2026-10-22): the fast sword, east where the Strider's speed is, and the Yard's third sword cluster with its own partner (Keen Edge is sword with accuracy in the west, Bloodied Edge sword with leech in the south). A straight bridge from the east road's second node to the Strider's road into the Pits: a near crossing, so the Reaver walks on to the Ford's speed and a Strider with a sword comes in for it.",
+      at: [783, 2652],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [swordDamage(10)],
+          at: [675, 2604],
+          why: 'The entrance, from the east road.',
+        },
+        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [728, 2628] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Darting Steel',
+          lines: [swordDamage(24), weaponSpeed('sword', 8)],
+          at: [783, 2652],
+          why: 'A light blade that never stops moving: 2.4 + 1.6 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [swordDamage(10)],
+          at: [837, 2676],
+          why: "The exit, to the Strider's road.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -338,6 +377,16 @@ export const dual: AreaSpec = {
       from: 'crossedBlades.b',
       to: 'east.e3',
       why: "The dual crit back onto the east road's third node: a pocket that bridges two road nodes.",
+    },
+    {
+      from: 'east.e2',
+      to: 'darting.a',
+      why: "The east road's second node onto the fast sword (G3, RE-1), east, opposite the dual crit's pocket.",
+    },
+    {
+      from: 'darting.c',
+      to: 'bow.steel.toBlood.c',
+      why: "The fast sword (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Darting Steel lands on the Strider's road into the Pits, so the Reaver's sword meets the Ford's speed (Thirsty Quiver, Hatchet Work, Sentry Post) and a Strider with a sword reaches it from its own road.",
     },
   ],
 };

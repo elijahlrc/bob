@@ -9,7 +9,6 @@
  */
 import {
   allAttr,
-  aoe,
   attackSpeed,
   bleedChance,
   bleedDamage,
@@ -19,13 +18,14 @@ import {
   dex,
   evasion,
   life,
-  manaRegen,
+  moveSpeed,
   oneHandMelee,
   poisonChance,
   poisonDamage,
   projectileDamage,
   projectileSpeed,
-  shieldDef,
+  shieldBlock,
+  shieldStunAvoid,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -86,9 +86,9 @@ export const flight: AreaSpec = {
           id: 'n1',
           kind: 'notable',
           name: 'Far Flight',
-          lines: [projectileDamage(20), projectileSpeed(20), dex(20)],
+          lines: [projectileDamage(20), projectileSpeed(20), dex(15)],
           at: P(2017, -300),
-          why: '2 + 2 + 1.3 units.',
+          why: "2 + 2 + 1 units. G3 round 1 (2026-10-22): dexterity 20 → 15, so the notable is 5 units, not 5.3 (CONSTRAINTS §8.6; the brief's ST-p2).",
         },
         {
           id: 'n2',
@@ -183,31 +183,31 @@ export const flight: AreaSpec = {
         {
           id: 'n430',
           kind: 'small',
-          lines: [manaRegen(12)],
+          lines: [moveSpeed(4)],
           at: P(1322, -302),
-          why: 'Added in the editor (2026-10-19).',
+          why: "Added in the editor (2026-10-19). G3 round 1 (2026-10-22): mana regeneration → movement speed, one of the two smalls of the chain from Wanderer to Fleet Foot (movement is Fleet Foot's lead); the mana belonged to no notable once Round Shield lost it (CONSTRAINTS §8.7).",
         },
         {
           id: 'n429',
           kind: 'small',
-          lines: [manaRegen(12)],
+          lines: [shieldBlock(2)],
           at: P(1042, -202),
-          why: 'Added in the editor (2026-10-19).',
+          why: "Added in the editor (2026-10-19). G3 round 1 (2026-10-22): mana regeneration → shield block, Round Shield's small on its north side (the brief's ST-r1).",
         },
         {
           id: 'n432',
           kind: 'notable',
           name: 'Round Shield',
-          lines: [manaRegen(15), aoe(10), shieldDef(20)],
+          lines: [shieldBlock(5), shieldStunAvoid(30)],
           at: P(984, -164),
-          why: 'Added in the editor (2026-10-19) as Sheild power; named 2026-10-19, lines theirs.',
+          why: "Added in the editor (2026-10-19) as Sheild power; named 2026-10-19. G3 round 1 (2026-10-22, the brief's ST-r1, approved at stop 2): one theme, the shield, where it carried mana regeneration, area and shield defences: 2.5 + 1.5 units, block and staying on your feet behind a shield, the dexterity side's sword-and-board pull.",
         },
         {
           id: 'n433',
           kind: 'small',
-          lines: [manaRegen(12)],
+          lines: [allAttr(4)],
           at: P(1091, -234),
-          why: 'Added in the editor (2026-10-19).',
+          why: "Added in the editor (2026-10-19). G3 round 1 (2026-10-22): mana regeneration → all attributes, Wanderer's small on the way from Round Shield (the brief's ST-r1).",
         },
         {
           id: 'n434',

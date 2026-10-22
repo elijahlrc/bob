@@ -11,7 +11,7 @@
  * right angle to its pocket link would meet the arc 20 to 24 degrees off, since the old edge does not face the same way
  * as the arc). Road nodes sit about 250 to 380 units apart on the arc, turning 4 to 6 degrees at each.
  */
-import { dex, int, str } from '../lines';
+import { bowDamage, dex, int, life, resAll, str, weaponCrit, weaponCritMulti } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
 
@@ -25,7 +25,7 @@ export const farPasture: AreaSpec = {
     {
       id: 'road',
       name: 'The outer road',
-      why: "Sixteen attribute nodes on an arc at radius about 3,800, north to south. The junctions are where the brief's clusters hang (G1/strider.md §2, G1-brief.md §2.5–2.6): j1 the Shade's rim road and ST-9, m12 ST-6, j2 the north spoke and ST-1, j3 the middle spoke and ST-1's crit chain, m34 ST-5, j4 ST-3, j5 the south spoke, m56a ST-2, j6 ST-7, m67 ST-4, j7 ST-10, j8 the Fosse. Dexterity and intelligence on the two nodes nearest the Shade, strength and dexterity on the two nearest the Fosse (CONSTRAINTS §7.4: the hybrid ends serve both neighbours' gear), dexterity between.",
+      why: "Sixteen attribute nodes on an arc at radius about 3,800, north to south. The junctions are where the brief's clusters hang (G1/strider.md §2, G1-brief.md §2.5–2.6): j1 the Shade's rim road and Hardy Stock (ST-9), m12 ST-6, j2 the north spoke, m23a Kill Shot (ST-1), j3 the middle spoke, m34 ST-5, j4 ST-3, j5 the south spoke, m56a ST-2, j6 Field Kit (ST-7), m67 ST-4, m78 Fouled Tips (ST-10), j8 the Fosse (G3 round 1 moved ST-1 and ST-10 one node each, for square junctions). Dexterity and intelligence on the two nodes nearest the Shade, strength and dexterity on the two nearest the Fosse (CONSTRAINTS §7.4: the hybrid ends serve both neighbours' gear), dexterity between.",
       at: P(2600, 0),
       shape: { kind: 'hand' },
       nodes: [
@@ -34,7 +34,7 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(6), int(6)],
           at: P(2366, -1770),
-          why: "The road's north end, where the Shade's rim road (the Seawall) arrives and ST-9 bridges in from the Shade's road to Ricochet.",
+          why: "The road's north end, a three-way junction: the Shade's rim road (the Seawall) arrives from the north-east, the road runs south, and Hardy Stock (ST-9) bridges in from the west, from the Shade's road to Ricochet.",
         },
         {
           id: 'm12',
@@ -55,7 +55,7 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(7)],
           at: P(2689, -913),
-          why: "The long run between the north and middle spokes, past ST-1 outward and the north-east band inward (the brief's room for a second round).",
+          why: "The long run between the north and middle spokes: Kill Shot (ST-1) hangs straight outward here, square to the road, and the north-east band lies inward (the brief's room for a later round).",
         },
         {
           id: 'm23b',
@@ -111,7 +111,7 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(7)],
           at: P(2453, 1540),
-          why: 'Evasion with flasks (ST-7) bridges in from Sentry Post.',
+          why: 'Field Kit (ST-7, evasion with flasks) bridges in from Sentry Post, square to the road.',
         },
         {
           id: 'm67',
@@ -125,14 +125,14 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(7)],
           at: P(2150, 2096),
-          why: 'Poison with bow damage (ST-10) bridges in from Pitch Arrows.',
+          why: 'Bare for now (G3 round 1): Fouled Tips (ST-10) lands on m78 instead, where its line to Pitch Arrows is square to the road; ST-4 hangs on m67 beside it in a later round.',
         },
         {
           id: 'm78',
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: P(1994, 2318),
-          why: 'Between ST-10 and the Fosse crossing; strength with dexterity as the Reaver nears.',
+          why: 'Fouled Tips (ST-10, poison with bow damage) bridges in from Pitch Arrows, square to the road; strength with dexterity as the Reaver nears.',
         },
         {
           id: 'j8',
@@ -158,6 +158,78 @@ export const farPasture: AreaSpec = {
         ['m67', 'j7'],
         ['j7', 'm78'],
         ['m78', 'j8'],
+      ],
+    },
+    {
+      id: 'hardyStock',
+      name: 'Hardy Stock',
+      why: "ST-9 (G1/strider.md §1, G3 round 1, 2026-10-22): life with all elemental resistances, a straight bridge from the Shade's road into Ricochet to the outer road's north end. The crit archer who walks out for Kill Shot is the region's glass cannon, and life is what both bow builds leave behind; its partner is neither Wayfarer's (evasion with resistances) nor Hard Target's (evasion with life). It is also the Shade's way onto the outer road, with the life the Shade's south lacks (CONSTRAINTS §4.5, §3.5, §3.7). Five life smalls, two on the Shade side and three on the road side, so the notable is reached from either end for two or three points of life. Laid on the straight line between its two landings (the brief drew its centre about 250 units south; a straight bridge needs no bend at its notable).",
+      at: P(1983, -1558),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(1873, -1497),
+          why: "The Shade side's door, from the road into Ricochet.",
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: P(1922, -1524) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hardy Stock',
+          lines: [life(10), resAll(8)],
+          at: P(1983, -1558),
+          why: '2 + 2 units.',
+        },
+        { id: 'c', kind: 'small', lines: [life(5)], at: P(2044, -1592) },
+        { id: 'd', kind: 'small', lines: [life(5)], at: P(2092, -1618) },
+        {
+          id: 'e',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(2140, -1645),
+          why: "The road side's door, toward j1.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+        ['d', 'e'],
+      ],
+    },
+    {
+      id: 'killShot',
+      name: 'Kill Shot',
+      why: "ST-1 (G1/strider.md §1, G3 round 1, 2026-10-22): bow damage with crit chance and multiplier with bows, the crit archer's own notable (its crit was Vital Aim's, generic, and the Shade's). A pocket straight out from m23a, square to the road, 20 steps from the start: the far end of the bow's directions, beside Hardy Stock's life on the north stretch. Bow damage smalls beside it. The brief's crit chance chain back to j3 (ST-s5) is not laid: any straight chain from here to j3 meets j3 18 to 25 degrees off its road (CONSTRAINTS §11.5), so it waits for a later round, to join Kill Shot to the next outward cluster instead.",
+      at: P(3009, -992),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [bowDamage(10)],
+          at: P(2834, -949),
+          why: 'The entrance, facing the road.',
+        },
+        { id: 'b', kind: 'small', lines: [bowDamage(10)], at: P(2888, -962) },
+        { id: 'a', kind: 'small', lines: [bowDamage(10)], at: P(2941, -975) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Kill Shot',
+          lines: [bowDamage(16), weaponCrit('bow', 25), weaponCritMulti('bow', 15)],
+          at: P(3009, -992),
+          why: '1.6 + 1.7 + 1.25 units.',
+        },
+      ],
+      links: [
+        ['c', 'b'],
+        ['b', 'a'],
+        ['a', 'n'],
       ],
     },
     {
@@ -267,5 +339,16 @@ export const farPasture: AreaSpec = {
       why: 'The south spoke onto the flask pocket: Skewer and Quick Sip stay joined, through the road.',
     },
     { from: 'southSpoke.s', to: 'road.j5', why: 'The south spoke reaches the outer road.' },
+    {
+      from: 'hardyStock.a',
+      to: 'knife.snares.toRicochet.r4',
+      why: "Life for the Shade's south (G2/borders.md §4, deferred to G3 and laid as listed): the Shade's road into Ricochet onto Hardy Stock, the Shade's way onto the outer road.",
+    },
+    {
+      from: 'hardyStock.e',
+      to: 'road.j1',
+      why: "Hardy Stock reaches the outer road's north end (G2/borders.md §4): j1 becomes a three-way junction.",
+    },
+    { from: 'killShot.c', to: 'road.m23a', why: 'The crit bow hangs straight out from the road.' },
   ],
 };

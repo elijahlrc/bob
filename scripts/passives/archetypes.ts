@@ -66,6 +66,18 @@ const SHIELD = {
 };
 const FLASK = { flaskEffect: 0.25, flaskRecovery: 0.25, flaskDuration: 0.25 };
 
+/**
+ * A weapon's own lines (`weaponDamage`, `weaponSpeed`, `weaponCrit`... with the weapon as argument), which the older
+ * weapon functions (`maceDamage`, `bowDamage`...) do not cover. Spread first, so an archetype's own weights win.
+ */
+const weapon = (w: string, k = 1) => ({
+  [`weaponDamage:${w}`]: k,
+  [`weaponSpeed:${w}`]: 0.9 * k,
+  [`weaponCrit:${w}`]: 0.6 * k,
+  [`weaponCritMulti:${w}`]: 0.6 * k,
+  [`weaponAccuracy:${w}`]: 0.4 * k,
+});
+
 // ---- Families reported, shared.
 const F = {
   life: ['life', 'lifeFlat'],
@@ -120,6 +132,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Strength sword build: all the life, all the armour and all the sword damage.',
     start: 'reaver',
     weights: {
+      ...weapon('sword'),
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
@@ -149,6 +162,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Two-handed mace slams: big hits, area, stun, life and armour.',
     start: 'vanguard',
     weights: {
+      ...weapon('mace'),
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
@@ -172,7 +186,13 @@ export const ARCHETYPES: Archetype[] = [
     main: {
       life: F.life,
       armour: F.armour,
-      'two-handed mace damage': ['maceDamage', 'twoHandDamage', 'meleePhys', 'meleeArea'],
+      'two-handed mace damage': [
+        'maceDamage',
+        'weaponDamage:mace',
+        'twoHandDamage',
+        'meleePhys',
+        'meleeArea',
+      ],
     },
     pair: ['life', 'armour'],
     gear: { str: 180 },
@@ -182,6 +202,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Mace and shield: block, armour and life first, mace damage after.',
     start: 'vanguard',
     weights: {
+      ...weapon('mace'),
       ...LIFE,
       ...ARMOUR,
       ...SHIELD,
@@ -199,7 +220,7 @@ export const ARCHETYPES: Archetype[] = [
       life: F.life,
       armour: F.armour,
       block: F.block,
-      'mace damage': ['maceDamage', 'oneHandMelee'],
+      'mace damage': ['maceDamage', 'weaponDamage:mace', 'oneHandMelee'],
     },
     pair: ['life', 'block'],
     gear: { str: 150 },
@@ -238,6 +259,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Physical bow: bow damage, attack speed, crit, evasion and life.',
     start: 'strider',
     weights: {
+      ...weapon('bow'),
       ...LIFE,
       ...EVASION,
       ...ATTACK,
@@ -261,7 +283,7 @@ export const ARCHETYPES: Archetype[] = [
       life: F.life,
       evasion: F.evasion,
       'bow damage': ['bowDamage', 'projectileDamage', 'projectileAttack', 'physAttack'],
-      crit: ['critChance', 'critMulti'],
+      crit: ['critChance', 'critMulti', 'weaponCrit:bow', 'weaponCritMulti:bow'],
     },
     pair: ['bow damage', 'life'],
     gear: { dex: 180 },
@@ -271,6 +293,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Elemental bow: elemental damage with attacks, penetration, attack speed, evasion.',
     start: 'strider',
     weights: {
+      ...weapon('bow'),
       ...LIFE,
       ...EVASION,
       ...ATTACK,
@@ -307,6 +330,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Poison bow, across the map: poison and chaos with bow attacks, evasion and life.',
     start: 'strider',
     weights: {
+      ...weapon('bow', 0.6),
       ...LIFE,
       ...EVASION,
       ...ATTACK,
@@ -394,6 +418,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Wand attacks: wand damage, attack speed, crit, energy shield.',
     start: 'mystic',
     weights: {
+      ...weapon('wand'),
       ...ES,
       ...RES,
       ...ATTACK,
@@ -422,6 +447,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Axe bleed: bleed chance and damage, axe damage, leech and life.',
     start: 'reaver',
     weights: {
+      ...weapon('axe'),
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
@@ -453,6 +479,8 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dual-wielding swords or axes: dual wield damage, speed and crit, life, evasion.',
     start: 'reaver',
     weights: {
+      ...weapon('sword', 0.7),
+      ...weapon('axe', 0.7),
       ...LIFE,
       ...EVASION,
       ...ATTACK,
@@ -512,6 +540,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Staff caster who blocks: staff and spell damage, spell block, life and energy shield.',
     start: 'zealot',
     weights: {
+      ...weapon('staff'),
       ...SPELL,
       ...LIFE,
       ...RES,
@@ -563,6 +592,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dagger crit attacker: dagger damage, crit, attack speed, evasion and dodge.',
     start: 'shade',
     weights: {
+      ...weapon('dagger'),
       ...LIFE,
       ...EVASION,
       ...ATTACK,
@@ -594,6 +624,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Poison claws: claw damage, poison, chaos, attack speed, evasion.',
     start: 'shade',
     weights: {
+      ...weapon('claw'),
       ...LIFE,
       ...EVASION,
       ...ATTACK,
@@ -794,6 +825,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Fire attacks with a sceptre: sceptre and fire attack damage, burning, attack speed, life and armour.',
     start: 'zealot',
     weights: {
+      ...weapon('sceptre'),
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
@@ -853,6 +885,8 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dodging blades from the Shade: dodge, spell dodge, evasion, crit, dagger or claw damage.',
     start: 'shade',
     weights: {
+      ...weapon('dagger', 0.8),
+      ...weapon('claw', 0.8),
       ...LIFE,
       ...EVASION,
       ...ATTACK,

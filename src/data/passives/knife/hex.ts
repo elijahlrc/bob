@@ -17,7 +17,9 @@ import {
   dotDamage,
   eleDamage,
   es,
+  evasion,
   int,
+  life,
   leechLife,
   mineDamage,
   mineSpeed,
@@ -31,7 +33,7 @@ export const hex: AreaSpec = {
   region: 'shade',
   name: 'The Stair',
   why: "The Knife's north barb, climbing toward the Spire: chaos spells or mines on one wheel, the climb to Spellslip, and the dear road to the Spire.",
-  at: [1610, -2580], // Where the area's name is drawn: clear of every other area's name (label pass, round 4; nudged west in G2 for Static Edge).
+  at: [1760, -2880], // Where the area's name is drawn: clear of every other area's name (label pass, round 4; nudged west in G2 for Static Edge; moved up to the Stair's top in G3 round 1, off Wiry Frame).
   clusters: [
     {
       id: 'jH',
@@ -162,6 +164,47 @@ export const hex: AreaSpec = {
       ],
     },
     {
+      id: 'wiry',
+      name: 'Wiry Frame',
+      why: "Life with evasion in the Stair's middle (G3 round 1, 2026-10-22; the ledger's SH-15 with the folded life and evasion sections SH-s2 and SH-s4): a bridge from the climb to the Static Edge pocket, so the Stair's middle is a loop (the climb, the Spellslip junction, the lightning pocket). Life three times on the climb side, the notable, evasion twice on the lightning side. The Shade's life was the thinnest of any region and sat in one place, Thick Blood by the start; here it is a direction north, away from the daggers and claws, so the attacker who wants it gives up offence to walk here (G1/shade.md §1.2). Thick Blood is nine steps from here; the Strider's Hard Target (life with evasion) is far south.",
+      at: P(1833, -1220),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'l3',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(1670, -1297),
+          why: 'The entrance, from the climb.',
+        },
+        { id: 'l2', kind: 'small', lines: [life(5)], at: P(1719, -1274) },
+        { id: 'l1', kind: 'small', lines: [life(5)], at: P(1769, -1250) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Wiry Frame',
+          lines: [life(12), evasion(15)],
+          at: P(1833, -1220),
+          why: "2.4 + 1.5 units. The corner of the bridge: the life chain runs east from the climb, the evasion chain leaves toward the lightning pocket's first small at a clean angle to its road.",
+        },
+        { id: 'e1', kind: 'small', lines: [evasion(10)], at: P(1896, -1249) },
+        {
+          id: 'e2',
+          kind: 'small',
+          lines: [evasion(10)],
+          at: P(1946, -1272),
+          why: 'The exit, to the lightning pocket.',
+        },
+      ],
+      links: [
+        ['l3', 'l2'],
+        ['l2', 'l1'],
+        ['l1', 'n'],
+        ['n', 'e1'],
+        ['e1', 'e2'],
+      ],
+    },
+    {
       id: 'powder',
       name: 'Black Powder',
       why: 'A pocket at the top of the Stair, on the Spire border: mine damage twice, then mines with area damage. The second mine cluster, eight steps from Sapper.',
@@ -225,6 +268,12 @@ export const hex: AreaSpec = {
       why: 'The Stair foot onto the small of the curse chain, so Second Curse hangs as a leaf and is not a road to Shade Leech.',
     },
     { from: 'climb.a', to: 'bloodletter.a', why: 'The road onto Bloodletter.' },
+    { from: 'climb.a', to: 'wiry.l3', why: 'The climb onto the life chain (G3).' },
+    {
+      from: 'wiry.e2',
+      to: 'static.a',
+      why: "The evasion side lands on the lightning pocket's first small: the Stair's middle becomes a loop, and Wiry Frame a bridge rather than a dead end (G1/shade.md §3.3).",
+    },
     { from: 'toSpire.b', to: 'powder.a', why: 'The road onto Black Powder.' },
     { from: 'j4.a', to: 'static.a', why: 'The Spellslip junction onto the lightning pocket.' },
     { from: 'jH.a', to: 'road.a', why: 'The junction to the barb road.' },

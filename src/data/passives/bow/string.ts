@@ -17,7 +17,6 @@ import {
   manaRegen,
   moveSpeed,
   resOne,
-  shieldDef,
   stunAvoid,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -193,9 +192,9 @@ export const string: AreaSpec = {
         {
           id: 'n431',
           kind: 'small',
-          lines: [shieldDef(10)],
+          lines: [moveSpeed(4)],
           at: P(1454, -86),
-          why: 'Added in the editor (2026-10-19).',
+          why: "Added in the editor (2026-10-19). G3 round 1 (2026-10-22): shield defences → movement speed, the second small of the chain from Wanderer to Fleet Foot (the brief's ST-r1 counted it among Round Shield's mana smalls; it was shield defences, which belonged to no notable here either).",
         },
       ],
       links: [

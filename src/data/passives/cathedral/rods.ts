@@ -7,6 +7,7 @@ import {
   blockAttack,
   eleDamageAll,
   int,
+  spellBlock,
   staffDamage,
   str,
   totemDamage,
@@ -132,6 +133,43 @@ export const rods: AreaSpec = {
       ],
     },
     {
+      id: 'warding',
+      name: 'Warding Staff',
+      why: "G3 round 1 (2026-10-22; ledger ZE-7): a pocket loop south of the dear road, between its first two nodes, toward Idle Hands: spell block on every small, then the notable with staff damage and spell block. The staff blocker's block (it had a few points of it, all from Quarterstaff, and nowhere to climb). The smalls carry the spell block, not the staff, because block is the flat want; staff damage already has Quarterstaff (with attack block) and Crozier (with spell damage), 8 and 12 steps away. Spell block's other homes need a shield (Glass Wall) or sit far north with energy shield (Rood Screen).",
+      at: P(1545, -1114),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: P(1510, -1053),
+          why: "The entrance from the road's first node.",
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Warding Staff',
+          lines: [staffDamage(24), spellBlock(4)],
+          at: P(1545, -1114),
+          why: 'Staff damage and spell block: 2 + 2 units. A staff caster blocks spells without a shield.',
+        },
+        { id: 'b', kind: 'small', lines: [spellBlock(2)], at: P(1595, -1064) },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: P(1634, -1025),
+          why: "The far node, onto the road's middle node.",
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+        ['b', 'c'],
+      ],
+    },
+    {
       id: 'idleHands',
       name: 'Idle Hands',
       why: 'Two nodes of totem damage, then the trade: your own skills deal no damage, but totems, traps, mines, brands and minions still do, and one more totem. On the Wall crossing (brief §6), for the totem Vanguard and the summoner Zealot alike.',
@@ -164,6 +202,16 @@ export const rods: AreaSpec = {
       from: 'toWall.c',
       to: 'cathedral.pyre.wheel.f1',
       why: "The dear road lands on the tower wheel's entrance.",
+    },
+    {
+      from: 'toWall.a',
+      to: 'warding.a',
+      why: "The dear road's first node onto the staff's spell block (G3).",
+    },
+    {
+      from: 'warding.c',
+      to: 'toWall.b',
+      why: "Warding Staff back onto the road's middle node: a loop beside the road, reached from either of its first two nodes.",
     },
     {
       from: 'toWall.b',

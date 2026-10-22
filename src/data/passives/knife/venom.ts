@@ -1,6 +1,6 @@
 /**
  * The Rookery (the Knife's blade, past the edge): the venom junction, the wheel (poison with crit on the north
- * side, shield and evasion on the south, attribute nodes at the ends), the north junction with the Shade Leech spur and the Second
+ * side, shield on the south, attribute nodes at the ends), the north junction with the Shade Leech spur and the Second
  * Curse chain bridging to the curse junction, and the point: the far junction with Cruel Agony straight out and Hollow
  * Vessel north, where the bow chain from the trap barb also arrives. Re-lined on 2026-10-20 (PHILOSOPHY §2a).
  */
@@ -10,10 +10,11 @@ import {
   curseEffect,
   dex,
   es,
-  evasion,
+  esRecharge,
   hexLimit,
   int,
   leechLife,
+  mana,
   poisonChance,
   poisonDamage,
   stunAvoid,
@@ -40,7 +41,7 @@ export const venom: AreaSpec = {
     {
       id: 'wheel',
       name: 'Barbed Point',
-      why: "The wheel of eight past the edge: entered from the venom junction, left to the point, attribute nodes at both ends so neither side pays for the other. On the north side poison with crit (Barbed Point; the other poison notables are Festering, with bleeding, in the Yard's Pits, and Venom Fletching, with chaos attacks, in the Strider); on the south side energy shield and evasion with stun avoidance, for the Shade who wants to live.",
+      why: "The wheel of eight past the edge: entered from the venom junction, left to the point, attribute nodes at both ends so neither side pays for the other. On the north side poison with crit (Barbed Point; the other poison notables are Festering, with bleeding, in the Yard's Pits, and Venom Fletching, with chaos attacks, in the Strider); on the south side energy shield with stun avoidance and recharge (Shroud; its evasion went to the evasion-and-shield cluster in G3), for the Shade who wants to live.",
       at: P(1750, 0),
       shape: { kind: 'hand' },
       nodes: [
@@ -77,9 +78,9 @@ export const venom: AreaSpec = {
           id: 'v5',
           kind: 'notable',
           name: 'Shroud',
-          lines: [es(10), evasion(12), stunAvoid(20)],
+          lines: [es(10), stunAvoid(20), esRecharge(15)],
           at: P(1750, 100),
-          why: "Both of the Shade's defences and a guard against stuns: 2 + 1.2 + 1 units.",
+          why: "The shield that keeps standing: energy shield, a guard against stuns and a faster recharge, 2 + 1 + 1 units. G3 (2026-10-22, the ledger's SH-r1): its evasion went to the evasion-and-shield cluster, and the recharge sits a few steps from Shade Leech, whose cost is a slower recharge, so the two pull against each other.",
         },
         { id: 'v6', kind: 'small', lines: [es(5)], at: P(1679, 71), why: 'The shield side.' },
         { id: 'v7', kind: 'small', lines: [poisonDamage(12)], at: P(1821, -71) },
@@ -147,6 +148,43 @@ export const venom: AreaSpec = {
       links: [['a', 'n']],
     },
     {
+      id: 'breath',
+      name: 'Hoarded Breath',
+      why: "Energy shield with mana (G3 round 1, 2026-10-22; the ledger's SH-13): a bridge over the Rookery's north from the north junction to the point, between the Shade Leech and Hollow Vessel spurs, so the north junction reaches the point without going round the Barbed Point wheel. Energy shield twice from the north junction, the notable, mana once toward the point. The shield Shade's corner: the two keystones that reward a shield are a few steps either side (a pull), and Shroud's shield on the wheel below is five steps round, by the point. Not by the Knife Gate, where it would sit beside Spoils' mana and Quiet Knife's spells, a caster's shield, mana and spell within seven steps of the start (G1/shade.md §1.2). The Spire's Glass Skin sells the same pairing for the Mystic start, about nineteen steps away.",
+      at: P(1942, -495),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'e2',
+          kind: 'small',
+          lines: [es(5)],
+          at: P(1825, -451),
+          why: 'The entrance, from the north junction.',
+        },
+        { id: 'e1', kind: 'small', lines: [es(5)], at: P(1877, -471) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hoarded Breath',
+          lines: [es(14), mana(12)],
+          at: P(1942, -495),
+          why: "2.8 + 1.5 units: the shield and the mana a caster's shield is paid from.",
+        },
+        {
+          id: 'm',
+          kind: 'small',
+          lines: [mana(8)],
+          at: P(1963, -429),
+          why: 'The exit, toward the point.',
+        },
+      ],
+      links: [
+        ['e2', 'e1'],
+        ['e1', 'n'],
+        ['n', 'm'],
+      ],
+    },
+    {
       id: 'j5',
       name: 'The point',
       why: "The blade's far junction: Cruel Agony straight out, Hollow Vessel north, the bow chain from the trap barb arriving from the south, so the point is a loop with the barb.",
@@ -203,6 +241,16 @@ export const venom: AreaSpec = {
     { from: 'wheel.v2', to: 'jN.a', why: 'The dagger side up to the north junction.' },
     { from: 'jN.a', to: 'shadeLeech.a', why: 'Junction to the keystone spur.' },
     { from: 'jN.a', to: 'secondCurse.a', why: 'Junction onto the Second Curse chain.' },
+    {
+      from: 'jN.a',
+      to: 'breath.e2',
+      why: 'The north junction onto the shield-and-mana bridge (G3).',
+    },
+    {
+      from: 'breath.m',
+      to: 'j5.a',
+      why: "The bridge lands on the point, between the Hollow Vessel spur and the wheel's exit: the Rookery's north is a loop (G1/shade.md §3.3).",
+    },
     { from: 'wheel.v4', to: 'j5.a', why: 'Through the wheel to the point.' },
     { from: 'j5.a', to: 'cruelAgony.a', why: 'The point to the Cruel Agony spur.' },
     { from: 'j5.a', to: 'hollowVessel.a', why: 'The point to the Hollow Vessel spur.' },

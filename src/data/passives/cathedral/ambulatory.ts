@@ -27,6 +27,7 @@ import {
   spellDamage,
   staffDamage,
   str,
+  stunRecovery,
   warcryEffect,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -125,7 +126,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'plate',
       name: 'Consecrated Plate',
-      why: "A bridge inward from the walk to the back road: armour twice and the notable with armour and energy shield, the Zealot's two defences in one place. Its armour was thin before.",
+      why: 'A bridge inward from the walk to the back road: armour twice and the notable with armour and stun recovery (energy shield until G3). Its armour was thin before. Since G2 the aisle arrives too, so it is a crossroads.',
       at: P(2380, 260),
       shape: { kind: 'hand' },
       nodes: [
@@ -134,9 +135,9 @@ export const ambulatory: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Consecrated Plate',
-          lines: [armour(24), es(10)],
+          lines: [armour(24), stunRecovery(30)],
           at: P(2370, 280),
-          why: '2 + 2 units.',
+          why: "Armour, and stuns shaken off sooner: 2 + 2 units. G3 (2026-10-22, G1-brief.md §4.3): its energy shield went, because with Lectern four steps away on the aisle every Zealot caster took both (the allocator's plans for five casters), spell damage and energy shield in one stop. Thick Skin, in the Wall, is armour with stun threshold.",
         },
         { id: 'b', kind: 'small', lines: [armour(12)], at: P(2385, 212) },
       ],
