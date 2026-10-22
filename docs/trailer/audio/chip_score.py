@@ -16,7 +16,7 @@ BEAT = 0.5
 S16 = BEAT / 4
 
 # separate buses so the kick can duck the music and the lead can get its echo
-bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx', 'wub')}
+bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx')}
 
 
 def midi(m):
@@ -293,34 +293,6 @@ crash(27.0, 0.6, 2.5)
 bassnote(27.0, D2, 2.2, 0.6)
 lead(27.0, 62, 1.8, 0.3, duty=0.125)
 
-# ================= the wub =================
-# The crushed riff is all edges, so it does not read as bass. Under it sits a wobbling low note: a sine that modulates itself
-# (the feedback-FM wobble), its modulation index swinging up and down on the eighth notes, so it opens and closes like a filter
-# sweep, with the volume following the same swing and a clean sine an octave below for weight.
-
-
-def wub(at, dur, midis, rate=4.0, g=1.0, depth=4.2):
-    """`midis` is the pitch for each sixteenth of the note (a list), `rate` the swing in Hz (4 Hz is eighth notes at 120 bpm)."""
-    n = int(dur * SR)
-    t = np.arange(n) / SR
-    step = np.minimum((t / S16).astype(int), len(midis) - 1)
-    f = np.array([midi(m) for m in midis])[step]
-    ph = 2 * np.pi * np.cumsum(f) / SR
-    swing = 0.5 - 0.5 * np.cos(2 * np.pi * rate * t)  # 0 on the beat, 1 half way through the eighth
-    x = np.sin(ph + (0.35 + depth * swing) * np.sin(ph))
-    x = np.tanh(x * 2.0) * (0.45 + 0.55 * swing)
-    sub = np.sin(ph / 2) * 0.55  # the octave below: D1
-    env_ = adsr(n, a=0.006, d=0.05, s=0.92, r=0.03)
-    place('wub', at, (x + sub) * env_, 0.95 * g)
-
-
-for b in range(8):  # the groove, bars 0-7: D, lifting to Eb on the last eighth of every second bar
-    wub(b * 2.0, 2.0, [38] * 14 + [39 if b % 2 else 38] * 2)
-for t0 in (19.0, 21.0):
-    wub(t0, 2.0, [38] * 14 + [39 if round(t0 / 2.0) % 2 else 38] * 2)
-wub(23.0, 1.0, [38] * 8)
-wub(27.0, 2.6, [38] * 16, rate=2.0, g=1.1, depth=3.0)  # the title: a slower swing under the last hit
-
 # ================= sound effects =================
 # The game has no sound yet, so the trailer's effects are made here: short chip sounds on their own bus, laid over
 # the groove and never ducked by it. The music stays the same underneath.
@@ -451,7 +423,7 @@ _b = bus['bass']
 _sub = lowpass(_b, 110)
 _grit = degrade(_b, 6000, 3, 4.5)
 _harm = np.tanh(_sub * 7.0) * 0.5
-bus['bass'] = (_grit * 0.6 * 1.2 + _sub * 0.6 + _harm * 0.45) * 1.0
+bus['bass'] = (_grit * 0.6 * 1.2 + _sub * 1.5 + _harm * 0.7) * 1.0
 
 # The lead, crushed hard: held to a very low sample rate (aliasing), pushed into a hard clip, wavefolded, cut to 2 and 3 bits and
 # the two blended, then a short metallic comb (a 1.7 ms delay fed back) and a copy that is crushed harder still.
@@ -480,7 +452,7 @@ for at in duck_points:
 if len(sys.argv) > 2:  # `chip_score.py out.wav --stems`: how loud each voice is, before the mix
     print(' '.join(f'{k} {20 * np.log10(np.sqrt(np.mean(v ** 2)) + 1e-9):.1f}' for k, v in bus.items()))
 mono = bus['drums'] + bus['sfx'] * 0.9
-music = (bus['pad'] + bus['bass'] + bus['wub']) * duck
+music = (bus['pad'] + bus['bass']) * duck
 L += mono + music
 R += mono + music
 # the chip chord a little wide: a short offset on one side
