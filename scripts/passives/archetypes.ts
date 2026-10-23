@@ -260,6 +260,35 @@ export const ARCHETYPES: Archetype[] = [
     pair: ['totem damage', 'life'],
     gear: { str: 120 },
   },
+  {
+    // Added after G3 (2026-10-22): no totem build outside the Vanguard was measured, and Idle Hands aims partly at it.
+    id: 'spell-totem',
+    want: 'Spell totems from the Zealot: totem damage and speed, spell and elemental damage, a staff, life and energy shield.',
+    start: 'zealot',
+    weights: {
+      ...LIFE,
+      ...RES,
+      ...weapon('staff', 0.6),
+      es: 0.6,
+      totemDamage: 1,
+      totemSpeed: 1,
+      totemDuration: 0.5,
+      spellDamage: 0.8,
+      eleDamageAll: 0.8,
+      'eleDamage:fire': 0.6,
+      'eleDamage:lightning': 0.6,
+      staffDamage: 0.6,
+      skillDuration: 0.3,
+    },
+    keystones: { 'Idle Hands': 3 },
+    main: {
+      'totem damage': ['totemDamage', 'totemSpeed'],
+      'spell damage': ['spellDamage', 'eleDamageAll'],
+      life: F.life,
+    },
+    pair: ['totem damage', 'life'],
+    gear: { str: 100, int: 120 },
+  },
 
   // The Strider (dexterity).
   {
