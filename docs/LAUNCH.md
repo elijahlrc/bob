@@ -62,34 +62,32 @@ Nothing is announced until every gate is green.
    - one start-to-death pass on a real phone (docs/MOBILE.md §9).
 5. **Freeze.** No change that moves passive nodes or the save format until after launch. A save-version bump would empty the
    seeded rivals pool and the high scores overnight.
-6. **Rivals pool.** Send the 3 leftover Zealot bots (scratchpad `rivals23/zealot-unsent.json`,
-   `npx tsx scripts/postrivals.ts --post`), once the limits are raised or after about 9:00.
-7. **The itch.io page** (yours; butler can't set these):
+6. **The itch.io page** (yours; butler can't set these):
    - HTML kind, "played in the browser" on the html5 upload, embed size, fullscreen button, mobile-friendly flag;
    - the cover (`itch-cover/` v0 to v3) and the v2 screenshots (`itch-screenshots/`);
    - a short description in the game's voice with the Discord link;
    - tags, and "inspired by ARPGs", never the reference game's name.
-8. **GitHub Pages goes away.**
+7. **GitHub Pages goes away.**
    - A private repository on a free plan has no Pages at all. To keep a "moved to itch.io" page at the old address, either
      the plan needs Pages for private repositories (GitHub Pro), or the notice goes up and stays a few days before the
      repository goes private.
    - Recommended: tonight, publish the notice page from `pages.yml` (keeping its check-and-build job as the CI); make the
      repository private after launch week.
    - CI on a private repository uses the free Actions minutes; a check-and-build run every push is well within them.
-9. **The docs say itch.io is the home**, for when a push no longer deploys:
+8. **The docs say itch.io is the home**, for when a push no longer deploys:
    - the `/patch-notes` skill: the butler upload becomes the publish step;
    - CLAUDE.md's patch-notes bullet;
    - the comment at the top of `src/update.ts`;
    - DESIGN.md Appendix A.
-10. **Your end-to-end run on itch.io**, from a fresh browser profile and then a phone: a new run to a death, the character
-    posts, a duel, the rating moves, the high scores show it. This also proves the backend accepts the itch.io frame.
-11. **Media.**
+9. **Your end-to-end run on itch.io**, from a fresh browser profile and then a phone: a new run to a death, the character
+   posts, a duel, the rating moves, the high scores show it. This also proves the backend accepts the itch.io frame.
+10. **Media.**
     - **The video:** uploaded unlisted, with the itch.io link first in the description, then the Discord; a thumbnail; an end
       screen.
     - **The posts:** one per subreddit, not the same text everywhere. Each has the itch.io link, one GIF or screenshot, a
       two-line pitch, the Discord, and says plainly that it's your own game. The pitch: "A new build every run: level 1 to 100
       in a sitting, then duel other players' builds. Inspired by ARPGs."
-12. **Patch notes:** `/patch-notes draft` tonight, read in the morning.
+11. **Patch notes:** `/patch-notes draft` tonight, read in the morning.
 
 ## 2. Where to post
 
@@ -109,7 +107,7 @@ r/roguelikes is strict about what counts as a roguelike.
 
 | Time     | Step                                                                                                                                              |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 9:00     | Your address is clear even without the migration. The end-to-end run (gate 10) and the 3 Zealot bots (gate 6).                                    |
+| 9:00     | The end-to-end run (gate 9), if it wasn't done tonight.                                                                                           |
 | 10:00    | `/patch-notes`: the final build to itch.io. Check from a fresh browser and a phone: a run starts, there is no update nudge, the patch notes open. |
 | 11:00    | The itch.io page goes public. The Pages "moved" notice is live.                                                                                   |
 | 11:30    | The YouTube video goes public. Pin a comment with the itch.io and Discord links.                                                                  |
