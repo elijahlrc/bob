@@ -42,7 +42,7 @@ export const UNIT = {
   armour: 12,
   evasion: 10,
   resAll: 4,
-  resOne: 8,
+  resOne: 10,
   lifeRegen: 0.4,
   manaRegen: 10,
   stunThreshold: 8,
@@ -473,6 +473,16 @@ export const daggerSpellDamage = def('daggerSpellDamage', (v: number): Line =>
     label: `${v}% spell damage with a dagger`,
   }),
 );
+const STAFF: Condition = { id: 'wieldingStaff' };
+/** Spell damage while wielding a staff: the staff caster's line, apart from the staff attacker's `staffDamage`. */
+export const staffSpellDamage = def('staffSpellDamage', (v: number): Line =>
+  damage(v, {
+    tags: ['spell'],
+    condition: STAFF,
+    unit: 8,
+    label: `${v}% spell damage with a staff`,
+  }),
+);
 export const daggerSpellCrit = def('daggerSpellCrit', (v: number): Line =>
   line(
     `${v}% spell crit chance with a dagger`,
@@ -744,6 +754,14 @@ export const dualAccuracy = def('dualAccuracy', (v: number): Line =>
 );
 export const spellBlock = def('spellBlock', (v: number): Line =>
   line(`+${v}% spell block`, v / 2, mod('blockSpell', 'base', v)),
+);
+/** Spell block while wielding a staff: the staff's answer to a shield's `shieldSpellBlock`. */
+export const staffSpellBlock = def('staffSpellBlock', (v: number): Line =>
+  line(
+    `+${v}% spell block with a staff`,
+    v / 2,
+    mod('blockSpell', 'base', v, { condition: { id: 'wieldingStaff' } }),
+  ),
 );
 export const blockRecovery = def('blockRecovery', (v: number): Line =>
   line(`${v}% block recovery`, v / 20, mod('blockRecovery', 'inc', v)),

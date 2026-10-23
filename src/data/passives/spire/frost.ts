@@ -112,8 +112,8 @@ export const frost: AreaSpec = {
       at: [-480, -3780],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [-745, -3962] },
-        { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [-790, -3999] },
+        { id: 'a', kind: 'small', lines: [eleDamageAll(10)], at: [-745, -3962] },
+        { id: 'b', kind: 'small', lines: [eleDamageAll(10)], at: [-790, -3999] },
         { id: 'k', kind: 'keystone', name: 'Prismatic Balance', lines: [], at: [-856, -4053] },
       ],
       links: [
@@ -195,8 +195,8 @@ export const frost: AreaSpec = {
       at: [0, -4330],
       shape: { kind: 'line', heading: -90, gap: 145 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [56, -4489] },
-        { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [33, -4542] },
+        { id: 'a', kind: 'small', lines: [eleDamageAll(10)], at: [56, -4489] },
+        { id: 'b', kind: 'small', lines: [eleDamageAll(10)], at: [33, -4542] },
         { id: 'k', kind: 'keystone', name: 'Fever Pitch', lines: [] },
       ],
       links: [

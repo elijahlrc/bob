@@ -100,6 +100,16 @@ const FLASK = { flaskEffect: 0.25, flaskRecovery: 0.25, flaskDuration: 0.25 };
 // valued a little as fervour is for attackers (src/calc/charges.ts).
 const GRIT = { maxGrit: 0.3, gritOnHitTaken: 0.3, gritDuration: 0.2, lifeRegenPerGrit: 0.3 };
 const INSIGHT = { maxInsight: 0.3, insightOnCrit: 0.3, insightDuration: 0.2 };
+// What every build counts a little, under its own weights (G4 audit round 2, builds F4): movement, flasks and mana were
+// priced at nothing for most archetypes, so the clusters that sell them read as pure loss.
+const UTILITY = {
+  moveSpeed: 0.25,
+  flaskEffect: 0.2,
+  flaskRecovery: 0.2,
+  flaskDuration: 0.2,
+  mana: 0.15,
+  manaRegen: 0.15,
+};
 
 /**
  * A weapon's own lines (`weaponDamage`, `weaponSpeed`, `weaponCrit`... with the weapon as argument), which the older
@@ -121,13 +131,13 @@ const F = {
   evasion: ['evasion', 'evasionFlat'],
   spell: ['spellDamage'],
   block: ['shieldBlock', 'blockAttack', 'dualBlock'],
-  spellBlock: ['spellBlock', 'shieldSpellBlock'],
+  spellBlock: ['spellBlock', 'shieldSpellBlock', 'staffSpellBlock'],
   attackSpeed: ['attackSpeed'],
   castSpeed: ['castSpeed', 'wandCastSpeed'],
   minion: ['minionDamage'],
 };
 
-export const ARCHETYPES: Archetype[] = [
+const LIST: Archetype[] = [
   // The user's two examples (2026-10-22).
   {
     id: 'caster-es',
@@ -184,6 +194,8 @@ export const ARCHETYPES: Archetype[] = [
       oneHandMelee: 0.9,
       'attackSpeed:oneHand': 0.8,
       stunThreshold: 0.2,
+      critChance: 0.3,
+      critMulti: 0.4,
     },
     keystones: { 'Crimson Pact': 3 },
     main: {
@@ -532,6 +544,7 @@ export const ARCHETYPES: Archetype[] = [
       axeDamage: 1,
       'attackSpeed:axe': 1,
       'weaponCrit:axe': 0.3,
+      critMulti: 0.3,
       bleedChance: 1,
       bleedDamage: 1,
       bleedFaster: 0.8,
@@ -566,6 +579,7 @@ export const ARCHETYPES: Archetype[] = [
       dualDamage: 1,
       dualSpeed: 1,
       dualCrit: 1,
+      critMulti: 0.5,
       dualAccuracy: 0.5,
       dualBlock: 0.6,
       oneHandMelee: 1,
@@ -623,15 +637,17 @@ export const ARCHETYPES: Archetype[] = [
       ...RES,
       es: 0.7,
       staffDamage: 1,
+      staffSpellDamage: 1,
       spellBlock: 1,
+      staffSpellBlock: 1,
       blockAttack: 1,
       eleDamageAll: 0.8,
       'eleDamage:lightning': 0.6,
       physSpell: 0.6,
     },
     main: {
-      'spell damage': ['spellDamage', 'eleDamageAll'],
-      block: ['spellBlock', 'blockAttack'],
+      'spell damage': ['spellDamage', 'staffSpellDamage', 'eleDamageAll'],
+      block: ['spellBlock', 'staffSpellBlock', 'blockAttack'],
       life: F.life,
     },
     pair: ['block', 'life'],
@@ -801,6 +817,7 @@ export const ARCHETYPES: Archetype[] = [
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
+      ...MELEE,
       ...RES,
       twoHandDamage: 1,
       'attackSpeed:twoHand': 0.8,
@@ -1000,4 +1017,121 @@ export const ARCHETYPES: Archetype[] = [
     pair: ['dodge', 'evasion'],
     gear: { dex: 150, int: 90 },
   },
+
+  // Added after G4 audit round 2 (builds F3–F4, network finding 1): builds the yardstick lacked, so the clusters they
+  // want read as unused.
+  {
+    id: 'spellblade',
+    want: 'A Reaver who casts: spell damage and cast speed with a one-handed weapon, life and armour.',
+    start: 'reaver',
+    weights: {
+      ...SPELL,
+      ...LIFE,
+      ...ARMOUR,
+      ...MANA,
+      ...RES,
+      ...GRIT,
+      armour: 0.6,
+      armourFlat: 0.6,
+      oneHandMelee: 0.3,
+      'manaLeech:spell': 0.4,
+    },
+    main: {
+      'spell damage': F.spell,
+      'cast speed': F.castSpeed,
+      life: F.life,
+      armour: F.armour,
+    },
+    pair: ['spell damage', 'life'],
+    gear: { str: 100, int: 100 },
+  },
+  {
+    id: 'curse-attacker',
+    want: 'An axe that curses on hit: curse effect, damage against the cursed, axe damage, life and armour.',
+    start: 'reaver',
+    weights: {
+      ...weapon('axe'),
+      ...LIFE,
+      ...ARMOUR,
+      ...ATTACK,
+      ...MELEE,
+      ...RES,
+      axeDamage: 1,
+      'attackSpeed:axe': 0.8,
+      curseEffect: 1,
+      damageVsCursed: 1,
+      hexLimit: 0.6,
+      skillDuration: 0.3,
+    },
+    main: {
+      curses: ['curseEffect', 'hexLimit', 'damageVsCursed'],
+      life: F.life,
+      'axe damage': ['axeDamage', 'weaponDamage:axe', 'meleePhys'],
+    },
+    pair: ['curses', 'life'],
+    gear: { str: 140, dex: 100 },
+  },
+  {
+    id: 'sword-board',
+    want: 'Dexterity sword and shield: block, evasion, life, sword damage and melee crit.',
+    start: 'strider',
+    weights: {
+      ...weapon('sword'),
+      ...LIFE,
+      ...EVASION,
+      ...SHIELD,
+      ...ATTACK,
+      ...MELEE,
+      ...RES,
+      swordDamage: 1,
+      oneHandMelee: 0.8,
+      'attackSpeed:oneHand': 0.8,
+      shieldAttack: 0.5,
+      shieldSpeed: 0.5,
+      critMulti: 0.4,
+    },
+    main: {
+      block: F.block,
+      evasion: F.evasion,
+      life: F.life,
+      'sword damage': ['swordDamage', 'weaponDamage:sword', 'oneHandMelee'],
+    },
+    pair: ['block', 'evasion'],
+    gear: { dex: 150, str: 90 },
+  },
+  {
+    id: 'storm-blade',
+    want: 'Lightning strikes with a one-handed weapon: lightning attack damage, shock, attack speed, life and evasion.',
+    start: 'reaver',
+    weights: {
+      ...weapon('sword', 0.6),
+      ...LIFE,
+      ...EVASION,
+      ...ATTACK,
+      ...MELEE,
+      ...RES,
+      evasion: 0.6,
+      evasionFlat: 0.6,
+      'eleAttackOne:lightning': 1,
+      eleAttack: 1,
+      'eleDamage:lightning': 0.8,
+      eleDamageAll: 0.6,
+      shockChance: 0.6,
+      critChance: 0.4,
+      oneHandMelee: 0.6,
+      'attackSpeed:oneHand': 0.8,
+    },
+    main: {
+      'lightning attack damage': ['eleAttackOne:lightning', 'eleAttack', 'eleDamage:lightning'],
+      'attack speed': ['attackSpeed', 'attackSpeed:oneHand'],
+      life: F.life,
+    },
+    pair: ['lightning attack damage', 'life'],
+    gear: { str: 110, dex: 120 },
+  },
 ];
+
+export const ARCHETYPES: Archetype[] = LIST.map((a) => ({
+  ...a,
+  weights: { ...UTILITY, ...a.weights },
+}));

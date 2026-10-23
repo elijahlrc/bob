@@ -68,14 +68,14 @@ export const craft: AreaSpec = {
         {
           id: 'd',
           kind: 'small',
-          lines: [resOne('chaos', 8)],
+          lines: [resOne('chaos', 10)],
           why: "Chaos resistance, the south side's stat (energy shield until G3, MY-r1).",
         },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Warded Mind',
-          lines: [resOne('chaos', 16), mana(8), manaRegen(10)],
+          lines: [resOne('chaos', 20), mana(8), manaRegen(10)],
           why: 'The chaos resistance a caster lacks, with mana and a little regeneration: 2 + 1 + 1 units. No energy shield since G3 (MY-r1): the east wheel is spell damage or chaos resistance, not spell damage and energy shield.',
         },
       ],
