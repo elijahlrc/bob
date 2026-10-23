@@ -1155,3 +1155,15 @@ since it is then a fair fight at the level it died at. `npm run sim -- --strong-
 to a file and `scripts/postrivals.ts` shows them and, with `--post`, sends them. One sim at seed 20: 9 runs a class, 5 with the kit, all
 54 died below level 100 (kitted levels 19 to 91, median about 40; plain 8 to 77, most near 21 at the map-20 boss). All 54 were posted and
 pass the game's rival check; `rivals_for` now gives 20 rivals near maps 10, 30 and 60 and 5 near map 85.
+
+## The passive network grown (phase G, docs/tree/design/G-growth.md), built (2026-10-22/23)
+
+The hand-written network grew from 1,009 to 1,396 live nodes so a build can no longer take everything it wants: a ledger
+and region briefs, a road skeleton, three rounds of clusters by region agents, five seam clusters where regions meet, two
+rounds of six audits and two fix passes, measured throughout by an allocator over 32 archetypes (`npm run passives:builds`;
+`docs/tree/design/G4/stop4.md` has the numbers against the pre-growth tree). Save versions 21 to 23 each hand passives back
+once, so each started a new high score list and rival pool. The one bot sample (8 runs a class, seed 7,
+`scripts/simpar.sh`, after the last change): no crash, every class allocates and plays; median map reached vanguard 22,
+strider 34.5, mystic 15, reaver 20, zealot 20, shade 20, mean of all runs about 23.5 (24.2 at the last seed-7 sample,
+before the hand-written tree; not comparable run for run). Most deaths are the map-10 and map-20 bosses, as before. The
+mystic is the lowest; eight runs cannot tell that from noise.
