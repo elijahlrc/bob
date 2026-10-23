@@ -4,6 +4,8 @@
  * arguments (S: src/trailer/stage.ts, c: the controller, game: the Phaser game, arg/i).
  */
 import type { Take, Page } from './capture';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { treeCamera } from './camera';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -54,6 +56,8 @@ function mapClip(
     zoom?: number;
     speed?: number;
     css?: string;
+    /** Runs in the page before each filmed frame. */
+    each?: (S: any, c: any, i: number) => void;
   } = {},
 ): Clip {
   return {
@@ -82,7 +86,7 @@ function mapClip(
           speed: opts.speed,
         },
       );
-      await t.rec(frames);
+      await t.rec(frames, { each: opts.each });
     },
   };
 }
@@ -118,7 +122,17 @@ export const CLIPS: Clip[] = [
     84,
     { theme: 'mix:charnelPits+kilnHall', biome: 'ruins' },
     150,
-    { zoom: 3, pack: 6 },
+    {
+      zoom: 3,
+      pack: 6,
+      // The strike that lands with the crash (frame 81, cut in so it is on 1.5 s) falls on the pack around the Mystic and kills
+      // it: from frame 73, after the strike before it, the markers are kept on the pack.
+      each: (S, c, i) => {
+        if (i < 73) return;
+        S.aimMarkers(c.world);
+        S.doomMarked(c.world);
+      },
+    },
   ),
 
   /* 2. The tree: a whole build growing, level 5 to 100, zoomed out so that it reads as big, and kept in frame. */
@@ -127,16 +141,19 @@ export const CLIPS: Clip[] = [
     viewport: UI,
     css: `.tree-bar, .tree-help, .tree-legend { display: none !important; }
       .tree-wrap .tooltip, svg.tree g.preview { display: none !important; }
+      * { user-select: none !important; -webkit-user-select: none !important; }
       #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 400 44px/1 'Jacquard 24', Georgia, serif;
         color: #d98a3a; text-shadow: 0 2px 6px #000, 0 0 14px #000; pointer-events: none; }`,
     async film(t) {
-      const { order, start, pts } = await t.stage((S, c) => {
+      // The build a two-handed mace Vanguard plans (tree-build.json, written by treeBuild.ts), in the order it is taken.
+      const plan = JSON.parse(readFileSync(join(import.meta.dirname, 'tree-build.json'), 'utf8'));
+      const { order, start, pts } = await t.stage((S, c, _g, a) => {
         const run = S.stagedRun({ classId: 'vanguard', level: 100, seed: 3 }, 60);
-        const ids = S.growBuild('vanguard', 99);
+        S.checkNodes(a.ids, a.names);
         S.toCamp(c, run);
-        S.setAllocated(c, ids.slice(0, 3));
-        return { order: ids, ...S.nodePoints('vanguard', ids) };
-      });
+        S.setAllocated(c, a.ids.slice(0, 3));
+        return { order: a.ids, ...S.nodePoints('vanguard', a.ids) };
+      }, plan);
       await tab(t, 'Passive tree');
       await t.page.waitForTimeout(300);
       await t.page.evaluate(() => {
@@ -199,6 +216,7 @@ export const CLIPS: Clip[] = [
         await setView(k, cx, cy);
         await t.page.mouse.move(5, 470);
         await t.page.evaluate((l: number) => {
+          window.getSelection()?.removeAllRanges();
           const el = document.getElementById('trailer-level');
           if (el) el.textContent = `Level ${l}`;
         }, level);
@@ -312,26 +330,51 @@ export const CLIPS: Clip[] = [
           difficulty: SOFT,
         },
       );
-      // A big monster walks into the shot 1.5 s before the end of the traps' part (held up through the fight), and it falls as the
-      // clip ends: the amulet drops where it stood.
-      await t.rec(150, {
+      // A big monster walks into the shot (frame 100) and is held up through the fight. From frame 120 the traps leave it alone,
+      // so nothing is lit over it; from 135 a trap thrown at it is let be, and the first hit after that throw fells it: the
+      // amulet drops where it stood, and the Shade stands still (no more throws, no walk to the loot) while it lies there. The
+      // frames of the throw and the fall are printed, for the cut.
+      await t.rec(210, {
         each: (S, c, i) => {
           const win = window as any;
-          if (i === 100) win.__big = S.bigOne(c.world, win.__run);
-          if (win.__big != null) S.keepBig(c.world, win.__big);
-          // The traps' strikes leave it alone for the last second, so that nothing is lit over it when it falls.
-          if (i >= 120) S.calmBig(c.world, win.__big);
+          const w = c.world;
+          if (i === 100) win.__big = S.bigOne(w, win.__run);
+          if (win.__big == null) return;
+          // The strike that felled it plays for a fifth of a second; then nothing is lit over the item.
+          if (win.__fell != null) {
+            if (i >= win.__fell + 6) S.calmBig(w, win.__big);
+            return;
+          }
+          const m = w.actors.find((a: any) => a.id === win.__big);
+          if (i < 135) {
+            S.keepBig(w, win.__big);
+            if (i >= 120) S.calmBig(w, win.__big);
+            win.__had = new Set(w.sides[0].deployables.map((d: any) => d.id));
+            return;
+          }
+          if (win.__toss == null) {
+            const near = w.sides[0].deployables.some(
+              (d: any) => !win.__had.has(d.id) && Math.hypot(d.x - m.x, d.y - m.y) < 2.5,
+            );
+            if (near) win.__toss = i - 1;
+            S.keepBig(w, win.__big);
+            win.__life = m.life;
+            return;
+          }
+          if (m.life < win.__life - 1e-6) {
+            const uid = S.rareAmulet(win.__run, 70);
+            S.fellBig(w, win.__run, win.__big, uid);
+            win.__run.inventory = win.__run.inventory.filter((x: any) => x.uid !== uid);
+            S.standStill(c, win.__game);
+            win.__fell = i;
+            return;
+          }
+          S.keepBig(w, win.__big);
+          win.__life = m.life;
         },
       });
-      t.cut('drop');
-      await t.stage((S, c) => {
-        const run = (window as any).__run;
-        const uid = S.rareAmulet(run, 70);
-        (window as any).__amulet = run.inventory.find((i: any) => i.uid === uid);
-        S.fellBig(c.world, run, (window as any).__big, uid);
-        run.inventory = run.inventory.filter((i: any) => i.uid !== uid);
-      });
-      await t.rec(30, { each: (S, c) => S.calmBig(c.world, (window as any).__big) });
+      const at = await t.page.evaluate(() => [(window as any).__toss, (window as any).__fell]);
+      console.log(`  the trap is thrown on frame ${at[0]}; the big one falls on frame ${at[1]}`);
     },
   },
 

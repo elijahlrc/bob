@@ -48,14 +48,17 @@ deterministic: an unchanged page and score give byte-identical files.
   to 100 in a sitting, then duels and the high scores. The reference game is never named, here or in the trailer.
 - Text, in order: "Grind to level 100 in a sitting." / "Duel their builds." / "Take the top
   spot." / "Arcade. ARPG. Roguelike. Autobattler." / "Battle of Builds · Free on itch.io".
-- Shots: endgame cold open (a Skyfall in a mixed pack); the tree, one build growing from level 1 to 100 outward from
-  its class start like a crown (`growBuild`, `src/trailer/stage.ts`), the camera opening zoomed in and zooming out as it
-  grows, following what is lit until the whole build is in frame (no class screen, no text); the Vanguard's slam on 5 s and the Shade (gem link, traps, a drop for the
-  build);
+- Shots: endgame cold open (a Skyfall in a mixed pack; the strike on the crash, 1.5 s, falls on the pack round the
+  Mystic and kills it); the tree, one build growing from level 1 to 100: the two-handed mace Vanguard the build
+  allocator plans at 60 points and grows to 100, in the order a player takes it (`scripts/trailer/treeBuild.ts` writes
+  `tree-build.json`; run it again after the tree changes), the camera opening zoomed in and zooming out as it grows,
+  following what is lit until the whole build is in frame (no class screen, no text); the Vanguard's slam on 5 s and the
+  Shade (gem link, traps; a trap thrown at a Slag Brute, which falls on 8.5 s, and the amulet alone on the ground for a
+  second, the Shade standing still; then the card and Swap);
   three more classes side by side in phone-shaped panels; the climb, four cuts on the beat (the first a beat long, the others half a second); then level 72 is one shot of a
   boss fight, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper on map
   63, his fourth toll: he hoists his bell over his head through the tell (the game's own animation, added for this), holds
-  it while the six rings show, and brings it down as the first ring strikes and kills the Shade; a pause; the end screen
+  it while the six rings show, and brings it down as the first ring strikes and kills the Shade (the screen's edge goes red as it lands); a pause; the end screen
   zoomed in on the "Killed by" line; the duel with Sin; the rating; the high scores (Sin first, as the first
   to beat the game; oostin and Eli are real players, the other names made up); the genre grid; the title over it.
 - Music: rhythm first, simple, one groove that stops dead when the toll's rings show, the bell and an impact as it comes down, and back for the duel; a heavy bass (a clean sine and its saturated

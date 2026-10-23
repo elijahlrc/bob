@@ -201,37 +201,13 @@ export function treeShot(run: RunState, steps = 4): { name: string; path: number
   return { name: tree.nodes[best.id].name, path: best.path.slice(-steps) };
 }
 
-/**
- * A build's worth of passives, in the order they would be taken: from the class start, the notable that costs the fewest nodes
- * (a keystone counts as worth two and a half), again and again, until `count` nodes are taken. It grows from the start toward
- * the middle of the tree and on, a trunk and then a crown with limbs: a notable's score is its path length, plus its distance
- * off that line (per 800 units) and less its distance along it (per 300 units).
- */
-export function growBuild(classId: string, count: number): number[] {
-  const tree = getTree();
-  const taken: number[] = [];
-  const targets = tree.nodes.filter(
-    (n) => (n.kind === 'notable' || n.kind === 'keystone') && !n.retired,
-  );
-  const st = tree.nodes[tree.starts[classId]];
-  const len = Math.hypot(st.x, st.y) || 1;
-  const dx = -st.x / len;
-  const dy = -st.y / len;
-  while (taken.length < count) {
-    let best: { path: number[]; score: number } | null = null;
-    for (const n of targets) {
-      if (taken.includes(n.id)) continue;
-      const p = pathTo(taken, classId, n.id);
-      if (!p || !p.length) continue;
-      const along = (n.x - st.x) * dx + (n.y - st.y) * dy;
-      const off = Math.abs((n.x - st.x) * dy - (n.y - st.y) * dx);
-      const score = p.length / (n.kind === 'keystone' ? 2.5 : 1) + off / 800 - along / 300;
-      if (!best || score < best.score) best = { path: p, score };
-    }
-    if (!best) break;
-    taken.push(...best.path);
-  }
-  return taken;
+/** Throw unless the tree's nodes `ids` have the names `names` (a build written down before the tree changed). */
+export function checkNodes(ids: number[], names: string[]): void {
+  const { nodes } = getTree();
+  ids.forEach((id, i) => {
+    if (nodes[id]?.name !== names[i])
+      throw new Error(`node ${id} is ${nodes[id]?.name}, not ${names[i]}: run treeBuild.ts`);
+  });
 }
 
 /** Where `classId` starts and where each of the nodes `ids` is, in tree units. */
@@ -360,6 +336,39 @@ export function bigOne(
   return m.id;
 }
 
+/** The living monsters within `r` tiles of the character, nearest first. */
+function packOf(w: World, r: number): World['actors'] {
+  const p = w.sides[0].player;
+  const d = (a: { x: number; y: number }) => Math.hypot(a.x - p.x, a.y - p.y);
+  return w.actors
+    .filter((a) => !a.isPlayer && a.alive && a.side === null && d(a) < r)
+    .sort((a, b) => d(a) - d(b));
+}
+
+/** Put the character's Skyfall markers on the pack around it (within `r` tiles), one on each monster in turn. */
+export function aimMarkers(w: World, r = 3): void {
+  const pack = packOf(w, r);
+  if (!pack.length) return;
+  w.sides[0].markers.forEach((m, j) => {
+    m.x = pack[j % pack.length].x;
+    m.y = pack[j % pack.length].y;
+  });
+}
+
+/** When the Skyfall markers are struck in the next frame (of `dt` seconds), every monster under one dies of it. */
+export function doomMarked(w: World, dt = 1 / 30): void {
+  const s = w.sides[0];
+  if (!s.markers.some((m) => m.t <= dt + 1e-6)) return;
+  for (const m of s.markers) {
+    const r = m.profile.skill.markers!.radius * m.profile.radiusMult;
+    for (const e of packOf(w, 99))
+      if (Math.hypot(e.x - m.x, e.y - m.y) <= r + e.r) {
+        e.life = Math.min(e.life, 1);
+        e.es = 0;
+      }
+  }
+}
+
 /** Hold the big monster `id` up: it takes no more than half its life. */
 export function keepBig(w: World, id: number): void {
   const m = w.actors.find((a) => a.id === id);
@@ -374,6 +383,8 @@ export function calmBig(w: World, id: number): void {
   w.effects = w.effects.filter(clear);
   w.projectiles = w.projectiles.filter(clear);
   w.sides[0].deployables = w.sides[0].deployables.filter(clear);
+  w.sides[0].zones = w.sides[0].zones.filter(clear);
+  w.sides[0].fields = w.sides[0].fields.filter(clear);
 }
 
 /** Bring the big monster `id` down, and the item `uid` drops where it stood, a step toward the character. */
@@ -383,14 +394,64 @@ export function fellBig(w: World, run: RunState, id: number, uid: number): void 
   const p = w.sides[0].player;
   const d = Math.hypot(p.x - m.x, p.y - m.y) || 1;
   const item = run.inventory.find((i) => i.uid === uid)!;
-  calmBig(w, id);
+  // Its own loot is left out: the item is what drops.
+  const had = new Set(w.drops.map((d) => d.id));
   killActor(w, m);
+  w.drops = w.drops.filter((d) => had.has(d.id));
   w.drops.push({
     id: w.nextId++,
     x: m.x + ((p.x - m.x) / d) * 0.7,
     y: m.y + ((p.y - m.y) / d) * 0.7,
     item,
   } as World['drops'][number]);
+}
+
+/**
+ * From now on the character stands where it is and does nothing (after each sim frame, before it is drawn): no step (it would
+ * walk to the loot and pick it up), no skill, and nothing new thrown or set down is drawn or kept. What is already down plays on.
+ */
+export function standStill(
+  c: Controller,
+  game: { scene: { getScene(key: string): unknown } },
+): void {
+  const w = c.world!;
+  const s = w.sides[0];
+  const p = s.player;
+  const at = { x: p.x, y: p.y, facing: p.facing };
+  type Events = (events: World['events'], w: World) => void;
+  const style = (
+    game.scene.getScene('map') as {
+      style: { onEvents: Events; fx: { flights: Map<number, unknown> } } | null;
+    }
+  ).style;
+  if (!style) throw new Error('no map style');
+  // A trap still in the air when it stops is not drawn landing, nor kept.
+  s.deployables = s.deployables.filter((d) => !style.fx.flights.has(d.id));
+  const had = new Set(s.deployables.map((d) => d.id));
+  const grounded = () => {
+    for (const id of style.fx.flights.keys())
+      if (!s.deployables.some((d) => d.id === id)) style.fx.flights.delete(id);
+  };
+  grounded();
+  const draw = style.onEvents.bind(style);
+  style.onEvents = (events, ww) =>
+    draw(
+      events.filter(
+        (e) =>
+          !(e.t === 'deploy' && !e.end && !had.has(e.id)) && !(e.t === 'use' && e.src === p.id),
+      ),
+      ww,
+    );
+  c.bus.on('ticked', () => {
+    p.x = at.x;
+    p.y = at.y;
+    p.facing = at.facing;
+    p.moving = false;
+    p.action = null;
+    s.deployables = s.deployables.filter((d) => had.has(d.id));
+    w.projectiles = w.projectiles.filter((o) => o.owner !== p.id);
+    grounded();
+  });
 }
 
 /**

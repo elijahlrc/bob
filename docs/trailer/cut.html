@@ -249,7 +249,9 @@
       (c) =>
         `<radialGradient id="g${c.slice(1)}"><stop offset="0" stop-color="${c}" stop-opacity=".6"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`,
     )
-    .join('')}</defs>`;
+    .join(
+      '',
+    )}<radialGradient id="redEdge" r=".72"><stop offset=".72" stop-color="#c0141a" stop-opacity="0"/><stop offset="1" stop-color="#c0141a" stop-opacity=".8"/></radialGradient></defs>`;
   const glow = (x, y, r, col, o = 1) =>
     `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${col.slice(1)})" opacity="${o}"/>`;
   const floor = (cx, cy, w, h, fill = C.floor) =>
@@ -347,8 +349,7 @@
     tree3: 90,
     vanguard: 150,
     skills: 60,
-    shade: 150,
-    drop: 30,
+    shade: 210,
     equip: 45,
     strider: 90,
     reaver: 90,
@@ -368,7 +369,7 @@
   const IN = {
     endgame: 37,
     vanguard: 24,
-    shade: 135,
+    shade: 129,
     strider: 0,
     reaver: 0,
     zealot: 16,
@@ -427,13 +428,13 @@
     {
       t: [6, 10.5],
       name: 'Run two: the Shade',
-      what: 'The gem list, the socket and the DPS in one view: Wired Harm is picked up, its socket lights, and the Spire Trap’s damage jumps; then the traps, the last kill drops a rare amulet in one continuous shot; the card against the worn locket, and Swap.',
+      what: 'The gem list, the socket and the DPS in one view: Wired Harm is picked up, its socket lights, and the Spire Trap’s damage jumps; then the traps, a trap thrown at a Slag Brute that falls and drops a rare amulet, held a second; the card against the worn locket, and Swap.',
       draw(lt) {
         if (lt < 2) return img(at('skills', lt, 0));
-        if (lt < 2.5) return img(at('shade', lt - 2));
-        if (lt < 3) return img(at('drop', lt - 2.5, 0));
-        /* the camp screen, from under its tabs to under the Swap button (the clip is filmed 1280 × 990) */
-        return crop(at('equip', lt - 3, 0), [0, 100, 1280, 720], [0, 0, 320, 180], 1280, 990);
+        /* one shot: a trap thrown at the big one (8.17), it falls on 8.5 and the amulet lies there a second */
+        if (lt < 3.5) return img(at('shade', lt - 2));
+        /* the camp screen, from under its tabs to under the Swap button (the clip is filmed 1280 × 990); Swap on 10.0 */
+        return crop(at('equip', lt - 3.5, 15), [0, 100, 1280, 720], [0, 0, 320, 180], 1280, 990);
       },
     },
     {
@@ -584,6 +585,17 @@
 
   /* hard cuts that land on a hit get a short flash */
   const FLASH = [1.5, 5.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
+  /* the toll's ring lands on the Shade (fall frame 114, drawn from 18.03): the screen's edge goes red, strong at once and fading, until the end screen */
+  const HURT = [18.02, 18.85];
+  const hurt = (t) => {
+    const k = t - HURT[0];
+    if (k < 0 || t >= HURT[1]) return '';
+    const o = lerp(0.9, 0.35, ease(k / 0.5));
+    return (
+      `<rect width="320" height="180" fill="url(#redEdge)" opacity="${o}"/>` +
+      `<rect x="2" y="2" width="316" height="176" fill="none" stroke="#e0242a" stroke-width="3" opacity="${o}"/>`
+    );
+  };
 
   const svg = document.getElementById('svg');
   function draw(t) {
@@ -603,6 +615,7 @@
       DEFS +
       `<rect width="320" height="180" fill="#07070b"/>` +
       `<g transform="translate(160 90) scale(${z}) translate(-160 -90)">${body}</g>` +
+      hurt(t) +
       (fl ? `<rect width="320" height="180" fill="#fff4e0" opacity="${fl}"/>` : '');
     return i;
   }

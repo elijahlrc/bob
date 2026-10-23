@@ -350,7 +350,7 @@ whoosh(4.6, 0.4, 0.8)
 thud(5.0, 1.5)
 place('sfx', 5.0, noise(0.6, 3000) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.15), 0.25)  # the floor cracking
 # 6-10.5: the gem is picked up (6.4) and dropped into its socket (7.0), the number climbs, the traps spring, the amulet drops
-# (8.5), the card (9.0) and Swap (10.0)
+# (8.5), the card (9.5) and Swap (10.0)
 blip(6.4, 81, 0.25, 0.4, 0.5, slide=-2)
 click(7.0, 1.3)
 for k in range(8):
