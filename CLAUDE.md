@@ -89,6 +89,9 @@
 - **In-game text is concise** (2026-10-14): a screen, card or tooltip says what the player gets and what they choose, in as few
   words as it takes. Never say what a level, stop or feature does _not_ do ("no loot, no XP"), restate what the UI already
   shows, or explain the obvious. One short line beats a paragraph. Check new text against this before adding it.
+  **Voice** (the owner, 2026-10-23): names, headings and flavour may be overwrought, Diablo-style hellfire about souls and
+  damnation ("Duel for your damned soul's fate"); rules text stays plain. Privacy text says "No personal information is
+  collected", never a list of what is not. Loose ends of this kind are in [TODO.md](TODO.md).
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
