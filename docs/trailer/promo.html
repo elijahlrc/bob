@@ -153,11 +153,11 @@
       const x = c.getContext('2d');
       // The build fills the right; the title and the lines under it the left, by its start.
       await backdrop(x, W, H, [-230, 142, 2182, 1145]);
-      const t = pixText('Battle of Builds', { k: 2 });
-      glow(x, 44 + t.width / 2, 370, 330, 0.3);
-      x.drawImage(t, 44, 330);
-      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 21, 48, 330 + t.height + 40);
-      line(x, 'Free in your browser', 19, 48, 330 + t.height + 72, BONE);
+      const t = pixText('Battle of Builds', { k: 3 });
+      glow(x, 44 + t.width / 2, 370, 400, 0.3);
+      x.drawImage(t, 40, 310);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 32, 46, 310 + t.height + 54);
+      line(x, 'Free in your browser', 28, 46, 310 + t.height + 102, BONE);
     },
     /* home page featuring: 21:9, 2520 × 1080 */
     async wide(c) {
@@ -166,10 +166,10 @@
       const x = c.getContext('2d');
       // The build at the right, the whole of it; the title and the genres at the left.
       await backdrop(x, W, H, [-560, 150, 2637, 1130]);
-      const t = pixText('Battle of Builds', { k: 4 });
-      glow(x, 140 + t.width / 2, 470, 650, 0.28);
-      x.drawImage(t, 140, 400);
-      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 46, 148, 400 + t.height + 84);
+      const t = pixText('Battle of Builds', { k: 5 });
+      glow(x, 140 + t.width / 2, 520, 760, 0.28);
+      x.drawImage(t, 130, 430);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 72, 140, 430 + t.height + 112);
     },
     /* the browser tab: one "B", 32 font pixels square, scaled to 512 */
     async favicon(c) {
