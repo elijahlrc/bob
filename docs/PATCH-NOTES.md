@@ -16,6 +16,9 @@ change, and our own names only. Dash bullets under plain headings.
 - Gems found on the level just played are marked NEW on the Skills tab.
 - New fonts for the interface and headings, and a pixel font for damage numbers and drop labels on the map.
 - Dropdown options are readable without hovering over them.
+- The passive tree changes again, with five new clusters where class regions meet and several notables renamed; spent passive points are handed back once more.
+- Scroll bars are drawn in the game's colours.
+- The closed Workbench tab is hidden for now, and several hints and tooltips are shorter.
 
 ## 2026-10-21
 
