@@ -16,6 +16,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { CLASSES } from '../../src/data/classes';
 import { buildAll } from '../../src/data/passives';
 import { makeLine } from '../../src/data/passives/vocab';
 import type { LineSpec } from '../../src/data/passives/types';
@@ -75,18 +76,30 @@ const attrOf = (i: number, a: 'str' | 'dex' | 'int') =>
 function weightOf(a: Archetype, key: string): number {
   if (a.weights[key] !== undefined) return a.weights[key];
   const fn = key.split(':')[0];
-  if (fn !== key && a.weights[`${fn}:*`] !== undefined) return a.weights[`${fn}:*`];
+  if (a.weights[`${fn}:*`] !== undefined) return a.weights[`${fn}:*`];
   return 0;
 }
 
-/** What each node is worth to an archetype (attributes are worth nothing; see archetypes.ts). */
-function valuesFor(a: Archetype): Float64Array {
+type Attr = 'str' | 'dex' | 'int';
+/**
+ * What each node is worth to an archetype. Attribute lines are worth nothing (see archetypes.ts), except an attribute
+ * the plan is short of for its gear: `attrW` gives that attribute a weight per unit, so a plan must pay for what its
+ * weapon asks. The tax always counts against the values without it.
+ */
+function valuesFor(a: Archetype, attrW: Partial<Record<Attr, number>> = {}): Float64Array {
   const v = new Float64Array(N);
   for (let i = 0; i < N; i++) {
     if (!live(i)) continue;
     if (nodes[i].kind === 'keystone') v[i] = a.keystones?.[nodes[i].name] ?? 0;
     else
-      v[i] = rows[i].reduce((s, r) => s + (ATTR.has(r.key) ? 0 : r.units * weightOf(a, r.key)), 0);
+      v[i] = rows[i].reduce((s, r) => {
+        if (!ATTR.has(r.key)) return s + r.units * weightOf(a, r.key);
+        const w =
+          r.key === 'allAttr'
+            ? Math.max(attrW.str ?? 0, attrW.dex ?? 0, attrW.int ?? 0)
+            : (attrW[r.key as Attr] ?? 0);
+        return s + r.units * w;
+      }, 0);
   }
   return v;
 }
@@ -327,6 +340,8 @@ type Step = {
   searchGain: number;
   tax: { points: number; share: number; road: number };
   attrs: { str: number; dex: number; int: number };
+  /** What the plan still lacks for its gear, the class's own attributes counted. */
+  short: Partial<Record<Attr, number>>;
   taken: string[];
   plan: number[];
 };
@@ -347,31 +362,44 @@ function familyOf(a: Archetype, label: string, set: Set<number>): Family {
   return { label, units, amounts };
 }
 
+/** How far a plan falls short of its gear, by attribute, with the class's own attributes counted. */
+function shortOf(a: Archetype, set: Set<number>): Partial<Record<Attr, number>> {
+  const base = CLASSES.find((c) => c.id === a.start)!.attrs;
+  const out: Partial<Record<Attr, number>> = {};
+  for (const k of ['str', 'dex', 'int'] as const) {
+    const need = a.gear?.[k] ?? 0;
+    let have = base[k];
+    for (const i of set) have += attrOf(i, k);
+    if (have < need) out[k] = need - have;
+  }
+  return out;
+}
+
 function measure(a: Archetype): Result {
-  const v = valuesFor(a);
+  const v0 = valuesFor(a);
   const start = built.tree.starts[a.start];
-  const fromStart = bfs([start], v, new Set()).d;
+  const fromStart = bfs([start], v0, new Set()).d;
   const step = (budget: number, set: Set<number>, near: Plan[] | null, gain: number): Step => {
     const points = set.size - 1;
     let taxPts = 0,
       road = 0;
     for (const i of set) {
       if (i === start) continue;
-      if (v[i] <= 0) taxPts++;
+      if (v0[i] <= 0) taxPts++;
       if (nodes[i].kind === 'travel') road++;
     }
     const attrs = { str: 0, dex: 0, int: 0 };
     for (const i of set) for (const k of ['str', 'dex', 'int'] as const) attrs[k] += attrOf(i, k);
-    const score = scoreOf(set, v);
     return {
       budget,
       points,
       families: Object.keys(a.main).map((l) => familyOf(a, l, set)),
       choice: near?.length ?? 0,
-      nearScores: near?.map((p) => p.score / score) ?? [],
+      nearScores: near?.map((p) => p.score / near[0].score) ?? [],
       searchGain: gain,
       tax: { points: taxPts, share: points ? taxPts / points : 0, road },
       attrs,
+      short: shortOf(a, set),
       taken: [...set]
         .filter(big)
         .sort((x, y) => fromStart[x] - fromStart[y])
@@ -382,7 +410,18 @@ function measure(a: Archetype): Result {
   const curve: Step[] = [];
   const judged: Verdict[] = [];
   for (const budget of JUDGED) {
-    const { best, near, firstGain } = plans(a, budget, v);
+    // Solve; while the plan is short of its gear, value the attribute it lacks more and solve again.
+    let v = v0;
+    let found = plans(a, budget, v);
+    const attrW: Partial<Record<Attr, number>> = {};
+    for (let round = 0; round < 5; round++) {
+      const short = shortOf(a, found.best.set);
+      if (!Object.keys(short).length) break;
+      for (const k of Object.keys(short) as Attr[]) attrW[k] = (attrW[k] ?? 0) + 0.15;
+      v = valuesFor(a, attrW);
+      found = plans(a, budget, v);
+    }
+    const { best, near, firstGain } = found;
     curve.push(step(budget, best.set, near, firstGain));
     // The same build grown by GROW points at a time: what more points would buy.
     let set = best.set;
@@ -391,8 +430,8 @@ function measure(a: Archetype): Result {
       curve.push(step(budget + more, set, null, 0));
     }
     const gaveUp = [...set]
-      .filter((i) => big(i) && !best.set.has(i) && v[i] > 0 && wantedShare(a, i) >= 0.5)
-      .map((i) => ({ name: nodes[i].name, value: v[i] }))
+      .filter((i) => big(i) && !best.set.has(i) && v0[i] > 0 && wantedShare(a, i) >= 0.5)
+      .map((i) => ({ name: nodes[i].name, value: v0[i] }))
       .sort((x, y) => y.value - x.value);
     judged.push({ budget, gaveUp });
   }
@@ -485,7 +524,13 @@ for (const a of ARCHETYPES) {
   for (const b of JUDGED) {
     const s = at(b);
     console.log(
-      `  ${b} points: choice ${s.choice} [${s.nearScores.map(pct).join(' ')}], tax ${pct(s.tax.share)} (${s.tax.points}; roads ${s.tax.road}), attributes str ${s.attrs.str} dex ${s.attrs.dex} int ${s.attrs.int}${s.points < b ? `, ${b - s.points} points unspent` : ''}`,
+      `  ${b} points: choice ${s.choice} [${s.nearScores.map(pct).join(' ')}], tax ${pct(s.tax.share)} (${s.tax.points}; roads ${s.tax.road}), attributes str ${s.attrs.str} dex ${s.attrs.dex} int ${s.attrs.int}${
+        Object.keys(s.short).length
+          ? ` (short of gear: ${Object.entries(s.short)
+              .map(([k, x]) => `${k} ${x}`)
+              .join(', ')})`
+          : ''
+      }${s.points < b ? `, ${b - s.points} points unspent` : ''}`,
     );
   }
   console.log(`  ${pad('points', 34)}${res.curve.map((s) => pad(String(s.budget), 7)).join('')}`);

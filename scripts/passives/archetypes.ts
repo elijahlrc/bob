@@ -33,9 +33,18 @@ export type Archetype = {
 };
 
 // ---- Bundles most builds share.
-const RES = { resAll: 0.4, 'resOne:*': 0.25, maxResAll: 0.4, 'maxResOne:*': 0.3 };
+// Resistances, and the stun and ailment defences every build counts a little (CONSTRAINTS §4.5 names stun).
+const RES = {
+  resAll: 0.4,
+  'resOne:*': 0.25,
+  maxResAll: 0.4,
+  'maxResOne:*': 0.3,
+  stunAvoid: 0.25,
+  stunRecovery: 0.2,
+  avoidAilments: 0.25,
+};
 const LIFE = { life: 1, lifeFlat: 1, lifeRegen: 0.4 };
-const ES = { es: 1, esFlat: 1, esRecharge: 0.5, esRechargeDelay: 0.5 };
+const ES = { es: 1, esFlat: 1, esRecharge: 0.5, esRechargeDelay: 0.5, esOnHit: 0.4, esLeech: 0.4 };
 const MANA = { mana: 0.3, manaRegen: 0.3, costReduction: 0.3 };
 const ARMOUR = { armour: 1, armourFlat: 1, physReduction: 1, globalDefences: 0.5 };
 const EVASION = { evasion: 1, evasionFlat: 1, globalDefences: 0.5 };
@@ -52,6 +61,8 @@ const SPELL = {
   spellCritMulti: 0.4,
   costReduction: 0.3,
   'manaLeech:spell': 0.3,
+  damageOnFullLife: 0.3,
+  damageVsLowLife: 0.3,
 };
 // Fervour charges grant speed and more damage (src/calc/charges.ts), so attackers want their lines a little.
 const ATTACK = {
@@ -61,8 +72,19 @@ const ATTACK = {
   fervourOnKill: 0.3,
   maxFervour: 0.3,
   fervourDuration: 0.2,
+  doubleDamage: 0.5,
+  damageVsLowLife: 0.3,
+  cullingStrike: 0.3,
+  damageOnFullLife: 0.3,
+  critOnFullLife: 0.2,
 };
-const MELEE = { meleeDamage: 0.8, meleePhys: 1, physAttack: 1, 'critChance:melee': 0.3 };
+const MELEE = {
+  meleeDamage: 0.8,
+  meleePhys: 1,
+  physAttack: 1,
+  'critChance:melee': 0.3,
+  meleeRange: 0.3,
+};
 const SHIELD = {
   shieldBlock: 1,
   blockAttack: 1,
@@ -71,8 +93,13 @@ const SHIELD = {
   blockRecovery: 0.3,
   spellBlock: 0.6,
   shieldSpellBlock: 0.6,
+  shieldStunAvoid: 0.3,
 };
 const FLASK = { flaskEffect: 0.25, flaskRecovery: 0.25, flaskDuration: 0.25 };
+// The strength builds' charges (grit: physical reduction and resistances) and the crit casters' (insight: crit chance),
+// valued a little as fervour is for attackers (src/calc/charges.ts).
+const GRIT = { maxGrit: 0.3, gritOnHitTaken: 0.3, gritDuration: 0.2, lifeRegenPerGrit: 0.3 };
+const INSIGHT = { maxInsight: 0.3, insightOnCrit: 0.3, insightDuration: 0.2 };
 
 /**
  * A weapon's own lines (`weaponDamage`, `weaponSpeed`, `weaponCrit`... with the weapon as argument), which the older
@@ -107,6 +134,9 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Classic caster: cold spells, all the spell damage and all the energy shield it can find.',
     start: 'mystic',
     weights: {
+      freezeDuration: 0.3,
+      ailmentEffect: 0.3,
+      ...INSIGHT,
       ...SPELL,
       ...ES,
       ...MANA,
@@ -125,7 +155,7 @@ export const ARCHETYPES: Archetype[] = [
       dodgeSpell: 0.3,
       reducedReservation: 0.2,
     },
-    keystones: { 'Hollow Vessel': 4 },
+    keystones: { 'Prismatic Balance': 2, 'Hollow Vessel': 4 },
     main: {
       'spell damage': ['spellDamage', 'wandSpellDamage', 'spellAreaDamage'],
       'cold damage': ['eleDamage:cold', 'eleDamageAll'],
@@ -140,6 +170,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Strength sword build: all the life, all the armour and all the sword damage.',
     start: 'reaver',
     weights: {
+      ...GRIT,
       ...weapon('sword'),
       ...LIFE,
       ...ARMOUR,
@@ -154,6 +185,7 @@ export const ARCHETYPES: Archetype[] = [
       'attackSpeed:oneHand': 0.8,
       stunThreshold: 0.2,
     },
+    keystones: { 'Crimson Pact': 3 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -170,6 +202,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Two-handed mace slams: big hits, area, stun, life and armour.',
     start: 'vanguard',
     weights: {
+      ...GRIT,
       ...weapon('mace'),
       ...LIFE,
       ...ARMOUR,
@@ -190,7 +223,7 @@ export const ARCHETYPES: Archetype[] = [
       'weaponCritMulti:mace': 0.3,
       warcryEffect: 0.3,
     },
-    keystones: { 'Rooted Stance': 3 },
+    keystones: { 'Unerring Discipline': 3, 'Rooted Stance': 3 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -210,6 +243,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Mace and shield: block, armour and life first, mace damage after.',
     start: 'vanguard',
     weights: {
+      ...GRIT,
       ...weapon('mace'),
       ...LIFE,
       ...ARMOUR,
@@ -238,6 +272,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Totems and warcries: totem damage, warcry effect, life and regeneration.',
     start: 'vanguard',
     weights: {
+      ...GRIT,
       ...LIFE,
       ...ARMOUR,
       ...RES,
@@ -315,7 +350,7 @@ export const ARCHETYPES: Archetype[] = [
       projectileSpeed: 0.3,
       'leechLife:attack': 0.4,
     },
-    keystones: { 'Steady Draw': 4 },
+    keystones: { 'Close Quarters': 2, 'Arrow Weave': 3, 'Steady Draw': 4 },
     main: {
       life: F.life,
       evasion: F.evasion,
@@ -348,6 +383,7 @@ export const ARCHETYPES: Archetype[] = [
       shockEffect: 0.3,
       igniteChance: 0.3,
     },
+    keystones: { 'Arrow Weave': 3 },
     main: {
       life: F.life,
       evasion: F.evasion,
@@ -385,6 +421,7 @@ export const ARCHETYPES: Archetype[] = [
       damageVsPoisoned: 0.6,
       'resOne:chaos': 0.5,
     },
+    keystones: { 'Cruel Agony': 3, 'Arrow Weave': 3 },
     main: {
       life: F.life,
       poison: ['poisonDamage', 'poisonChance', 'chaosAttack', 'dotDamage'],
@@ -400,6 +437,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Fire and lightning caster on life: spell damage, crit, life, mana.',
     start: 'mystic',
     weights: {
+      ...INSIGHT,
       ...SPELL,
       ...LIFE,
       ...MANA,
@@ -416,6 +454,7 @@ export const ARCHETYPES: Archetype[] = [
       shockEffect: 0.4,
       igniteChance: 0.3,
     },
+    keystones: { 'Mind Bulwark': 3, 'Pain Conduit': 3 },
     main: {
       'spell damage': ['spellDamage', 'spellProjectile'],
       'elemental damage': ['eleDamageAll', 'eleDamage:fire', 'eleDamage:lightning'],
@@ -502,7 +541,7 @@ export const ARCHETYPES: Archetype[] = [
       physAttack: 0.8,
       twoHandDamage: 0.5,
     },
-    keystones: { 'Wound Dance': 3 },
+    keystones: { 'Crimson Pact': 3, 'Wound Dance': 3 },
     main: {
       life: F.life,
       bleed: ['bleedDamage', 'bleedChance', 'damageVsBleeding'],
@@ -534,6 +573,7 @@ export const ARCHETYPES: Archetype[] = [
       axeDamage: 0.7,
       attackSpeedOnKill: 0.6,
     },
+    keystones: { Strongarm: 2 },
     main: {
       life: F.life,
       'dual wield': ['dualDamage', 'oneHandMelee', 'dualSpeed', 'dualCrit'],
@@ -563,7 +603,7 @@ export const ARCHETYPES: Archetype[] = [
       'penetration:fire': 0.6,
       'maxResOne:fire': 0.5,
     },
-    keystones: { 'Searing Avatar': 3 },
+    keystones: { 'Fever Pitch': 2, 'Searing Avatar': 3 },
     main: {
       'fire damage': ['eleDamage:fire', 'eleDamageAll', 'burnDamage', 'dotDamage'],
       'spell damage': F.spell,
@@ -602,6 +642,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Aura and brand support caster: auras, reservation, brands, spell damage, life.',
     start: 'zealot',
     weights: {
+      'critChance:brand': 0.6,
       ...LIFE,
       ...RES,
       ...ES,
@@ -629,6 +670,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dagger crit attacker: dagger damage, crit, attack speed, evasion and dodge.',
     start: 'shade',
     weights: {
+      ...INSIGHT,
       ...weapon('dagger'),
       ...LIFE,
       ...EVASION,
@@ -646,7 +688,7 @@ export const ARCHETYPES: Archetype[] = [
       dodgeAttack: 0.8,
       dodgeSpell: 0.5,
     },
-    keystones: { 'Nimble Gambit': 3 },
+    keystones: { 'Shade Leech': 2, 'Nimble Gambit': 3 },
     main: {
       life: F.life,
       crit: ['critChance', 'critMulti', 'weaponCrit:dagger'],
@@ -679,6 +721,7 @@ export const ARCHETYPES: Archetype[] = [
       dodgeAttack: 0.5,
       'resOne:chaos': 0.5,
     },
+    keystones: { 'Cruel Agony': 3 },
     main: {
       life: F.life,
       poison: ['poisonDamage', 'poisonChance', 'chaosAttack', 'dotDamage'],
@@ -692,6 +735,10 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Traps and mines: trap and mine damage, throwing speed, area, energy shield and evasion.',
     start: 'shade',
     weights: {
+      'critChance:trap': 0.6,
+      'critChance:mine': 0.6,
+      'critMulti:trap': 0.6,
+      'critMulti:mine': 0.6,
       ...ES,
       ...EVASION,
       ...RES,
@@ -722,6 +769,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dagger caster: spell damage and crit with a dagger, cast speed, energy shield.',
     start: 'shade',
     weights: {
+      ...INSIGHT,
       ...SPELL,
       ...ES,
       ...RES,
@@ -747,6 +795,9 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Two-handed fire melee: fire damage with attacks, two-handed damage, life, armour.',
     start: 'vanguard',
     weights: {
+      maceDamage: 0.4,
+      axeDamage: 0.4,
+      ...GRIT,
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
@@ -764,7 +815,7 @@ export const ARCHETYPES: Archetype[] = [
       burnDamage: 0.5,
       'maxResOne:fire': 0.5,
     },
-    keystones: { 'Searing Avatar': 4 },
+    keystones: { 'Blood Rite': 2, 'Searing Avatar': 4 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -849,6 +900,7 @@ export const ARCHETYPES: Archetype[] = [
       'eleDamage:lightning': 0.6,
       life: 0.5,
     },
+    keystones: { 'Mana Bastion': 3, 'Mind Bulwark': 3 },
     main: {
       'channelling and spell damage': ['channelDamage', 'spellDamage'],
       'mana sustain': ['mana', 'manaRegen', 'costReduction', 'manaLeech:spell'],
