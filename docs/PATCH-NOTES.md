@@ -4,6 +4,16 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-23
+
+- The passive tree is reworked again, and spent passive points are handed back once more; Wasp Sting becomes Cutpurse's Luck, crit with daggers and claws instead of poison.
+- The Mystic's start trades crit chance for mana regeneration.
+- Passive stats that apply to one kind of skill now say which, such as melee crit chance or two-handed attack speed.
+- The high score list starts over with this version, with a fresh field of rivals to duel.
+- Wand attacks shoot a bolt at range instead of stabbing.
+- Pixel art on the map is no longer blurred on scaled-up screens.
+- On phones, the Strategy tab gives each skill's name its own line.
+
 ## 2026-10-22
 
 - The passive tree grows by more than a third, with new clusters in every class region; its clusters sit tighter and some existing nodes change.
