@@ -443,6 +443,9 @@ Each was tried or proposed and struck by the user. The date is when it was struc
 - **Laying out wheels, loops and other shapes by algorithm alone.** [10-21] Tightening node by node squashed every wheel
   and loop it touched, took a road's smalls for a pocket and put kinks into the roads out of a start. A script places
   the simple cases (a chain off one notable); every cluster is then looked at.
+- **New rules proposed by audits.** [10-22] G4 audit round 1 proposed fifteen additions (G4/fix-1.md §4, C1–C15); the
+  user adopted none: "Literally none of these should be adopted." Audits report findings against the rules as they
+  stand, with fixes; they do not propose new rules.
 - **Section ideas that confused the user, earlier** [10-19]:
   - Delivery categories that are not meaningful to a player (melee, projectile, area, chaining, channelled, triggered,
     slam, strike, nova).

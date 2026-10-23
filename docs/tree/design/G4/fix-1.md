@@ -363,7 +363,9 @@ partner (mana against life); left.
 
 ---
 
-## 4. Proposed CONSTRAINTS changes (not made; for the user)
+## 4. Proposed CONSTRAINTS changes (none adopted)
+
+**The user, 2026-10-22: "Literally none of these should be adopted."** Kept as a record only (CONSTRAINTS §14).
 
 Gathered from the six reports' "missing rules", de-duplicated. **Good** = clearly good, a written-down version of what
 the audits found and the user has already said. **View** = needs the user's view.
