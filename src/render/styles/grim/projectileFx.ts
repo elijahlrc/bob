@@ -25,19 +25,21 @@ export type ProjectileState = {
   trail: { x: number; y: number; z: number }[];
   /** A phase for the flicker and the spin, so neighbours do not move together. */
   phase: number;
+  /** An attack shot from a wand: a bolt, not an arrow. */
+  bolt: boolean;
 };
 
 /** Pixels a flight rides over the ground (a hand's height). */
 export const FLIGHT_HEIGHT = 9;
 
-export function newProjectileState(p: Projectile): ProjectileState {
-  return { trail: [], phase: (p.id * 2.399963) % (Math.PI * 2) };
+export function newProjectileState(p: Projectile, bolt = false): ProjectileState {
+  return { trail: [], phase: (p.id * 2.399963) % (Math.PI * 2), bolt };
 }
 
 /** What kind of body a projectile has. */
 export type Body = 'arrow' | 'orb' | 'bigOrb' | 'shield' | 'tornado' | 'skull' | 'mirror';
 
-export function bodyOf(p: Projectile): Body {
+export function bodyOf(p: Projectile, bolt = false): Body {
   switch (p.kind) {
     case 'shield':
       return 'shield';
@@ -52,7 +54,7 @@ export function bodyOf(p: Projectile): Body {
     default:
       break;
   }
-  if (p.profile.skill.type === 'attack') return 'arrow';
+  if (p.profile.skill.type === 'attack' && !bolt) return 'arrow';
   return 'orb';
 }
 
@@ -140,7 +142,7 @@ export class ProjectileFx {
   /** Draw one projectile (and keep its trail). */
   draw(p: Projectile, st: ProjectileState, color: number, time: number): void {
     this.begin(time);
-    const body = bodyOf(p);
+    const body = bodyOf(p, st.bolt);
     const lift = FLIGHT_HEIGHT + (isLob(p) ? lobHeight(p) : 0);
     // The trail is the last stretch of the flight, in world tiles.
     st.trail.push({ x: p.x, y: p.y, z: lift });

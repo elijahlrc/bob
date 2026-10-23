@@ -78,7 +78,7 @@ describe('the sheet plays the rotation the sim plays', () => {
     const sim = inSim(b, 'boss');
     const sheet = onSheet(b, 'boss');
     near(sim.uses.rimeCore, sheet.uses.rimeCore, 0.08, 'Rime Core uses');
-    near(sim.uses.defaultAttack, sheet.uses.defaultAttack, 0.08, 'weapon uses');
+    near(sim.uses.defaultWandAttack, sheet.uses.defaultWandAttack, 0.08, 'weapon uses');
     near(sim.dps, sheet.dps, 0.1, 'DPS');
   });
 
@@ -87,7 +87,7 @@ describe('the sheet plays the rotation the sim plays', () => {
     const b = build(['rimeCore', 'flameBolt']);
     const sim = inSim(b, 'boss');
     const sheet = onSheet(b, 'boss');
-    expect(sheet.uses.defaultAttack ?? 0).toBeLessThan(0.02);
+    expect(sheet.uses.defaultWandAttack ?? 0).toBeLessThan(0.02);
     near(sim.uses.rimeCore, sheet.uses.rimeCore, 0.08, 'Rime Core uses');
     near(sim.uses.flameBolt, sheet.uses.flameBolt, 0.08, 'Flame Bolt uses');
     near(sim.dps, sheet.dps, 0.2, 'DPS');

@@ -32,6 +32,14 @@ export function figureOf(w: World, a: Actor): FigureKind {
   return monsterFigure(a.mon!.spec.type, a.mon!.spec.rarity);
 }
 
+/** Whether the actor with this id is a character holding a wand (its attacks fly as bolts, not arrows). */
+export function holdsWand(w: World, id: number): boolean {
+  const a = w.actors.find((x) => x.id === id);
+  if (!a?.isPlayer) return false;
+  const mh = sideOf(w, a).build.equipment.mainHand;
+  return !!mh && itemBase(mh.baseId).itemClass === 'wand';
+}
+
 /** The colour of a character's class: the rival in a duel is drawn in its own. */
 export function heroColor(w: World, a: Actor): number {
   return classDef(sideOf(w, a).build.classId).color;
