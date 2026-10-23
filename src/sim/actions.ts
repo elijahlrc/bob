@@ -2,7 +2,7 @@ import { angleDiff } from '../core/math';
 import { MONSTER_TYPES } from '../data/monsters';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
-import { fallOf } from '../calc/skillLook';
+import { fallOf, profileElement } from '../calc/skillLook';
 import { areaPace } from '../calc/monster';
 import { rollGains } from './buffs';
 import { CHARGE_KINDS } from '../calc/charges';
@@ -321,16 +321,7 @@ export function enemiesOf(w: World, a: Actor): Actor[] {
 }
 
 /** The damage type of a skill's biggest chunk (what an effect looks like). */
-function dominantType(p: SkillProfile, hand: number): number {
-  let dtype = 0;
-  let best = -1;
-  for (const c of p.hands[Math.min(hand, p.hands.length - 1)].chunks)
-    if (c.max > best) {
-      best = c.max;
-      dtype = c.type;
-    }
-  return dtype;
-}
+const dominantType = (p: SkillProfile, hand: number): number => profileElement(p, hand);
 
 /** A slam, or any blow of a boss: it shakes the ground. */
 function isHeavy(a: Actor, p: SkillProfile): boolean {
@@ -438,7 +429,7 @@ export function fire(w: World, a: Actor, act: Action): void {
       interval: 1,
       pulseT: 0,
       pulsesLeft: 1,
-      dtype: 0,
+      dtype: profileElement(q, act.hand),
     });
   }
   // A skill that discharges the charges held (its damage grew with them) spends them once it has landed.
@@ -690,13 +681,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     const cx = b.origin === 'self' ? a.x : act.aimX;
     const cy = b.origin === 'self' ? a.y : act.aimY;
     const radius = b.radius * p.radiusMult;
-    let dominant = 0;
-    let best = -1;
-    for (const c of p.hands[0].chunks)
-      if (c.max > best) {
-        best = c.max;
-        dominant = c.type;
-      }
+    const dominant = profileElement(p);
     if (!act.ringed)
       w.events.push({
         t: 'explode',

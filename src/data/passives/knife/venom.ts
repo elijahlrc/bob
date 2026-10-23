@@ -1,6 +1,6 @@
 /**
  * The Rookery (the Knife's blade, past the edge): the venom junction, the wheel (poison with crit on the north
- * side, shield and evasion on the south, attribute nodes at the ends), the north junction with the Shade Leech spur and the Second
+ * side, shield on the south, attribute nodes at the ends), the north junction with the Shade Leech spur and the Second
  * Curse chain bridging to the curse junction, and the point: the far junction with Cruel Agony straight out and Hollow
  * Vessel north, where the bow chain from the trap barb also arrives. Re-lined on 2026-10-20 (PHILOSOPHY §2a).
  */
@@ -10,10 +10,11 @@ import {
   curseEffect,
   dex,
   es,
-  evasion,
+  esRecharge,
   hexLimit,
   int,
   leechLife,
+  mana,
   poisonChance,
   poisonDamage,
   stunAvoid,
@@ -40,7 +41,7 @@ export const venom: AreaSpec = {
     {
       id: 'wheel',
       name: 'Barbed Point',
-      why: "The wheel of eight past the edge: entered from the venom junction, left to the point, attribute nodes at both ends so neither side pays for the other. On the north side poison with crit (Barbed Point; the other poison notables are Festering, with bleeding, in the Yard's Pits, and Venom Fletching, with chaos attacks, in the Strider); on the south side energy shield and evasion with stun avoidance, for the Shade who wants to live.",
+      why: "The wheel of eight past the edge: entered from the venom junction, left to the point, attribute nodes at both ends so neither side pays for the other. On the north side poison with crit (Barbed Point; the other poison notables are Festering, with bleeding, in the Yard's Pits, and Venom Fletching, with chaos attacks, in the Strider); on the south side energy shield with stun avoidance and recharge (Shroud; its evasion went to the evasion-and-shield cluster in G3), for the Shade who wants to live.",
       at: P(1750, 0),
       shape: { kind: 'hand' },
       nodes: [
@@ -48,42 +49,42 @@ export const venom: AreaSpec = {
           id: 'v1',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          at: P(1529, 0),
+          at: P(1650, 0),
           why: 'The west entrance: a road node both sides use.',
         },
         {
           id: 'v2',
           kind: 'small',
           lines: [poisonDamage(12)],
-          at: P(1640, -191),
+          at: P(1679, -71),
           why: 'The poison side; the north junction leaves here.',
         },
         {
           id: 'v3',
           kind: 'notable',
           name: 'Barbed Point',
-          lines: [poisonDamage(24), poisonChance(10), critChance(20)],
-          at: P(1861, -191),
+          lines: [poisonDamage(24), poisonChance(10), critChance(15)],
+          at: P(1750, -100),
           why: 'Poison that rides on crits: 2 + 1 + 1 units.',
         },
         {
           id: 'v4',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          at: P(1971, 0),
+          at: P(1850, 0),
           why: 'The east exit, to the point.',
         },
         {
           id: 'v5',
           kind: 'notable',
           name: 'Shroud',
-          lines: [es(10), evasion(14), stunAvoid(20)],
-          at: P(1861, 191),
-          why: "Both of the Shade's defences and a guard against stuns: 2 + 1.2 + 1 units.",
+          lines: [es(10), stunAvoid(20), esRecharge(15)],
+          at: P(1750, 100),
+          why: "The shield that keeps standing: energy shield, a guard against stuns and a faster recharge, 2 + 1 + 1 units. G3 (2026-10-22, the ledger's SH-r1): its evasion went to the evasion-and-shield cluster, and the recharge sits a few steps from Shade Leech, whose cost is a slower recharge, so the two pull against each other.",
         },
-        { id: 'v6', kind: 'small', lines: [es(5)], at: P(1640, 191), why: 'The shield side.' },
-        { id: 'v7', kind: 'small', lines: [poisonDamage(12)], at: P(1958, -120) },
-        { id: 'v8', kind: 'small', lines: [es(5)], at: P(1958, 120) },
+        { id: 'v6', kind: 'small', lines: [es(5)], at: P(1679, 71), why: 'The shield side.' },
+        { id: 'v7', kind: 'small', lines: [poisonDamage(12)], at: P(1821, -71) },
+        { id: 'v8', kind: 'small', lines: [es(5)], at: P(1821, 71) },
       ],
       links: [
         ['v1', 'v2'],
@@ -100,9 +101,9 @@ export const venom: AreaSpec = {
       id: 'jN',
       name: 'North junction',
       why: "Off the wheel's chaos side: the Shade Leech spur north, the Veil pocket west to the curse junction.",
-      at: P(1760, -400),
+      at: P(1640, -380),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1760, -400) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1640, -380) }],
       links: [],
     },
     {
@@ -112,8 +113,8 @@ export const venom: AreaSpec = {
       at: P(1850, -800),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1800, -600) },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1850, -800) },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1845, -868) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1867, -922) },
         { id: 'k', kind: 'keystone', name: 'Shade Leech', lines: [], at: P(1900, -1000) },
       ],
       links: [
@@ -132,7 +133,7 @@ export const venom: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [curseEffect(8)],
-          at: P(1600, -500),
+          at: P(1540, -570),
           why: 'The entrance, from the north junction.',
         },
         {
@@ -140,11 +141,48 @@ export const venom: AreaSpec = {
           kind: 'notable',
           name: 'Second Curse',
           lines: [hexLimit(1)],
-          at: P(1560, -720),
+          at: P(1531, -640),
           why: 'One more curse at a time: 5 units by the table. The tip of the chain.',
         },
       ],
       links: [['a', 'n']],
+    },
+    {
+      id: 'breath',
+      name: 'Hoarded Breath',
+      why: "Energy shield with mana (G3 round 1, 2026-10-22; the ledger's SH-13): a bridge over the Rookery's north from the north junction to the point, between the Shade Leech and Hollow Vessel spurs, so the north junction reaches the point without going round the Barbed Point wheel. Energy shield twice from the north junction, the notable, mana once toward the point. The shield Shade's corner: the two keystones that reward a shield are a few steps either side (a pull), and Shroud's shield on the wheel below is five steps round, by the point. Not by the Knife Gate, where it would sit beside Spoils' mana and Quiet Knife's spells, a caster's shield, mana and spell within seven steps of the start (G1/shade.md §1.2). The Spire's Glass Skin sells the same pairing for the Mystic start, about nineteen steps away.",
+      at: P(1942, -495),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'e2',
+          kind: 'small',
+          lines: [es(5)],
+          at: P(1825, -451),
+          why: 'The entrance, from the north junction.',
+        },
+        { id: 'e1', kind: 'small', lines: [es(5)], at: P(1877, -471) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hoarded Breath',
+          lines: [es(14), mana(12)],
+          at: P(1942, -495),
+          why: "2.8 + 1.5 units: the shield and the mana a caster's shield is paid from.",
+        },
+        {
+          id: 'm',
+          kind: 'small',
+          lines: [mana(8)],
+          at: P(1963, -429),
+          why: 'The exit, toward the point.',
+        },
+      ],
+      links: [
+        ['e2', 'e1'],
+        ['e1', 'n'],
+        ['n', 'm'],
+      ],
     },
     {
       id: 'j5',
@@ -162,8 +200,8 @@ export const venom: AreaSpec = {
       at: P(2460, 0),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [critMulti(12)], at: P(2280, 0) },
-        { id: 'b', kind: 'small', lines: [critMulti(12)], at: P(2460, 0) },
+        { id: 'a', kind: 'small', lines: [critMulti(12)], at: P(2496, 0) },
+        { id: 'b', kind: 'small', lines: [critMulti(12)], at: P(2554, 0) },
         { id: 'k', kind: 'keystone', name: 'Cruel Agony', lines: [], at: P(2640, 0) },
       ],
       links: [
@@ -178,8 +216,8 @@ export const venom: AreaSpec = {
       at: P(2250, -450),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [es(5)], at: P(2160, -250) },
-        { id: 'b', kind: 'small', lines: [es(5)], at: P(2250, -450) },
+        { id: 'a', kind: 'small', lines: [es(5)], at: P(2290, -516) },
+        { id: 'b', kind: 'small', lines: [es(5)], at: P(2310, -571) },
         { id: 'k', kind: 'keystone', name: 'Hollow Vessel', lines: [], at: P(2340, -650) },
       ],
       links: [
@@ -203,6 +241,16 @@ export const venom: AreaSpec = {
     { from: 'wheel.v2', to: 'jN.a', why: 'The dagger side up to the north junction.' },
     { from: 'jN.a', to: 'shadeLeech.a', why: 'Junction to the keystone spur.' },
     { from: 'jN.a', to: 'secondCurse.a', why: 'Junction onto the Second Curse chain.' },
+    {
+      from: 'jN.a',
+      to: 'breath.e2',
+      why: 'The north junction onto the shield-and-mana bridge (G3).',
+    },
+    {
+      from: 'breath.m',
+      to: 'j5.a',
+      why: "The bridge lands on the point, between the Hollow Vessel spur and the wheel's exit: the Rookery's north is a loop (G1/shade.md §3.3).",
+    },
     { from: 'wheel.v4', to: 'j5.a', why: 'Through the wheel to the point.' },
     { from: 'j5.a', to: 'cruelAgony.a', why: 'The point to the Cruel Agony spur.' },
     { from: 'j5.a', to: 'hollowVessel.a', why: 'The point to the Hollow Vessel spur.' },

@@ -24,7 +24,7 @@ export const pyre: AreaSpec = {
   region: 'zealot',
   name: 'The Bell Tower',
   why: 'The tip toward the Wall: cold attacks or an aura on one wheel, and Searing Avatar.',
-  at: [-3321, -1139], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-3301, -1359], // Where the area's name is drawn: clear of every other area's name and every notable (moved in G3 round 1, 2026-10-22: it lay over Rimed Steel and Benediction).
   clusters: [
     {
       id: 'wheel',
@@ -37,14 +37,14 @@ export const pyre: AreaSpec = {
           id: 'f1',
           kind: 'small',
           lines: [eleDamageAll(10)],
-          at: P(2029, -550),
+          at: P(2150, -550),
           why: 'The west entrance; the dear road from the Wall also arrives.',
         },
         {
           id: 'f2',
           kind: 'small',
           lines: [eleAttackOne('cold', 12)],
-          at: P(2140, -741),
+          at: P(2179, -621),
           why: 'The attack side.',
         },
         {
@@ -52,14 +52,14 @@ export const pyre: AreaSpec = {
           kind: 'notable',
           name: 'Rimed Steel',
           lines: [eleAttackOne('cold', 24), chillEffect(15)],
-          at: P(2361, -741),
+          at: P(2250, -650),
           why: 'Cold strikes that chill: 2 + 1.5 units. The first cold home outside the Spire, whose cold is all spells.',
         },
         {
           id: 'f4',
           kind: 'small',
           lines: [eleDamageAll(10)],
-          at: P(2471, -550),
+          at: P(2350, -550),
           why: 'The east exit, to the tower junction.',
         },
         {
@@ -67,18 +67,18 @@ export const pyre: AreaSpec = {
           kind: 'notable',
           name: 'Benediction',
           lines: [auraEffect(12), es(8), lifeRegen(0.4)],
-          at: P(2361, -359),
+          at: P(2250, -450),
           why: 'Aura effect with shield and regeneration: 2 + 1.6 + 1 units.',
         },
         {
           id: 'f6',
           kind: 'small',
           lines: [auraEffect(6)],
-          at: P(2140, -359),
+          at: P(2179, -479),
           why: 'The aura side.',
         },
-        { id: 'f7', kind: 'small', lines: [eleAttackOne('cold', 12)], at: P(2458, -670) },
-        { id: 'f8', kind: 'small', lines: [auraEffect(6)], at: P(2458, -430) },
+        { id: 'f7', kind: 'small', lines: [eleAttackOne('cold', 12)], at: P(2321, -621) },
+        { id: 'f8', kind: 'small', lines: [auraEffect(6)], at: P(2321, -479) },
       ],
       links: [
         ['f1', 'f2'],
@@ -107,8 +107,8 @@ export const pyre: AreaSpec = {
       at: P(2920, -750),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('fire', 10)], at: P(2760, -650) },
-        { id: 'b', kind: 'small', lines: [eleDamage('fire', 10)], at: P(2920, -750) },
+        { id: 'a', kind: 'small', lines: [eleDamage('fire', 10)], at: P(2958, -774) },
+        { id: 'b', kind: 'small', lines: [eleDamage('fire', 10)], at: P(3008, -805) },
         { id: 'k', kind: 'keystone', name: 'Searing Avatar', lines: [], at: P(3080, -850) },
       ],
       links: [

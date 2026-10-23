@@ -80,12 +80,19 @@ between the two sides.
    dear bridges of several attribute nodes, and the user's own extras. A region's edge facing a neighbour is designed
    around the links that land on it.
 9. **Geometry serves reading.** Pockets as tight orbits facing their junction; roads as straight runs with corners;
-   no crossing edges (the crossing check must print zero); no two unlinked nodes within 100 units; area labels off
-   the nodes.
+   no crossing edges (the crossing check must print zero); no two nodes drawn over each other; area labels off
+   the nodes. How to draw it is CONSTRAINTS.md §11 item 5.
 10. **Placing a node is a decision that weighs all of the above at once**: what build wants it here, what it bridges,
     whether its section stays uniform, whether the region's defences and families stay varied, whether the geometry
     still reads. The area files carry reasons for the decisions worth explaining (an area, a cluster, a link that is not
     obvious); they are not a log of every node, and nobody needs one. The process matters, not the paperwork.
+
+## 3a. How the network is drawn (the user, 2026-10-21)
+
+Clusters are drawn tight, chains run straight, shapes are regular and shrink as a whole, and empty space is welcome:
+the rules are CONSTRAINTS.md §11 item 5, and the process (a script for the first pass, then an agent's eyes on every
+cluster of every region) is §15 item 10. The record of that pass, with every agent's pictures, is in
+`docs/tree/design/tighten/`.
 
 ## 4. How to judge it
 
@@ -117,8 +124,10 @@ second keystones and the far wheels either pay off or show up as filler. Fix the
   full of them, as long as they are placed with care and are not the only kind of cluster in the region.
 - Chains of two attribute nodes into a signature that fixed the build before the first gem.
 - Treating the audit's unit counts as proof of quality.
-- Rules invented to be restrictive (one entrance per cluster, keystones at 10 to 14 steps, roads at a tenth) and
-  followed as checklists instead of from the player's seat.
+- Rules invented to be restrictive (one entrance per cluster, keystones at 10 to 14 steps, roads at a tenth, no two
+  nodes within 100 units) and followed as checklists instead of from the player's seat.
+- Trusting a layout algorithm with shapes it does not understand: tightening node by node broke every wheel and loop
+  it touched (2026-10-21). A script places the simple cases; a person or an agent looks at every cluster.
 
 ## 7. State and open work (2026-10-19)
 
@@ -201,6 +210,16 @@ units behind the nodes, and fade as the view closes in (the user's idea), in the
 `npm run passives:bake`); save version 20 hands passives back; the editor edits this tree by default (`?tree=old` for
 the old one). Still owed: the supply audit beside the brief and the brief-against-built note.
 
-Judging tools in the session scratchpad (recreate if gone, they are twenty lines each): a crossing check that also
-counts nodes within 100 units and labels over nodes; a line-usage count per region; a walk script that buys the
-cheapest tree from a start to a list of notables and prints every node bought.
+**2026-10-21, the layout pass (§3a, CONSTRAINTS §11.5 and §15.10):** the user asked for tight clusters and no arbitrary angles. `tighten.ts` moved
+364 smalls onto straight chains beside their notables; seven agents (six regions and the centre) then audited every
+cluster by hand: wheels and loops restored to regular shapes and shrunk as a whole (most to about half their radius),
+chains between two notables split by stat, roads straightened, the first pass's mistakes undone (a road's smalls taken
+for a pocket, the Oathbound diamond, kinks out of the starts). Positions only: no node, link or line changed. Whole tree:
+0 crossings, 0 overlaps; 73 bends over 20°, nearly all ring corners. Open questions put to the user: wider rings for the
+Longbow and Deep Cuts wheels so their names clear, the 30° turn of Deep Well and Arcane Focus, where Still Mind and Sharp
+Mind sit on their loops, and the Quickened Steel start loop (a diamond before). A few long links came out of it (three in
+the Strider, round Devotion), and some `why` texts name links that no longer match (they were wrong before the pass).
+
+Judging tools: `scripts/passives/geometry.ts` (crossings, nodes drawn over each other, bends; `--region`, `--bends`). In
+the session scratchpad (recreate if gone, they are twenty lines each): a label-over-nodes check; a line-usage count per
+region; a walk script that buys the cheapest tree from a start to a list of notables and prints every node bought.

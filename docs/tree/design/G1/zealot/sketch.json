@@ -1,0 +1,209 @@
+{
+  "title": "Zealot (the Cathedral): G1b sketch. ZE-n: new clusters; green: new links; red: cuts; arrows: moves",
+  "region": "zealot",
+  "clusters": [
+    {
+      "id": "ZE-1",
+      "label": "ZE-1 spell dmg + less reservation",
+      "at": [-2290, -2090],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-2",
+      "label": "ZE-2 minion dmg + life",
+      "at": [-2450, -1520],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-3",
+      "label": "ZE-3 channelling + elemental",
+      "at": [-1650, -3800],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-4",
+      "label": "ZE-4 cold + shield block",
+      "at": [-2540, -870],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-5",
+      "label": "ZE-5 armour + sceptre",
+      "at": [-2240, -600],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-6",
+      "label": "ZE-6 sceptre + burning",
+      "at": [-4040, -1570],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-7",
+      "label": "ZE-7 staff + spell block",
+      "at": [-2770, -250],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-8",
+      "label": "ZE-8 life + aura effect",
+      "at": [-4230, -330],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-9",
+      "label": "ZE-9 spell dmg + duration",
+      "at": [-2330, -3520],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-10",
+      "label": "ZE-10 ES + life",
+      "at": [-3990, -1000],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-11",
+      "label": "ZE-11 ES + spell block",
+      "at": [-2860, -3240],
+      "nodes": 4
+    }
+  ],
+  "roads": [
+    {
+      "label": "the aisle",
+      "points": [
+        "cathedral.nave.toChoir.a",
+        [-2030, -1540],
+        [-2270, -1670],
+        [-2510, -1800],
+        "cathedral.ambulatory.plate.n"
+      ],
+      "nodes": 3
+    },
+    {
+      "label": "the outer walk",
+      "points": [
+        "cathedral.ambulatory.censer.n",
+        [-4020, -790],
+        [-4230, -1060],
+        [-4300, -1360],
+        [-4230, -1660],
+        "cathedral.ambulatory.peal.n"
+      ],
+      "nodes": 4
+    },
+    {
+      "label": "the north walk",
+      "points": [
+        "cathedral.ambulatory.kindled.n",
+        [-3300, -3200],
+        [-2950, -3520],
+        [-2560, -3760],
+        [-2150, -3930],
+        [-1800, -4050]
+      ],
+      "nodes": 5
+    }
+  ],
+  "links": [
+    {
+      "from": [-2510, -1800],
+      "to": "ZE-1"
+    },
+    {
+      "from": "ZE-1",
+      "to": "cathedral.ambulatory.brand.n"
+    },
+    {
+      "from": [-2270, -1670],
+      "to": "ZE-2"
+    },
+    {
+      "from": "ZE-2",
+      "to": "cathedral.rods.jR.a"
+    },
+    {
+      "from": "cathedral.nave.toWall.a",
+      "to": "ZE-5"
+    },
+    {
+      "from": "cathedral.nave.jN.a",
+      "to": "ZE-4"
+    },
+    {
+      "from": "ZE-4",
+      "to": "cathedral.rods.toWall.c"
+    },
+    {
+      "from": "cathedral.rods.toWall.a",
+      "to": "ZE-7"
+    },
+    {
+      "from": "ZE-7",
+      "to": "cathedral.rods.toWall.b"
+    },
+    {
+      "from": "cathedral.ambulatory.censer.n",
+      "to": "ZE-8"
+    },
+    {
+      "from": [-4230, -1060],
+      "to": "ZE-10"
+    },
+    {
+      "from": [-4230, -1660],
+      "to": "ZE-6"
+    },
+    {
+      "from": [-2950, -3520],
+      "to": "ZE-11"
+    },
+    {
+      "from": [-2560, -3760],
+      "to": "ZE-9"
+    },
+    {
+      "from": [-1800, -4050],
+      "to": "ZE-3"
+    },
+    {
+      "from": "cathedral.crypt.tomb.n",
+      "to": [-1800, -4050]
+    },
+    {
+      "from": "ZE-8",
+      "to": "wall.maces.oath.n",
+      "label": "V3: to Grim Oath"
+    },
+    {
+      "from": [-2270, -1670],
+      "to": [-2268, -1745]
+    },
+    {
+      "from": "ZE-5",
+      "to": "wall.resists.j.a",
+      "label": "joined: armoured sceptre crossing"
+    },
+    {
+      "from": "cathedral.crypt.rite.n",
+      "to": "ZE-3"
+    },
+    {
+      "from": [-1800, -4050],
+      "to": [-1380, -4150],
+      "label": "joined: the far loop"
+    }
+  ],
+  "cuts": [["cathedral.choir.jC.a", "cathedral.choir.loneVow.a"]],
+  "moves": [
+    {
+      "id": "cathedral.choir.loneVow.a",
+      "to": [-2268, -1745]
+    },
+    {
+      "id": "cathedral.choir.loneVow.b",
+      "to": [-2265, -1805]
+    }
+  ]
+}

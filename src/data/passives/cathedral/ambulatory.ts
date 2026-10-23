@@ -12,9 +12,9 @@ import {
   brandDamage,
   burnDamage,
   castSpeed,
+  critChance,
   eleAttackOne,
   eleDamage,
-  eleDamageAll,
   es,
   igniteChance,
   igniteDuration,
@@ -27,6 +27,7 @@ import {
   spellDamage,
   staffDamage,
   str,
+  stunRecovery,
   warcryEffect,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -94,8 +95,8 @@ export const ambulatory: AreaSpec = {
       at: P(2330, -165),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2210, -180) },
-        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(2450, -150) },
+        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2227, -150) },
+        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(2463, -150) },
       ],
       links: [['a', 'b']],
     },
@@ -106,8 +107,8 @@ export const ambulatory: AreaSpec = {
       at: P(3050, 30),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [staffDamage(12)], at: P(2900, 60) },
-        { id: 'b', kind: 'small', lines: [staffDamage(12)], at: P(3080, 40) },
+        { id: 'a', kind: 'small', lines: [staffDamage(12)], at: P(3132, 29) },
+        { id: 'b', kind: 'small', lines: [staffDamage(12)], at: P(3190, 25) },
         {
           id: 'n',
           kind: 'notable',
@@ -125,20 +126,20 @@ export const ambulatory: AreaSpec = {
     {
       id: 'plate',
       name: 'Consecrated Plate',
-      why: "A bridge inward from the walk to the back road: armour twice and the notable with armour and energy shield, the Zealot's two defences in one place. Its armour was thin before.",
+      why: 'A bridge inward from the walk to the back road: armour twice and the notable with armour and stun recovery (energy shield until G3). Its armour was thin before. Since G2 the aisle arrives too, so it is a crossroads.',
       at: P(2380, 260),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [armour(12)], at: P(2540, 330) },
+        { id: 'a', kind: 'small', lines: [armour(12)], at: P(2440, 277) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Consecrated Plate',
-          lines: [armour(24), es(10)],
+          lines: [armour(24), stunRecovery(30)],
           at: P(2370, 280),
-          why: '2 + 2 units.',
+          why: "Armour, and stuns shaken off sooner: 2 + 2 units. G3 (2026-10-22, G1-brief.md §4.3): its energy shield went, because with Lectern four steps away on the aisle every Zealot caster took both (the allocator's plans for five casters), spell damage and energy shield in one stop. Thick Skin, in the Wall, is armour with stun threshold.",
         },
-        { id: 'b', kind: 'small', lines: [armour(12)], at: P(2380, 60) },
+        { id: 'b', kind: 'small', lines: [armour(12)], at: P(2385, 212) },
       ],
       links: [
         ['a', 'n'],
@@ -148,24 +149,40 @@ export const ambulatory: AreaSpec = {
     {
       id: 'brand',
       name: 'Brandwright',
-      why: 'A pocket inward off the walk: brand damage twice, then brands with elemental damage and cast speed. The second brand cluster; Runecarver, at the shrine, sells duration and area.',
+      why: "A bridge inward from the walk to Lectern: brand damage twice either side of the notable with brand damage and brand crit. The second brand cluster; Runecarver, at the shrine, sells brands with duration and area. G3 round 2 (2026-10-22, the user's decision): it sold elemental damage and cast speed, so every Zealot caster that took Lectern took it one step on, for those and not its brands; now it is the brand cluster only, and the two smalls between it and Lectern (spell damage, Lectern's until then) carry brand damage, so the bridge reads spell, Lectern, brand, Brandwright, brand.",
       at: P(2420, 560),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2530, 500) },
-        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2370, 560) },
+        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2360, 613) },
+        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2305, 634) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Brandwright',
-          lines: [brandDamage(20), eleDamageAll(10), castSpeed(4)],
+          lines: [brandDamage(24), critChance(30, ['brand'])],
           at: P(2240, 660),
-          why: '1.7 + 1 + 1 units.',
+          why: 'Brand damage and crit chance with brands: 2 + 2 units (G3 round 2; it was brand damage, elemental damage and cast speed, which drew every caster).',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [brandDamage(12)],
+          at: P(2211, 588),
+          why: 'Toward Lectern (was `cathedral.nave.lectern.d`, spell damage, until G3 round 2).',
+        },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [brandDamage(12)],
+          at: P(2191, 536),
+          why: 'The far node, onto Lectern (was `cathedral.nave.lectern.c`, spell damage, until G3 round 2).',
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
       ],
     },
     {
@@ -175,8 +192,8 @@ export const ambulatory: AreaSpec = {
       at: P(3020, 720),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(2870, 720) },
-        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3050, 760) },
+        { id: 'a', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3102, 716) },
+        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3160, 718) },
         {
           id: 'n',
           kind: 'notable',
@@ -198,7 +215,7 @@ export const ambulatory: AreaSpec = {
       at: P(2380, -1000),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2180, -960) },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2350, -1083) },
         {
           id: 'n',
           kind: 'notable',
@@ -207,12 +224,12 @@ export const ambulatory: AreaSpec = {
           at: P(2380, -1020),
           why: '2 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2560, -900) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2410, -957) },
         {
           id: 'c',
           kind: 'attribute',
           lines: [str(6), int(6)],
-          at: P(2590, -720),
+          at: P(2507, -748),
           why: 'A road node onto the tower junction.',
         },
       ],
@@ -237,8 +254,8 @@ export const ambulatory: AreaSpec = {
           at: P(1900, -1400),
           why: 'Where the warcry pocket leaves.',
         },
-        { id: 'c', kind: 'attribute', lines: [str(7)], at: P(1720, -1640) },
-        { id: 'd', kind: 'attribute', lines: [str(7)], at: P(1500, -1650) },
+        { id: 'c', kind: 'attribute', lines: [str(7)], at: P(1868, -1521) },
+        { id: 'd', kind: 'attribute', lines: [str(7)], at: P(1835, -1644) },
       ],
       links: [
         ['a', 'b'],
@@ -253,8 +270,8 @@ export const ambulatory: AreaSpec = {
       at: P(2280, -1560),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: P(2100, -1500) },
-        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: P(2280, -1590) },
+        { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: P(2335, -1492) },
+        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: P(2391, -1505) },
         {
           id: 'n',
           kind: 'notable',
@@ -276,8 +293,8 @@ export const ambulatory: AreaSpec = {
       at: [-3327, -2334],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionDamage(12)], at: [-3207, -2214] },
-        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: [-3327, -2334] },
+        { id: 'a', kind: 'small', lines: [minionDamage(12)], at: P(3089, 369) },
+        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: P(3147, 384) },
         {
           id: 'n',
           kind: 'notable',
@@ -299,8 +316,8 @@ export const ambulatory: AreaSpec = {
       at: [-3664, -1648],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [-3507, -1583] },
-        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [-3664, -1648] },
+        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: P(3039, -410) },
+        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: P(3096, -418) },
         {
           id: 'n',
           kind: 'notable',
@@ -318,18 +335,18 @@ export const ambulatory: AreaSpec = {
     {
       id: 'censer',
       name: 'Censer',
-      why: 'A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20).',
+      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with life, `rim.ts`) bridges it to the Vanguard's Grim Oath, so it is a junction of three; Brazier, off the far end of the outer walk, is burning with the sceptre.",
       at: [-3554, -638],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [burnDamage(12)], at: [-3397, -573] },
-        { id: 'b', kind: 'small', lines: [burnDamage(12)], at: [-3554, -638] },
+        { id: 'a', kind: 'small', lines: [burnDamage(12)], at: P(2424, -1295) },
+        { id: 'b', kind: 'small', lines: [burnDamage(12)], at: P(2479, -1313) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Censer',
           lines: [burnDamage(24), areaDamage(10), igniteDuration(15)],
-          at: [-3711, -703],
+          at: P(2546, -1334),
           why: '2 + 1 + 1 units.',
         },
       ],

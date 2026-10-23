@@ -30,6 +30,11 @@ button {
   font: inherit;
   color: inherit;
 }
+input,
+select,
+textarea {
+  font-family: inherit;
+}
 .screen {
   position: absolute;
   inset: 0;
@@ -857,8 +862,16 @@ span.save-name {
 .star.on {
   color: var(--hi);
 }
+/* Every dropdown in the game's colours: options on a dark panel need light text, or they show only when hovered. */
+select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
 select option {
   background: var(--panel);
+  color: var(--text);
 }
 
 /* ---- Orb HUD ---- */

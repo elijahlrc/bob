@@ -8,7 +8,7 @@ export type View = { x: number; y: number; k: number };
 export type HitNode = { id: number; x: number; y: number; r: number };
 
 export const K_MIN = 0.05;
-export const K_MAX = 1.5;
+export const K_MAX = 2;
 
 export const clampK = (k: number): number => Math.max(K_MIN, Math.min(K_MAX, k));
 

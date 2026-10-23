@@ -1,17 +1,21 @@
 /**
- * The Spire's right (the craft road): the wheel off the craft road (spell damage one side, energy shield the other), the
+ * The Spire's right (the craft road): the wheel off the craft road (spell damage one side, chaos resistance the other since G3), the
  * cost room (swapped in from the west on 2026-10-20), the wand attack chain, the junction, the insight room, the
  * Mana Bastion spur, and the Devotion chain (reservation, energy shield) from the junction east toward the Knife, the
  * near Spire-Knife crossing's Spire half. The east road: the curse pocket (Hexwright) and a spell-dodge pocket climbing
  * from the Devotion chain to the east arm's junction along the Knife border, so the craft reaches the arms without the
  * column. Round 3 (2026-10-20): Hexwright and Devotion traded places, so the curse notable is not three steps from the
- * Stair's chaos-spell notable and seven from Second Curse.
+ * Stair's chaos-spell notable and seven from Second Curse. G3 round 1 (2026-10-22): Keen Verse (spell damage with the
+ * spell crit multiplier) bridges the road to Wand Volley and the road between Mist Walk and Hexwright. G3 round 2:
+ * Hale Scribe (life with mana) bridges the scriptorium stair and Wand Volley, and Sharp Tongue (dagger spells with
+ * cast speed) bridges Mist Walk and the Shade's crossing road below the Stair.
  */
 import {
   castSpeed,
   costReduction,
   curseArea,
   curseEffect,
+  daggerSpellDamage,
   dex,
   dodgeAttack,
   dodgeSpell,
@@ -19,6 +23,7 @@ import {
   insightDuration,
   insightOnCrit,
   int,
+  life,
   mana,
   manaRegen,
   maxInsight,
@@ -26,9 +31,9 @@ import {
   reducedReservation,
   resOne,
   skillDuration,
+  spellCritMulti,
   spellDamage,
   wandAttack,
-  weaponCrit,
   weaponSpeed,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -38,16 +43,16 @@ export const craft: AreaSpec = {
   region: 'mystic',
   name: 'The Scriptorium',
   why: 'The busy side of the Spire, toward the Knife: spell damage and cast speed on the wheel with a shield on its other side, cost, wand attacks, the insight charges, the curses and an aura pocket on the Knife border, and Mana Bastion.',
-  at: [960, -2240], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [1170, -2240], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved 210 east in G3 round 2 off Frugal.
   clusters: [
     {
       id: 'focus',
       name: 'Arcane Focus',
-      why: "The wheel: entered from the craft road on the west, left to the junction on the east and the column from its north-west small. Mana at both ends, which every caster uses. Damage and cast speed on the south side (Arcane Focus); energy shield and its recharge on the north (Warded Mind), for the caster who wants to live through the cast. The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms.",
-      at: [450, -2000],
-      shape: { kind: 'ring', r: 150, a0: 180 },
+      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Mana at both ends, which every caster uses. Damage and cast speed on the north side (Arcane Focus); chaos resistance and mana on the south (Warded Mind), the defence a caster forgets until a poisoner finds it. Until G3 (2026-10-22, G1/mystic.md MY-r1) the south side was energy shield, so the wheel handed a caster spell damage and energy shield on its two sides seven steps out; the near energy shield is west now (Glass Skin). The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms, Keen Verse on the east road.",
+      at: [469, -2000],
+      shape: { kind: 'ring', r: 80, a0: 150 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mana(8)], why: 'The entrance, west.' },
+        { id: 'a', kind: 'small', lines: [mana(8)], why: 'The entrance, south-west.' },
         { id: 'b', kind: 'small', lines: [spellDamage(8)] },
         {
           id: 'n1',
@@ -56,14 +61,19 @@ export const craft: AreaSpec = {
           lines: [spellDamage(20), castSpeed(6)],
           why: '2.5 + 1.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [mana(8)], why: 'The east exit, to the junction.' },
-        { id: 'd', kind: 'small', lines: [es(5)] },
+        { id: 'c', kind: 'small', lines: [mana(8)], why: 'The north-east exit, to the junction.' },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [resOne('chaos', 8)],
+          why: "Chaos resistance, the south side's stat (energy shield until G3, MY-r1).",
+        },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Warded Mind',
-          lines: [es(12), resOne('chaos', 15), mana(8)],
-          why: 'Shield, and the chaos resistance a shield build lacks: 2.4 + 1.9 + 1 units. Glass Skin, in the well, is the shield with its recharge. The north exit, to the column.',
+          lines: [resOne('chaos', 16), mana(8), manaRegen(10)],
+          why: 'The chaos resistance a caster lacks, with mana and a little regeneration: 2 + 1 + 1 units. No energy shield since G3 (MY-r1): the east wheel is spell damage or chaos resistance, not spell damage and energy shield.',
         },
       ],
       links: [
@@ -79,18 +89,19 @@ export const craft: AreaSpec = {
       id: 'frugal',
       name: 'Frugal',
       why: "Reduced mana cost, then the notable with cost reduction and regeneration: the caster who casts without stopping, as a side room off the damage notable, so the east has a mana answer and the west's mana is not the only one. (Swapped with the wand chain on 2026-10-20.)",
-      at: [560, -2320],
-      shape: { kind: 'ring', r: 100, a0: 90 },
+      at: [469, -2235],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [costReduction(4)] },
+        { id: 'a', kind: 'small', lines: [costReduction(4)], at: [469, -2165] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Frugal',
           lines: [costReduction(8), manaRegen(10)],
+          at: [469, -2235],
           why: '2 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [costReduction(4)] },
+        { id: 'b', kind: 'small', lines: [costReduction(4)], at: [539, -2235] },
       ],
       links: [
         ['a', 'n'],
@@ -100,7 +111,7 @@ export const craft: AreaSpec = {
     {
       id: 'wandVolley',
       name: 'Wand Volley',
-      why: "The wand as a weapon, not a stat stick: wand attack damage twice, then the notable with wand attack damage, attack speed and crit with wands. Four attack gems take a wand and the kit is one; the Spire sold nothing for them. A chain from the wand room's far node up to the projectile cluster's east side, so the wand attacker reaches the projectiles without the column's junction.",
+      why: "The wand as a weapon, not a stat stick: wand attack damage twice, then the notable with wand attack damage and attack speed with wands, the fast wand. Four attack gems take a wand and the kit is one; the Spire sold nothing for them. A chain from the wand room's far node up to the projectile cluster's east side, so the wand attacker reaches the projectiles without the column's junction. Its crit went in G3 (2026-10-22, G1/mystic.md MY-r3): the crit wand is a cluster of its own on the Eaves, and the elemental wand (Bright Wand) is in the Lantern, so the four wand clusters have four partners.",
       at: [600, -2640],
       shape: { kind: 'hand' },
       nodes: [
@@ -108,22 +119,22 @@ export const craft: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [wandAttack(12)],
-          at: [560, -2520],
+          at: [657, -2584],
           why: 'The entrance, from Wandwork.',
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Wand Volley',
-          lines: [wandAttack(24), weaponSpeed('wand', 5), weaponCrit('wand', 20)],
+          lines: [wandAttack(24), weaponSpeed('wand', 12)],
           at: [680, -2650],
-          why: '2 + 1.7 + 1 units.',
+          why: '2 + 2.4 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [wandAttack(12)],
-          at: [560, -2760],
+          at: [722, -2706],
           why: 'The exit, to the projectile cluster.',
         },
       ],
@@ -146,7 +157,7 @@ export const craft: AreaSpec = {
       name: 'Flashes of Insight',
       why: "Insight charges (40% crit chance each): a charge more, charges on crit, longer charges. The crit caster's commitment, a side room.",
       at: [1000, -1900],
-      shape: { kind: 'ring', r: 105, a0: 180 },
+      shape: { kind: 'ring', r: 56, a0: 180 },
       nodes: [
         { id: 'a', kind: 'small', lines: [insightDuration(15)] },
         { id: 'b', kind: 'small', lines: [insightDuration(15)] },
@@ -173,8 +184,8 @@ export const craft: AreaSpec = {
       at: [1150, -2290],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [reducedReservation(3)], at: [1000, -2180] },
-        { id: 'b', kind: 'small', lines: [reducedReservation(3)], at: [1150, -2280] },
+        { id: 'a', kind: 'small', lines: [reducedReservation(3)], at: [1189, -2329] },
+        { id: 'b', kind: 'small', lines: [reducedReservation(3)], at: [1241, -2362] },
         {
           id: 'n',
           kind: 'notable',
@@ -201,8 +212,9 @@ export const craft: AreaSpec = {
           kind: 'small',
           lines: [curseEffect(8)],
           why: 'The entrance, facing the Devotion chain.',
+          at: [1305, -2664],
         },
-        { id: 'b', kind: 'small', lines: [curseEffect(8)] },
+        { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [1316, -2721] },
         {
           id: 'n',
           kind: 'notable',
@@ -223,8 +235,14 @@ export const craft: AreaSpec = {
       at: [1120, -3180],
       shape: { kind: 'ring', r: 80, a0: 90 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dodgeSpell(3)], why: 'The entrance, facing Draught.' },
-        { id: 'b', kind: 'small', lines: [dodgeSpell(3)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [dodgeSpell(3)],
+          why: 'The entrance, facing Draught.',
+          at: [1061, -3217],
+        },
+        { id: 'b', kind: 'small', lines: [dodgeSpell(3)], at: [1119, -3218] },
         {
           id: 'n',
           kind: 'notable',
@@ -245,8 +263,8 @@ export const craft: AreaSpec = {
       at: [1030, -2290],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [es(5)], at: [880, -2230] },
-        { id: 'b', kind: 'small', lines: [es(5)], at: [960, -2360] },
+        { id: 'a', kind: 'small', lines: [es(5)], at: [968, -2367] },
+        { id: 'b', kind: 'small', lines: [es(5)], at: [997, -2417] },
         { id: 'k', kind: 'keystone', name: 'Mana Bastion', lines: [], at: [1040, -2490] },
       ],
       links: [
@@ -258,11 +276,11 @@ export const craft: AreaSpec = {
       id: 'roadN',
       name: 'The scriptorium stair',
       why: 'Intelligence twice: the road from the column junction down to the craft wheel.',
-      at: [125, -2417],
+      at: [133, -2387],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [int(7)], at: [125, -2417] },
-        { id: 'b', kind: 'attribute', lines: [int(7)], at: [250, -2273] },
+        { id: 'a', kind: 'attribute', lines: [int(7)], at: [133, -2387] },
+        { id: 'b', kind: 'attribute', lines: [int(7)], at: [267, -2213] },
       ],
       links: [['a', 'b']],
     },
@@ -282,11 +300,11 @@ export const craft: AreaSpec = {
       id: 'toAlleys',
       name: 'To the Alleys',
       why: 'Two attribute nodes from Flashes of Insight to Thick Blood: a near road between the Scriptorium and the Alleys, for the crit caster and the life Shade, and two notables that were dead ends are now on a road.',
-      at: [1285, -1764],
+      at: [1196, -1732],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'r1', kind: 'attribute', lines: [int(7)], at: [1285, -1764] },
-        { id: 'r2', kind: 'attribute', lines: [dex(6), int(6)], at: [1464, -1628] },
+        { id: 'r1', kind: 'attribute', lines: [int(7)], at: [1196, -1732] },
+        { id: 'r2', kind: 'attribute', lines: [dex(6), int(6)], at: [1336, -1565] },
       ],
       links: [['r1', 'r2']],
     },
@@ -294,20 +312,20 @@ export const craft: AreaSpec = {
       id: 'toFlashpoint',
       name: 'To Flashpoint',
       why: 'One intelligence node from Mist Walk to Flashpoint: the run from the Gallery stair down to Devotion had no branch for seven nodes.',
-      at: [912, -3214],
+      at: [870, -3294],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'r1', kind: 'attribute', lines: [int(7)], at: [912, -3214] }],
+      nodes: [{ id: 'r1', kind: 'attribute', lines: [int(7)], at: [870, -3294] }],
       links: [],
     },
     {
       id: 'toVolley',
       name: 'To Wand Volley',
       why: 'Two intelligence nodes from Hexwright to Wand Volley: the east edge of the Scriptorium is a loop, not a strand.',
-      at: [981, -2780],
+      at: [1118, -2716],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'r1', kind: 'attribute', lines: [int(7)], at: [981, -2780] },
-        { id: 'r2', kind: 'attribute', lines: [int(7)], at: [770, -2770] },
+        { id: 'r1', kind: 'attribute', lines: [int(7)], at: [1118, -2716] },
+        { id: 'r2', kind: 'attribute', lines: [int(7)], at: [920, -2711] },
       ],
       links: [['r1', 'r2']],
     },
@@ -321,6 +339,15 @@ export const craft: AreaSpec = {
       links: [],
     },
     {
+      id: 'toStair',
+      name: 'The curse crossing',
+      why: "One attribute node from Hexwright's notable toward the Shade's Stair junction (G2, 2026-10-22; G1/mystic.md §3, kept in the join, G1-brief.md §2.1): the curser from either start reaches Hexwright and the Shade's curse home. On the straight line between the two; the last node before the Shade, so half dexterity. Its link onward to the Stair's junction was laid by the border pass.",
+      at: [1465, -2755],
+      shape: { kind: 'hand' },
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: [1465, -2755] }],
+      links: [],
+    },
+    {
       id: 'toDev2',
       name: 'A road',
       why: 'Intelligence once between Mist Walk and Hexwright.',
@@ -329,8 +356,153 @@ export const craft: AreaSpec = {
       nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [1225, -2945] }],
       links: [],
     },
+    {
+      id: 'keenVerse',
+      name: 'Keen Verse',
+      why: "Spell damage with the spell crit multiplier (G3 round 1, 2026-10-22; G1/mystic.md MY-1): the crit caster's spell damage, on the east, the Mystic's crit side. A bridge across the gap between Wand Volley, Hexwright and Mist Walk, from the road to Wand Volley up to the road between Mist Walk and Hexwright, laid as a V with the notable at its tip and two spell damage smalls on each leg (the ledger's spell section MY-s2 folded in). Spell damage is the flattest stat of every caster; this is its east direction, with crit as the partner, where Arcane Focus (8 steps) sells it with cast speed, the spine's Piercing Word with penetration, and the Eaves (G3, later round) with regeneration. Steps from the Mystic start: 17.",
+      at: [1000, -2930],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [957, -2813],
+          why: 'The entrance from the road to Wand Volley, on the straight line to the notable.',
+        },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [976, -2864] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Keen Verse',
+          lines: [spellDamage(20), spellCritMulti(18)],
+          at: [1000, -2930],
+          why: '2.5 + 1.5 units. The tip of the V; the bend is here, at the notable.',
+        },
+        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [1070, -2935] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [spellDamage(8)],
+          at: [1125, -2938],
+          why: 'The exit, on the straight line to the road node between Mist Walk and Hexwright.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+      ],
+    },
+    {
+      id: 'haleScribe',
+      name: 'Hale Scribe',
+      why: "Life with mana (G3 round 2, 2026-10-22; G1/mystic.md MY-9, the ledger's near life section MY-s6 moved into it): life for the caster on the east, the offence side, so the Scriptorium is not a corridor of spell damage, crit and cost (CONSTRAINTS §4.8), and the Mystic's life lies in three directions with three partners (Warm Blood shield at home, Quiet Pulse regeneration west, mana here; Living Verse's spell damage far west). A bridge from the scriptorium stair to Wand Volley across the gap between the column junction, Darting Bolts, Wand Volley and Frugal, with the bend at the notable so it meets Wand Volley's entrance clear of Frugal's link. Two life smalls each side. 12 steps from the Mystic start: the nearest of the new clusters, and life, which no Mystic build collected too much of.",
+      at: [420, -2560],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          at: [313, -2495],
+          why: 'The entrance from the scriptorium stair, on the straight line to the notable.',
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [360, -2524] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hale Scribe',
+          lines: [life(12), mana(10)],
+          at: [420, -2560],
+          why: '2.4 + 1.25 units. The bend of the bridge is here, at the notable.',
+        },
+        { id: 'c', kind: 'small', lines: [life(5)], at: [490, -2567] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [life(5)],
+          at: [544, -2573],
+          why: "The exit, on the straight line to Wand Volley's entrance.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+      ],
+    },
+    {
+      id: 'sharpTongue',
+      name: 'Sharp Tongue',
+      why: "Spell damage with a dagger and cast speed (G3 round 2, 2026-10-22; G1/mystic.md MY-10): the dagger caster's cluster on the Mystic side of the border, a bridge from Mist Walk's notable to the Shade's crossing road below the Stair (the dagger caster's bridge, G2/borders.md §4). A dagger asks for intelligence and dexterity, so it sits on the int-int border where the Shade's dexterity is a step away. The Shade's dagger caster reaches it, Mist Walk's spell dodge and Keen Verse; the Mystic caster reaches the Stair. A V with the bend at the notable: the Shade side arrives at the crossing road from due west, square to the road, and the Mystic side runs straight to Mist Walk. Two dagger smalls on the Mystic side, one on the Shade side. 18 steps from the Mystic start and 16 from the Shade's; Keen Verse (spell damage, crit) is 9 away.",
+      at: [1350, -3010],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [daggerSpellDamage(8)],
+          at: [1274, -3109],
+          why: "The entrance from Mist Walk's notable, on the straight line to the notable.",
+        },
+        { id: 'b', kind: 'small', lines: [daggerSpellDamage(8)], at: [1307, -3066] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Sharp Tongue',
+          lines: [daggerSpellDamage(20), castSpeed(6)],
+          at: [1350, -3010],
+          why: '2.5 + 1.5 units. The tip of the V.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [daggerSpellDamage(8)],
+          at: [1420, -3005],
+          why: 'The Shade side, to the crossing road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'roadN.a',
+      to: 'haleScribe.a',
+      why: 'The scriptorium stair onto Hale Scribe (MY-9): the stair is a junction now, not a bare run.',
+    },
+    {
+      from: 'haleScribe.d',
+      to: 'wandVolley.a',
+      why: "Hale Scribe onto Wand Volley's entrance: a bridge, so the column junction reaches the fast wand without the wheel and Frugal.",
+    },
+    {
+      from: 'mistWalk.n',
+      to: 'sharpTongue.a',
+      why: "Mist Walk onto Sharp Tongue (MY-10): the spell dodge notable becomes a junction toward the Shade's Stair.",
+    },
+    {
+      from: 'sharpTongue.c',
+      to: 'knife.hex.toSpire.a',
+      why: "The dagger caster's bridge (G2/borders.md §4, laid in G3 round 2): Sharp Tongue onto the Shade's crossing road below the Stair's junction, so the Shade's dagger caster reaches the Mystic's dagger spells and Mist Walk, and the Mystic caster the Stair.",
+    },
+    {
+      from: 'toVolley.r2',
+      to: 'keenVerse.a',
+      why: 'The road to Wand Volley onto Keen Verse (MY-1): the road had nothing coming off it between Hexwright and Wand Volley.',
+    },
+    {
+      from: 'keenVerse.d',
+      to: 'toDev2.a',
+      why: 'Keen Verse onto the road between Mist Walk and Hexwright: a bridge, so the gap is crossed through spell damage, and the east road has a second way from Wand Volley to Mist Walk.',
+    },
     {
       from: 'wandVolley.a',
       to: 'frugal.b',
@@ -422,6 +594,16 @@ export const craft: AreaSpec = {
       from: 'spire.craft.toDev2.a',
       to: 'spire.craft.hexwright.n',
       why: 'The far end of the road.',
+    },
+    {
+      from: 'hexwright.n',
+      to: 'toStair.a',
+      why: 'Hexwright onto the curse crossing: the curse notable is on the way to the Stair, so a curser coming from the Shade pays for it and one from the Mystic walks on to the Shade curses.',
+    },
+    {
+      from: 'toStair.a',
+      to: 'knife.hex.j4.a',
+      why: "The curse crossing (a near crossing; G1-brief.md §2.1, laid in the G2 border pass): Hexwright through one node to the Stair's junction, so the curser from either start has the other's curses (Hexwright with Second Curse and the Shade's curse cluster). The Stair's west becomes a loop: the junction, Hexwright, Devotion, the hex wheel, the climb.",
     },
     {
       from: 'spire.storm.jArm.a',

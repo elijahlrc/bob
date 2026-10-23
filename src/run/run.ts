@@ -49,7 +49,7 @@ import { CURRENCY_DROPS } from '../data/constants';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 20;
+export const SAVE_VERSION = 21;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {

@@ -8,6 +8,11 @@ import { Controller } from './run/controller';
 import { App } from './ui/App';
 import { installUiScale } from './ui/uiScale';
 import { monsterPortrait } from './render/styles/grim/portrait';
+// The interface faces, shipped with the game (SIL Open Font License): Grenze for text, Jacquard 24 for headings.
+import '@fontsource/grenze/400.css';
+import '@fontsource/grenze/400-italic.css';
+import '@fontsource/grenze/600.css';
+import '@fontsource/jacquard-24/400.css';
 import './ui/styles.css';
 import './ui/skins.css';
 import './ui/tree.css';

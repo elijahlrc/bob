@@ -196,6 +196,34 @@ export const LABEL_K_NOTABLE = 0.4;
 export const LABEL_K_KEYSTONE = 0.14;
 
 /**
+ * A node's stat lines under it once the view is close enough (as in the tree editor): set at `px` screen pixels, wrapped at
+ * about `wrap` letters, and shown from the zoom at which the widest row is narrower than the distance to the node's nearest
+ * neighbour (at most `fit` tree units), so the lines of two neighbours do not run into each other.
+ */
+export const NODE_TEXT = { px: 11, wrap: 22, fit: 180 } as const;
+
+/** Breaks a line into rows of about `max` letters at spaces (a longer word keeps a row of its own). */
+export function wrapLine(line: string, max: number = NODE_TEXT.wrap): string[] {
+  const rows: string[] = [];
+  let row = '';
+  for (const word of line.split(' ')) {
+    if (row && row.length + 1 + word.length > max) {
+      rows.push(row);
+      row = word;
+    } else row = row ? `${row} ${word}` : word;
+  }
+  if (row) rows.push(row);
+  return rows;
+}
+
+/**
+ * The zoom from which rows this many screen pixels wide fit under a node whose nearest neighbour is `room` tree units away;
+ * never more than `kMax`, so that the closest zoom shows every node's lines.
+ */
+export const textZoom = (widthPx: number, room: number, kMax: number): number =>
+  Math.min(kMax, widthPx / Math.min(room, NODE_TEXT.fit));
+
+/**
  * Area names (the hand-written tree's areas): set in tree units behind the nodes, like place names on a map, so they
  * shrink with the tree when it is zoomed out. `size` is the font size; `glyph` the width of an average letter as a share
  * of it, which the placement checks use (scripts/passives).

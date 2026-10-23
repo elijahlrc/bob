@@ -440,6 +440,8 @@ resolution and that regeneration and leech scale consistently. The HUD shows the
 - **Phase 1 types:** Crescendo, Quarry, Throng. Between them they ask for speed, burst and area damage, with almost
   no new engine code beyond Crescendo's hook.
 - **Phase 2 types:** Holdout, Collapse, Crawl. They are drafted here so the offer and type model has room for them.
+  Collapse is built but withheld from the offers since 2026-10-22 (`withheld` in `src/data/mapTypes.ts`): it was far
+  deadlier than the other types.
 - A type may appear on any map offer that is not on a gate level, at any offset, including the anchor.
 - Types do not combine with each other.
 - Quarry and Collapse need a forced exit rule that fits "no abandoning mini-bosses" (neither ends in a mini-boss, so

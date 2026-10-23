@@ -2541,7 +2541,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
   {
     kind: 'active',
     id: 'rimeRebuke',
-    name: 'Rime Rebuke',
+    name: 'Iron Rebuke',
     attr: 'dex',
     skillType: 'attack',
     tags: ['attack', 'melee'],

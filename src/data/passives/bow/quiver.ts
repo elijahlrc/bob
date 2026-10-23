@@ -31,7 +31,7 @@ export const quiver: AreaSpec = {
   region: 'strider',
   name: 'The Thicket',
   why: 'Attack speed and bleeding on attacks, on the road between the projectiles and the physical end.',
-  at: [2181, 1800], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [2130, 1800], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); G3 round 2 nudged it off Arrow Weave.
   clusters: [
     {
       id: 'road',
@@ -73,8 +73,8 @@ export const quiver: AreaSpec = {
           at: P(1605, 713),
           why: 'The entrance, facing the hub: a little of both sides.',
         },
-        { id: 'a1', kind: 'small', lines: [projectileDamage(10)], at: P(1917, -448) },
-        { id: 'a2', kind: 'small', lines: [projectileDamage(10)], at: P(2048, -501) },
+        { id: 'a1', kind: 'small', lines: [projectileDamage(10)], at: P(2059, -568) },
+        { id: 'a2', kind: 'small', lines: [projectileDamage(10)], at: P(2111, -591) },
         {
           id: 'n1',
           kind: 'notable',
@@ -88,11 +88,11 @@ export const quiver: AreaSpec = {
           kind: 'notable',
           name: 'Deep Cuts',
           lines: [bleedDamage(30), physAttack(12), bleedFaster(10)],
-          at: P(1602, 1027),
+          at: P(1656, 861),
           why: '2.5 + 1.2 + 1 units.',
         },
-        { id: 'c2', kind: 'small', lines: [bleedDamage(12)], at: P(1516, 938) },
-        { id: 'c1', kind: 'small', lines: [bleedDamage(12)], at: P(1517, 799) },
+        { id: 'c2', kind: 'small', lines: [bleedDamage(12)], at: P(1598, 834) },
+        { id: 'c1', kind: 'small', lines: [bleedDamage(12)], at: P(1576, 772) },
       ],
       links: [
         ['e', 'c1'],
@@ -113,10 +113,10 @@ export const quiver: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [bowDamage(10)],
-          at: P(1833, 327),
+          at: P(1920, 395),
           why: 'The entrance, facing the junction.',
         },
-        { id: 'b', kind: 'small', lines: [bowDamage(10)], at: P(1932, 397) },
+        { id: 'b', kind: 'small', lines: [bowDamage(10)], at: P(1965, 430) },
         {
           id: 'n',
           kind: 'notable',
@@ -134,7 +134,7 @@ export const quiver: AreaSpec = {
     {
       id: 'skewer',
       name: 'Skewer',
-      why: 'Projectile damage twice, then the notable with an extra pierce and projectile damage: pierce is the projectile line no small sells and the one a thrown or bow build reshapes itself around. Passed through to the flask pocket, so the rim is a road. Split Volley was beside it until round 4.',
+      why: 'Projectile damage twice, then the notable with an extra pierce and projectile damage: pierce is the projectile line no small sells and the one a thrown or bow build reshapes itself around. Passed through to the flask pocket, so the rim is a road; since G2 (2026-10-22) both its doors are road nodes of the middle and south spokes. Split Volley was beside it until round 4.',
       at: P(2400, 190),
       shape: { kind: 'hand' },
       nodes: [
@@ -142,17 +142,17 @@ export const quiver: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [projectileDamage(10)],
-          at: P(2390, 50),
-          why: 'The entrance, facing the landmark wheel.',
+          at: P(2337, 208),
+          why: 'The entrance, from the middle spoke and the landmark wheel.',
         },
-        { id: 'b', kind: 'small', lines: [projectileDamage(10)], at: P(2450, 180) },
+        { id: 'b', kind: 'small', lines: [projectileDamage(10)], at: P(2365, 259) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Skewer',
           lines: [pierce(1), projectileDamage(10)],
           at: P(2400, 320),
-          why: '3 + 1 units. The exit, to the flask pocket.',
+          why: '3 + 1 units. The exit, to the south spoke and the flask pocket.',
         },
       ],
       links: [
@@ -171,10 +171,10 @@ export const quiver: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [flaskEffect(5)],
-          at: P(2310, 470),
-          why: 'The entrance from Skewer and from Rapid Fire.',
+          at: P(2265, 550),
+          why: 'The entrance, from the south spoke and Skewer.',
         },
-        { id: 'b', kind: 'small', lines: [flaskEffect(5)], at: P(2320, 610) },
+        { id: 'b', kind: 'small', lines: [flaskEffect(5)], at: P(2235, 600) },
         {
           id: 'n',
           kind: 'notable',
@@ -199,8 +199,8 @@ export const quiver: AreaSpec = {
         {
           id: 'n439',
           kind: 'small',
-          lines: [critChance(20)],
-          at: P(1839, 717),
+          lines: [critChance(15)],
+          at: P(1725, 720),
           why: 'Added in the editor (2026-10-19).',
         },
         {
@@ -208,14 +208,14 @@ export const quiver: AreaSpec = {
           kind: 'notable',
           name: 'Killing Eye',
           lines: [critMulti(24), damageVsLowLife(16)],
-          at: P(1890, 826),
+          at: P(1747, 781),
           why: "2 + 2 units. Added in the editor (2026-10-19) as a second Vital Aim; round 4 (approved 2026-10-20) gave it the finishing blow instead of crit chance, so it is not Vital Aim's pairing.",
         },
         {
           id: 'n441',
           kind: 'small',
-          lines: [critChance(20)],
-          at: P(1723, 656),
+          lines: [critChance(15)],
+          at: P(1666, 692),
           why: 'Added in the editor (2026-10-19).',
         },
       ],
@@ -227,12 +227,6 @@ export const quiver: AreaSpec = {
   ],
   links: [
     { from: 'road.jq3', to: 'rapid.a', why: 'The attack-speed pocket.' },
-    {
-      from: 'bow.flight.wheel.n2',
-      to: 'skewer.a',
-      why: 'Barbed Arrows onto the pierce pocket: the rim is a road on from the landmark wheel.',
-    },
-    { from: 'skewer.n', to: 'quickSip.a', why: 'Pierce on to the flask pocket.' },
     {
       from: 'quickSip.n',
       to: 'added.n440',

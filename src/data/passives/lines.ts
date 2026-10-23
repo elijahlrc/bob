@@ -40,17 +40,17 @@ export const UNIT = {
   es: 5,
   mana: 8,
   armour: 12,
-  evasion: 12,
+  evasion: 10,
   resAll: 4,
   resOne: 8,
   lifeRegen: 0.4,
   manaRegen: 10,
   stunThreshold: 8,
   moveSpeed: 4,
-  attackSpeed: 3,
+  attackSpeed: 5,
   castSpeed: 4,
   accuracy: 10,
-  critChance: 20,
+  critChance: 15,
   critMulti: 12,
   aoe: 8,
   stunDuration: 15,
@@ -332,7 +332,7 @@ export const dualDamage = def('dualDamage', (v: number): Line =>
 export const dualSpeed = def('dualSpeed', (v: number): Line =>
   line(
     `${v}% attack speed while dual wielding`,
-    v / 3,
+    v / UNIT.attackSpeed,
     mod('attackSpeed', 'inc', v, { condition: DUAL }),
   ),
 );
@@ -438,7 +438,11 @@ export const bowDamage = def('bowDamage', (v: number): Line =>
   weaponLine(`${v}% bow damage`, v, 10, ['bow'], 'wieldingBow'),
 );
 export const bowSpeed = def('bowSpeed', (v: number): Line =>
-  line(`${v}% bow attack speed`, v / 3, mod('attackSpeed', 'inc', v, { tags: ['bow'] })),
+  line(
+    `${v}% bow attack speed`,
+    v / UNIT.attackSpeed,
+    mod('attackSpeed', 'inc', v, { tags: ['bow'] }),
+  ),
 );
 export const physAttack = def('physAttack', (v: number): Line =>
   damage(v, {
@@ -689,13 +693,21 @@ export const weaponDamage = def('weaponDamage', (w: Weapon, v: number): Line =>
   weaponLine(`${v}% ${w} damage`, v, 10, [w], WIELD[w]),
 );
 export const weaponCrit = def('weaponCrit', (w: Weapon, v: number): Line =>
-  line(`${v}% crit chance with ${w}s`, v / 20, mod('critChance', 'inc', v, { tags: [w] })),
+  line(
+    `${v}% crit chance with ${w}s`,
+    v / UNIT.critChance,
+    mod('critChance', 'inc', v, { tags: [w] }),
+  ),
 );
 export const weaponCritMulti = def('weaponCritMulti', (w: Weapon, v: number): Line =>
   line(`+${v}% crit multiplier with ${w}s`, v / 12, mod('critMulti', 'base', v, { tags: [w] })),
 );
 export const weaponSpeed = def('weaponSpeed', (w: Weapon, v: number): Line =>
-  line(`${v}% attack speed with ${w}s`, v / 3, mod('attackSpeed', 'inc', v, { tags: [w] })),
+  line(
+    `${v}% attack speed with ${w}s`,
+    v / UNIT.attackSpeed,
+    mod('attackSpeed', 'inc', v, { tags: [w] }),
+  ),
 );
 export const weaponAccuracy = def('weaponAccuracy', (w: Weapon, v: number): Line =>
   line(`${v}% accuracy with ${w}s`, v / 10, mod('accuracy', 'inc', v, { tags: [w] })),
@@ -712,14 +724,14 @@ export const shieldAttack = def('shieldAttack', (v: number): Line =>
 export const shieldSpeed = def('shieldSpeed', (v: number): Line =>
   line(
     `${v}% attack speed with a shield`,
-    v / 3,
+    v / UNIT.attackSpeed,
     mod('attackSpeed', 'inc', v, { condition: SHIELD }),
   ),
 );
 export const dualCrit = def('dualCrit', (v: number): Line =>
   line(
     `${v}% crit chance while dual wielding`,
-    v / 20,
+    v / UNIT.critChance,
     mod('critChance', 'inc', v, { condition: DUAL }),
   ),
 );
@@ -843,14 +855,16 @@ export const damageOnLowLife = def('damageOnLowLife', (v: number): Line =>
 export const attackSpeedOnKill = def('attackSpeedOnKill', (v: number): Line =>
   line(
     `${v}% attack speed if you killed recently`,
-    v / 4,
+    // Conditional, so a third cheaper than plain attack speed.
+    v / ((UNIT.attackSpeed * 4) / 3),
     mod('attackSpeed', 'inc', v, { condition: { id: 'killedRecently' } }),
   ),
 );
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(
     `${v}% crit chance while on full life`,
-    v / 25,
+    // Conditional, so a quarter cheaper than plain crit chance.
+    v / ((UNIT.critChance * 5) / 4),
     mod('critChance', 'inc', v, { condition: { id: 'onFullLife' } }),
   ),
 );
