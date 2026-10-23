@@ -32,7 +32,7 @@ The public announcement of Battle of Builds, on **2026-10-24 at midday** (Pacifi
 
 Nothing is announced until every gate is green.
 
-1. **Rivals limits, raised.** A migration on the live database, waiting on your approval. The proposed values, per 24 hours
+1. **Rivals limits, raised.** Done 2026-10-23 (migration `launch_raise_rate_caps` on the live database). The values, per 24 hours
    unless stated:
 
    | Limit                    | Now        | Proposed    |

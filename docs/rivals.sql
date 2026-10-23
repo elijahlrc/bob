@@ -220,7 +220,7 @@ create trigger rivals_3_check_name
   before insert on public.rivals
   for each row execute function public.rivals_check_name();
 
---    7d. The caps: 20 snapshots a day from one token, 60 from one address (several people can share one), and 300 an hour
+--    7d. The caps: 40 snapshots a day from one token, 300 from one address (several people can share one), and 5,000 an hour
 --    from everyone together, which bounds a flood from many addresses to what you would notice and delete.
 create or replace function public.rivals_rate_cap() returns trigger
 language plpgsql
@@ -229,15 +229,15 @@ set search_path = public
 as $$
 begin
   if (select count(*) from public.rivals r
-      where r.token_hash = new.token_hash and r.created_at > now() - interval '24 hours') >= 20 then
+      where r.token_hash = new.token_hash and r.created_at > now() - interval '24 hours') >= 40 then
     raise exception 'too many characters from this browser today' using errcode = 'check_violation';
   end if;
   if new.ip_hash is not null and
      (select count(*) from public.rivals r
-      where r.ip_hash = new.ip_hash and r.created_at > now() - interval '24 hours') >= 60 then
+      where r.ip_hash = new.ip_hash and r.created_at > now() - interval '24 hours') >= 300 then
     raise exception 'too many characters from this address today' using errcode = 'check_violation';
   end if;
-  if (select count(*) from public.rivals r where r.created_at > now() - interval '1 hour') >= 300 then
+  if (select count(*) from public.rivals r where r.created_at > now() - interval '1 hour') >= 5000 then
     raise exception 'the pool is taking a rest; try again later' using errcode = 'check_violation';
   end if;
   return new;
@@ -327,7 +327,7 @@ revoke all on function public.duel_seed(bigint, bigint) from public, anon, authe
 -- 12. Triggers on reporting a duel.
 --     12a. Before insert: the reporter must own side 0 (its token hash is the snapshot's, and the snapshot is a player's, never a
 --     bot's), the rival must exist and be of the same save version, the server's values are forced (time, address, seed,
---     unverified), the block list and the caps apply (50 reports a day from one token, 150 from one address, 1000 an hour from
+--     unverified), the block list and the caps apply (200 reports a day from one token, 1,000 from one address, 20,000 an hour from
 --     everyone).
 create or replace function public.duels_check() returns trigger
 language plpgsql
@@ -365,15 +365,15 @@ begin
     raise exception 'the two characters are of different versions' using errcode = 'check_violation';
   end if;
   if (select count(*) from public.duels d
-      where d.token_hash = new.token_hash and d.created_at > now() - interval '24 hours') >= 50 then
+      where d.token_hash = new.token_hash and d.created_at > now() - interval '24 hours') >= 200 then
     raise exception 'too many reports from this browser today' using errcode = 'check_violation';
   end if;
   if new.ip_hash is not null and
      (select count(*) from public.duels d
-      where d.ip_hash = new.ip_hash and d.created_at > now() - interval '24 hours') >= 150 then
+      where d.ip_hash = new.ip_hash and d.created_at > now() - interval '24 hours') >= 1000 then
     raise exception 'too many reports from this address today' using errcode = 'check_violation';
   end if;
-  if (select count(*) from public.duels d where d.created_at > now() - interval '1 hour') >= 1000 then
+  if (select count(*) from public.duels d where d.created_at > now() - interval '1 hour') >= 20000 then
     raise exception 'the ladder is taking a rest; try again later' using errcode = 'check_violation';
   end if;
   return new;
