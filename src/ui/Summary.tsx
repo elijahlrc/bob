@@ -184,14 +184,16 @@ export function Summary({ c }: { c: Controller }) {
   return (
     <div class="screen summary">
       {slain ? (
-        <h1 class="slain">Slain on level {run.build.level}</h1>
+        <h1 class="slain">Slain on level {last?.map ?? run.map}</h1>
       ) : (
         <h2>{won ? 'Victory!' : 'Your run has ended'}</h2>
       )}
       <p>
         {classDef(run.classId).name} · Level {run.build.level}
       </p>
-      <p>{won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}</p>
+      {!slain && (
+        <p>{won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}</p>
+      )}
       <p class="muted">
         Maps cleared: {run.history.filter((h) => h.status === 'cleared').length}
         {run.history.some((h) => h.status === 'abandoned') &&

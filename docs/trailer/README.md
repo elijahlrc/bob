@@ -59,7 +59,7 @@ deterministic: an unchanged page and score give byte-identical files.
   boss fight, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper on map
   63, his fourth toll: the shot opens on his bell already rising over his head (the tell, the game's own animation, added for this), held
   while the six rings show, and brought down as the first ring strikes and kills the Shade on 17.5 s (the screen's edge goes red as it lands); a pause; the end screen,
-  "Slain on level 72" down to the duel button, held from 18.35 s; the duel with Sin; the rating; the high scores (Sin first, as the first
+  "Slain on level 63" down to "Killed by the Tollkeeper", held from 18.35 s; the duel with Sin; the rating; the high scores (Sin first, as the first
   to beat the game; oostin and Eli are real players, the other names made up); the genre grid; the title over it.
 - Music: rhythm first, simple, one groove that stops dead when the toll's rings show, the bell and an impact as it comes down, and back for the duel; a heavy bass (a clean sine and its saturated
   harmonics under the gritty triangle, about 8 dB up from the first score) and a melody crushed hard (a very low sample

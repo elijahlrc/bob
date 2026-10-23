@@ -84,7 +84,15 @@
     0 3px 0 #000;
   color: #e8d6b0;
 }
-/* The end screen of a run that died. */
+/* The end screen of a run: its head lines closer together and a little down from the top (phones have their own). */
+@media (min-width: 601px) {
+  :root .screen.summary {
+    padding-top: 56px;
+  }
+  :root .screen.summary > p {
+    margin: 0.35em 0;
+  }
+}
 :root .summary h1.slain {
   font-size: 64px;
   letter-spacing: 0.04em;

@@ -482,7 +482,7 @@
     {
       t: [15, 20],
       name: 'The fall',
-      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, opening on the bell already rising over his head, held while its six rings show from 16.75, brought down as the first ring strikes and kills the Shade on 17.5 (the screen edged red); the body held; the end screen, Slain on level 72, held, the duel button pressed on 19.25.',
+      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, opening on the bell already rising over his head, held while its six rings show from 16.75, brought down as the first ring strikes and kills the Shade on 17.5 (the screen edged red); the body held; the end screen, Slain on level 63, held, the duel button pressed on 19.25.',
       draw(lt) {
         if (lt < 3.35) {
           let s = img(at('fall', lt));
@@ -497,9 +497,9 @@
             ])
           );
         }
-        /* from "Slain on level 72" down to the duel button */
+        /* from "Slain on level 63" down to "Killed by the Tollkeeper" */
         /* held on its first frame until the duel button is pressed on 19.25 (the clip's frame 12) */
-        return crop(at('summary', lt - 3.35, -15), [115, 4, 1050, 590.6]);
+        return crop(at('summary', lt - 3.35, -15), [100, 68, 1080, 607.5]);
       },
     },
     {
