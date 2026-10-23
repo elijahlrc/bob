@@ -411,14 +411,35 @@ export const CLIPS: Clip[] = [
             );
             (b as HTMLElement | undefined)?.classList.add('trailer-press');
           });
-        if (i === 30)
+        if (i === 30) {
           await t.page.evaluate(() =>
             (document.querySelector('.trailer-press') as HTMLElement | null)?.click(),
+          );
+          await t.page.waitForTimeout(100);
+          // The game selects the old amulet after a swap (is it worth keeping?); the shot is about the new one: its slot is
+          // selected and lit, so the card shows the Night Locket worn. (The old one is let go first: a slot clicked with a bag
+          // item selected wears that item.)
+          await t.page.click('.ix-close');
+          await t.page.waitForTimeout(50);
+          await t.page.evaluate(() => {
+            const slot = [...document.querySelectorAll('.ix-slot')].find(
+              (s) => s.querySelector('.ix-slot-name')?.textContent === 'Night Locket',
+            ) as HTMLElement | undefined;
+            slot?.click();
+            slot?.classList.add('trailer-lit');
+          });
+          await t.page.mouse.move(5, 470);
+        }
+        // Nothing scrolls: the screen stays as it was, only what changed moves.
+        if (i >= 30)
+          await t.page.evaluate(() =>
+            document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0)),
           );
         await t.still(1);
       }
     },
-    css: `.trailer-press { filter: brightness(1.5); transform: scale(0.96); }`,
+    css: `.trailer-press { filter: brightness(1.5); transform: scale(0.96); }
+      .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; border-color: #d98a3a !important; }`,
   },
 
   /* 5. Three more builds, in phone-shaped panels. */
