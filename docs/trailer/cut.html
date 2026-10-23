@@ -251,7 +251,7 @@
     )
     .join(
       '',
-    )}<radialGradient id="redEdge" r=".72"><stop offset=".72" stop-color="#c0141a" stop-opacity="0"/><stop offset="1" stop-color="#c0141a" stop-opacity=".8"/></radialGradient></defs>`;
+    )}<radialGradient id="redEdge" r=".72"><stop offset=".3" stop-color="#c0141a" stop-opacity="0"/><stop offset=".7" stop-color="#c0141a" stop-opacity=".45"/><stop offset="1" stop-color="#c0141a" stop-opacity=".9"/></radialGradient></defs>`;
   const glow = (x, y, r, col, o = 1) =>
     `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${col.slice(1)})" opacity="${o}"/>`;
   const floor = (cx, cy, w, h, fill = C.floor) =>
