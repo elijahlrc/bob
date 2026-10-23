@@ -84,6 +84,16 @@
     0 3px 0 #000;
   color: #e8d6b0;
 }
+/* The end screen of a run that died. */
+:root .summary h1.slain {
+  font-size: 64px;
+  letter-spacing: 0.04em;
+  margin: 0.1em 0 0.15em;
+  color: #d8423a;
+  text-shadow:
+    0 0 18px #a0201a99,
+    0 3px 0 #000;
+}
 :root .btn,
 :root .tab {
   background: linear-gradient(#3a2b1e, #24190f);

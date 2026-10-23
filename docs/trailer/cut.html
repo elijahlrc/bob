@@ -377,7 +377,7 @@
     climb2: 0,
     climb4: 0,
     climb5: 0,
-    fall: 23.5,
+    fall: 38.5,
     duel: 0,
     auto: 0,
   };
@@ -482,12 +482,12 @@
     {
       t: [15, 20],
       name: 'The fall',
-      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, the bell rising over his head from 15.25, held while its six rings show from 17.25, brought down as the first ring strikes and kills the Shade on 18.0; the body held; the end screen, the duel button pressed.',
+      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, opening on the bell already rising over his head, held while its six rings show from 16.75, brought down as the first ring strikes and kills the Shade on 17.5 (the screen edged red); the body held; the end screen, Slain on level 72, held, the duel button pressed on 19.25.',
       draw(lt) {
-        if (lt < 3.85) {
+        if (lt < 3.35) {
           let s = img(at('fall', lt));
           /* the room goes dark while the body is held */
-          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 3.3) / 0.55) * 0.55}"/>`;
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 2.8) / 0.55) * 0.55}"/>`;
           /* the level stays on screen, as in the climb (the boss's bar keeps the middle of the top clear) */
           return (
             s +
@@ -497,8 +497,9 @@
             ])
           );
         }
-        /* zoomed in so the last line shown is "Killed by the Tollkeeper" */
-        return crop(at('summary', lt - 3.85, 0), [107, 95, 1067, 600]);
+        /* from "Slain on level 72" down to the duel button */
+        /* held on its first frame until the duel button is pressed on 19.25 (the clip's frame 12) */
+        return crop(at('summary', lt - 3.35, -15), [115, 4, 1050, 590.6]);
       },
     },
     {
@@ -585,8 +586,8 @@
 
   /* hard cuts that land on a hit get a short flash */
   const FLASH = [1.5, 5.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
-  /* the toll's ring lands on the Shade (fall frame 114, drawn from 18.03): the screen's edge goes red, strong at once and fading, until the end screen */
-  const HURT = [18.02, 18.85];
+  /* the toll's ring lands on the Shade (fall frame 114, drawn from 17.53): the screen's edge goes red, strong at once and fading, until the end screen */
+  const HURT = [17.52, 18.35];
   const hurt = (t) => {
     const k = t - HURT[0];
     if (k < 0 || t >= HURT[1]) return '';

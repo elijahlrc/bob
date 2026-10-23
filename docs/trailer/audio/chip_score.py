@@ -222,21 +222,21 @@ def motif(t0, g=0.32):
         lead(t0 + off, m, d, g, duty=0.125, vib=0.0)
 
 
-# 0-17.25 s: the groove, eight bars and most of a ninth, stopped dead by the Tollkeeper's bell on 17.25 (the and of 3). In on
+# 0-16.75 s: the groove, eight bars and most of a ninth, stopped dead by the Tollkeeper's bell on 16.75 (the and of 2). In on
 # the first frame, one hit at 1.5 on the opening's biggest burst.
 for b in range(8):
     bar(b * 2.0)
-bar(16.0, steps=10)
+bar(16.0, steps=6)
 boom(1.5)
 for t0 in (4.0, 8.0, 12.0):  # the phrase every other bar from bar 3
     motif(t0)
 for st in range(8):  # a short roll into the stop
-    snare(16.25 + st * S16, 0.4 + 0.08 * st)
+    snare(15.75 + st * S16, 0.4 + 0.08 * st)
 
-# 17.25-20 s: the fall. The groove stops as the toll's rings show on the floor, the bell held up; it comes down as the first
-# ring kills on 18.0, an impact, the bell and a low ring; a roll back in.
-boom(18.0, 1.3)
-place('bass', 18.0, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
+# 16.75-20 s: the fall. The groove stops as the toll's rings show on the floor, the bell held up; it comes down as the first
+# ring kills on 17.5, an impact, the bell and a low ring; the end screen held; a roll back in.
+boom(17.5, 1.3)
+place('bass', 17.5, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
 for st in range(4):  # a pickup in sixteenths that ends before the downbeat, then the groove lands with a hit
     snare(19.5 + st * S16, 0.45 + 0.15 * st)
 boom(20.0, 0.9)
@@ -379,13 +379,13 @@ for at, fx in ((12.5, zap), (13.5, thud), (14.0, zap), (14.5, zap), (15.0, thud)
     fx(at + 0.12)
 # 15-20: the Tollkeeper's bell rises (a slow climb under the fight), the rings of its fourth toll crackle onto the floor, the
 # bell comes down as the first strikes; the duel button
-place('sfx', 15.25, pulse(midi(50), 2.0, 0.25, slide=0.5) * np.linspace(0, 1, int(2.0 * SR)) ** 2, 0.12)
-place('sfx', 17.25, noise(0.25, 16000) * np.exp(-np.arange(int(0.25 * SR)) / SR / 0.05), 0.2)  # the rings of lightning appear
-place('sfx', 17.5, pulse(midi(74), 0.5, 0.5, slide=-3) * np.linspace(0.2, 1, int(0.5 * SR)), 0.16)
-place('sfx', 17.5, noise(0.5, 4000) * np.linspace(0, 1, int(0.5 * SR)) ** 2, 0.15)
-bell(18.0, 62, 1.2)
-thud(18.0, 1.6)
-place('sfx', 18.0, noise(1.2, 2500) * np.exp(-np.arange(int(1.2 * SR)) / SR / 0.35), 0.35)  # the floor shattering
+place('sfx', 15.0, pulse(midi(50), 1.75, 0.25, slide=0.5) * np.linspace(0, 1, int(1.75 * SR)) ** 2, 0.12)
+place('sfx', 16.75, noise(0.25, 16000) * np.exp(-np.arange(int(0.25 * SR)) / SR / 0.05), 0.2)  # the rings of lightning appear
+place('sfx', 17.0, pulse(midi(74), 0.5, 0.5, slide=-3) * np.linspace(0.2, 1, int(0.5 * SR)), 0.16)
+place('sfx', 17.0, noise(0.5, 4000) * np.linspace(0, 1, int(0.5 * SR)) ** 2, 0.15)
+bell(17.5, 62, 1.2)
+thud(17.5, 1.6)
+place('sfx', 17.5, noise(1.2, 2500) * np.exp(-np.arange(int(1.2 * SR)) / SR / 0.35), 0.35)  # the floor shattering
 click(19.25, 1.2)
 blip(19.3, 74, 0.12, 0.7, 0.5)
 blip(19.45, 69, 0.3, 0.6, 0.5)
