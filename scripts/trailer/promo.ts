@@ -5,7 +5,8 @@
  *   npx tsx scripts/trailer/promo.ts [out dir]      (default docs/trailer/promo, git-ignored with the footage)
  *
  * social.png 1200 × 630 (shown when the page is linked), wide.png 2520 × 1080 (21:9, home page featuring), favicon.png
- * 512 × 512, logo.png (transparent, for light and dark backgrounds).
+ * 512 × 512, logo.png (transparent, for light and dark backgrounds); for the page's theme, banner.png 960 × 300,
+ * background.png 1920 × 1080 (fixed, not tiled) and embed.png 1280 × 720 (behind the game before it is run).
  */
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -23,7 +24,7 @@ async function main(): Promise<void> {
   });
   mkdirSync(OUT, { recursive: true });
   const page = await browser.newPage({ viewport: { width: 2600, height: 1200 } });
-  for (const kind of ['social', 'wide', 'favicon', 'logo']) {
+  for (const kind of ['social', 'wide', 'favicon', 'logo', 'banner', 'background', 'embed']) {
     await page.goto(
       pathToFileURL(path.join(ROOT, 'docs/trailer/promo.html')).href + `?kind=${kind}`,
     );
