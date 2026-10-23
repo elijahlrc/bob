@@ -12,6 +12,7 @@ import { forceDensity, type DensityId } from '../data/density';
 import type { Difficulty } from '../data/difficulty';
 import { inBlast, pending } from '../sim/blasts';
 import { bossState } from '../sim/bosses';
+import { killActor } from '../sim/combat';
 import type { Build, Item } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { botAllocate } from '../run/bot';
@@ -202,9 +203,9 @@ export function treeShot(run: RunState, steps = 4): { name: string; path: number
 
 /**
  * A build's worth of passives, in the order they would be taken: from the class start, the notable that costs the fewest nodes
- * (a keystone counts as worth two and a half), again and again, until `count` nodes are taken. It grows outward from the start,
- * away from the middle of the tree, like a tree's crown: a notable's score is its path length, plus its distance off that line
- * (per 400 units) and less its distance along it (per 600 units).
+ * (a keystone counts as worth two and a half), again and again, until `count` nodes are taken. It grows from the start toward
+ * the middle of the tree and on, a trunk and then a crown with limbs: a notable's score is its path length, plus its distance
+ * off that line (per 800 units) and less its distance along it (per 300 units).
  */
 export function growBuild(classId: string, count: number): number[] {
   const tree = getTree();
@@ -214,8 +215,8 @@ export function growBuild(classId: string, count: number): number[] {
   );
   const st = tree.nodes[tree.starts[classId]];
   const len = Math.hypot(st.x, st.y) || 1;
-  const dx = st.x / len;
-  const dy = st.y / len;
+  const dx = -st.x / len;
+  const dy = -st.y / len;
   while (taken.length < count) {
     let best: { path: number[]; score: number } | null = null;
     for (const n of targets) {
@@ -224,7 +225,7 @@ export function growBuild(classId: string, count: number): number[] {
       if (!p || !p.length) continue;
       const along = (n.x - st.x) * dx + (n.y - st.y) * dy;
       const off = Math.abs((n.x - st.x) * dy - (n.y - st.y) * dx);
-      const score = p.length / (n.kind === 'keystone' ? 2.5 : 1) + off / 400 - along / 600;
+      const score = p.length / (n.kind === 'keystone' ? 2.5 : 1) + off / 800 - along / 300;
       if (!best || score < best.score) best = { path: p, score };
     }
     if (!best) break;
@@ -322,6 +323,74 @@ export function dropNear(w: World, run: RunState, itemUid: number, dx = 1.5, dy 
   const item = run.inventory.find((i) => i.uid === itemUid)!;
   const p = w.sides[0].player;
   w.drops.push({ id: w.nextId++, x: p.x + dx, y: p.y + dy, item } as World['drops'][number]);
+}
+
+/**
+ * A big monster set down `dist` tiles from the character, toward the nearest other monster, standing in the shot; returns its id.
+ * `keepBig` holds it up through the fight and `fellBig` brings it down with a drop.
+ */
+export function bigOne(
+  w: World,
+  run: RunState,
+  type: keyof typeof MONSTER_TYPES = 'slagbrute',
+  dist = 3.6,
+): number {
+  const p = w.sides[0].player;
+  const foes = w.actors
+    .filter((a) => !a.isPlayer && a.alive && a.side === null)
+    .sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y));
+  const ang = foes[0] ? Math.atan2(foes[0].y - p.y, foes[0].x - p.x) : 0;
+  const spot = w.grid.collide(p.x + Math.cos(ang) * dist, p.y + Math.sin(ang) * dist, 0.9);
+  const room = w.plan.lab.rooms.findIndex(
+    (r) =>
+      spot.x >= r.rect.x &&
+      spot.x < r.rect.x + r.rect.w &&
+      spot.y >= r.rect.y &&
+      spot.y < r.rect.y + r.rect.h,
+  );
+  const spec = {
+    type,
+    variant: 'none' as const,
+    rarity: 'rare' as const,
+    level: run.map,
+    mods: [],
+  };
+  const m = spawnMonster(w, spec, spot.x, spot.y, Math.max(0, room), 999, MONSTER_TYPES[type].name);
+  m.state = 'chase';
+  return m.id;
+}
+
+/** Hold the big monster `id` up: it takes no more than half its life. */
+export function keepBig(w: World, id: number): void {
+  const m = w.actors.find((a) => a.id === id);
+  if (m?.alive) m.life = Math.max(m.life, m.def.maxLife * 0.5);
+}
+
+/** Clear the character's traps and bolts from around the big monster `id` (living or fallen), so that nothing hides it. */
+export function calmBig(w: World, id: number): void {
+  const m = w.actors.find((a) => a.id === id);
+  if (!m) return;
+  const clear = (o: { x: number; y: number }) => Math.hypot(o.x - m.x, o.y - m.y) > 4;
+  w.effects = w.effects.filter(clear);
+  w.projectiles = w.projectiles.filter(clear);
+  w.sides[0].deployables = w.sides[0].deployables.filter(clear);
+}
+
+/** Bring the big monster `id` down, and the item `uid` drops where it stood, a step toward the character. */
+export function fellBig(w: World, run: RunState, id: number, uid: number): void {
+  const m = w.actors.find((a) => a.id === id);
+  if (!m) throw new Error('no big monster to fell');
+  const p = w.sides[0].player;
+  const d = Math.hypot(p.x - m.x, p.y - m.y) || 1;
+  const item = run.inventory.find((i) => i.uid === uid)!;
+  calmBig(w, id);
+  killActor(w, m);
+  w.drops.push({
+    id: w.nextId++,
+    x: m.x + ((p.x - m.x) / d) * 0.7,
+    y: m.y + ((p.y - m.y) / d) * 0.7,
+    item,
+  } as World['drops'][number]);
 }
 
 /**

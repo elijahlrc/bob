@@ -4,6 +4,7 @@
  * arguments (S: src/trailer/stage.ts, c: the controller, game: the Phaser game, arg/i).
  */
 import type { Take, Page } from './capture';
+import { treeCamera } from './camera';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Clip = {
@@ -143,28 +144,19 @@ export const CLIPS: Clip[] = [
         el.id = 'trailer-level';
         document.body.appendChild(el);
       });
-      // The camera: it opens zoomed in on the class start and the first nodes, and zooms out as the build grows until the whole build
-      // sits in the view, following the middle of what is lit as it spreads. The view is driven the way a hand does it (a wheel step
-      // about the view's top-left corner, then a drag), so the tree's own text and sizes follow the zoom.
+      // The camera (scripts/trailer/camera.ts): one smooth zoom out from a part-way close view of the class start to the whole
+      // build, the middle following what is lit. The view is driven the way a hand does it (a wheel step about the view's
+      // top-left corner, then a drag), so the tree's own text and sizes follow the zoom.
       const svg = (await t.page.locator('svg.tree').first().boundingBox())!;
       const W = svg.width;
       const H = svg.height;
-      // Tree units kept clear around the lit nodes (their size and names).
-      const PAD = 170;
-      const box = (n: number) => {
-        const p: [number, number][] = [start, ...pts.slice(0, n)];
-        return {
-          x0: Math.min(...p.map((q) => q[0])),
-          x1: Math.max(...p.map((q) => q[0])),
-          y0: Math.min(...p.map((q) => q[1])),
-          y1: Math.max(...p.map((q) => q[1])),
-        };
-      };
-      /** The zoom at which `b` fills `frac` of the view. */
-      const fit = (b: ReturnType<typeof box>, frac: number) =>
-        frac * Math.min(W / (b.x1 - b.x0 + 2 * PAD), H / (b.y1 - b.y0 + 2 * PAD));
-      const k1 = fit(box(order.length), 0.9);
-      const k0 = k1 * 2.6;
+      const N = 90;
+      const cams = treeCamera(start, pts, W, H, N, {
+        first: 0.2,
+        around: 8,
+        lead: 1,
+        pace: 1.5,
+      });
       const setView = async (k: number, cx: number, cy: number) => {
         const cur = await t.page.evaluate(() => {
           const g = document.querySelector('svg.tree g[transform^="translate("]')!;
@@ -200,29 +192,11 @@ export const CLIPS: Clip[] = [
         await t.page.mouse.move(ox + dx, oy + dy, { steps: 2 });
         await t.page.mouse.up();
       };
-      const N = 90;
-      let ls = Math.log(k0);
-      let cx = start[0];
-      let cy = start[1];
       for (let i = 0; i < N; i++) {
-        const k = i / (N - 1);
-        const e = 1 - Math.pow(1 - k, 2);
-        const n = Math.max(3, Math.round(e * order.length));
-        const level = Math.round(5 + e * 95);
-        const b = box(n);
-        const kt = Math.min(k0 * Math.pow(k1 / k0, e), fit(b, 0.92));
-        const a = i === N - 1 ? 1 : 0.35;
-        ls += (Math.log(kt) - ls) * a;
-        cx += ((b.x0 + b.x1) / 2 - cx) * a;
-        cy += ((b.y0 + b.y1) / 2 - cy) * a;
-        const kk = Math.min(Math.exp(ls), fit(b, 0.95));
-        // What is lit stays in view whatever the smoothing lags behind.
-        const hw = W / (2 * kk);
-        const hh = H / (2 * kk);
-        cx = Math.min(Math.max(cx, b.x1 + 60 - hw), b.x0 - 60 + hw);
-        cy = Math.min(Math.max(cy, b.y1 + 60 - hh), b.y0 - 60 + hh);
-        await t.stage((S, c, _g, a2) => S.setAllocated(c, a2), order.slice(0, n));
-        await setView(kk, cx, cy);
+        const { k, cx, cy, lit } = cams[i];
+        const level = Math.round(5 + (95 * lit) / order.length);
+        await t.stage((S, c, _g, a2) => S.setAllocated(c, a2), order.slice(0, lit));
+        await setView(k, cx, cy);
         await t.page.mouse.move(5, 470);
         await t.page.evaluate((l: number) => {
           const el = document.getElementById('trailer-level');
@@ -338,16 +312,26 @@ export const CLIPS: Clip[] = [
           difficulty: SOFT,
         },
       );
-      await t.rec(150);
+      // A big monster walks into the shot 1.5 s before the end of the traps' part (held up through the fight), and it falls as the
+      // clip ends: the amulet drops where it stood.
+      await t.rec(150, {
+        each: (S, c, i) => {
+          const win = window as any;
+          if (i === 100) win.__big = S.bigOne(c.world, win.__run);
+          if (win.__big != null) S.keepBig(c.world, win.__big);
+          // The traps' strikes leave it alone for the last second, so that nothing is lit over it when it falls.
+          if (i >= 120) S.calmBig(c.world, win.__big);
+        },
+      });
       t.cut('drop');
       await t.stage((S, c) => {
         const run = (window as any).__run;
         const uid = S.rareAmulet(run, 70);
         (window as any).__amulet = run.inventory.find((i: any) => i.uid === uid);
-        S.dropNear(c.world, run, uid, 3, 1);
+        S.fellBig(c.world, run, (window as any).__big, uid);
         run.inventory = run.inventory.filter((i: any) => i.uid !== uid);
       });
-      await t.rec(30);
+      await t.rec(30, { each: (S, c) => S.calmBig(c.world, (window as any).__big) });
     },
   },
 
