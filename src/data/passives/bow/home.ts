@@ -11,7 +11,7 @@
  * is a side, not a stat; the second is a real pick from four or five things; the third can be the signature, a pocket's
  * second node, or a road. Nothing in the home is about bows or projectiles: the Strider's skills are bows, dexterity
  * blades, thrown steel, traps and totems, and the home serves them all. The signature is the attacker's notable (attack
- * damage, attack speed, evasion, dexterity) on the loop between the hubs, outward of the start, and the way onto the
+ * damage, attack speed, dexterity) on the loop between the hubs, outward of the start, and the way onto the
  * string. Each hub has one pocket here (life north, crit south, since the user's editor pass), drawn as a tight orbit beside the hub as the reference
  * draws its pockets; the other pockets of the first ten points hang off the roads, so that a hub is a crossroads and not
  * a bouquet.
@@ -48,7 +48,7 @@ export const home: AreaSpec = {
     {
       id: 'hubs',
       name: 'The hubs',
-      why: 'The two dexterity hubs the start touches. North leads to the bows, Long Breath, Hedge Magic and the ring toward the Shade; south to the physical end, Vital Aim, Wayfarer and the ring toward the Reaver. Point one is a side.',
+      why: 'The two dexterity hubs the start touches. North leads to the bows, Long Breath and the ring toward the Shade (the link to Hedge Magic went in G4 fix 2: one pocket per hub); south to the physical end, Vital Aim, Wayfarer and the ring toward the Reaver. Point one is a side.',
       at: P(8, 58),
       shape: { kind: 'hand' },
       nodes: [
@@ -57,7 +57,7 @@ export const home: AreaSpec = {
           kind: 'attribute',
           lines: [dex(20)],
           at: P(60, -200),
-          why: 'The north hub: five ways out.',
+          why: 'The north hub: four ways out (the start side, the ring, the bows road, Long Breath).',
         },
         {
           id: 's',
@@ -72,7 +72,7 @@ export const home: AreaSpec = {
     {
       id: 'sig',
       name: "Hawk's Eye",
-      why: "The signature loop between the hubs, outward of the start: attack speed on the north side, evasion on the south, the attacker's notable at the tip. Three steps from the start by either hub, as the reference places every class's first notable, and the only way onto the string without a road.",
+      why: "The signature loop between the hubs, outward of the start: attack speed on the north side, evasion on the south, the attacker's notable (attack damage, attack speed, dexterity) at the tip. Three steps from the start by either hub, as the reference places every class's first notable, and the only way onto the string without a road.",
       at: P(226, 0),
       shape: { kind: 'hand' },
       nodes: [
@@ -87,9 +87,9 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: "Hawk's Eye",
-          lines: [attackDamage(14), attackSpeed(5), evasion(10), dex(20)],
+          lines: [attackDamage(14), attackSpeed(5), dex(20)],
           at: P(280, 0),
-          why: 'The class in one node, and nothing about a weapon: 1.4 + 1 + 1 + 1.3 units. The string leaves from here.',
+          why: "The attacker's notable, and nothing about a weapon: 1.4 + 1 + 1.3 units. G4 fix 2 (2026-10-23, the starts audit F3): its 10% evasion went (4.7 units were the richest notable in the network, and an evasion stop for the neighbours' attackers); the loop's south side still sells evasion. The string leaves from here.",
         },
         {
           id: 'b',

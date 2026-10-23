@@ -330,7 +330,7 @@ export const frost: AreaSpec = {
     {
       id: 'stream',
       name: 'Steady Stream',
-      why: "A pocket outward off the road to Shatter: damage with channelling skills twice, then channelling with cheaper mana. The channelled spell drinks mana for as long as it is held; the Fosse's Ceaseless Blades sells channelling to attackers, with speed and footing. Round 4 (the user approved channelling as two notables, 2026-10-20).",
+      why: "A chain outward off the road to Shatter: damage with channelling skills twice, then channelling with cheaper mana; since G4 fix 2 a bridge on to High Veil, not a pocket. The channelled spell drinks mana for as long as it is held; the Fosse's Ceaseless Blades sells channelling to attackers, with speed and footing. Round 4 (the user approved channelling as two notables, 2026-10-20).",
       at: [-326, -4166],
       shape: { kind: 'hand' },
       nodes: [
@@ -342,7 +342,7 @@ export const frost: AreaSpec = {
           name: 'Steady Stream',
           lines: [channelDamage(20), costReduction(6)],
           at: [-404, -4294],
-          why: '2 + 1.5 units. The tip of the pocket: it led on to High Veil in G3 round 1, which made the far shield a step off the climb; the link went in round 2.',
+          why: '2 + 1.5 units. The far end of the pocket, which leads on to High Veil: linked in G3 round 1, cut in round 2 (the classic caster took the far shield a step off the climb), linked again in G4 fix 2 (audit/growth-2 network finding 3) now that the loop widens choice.',
         },
       ],
       links: [
@@ -390,7 +390,7 @@ export const frost: AreaSpec = {
     {
       id: 'highVeil',
       name: 'High Veil',
-      why: "Energy shield with all elemental resistances (G3 round 1, 2026-10-22; G1/mystic.md MY-4, the ledger's shield section MY-s4 folded in): the far shield cluster at the top left, paired with resistances, not offence. A four-node ring at the head of the north-west rim road, which lands on its west side, so the notable, on the outer side, is a step off the road (G1/mystic.md: the rim roads land on smalls, never on notables). Reached only from the rim road since G3 round 2 (2026-10-22, the user's ask): round 1 also joined it to Steady Stream, and the classic caster took it in its 60-point plan through Steady Stream and finished its energy shield by 120 points. Now it is the far tip of the road, 27 steps from the Mystic start (through the Lantern and Cinder) and 24 from the Zealot's (the far loop): a commitment, not a step off the climb.",
+      why: "Energy shield with all elemental resistances (G3 round 1, 2026-10-22; G1/mystic.md MY-4, the ledger's shield section MY-s4 folded in): the far shield cluster at the top left, paired with resistances, not offence. A four-node ring at the head of the north-west rim road, which lands on its west side, so the notable, on the outer side, is a step off the road (G1/mystic.md: the rim roads land on smalls, never on notables). Reached only from the rim road from G3 round 2 (2026-10-22, the user's ask): round 1 also joined it to Steady Stream, and the classic caster took it in its 60-point plan through Steady Stream and finished its energy shield by 120 points. G4 fix 2 (2026-10-23, audit/growth-2 network finding 3) joined it to Steady Stream again: re-tested with the seams in, the loop widened the choices of five casters and narrowed only the classic caster's at 60, and the cul-de-sac of ten nodes became a loop. 23 steps from the Mystic start, through the climb and Steady Stream, still a long way past the channelled spells.",
       at: [-706, -4531],
       shape: { kind: 'hand' },
       nodes: [
@@ -399,7 +399,7 @@ export const frost: AreaSpec = {
           kind: 'small',
           lines: [es(5)],
           at: [-662, -4497],
-          why: 'The south-east side (Steady Stream arrived here in G3 round 1; the link went in round 2).',
+          why: 'The south-east side, where Steady Stream arrives (G3 round 1, cut in round 2, back in G4 fix 2).',
         },
         {
           id: 'n',
@@ -451,6 +451,11 @@ export const frost: AreaSpec = {
       from: 'piercing.b',
       to: 'harshWeather.n',
       why: "Piercing Word onto Harsh Weather's notable: a bridge, so the chill-and-shock chain is no longer a dead end and the east join has a second way to the top that is not Shatter.",
+    },
+    {
+      from: 'stream.n',
+      to: 'highVeil.a',
+      why: "Steady Stream onto High Veil's south-east corner (G4 fix 2, 2026-10-23, fix-2.md M-4; audit/growth-2 network finding 3): the round-2 exception reversed. With Quickening on the west climb and the seams in, the loop widens the casters' choices instead of narrowing them, and the network's one cul-de-sac of several clusters becomes a loop: Steady Stream is a bridge, High Veil 23 steps from the Mystic start (was 27). Channelling and energy shield with resistances are different kinds, so the two do not make one shop.",
     },
     {
       from: 'highVeil.b',

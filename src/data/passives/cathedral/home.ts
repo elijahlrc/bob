@@ -90,15 +90,15 @@ export const home: AreaSpec = {
     {
       id: 'hymn',
       name: 'Hymn',
-      why: "The east hub's pocket, a tight orbit pointing at the Spire: a lightning small on either side of the notable with spell damage and lightning, the casting Zealot's first spell notable and the storm caster's own line. G4 fix 1 (2026-10-22, audit S1, fix brief §1.2 item 5): it was mana, regeneration and a little shield, in no plan at any budget, and every Zealot caster opened the same way (Zeal, Hearthfire, Vigil, Choirmaster) because the first spell line was the fire wheel's at 7 steps. Now points 3 to 5 fork for a caster: Hymn east (spell and lightning), the fire wheel through the transept (fire with cast speed), Ardour west for the striker. The Zealot's mana stays on Choirmaster and the Banner. Twins: Hearthfire (fire with cast speed) 6 steps away, First Light (spell damage with mana and shield) 10, Thunder Peal (lightning with regeneration and shocks) far.",
-      at: P(330, 545),
+      why: "The east hub's pocket, a bridge from the east hub onto the east road: a lightning small on either side of the notable with spell damage and lightning, the casting Zealot's first spell notable and the storm caster's own line. G4 fix 1 (2026-10-22, audit S1, fix brief §1.2 item 5): it was mana, regeneration and a little shield, in no plan at any budget, and every Zealot caster opened the same way (Zeal, Hearthfire, Vigil, Choirmaster) because the first spell line was the fire wheel's at 7 steps. Now points 3 to 5 fork for a caster: Hymn east (spell and lightning), the fire wheel through the transept (fire with cast speed), Ardour west for the striker. The Zealot's mana stays on Choirmaster and the Banner. Twins: Hearthfire (fire with cast speed) 6 steps away, First Light (spell damage with mana and shield) 10, Thunder Peal (lightning with regeneration and shocks) far. G4 fix 2 (2026-10-23): the Mystic's crossing left its far small for the east road's second node (fix brief M-1), so the pocket no longer points at the Spire; it is laid as a right-angled triangle on the east road's first leg (the hub and the road's first node at the base corners, the notable at the apex, a small halfway along each side), which leaves the far small straight between the notable and the road instead of doubling back.",
+      at: P(347, 394),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [eleDamage('lightning', 10)],
-          at: P(319, 494),
+          at: P(298, 337),
           why: 'The entrance, facing the hub.',
         },
         {
@@ -106,14 +106,14 @@ export const home: AreaSpec = {
           kind: 'notable',
           name: 'Hymn',
           lines: [spellDamage(16), eleDamage('lightning', 16)],
-          at: P(340, 560),
+          at: P(347, 394),
           why: 'Spell damage and lightning: 2 + 1.6 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [eleDamage('lightning', 10)],
-          at: P(379, 618),
+          at: P(403, 345),
           why: 'The far node, onto the east road.',
         },
       ],

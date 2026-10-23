@@ -86,7 +86,7 @@ export const fire: AreaSpec = {
     {
       id: 'familiars',
       name: 'Familiars',
-      why: "Minions in the Spire (2026-10-19, the user's review: the Mystic can pick a summon like any other gem and the region sold nothing for one). Minion damage twice, then the notable with minion damage, life and speed, as a chain from the west road's mana-leech pocket to the arm's junction: the Spire's half of the dear crossing to the Cathedral's minion tower, which lands on its notable, so a minion Mystic and a fire Zealot pass each other here.",
+      why: "Minions in the Spire (2026-10-19, the user's review: the Mystic can pick a summon like any other gem and the region sold nothing for one). Minion damage twice, then the notable with minion damage, minion life and spell damage (the summoning caster's), as a chain from the west road's mana-leech pocket to the arm's junction: the Spire's half of the dear crossing to the Cathedral's minion tower, which lands on its notable, so a minion Mystic and a fire Zealot pass each other here.",
       at: [-1120, -3300],
       shape: { kind: 'hand' },
       nodes: [
@@ -121,7 +121,7 @@ export const fire: AreaSpec = {
     {
       id: 'cinder',
       name: 'Cinder',
-      why: "Ignite: chance, burning damage, faster burning. Fire as a burn, at the arm's end beside the two-element keystone; the fire caster who wants the hit instead goes east to Flashpoint. The arm's end: a dead end since 2026-10-20, when its link to the Prismatic spur went so the keystone sits on a spur; a bridge again since G2 (2026-10-22), its far side leading on to the north-west rim road.",
+      why: "Ignite: chance, burning damage, faster burning. Fire as a burn, at the arm's end beside the two-element keystone; the fire caster who wants the hit instead goes east to Flashpoint. The arm's end: a dead end since 2026-10-20, when its link to the Prismatic spur went so the keystone sits on a spur; a bridge again since G2 (2026-10-22), its far side leading on to the north-west rim road. Since G4 fix 1 (2026-10-22) it is also the Mystic end of seam 2: the Zealot's Bright Omen (spell crit with mana regeneration) lands on its notable, so Cinder is a junction of the Lantern arm, the rim road and the far crossing.",
       at: [-1150, -3850],
       shape: { kind: 'ring', r: 56, a0: 60 },
       nodes: [
@@ -146,7 +146,7 @@ export const fire: AreaSpec = {
     {
       id: 'rim',
       name: 'The north-west rim road',
-      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4), past Cold Light's pocket (spell crit with cold, G3 round 3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop). Cinder stops being a dead end. Since G3 round 2 the road is a spur with a far tip: Steady Stream no longer leads onto High Veil, so the far shield is reached from the Lantern through Cinder or from the Zealot, never a step off the climb to Shatter. The north-east rim road is the Eaves (`rim.ts`).",
+      why: "Three attribute nodes on one straight run along the Spire's north-west rim (G2, 2026-10-22; G1/mystic.md §3 as joined in G1-brief.md §2.2): from High Veil (the shield and resistance ring, G3, G1/mystic.md MY-4), past Cold Light's pocket (spell crit with cold, G3 round 3) to the corner over Cinder, where the road turns onto the Zealot's north walk (the far loop). Cinder stops being a dead end. From G3 round 2 to G4 fix 2 the road was a spur with a far tip; since G4 fix 2 (2026-10-23) Steady Stream leads onto High Veil again, so the road is one side of a loop from the climb to Shatter round to Cinder. The north-east rim road is the Eaves (`rim.ts`).",
       at: [-1115, -4325],
       shape: { kind: 'hand' },
       nodes: [

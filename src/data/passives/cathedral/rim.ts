@@ -5,8 +5,8 @@
  * two junctions. Energy shield with life (Wake, G3 round 2) hangs as an arc inward of the first leg, spell block (Buttress,
  * round 3) as an arc outward of the second (both arcs since G4 fix 1), and burning with the sceptre (Brazier, round 3)
  * inward off the far corner as the walk's one far tip; the leg into Thunder Peal is the pocket's own line carried on.
- * Since G3 round 3 the far south-west's bridge from Censer to the Vanguard's Grim Oath (Procession, auras with movement
- * since G4 fix 1) lives here too. The export keeps the name
+ * Since G3 round 3 the far south-west's pocket off Censer (Procession, auras with movement since G4 fix 1) lives here
+ * too; it was a bridge to the Vanguard's Grim Oath until G4 fix 2 cut that crossing. The export keeps the name
  * index.ts imports.
  */
 import {
@@ -29,7 +29,7 @@ export const outerWalk: AreaSpec = {
   id: 'cathedral.rim',
   region: 'zealot',
   name: 'The Churchyard',
-  why: "The ground outside the Bell Tower: the outer walk from Censer to Thunder Peal and the clusters that hang inward off it (the fire caster's two pools, the sceptre's burning beside Searing Avatar), spell block out on the rim, and the bridge from Censer to the Vanguard's Grim Oath (auras with movement).",
+  why: "The ground outside the Bell Tower: the outer walk from Censer to Thunder Peal and the clusters that hang inward off it (the fire caster's two pools, the sceptre's burning beside Searing Avatar), spell block out on the rim, and the pocket off Censer at the far south-west (auras with movement).",
   at: [-4960, -1290], // Where the area's name is drawn: outside the walk, clear of the Bell Tower's name and every notable.
   clusters: [
     {
@@ -145,8 +145,8 @@ export const outerWalk: AreaSpec = {
     {
       id: 'procession',
       name: 'Procession',
-      why: "G3 round 3 (2026-10-22; ledger ZE-8): the bridge from Censer to the Vanguard's Grim Oath, aura effect twice, the notable with aura effect and movement speed, aura effect once more. The support build's auras on the move, at the far south-west where Battle Hymn's shouts and Grim Oath's curses are (the support corner). Aura-led, not life-led as the brief had it: the aura build's auras stood flat from 120 to 160 points (its other aura notables, Choirmaster, Benediction, Lone Vow's spur and the Banner, are all taken by 120), while its life still climbed, and life is spread over every region. Aura twins: Choirmaster (reservation, mana) north-east, Benediction (shield, regeneration) on the tower wheel, Battle Hymn (warcries) seven steps away by the Rampart road. The bridge turns at the notable, toward Grim Oath. G4 fix 1 (2026-10-22, audit S4): its life became movement speed, the Zealot's one movement line (a procession walks); life is spread over every region, and the Zealot had no movement at all (§4.6). The Zealot's flasks are the centre's Provisions, six steps from its start by the west hub's ring road.",
-      at: P(2641, -1814),
+      why: "G3 round 3 (2026-10-22; ledger ZE-8): a pocket off Censer, aura effect three times, then the notable with aura effect and movement speed. The support build's auras on the move, at the far south-west where Battle Hymn's shouts are (the support corner). Aura-led, not life-led as the brief had it: the aura build's auras stood flat from 120 to 160 points (its other aura notables, Choirmaster, Benediction, Lone Vow's spur and the Banner, are all taken by 120), while its life still climbed, and life is spread over every region. Aura twins: Choirmaster (reservation, mana) north-east, Benediction (shield, regeneration) on the tower wheel, Battle Hymn (warcries) seven steps away by the Rampart road. G4 fix 1 (2026-10-22, audit S4): its life became movement speed, the Zealot's one movement line (a procession walks); life is spread over every region, and the Zealot had no movement at all (§4.6). The Zealot's flasks are the centre's Provisions, six steps from its start by the west hub's ring road. G4 fix 2 (2026-10-23, audit N4): its far node's crossing to the Vanguard's Grim Oath was cut (the corner had two crossings for one combination and no build walked either; Battle Hymn stays the corner's crossing), so Procession is Censer's far tip, laid as a straight pocket with the notable at the end.",
+      at: P(2651, -1868),
       shape: { kind: 'hand' },
       nodes: [
         {
@@ -158,25 +158,25 @@ export const outerWalk: AreaSpec = {
         },
         { id: 'b', kind: 'small', lines: [auraEffect(6)], at: P(2628, -1745) },
         {
+          id: 'c',
+          kind: 'small',
+          lines: [auraEffect(6)],
+          at: P(2638, -1799),
+          why: 'The last small before the notable (G4 fix 2: it was the far node onto Grim Oath).',
+        },
+        {
           id: 'n',
           kind: 'notable',
           name: 'Procession',
           lines: [auraEffect(12), moveSpeed(8)],
-          at: P(2641, -1814),
+          at: P(2651, -1868),
           why: 'Aura effect and movement speed: 2 + 2 units.',
-        },
-        {
-          id: 'c',
-          kind: 'small',
-          lines: [auraEffect(6)],
-          at: P(2590, -1862),
-          why: 'The far node, onto Grim Oath.',
         },
       ],
       links: [
         ['a', 'b'],
-        ['b', 'n'],
-        ['n', 'c'],
+        ['b', 'c'],
+        ['c', 'n'],
       ],
     },
     {
@@ -257,11 +257,6 @@ export const outerWalk: AreaSpec = {
       from: 'cathedral.ambulatory.censer.n',
       to: 'procession.a',
       why: 'Censer onto the auras with movement (G3 round 3): Censer is a junction of three, its links about evenly spread (its own chain east, the outer walk north-west, this south-west).',
-    },
-    {
-      from: 'procession.c',
-      to: 'wall.maces.oath.n',
-      why: "Two-handed fire (a near crossing at the rim; G1-brief.md §2.3, deferred to G3 by G2/borders.md §4): Procession's far node lands on the Vanguard's Grim Oath, so the Zealot's outer walk and the Vanguard's west rim road are one road through the support corner: Censer's burning, Searing Avatar and Brazier for the Vanguard's fire two-hander, Grim Oath's curses for the Zealot's support build.",
     },
   ],
 };

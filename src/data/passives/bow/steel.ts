@@ -69,7 +69,7 @@ export const steel: AreaSpec = {
     {
       id: 'wayfarer',
       name: 'Wayfarer',
-      why: "Evasion with resistances, a tight orbit off the physical road's second junction toward the Reaver: the defence pocket a Strider takes when the maps start hitting back, five steps from the start. The reference's evasion-and-resistances pocket is the same distance from its start. Since the user's editor pass it runs on past the notable (c, d, re-homed in G4 fix 1) to the Reaver's dual-wield junction and the Ford's corner, so it is a bridge.",
+      why: "Evasion with resistances, a tight orbit off the physical road's second junction toward the Reaver: the defence pocket a Strider takes when the maps start hitting back, five steps from the start. The reference's evasion-and-resistances pocket is the same distance from its start. Since the user's editor pass it runs on past the notable to the Reaver's dual-wield junction and the Ford's corner, so it is a bridge; since G4 fix 2 (2026-10-23, the trade-offs audit T1) the two nodes past it (c, d) are a dexterity road, the border road they always were, so the pocket's evasion is its own two smalls and the notable.",
       at: P(110, 537),
       shape: { kind: 'hand' },
       nodes: [
@@ -78,7 +78,7 @@ export const steel: AreaSpec = {
           kind: 'small',
           lines: [evasion(10)],
           at: P(105, 520),
-          why: "The entrance, facing the hub (moved 2026-10-19: it sat 81 units from the crit pocket's entrance). G4 fix 1: 8% → 10% evasion, one unit, as the Ford's two evasion smalls beyond the notable.",
+          why: "The entrance, facing the hub (moved 2026-10-19: it sat 81 units from the crit pocket's entrance). G4 fix 1: 8% → 10% evasion, one unit.",
         },
         { id: 'b', kind: 'small', lines: [evasion(10)], at: P(139, 566) },
         {
@@ -91,17 +91,17 @@ export const steel: AreaSpec = {
         },
         {
           id: 'c',
-          kind: 'small',
-          lines: [evasion(10)],
+          kind: 'attribute',
+          lines: [dex(7)],
           at: P(211, 686),
-          why: "Past the notable, toward the Ford (the user's editor node n408; 8% → 10% in G4 fix 1).",
+          why: "Past the notable, the road toward the Ford (the user's editor node n408): an evasion small until G4 fix 2 (2026-10-23, the trade-offs audit T1), a dexterity road node now, since it is the border road and not the pocket.",
         },
         {
           id: 'd',
-          kind: 'small',
-          lines: [evasion(10)],
+          kind: 'attribute',
+          lines: [dex(7)],
           at: P(238, 738),
-          why: "The far door: the Reaver's dual-wield junction and the Ford's corner leave here (the editor's n409).",
+          why: "The road's junction (the editor's n409): the Reaver's dual-wield junction and the Ford's corner leave here. An evasion small until G4 fix 2, a dexterity road node now.",
         },
       ],
       links: [
@@ -444,7 +444,7 @@ export const steel: AreaSpec = {
     {
       from: 'wayfarer.d',
       to: 'hub.t',
-      why: "The Strider's own way to its Ford hub (the user, stop 3, 2026-10-22): the G2 border pass cut the hub's link through the Reaver's east gate, which had put the Ford four steps farther out; this keeps the cut and brings the Ford back to one step farther than before.",
+      why: "The Strider's own way to its Ford hub (the user, stop 3, 2026-10-22): the G2 border pass cut the hub's link through the Reaver's east gate, which had put the Ford four steps farther out; this keeps the cut and brings the Ford back to one step farther than before. Since G4 fix 2 it joins two road nodes, a road leg; the looks audit's cut (L3) was not made, since without it the Ford is 9 steps from the start, not 6.",
     },
   ],
 };

@@ -315,7 +315,6 @@ const LIST: Archetype[] = [
     weights: {
       ...LIFE,
       ...RES,
-      ...weapon('staff', 0.6),
       es: 0.6,
       totemDamage: 1,
       totemSpeed: 1,
@@ -324,13 +323,14 @@ const LIST: Archetype[] = [
       eleDamageAll: 0.8,
       'eleDamage:fire': 0.6,
       'eleDamage:lightning': 0.6,
-      staffDamage: 0.6,
+      // A totem casts the spell, so the staff's attack lines are worth nothing to it; its spell lines are.
+      staffSpellDamage: 0.6,
       skillDuration: 0.3,
     },
     keystones: { 'Idle Hands': 3 },
     main: {
       'totem damage': ['totemDamage', 'totemSpeed'],
-      'spell damage': ['spellDamage', 'eleDamageAll'],
+      'spell damage': ['spellDamage', 'staffSpellDamage', 'eleDamageAll'],
       life: F.life,
     },
     pair: ['totem damage', 'life'],
@@ -860,7 +860,7 @@ const LIST: Archetype[] = [
     keystones: { Shieldwall: 3 },
     main: {
       block: ['shieldBlock', 'blockAttack'],
-      'spell block': F.spellBlock,
+      'spell block': ['spellBlock', 'shieldSpellBlock'],
       'spell damage': F.spell,
       'energy shield': F.es,
     },

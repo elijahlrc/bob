@@ -12,11 +12,9 @@ import {
   dex,
   dodgeAttack,
   dualCrit,
-  es,
   evasion,
   int,
   life,
-  lifeFlat,
   lifeOnHit,
   manaOnHit,
   resAll,
@@ -230,7 +228,7 @@ export const edge: AreaSpec = {
     {
       id: 'thickBlood',
       name: 'Thick Blood',
-      why: "Life once on the way, the notable with life, flat life and a little shield, and two more life in a pocket behind it: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction. G3 (2026-10-22, the ledger's SH-s1): two more life smalls, so it reads as a cluster and the Shade's thin life has a second section; the far life is the Stair's Wiry Frame. G3 round 2: the two new smalls hang as a pocket off the notable instead of lengthening the chain, so the Stair foot is as near the start as before round 1 (Thick Blood 7 steps, the Stair foot 8, Second Curse 10).",
+      why: "Life once on the way, the notable with life and chaos resistance, and two more life in a pocket behind it: the Knife's life, which an evasion-and-shield class still needs by map 20. A chain from the wheel's claw side to the curse junction, so the claw side and the curse barb are joined without the venom junction. G3 (2026-10-22, the ledger's SH-s1): two more life smalls, so it reads as a cluster and the Shade's thin life has a second section; the far life is the Stair's Wiry Frame. G3 round 2: the two new smalls hang as a pocket off the notable instead of lengthening the chain, so the Stair foot is as near the start as before round 1 (Thick Blood 7 steps, the Stair foot 8, Second Curse 10).",
       at: P(1090, -420),
       shape: { kind: 'hand' },
       nodes: [
@@ -245,9 +243,9 @@ export const edge: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Thick Blood',
-          lines: [life(10), lifeFlat(20), es(5)],
+          lines: [life(10), resOne('chaos', 15)],
           at: P(979, -471),
-          why: '2 + 1 + 1 units. The exit, to the curse junction.',
+          why: "2 + 1.5 units: life with chaos resistance, blood thick enough to shrug off a poison. The exit, to the curse junction. G4 fix 2 (2026-10-23): it was life, flat life and a little energy shield, and the last stop of half the network's builds at 120 (17 of 32 plans); the flat life is gone, and chaos resistance replaces the shield, a line the Shade's poison and curse builds weigh and the casters passing through count little.",
         },
         {
           id: 'b',
@@ -291,7 +289,7 @@ export const edge: AreaSpec = {
     {
       from: 'rake.c',
       to: 'knife.snares.toBow.a',
-      why: "The fast claw lands on the Bow's dear road where the Strider's stub arrives: the claw cluster is a bridge between the Alleys and the Docks' south, so a claw Shade reaches Wasp Sting (crit with poison) and the Strider's poison without walking back to the trap junction.",
+      why: "The fast claw lands on the Bow's dear road where the Strider's stub arrives: the claw cluster is a bridge between the Alleys and the Docks' south, so a claw Shade reaches Cutpurse's Luck (crit with daggers and claws) and the Strider's poison without walking back to the trap junction.",
     },
     { from: 'star.f', to: 'wheel.w5', why: 'The fire spoke lands on Fine Point.' },
     {

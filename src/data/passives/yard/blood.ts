@@ -3,9 +3,9 @@
  * diamond with Crimson Pact beyond the east one, the Festering chain (poison with bleeding; round 3, where Thirsting
  * Blade was) under the keystone spur, the dear crossings west to the Wall's grit and the Bow's dear road landing on the
  * east rim junction. Since G2 (2026-10-22) its roads: the spine (the middle road carried down from the shield wheel
- * between the two diamonds to the Fosse), the rim road (from the west junction to the east one, under the diamonds), the
- * leg from the Pits' west junction down to the Fosse, and Spellsword moved under the rim road, bridging the spine and
- * the Fosse. Since G3 round 2 the leg carries the wheel of the fighter without a shield (Full Swing two-handed with life,
+ * between the two diamonds to the Fosse), the leg from the Pits' west junction down to the Fosse, and Spellsword
+ * moved under the diamonds, bridging the spine and the Fosse (a rim road between the two junctions under the diamonds
+ * was cut back to the spine's one node in G4 fix 2, 2026-10-23: it ran beside the diamonds' own row). Since G3 round 2 the leg carries the wheel of the fighter without a shield (Full Swing two-handed with life,
  * Paired Steel dual wield with leech), and since round 3 the lasting bleed (Lasting Wounds) bridges the spine's end and
  * the Fosse below Wound Dance.
  */
@@ -139,7 +139,7 @@ export const blood: AreaSpec = {
     {
       id: 'j3',
       name: 'Junction',
-      why: "The west rim junction: the bleed diamond above, the Wound Dance spur below, the rim road east, the Pits' west junction west, and Shield Bash's road.",
+      why: "The west rim junction: the bleed diamond above, the Wound Dance spur below, the Pits' west junction west, and Shield Bash's road.",
       at: [-420, 3100],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [-420, 3100] }],
@@ -164,7 +164,7 @@ export const blood: AreaSpec = {
     {
       id: 'j2',
       name: 'Junction',
-      why: "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the rim road from the west, the Bow's dear road from the east; the Crimson Pact spur and the Fosse leave it (Festering left it for the Fosse's first node in G3 round 3).",
+      why: "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the Bow's dear road from the east; the Crimson Pact spur and the Fosse leave it (Festering left it for the Fosse's first node in G3 round 3).",
       at: [420, 3100],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [420, 3100] }],
@@ -224,7 +224,7 @@ export const blood: AreaSpec = {
     {
       id: 'spellsword',
       name: 'Spellsword',
-      why: "Cast speed twice, then the notable with spell damage, cast speed and mana regeneration: a Reaver picks a spell as often as anyone (56 of the 174 skills are spells) and the Yard sold nothing for one. At the rim, as the brief's grid says (spells are far for a Reaver). Since G2 a straight chain under the rim road from the spine to the Fosse's first node, which had nothing coming off it; it joined the two rim junctions before, where the rim road now runs.",
+      why: "Cast speed twice, then the notable with spell damage, cast speed and mana regeneration: a Reaver picks a spell as often as anyone (56 of the 174 skills are spells) and the Yard sold nothing for one. At the rim, as the brief's grid says (spells are far for a Reaver). Since G2 a straight chain under the diamonds from the spine to the Fosse's first node, which had nothing coming off it; it joined the two rim junctions before.",
       at: [181, 3470],
       shape: { kind: 'hand' },
       nodes: [
@@ -259,7 +259,7 @@ export const blood: AreaSpec = {
     {
       id: 'toWall',
       name: 'The Pits junction',
-      why: "A strength junction on the west side of the Pits, where the west road comes down from the Practice Ground and the leg leaves for the Fosse (G2); the Standard Bearer chain and the Wall's road land on it, and the rim road starts one node east. The Yard reaches the Wall by its near crossings.",
+      why: "A strength junction on the west side of the Pits, where the west road comes down from the Practice Ground and the leg leaves for the Fosse (G2); the Standard Bearer chain and the Wall's road land on it, and the west rim junction is one node east. The Yard reaches the Wall by its near crossings.",
       at: [-660, 3140],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-660, 3140] }],
@@ -276,30 +276,25 @@ export const blood: AreaSpec = {
     },
     {
       id: 'rim',
-      name: 'The rim road',
-      why: "The road under the bleed and the leech diamonds (G2, 2026-10-22), from the west rim junction to the east one, its middle node shared with the spine: it replaces Spellsword's chain between the two junctions, so the diamonds are a loop from below by road, not through a notable.",
-      at: [0, 3200],
+      name: 'A spine node',
+      why: "One node of the spine between the diamonds' road node and Spellsword's (G2, 2026-10-22). Until G4 fix 2 (2026-10-23) it was the middle of a rim road from the west rim junction to the east one, 90 to 240 units under the diamonds' own row between the same two junctions: a second road beside the first with nothing coming off its two outer nodes, in no build's plan (network audit N2). Those two nodes are gone (ids retired); the diamonds are still a loop by road through the spine's top node.",
+      at: [-24, 3220],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'p1', kind: 'attribute', lines: [str(6), dex(6)], at: [-200, 3190] },
         {
           id: 'p2',
           kind: 'attribute',
           lines: [str(6), dex(6)],
-          at: [0, 3220],
-          why: 'Where the rim road crosses the spine.',
+          at: [-24, 3220],
+          why: "The spine, on the straight line from the diamonds' road node down to Spellsword's.",
         },
-        { id: 'p3', kind: 'attribute', lines: [str(6), dex(6)], at: [210, 3190] },
       ],
-      links: [
-        ['p1', 'p2'],
-        ['p2', 'p3'],
-      ],
+      links: [],
     },
     {
       id: 'spine',
       name: 'The spine',
-      why: "The middle road's last stretch (G2, 2026-10-22): from where the rim road crosses it straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the lasting bleed (Lasting Wounds, RE-8, G3 round 3) leaves west for the Fosse's fifth node.",
+      why: "The middle road's last stretch (G2, 2026-10-22): from Spellsword's node straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the lasting bleed (Lasting Wounds, RE-8, G3 round 3) leaves west for the Fosse's fifth node.",
       at: [-80, 3660],
       shape: { kind: 'hand' },
       nodes: [
@@ -473,10 +468,8 @@ export const blood: AreaSpec = {
       to: 'toHarvest.a',
       why: 'The spine goes on down between the two diamonds (G2).',
     },
-    { from: 'toHarvest.a', to: 'rim.p2', why: 'The spine meets the rim road.' },
-    { from: 'j3.a', to: 'rim.p1', why: 'The rim road leaves the west rim junction.' },
-    { from: 'rim.p3', to: 'j2.a', why: 'The rim road reaches the east rim junction.' },
-    { from: 'rim.p2', to: 'spine.s1', why: 'The spine goes on south past the rim road.' },
+    { from: 'toHarvest.a', to: 'rim.p2', why: 'The spine goes on south.' },
+    { from: 'rim.p2', to: 'spine.s1', why: "The spine goes on south to Spellsword's node." },
     {
       from: 'spine.s2',
       to: 'yard.fosse.road.f4',

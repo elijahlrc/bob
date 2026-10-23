@@ -215,31 +215,31 @@ export const bows: AreaSpec = {
     {
       id: 'hedgeMagic',
       name: 'Hedge Magic',
-      why: "Cast speed twice, then the notable with spell damage, cast speed and a little intelligence: a Strider picks a spell as often as anyone and the Bow sold nothing for one. On the Knife border, where the dexterity-and-intelligence class lives, as a chain from the north hub to the near Knife stub, so the stub has two Strider doors and the spell Strider is a step from the Shade's road. New cluster only; nothing of the user's edit moved (2026-10-19).",
-      at: [1310, 60],
+      why: "Cast speed twice, then the notable with spell damage, cast speed and a little intelligence: a Strider picks a spell as often as anyone and the Bow sold nothing for one. On the Knife border, where the dexterity-and-intelligence class lives: a bridge between the Shade's road to it (`knife.home.toHedge.r1`) and the near Knife stub, laid straight on the line between the two. G4 fix 2 (2026-10-23, the starts audit F3): its link to the north hub was cut, so each Strider hub carries one pocket; the spell Strider reaches it through the stub, a little farther out.",
+      at: [1404, -61],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [castSpeed(4)],
-          at: P(131, -547),
-          why: 'The entrance, from the north hub.',
+          at: P(121, -727),
+          why: "The door from the Shade's road (G4 fix 2: the north hub's link went, and the chain was laid straight).",
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Hedge Magic',
           lines: [spellDamage(16), castSpeed(6), int(10)],
-          at: P(146, -615),
+          at: P(185, -755),
           why: '2 + 1.5 + 0.7 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [castSpeed(4)],
-          at: P(199, -661),
-          why: 'The exit, to the Knife stub.',
+          at: P(250, -782),
+          why: 'The door to the Knife stub.',
         },
       ],
       links: [
@@ -249,11 +249,10 @@ export const bows: AreaSpec = {
     },
   ],
   links: [
-    { from: 'bow.home.hubs.n', to: 'hedgeMagic.a', why: 'The north hub onto the spell chain.' },
     {
       from: 'hedgeMagic.b',
       to: 'toKnife.a',
-      why: 'The spell chain lands on the near Knife stub: a loop with the third junction.',
+      why: "The spell chain lands on the near Knife stub: with the Shade's road at its other end, a second Strider–Shade path.",
     },
     { from: 'road.jb3', to: 'hub.b', why: 'The road reaches the hub.' },
     { from: 'road.jb3', to: 'toKnife.a', why: 'The first step of the near Knife crossing.' },

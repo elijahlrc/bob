@@ -45,7 +45,7 @@ export const string: AreaSpec = {
     {
       id: 'hardTarget',
       name: 'Hard Target',
-      why: "Evasion with life, a bridge from the string's second node to the projectiles hub: two life smalls on the string side, the notable, then one evasion small at the hub, where Fleet Foot's evasion small joins it. Walked from the string it costs life to reach the evasion; walked from the hub, the other way round. G4 fix 1 (2026-10-22): the direct link to Fleet Foot was cut (two evasion notables a step apart, the trade-offs audit F1) and Hard Target reaches the hub through its own evasion small.",
+      why: "Evasion with life, a bridge from the string's second node to the projectiles hub: two life smalls on the string side, the notable, then its evasion small, which joins Fleet Foot's evasion small on the way to the hub. Walked from the string it costs life to reach the evasion; walked from the hub, the other way round. G4 fix 1 (2026-10-22): the direct link to Fleet Foot was cut (two evasion notables a step apart, the trade-offs audit F1). G4 fix 2 (2026-10-23, the looks audit L1): the evasion small sits beside Hard Target, and the hub is reached through Fleet Foot's small (three steps from Hard Target, two from Fleet Foot).",
       at: P(1285, -9),
       shape: { kind: 'hand' },
       nodes: [
@@ -53,8 +53,8 @@ export const string: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [evasion(10)],
-          at: P(1652, -7),
-          why: "Hard Target's evasion small, on its line to the projectiles hub; a junction where Fleet Foot's evasion small joins (G4 fix 1: moved onto that line, clear of Fleet Foot).",
+          at: P(1367, -31),
+          why: "Hard Target's evasion small, beside it on the line toward Fleet Foot's evasion small, which it joins. G4 fix 2 (2026-10-23, the looks audit L1): it sat beside Fleet Foot, 355 units from its own notable, and read as Fleet Foot's; the link to the projectiles hub now leaves from Fleet Foot's small.",
         },
         {
           id: 'n',
@@ -76,7 +76,7 @@ export const string: AreaSpec = {
     {
       id: 'speed',
       name: 'Quick Hands and Fleet Foot',
-      why: "Two notables of the Meadow, apart since G4 fix 1 (2026-10-22). Quick Hands, the attacker's speed, is a bridge from the string's second node to Weathered's chaos spoke, an attack speed small on each side. Fleet Foot, the kiter's movement and evasion, is a bridge from Wanderer (two movement smalls) to the projectiles hub (an evasion small, joining Hard Target's). True Aim, the second attack-speed notable two steps from Quick Hands, was removed (the trade-offs audit, F1).",
+      why: "Two notables of the Meadow, apart since G4 fix 1 (2026-10-22). Quick Hands, the attacker's speed, is a bridge from the string's second node to Weathered's chaos spoke, an attack speed small on each side. Fleet Foot, the kiter's movement and evasion, is a bridge from Wanderer (two movement smalls) to the projectiles hub (an evasion small, which also joins Hard Target's: since G4 fix 2 the hub's link leaves from it). True Aim, the second attack-speed notable two steps from Quick Hands, was removed (the trade-offs audit, F1).",
       at: P(1317, 108),
       shape: { kind: 'hand' },
       nodes: [
@@ -115,7 +115,7 @@ export const string: AreaSpec = {
           kind: 'small',
           lines: [evasion(10)],
           at: P(1608, -63),
-          why: "Fleet Foot's evasion small, toward the projectiles hub; 8% → 10%, one unit (G4 fix 1, D4).",
+          why: "Fleet Foot's evasion small, toward the projectiles hub; 8% → 10%, one unit (G4 fix 1, D4). A junction since G4 fix 2: the hub and Hard Target's evasion small both leave from it.",
         },
         {
           id: 'f1',
@@ -172,12 +172,12 @@ export const string: AreaSpec = {
     {
       from: 'hardTarget.a',
       to: 'speed.b',
-      why: "Fleet Foot's evasion small joins Hard Target's at the hub: Fleet Foot's way to the hub, and its second way in since G4 fix 1 (the user's editor link).",
+      why: "Hard Target's evasion small joins Fleet Foot's (the user's editor link): the link between the two clusters, so Hard Target is a bridge from the string to the hub, without a notable-to-notable link.",
     },
     {
-      from: 'hardTarget.a',
+      from: 'speed.b',
       to: 'bow.flight.hub.p',
-      why: "Hard Target's evasion side reaches the projectiles hub (the user's editor link).",
+      why: "Fleet Foot's evasion small reaches the projectiles hub, the way on for Hard Target too (G4 fix 2, the looks audit L1: re-aimed from Hard Target's small when that moved beside its notable; the user's editor link before).",
     },
     {
       from: 'speed.m',

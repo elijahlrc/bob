@@ -25,8 +25,7 @@ import {
   manaRegen,
   minionDamage,
   shockDuration,
-  spellDamage,
-  staffDamage,
+  staffSpellDamage,
   str,
   stunRecovery,
   warcryEffect,
@@ -104,19 +103,19 @@ export const ambulatory: AreaSpec = {
     {
       id: 'crozier',
       name: 'Crozier',
-      why: "A pocket outward off the walk: staff damage twice, then the staff in a caster's hand. The Zealot's second staff cluster; Quarterstaff, at the Vestry, is the staff with block.",
+      why: "A pocket outward off the walk: spell damage with a staff twice, then the notable with spell damage with a staff and cast speed: the staff in a caster's hand. G4 fix 2 (2026-10-23, audit D1): it was staff damage, which reaches only attacks, beside spell damage, so the staff attacker and the staff caster each got half; now the whole cluster is the caster's. The staff attacker's homes are Quarterstaff (staff damage with attack block, at the Vestry) and Warding Staff (staff damage with spell block with a staff, by the dear road).",
       at: P(3050, 30),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [staffDamage(12)], at: P(3132, 29) },
-        { id: 'b', kind: 'small', lines: [staffDamage(12)], at: P(3190, 25) },
+        { id: 'a', kind: 'small', lines: [staffSpellDamage(8)], at: P(3132, 29) },
+        { id: 'b', kind: 'small', lines: [staffSpellDamage(8)], at: P(3190, 25) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Crozier',
-          lines: [staffDamage(16), spellDamage(16), castSpeed(4)],
+          lines: [staffSpellDamage(20), castSpeed(6)],
           at: P(3260, 20),
-          why: '1.3 + 2 + 1 units.',
+          why: 'Spell damage with a staff and cast speed: 2.5 + 1.5 units.',
         },
       ],
       links: [
@@ -342,7 +341,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'censer',
       name: 'Censer',
-      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with movement, `rim.ts`) bridges it to the Vanguard's Grim Oath, so it is a junction of three; Brazier, off the far end of the outer walk, is burning with the sceptre.",
+      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with movement, `rim.ts`) hangs off it, so it is a junction of three (Procession's crossing on to the Vanguard's Grim Oath was cut in G4 fix 2); Brazier, off the far end of the outer walk, is burning with the sceptre.",
       at: [-3554, -638],
       shape: { kind: 'hand' },
       nodes: [
