@@ -194,7 +194,7 @@ export const rampart: AreaSpec = {
           kind: 'notable',
           name: 'Steady Hands',
           lines: [accuracy(20), attackSpeed(8)],
-          why: '2 units of accuracy and 1.7 of speed: 3.7.',
+          why: '2 units of accuracy and 1.6 of speed: 3.6.',
         },
         {
           id: 'b',
