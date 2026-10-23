@@ -81,6 +81,10 @@ storm-blade [reaver] choice 5, tax 33%: lightning attack damage –→23.8 (+15%
 
 ## 3. For the user
 
+**The user's answer (2026-10-23):** "I think all of these questions are going to require a lot of human play testing to
+answer, so for now let's move on to G5." Questions 1 to 4 are left as the network stands (the inner Ford link kept, no
+fifth wand cluster, life as measured, the two casters as they open) until playtesting says otherwise.
+
 1. **The inner Ford link.** The final looks audit asked to cut `bow.steel.hub.t`–`bow.steel.wayfarer.d`, the Strider
    home's longest link (622 units). It is the inner Ford link the user chose at stop 3; without it the Ford corner is 9
    steps from the Strider start instead of 6. The Strider fixer kept it. Keep or cut?
