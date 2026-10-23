@@ -79,7 +79,7 @@ function TelemetryNotice() {
   return (
     <label
       class="telemetry muted"
-      title="Sent when a run ends: class, level, map, what killed you and the map's modifiers. No name, no save, no cookies."
+      title="Sent when a run ends: class, level, map, what killed you and the map's modifiers. No personal information is collected."
     >
       <input
         type="checkbox"
@@ -115,12 +115,11 @@ function DiscordInvite() {
   if (!DISCORD_URL) return null;
   return (
     <p class="discord">
-      Your feedback shapes this game. Found a bug, or something that feels off?{' '}
+      Wanna talk to me about this project?{' '}
       <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer">
         <DiscordMark />
-        Join the Discord
-      </a>{' '}
-      and tell me.
+        Join the Discord!
+      </a>
     </p>
   );
 }
@@ -131,7 +130,7 @@ export function Title({ c }: { c: Controller }) {
   return (
     <div class="screen title">
       <h1>Battle of Builds</h1>
-      <p class="subtitle">An auto-battler of bones and numbers.</p>
+      <p class="subtitle">Craft your build, test its mettle, climb the ranks.</p>
       <UpdateNotice />
       {saves.length > 0 && (
         <div class="saves">

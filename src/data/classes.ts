@@ -28,7 +28,7 @@ export const CLASSES: ClassDef[] = [
     name: 'Mystic',
     attrs: { str: 14, dex: 14, int: 32 },
     color: 0x5a78d0,
-    style: 'Carries a wand; a caster at heart.',
+    style: 'Casts spells with a wand.',
     startWeapons: ['wand_1'],
     // The wand attacks for a long while before the first spell gem arrives, and Willow Twig and a
     // Threadbare Vestment alone could not clear map 1 (about 9 in 10 died there).
