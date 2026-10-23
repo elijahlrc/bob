@@ -46,7 +46,7 @@ deterministic: an unchanged page and score give byte-identical files.
 
 - Audience: ARPG and roguelike players who lack the hours for a full ARPG; the pitch is a new build every run, level 1
   to 100 in a sitting, then duels and the high scores. The reference game is never named, here or in the trailer.
-- Text, in order: "Grind to level 100 in a sitting." / "Duel their builds." / "Take the top
+- Text, in order: "Grind to level 100 in a sitting." / "Duel other builds." / "Take the top
   spot." / "Arcade. ARPG. Roguelike. Autobattler." / "Battle of Builds · Free on itch.io".
 - Shots: endgame cold open (a Skyfall in a mixed pack; the strike on the crash, 1.5 s, falls on the pack round the
   Mystic and kills it); the tree, one build growing from level 1 to 100: the two-handed mace Vanguard the build
