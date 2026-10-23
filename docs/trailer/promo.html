@@ -20,8 +20,13 @@
   const BONE = '#e8dcc0';
   const TORCH = '#d98a3a';
   const INK = '#0f1016';
-  /* the frame the backgrounds come from: the opening shot, the Mystic in the pack (2560 × 1440, the HUD below 1100) */
-  const BG = 'footage/endgame/f0078.jpg';
+  /* the frame the backgrounds come from: the tree shot's last, a Vanguard's whole build at level 100 (2562 × 1440: the tabs
+     above 150, the bottom bar below 1280, the build between x 650 and 1900), its level tag painted out */
+  const BG = {
+    src: 'footage/tree3/f0089.jpg',
+    erase: [[40, 165, 480, 150]],
+    tree: '#0a0809',
+  };
 
   const load = (src) =>
     new Promise((ok, no) => {
@@ -96,12 +101,19 @@
 
   /* the footage, darkened toward the side the title sits on */
   async function backdrop(x, W, H, crop, side = 'left') {
-    const bg = await load(BG);
+    const bg = await load(BG.src);
+    // Past the frame's edge (a crop may reach out of it, to give the title room) the tree's own black goes on.
+    x.fillStyle = BG.tree;
+    x.fillRect(0, 0, W, H);
+    const k = W / crop[2];
     x.imageSmoothingEnabled = true;
-    // The game is lit for play; a print of it wants a little more light.
-    x.filter = 'brightness(1.3) saturate(1.1)';
-    x.drawImage(bg, crop[0], crop[1], crop[2], crop[3], 0, 0, W, H);
-    x.filter = 'none';
+    x.drawImage(bg, -crop[0] * k, -crop[1] * k, bg.width * k, bg.height * k);
+    x.fillStyle = BG.tree;
+    for (const [ex, ey, ew, eh] of BG.erase)
+      x.fillRect((ex - crop[0]) * k, (ey - crop[1]) * k, ew * k, eh * k);
+    // Nothing of the screen's tabs or bottom bar.
+    x.fillRect(0, 0, W, (150 - crop[1]) * k);
+    x.fillRect(0, (1280 - crop[1]) * k, W, H);
     const gr =
       side === 'left' ? x.createLinearGradient(0, 0, W, 0) : x.createLinearGradient(0, H, 0, 0);
     gr.addColorStop(0, 'rgba(10,8,9,.85)');
@@ -139,25 +151,25 @@
       const W = (c.width = 1200),
         H = (c.height = 630);
       const x = c.getContext('2d');
-      // The pack round the Mystic (about 1300, 450 in the frame) right of centre and low, clear of the title.
-      await backdrop(x, W, H, [240, 60, 1400, 735]);
-      const t = pixText('Battle of Builds', { k: 3 });
-      glow(x, 56 + t.width / 2, 110, 380, 0.3);
-      x.drawImage(t, 56, 50);
-      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 30, 62, 50 + t.height + 50);
-      line(x, 'Free in your browser', 26, 62, 50 + t.height + 92, BONE);
+      // The build fills the right; the title and the lines under it the left, by its start.
+      await backdrop(x, W, H, [-230, 142, 2182, 1145]);
+      const t = pixText('Battle of Builds', { k: 2 });
+      glow(x, 44 + t.width / 2, 370, 330, 0.3);
+      x.drawImage(t, 44, 330);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 21, 48, 330 + t.height + 40);
+      line(x, 'Free in your browser', 19, 48, 330 + t.height + 72, BONE);
     },
     /* home page featuring: 21:9, 2520 × 1080 */
     async wide(c) {
       const W = (c.width = 2520),
         H = (c.height = 1080);
       const x = c.getContext('2d');
-      // Closer in: the pack at the right; the title and the genres at the left.
-      await backdrop(x, W, H, [0, 60, 2000, 857]);
-      const t = pixText('Battle of Builds', { k: 5 });
-      glow(x, 140 + t.width / 2, 400, 700, 0.28);
-      x.drawImage(t, 140, 320);
-      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 56, 150, 320 + t.height + 100);
+      // The build at the right, the whole of it; the title and the genres at the left.
+      await backdrop(x, W, H, [-560, 150, 2637, 1130]);
+      const t = pixText('Battle of Builds', { k: 4 });
+      glow(x, 140 + t.width / 2, 470, 650, 0.28);
+      x.drawImage(t, 140, 400);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 46, 148, 400 + t.height + 84);
     },
     /* the browser tab: one "B", 32 font pixels square, scaled to 512 */
     async favicon(c) {
