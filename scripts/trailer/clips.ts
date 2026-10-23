@@ -94,6 +94,9 @@ function mapClip(
 /** The camp tabs, by the start of their label (they carry counts). */
 const tab = (t: Take, label: string) => t.page.click(`.tabs .tab:has-text("${label}")`);
 
+/** The map's zoom of the climb, the fall and the duel, so that the cuts between them keep one scale. */
+const CLOSE = 3.2;
+
 /** Our character's name on the board and in the duel. */
 const ME = 'Morrow';
 
@@ -474,13 +477,14 @@ export const CLIPS: Clip[] = [
     { viewport: PHONE, css: PHONE_UI },
   ),
 
-  /* 6. The climb: four builds, four places, a half second each; then level 72, the boss fight (7). */
+  /* 6. The climb: four builds, four places, a half second each, as close in as the boss fight that follows (7). */
   mapClip(
     'climb1',
     { classId: 'reaver', level: 12, body: ['reapingArc', 'bruteForce'] },
     4,
     { theme: 'ashenCrypt', biome: 'crypt' },
     45,
+    { zoom: CLOSE },
   ),
   mapClip(
     'climb2',
@@ -488,6 +492,7 @@ export const CLIPS: Clip[] = [
     12,
     { theme: 'bonePits', biome: 'forge' },
     45,
+    { zoom: CLOSE },
   ),
   mapClip(
     'climb4',
@@ -495,6 +500,7 @@ export const CLIPS: Clip[] = [
     31,
     { theme: 'hollowVigil', biome: 'ruins' },
     45,
+    { zoom: CLOSE },
   ),
   mapClip(
     'climb5',
@@ -502,6 +508,7 @@ export const CLIPS: Clip[] = [
     41,
     { theme: 'gnawingWarrens', biome: 'marsh' },
     45,
+    { zoom: CLOSE },
   ),
   /* 7. The fall, level 72: the Shade fights the Tollkeeper, and his whole fourth toll runs: the bell hoisted over his head
         through the tell and held while its six rings show, then brought down as the first ring strikes and kills. The body
@@ -511,7 +518,7 @@ export const CLIPS: Clip[] = [
         on are printed, for the cut. */
   {
     name: 'fall',
-    zoom: 3.2,
+    zoom: CLOSE,
     css: BARE,
     async film(t) {
       await t.stage((S, c, game, fallen) => {
@@ -595,7 +602,7 @@ export const CLIPS: Clip[] = [
         each takes is multiplied by 5, not 0.3) so a fight is a few seconds, not over a minute. */
   {
     name: 'duel',
-    zoom: 3.2,
+    zoom: CLOSE,
     css: `.hud-top .muted, .speeds, .biome-banner { display: none !important; }`,
     async film(t) {
       const RULES = { damageScale: 5 };
