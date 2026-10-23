@@ -216,46 +216,67 @@
       x.drawImage(t, Math.round((W - t.width) / 2), Math.round((H - t.height) / 2) - 18);
       line(x, 'Arcade · ARPG · Roguelike · Autobattler', 30, W / 2, H / 2 + 92, TORCH, 'center');
     },
-    /* the page's background, 1920 × 1080 (set to stay put, not tiled): the whole tree, dimmed far down so the text reads */
+    /*
+     * The page's background, a 560 × 560 tile that repeats both ways: a square of the tree twice that size (below the tabs,
+     * right of the level tag), folded onto itself so that each edge meets the opposite one. Down the tile the lower half
+     * fades into the upper, then across it the right half into the left: at every edge only the pixels the next tile starts
+     * with show. Dimmed far down, so the page's text reads over it.
+     */
     async background(c) {
+      const S = 560;
+      c.width = c.height = S;
+      const bg = await load(BG.src);
+      const sq = document.createElement('canvas');
+      sq.width = sq.height = 2 * S;
+      sq.getContext('2d').drawImage(bg, 700, 160, 2 * S, 2 * S, 0, 0, 2 * S, 2 * S);
+      // Out of `from` (w × 2h, or 2w × h across): the second half, and over it the first, coming in from nothing at the
+      // start of the fold to whole at its end.
+      const fold = (from, w, h, across) => {
+        const out = document.createElement('canvas');
+        out.width = w;
+        out.height = h;
+        const o = out.getContext('2d');
+        o.drawImage(from, across ? w : 0, across ? 0 : h, w, h, 0, 0, w, h);
+        const first = document.createElement('canvas');
+        first.width = w;
+        first.height = h;
+        const f = first.getContext('2d');
+        f.drawImage(from, 0, 0, w, h, 0, 0, w, h);
+        const m = across ? f.createLinearGradient(0, 0, w, 0) : f.createLinearGradient(0, 0, 0, h);
+        m.addColorStop(0, 'rgba(0,0,0,0)');
+        m.addColorStop(1, 'rgba(0,0,0,1)');
+        f.globalCompositeOperation = 'destination-in';
+        f.fillStyle = m;
+        f.fillRect(0, 0, w, h);
+        o.drawImage(first, 0, 0);
+        return out;
+      };
+      const tile = fold(fold(sq, 2 * S, S, false), S, S, true);
+      const x = c.getContext('2d');
+      x.drawImage(tile, 0, 0);
+      x.fillStyle = 'rgba(7,5,8,.8)';
+      x.fillRect(0, 0, S, S);
+    },
+    /*
+     * Behind the game before it is run, 1920 × 1080: the room of the opening shot, the fight up and left of the middle,
+     * where the Run button is drawn on only floor, shaded a little. Whatever part of it a frame of any shape shows, nothing
+     * that matters is under the button. No title: the banner has it.
+     */
+    async embed(c) {
       const W = (c.width = 1920),
         H = (c.height = 1080);
       const x = c.getContext('2d');
-      await backdrop(x, W, H, [270, 150, 2009, 1130], null);
-      x.fillStyle = 'rgba(7,5,8,.8)';
-      x.fillRect(0, 0, W, H);
-      const v = x.createRadialGradient(W / 2, H / 2, H * 0.2, W / 2, H / 2, W * 0.7);
-      v.addColorStop(0, 'rgba(7,5,8,.35)');
-      v.addColorStop(1, 'rgba(7,5,8,.85)');
-      x.fillStyle = v;
-      x.fillRect(0, 0, W, H);
-    },
-    /* behind the game before it is run, 1280 × 720: the Mystic in a pack, dark in the middle where the Run button sits */
-    async embed(c) {
-      const W = (c.width = 1280),
-        H = (c.height = 720);
-      const x = c.getContext('2d');
       const bg = await load('footage/endgame/f0078.jpg');
       x.filter = 'brightness(1.3) saturate(1.1)';
-      // The fight, the HUD below 1100 left out.
-      x.drawImage(bg, 330, 0, 1956, 1100, 0, 0, W, H);
+      // The room, the HUD below 1100 left out; the pack (about 1300, 450 in the frame) lands near (690, 440).
+      x.drawImage(bg, 600, 0, 1956, 1100, 0, 0, W, H);
       x.filter = 'none';
-      const d = x.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.65);
-      d.addColorStop(0, 'rgba(7,5,8,.72)');
-      d.addColorStop(0.5, 'rgba(7,5,8,.45)');
-      d.addColorStop(1, 'rgba(7,5,8,.75)');
+      const d = x.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.hypot(W, H) / 2);
+      d.addColorStop(0, 'rgba(7,5,8,.55)');
+      d.addColorStop(0.35, 'rgba(7,5,8,.35)');
+      d.addColorStop(1, 'rgba(7,5,8,.15)');
       x.fillStyle = d;
       x.fillRect(0, 0, W, H);
-      // A darker band behind the title, so the bars of the pack do not show through it.
-      const band = x.createLinearGradient(0, 0, 0, 330);
-      band.addColorStop(0, 'rgba(7,5,8,.85)');
-      band.addColorStop(0.7, 'rgba(7,5,8,.6)');
-      band.addColorStop(1, 'rgba(7,5,8,0)');
-      x.fillStyle = band;
-      x.fillRect(0, 0, W, 330);
-      glow(x, W / 2, 170, 420, 0.22);
-      const t = pixText('Battle of Builds', { k: 4, out: 1 });
-      x.drawImage(t, Math.round((W - t.width) / 2), 110);
     },
     /* the logo, on nothing: bone with a dark outline and drop, so it reads on white and on black */
     async logo(c) {
