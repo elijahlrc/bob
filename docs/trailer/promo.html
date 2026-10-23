@@ -96,7 +96,24 @@
     const ox = o.getContext('2d');
     ox.imageSmoothingEnabled = false;
     ox.drawImage(g, x0, y0, x1 - x0 + 1, y1 - y0 + 1, 0, 0, o.width, o.height);
+    // How far below the image's top the baseline is, so that words can be set on a line.
+    o.base = (40 + out - y0) * k;
     return o;
+  }
+
+  /**
+   * The title stacked, one word to a line (Battle / of / Builds), left-aligned at `left`: the first baseline at `base`, each
+   * next one `step` font pixels below. Returns the bottom of the ink.
+   */
+  function stackedTitle(x, left, base, k, step = 30) {
+    let bottom = 0;
+    ['Battle', 'of', 'Builds'].forEach((w, i) => {
+      const t = pixText(w, { k });
+      const y = base + i * step * k - t.base;
+      x.drawImage(t, left, y);
+      bottom = Math.max(bottom, y + t.height);
+    });
+    return bottom;
   }
 
   /* the footage, darkened toward the side the title sits on */
@@ -153,11 +170,10 @@
       const x = c.getContext('2d');
       // The build fills the right; the title and the lines under it the left, by its start.
       await backdrop(x, W, H, [-230, 142, 2182, 1145]);
-      const t = pixText('Battle of Builds', { k: 3 });
-      glow(x, 44 + t.width / 2, 370, 400, 0.3);
-      x.drawImage(t, 40, 310);
-      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 32, 46, 310 + t.height + 54);
-      line(x, 'Free in your browser', 28, 46, 310 + t.height + 102, BONE);
+      glow(x, 200, 260, 380, 0.32);
+      const end = stackedTitle(x, 40, 34 + 26 * 4, 4);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 36, 46, end + 52);
+      line(x, 'Free in your browser', 32, 46, end + 100, BONE);
     },
     /* home page featuring: 21:9, 2520 × 1080 */
     async wide(c) {
@@ -166,11 +182,10 @@
       const x = c.getContext('2d');
       // The build at the right, the whole of it; the title and the genres at the left.
       await backdrop(x, W, H, [-560, 150, 2637, 1130]);
-      const t = pixText('Battle of Builds', { k: 5 });
-      glow(x, 140 + t.width / 2, 520, 760, 0.28);
-      x.drawImage(t, 130, 430);
-      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 72, 140, 430 + t.height + 112);
-      line(x, 'Free in your browser', 62, 140, 430 + t.height + 196, BONE);
+      glow(x, 480, 460, 760, 0.3);
+      const end = stackedTitle(x, 130, 110 + 26 * 7, 7);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 84, 140, end + 112);
+      line(x, 'Free in your browser', 72, 140, end + 206, BONE);
     },
     /* the browser tab: one "B", 32 font pixels square, scaled to 512 */
     async favicon(c) {
