@@ -374,11 +374,10 @@ for at in (10.85, 11.45, 12.05):
 place('sfx', 10.7, tri(220, 0.12, slide=-4) * adsr(int(0.12 * SR), d=0.1, s=0), 0.4)  # the totem lands
 for n in range(5):
     blip(11.05 + n * 0.33, 93, 0.18, 0.5, 0.125)
-# 12.5-14.5: an impact on every cut, and on the cut to the boss
-for k in range(5):
-    at = 12.5 + k * 0.5
-    [zap, thud, zap, zap, thud][k](at + 0.12)
-# 14.5-20: the Tollkeeper's bell rises (a slow climb under the fight), the rings of its fourth toll crackle onto the floor, the
+# 12.5-15: an impact on every cut (the first climb shot is a beat longer), and on the cut to the boss on 15
+for at, fx in ((12.5, zap), (13.5, thud), (14.0, zap), (14.5, zap), (15.0, thud)):
+    fx(at + 0.12)
+# 15-20: the Tollkeeper's bell rises (a slow climb under the fight), the rings of its fourth toll crackle onto the floor, the
 # bell comes down as the first strikes; the duel button
 place('sfx', 15.25, pulse(midi(50), 2.0, 0.25, slide=0.5) * np.linspace(0, 1, int(2.0 * SR)) ** 2, 0.12)
 place('sfx', 17.25, noise(0.25, 16000) * np.exp(-np.arange(int(0.25 * SR)) / SR / 0.05), 0.2)  # the rings of lightning appear

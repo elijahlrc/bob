@@ -1,9 +1,9 @@
 <title>Battle of Builds Cut</title>
 <meta name="claude:viewport-fit-sides" content="cover" />
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap"
-/>
+<!-- The game's own faces (SIL Open Font License), from the repo's dependencies: Grenze for text, Jacquard 24 for headings. -->
+<link rel="stylesheet" href="../../node_modules/@fontsource/grenze/400.css" />
+<link rel="stylesheet" href="../../node_modules/@fontsource/grenze/600.css" />
+<link rel="stylesheet" href="../../node_modules/@fontsource/jacquard-24/400.css" />
 <style>
   /* Layout: a 16:9 stage, a transport bar under it (play, scrubber with shot marks, time), the shot's notes below. */
   :root {
@@ -13,9 +13,9 @@
     --ink: #e6dcc6;
     --muted: #9a927f;
     --torch: #d98a3a;
-    --display: 'IM Fell English SC', 'Iowan Old Style', Georgia, serif;
-    --body: 'Alegreya Sans', 'Gill Sans', 'Segoe UI', sans-serif;
-    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --display: 'Jacquard 24', Georgia, serif;
+    --body: 'Grenze', Georgia, serif;
+    --mono: 'Grenze', Georgia, serif;
     color-scheme: dark;
   }
   body {
@@ -268,13 +268,10 @@
     t,
     { size = 10, col = C.bone, font = 'mono', anchor = 'start', weight = 400, o = 1 } = {},
   ) => {
-    const f =
-      font === 'display'
-        ? 'IM Fell English SC, Georgia, serif'
-        : font === 'body'
-          ? 'Alegreya Sans, sans-serif'
-          : 'JetBrains Mono, monospace';
-    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${f}" font-size="${size}" font-weight="${weight}" fill="${col}" opacity="${o}">${t}</text>`;
+    /* the game's faces: Jacquard 24 for headings and names (one weight only, so none is faked), Grenze for the rest */
+    const display = font === 'display';
+    const f = display ? "'Jacquard 24', Georgia, serif" : "'Grenze', Georgia, serif";
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${f}" font-size="${size}" font-weight="${display ? 400 : weight}" fill="${col}" opacity="${o}">${t}</text>`;
   };
   const panel = (x, y, w, h, stroke = C.uiLine) =>
     `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${C.ui}" stroke="${stroke}"/>`;
@@ -369,7 +366,7 @@
   };
   /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame; picked by eye from the events */
   const IN = {
-    endgame: 65,
+    endgame: 52,
     vanguard: 24,
     shade: 135,
     strider: 0,
@@ -379,7 +376,7 @@
     climb2: 0,
     climb4: 0,
     climb5: 0,
-    fall: 8.5,
+    fall: 23.5,
     duel: 0,
     auto: 0,
   };
@@ -435,7 +432,8 @@
         if (lt < 2) return img(at('skills', lt, 0));
         if (lt < 2.5) return img(at('shade', lt - 2));
         if (lt < 3) return img(at('drop', lt - 2.5, 0));
-        return crop(at('equip', lt - 3, 0), [427, 90, 853, 480]);
+        /* the camp screen, from under its tabs to under the Swap button (the clip is filmed 1280 × 990) */
+        return crop(at('equip', lt - 3, 0), [0, 100, 1280, 720], [0, 0, 320, 180], 1280, 990);
       },
     },
     {
@@ -459,29 +457,36 @@
       },
     },
     {
-      t: [12.5, 14.5],
+      t: [12.5, 15],
       name: 'Level 1 to 100',
-      what: 'Half-second cuts, each a different build in a different place against different monsters, the level in large type.',
+      what: 'Four cuts on the beat, each a different build in a different place against different monsters, the level in large type: the first a beat longer, the other three a beat each.',
       draw(lt) {
-        const i = Math.min(3, Math.floor(lt / 0.5));
-        const l = lt - i * 0.5;
-        const level = [12, 20, 42, 52][i];
-        const names = ['Crypt', 'Forge', 'Ruins', 'Marsh'];
-        const clip = ['climb1', 'climb2', 'climb4', 'climb5'][i];
-        let s = img(at(clip, l));
-        s += levelTag(level, names[i]);
+        /* where each cut starts (s), its clip, its level and its place */
+        const CUTS = [
+          [0, 'climb1', 12, 'Crypt'],
+          [1, 'climb2', 20, 'Forge'],
+          [1.5, 'climb4', 42, 'Ruins'],
+          [2, 'climb5', 52, 'Marsh'],
+        ];
+        let i = 0;
+        CUTS.forEach((c, j) => {
+          if (lt >= c[0]) i = j;
+        });
+        const [from, clip, level, place] = CUTS[i];
+        let s = img(at(clip, lt - from));
+        s += levelTag(level, place);
         return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 150, 17);
       },
     },
     {
-      t: [14.5, 20],
+      t: [15, 20],
       name: 'The fall',
       what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, the bell rising over his head from 15.25, held while its six rings show from 17.25, brought down as the first ring strikes and kills the Shade on 18.0; the body held; the end screen, the duel button pressed.',
       draw(lt) {
-        if (lt < 4.35) {
+        if (lt < 3.85) {
           let s = img(at('fall', lt));
           /* the room goes dark while the body is held */
-          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 3.8) / 0.55) * 0.55}"/>`;
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 3.3) / 0.55) * 0.55}"/>`;
           /* the level stays on screen, as in the climb (the boss's bar keeps the middle of the top clear) */
           return (
             s +
@@ -492,7 +497,7 @@
           );
         }
         /* zoomed in so the last line shown is "Killed by the Tollkeeper" */
-        return crop(at('summary', lt - 4.35, 0), [107, 95, 1067, 600]);
+        return crop(at('summary', lt - 3.85, 0), [107, 95, 1067, 600]);
       },
     },
     {

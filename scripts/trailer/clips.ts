@@ -126,15 +126,15 @@ export const CLIPS: Clip[] = [
     viewport: UI,
     css: `.tree-bar, .tree-help, .tree-legend { display: none !important; }
       .tree-wrap .tooltip, svg.tree g.preview { display: none !important; }
-      #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 600 40px/1 'IM Fell English SC', Georgia, serif;
+      #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 400 44px/1 'Jacquard 24', Georgia, serif;
         color: #d98a3a; text-shadow: 0 2px 6px #000, 0 0 14px #000; pointer-events: none; }`,
     async film(t) {
-      const { order } = await t.stage((S, c) => {
+      const { order, start, pts } = await t.stage((S, c) => {
         const run = S.stagedRun({ classId: 'vanguard', level: 100, seed: 3 }, 60);
         const ids = S.growBuild('vanguard', 99);
         S.toCamp(c, run);
         S.setAllocated(c, ids.slice(0, 3));
-        return { order: ids };
+        return { order: ids, ...S.nodePoints('vanguard', ids) };
       });
       await tab(t, 'Passive tree');
       await t.page.waitForTimeout(300);
@@ -143,74 +143,87 @@ export const CLIPS: Clip[] = [
         el.id = 'trailer-level';
         document.body.appendChild(el);
       });
-      // Zoomed out until the finished build sits inside the view with a margin, and centred (the tree opens at a fifth of a pixel
-      // a unit, centred on the class start; a wheel step scales by exp(-dy * 0.0015)). The lit edges are measured on screen, so
-      // the fit is what the viewer sees, not a sum.
-      await t.stage((S, c, _g, ids) => S.setAllocated(c, ids), order);
-      await t.page.waitForTimeout(250);
+      // The camera: it opens zoomed in on the class start and the first nodes, and zooms out as the build grows until the whole build
+      // sits in the view, following the middle of what is lit as it spreads. The view is driven the way a hand does it (a wheel step
+      // about the view's top-left corner, then a drag), so the tree's own text and sizes follow the zoom.
       const svg = (await t.page.locator('svg.tree').first().boundingBox())!;
-      const cx = svg.x + svg.width / 2;
-      const cy = svg.y + svg.height / 2;
-      const lit = async () =>
-        t.page.evaluate(() => {
-          const r = (document.querySelector('svg.tree') as Element).getBoundingClientRect();
-          let x0 = Infinity,
-            y0 = Infinity,
-            x1 = -Infinity,
-            y1 = -Infinity;
-          document.querySelectorAll('svg.tree .tn.on .ring, svg.tree .edge.on').forEach((e) => {
-            const b = e.getBoundingClientRect();
-            x0 = Math.min(x0, b.left);
-            y0 = Math.min(y0, b.top);
-            x1 = Math.max(x1, b.right);
-            y1 = Math.max(y1, b.bottom);
-          });
-          return { x0, y0, x1, y1, l: r.left, t: r.top, w: r.width, h: r.height };
+      const W = svg.width;
+      const H = svg.height;
+      // Tree units kept clear around the lit nodes (their size and names).
+      const PAD = 170;
+      const box = (n: number) => {
+        const p: [number, number][] = [start, ...pts.slice(0, n)];
+        return {
+          x0: Math.min(...p.map((q) => q[0])),
+          x1: Math.max(...p.map((q) => q[0])),
+          y0: Math.min(...p.map((q) => q[1])),
+          y1: Math.max(...p.map((q) => q[1])),
+        };
+      };
+      /** The zoom at which `b` fills `frac` of the view. */
+      const fit = (b: ReturnType<typeof box>, frac: number) =>
+        frac * Math.min(W / (b.x1 - b.x0 + 2 * PAD), H / (b.y1 - b.y0 + 2 * PAD));
+      const k1 = fit(box(order.length), 0.9);
+      const k0 = k1 * 2.6;
+      const setView = async (k: number, cx: number, cy: number) => {
+        const cur = await t.page.evaluate(() => {
+          const g = document.querySelector('svg.tree g[transform^="translate("]')!;
+          const m = /translate\(([-\d.e]+) ([-\d.e]+)\) scale\(([-\d.e]+)\)/.exec(
+            g.getAttribute('transform')!,
+          )!;
+          return { x: +m[1], y: +m[2], k: +m[3] };
         });
-      // Zoom out with the tree's own button (a fixed step of 1.4, about the middle of the view; a wheel step depends on the device
-      // scale) until the build fills at most 80% of the view, then drag it to the middle. Measured on screen each time.
-      const zoomOut = () =>
-        t.page.evaluate(() =>
-          (
-            document.querySelector('.tree-zoom button[aria-label="Zoom out"]') as HTMLElement
-          ).click(),
-        );
-      for (let pass = 0; pass < 12; pass++) {
-        const m = await lit();
-        const w = m.x1 - m.x0;
-        const h = m.y1 - m.y0;
-        const dx = m.l + m.w / 2 - (m.x0 + m.x1) / 2;
-        const dy = m.t + m.h / 2 - (m.y0 + m.y1) / 2;
-        const tooBig = w > m.w * 0.8 || h > m.h * 0.8;
-        if (!tooBig && Math.abs(dx) < 6 && Math.abs(dy) < 6) break;
-        if (tooBig) {
-          await zoomOut();
-          await t.page.waitForTimeout(150);
-          continue;
-        }
-        await t.page.mouse.move(cx, cy);
+        if (Math.abs(k / cur.k - 1) > 1e-6)
+          await t.page.evaluate((f: number) => {
+            const el = document.querySelector('svg.tree') as SVGElement;
+            const r = el.getBoundingClientRect();
+            el.dispatchEvent(
+              new WheelEvent('wheel', {
+                deltaY: -Math.log(f) / 0.0015,
+                clientX: r.left,
+                clientY: r.top,
+                cancelable: true,
+                bubbles: true,
+              }),
+            );
+          }, k / cur.k);
+        // The zoom was about the top-left corner: the view's origin scaled with it.
+        const f = k / cur.k;
+        const dx = W / 2 - cx * k - cur.x * f;
+        const dy = H / 2 - cy * k - cur.y * f;
+        if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3) return;
+        const ox = svg.x + W / 2;
+        const oy = svg.y + H / 2;
+        await t.page.mouse.move(ox, oy);
         await t.page.mouse.down();
-        await t.page.mouse.move(cx + dx, cy + dy, { steps: 6 });
+        await t.page.mouse.move(ox + 20, oy); // past the drag threshold, so that the release is not a click
+        await t.page.mouse.move(ox + dx, oy + dy, { steps: 2 });
         await t.page.mouse.up();
-        await t.page.waitForTimeout(150);
-      }
-      const done = await lit();
-      if (
-        done.x0 < done.l ||
-        done.y0 < done.t ||
-        done.x1 > done.l + done.w ||
-        done.y1 > done.t + done.h
-      )
-        throw new Error('the build is not in frame');
-      await t.stage((S, c, _g, ids) => S.setAllocated(c, ids), order.slice(0, 3));
-      await t.page.mouse.move(5, 470);
+      };
       const N = 90;
+      let ls = Math.log(k0);
+      let cx = start[0];
+      let cy = start[1];
       for (let i = 0; i < N; i++) {
         const k = i / (N - 1);
         const e = 1 - Math.pow(1 - k, 2);
         const n = Math.max(3, Math.round(e * order.length));
         const level = Math.round(5 + e * 95);
-        await t.stage((S, c, _g, a) => S.setAllocated(c, a), order.slice(0, n));
+        const b = box(n);
+        const kt = Math.min(k0 * Math.pow(k1 / k0, e), fit(b, 0.92));
+        const a = i === N - 1 ? 1 : 0.35;
+        ls += (Math.log(kt) - ls) * a;
+        cx += ((b.x0 + b.x1) / 2 - cx) * a;
+        cy += ((b.y0 + b.y1) / 2 - cy) * a;
+        const kk = Math.min(Math.exp(ls), fit(b, 0.95));
+        // What is lit stays in view whatever the smoothing lags behind.
+        const hw = W / (2 * kk);
+        const hh = H / (2 * kk);
+        cx = Math.min(Math.max(cx, b.x1 + 60 - hw), b.x0 - 60 + hw);
+        cy = Math.min(Math.max(cy, b.y1 + 60 - hh), b.y0 - 60 + hh);
+        await t.stage((S, c, _g, a2) => S.setAllocated(c, a2), order.slice(0, n));
+        await setView(kk, cx, cy);
+        await t.page.mouse.move(5, 470);
         await t.page.evaluate((l: number) => {
           const el = document.getElementById('trailer-level');
           if (el) el.textContent = `Level ${l}`;
@@ -341,7 +354,8 @@ export const CLIPS: Clip[] = [
   /* 4c. The amulet's card in the bag, and Equip on 10.2 s. */
   {
     name: 'equip',
-    viewport: UI,
+    // Taller than the other camp screens (1280×990 drawn), so that both cards show whole with the Swap button under them.
+    viewport: { w: 854, h: 660, scale: 1.5 },
     async film(t) {
       const name = await t.stage((S, c) => {
         const run = S.stagedRun(
@@ -358,11 +372,8 @@ export const CLIPS: Clip[] = [
       await t.page.waitForTimeout(200);
       await t.page.click(`text=${name}`);
       await t.page.mouse.move(5, 470);
-      await t.page.evaluate(() =>
-        [...document.querySelectorAll('button')]
-          .find((x) => /^(Equip|Swap)/.test(x.textContent ?? ''))
-          ?.scrollIntoView({ block: 'nearest' }),
-      );
+      // Both cards from their titles down: nothing scrolled.
+      await t.page.evaluate(() => document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0)));
       await t.page.waitForTimeout(200);
       // 1.5 s: the new amulet beside the worn one (0.7 s), the button pressed (0.3 s), the swap done (0.5 s).
       for (let i = 0; i < 45; i++) {

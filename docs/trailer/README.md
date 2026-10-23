@@ -48,10 +48,11 @@ deterministic: an unchanged page and score give byte-identical files.
   to 100 in a sitting, then duels and the high scores. The reference game is never named, here or in the trailer.
 - Text, in order: "Grind to level 100 in a sitting." / "Duel their builds." / "Take the top
   spot." / "Arcade. ARPG. Roguelike. Autobattler." / "Battle of Builds · Free on itch.io".
-- Shots: endgame cold open (a Skyfall in a mixed pack); the tree, one build growing from level 1 to 100 zoomed out and
-  kept in frame (no class screen, no text); the Vanguard's slam on 5 s and the Shade (gem link, traps, a drop for the
+- Shots: endgame cold open (a Skyfall in a mixed pack); the tree, one build growing from level 1 to 100 outward from
+  its class start like a crown (`growBuild`, `src/trailer/stage.ts`), the camera opening zoomed in and zooming out as it
+  grows, following what is lit until the whole build is in frame (no class screen, no text); the Vanguard's slam on 5 s and the Shade (gem link, traps, a drop for the
   build);
-  three more classes side by side in phone-shaped panels; the climb, four half-second cuts; then level 72 is one shot of a
+  three more classes side by side in phone-shaped panels; the climb, four cuts on the beat (the first a beat long, the others half a second); then level 72 is one shot of a
   boss fight, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper on map
   63, his fourth toll: he hoists his bell over his head through the tell (the game's own animation, added for this), holds
   it while the six rings show, and brings it down as the first ring strikes and kills the Shade; a pause; the end screen
@@ -64,4 +65,6 @@ deterministic: an unchanged page and score give byte-identical files.
   peaks at -3 dB, and the video's audio is 320 kb/s AAC: a crushed, clipped signal otherwise rings in the encoder and
   clips on playback.
 - Captions sit just above the flasks, clear of the screen's own UI.
+- Type: the game's own faces (`cut.html` links them from `node_modules/@fontsource`): Jacquard 24 for the captions, the level
+  and place tags, the title and the genre words; Grenze for any other text.
 - Cuts land on the beat (120 bpm: a beat is 0.5 s, a bar 2 s); any timing change keeps to the grid.

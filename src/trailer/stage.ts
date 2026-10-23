@@ -201,9 +201,10 @@ export function treeShot(run: RunState, steps = 4): { name: string; path: number
 }
 
 /**
- * A build's worth of passives, in the order they would be taken: from the class start, the nearest notable (a keystone counts as
- * worth two and a half) by its shortest path, again and again, until `count` nodes are taken. A dense cluster growing out of the
- * start, every node joined to the rest.
+ * A build's worth of passives, in the order they would be taken: from the class start, the notable that costs the fewest nodes
+ * (a keystone counts as worth two and a half), again and again, until `count` nodes are taken. It grows outward from the start,
+ * away from the middle of the tree, like a tree's crown: a notable's score is its path length, plus its distance off that line
+ * (per 400 units) and less its distance along it (per 600 units).
  */
 export function growBuild(classId: string, count: number): number[] {
   const tree = getTree();
@@ -211,19 +212,38 @@ export function growBuild(classId: string, count: number): number[] {
   const targets = tree.nodes.filter(
     (n) => (n.kind === 'notable' || n.kind === 'keystone') && !n.retired,
   );
+  const st = tree.nodes[tree.starts[classId]];
+  const len = Math.hypot(st.x, st.y) || 1;
+  const dx = st.x / len;
+  const dy = st.y / len;
   while (taken.length < count) {
     let best: { path: number[]; score: number } | null = null;
     for (const n of targets) {
       if (taken.includes(n.id)) continue;
       const p = pathTo(taken, classId, n.id);
       if (!p || !p.length) continue;
-      const score = p.length / (n.kind === 'keystone' ? 2.5 : 1);
+      const along = (n.x - st.x) * dx + (n.y - st.y) * dy;
+      const off = Math.abs((n.x - st.x) * dy - (n.y - st.y) * dx);
+      const score = p.length / (n.kind === 'keystone' ? 2.5 : 1) + off / 400 - along / 600;
       if (!best || score < best.score) best = { path: p, score };
     }
     if (!best) break;
     taken.push(...best.path);
   }
   return taken;
+}
+
+/** Where `classId` starts and where each of the nodes `ids` is, in tree units. */
+export function nodePoints(
+  classId: string,
+  ids: number[],
+): { start: [number, number]; pts: [number, number][] } {
+  const tree = getTree();
+  const st = tree.nodes[tree.starts[classId]];
+  return {
+    start: [st.x, st.y],
+    pts: ids.map((id) => [tree.nodes[id].x, tree.nodes[id].y] as [number, number]),
+  };
 }
 
 /** The box the nodes `ids` fill, and where `classId` starts, in tree units. */
