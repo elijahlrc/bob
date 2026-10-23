@@ -299,9 +299,11 @@ The core of section 1, made concrete.
    inside them. A cluster or a notable may pair two things that belong together in a build, such as "axes and bleed" or
    "staff damage and block". It may not pair two that do not, such as "poison damage and staff damage". The one
    exception is a wheel's two sides (§8 item 3).
-3. **Every line a node carries must be read by the sheet and obeyed by the simulation.** [adopted] Dead lines are never
-   written: `skillDuration` tagged mine, `aoe` tagged minion, `cooldownRecovery` tagged warcry. [adopted, from the
-   engine-stat investigation the user delegated]
+3. **Every line a node carries must be obeyed by the simulation.** [adopted] Dead lines are never written:
+   `skillDuration` tagged mine, `aoe` tagged minion, `cooldownRecovery` tagged warcry. [adopted, from the engine-stat
+   investigation the user delegated] **The character sheet need not count every line**: conditional lines (against
+   bleeding enemies, while on full life, on kill) are fine where the fight uses them. "There is no rule that all stats
+   are on the character sheet. This is a non issue." [user, 10-22]
 4. **Node kinds.** [adopted] The kinds are small, notable, keystone, attribute and start. New nodes may use existing
    stats, and new engine stats are added where a theme clearly needs one. [user, 10-19] Masteries, jewel sockets, ranked
    nodes and points-in-region gates are declined for now. [adopted]
