@@ -4,8 +4,8 @@
  * recovery) from the slams' radius node to the totems, the Vampiric Strikes chain from the Unbloodied notable to the
  * warcries' far side, Ground Shaker from the two-hander wheel, the totems, the tip junction with the Strongarm spur and the
  * near crossing from the Yard, and Bracing (shield block) as a bridge from the slam road to the slam wheel and the Yard.
- * Re-lined on 2026-10-20 (PHILOSOPHY §2a): Thick Skin and Unbloodied came here, Iron Lungs and Stagger went north. Round
- * 3 (2026-10-20): Bracing and Thick Skin traded places, so the shield leaves the start south-east, toward the Yard's
+ * Re-lined on 2026-10-20 (PHILOSOPHY §2a): Ox Hide and Unbloodied came here, Iron Lungs and Stagger went north. Round
+ * 3 (2026-10-20): Bracing and Ox Hide traded places, so the shield leaves the start south-east, toward the Yard's
  * shields, and the mace west. G2 (2026-10-22): Second Wind came here from the Rampart, below Unbloodied, with a road node
  * toward the Yard's Thirsting Blade; the Quarry floor road runs from the slam junction toward Ground Shaker. G3 round 2:
  * Sledge and Sinew (mace with life) on the Quarry floor.

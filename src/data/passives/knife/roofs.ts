@@ -272,7 +272,7 @@ export const roofs: AreaSpec = {
     {
       id: 'hasty',
       name: 'Hasty Words',
-      why: "The quick caster (G3 round 1, 2026-10-22; the ledger's SH-11 with the folded spell damage section SH-s5): a pocket straight north off the crossroad's first node, spell damage three times, then spell damage with cast speed. The Shade's plain spell damage had one notable, Quiet Knife by the start; this is its far one, the tip of the north-east, and its partner (speed) is not Quiet Knife's dagger. A dead end on purpose (G1/shade.md §7 item 5): the far tip a caster commits to, rather than a road. Ritual Blade (spells with a dagger) is nine steps west along the ridge, Athame ten; the Spire's Arcane Focus sells this pairing for the Mystic start, far away.",
+      why: "The quick caster (G3 round 1, 2026-10-22; the ledger's SH-11 with the folded spell damage section SH-s5): a pocket straight north off the crossroad's first node, spell damage three times, then spell damage with cast speed. The Shade's plain spell damage had one notable, Quiet Knife by the start; this is its far one, the tip of the north-east, and its partner (speed) is not Quiet Knife's dagger. A dead end on purpose (G1/shade.md §7 item 5): the far tip a caster commits to, rather than a road. Ritual Blade (spells with a dagger) is nine steps west along the ridge, Athame ten; the Spire's Ready Wit sells this pairing for the Mystic start, far away.",
       at: [2780, -3290],
       shape: { kind: 'hand' },
       nodes: [

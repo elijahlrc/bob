@@ -77,7 +77,7 @@ export const fosse: AreaSpec = {
     {
       id: 'storm',
       name: 'Stormstruck',
-      why: "A pocket east off the fosse road: lightning with attacks twice, then lightning strikes with attack speed. The tree had no lightning-attack cluster; this one is near the Strider and the Reaver, the dexterity side where most elemental attacks are. The Cathedral's two sell fire strikes with ignite (Kindled Steel) and cold strikes with chill (Rimed Steel); the lightning notables for casters and attackers alike (Static Edge, Overcharge, Thunder Peal) sell crit and shock.",
+      why: "A pocket east off the fosse road: lightning with attacks twice, then lightning strikes with attack speed. The tree had no lightning-attack cluster; this one is near the Strider and the Reaver, the dexterity side where most elemental attacks are. The Cathedral's two sell fire strikes with ignite (Kindled Steel) and cold strikes with chill (Rimed Steel); the lightning notables for casters and attackers alike (Static Edge, Live Current, Thunder Peal) sell crit and shock.",
       at: [680, 3845],
       shape: { kind: 'hand' },
       nodes: [

@@ -3,7 +3,7 @@
  * meet (G2, 2026-10-22); the resist star beside it, a notable with four single-node spokes landing in four different
  * places; the shield wheel on the spine; the crit pocket (Fencer's Eye, moved here from the sword diamond on
  * 2026-10-20); the block run from the west junction to the west road, with the Shieldwall spur off the road; the
- * Standard Bearer chain from the crit pocket down to the Pits' west junction, which Executioner joins; and Shield Bash.
+ * Standard Bearer chain from the crit pocket down to the Pits' west junction, which Finishing Cut joins; and Shield Bash.
  */
 import {
   attackSpeed,
@@ -160,7 +160,7 @@ export const shield: AreaSpec = {
     {
       id: 'fencer',
       name: "Fencer's Eye",
-      why: "Melee crit twice round the notable with crit multiplier, sword crit and axe crit: the crit Reaver's pocket, four or five steps from the sword and axe damage (it sat a step off the sword diamond until 2026-10-20). Reached from the junction, and on to the Standard Bearer chain below, which Executioner joins from the west road.",
+      why: "Melee crit twice round the notable with crit multiplier, sword crit and axe crit: the crit Reaver's pocket, four or five steps from the sword and axe damage (it sat a step off the sword diamond until 2026-10-20). Reached from the junction, and on to the Standard Bearer chain below, which Finishing Cut joins from the west road.",
       at: [-500, 2800],
       shape: { kind: 'hand' },
       nodes: [
@@ -195,7 +195,7 @@ export const shield: AreaSpec = {
     {
       id: 'standard',
       name: 'Standard Bearer',
-      why: "Reduced mana reservation, then the notable with aura effect: for the Reaver who runs a standard or a herald, between the crit pocket and the Pits' west junction, with Executioner joining its small from the west road (G2). The Yard's only reservation lines; a Vanguard crossing from the grit comes for them.",
+      why: "Reduced mana reservation, then the notable with aura effect: for the Reaver who runs a standard or a herald, between the crit pocket and the Pits' west junction, with Finishing Cut joining its small from the west road (G2). The Yard's only reservation lines; a Vanguard crossing from the grit comes for them.",
       at: [-520, 3100],
       shape: { kind: 'hand' },
       nodes: [

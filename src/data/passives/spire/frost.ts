@@ -46,7 +46,7 @@ export const frost: AreaSpec = {
     {
       id: 'thunderhead',
       name: 'Thunderhead',
-      why: "Lightning with cast speed and a chance to shock: the quick lightning caster's cluster, the first of the middle arm, with the two inter-arm junctions off its sides. The other lightning cluster (Overcharge, east) sells shock effect and penetration; this one sells speed.",
+      why: "Lightning with cast speed and a chance to shock: the quick lightning caster's cluster, the first of the middle arm, with the two inter-arm junctions off its sides. The other lightning cluster (Live Current, east) sells shock effect and penetration; this one sells speed.",
       at: [0, -3450],
       shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
@@ -162,7 +162,7 @@ export const frost: AreaSpec = {
     {
       id: 'harshWeather',
       name: 'Harsh Weather',
-      why: "Effect of non-damaging ailments twice, then the notable with effect, freeze duration and shock duration: the chill, freeze and shock caster, as a chain off the shatter room's east side. Until 2026-10-20 it ran on to Overcharge, which put two notables a shock caster wants both of a step apart; since G3 round 2 its notable leads on to Piercing Word (spell damage), down to the east join.",
+      why: "Effect of non-damaging ailments twice, then the notable with effect, freeze duration and shock duration: the chill, freeze and shock caster, as a chain off the shatter room's east side. Until 2026-10-20 it ran on to Live Current, which put two notables a shock caster wants both of a step apart; since G3 round 2 its notable leads on to Piercing Word (spell damage), down to the east join.",
       at: [480, -4000],
       shape: { kind: 'ring', r: 90, a0: 180 },
       nodes: [
@@ -217,8 +217,8 @@ export const frost: AreaSpec = {
     },
     {
       id: 'toOvercharge',
-      name: 'The east climb to Overcharge',
-      why: "One intelligence node from the tip of Harsh Weather to Overcharge's far small: Harsh Weather is a bridge again, four steps from Overcharge, not one.",
+      name: 'The east climb to Live Current',
+      why: "One intelligence node from the tip of Harsh Weather to Live Current's far small: Harsh Weather is a bridge again, four steps from Live Current, not one.",
       at: [743, -4041],
       shape: { kind: 'hand' },
       nodes: [{ id: 'r1', kind: 'attribute', lines: [int(7)], at: [743, -4041] }],
@@ -236,7 +236,7 @@ export const frost: AreaSpec = {
     {
       id: 'snare',
       name: 'Snare Line',
-      why: "A chain outward off Harsh Weather's climb to Overcharge: trap damage twice, then traps with duration. The caster's trap, for a spell set as a trap and the traps that last; the Docks' Trapper sells traps with area and the Strider's Tripwire traps with throwing speed and cooldown. Round 4 (2026-10-20). Since G2 (2026-10-22) its notable leads on to the Eaves road (`rim.ts`), so the chain is a bridge from Harsh Weather's climb to the rim.",
+      why: "A chain outward off Harsh Weather's climb to Live Current: trap damage twice, then traps with duration. The caster's trap, for a spell set as a trap and the traps that last; the Docks' Trapper sells traps with area and the Strider's Tripwire traps with throwing speed and cooldown. Round 4 (2026-10-20). Since G2 (2026-10-22) its notable leads on to the Eaves road (`rim.ts`), so the chain is a bridge from Harsh Weather's climb to the rim.",
       at: [960, -4225],
       shape: { kind: 'hand' },
       nodes: [
@@ -317,7 +317,7 @@ export const frost: AreaSpec = {
     {
       id: 'piercing',
       name: 'Piercing Word',
-      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went). Moved in G3 round 2 (2026-10-22, the user's ask) off the west climb to Shatter, where Hoarfrost, this, Shatter and High Veil lay 4 to 10 steps apart and read as one destination for a cold caster. Now a chain from the east join up to Harsh Weather's notable, in the open ground between Siphon, Harsh Weather and the Gallery: a cold caster at the top of the column chooses between the cold of the climb (Hoarfrost west, Shatter north) and spell damage north-east, 10 and 7 steps away, and Harsh Weather stops being a dead end. Measured against three other places (the west climb, the north-west rim road beside High Veil): this one left the casters hungriest for both spell damage and shield at 120 points without raising their tax. Spell damage's partners by direction: cast speed (Arcane Focus), crit (Keen Verse), life (Living Verse), penetration here, mana regeneration on the Eaves (later). Two smalls on the join's side, one on Harsh Weather's.",
+      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went). Moved in G3 round 2 (2026-10-22, the user's ask) off the west climb to Shatter, where Hoarfrost, this, Shatter and High Veil lay 4 to 10 steps apart and read as one destination for a cold caster. Now a chain from the east join up to Harsh Weather's notable, in the open ground between Siphon, Harsh Weather and the Gallery: a cold caster at the top of the column chooses between the cold of the climb (Hoarfrost west, Shatter north) and spell damage north-east, 10 and 7 steps away, and Harsh Weather stops being a dead end. Measured against three other places (the west climb, the north-west rim road beside High Veil): this one left the casters hungriest for both spell damage and shield at 120 points without raising their tax. Spell damage's partners by direction: cast speed (Ready Wit), crit (Keen Verse), life (Living Verse), penetration here, mana regeneration on the Eaves (later). Two smalls on the join's side, one on Harsh Weather's.",
       at: [444, -3796],
       shape: { kind: 'hand' },
       nodes: [
@@ -424,7 +424,7 @@ export const frost: AreaSpec = {
     {
       from: 'spire.frost.harshWeather.b',
       to: 'spire.frost.toOvercharge.r1',
-      why: "One intelligence node from the tip of Harsh Weather to Overcharge's far small: Harsh Weather is a bridge again, four steps from Overcharge, not one.",
+      why: "One intelligence node from the tip of Harsh Weather to Live Current's far small: Harsh Weather is a bridge again, four steps from Live Current, not one.",
     },
     {
       from: 'spire.frost.toOvercharge.r1',

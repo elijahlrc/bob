@@ -229,7 +229,7 @@ export const flight: AreaSpec = {
     {
       id: 'ricochet',
       name: 'Ricochet',
-      why: "Projectile damage twice, then the notable that makes projectiles chain once more: the projectile line no small node gives, beside pierce at Skewer. A chain from the poison pocket's far node round the outside of Close Quarters to Heavy Draw, so the rim between the Knife side and the physical row is a road. New cluster only (2026-10-19). Since G2 (2026-10-22) its exit reaches Heavy Draw through the north spoke's first road node.",
+      why: "Projectile damage twice, then the notable that makes projectiles chain once more: the projectile line no small node gives, beside pierce at Skewer. A chain from the poison pocket's far node round the outside of Close Quarters to Deep Pull, so the rim between the Knife side and the physical row is a road. New cluster only (2026-10-19). Since G2 (2026-10-22) its exit reaches Deep Pull through the north spoke's first road node.",
       at: [2960, 360],
       shape: { kind: 'hand' },
       nodes: [
@@ -253,7 +253,7 @@ export const flight: AreaSpec = {
           kind: 'small',
           lines: [projectileDamage(10)],
           at: P(1790, -1138),
-          why: 'The exit, to the north spoke and Heavy Draw.',
+          why: 'The exit, to the north spoke and Deep Pull.',
         },
       ],
       links: [

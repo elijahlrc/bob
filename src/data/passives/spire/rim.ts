@@ -62,7 +62,7 @@ export const parapet: AreaSpec = {
           kind: 'attribute',
           lines: [int(7)],
           at: [1592, -4177],
-          why: 'Halfway down the run to the Rooftops. Pinpoint, the crit wand (G3 round 3, G1/mystic.md MY-6), hangs here, bridged to Overcharge.',
+          why: 'Halfway down the run to the Rooftops. Pinpoint, the crit wand (G3 round 3, G1/mystic.md MY-6), hangs here, bridged to Live Current.',
         },
         {
           id: 'r5',
@@ -82,7 +82,7 @@ export const parapet: AreaSpec = {
     {
       id: 'longChant',
       name: 'Long Chant',
-      why: "Spell damage with mana regeneration, on three cast speed smalls (G3 round 3, 2026-10-22; G1/mystic.md MY-3, the ledger's cast speed section MY-s5 folded in): the far spell cluster, for the caster who casts all fight long, the channeller among them. Spell damage's partners by direction: cast speed (Arcane Focus), crit (Keen Verse), life (Living Verse), penetration (Piercing Word), and here the sustain to keep casting. A V pocket outward of the eaves road's first run, the notable at the tip, in the empty top between Fever Pitch's spur and the corner: a caster on the road pays two cast speed smalls from r1 or one from r2, and walking the road costs none of it. Not beside Steady Stream (channelling with cheaper mana would make the top left a one-stop for the channeller), and seven steps past Piercing Word through Harsh Weather and the road.",
+      why: "Spell damage with mana regeneration, on three cast speed smalls (G3 round 3, 2026-10-22; G1/mystic.md MY-3, the ledger's cast speed section MY-s5 folded in): the far spell cluster, for the caster who casts all fight long, the channeller among them. Spell damage's partners by direction: cast speed (Ready Wit), crit (Keen Verse), life (Living Verse), penetration (Piercing Word), and here the sustain to keep casting. A V pocket outward of the eaves road's first run, the notable at the tip, in the empty top between Fever Pitch's spur and the corner: a caster on the road pays two cast speed smalls from r1 or one from r2, and walking the road costs none of it. Not beside Steady Stream (channelling with cheaper mana would make the top left a one-stop for the channeller), and seven steps past Piercing Word through Harsh Weather and the road.",
       at: [475, -4645],
       shape: { kind: 'hand' },
       nodes: [
@@ -125,7 +125,7 @@ export const parapet: AreaSpec = {
     {
       id: 'pinpoint',
       name: 'Pinpoint',
-      why: "Wand attacks with crit chance and crit multiplier with wands (G3 round 3, 2026-10-22; G1/mystic.md MY-6): the crit wand, the fourth wand-attack cluster, each with its own partner and direction (accuracy at home, speed on the Scriptorium (Wand Volley), elements in the Lantern (Bright Wand), crit here). East and up is the Mystic's crit side. A bridge from Overcharge's east small to the eaves road: the wand attacker coming up the Gallery pays the shock ring's smalls to reach it, and an intelligence-and-dexterity Shade from the Rooftops comes down the eaves road. A V with the bend at the notable, so it reaches r4 near the even fan of its three links and leaves Overcharge's ring from its outer side.",
+      why: "Wand attacks with crit chance and crit multiplier with wands (G3 round 3, 2026-10-22; G1/mystic.md MY-6): the crit wand, the fourth wand-attack cluster, each with its own partner and direction (accuracy at home, speed on the Scriptorium (Wand Volley), elements in the Lantern (Bright Wand), crit here). East and up is the Mystic's crit side. A bridge from Live Current's east small to the eaves road: the wand attacker coming up the Gallery pays the shock ring's smalls to reach it, and an intelligence-and-dexterity Shade from the Rooftops comes down the eaves road. A V with the bend at the notable, so it reaches r4 near the even fan of its three links and leaves Live Current's ring from its outer side.",
       at: [1359, -3944],
       shape: { kind: 'hand' },
       nodes: [
@@ -134,7 +134,7 @@ export const parapet: AreaSpec = {
           kind: 'small',
           lines: [wandAttack(12)],
           at: [1235, -3928],
-          why: "The entrance from Overcharge's east small, on the straight line to the notable.",
+          why: "The entrance from Live Current's east small, on the straight line to the notable.",
         },
         {
           id: 'b',
@@ -239,12 +239,12 @@ export const parapet: AreaSpec = {
     {
       from: 'spire.storm.overcharge.c',
       to: 'pinpoint.a',
-      why: "Overcharge's east small (the ring's outer side) onto the crit wand: the Gallery's way up to the eaves road that is not Harsh Weather's climb.",
+      why: "Live Current's east small (the ring's outer side) onto the crit wand: the Gallery's way up to the eaves road that is not Harsh Weather's climb.",
     },
     {
       from: 'pinpoint.c',
       to: 'road.r4',
-      why: "Pinpoint onto the eaves road at r4, arriving at r4 between its two road links (83° from r3's, 105° from r5's) rather than 31° off the even fan the straight line from Overcharge would give.",
+      why: "Pinpoint onto the eaves road at r4, arriving at r4 between its two road links (83° from r3's, 105° from r5's) rather than 31° off the even fan the straight line from Live Current would give.",
     },
     {
       from: 'road.r5',

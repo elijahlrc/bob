@@ -3,7 +3,7 @@
  * road from the south hub down to the physical corner, then a straight run outward along the physical row to the bleed
  * road. Off the road's second node, toward the Reaver, the evasion-and-resistances pocket; the Hard Target chain
  * arrives at the third from the string; the near crossing to the Yard's dual wield leaves the third; the physical
- * wheel, a closed ring of eight with Iron Tips and Heavy Draw on its rim, hangs off the row's first junction, below
+ * wheel, a closed ring of eight with Iron Tips and Deep Pull on its rim, hangs off the row's first junction, below
  * the row; from the corner, the long dear road of five attribute nodes down the Reaver border to the Yard's bleed and
  * leech, with Plated Hide one node off its second junction: the highway a bleed or leech Strider pays for, and the one a
  * Reaver pays coming the other way.
@@ -97,8 +97,8 @@ export const steel: AreaSpec = {
     },
     {
       id: 'wheel',
-      name: 'Iron Tips and Heavy Draw',
-      why: "The physical wheel, now a straight chain from the entrance up to Heavy Draw (layout pass 2026-10-21; it was a closed ring of eight with the notables on its rim). Clockwise from the entrance, the speed side (physical attack damage, then with attack speed, then Iron Tips); anticlockwise, the life side (physical attack damage, then with life, then Heavy Draw, which carries a little strength for the sword Strider's gear); the far node joins them.",
+      name: 'Iron Tips and Deep Pull',
+      why: "The physical wheel, now a straight chain from the entrance up to Deep Pull (layout pass 2026-10-21; it was a closed ring of eight with the notables on its rim). Clockwise from the entrance, the speed side (physical attack damage, then with attack speed, then Iron Tips); anticlockwise, the life side (physical attack damage, then with life, then Deep Pull, which carries a little strength for the sword Strider's gear); the far node joins them.",
       at: P(1820, -641),
       shape: { kind: 'hand' },
       nodes: [
@@ -112,7 +112,7 @@ export const steel: AreaSpec = {
         {
           id: 'n2',
           kind: 'notable',
-          name: 'Heavy Draw',
+          name: 'Deep Pull',
           lines: [physAttack(20), life(8), str(10)],
           at: P(1943, -822),
           why: '2 + 1.6 + 0.7 units.',

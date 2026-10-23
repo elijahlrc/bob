@@ -3,10 +3,10 @@
  * the junction with the Unerring Discipline spur and Hallowed Hammer, Steady Hands (the accuracy pocket), the Stagger
  * chain at the tower's top, the resist star's fire and chaos spokes arriving from the north, Stone Heart (life, stun
  * threshold) as a pocket off the tower road, and the road from Mortar and Stone to the tower's junction. Re-lined on
- * 2026-10-20 (PHILOSOPHY §2a): Thick Skin and Unbloodied moved south, Iron Lungs and Stagger came here. Round 3
- * (2026-10-20): Bracing and Thick Skin traded places. G2 (2026-10-22): the Bulwark's two sides were life and armour,
+ * 2026-10-20 (PHILOSOPHY §2a): Ox Hide and Unbloodied moved south, Iron Lungs and Stagger came here. Round 3
+ * (2026-10-20): Bracing and Ox Hide traded places. G2 (2026-10-22): the Bulwark's two sides were life and armour,
  * which every strength build wants both of, on the home's road; Iron Lungs took the life notable's place, Stone Heart
- * went to the tower road's pocket, Thick Skin to the west rim, Second Wind south to the Quarry, and the keystone spur
+ * went to the tower road's pocket, Ox Hide to the west rim, Second Wind south to the Quarry, and the keystone spur
  * turned away from the Zealot's.
  */
 import {
@@ -104,7 +104,7 @@ export const rampart: AreaSpec = {
     {
       id: 'stoneHeart',
       name: 'Stone Heart',
-      why: "Life twice, then the life notable with stun threshold: a pocket off the tower road, whose life smalls lead to it, so west of the Gate is the life direction and north-west (the Bulwark) the armour (G2, 2026-10-22: it was the Bulwark's life side, and Thick Skin, which was here, went to the west rim).",
+      why: "Life twice, then the life notable with stun threshold: a pocket off the tower road, whose life smalls lead to it, so west of the Gate is the life direction and north-west (the Bulwark) the armour (G2, 2026-10-22: it was the Bulwark's life side, and Ox Hide, which was here, went to the west rim).",
       at: [-1931, 880],
       shape: { kind: 'hand' },
       nodes: [
@@ -258,7 +258,7 @@ export const rampart: AreaSpec = {
     {
       id: 'toThickSkin',
       name: 'A road',
-      why: 'Strength once between the tower road and Stone Heart (the pocket was Thick Skin until G2, 2026-10-22).',
+      why: 'Strength once between the tower road and Stone Heart (the pocket was Ox Hide until G2, 2026-10-22).',
       at: [-1669, 808],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-1669, 808] }],

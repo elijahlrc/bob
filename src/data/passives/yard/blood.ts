@@ -286,7 +286,7 @@ export const blood: AreaSpec = {
     {
       id: 'lasting',
       name: 'Lasting Wounds',
-      why: "Bleed damage twice, then the notable with bleed damage and bleed duration, then bleed damage once more (RE-8, G3 round 3, 2026-10-22): wounds that stay open, below Wound Dance, whose eight stacks are worth more the longer each bleed lasts. A bridge from the spine's last node to the Fosse's fifth node, so the spine, the Fosse and this chain make a loop. Open Veins (bleed with bleed chance, the Pits above) is its twin, 9 steps away by the spine; Hewing (axes with bleed chance) and Executioner (against the bleeding) are farther west, and the Strider's bow bleeds farther east. Laid as an L with the notable at the corner: the straight line from the spine would reach the Fosse's fifth node 29 degrees from the road east to the fourth, so the last small comes down onto it from above.",
+      why: "Bleed damage twice, then the notable with bleed damage and bleed duration, then bleed damage once more (RE-8, G3 round 3, 2026-10-22): wounds that stay open, below Wound Dance, whose eight stacks are worth more the longer each bleed lasts. A bridge from the spine's last node to the Fosse's fifth node, so the spine, the Fosse and this chain make a loop. Open Veins (bleed with bleed chance, the Pits above) is its twin, 9 steps away by the spine; Hewing (axes with bleed chance) and Finishing Cut (against the bleeding) are farther west, and the Strider's bow bleeds farther east. Laid as an L with the notable at the corner: the straight line from the spine would reach the Fosse's fifth node 29 degrees from the road east to the fourth, so the last small comes down onto it from above.",
       at: [-470, 3980],
       shape: { kind: 'hand' },
       nodes: [

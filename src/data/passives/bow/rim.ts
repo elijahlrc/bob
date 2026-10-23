@@ -1,6 +1,6 @@
 /**
  * The Far Pasture (phase G2 of docs/tree/design/G-growth.md, 2026-10-22): the Strider's outer road. Today's edge is a
- * wall of pockets at radius 3,000 to 3,400 (Ricochet, Heavy Draw, Split Volley, Barbed Arrows, Skewer, Quick Sip, Pitch
+ * wall of pockets at radius 3,000 to 3,400 (Ricochet, Deep Pull, Split Volley, Barbed Arrows, Skewer, Quick Sip, Pitch
  * Arrows) with the map empty beyond it; the growth puts the region's second band of clusters out there (G1/strider.md
  * §2), and this is the road they hang from. A gentle arc at radius about 3,800 from the Shade's east rim road (at its
  * north end) to the Reaver's Fosse (at its south end), so the east of the map gets one outer ring, and three spokes back
@@ -456,7 +456,7 @@ export const farPasture: AreaSpec = {
     {
       id: 'northSpoke',
       name: 'The north spoke',
-      why: 'Ricochet and Heavy Draw stay joined through a road node, and the road runs straight out from it to the outer road: the edge pockets leave from a road (CONSTRAINTS §7.2), and walking from one to the other is no longer free of a choice (G1/strider.md §3).',
+      why: 'Ricochet and Deep Pull stay joined through a road node, and the road runs straight out from it to the outer road: the edge pockets leave from a road (CONSTRAINTS §7.2), and walking from one to the other is no longer free of a choice (G1/strider.md §3).',
       at: P(2045, -1054),
       shape: { kind: 'hand' },
       nodes: [
@@ -465,7 +465,7 @@ export const farPasture: AreaSpec = {
           kind: 'attribute',
           lines: [dex(7)],
           at: P(1867, -980),
-          why: 'Between Ricochet and Heavy Draw, where their link was.',
+          why: 'Between Ricochet and Deep Pull, where their link was.',
         },
         {
           id: 's',
@@ -530,12 +530,12 @@ export const farPasture: AreaSpec = {
     {
       from: 'northSpoke.x',
       to: 'bow.flight.ricochet.b',
-      why: "Ricochet's exit onto the north spoke (it went straight to Heavy Draw before G2).",
+      why: "Ricochet's exit onto the north spoke (it went straight to Deep Pull before G2).",
     },
     {
       from: 'northSpoke.x',
       to: 'bow.steel.wheel.n2',
-      why: 'The north spoke onto Heavy Draw: Ricochet and Heavy Draw stay joined, through the road.',
+      why: 'The north spoke onto Deep Pull: Ricochet and Deep Pull stay joined, through the road.',
     },
     { from: 'northSpoke.s', to: 'road.j2', why: 'The north spoke reaches the outer road.' },
     {

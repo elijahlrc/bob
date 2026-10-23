@@ -4,7 +4,7 @@
  * the Pits' west junction) and the west half of the crossroad (the junction east to the Muster's hub). The sword diamond
  * bridges the west road and the crossroad; the armour pocket hangs off the west road's first node toward the Wall; the
  * axes hang off its second; the elements below them; Killing Pace and the one-handed diamond above and below the
- * crossroad; Executioner off the west road's last node, joined to the reservation chain.
+ * crossroad; Finishing Cut off the west road's last node, joined to the reservation chain.
  */
 import {
   accuracy,
@@ -33,7 +33,7 @@ export const blades: AreaSpec = {
   id: 'yard.blades',
   region: 'reaver',
   name: 'The Practice Ground',
-  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Executioner chain, Killing Pace, armour on the Wall side (Guarded) and a second armour chain between the one-handed diamond and the elements (Mended Mail, G3), hung from the west road and the crossroad (G2); past the west road, the sword with a shield (Sword and Board, G3 round 2) on the way to the Wall. The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
+  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Finishing Cut chain, Killing Pace, armour on the Wall side (Guarded) and a second armour chain between the one-handed diamond and the elements (Mended Mail, G3), hung from the west road and the crossroad (G2); past the west road, the sword with a shield (Sword and Board, G3 round 2) on the way to the Wall. The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
   at: [-785, 1990], // Where the area's name is drawn: clear of every other area's name; nudged in G2 off Light Blades and the Wall's moved Second Wind.
   clusters: [
     {
@@ -104,7 +104,7 @@ export const blades: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [-925, 2940],
-          why: 'The Shieldwall spur leaves west, the block run and Executioner east.',
+          why: 'The Shieldwall spur leaves west, the block run and Finishing Cut east.',
         },
       ],
       links: [['w2', 'w3']],
@@ -154,7 +154,7 @@ export const blades: AreaSpec = {
           kind: 'notable',
           name: 'Guarded',
           lines: [armour(20), evasion(20)],
-          why: "Both of the Reaver's defences, the two-defence notable only a strength-dexterity region sells: 1.7 + 2 units. The Wall's armour-and-stun is Thick Skin, off the tower road.",
+          why: "Both of the Reaver's defences, the two-defence notable only a strength-dexterity region sells: 1.7 + 2 units. The Wall's armour-and-stun is Ox Hide, off the tower road.",
           at: [-775, 1458],
         },
       ],
@@ -202,7 +202,7 @@ export const blades: AreaSpec = {
     {
       id: 'elementalEdge',
       name: 'Elemental Edge',
-      why: "Elemental damage with attacks, below the axes: the Yard's one elemental cluster (C-brief §11), so that a Reaver with a fire or cold sword is near its element without a walk to the Spire. Reached through the axes and from the road to Headsman; no longer joined to the Shieldwall spur (G2: the road from the elements to Executioner ran through the keystone's spur).",
+      why: "Elemental damage with attacks, below the axes: the Yard's one elemental cluster (C-brief §11), so that a Reaver with a fire or cold sword is near its element without a walk to the Spire. Reached through the axes and from the road to Headsman; no longer joined to the Shieldwall spur (G2: the road from the elements to Finishing Cut ran through the keystone's spur).",
       at: [-700, 2560],
       shape: { kind: 'hand' },
       nodes: [
@@ -311,7 +311,7 @@ export const blades: AreaSpec = {
     },
     {
       id: 'executioner',
-      name: 'Executioner',
+      name: 'Finishing Cut',
       why: "Damage against bleeding enemies, then the notable that finishes them (culling strike, double damage): what an axe Reaver who bleeds wants after Hewing. Since G2 a chain east from the west road's last node to the reservation chain's first small, in the wedge between the block run and the road down to the Pits; it hung off the Shieldwall spur before.",
       at: [-815, 2936],
       shape: { kind: 'hand' },
@@ -326,7 +326,7 @@ export const blades: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Executioner',
+          name: 'Finishing Cut',
           lines: [damageVsBleeding(16), cullingStrike()],
           at: [-775, 2935],
           why: '2 + 3 units. The exit, to the reservation chain.',
@@ -493,12 +493,12 @@ export const blades: AreaSpec = {
     {
       from: 'west.w4',
       to: 'executioner.a',
-      why: "The west road's last node onto Executioner.",
+      why: "The west road's last node onto Finishing Cut.",
     },
     {
       from: 'executioner.n',
       to: 'yard.shield.standard.a',
-      why: 'Executioner on to the reservation chain: a second way in for each, and a way from the west road up to the crit pocket without the hub (G2; it replaced the road node that joined Executioner to Standard Bearer).',
+      why: 'Finishing Cut on to the reservation chain: a second way in for each, and a way from the west road up to the crit pocket without the hub (G2; it replaced the road node that joined Finishing Cut to Standard Bearer).',
     },
     { from: 'j1.a', to: 'crossroad.c1', why: 'The crossroad leaves the junction east.' },
     {

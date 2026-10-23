@@ -137,7 +137,7 @@ export const ambulatory: AreaSpec = {
           name: 'Consecrated Plate',
           lines: [armour(24), stunRecovery(30)],
           at: P(2370, 280),
-          why: "Armour, and stuns shaken off sooner: 2 + 2 units. G3 (2026-10-22, G1-brief.md §4.3): its energy shield went, because with Lectern four steps away on the aisle every Zealot caster took both (the allocator's plans for five casters), spell damage and energy shield in one stop. Thick Skin, in the Wall, is armour with stun threshold.",
+          why: "Armour, and stuns shaken off sooner: 2 + 2 units. G3 (2026-10-22, G1-brief.md §4.3): its energy shield went, because with Lectern four steps away on the aisle every Zealot caster took both (the allocator's plans for five casters), spell damage and energy shield in one stop. Ox Hide, in the Wall, is armour with stun threshold.",
         },
         { id: 'b', kind: 'small', lines: [armour(12)], at: P(2385, 212) },
       ],
@@ -312,7 +312,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'peal',
       name: 'Thunder Peal',
-      why: "A pocket west off the walk's first node, under the Bell Tower: lightning twice, then lightning with mana and long shocks. The lightning caster's late cluster, far from the Spire's two (Thunderhead sells lightning with cast speed, Overcharge with shock effect) and the Knife's Static Edge (with crit). Round 3 (2026-10-20).",
+      why: "A pocket west off the walk's first node, under the Bell Tower: lightning twice, then lightning with mana and long shocks. The lightning caster's late cluster, far from the Spire's two (Thunderhead sells lightning with cast speed, Live Current with shock effect) and the Knife's Static Edge (with crit). Round 3 (2026-10-20).",
       at: [-3664, -1648],
       shape: { kind: 'hand' },
       nodes: [

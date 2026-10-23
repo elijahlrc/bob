@@ -89,7 +89,7 @@ export const home: AreaSpec = {
     {
       id: 'ringing',
       name: 'Ringing Blows',
-      why: "The north hub's pocket, a tight orbit: melee damage twice and a notable with melee damage and the blow that rocks them (lower enemy stun threshold): the Vanguard's first offence on the north side, for any melee weapon, named for none, two to four points out. It was Unshakable (stun threshold, stun recovery) until G3 round 2 (2026-10-22): within six steps of the start every notable but Oathbound and the Banner was defence or utility, and the north side ran stun threshold, resistances, mana and armour before any offence (CONSTRAINTS §4.8). Stun threshold is still sold by Stone Heart (with life, west) and Thick Skin (with armour, the far west), and as lines on Bracing and Unhurried.",
+      why: "The north hub's pocket, a tight orbit: melee damage twice and a notable with melee damage and the blow that rocks them (lower enemy stun threshold): the Vanguard's first offence on the north side, for any melee weapon, named for none, two to four points out. It was Unshakable (stun threshold, stun recovery) until G3 round 2 (2026-10-22): within six steps of the start every notable but Oathbound and the Banner was defence or utility, and the north side ran stun threshold, resistances, mana and armour before any offence (CONSTRAINTS §4.8). Stun threshold is still sold by Stone Heart (with life, west) and Ox Hide (with armour, the far west), and as lines on Bracing and Unhurried.",
       at: [-1180, 160],
       shape: { kind: 'ring', r: 75, a0: 28 },
       nodes: [

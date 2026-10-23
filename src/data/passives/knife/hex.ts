@@ -2,7 +2,7 @@
  * The Stair (the Knife's north barb, hooking up toward the Spire): the curse junction off the venom junction (where
  * the life chain and the Second Curse chain also arrive), a shield small, the wheel (chaos spells on one notable since
  * round 3, mines on the other), the climb to the Spellslip junction, and the dear road of two attribute nodes from there to the
- * Spire's east arm. The near crossing from the Spire's Devotion chain lands on the wheel's north node. The id `knife.hex`
+ * Spire's east arm. The near crossing from the Spire's Kept Vows chain lands on the wheel's north node. The id `knife.hex`
  * predates the change and is kept.
  */
 import {
@@ -56,7 +56,7 @@ export const hex: AreaSpec = {
     {
       id: 'wheel',
       name: 'Rotting Word',
-      why: "The wheel of four on the Stair: attribute nodes at the south entrance and the north exit, so the Stair is a road and the wheel a fork on it. Chaos spells on the west (Rotting Word, round 3: the tree had no chaos-spell notable; here chaos comes with damage over time and cast speed, the Undercroft's Tomb Dust sells it with energy shield and area, and the Spire's Withering sells the damage-over-time multiplier). It carries no curse line, and Hexwright traded places with Devotion in round 3, so the curse notables are seven (Hexwright) and five (Second Curse) steps away: a chaos hexer had found Rotting Word, Hexwright and Second Curse by point 17, mines on the east (Sapper). The Spire's Hexwright lands on the north node, where the climb to Spellslip leaves. Festering (poison) was the west side until round 3, when it went to the Yard: the poison claw found all its notables round the Rookery.",
+      why: "The wheel of four on the Stair: attribute nodes at the south entrance and the north exit, so the Stair is a road and the wheel a fork on it. Chaos spells on the west (Rotting Word, round 3: the tree had no chaos-spell notable; here chaos comes with damage over time and cast speed, the Undercroft's Tomb Dust sells it with energy shield and area, and the Spire's Withering sells the damage-over-time multiplier). It carries no curse line, and Hexwright traded places with Kept Vows in round 3, so the curse notables are seven (Hexwright) and five (Second Curse) steps away: a chaos hexer had found Rotting Word, Hexwright and Second Curse by point 17, mines on the east (Sapper). The Spire's Hexwright lands on the north node, where the climb to Spellslip leaves. Festering (poison) was the west side until round 3, when it went to the Yard: the poison claw found all its notables round the Rookery.",
       at: [1509, -2026],
       shape: { kind: 'ring', r: 100, a0: 90 },
       nodes: [
@@ -77,7 +77,7 @@ export const hex: AreaSpec = {
           id: 'n',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          why: "The north node: the near crossing from the Spire's Devotion chain lands here, and the climb to Spellslip leaves.",
+          why: "The north node: the near crossing from the Spire's Kept Vows chain lands here, and the climb to Spellslip leaves.",
         },
         {
           id: 'n2',
@@ -143,7 +143,7 @@ export const hex: AreaSpec = {
     {
       id: 'static',
       name: 'Static Edge',
-      why: 'A pocket east off the Spellslip junction, into the ground beside the Stair: lightning twice, then lightning with crit; since round 3 the second small carries the Rooftops road on, and the notable is a leaf. The Spire sells lightning with cast speed (Thunderhead) and with shock (Overcharge); here it comes with crit, for the crit-spell Shade and the lightning trapper the dear road to the Spire was built for.',
+      why: 'A pocket east off the Spellslip junction, into the ground beside the Stair: lightning twice, then lightning with crit; since round 3 the second small carries the Rooftops road on, and the notable is a leaf. The Spire sells lightning with cast speed (Thunderhead) and with shock (Live Current); here it comes with crit, for the crit-spell Shade and the lightning trapper the dear road to the Spire was built for.',
       at: [1950, -2600],
       shape: { kind: 'hand' },
       nodes: [
