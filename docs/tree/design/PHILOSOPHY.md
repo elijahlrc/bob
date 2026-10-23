@@ -220,6 +220,16 @@ Longbow and Deep Cuts wheels so their names clear, the 30° turn of Deep Well an
 Mind sit on their loops, and the Quickened Steel start loop (a diamond before). A few long links came out of it (three in
 the Strider, round Devotion), and some `why` texts name links that no longer match (they were wrong before the pass).
 
+**2026-10-22/23, the growth (phase G, `G-growth.md`):** the user asked for 1,500 to 2,000 nodes so builds cannot take
+everything they want. Measured by an allocator over archetypes (`npm run passives:builds`: best plans at 60 and 120
+points, grown by 40; what more points still buy), never by one power number. A ledger and region briefs (G1), a skeleton
+of roads (G2), three rounds of clusters by region agents (G3), two audit rounds of six auditors and two fix passes (G4),
+five seam clusters where regions meet. 1,009 to 1,396 live nodes; the user's stop 4 left four questions for playtesting
+(`G4/stop4.md`). Lessons: the yardstick needs a build for every cluster before "nobody takes it" means anything (four
+archetypes were added in the last round and settled half the findings); audits report findings, never new rules (the user
+adopted none of fifteen); a re-partner can overshoot into a notable nobody takes, so measure the new partner before
+keeping it.
+
 Judging tools: `scripts/passives/geometry.ts` (crossings, nodes drawn over each other, bends; `--region`, `--bends`). In
 the session scratchpad (recreate if gone, they are twenty lines each): a label-over-nodes check; a line-usage count per
 region; a walk script that buys the cheapest tree from a start to a list of notables and prints every node bought.
