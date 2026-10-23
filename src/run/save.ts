@@ -44,9 +44,9 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
-  // Version 20 has the hand-written tree before the growth of docs/tree/design/G-growth.md: nodes were moved and retired, so
-  // the allocated passives are handed back as unspent points.
-  if (version === 20) {
+  // Version 20 has the hand-written tree before the growth of docs/tree/design/G-growth.md, and version 21 the grown tree
+  // before G4 fix pass 1: nodes were moved and retired, so the allocated passives are handed back as unspent points.
+  if (version === 20 || version === 21) {
     run.version = SAVE_VERSION;
     run.build = { ...run.build, allocated: [] };
     return run;
