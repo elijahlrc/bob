@@ -7,6 +7,7 @@
  */
 import {
   accuracy,
+  meleeRange,
   attackSpeed,
   avoidAilments,
   bowDamage,
@@ -26,7 +27,6 @@ import {
   maxFervour,
   physAttack,
   str,
-  stunAvoid,
   swordDamage,
   weaponSpeed,
 } from '../lines';
@@ -272,7 +272,7 @@ export const dual: AreaSpec = {
     {
       id: 'footwork',
       name: 'Footwork',
-      why: "Accuracy twice, then the notable with accuracy and avoid stun, then accuracy once more (RE-6, G3 round 2, 2026-10-22; re-partnered in G4 fix 2, 2026-10-23): the duellist's footing, the Lists' outer side between the east gate and the Strider's Ford hub (a near crossing). No evasion at all since fix 2: the gate is 4 steps from the Strider start, and evasion here made it every dexterity build's first stop; the Reaver's evasion is Weaving's (the wheel) and the Muster's. Footing, not dodge or the second blade: Sidestep (dodge, six steps), Twin Fangs (dual wield) and Crossed Blades (dual crit with accuracy) keep their own partners. Laid as an L with the notable at the corner: the straight line from the gate would reach the hub 18 degrees from the Strider's own link into it.",
+      why: "Accuracy twice, then the notable with accuracy and melee reach, then accuracy once more (RE-6, G3 round 2, 2026-10-22; re-partnered in G4 fix 2, 2026-10-23): the duellist's footing, the Lists' outer side between the east gate and the Strider's Ford hub (a near crossing). No evasion at all since fix 2: the gate is 4 steps from the Strider start, and evasion here made it every dexterity build's first stop; the Reaver's evasion is Weaving's (the wheel) and the Muster's. Reach, not dodge or the second blade: Sidestep (dodge, six steps), Twin Fangs (dual wield) and Crossed Blades (dual crit with accuracy) keep their own partners. Laid as an L with the notable at the corner: the straight line from the gate would reach the hub 18 degrees from the Strider's own link into it.",
       at: [898, 1742],
       shape: { kind: 'hand' },
       nodes: [
@@ -288,9 +288,9 @@ export const dual: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Footwork',
-          lines: [accuracy(20), stunAvoid(20)],
+          lines: [accuracy(20), meleeRange(1)],
           at: [898, 1742],
-          why: "Keep your feet and land the blow: accuracy with avoid stun, 2 + 1 units (G4 fix 2, 2026-10-23). It was evasion with accuracy, and every dexterity build from three starts made it a first stop for the evasion (trade-offs audit T1, starts audit F4, the U4 condition); the duellist's footing is a Reaver want the archers and the Shade's attackers do not chase. Not movement: trialled, and nobody took it.",
+          why: 'Step in and land the blow: accuracy with melee reach, 2 + 2 units (G4 fix 2, 2026-10-23). It was evasion with accuracy, and every dexterity build from three starts made it a first stop for the evasion (trade-offs audit T1, starts audit F4, the U4 condition). Reach is a melee want the archers do not chase: measured, the dual wielder and the lightning striker take it by 120 and the sword and shield by 160, no bow or Shade build. Not movement and not avoid stun: each trialled, and nobody took it.',
         },
         {
           id: 'c',
