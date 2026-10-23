@@ -14,6 +14,7 @@ import {
   es,
   esFlat,
   int,
+  manaRegen,
   minionLife,
   physSpell,
   shieldDef,
@@ -21,6 +22,7 @@ import {
   skillDuration,
   spellArea,
   spellBlock,
+  spellCrit,
   spellDamage,
   str,
   totemDamage,
@@ -39,11 +41,17 @@ export const crypt: AreaSpec = {
     {
       id: 'wheel',
       name: 'Homily',
-      why: "The wheel of eight in the crypt: spell damage on the north side (Homily, the Zealot's caster notable past the nave), spell block behind a shield on the south (Glass Wall), energy shield at the ends. The summoner on the way to Volatile Servants passes one of them; its minions are at the choir and across the Spire border.",
+      why: "The wheel of eight in the crypt: spell damage on the north side (Homily, the Zealot's caster notable past the nave), spell block behind a shield on the south (Glass Wall, with its flat energy shield), spell block at the ends. The summoner on the way to Volatile Servants passes one of them; its minions are at the choir and across the Spire border. G4 fix 1 (2026-10-22, audit T6.2 and T11): the ends were energy shield, so every caster who took the detour to Homily got spell damage and energy shield in one cluster; now the wheel reads spell damage one way, spell block with energy shield the other, and Glass Wall's side is the Zealot's own energy shield direction, away from the Mystic's Cloister.",
       at: P(1850, 1150),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'm1', kind: 'small', lines: [es(5)], at: P(1750, 1150), why: 'The west entrance.' },
+        {
+          id: 'm1',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: P(1750, 1150),
+          why: 'The west entrance: spell block (energy shield until G4 fix 1).',
+        },
         {
           id: 'm2',
           kind: 'small',
@@ -62,9 +70,9 @@ export const crypt: AreaSpec = {
         {
           id: 'm4',
           kind: 'small',
-          lines: [es(5)],
+          lines: [spellBlock(2)],
           at: P(1950, 1150),
-          why: 'The east exit, to the crypt junction.',
+          why: 'The east exit, to the crypt junction: spell block (energy shield until G4 fix 1).',
         },
         {
           id: 'm5',
@@ -254,9 +262,54 @@ export const crypt: AreaSpec = {
         ['b', 'n'],
       ],
     },
+    {
+      id: 'omen',
+      name: 'Bright Omen',
+      why: "G4 fix 1 (2026-10-22), seam 2 of the fix brief (§1.1, the Mystic–Zealot seam cluster): a straight bridge from Shattering Rite across the border to the Mystic's Cinder, mana regeneration, the notable with spell crit chance and mana regeneration, mana regeneration again. The casters' crossroads at the far loop already sells spell damage, energy shield, minions and channelling (Shattering Rite, Tomb Dust, Plainsong, Familiars, Cinder), so this is neither: spell crit, which casters on both sides weigh and the life caster leaves unfinished at 120 points, with the mana to keep casting. A pairing the tree did not have: spell crit's other notables pair it with damage (Cold Light), crit multiplier (Keen Verse), penetration, insight or generic damage. Mana regeneration's others pair it with spell damage (Long Chant), lightning (Thunder Peal) or curses (Hexwright). Shattering Rite becomes a junction of three and Cinder a bridge.",
+      at: [-1361, -3696],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          at: [-1417, -3653],
+          why: 'The entrance from Shattering Rite, on the straight line to Cinder.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Bright Omen',
+          lines: [spellCrit(30), manaRegen(15)],
+          at: [-1361, -3696],
+          why: 'Spell crit chance and mana regeneration: 2 + 1.5 units.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          at: [-1306, -3739],
+          why: "The far node, onto the Mystic's Cinder.",
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
+    },
   ],
   links: [
     { from: 'toSpire.b', to: 'rite.a', why: 'The crossing road onto the physical spells.' },
+    {
+      from: 'rite.n',
+      to: 'omen.a',
+      why: 'Shattering Rite onto the spell crit bridge (G4 fix 1, seam 2).',
+    },
+    {
+      from: 'omen.b',
+      to: 'spire.fire.cinder.n',
+      why: "Seam 2 (G4 fix 1; fix brief §1.1): Bright Omen's far small lands on the Mystic's Cinder, the one border link this seam lays. A far crossing, 21 steps from the Zealot start and 23 from the Mystic's: the casters of both sides find spell crit with mana here, between the Zealot's physical spells and the Mystic's burning, and Cinder becomes a bridge.",
+    },
     { from: 'toSpire.a', to: 'tomb.a', why: 'The crossing road onto the chaos pocket.' },
     { from: 'toSpire.a', to: 'stair.a', why: 'The Spire crossing onto the crypt stair.' },
     { from: 'stair.a', to: 'jV.a', why: 'The stair onto the crypt junction.' },

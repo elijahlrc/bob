@@ -84,7 +84,7 @@ export const slams: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           why: 'The entrance, facing the slam road.',
           at: [-970, 1125],
         },
@@ -94,12 +94,12 @@ export const slams: AreaSpec = {
           name: 'Bracing',
           lines: [shieldBlock(5), blockRecovery(20), stunThreshold(8)],
           at: [-900, 1125],
-          why: '2.5 + 1 + 1 units: the shield that does not buckle.',
+          why: '2.5 + 1 + 1 units: the shield that does not buckle. Its smalls are one unit each, 2% (3% until G4 fix 1, 2026-10-22).',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           why: 'The exit, to the slam wheel and the Yard.',
           at: [-912, 1194],
         },

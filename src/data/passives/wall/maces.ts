@@ -23,6 +23,7 @@ import {
   shieldDef,
   str,
   stunDuration,
+  stunRecovery,
   stunThreshold,
   twoHandDamage,
   weaponCrit,
@@ -97,7 +98,7 @@ export const maces: AreaSpec = {
     {
       id: 'greatweight',
       name: 'Greatweight',
-      why: "The tower's landmark: a wheel of six with two notables, two-handed damage on one side, life on the other, strength on both, so the two-hander picks the bigger hit or the bigger body. Stun belongs to Weight of Iron (with a mace) and Headsman (with a two-hander); Greatweight sold stun too until round 4. Two-handed speed is far south (Heavy Hands, by the grit) and the slam with a two-hander is Thunderstep: three places, three partners. Passed through toward the keystone.",
+      why: "The tower's landmark: a wheel of six with two notables, two-handed damage on one side, life on the other, so the two-hander picks the bigger hit or the bigger body. The blow's stun rides on the hit side (stun duration, one unit) and the body's on the life side (less stun taken), in place of the strength both carried until G4 fix 1 (2026-10-22): strength is worth nothing to a build's wishes, so each read as a notable of two and a half units. Stun is led by Weight of Iron (with a mace) and Headsman (with a two-hander, 19 steps south); Greatweight was stun-led until round 4 and carries it only as a partner now. Two-handed speed is far south (Heavy Hands, by the grit) and the slam with a two-hander is Thunderstep: three places, three partners. Passed through toward the keystone.",
       at: [-3315, 1254],
       shape: { kind: 'ring', r: 78, a0: -30 },
       nodes: [
@@ -107,8 +108,8 @@ export const maces: AreaSpec = {
           id: 'n1',
           kind: 'notable',
           name: 'Greatweight',
-          lines: [twoHandDamage(30), str(16)],
-          why: '2.5 units of two-handed damage and the strength the heaviest weapons ask for: 3.6.',
+          lines: [twoHandDamage(30), stunDuration(15)],
+          why: '2.5 units of two-handed damage and 1 of stun duration: 3.5. The heaviest blow leaves them reeling longer (G4 fix 1, 2026-10-22: it carried 16 strength, which no build weighs).',
         },
         { id: 'c', kind: 'small', lines: [life(5)], why: 'The life side.' },
         { id: 'd', kind: 'small', lines: [life(5)] },
@@ -116,8 +117,8 @@ export const maces: AreaSpec = {
           id: 'n2',
           kind: 'notable',
           name: 'Broad Back',
-          lines: [life(12), str(16)],
-          why: "2.4 + 1.1 units: the body that carries the weapon, life and the strength to lift it. Its armour went in G3 round 2 (2026-10-22): life with armour 13 steps from the start was the far hybrid every strength build took at 60 points, beside Mortar and Stone, Locked Shields and Ox Hide (the west tower's armour hot spot). Second Wind sells life with regeneration, Stone Heart with stun threshold.",
+          lines: [life(12), stunRecovery(15)],
+          why: "2.4 + 1 units: 3.4. The body that carries the weapon, life and a shorter stun when something does knock it down (G4 fix 1, 2026-10-22: it carried 16 strength, which no build weighs). Its armour went in G3 round 2 (2026-10-22): life with armour 13 steps from the start was the far hybrid every strength build took at 60 points, beside Mortar and Stone, Locked Shields and Ox Hide (the west tower's armour hot spot). Second Wind sells life with regeneration, the Reaver's Scarred Hide life with stun threshold.",
         },
       ],
       links: [
@@ -157,7 +158,7 @@ export const maces: AreaSpec = {
     {
       id: 'thickSkin',
       name: 'Ox Hide',
-      why: "Armour twice, then the notable with armour and stun threshold: the Vanguard who wants to stand in the hit, on the west rim beside Rooted Stance. The keystone makes stun threshold moot, so the two are a fork at the tower's tip. A pocket two steps off the tower road until G2 (2026-10-22), when the Wall's strength defence was one corner by the home; the road's pocket is Stone Heart's now.",
+      why: "Armour twice, then the notable with armour and stun threshold: the Vanguard who wants to stand in the hit, on the west rim beside Rooted Stance. The keystone makes stun threshold moot, so the two are a fork at the tower's tip. A pocket two steps off the tower road until G2 (2026-10-22), when the Wall's strength defence was one corner by the home; the road's pocket is Weak Spot's now (melee crit; Stone Heart until G4 fix 1, 2026-10-22).",
       at: [-3830, 1150],
       shape: { kind: 'hand' },
       nodes: [
@@ -332,13 +333,13 @@ export const maces: AreaSpec = {
     {
       id: 'toHymn',
       name: 'To Battle Hymn',
-      why: "Four attribute nodes from Crushing Blow north to Battle Hymn: the Barbican and the Cathedral's outer side meet. Hallowed Hammer left the second node in G2 (2026-10-22) for the rampart's junction; Hot Iron, on the west rim, joins it there since G3.",
+      why: "Four attribute nodes from Crushing Blow north to Battle Hymn: the Barbican and the Cathedral's outer side meet. Hallowed Hammer left the second node in G2 (2026-10-22) for the rampart's junction; Hot Iron, on the west rim, joins it there since G3. G4 fix 1 (2026-10-22): the road leaves Crushing Blow's small west of north and runs straight to its last node (it left 22° from the road to Stagger, a near-miss at a small that is also a junction, and bent at its first node); positions only, no shortcut between Stagger and the road.",
       at: [-3306, 496],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'r1', kind: 'attribute', lines: [str(7)], at: [-3306, 496] },
-        { id: 'r2', kind: 'attribute', lines: [str(7)], at: [-3389, 306] },
-        { id: 'r3', kind: 'attribute', lines: [str(6), int(6)], at: [-3471, 117] },
+        { id: 'r1', kind: 'attribute', lines: [str(7)], at: [-3444, 522] },
+        { id: 'r2', kind: 'attribute', lines: [str(7)], at: [-3481, 324] },
+        { id: 'r3', kind: 'attribute', lines: [str(6), int(6)], at: [-3517, 125] },
         { id: 'r4', kind: 'attribute', lines: [str(6), int(6)], at: [-3554, -73] },
       ],
       links: [

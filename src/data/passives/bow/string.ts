@@ -1,24 +1,13 @@
 /**
- * The string: the straight dexterity road from the signature east to the projectiles hub, the generic way across the
- * region. Five road nodes in a line; off them, the pockets every Strider wants whatever the weapon: accuracy (also the
- * short cut north onto the bows road, drawn as a straight run), evasion and life (also the short cut south onto the
- * physical road, a straight run the other way), attack speed and movement speed (a tight loop under the road between
- * its third and fourth nodes), and Arrow Weave one step off the fifth node. The two short cuts are what make the region
- * a lattice: bows, string and physical end are three roads out of the home and they are joined twice before the arc,
- * so a build can go out one way and come back another.
+ * The Meadow: the string, two dexterity road nodes from the signature toward the projectiles hub, and the pockets every
+ * Strider wants whatever the weapon hanging off its second node: Quick Hands (attack speed, a bridge on to Weathered's
+ * resist star), Hard Target (evasion with life, a bridge on to the projectiles hub), Weathered's fire spoke, Long
+ * Breath's and Clear Head's doors. Fleet Foot (movement with evasion) bridges Wanderer to the hub beside Hard Target, and
+ * Arrow Weave hangs one step off the hub. G4 fix 1 (2026-10-22) removed True Aim, the second attack-speed notable two
+ * steps from Quick Hands, and parted Fleet Foot from Hard Target (the trade-offs audit, F1); the user's editor nodes that
+ * lived in this file are re-homed in their notables' clusters.
  */
-import {
-  accuracy,
-  attackSpeed,
-  castSpeed,
-  dex,
-  evasion,
-  life,
-  manaRegen,
-  moveSpeed,
-  resOne,
-  stunAvoid,
-} from '../lines';
+import { attackSpeed, castSpeed, dex, evasion, life, moveSpeed, stunAvoid } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
 
@@ -54,32 +43,19 @@ export const string: AreaSpec = {
       links: [['s1', 's2']],
     },
     {
-      id: 'aim',
-      name: 'True Aim',
-      why: "Accuracy and attack speed, a straight pass-through run between the string's first node and the bows road: the short cut north costs the notable, and the notable is one every attacker wants (the reference's accuracy pocket sits the same distance from its start).",
-      at: P(1607, 135),
-      shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(8)], at: P(1587, 141) },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'True Aim',
-          lines: [accuracy(15), attackSpeed(8), dex(20)],
-          at: P(1529, 180),
-          why: '1.5 + 1.7 + 1.3 units.',
-        },
-      ],
-      links: [['a', 'n']],
-    },
-    {
       id: 'hardTarget',
       name: 'Hard Target',
-      why: "The evasion-and-life chain, a straight run from the string's second node down to the physical road: evasion on the string side, life on the physical side, the notable in the middle. Walked from the string it costs evasion to reach the life; walked from the physical road, the other way round. The short cut south costs the notable.",
+      why: "Evasion with life, a bridge from the string's second node to the projectiles hub: two life smalls on the string side, the notable, then one evasion small at the hub, where Fleet Foot's evasion small joins it. Walked from the string it costs life to reach the evasion; walked from the hub, the other way round. G4 fix 1 (2026-10-22): the direct link to Fleet Foot was cut (two evasion notables a step apart, the trade-offs audit F1) and Hard Target reaches the hub through its own evasion small.",
       at: P(1285, -9),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [evasion(10)], at: P(1600, -11) },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [evasion(10)],
+          at: P(1652, -7),
+          why: "Hard Target's evasion small, on its line to the projectiles hub; a junction where Fleet Foot's evasion small joins (G4 fix 1: moved onto that line, clear of Fleet Foot).",
+        },
         {
           id: 'n',
           kind: 'notable',
@@ -94,45 +70,74 @@ export const string: AreaSpec = {
       links: [
         ['n', 'c'],
         ['c', 'd'],
+        ['n', 'a'],
       ],
     },
     {
       id: 'speed',
       name: 'Quick Hands and Fleet Foot',
-      why: 'A tight loop under the string between its third and fourth nodes: attack speed on the west side up to Quick Hands, movement speed on the east side up to Fleet Foot, a mixed node at the bottom between the two notables. One side is three points for one notable; both notables cost the loop.',
+      why: "Two notables of the Meadow, apart since G4 fix 1 (2026-10-22). Quick Hands, the attacker's speed, is a bridge from the string's second node to Weathered's chaos spoke, an attack speed small on each side. Fleet Foot, the kiter's movement and evasion, is a bridge from Wanderer (two movement smalls) to the projectiles hub (an evasion small, joining Hard Target's). True Aim, the second attack-speed notable two steps from Quick Hands, was removed (the trade-offs audit, F1).",
       at: P(1317, 108),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(8)], at: P(1100, 175) },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [attackSpeed(5)],
+          at: P(1071, 256),
+          why: "Quick Hands' small on the string side; 8% → 5% attack speed, one unit (G4 fix 1, D4).",
+        },
         {
           id: 'qh',
           kind: 'notable',
           name: 'Quick Hands',
           lines: [attackSpeed(10), castSpeed(5)],
-          at: P(1167, 193),
-          why: "2 + 1.3 units: quick with the bow and the spell. Round 4 (approved 2026-10-20): it sold accuracy, attack speed and dexterity, True Aim's lines, two steps from it.",
+          at: P(1134, 284),
+          why: "2 + 1.3 units: quick with the bow and the spell. Round 4 (approved 2026-10-20): it sold accuracy, attack speed and dexterity, True Aim's lines. G4 fix 1: turned about the string's second node so the junction's fan is even (the looks audit, L1).",
         },
         {
           id: 'm',
           kind: 'small',
-          lines: [moveSpeed(5)],
-          at: P(1348, 187),
-          why: 'The node between the notables: a little of both.',
+          lines: [attackSpeed(5)],
+          at: P(1074, 321),
+          why: "Quick Hands' small toward Weathered's chaos spoke (G4 fix 1, 2026-10-22): 5% movement → 5% attack speed, Quick Hands' own stat, now that True Aim is gone (the discipline audit, F5).",
         },
         {
           id: 'ff',
           kind: 'notable',
           name: 'Fleet Foot',
-          lines: [moveSpeed(8), evasion(13), attackSpeed(5)],
-          at: P(1472, -18),
-          why: '2 + 1.3 + 1 units.',
+          lines: [moveSpeed(8), evasion(16)],
+          at: P(1565, -118),
+          why: "2 + 1.6 units: the kiter's notable. G4 fix 1 (2026-10-22): its 5% attack speed went (13% → 16% evasion), so Quick Hands sells the attacker's speed and Fleet Foot the kiter's feet, and the two are a choice (the trade-offs audit, F1).",
         },
-        { id: 'b', kind: 'small', lines: [evasion(8)], at: P(1542, -16) },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [evasion(10)],
+          at: P(1608, -63),
+          why: "Fleet Foot's evasion small, toward the projectiles hub; 8% → 10%, one unit (G4 fix 1, D4).",
+        },
+        {
+          id: 'f1',
+          kind: 'small',
+          lines: [moveSpeed(4)],
+          at: P(1512, -164),
+          why: "Fleet Foot's movement small beside it (the user's editor node n431; G3 round 1 made it movement; re-homed in G4 fix 1).",
+        },
+        {
+          id: 'f2',
+          kind: 'small',
+          lines: [moveSpeed(4)],
+          at: P(1470, -200),
+          why: "Fleet Foot's second movement small, the door from Wanderer (the editor's n430; re-homed in G4 fix 1).",
+        },
       ],
       links: [
         ['a', 'qh'],
         ['qh', 'm'],
         ['ff', 'b'],
+        ['ff', 'f1'],
+        ['f1', 'f2'],
       ],
     },
     {
@@ -147,74 +152,47 @@ export const string: AreaSpec = {
       ],
       links: [['a', 'k']],
     },
-    {
-      id: 'added',
-      name: 'Added in the editor',
-      why: 'Nodes added by the user in the tree editor (2026-10-19); names and reasons provisional.',
-      at: P(954, 209),
-      shape: { kind: 'hand' },
-      nodes: [
-        {
-          id: 'n402',
-          kind: 'small',
-          lines: [manaRegen(12)],
-          at: P(459, 226),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n417',
-          kind: 'small',
-          lines: [resOne('fire', 10)],
-          at: P(829, 366),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n418',
-          kind: 'small',
-          lines: [resOne('fire', 10)],
-          at: P(794, 319),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n419',
-          kind: 'small',
-          lines: [resOne('chaos', 10)],
-          at: P(936, 395),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n420',
-          kind: 'small',
-          lines: [resOne('chaos', 10)],
-          at: P(990, 373),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n431',
-          kind: 'small',
-          lines: [moveSpeed(4)],
-          at: P(1454, -86),
-          why: "Added in the editor (2026-10-19). G3 round 1 (2026-10-22): shield defences → movement speed, the second small of the chain from Wanderer to Fleet Foot (the brief's ST-r1 counted it among Round Shield's mana smalls; it was shield defences, which belonged to no notable here either).",
-        },
-      ],
-      links: [
-        ['n417', 'n418'],
-        ['n419', 'n420'],
-      ],
-    },
   ],
   links: [
-    { from: 'road.s2', to: 'speed.a', why: 'Added in the editor (2026-10-19).' },
-    { from: 'road.s2', to: 'hardTarget.d', why: 'Added in the editor (2026-10-19).' },
-    { from: 'road.s2', to: 'added.n402', why: 'Added in the editor (2026-10-19).' },
-    { from: 'road.s2', to: 'added.n418', why: 'Added in the editor (2026-10-19).' },
-    { from: 'aim.a', to: 'bow.flight.hub.p', why: 'Added in the editor (2026-10-19).' },
-    { from: 'aim.n', to: 'speed.m', why: 'Added in the editor (2026-10-19).' },
-    { from: 'hardTarget.a', to: 'speed.b', why: 'Added in the editor (2026-10-19).' },
-    { from: 'hardTarget.a', to: 'bow.flight.hub.p', why: 'Added in the editor (2026-10-19).' },
-    { from: 'hardTarget.n', to: 'speed.ff', why: 'Added in the editor (2026-10-19).' },
-    { from: 'speed.m', to: 'added.n420', why: 'Added in the editor (2026-10-19).' },
-    { from: 'speed.ff', to: 'added.n431', why: 'Added in the editor (2026-10-19).' },
-    { from: 'arrowWeave.a', to: 'bow.flight.hub.p', why: 'Added in the editor (2026-10-19).' },
+    {
+      from: 'road.s2',
+      to: 'speed.a',
+      why: "The string's second node onto Quick Hands (the user's editor link).",
+    },
+    {
+      from: 'road.s2',
+      to: 'hardTarget.d',
+      why: "The string's second node onto Hard Target's life side (the user's editor link).",
+    },
+    {
+      from: 'road.s2',
+      to: 'bow.steel.weathered.f2',
+      why: "The string's second node onto Weathered's fire spoke (the user's editor link).",
+    },
+    {
+      from: 'hardTarget.a',
+      to: 'speed.b',
+      why: "Fleet Foot's evasion small joins Hard Target's at the hub: Fleet Foot's way to the hub, and its second way in since G4 fix 1 (the user's editor link).",
+    },
+    {
+      from: 'hardTarget.a',
+      to: 'bow.flight.hub.p',
+      why: "Hard Target's evasion side reaches the projectiles hub (the user's editor link).",
+    },
+    {
+      from: 'speed.m',
+      to: 'bow.steel.weathered.c2',
+      why: "Quick Hands' far small onto Weathered's chaos spoke: Quick Hands is a bridge between the string and the resist star (the user's editor link; it went through True Aim's small until G4 fix 1).",
+    },
+    {
+      from: 'speed.f2',
+      to: 'bow.flight.wanderer.n',
+      why: "Fleet Foot's movement chain reaches Wanderer (the user's editor link): Wanderer, Fleet Foot and the hub in a row.",
+    },
+    {
+      from: 'arrowWeave.a',
+      to: 'bow.flight.hub.p',
+      why: "The keystone, one node off the projectiles hub (the user's editor link).",
+    },
   ],
 };

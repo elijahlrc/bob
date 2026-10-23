@@ -1,6 +1,6 @@
 /**
- * The Spire's left (the well road): the wheel off the well road, the recharge room (since G2, 2026-10-22, a pocket
- * between the Quiet Pulse road and the Undercroft road; Siphon moved to the Belfry, `frost.ts`), Composure (G3: energy
+ * The Spire's left (the well road): the wheel off the well road (the recharge room, Quickening, sat west of Quiet Pulse
+ * from G2 until G4 fix 1, 2026-10-22, when it moved to the Belfry's west climb, `frost.ts`, as Siphon had in G2), Composure (G3: energy
  * shield with avoid stun, a bridge from Quiet Pulse's road up to Broad Weave), the wand chain from the mana notable west to the flask chain that points at
  * the Cathedral (both swapped in from the east side on 2026-10-20), the junction, the Mind Bulwark spur, and the west road
  * (2026-10-19): a life pocket and a mana-leech pocket climbing from the junction to the fire arm's junction, so the well
@@ -10,8 +10,6 @@
 import {
   castSpeed,
   es,
-  esRecharge,
-  esRechargeDelay,
   flaskDuration,
   flaskEffect,
   int,
@@ -62,7 +60,7 @@ export const well: AreaSpec = {
           kind: 'notable',
           name: 'Glass Skin',
           lines: [es(16), mana(10)],
-          why: "Shield and the mana it sits beside: 3.2 + 1.25 units. The north-east exit, to the column. ES with recharge until G3 (2026-10-22, G1/mystic.md MY-r2): with Quickening moved west, the two would have been one pairing twice; Glass Skin is now the wheel's shield with mana, beside both mana keystones, and Quickening keeps the recharge.",
+          why: "Shield and the mana it sits beside: 3.2 + 1.25 units. The north-east exit, to the column. ES with recharge until G3 (2026-10-22, G1/mystic.md MY-r2): with Quickening moved away, the two would have been one pairing twice; Glass Skin is now the wheel's shield with mana, beside both mana keystones, and Quickening keeps the recharge, up the Belfry's west climb since G4 fix 1.",
         },
       ],
       links: [
@@ -75,48 +73,19 @@ export const well: AreaSpec = {
       ],
     },
     {
-      id: 'recharge',
-      name: 'Quickening',
-      why: "Recharge rate and a faster start of recharge: the energy-shield build's decision. Moved in G2 (2026-10-22, G1/mystic.md MY-m1) from the wheel's shield small, where Glass Skin, Quickening and Siphon sat three steps apart (a one-stop for the shield caster), to a pocket hanging as a bridge between the Quiet Pulse road and the Undercroft road: the recharge now lies west, past life. Each small sits on the straight line from the notable to the road node it leads to, so the pocket's tip, the notable, faces away from both roads.",
-      at: [-950, -2640],
-      shape: { kind: 'hand' },
-      nodes: [
-        {
-          id: 'a',
-          kind: 'small',
-          lines: [esRecharge(15)],
-          at: [-886, -2669],
-          why: 'The entrance, from the Quiet Pulse road.',
-        },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Quickening',
-          lines: [esRechargeDelay(30), esRecharge(15), es(5)],
-          at: [-950, -2640],
-          why: '3 + 1 + 1 units (trimmed from 5.3 in G3, MY-m1); the faster start is the half the sheet shows least and the fight feels most.',
-        },
-        {
-          id: 'b',
-          kind: 'small',
-          lines: [esRecharge(15)],
-          why: 'The exit, to the Undercroft road.',
-          at: [-1011, -2674],
-        },
-      ],
-      links: [
-        ['a', 'n'],
-        ['n', 'b'],
-      ],
-    },
-    {
       id: 'wandwork',
       name: 'Wandwork',
       why: "The wand caster's cluster, here beside the mana and not beside the spell damage: spell damage and cast speed while wielding a wand, off the mana notable. A wand caster who comes west for this passes the mana and the shield; the east wheel's spell damage is the other way to spend the same points. (Until 2026-10-20 it sat on the east wheel, one step from every other spell node, and the cost chain was here.)",
       at: [-750, -1780],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [wandSpellDamage(10)], at: [-772, -1800] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [wandSpellDamage(8)],
+          at: [-772, -1800],
+          why: 'One unit of wand spell damage (10% until G4 fix 1, 2026-10-22: a small is one unit).',
+        },
         {
           id: 'n',
           kind: 'notable',
@@ -318,18 +287,18 @@ export const well: AreaSpec = {
     {
       id: 'composure',
       name: 'Composure',
-      why: "Energy shield with avoid stun (G3 round 1, 2026-10-22; G1/mystic.md MY-8, the ledger's shield section MY-s3 folded in): the shield for the caster who gets knocked out of its casts. A bridge from Quiet Pulse's road node up to Broad Weave, laid straight on the line between them, two shield smalls before the notable and one after, so it is the Cloister's way up to the Column now that Siphon has moved north. Not linked to the Deep Well wheel: Glass Skin is six steps away and Quickening seven, so the shield caster's three near shield notables lie in three places with three partners (mana, stun, recharge). 13 steps from the Mystic start.",
+      why: "Energy shield with avoid stun (G3 round 1, 2026-10-22; G1/mystic.md MY-8, the ledger's shield section MY-s3 folded in): the shield for the caster who gets knocked out of its casts. A bridge from Quiet Pulse's road node up to Broad Weave, laid straight on the line between them, two avoid-stun smalls before the notable and one after, so it is the Cloister's way up to the Column now that Siphon has moved north. The smalls were energy shield until G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1, fix-1.md §1.2 item 9): every shield build took them, so the shield is on the notable and the smalls are its partner. Not linked to the Deep Well wheel: Glass Skin (shield with mana) is six steps away; the recharge (Quickening) moved to the Belfry's west climb in the same pass, so the shield caster's shield notables lie in three directions with three partners (mana at the wheel, stun here, recharge and hit recovery up the spine). 13 steps from the Mystic start.",
       at: [-442, -2714],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [es(5)],
+          lines: [stunAvoid(20)],
           at: [-540, -2635],
           why: "The entrance, from Quiet Pulse's road node.",
         },
-        { id: 'b', kind: 'small', lines: [es(5)], at: [-497, -2670] },
+        { id: 'b', kind: 'small', lines: [stunAvoid(20)], at: [-497, -2670] },
         {
           id: 'n',
           kind: 'notable',
@@ -341,7 +310,7 @@ export const well: AreaSpec = {
         {
           id: 'c',
           kind: 'small',
-          lines: [es(5)],
+          lines: [stunAvoid(20)],
           at: [-388, -2758],
           why: "The exit, on the straight line to Broad Weave's entrance.",
         },
@@ -355,18 +324,18 @@ export const well: AreaSpec = {
     {
       id: 'livingVerse',
       name: 'Living Verse',
-      why: "Spell damage with life (G3 round 2, 2026-10-22; G1/mystic.md MY-2): the life caster's own pair, kept far from both homes as the convergence rule asks of such pairs. A bridge from the second node of the road to the Undercroft over to the Zealot's crossing road (the Undercroft bridge, G2/borders.md §4), laid straight on the line between the two, so the wedge between the two crossing roads becomes a loop. Its two sides differ on purpose, each uniform: spell damage on the Mystic side, life on the Zealot side, so each start's caster pays in its own coin to reach the notable. Spell damage in the west at last: the Cloister was shield, mana and life with only the wand caster's cluster for offence. 20 steps from the Mystic start, about 18 from the Zealot's; Quiet Pulse (life) is 8 away and Keen Verse (spell) the far side of the map.",
+      why: "Spell damage with life (G3 round 2, 2026-10-22; G1/mystic.md MY-2): the life caster's own pair, kept far from both homes as the convergence rule asks of such pairs. A bridge from the second node of the road to the Undercroft over to the Zealot's crossing road (the Undercroft bridge, G2/borders.md §4), laid straight on the line between the two, so the wedge between the two crossing roads becomes a loop. All three smalls are life since G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1): the Mystic side's two were plain spell damage, so every caster took the cluster whatever its partner; now the smalls are the partner, the cluster is the life caster's, and the spell damage is on the notable. Spell damage in the west at last: the Cloister was shield, mana and life with only the wand caster's cluster for offence. 20 steps from the Mystic start, about 18 from the Zealot's; Quiet Pulse (life) is 8 away and Keen Verse (spell) the far side of the map.",
       at: [-1321, -2947],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [life(5)],
           at: [-1242, -2849],
           why: 'The entrance from the road to the Undercroft, on the straight line to the notable.',
         },
-        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [-1277, -2892] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-1277, -2892] },
         {
           id: 'n',
           kind: 'notable',
@@ -380,7 +349,7 @@ export const well: AreaSpec = {
           kind: 'small',
           lines: [life(5)],
           at: [-1365, -3001],
-          why: "The Zealot side: life, the life caster's coin from that start. On the straight line to the crossing road.",
+          why: 'The Zealot side, on the straight line to the crossing road.',
         },
       ],
       links: [
@@ -394,7 +363,7 @@ export const well: AreaSpec = {
     {
       from: 'toCrypt.r2',
       to: 'livingVerse.a',
-      why: "The road to the Undercroft onto Living Verse (MY-2): the road's second branch, beside Quickening.",
+      why: "The road to the Undercroft onto Living Verse (MY-2): the road's branch at its second node (Quickening also hung here until G4 fix 1).",
     },
     {
       from: 'livingVerse.c',
@@ -441,16 +410,6 @@ export const well: AreaSpec = {
       from: 'toCathedral.b',
       to: 'cathedral.home.hymn.b',
       why: 'The crossing lands on the Hymn pocket of the Narthex.',
-    },
-    {
-      from: 'toTap.a',
-      to: 'recharge.a',
-      why: 'The Quiet Pulse road onto the recharge pocket (G2, MY-m1): the shield caster who wants the faster recharge walks west past life to get it.',
-    },
-    {
-      from: 'recharge.b',
-      to: 'toCrypt.r2',
-      why: 'The recharge pocket onto the Undercroft road, so it is a bridge and the road to the Undercroft has something coming off it (it had nothing for four nodes).',
     },
     { from: 'deepWell.n1', to: 'wandwork.a', why: 'The mana notable onto the wand chain.' },
     { from: 'wandwork.n', to: 'draught.a', why: 'The wand chain lands on the flask chain.' },

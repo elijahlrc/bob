@@ -7,7 +7,7 @@
  * the caster alike. The signature (elemental damage, global defences, life, both attributes) is the loop's tip, and the
  * middle road leaves from it straight out: life three times to the block wheel. The west and east roads leaving the hubs
  * are strength-and-intelligence highways (2026-10-20). The west hub's pocket is the Wall's Warlord's Banner, one step away across the border (the aura
- * class's reservation, bought from the neighbour who wrote it first); the east hub has a mana pocket of its own; a
+ * class's reservation, bought from the neighbour who wrote it first); the east hub has a spell pocket of its own (Hymn, spell damage with lightning since G4 fix 1); a
  * pocket of elemental attacks hangs off the west road (a flask pocket until G3 round 2). The hubs carry both attributes and join the ring one node to either side.
  */
 import {
@@ -15,13 +15,12 @@ import {
   armour,
   attackSpeed,
   eleAttack,
+  eleDamage,
   eleDamageAll,
-  es,
   globalDefences,
   int,
   life,
-  mana,
-  manaRegen,
+  spellDamage,
   str,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -38,7 +37,7 @@ export const home: AreaSpec = {
   id: 'cathedral.home',
   region: 'zealot',
   name: 'The Narthex',
-  why: "Two stat nodes off the start (armour west, elemental damage east), the signature between them, two hubs one step out, and three roads: a highway to the west, life straight out, a highway to the east. The west hub's pocket is the Wall's Banner; the east hub's is mana.",
+  why: "Two stat nodes off the start (armour west, elemental damage east), the signature between them, two hubs one step out, and three roads: a highway to the west, life straight out, a highway to the east. The west hub's pocket is the Wall's Banner; the east hub's is Hymn, spell damage with lightning.",
   at: [-1202, -858], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
@@ -91,14 +90,14 @@ export const home: AreaSpec = {
     {
       id: 'hymn',
       name: 'Hymn',
-      why: "The east hub's pocket, a tight orbit pointing at the Spire: two mana nodes and a notable with mana, regeneration and a little shield. Auras reserve it and minions cost it; three points after the hub the Zealot has more of it.",
+      why: "The east hub's pocket, a tight orbit pointing at the Spire: a lightning small on either side of the notable with spell damage and lightning, the casting Zealot's first spell notable and the storm caster's own line. G4 fix 1 (2026-10-22, audit S1, fix brief §1.2 item 5): it was mana, regeneration and a little shield, in no plan at any budget, and every Zealot caster opened the same way (Zeal, Hearthfire, Vigil, Choirmaster) because the first spell line was the fire wheel's at 7 steps. Now points 3 to 5 fork for a caster: Hymn east (spell and lightning), the fire wheel through the transept (fire with cast speed), Ardour west for the striker. The Zealot's mana stays on Choirmaster and the Banner. Twins: Hearthfire (fire with cast speed) 6 steps away, First Light (spell damage with mana and shield) 10, Thunder Peal (lightning with regeneration and shocks) far.",
       at: P(330, 545),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [mana(8)],
+          lines: [eleDamage('lightning', 10)],
           at: P(319, 494),
           why: 'The entrance, facing the hub.',
         },
@@ -106,14 +105,14 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Hymn',
-          lines: [mana(16), manaRegen(10), es(5)],
+          lines: [spellDamage(16), eleDamage('lightning', 16)],
           at: P(340, 560),
-          why: '2 + 1 + 1 units.',
+          why: 'Spell damage and lightning: 2 + 1.6 units.',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [mana(8)],
+          lines: [eleDamage('lightning', 10)],
           at: P(379, 618),
           why: 'The far node, onto the east road.',
         },
@@ -191,7 +190,7 @@ export const home: AreaSpec = {
     {
       id: 'jT',
       name: 'The transept',
-      why: "Where the east road meets the nave wheel's fire side and the choir begins.",
+      why: "Where the east road meets the nave wheel's fire side and the choir begins; since G4 fix 1 Vigil's recovery chain leaves here too, beside the aura wheel's entrance.",
       at: P(880, 330),
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(880, 330) }],
@@ -253,7 +252,7 @@ export const home: AreaSpec = {
     {
       from: 'hymn.b',
       to: 'roadE.a',
-      why: 'The mana pocket is also a way onto the east road: a pocket as a bridge.',
+      why: 'The spell pocket is also a way onto the east road: a pocket as a bridge.',
     },
     { from: 'roadW.a', to: 'ardour.a', why: "The west road's first node onto the attack pocket." },
     { from: 'ardour.n', to: 'roadW.b', why: 'The attack pocket back onto the west road: a loop.' },

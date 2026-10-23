@@ -103,11 +103,11 @@ export const shield: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           at: [0, 2375],
           why: 'The entrance, top.',
         },
-        { id: 'b', kind: 'small', lines: [shieldBlock(3)], at: [91, 2428] },
+        { id: 'b', kind: 'small', lines: [shieldBlock(2)], at: [91, 2428] },
         {
           id: 'n1',
           kind: 'notable',
@@ -218,19 +218,19 @@ export const shield: AreaSpec = {
       at: [-680, 2500],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [shieldBlock(3)], at: [-460, 2620] },
-        { id: 'b', kind: 'small', lines: [shieldBlock(3)], at: [-600, 2700] },
+        { id: 'a', kind: 'small', lines: [shieldBlock(2)], at: [-460, 2620] },
+        { id: 'b', kind: 'small', lines: [shieldBlock(2)], at: [-600, 2700] },
         {
           id: 'c',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           at: [-740, 2780],
           why: 'The run lands on the west road.',
         },
         {
           id: 'd',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           at: [-1010, 2970],
           why: "The spur: one small off the west road's last node, a dead end.",
         },

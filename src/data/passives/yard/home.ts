@@ -4,7 +4,7 @@
  * small is one stat at the reference's size; nothing within three steps names a shield or a second sword.
  *
  * West side: melee physical damage, toward the blades. East side: attack speed, toward the second hand and the speed
- * cluster. The signature (speed, melee damage, life, both attributes) is the loop's tip, and the shield road leaves from
+ * cluster. The signature (speed, melee damage, both attributes) is the loop's tip, and the shield road leaves from
  * it straight down to the hub (it is life, since the user\'s review: block belongs to the shield area). Off the west hub, a life pocket pointing at the Wall; off the east hub, a block pocket
  * pointing at the Bow, both tight orbits. The hubs carry both attributes: a hybrid's sword asks for both.
  * The west and second-hand roads leaving the hubs are strength-and-dexterity highways (2026-10-20).
@@ -20,6 +20,7 @@ import {
   manaLeech,
   manaOnHit,
   meleePhys,
+  moveSpeed,
   shieldBlock,
   str,
   warcryEffect,
@@ -58,16 +59,16 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Quickened Steel',
-          lines: [attackSpeed(7), meleePhys(10), life(6), str(10), dex(10)],
+          lines: [attackSpeed(7), meleePhys(10), str(10), dex(10)],
           at: [0, 1240],
-          why: 'The signature: the Reaver is the fast melee class. Speed, melee damage, life and both attributes: 4.9 units. The shield road leaves from here.',
+          why: 'The signature: the Reaver is the fast melee class. Speed, melee damage and both attributes: 3.7 units. Its 6% life went in G4 fix 1 (2026-10-22): at 4.9 units it was among the richest generic notables, one ring step from two other homes, and late builds of other classes walked over to collect it (starts audit F6); the middle road below it sells life. The middle road leaves from here.',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [attackSpeed(8)],
+          lines: [attackSpeed(5)],
           at: [70, 1242],
-          why: 'The east side: speed.',
+          why: 'The east side: speed, one unit (5% since G4 fix 1; it was 8%).',
         },
       ],
       links: [
@@ -118,24 +119,24 @@ export const home: AreaSpec = {
     {
       id: 'block',
       name: 'Buckler',
-      why: "The east hub's pocket, a tight orbit pointing at the Bow: two block nodes and a block-and-shield-defences notable. Optional: the dual-wield Reaver walks past it.",
+      why: "The east hub's pocket, a tight orbit pointing at the Bow: two block nodes and a notable of block and evasion. Optional: the dual-wield Reaver walks past it.",
       at: [450, 1380],
       shape: { kind: 'ring', r: 75, a0: -139 },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           why: 'The entrance, facing the hub.',
           at: [365, 1347],
         },
-        { id: 'b', kind: 'small', lines: [shieldBlock(3)], at: [397, 1396] },
+        { id: 'b', kind: 'small', lines: [shieldBlock(2)], at: [397, 1396] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Buckler',
-          lines: [shieldBlock(5), evasion(13), life(5)],
-          why: 'The light shield: 2.5 + 1.3 + 1 units.',
+          lines: [shieldBlock(5), evasion(13)],
+          why: "The light shield: 2.5 + 1.3 units. Its 5% life went in G4 fix 1 (2026-10-22): a start notable at 4.8 units was a late stop for other classes' builds (starts audit F6).",
         },
       ],
       links: [
@@ -212,7 +213,7 @@ export const home: AreaSpec = {
     {
       id: 'fieldDressing',
       name: 'Field Dressing',
-      why: "Flask recovery twice, then the notable with recovery, duration and life: the Yard sold no flask lines, and the early game is life flasks. A pocket west of Stout Heart, its smalls on the way to the Wall, passed through to Fencer's Eye: the life pocket and the crit pocket are joined along the Wall border.",
+      why: "Flask recovery twice, then the notable with recovery, duration and movement: the Yard sold no flask lines, and the early game is life flasks. A pocket west of Stout Heart, its smalls on the way to the Wall: a bridge from Stout Heart to the Wall's Bracing (a near crossing), with the notable at the tip off the second small. Movement, not life, since G4 fix 1 (2026-10-22): flasks with life was Quartermaster's pairing five steps away in the Vanguard home (trade-offs audit F10), and the band between the two strength starts was all defence and flasks (starts audit F2); a flask that keeps you moving is the Reaver's.",
       at: [-700, 1290],
       shape: { kind: 'hand' },
       nodes: [
@@ -227,8 +228,8 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Field Dressing',
-          lines: [flaskRecovery(15), flaskDuration(10), life(5)],
-          why: "1.5 + 1 + 1 units. The exit, to Fencer's Eye.",
+          lines: [flaskRecovery(15), flaskDuration(10), moveSpeed(4)],
+          why: "Drink on the run: 1.5 + 1 + 1 units. The pocket's tip, off its west small.",
           at: [-693, 1340],
         },
         {

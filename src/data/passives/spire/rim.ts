@@ -4,12 +4,15 @@
  * between Shatter and Harsh Weather, up under the rim and down to the Shade's Rooftops: the top of the Spire gets an
  * outer road with clusters coming off it all along (Long Chant, the far spell cluster, Pinpoint, the crit wand, and Bad
  * Company, the hexing summoner, all G3 round 3; Snare Line, a bridge since G2) and a dear crossing to the Rooftops at its
- * foot (written by the border pass).
+ * foot (written by the border pass). G4 fix 1 (2026-10-22): Needlework, the Mystic–Shade seam cluster (attack speed with
+ * crit chance), bridges Pinpoint and the Shade's Black Powder.
  * The north-west rim road is the Lantern's (`fire.ts`); the two are joined across the top by the road through Shatter.
  * The export keeps the name `parapet` that index.ts imports.
  */
 import {
+  attackSpeed,
   castSpeed,
+  critChance,
   curseEffect,
   dex,
   int,
@@ -125,7 +128,7 @@ export const parapet: AreaSpec = {
     {
       id: 'pinpoint',
       name: 'Pinpoint',
-      why: "Wand attacks with crit chance and crit multiplier with wands (G3 round 3, 2026-10-22; G1/mystic.md MY-6): the crit wand, the fourth wand-attack cluster, each with its own partner and direction (accuracy at home, speed on the Scriptorium (Wand Volley), elements in the Lantern (Bright Wand), crit here). East and up is the Mystic's crit side. A bridge from Live Current's east small to the eaves road: the wand attacker coming up the Gallery pays the shock ring's smalls to reach it, and an intelligence-and-dexterity Shade from the Rooftops comes down the eaves road. A V with the bend at the notable, so it reaches r4 near the even fan of its three links and leaves Live Current's ring from its outer side.",
+      why: "Wand attacks with crit chance and crit multiplier with wands (G3 round 3, 2026-10-22; G1/mystic.md MY-6): the crit wand, the fourth wand-attack cluster, each with its own partner and direction (accuracy at home, speed on the Scriptorium (Wand Volley), elements in the Lantern (Bright Wand), crit here). East and up is the Mystic's crit side. A bridge from Live Current's east small to the eaves road: the wand attacker coming up the Gallery pays the shock ring's smalls to reach it, and an intelligence-and-dexterity Shade from the Rooftops comes down the eaves road. A V with the bend at the notable, so it reaches r4 near the even fan of its three links and leaves Live Current's ring from its outer side. Since G4 fix 1 (2026-10-22) its notable is also the Mystic end of the Mystic–Shade seam: Needlework (attack speed with crit chance) leads on from it to Black Powder.",
       at: [1359, -3944],
       shape: { kind: 'hand' },
       nodes: [
@@ -209,8 +212,55 @@ export const parapet: AreaSpec = {
         ['c', 'a'],
       ],
     },
+    {
+      id: 'needlework',
+      name: 'Needlework',
+      why: "Attack speed with crit chance (G4 fix 1, 2026-10-22; fix-1.md §1.1 seam 3): the Mystic–Shade seam cluster, for the quick, precise attacker from either side: the wand attacker coming down from Pinpoint, and the Shade's dagger and claw attackers coming up from Black Powder. Attack speed is the family both sides were thin in (the Mystic sold no attack speed, the Shade only weapon-specific speed), and crit chance is weighed by both sides' attackers and crit casters alike. A bridge on the straight line from Pinpoint's notable to Black Powder's, between Pain Conduit's keystone (below) and Bad Company (east), clear of both: two crit smalls on Pinpoint's side and one on Black Powder's, every small beside the notable and the room on the two end links. Three steps from Pinpoint, so the wand attacker who wants both pays for them (CONSTRAINTS §5.5). Twins: no other notable pairs attack speed with crit chance.",
+      at: [1597, -3776],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [critChance(15)],
+          at: [1495, -3848],
+          why: "The entrance from Pinpoint's notable, on the straight line to the notable.",
+        },
+        { id: 'b', kind: 'small', lines: [critChance(15)], at: [1540, -3816] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Needlework',
+          lines: [attackSpeed(10), critChance(22)],
+          at: [1597, -3776],
+          why: '2 + 1.5 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [critChance(15)],
+          at: [1654, -3736],
+          why: "The Shade side, on the straight line to Black Powder's notable.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
+    {
+      from: 'pinpoint.n',
+      to: 'needlework.a',
+      why: 'Pinpoint onto the seam cluster (G4 fix 1): the crit wand notable becomes a junction toward the Shade.',
+    },
+    {
+      from: 'needlework.c',
+      to: 'knife.hex.powder.n',
+      why: "The Mystic–Shade seam (G4 fix 1, fix-1.md §1.1 seam 3): Needlework onto Black Powder's notable, so the mine pocket at the top of the Stair and the crit wand on the Eaves are joined through a cluster both sides' attackers want, not a bare link. Far from both starts (20 steps from the Shade start, 22 from the Mystic start).",
+    },
     {
       from: 'road.r5',
       to: 'badCompany.a',

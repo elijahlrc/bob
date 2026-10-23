@@ -10,7 +10,6 @@ import {
   critChance,
   critMulti,
   daggerDamage,
-  damageVsLowLife,
   dex,
   dodgeAttack,
   dodgeSpell,
@@ -226,7 +225,7 @@ export const snares: AreaSpec = {
     {
       id: 'smear',
       name: 'Smeared Edge',
-      why: "The poisoned dagger (G3 round 2, 2026-10-22; the ledger's SH-4): a bridge straight across from the Bow's dear road to the road to Ricochet, between Mercy Stroke and the trap wheel: dagger damage once from the dear road, the notable with dagger damage and poison, poison once toward the Ricochet road. The dagger's attack homes, each with its own partner and direction: Fine Point by the start (crit), this one south (poison), Long Knives in the middle (speed and accuracy), Between Ribs far north-east (crit multiplier). The dagger small faces the way in from Fine Point and the poison small the Ricochet road, so a poison bow or claw coming up from the Strider pays a dagger small to reach it; Barbed Point, the Rookery's poison with crit, is the other way out of the trap junction (G1/shade.md §1.2: beside Barbed Point it would hand the poison dagger both for one path).",
+      why: "The poisoned dagger (G3 round 2, 2026-10-22; the ledger's SH-4): a bridge straight across from the Bow's dear road to the road to Ricochet, between Wasp Sting and the trap wheel: dagger damage once from the dear road, the notable with dagger damage and poison, poison once toward the Ricochet road. The dagger's attack homes, each with its own partner and direction: Fine Point by the start (crit), this one south (poison), Long Knives in the middle (speed and accuracy), Between Ribs far north-east (crit multiplier). The dagger small faces the way in from Fine Point and the poison small the Ricochet road, so a poison bow or claw coming up from the Strider pays a dagger small to reach it; Barbed Point, the Rookery's poison with crit, is the other way out of the trap junction (G1/shade.md §1.2: beside Barbed Point it would hand the poison dagger both for one path).",
       at: [2668, -315],
       shape: { kind: 'hand' },
       nodes: [
@@ -297,8 +296,8 @@ export const snares: AreaSpec = {
     },
     {
       id: 'mercy',
-      name: 'Mercy Stroke',
-      why: 'A pocket off the road to the Bow: crit multiplier twice, then the finishing blow, for the crit Shade of any weapon.',
+      name: 'Wasp Sting',
+      why: "A pocket off the road to the Bow, a bridge onto the Strider's poison arrows: crit multiplier twice, then crit multiplier with poison, the poison crit Shade's. G4 fix 1 (2026-10-22): it was Mercy Stroke, crit multiplier with damage against low life, the same notable as the Strider's Killing Eye; now its partner is the Shade's own poison. Poison's other notables keep other partners: Barbed Point (crit chance) nine steps up in the Rookery, Smeared Edge (a dagger) five steps across the barb, Rat Bite (attack speed) on the seawall, the Strider's Venom Fletching (chaos attacks) across the border link, three steps on.",
       at: [2649, -43],
       shape: { kind: 'hand' },
       nodes: [
@@ -307,10 +306,10 @@ export const snares: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Mercy Stroke',
-          lines: [critMulti(25), damageVsLowLife(10)],
+          name: 'Wasp Sting',
+          lines: [critMulti(25), poisonDamage(16)],
           at: [2714, 114],
-          why: '2.1 + 1.25 units.',
+          why: '2.1 + 1.3 units: the sting that lands hard and keeps burning.',
         },
       ],
       links: [
@@ -418,7 +417,7 @@ export const snares: AreaSpec = {
       to: 'knife.rim.wall.s6',
       why: "The rung lands on the seawall road's last node, between the road north and the Strider's outer road.",
     },
-    { from: 'toBow.b', to: 'mercy.a', why: 'The road onto Mercy Stroke.' },
+    { from: 'toBow.b', to: 'mercy.a', why: 'The road onto Wasp Sting.' },
     {
       from: 'toBow.b',
       to: 'smear.d',
@@ -432,7 +431,7 @@ export const snares: AreaSpec = {
     {
       from: 'mercy.n',
       to: 'bow.flight.venom.a',
-      why: "Crit poison (a near crossing; G1-brief.md §2.6, laid in the G2 border pass): Mercy Stroke onto Venom Fletching's first small, so Mercy Stroke stops being a dead end. The crit poison bow takes Mercy Stroke's crit multiplier beside Venom Fletching, and a Shade with a bow finds the poison arrows; it costs the Strider the pocket's small to pass, and the two notables stay three steps apart, a pairing rather than one cluster.",
+      why: "Crit poison (a near crossing; G1-brief.md §2.6, laid in the G2 border pass): Wasp Sting (Mercy Stroke until G4 fix 1) onto Venom Fletching's first small, so the pocket stops being a dead end. The crit poison bow takes Wasp Sting's crit multiplier and poison beside Venom Fletching's chaos and poison, and a Shade with a bow finds the poison arrows; it costs the Strider the pocket's small to pass, and the two notables stay three steps apart, a pairing rather than one cluster.",
     },
     { from: 'toRicochet.r1', to: 'tumble.a', why: 'The road onto Tumble.' },
     {

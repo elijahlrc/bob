@@ -1,8 +1,9 @@
 /**
  * The Rampart (the Wall's north-west): the Bulwark wheel off the rampart road (armour one side, mana on hit the other),
  * the junction with the Unerring Discipline spur and Hallowed Hammer, Steady Hands (the accuracy pocket), the Stagger
- * chain at the tower's top, the resist star's fire and chaos spokes arriving from the north, Stone Heart (life, stun
- * threshold) as a pocket off the tower road, and the road from Mortar and Stone to the tower's junction. Re-lined on
+ * chain at the tower's top, the resist star's fire and chaos spokes arriving from the north, Weak Spot (melee damage,
+ * melee crit; Stone Heart's life and stun threshold until G4 fix 1, 2026-10-22) as a pocket off the tower road, and
+ * the road from Mortar and Stone to the tower's junction. Re-lined on
  * 2026-10-20 (PHILOSOPHY §2a): Ox Hide and Unbloodied moved south, Iron Lungs and Stagger came here. Round 3
  * (2026-10-20): Bracing and Ox Hide traded places. G2 (2026-10-22): the Bulwark's two sides were life and armour,
  * which every strength build wants both of, on the home's road; Iron Lungs took the life notable's place, Stone Heart
@@ -13,16 +14,16 @@ import {
   accuracy,
   armour,
   attackSpeed,
+  critChance,
   enemyStunThreshold,
-  life,
   mana,
   manaLeech,
   manaOnHit,
+  meleePhys,
   physReduction,
   str,
   stunDamage,
   stunDuration,
-  stunThreshold,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -30,7 +31,7 @@ export const rampart: AreaSpec = {
   id: 'wall.rampart',
   region: 'vanguard',
   name: 'The Rampart',
-  why: "The Wall's north-west, under the battlements: the Bulwark wheel (armour or mana on hit), Stone Heart off the tower road, the accuracy pocket, Stagger and Unerring Discipline.",
+  why: "The Wall's north-west, under the battlements: the Bulwark wheel (armour or mana on hit), Weak Spot (melee crit) off the tower road, the accuracy pocket, Stagger and Unerring Discipline.",
   at: [-2312, 720], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved down off the Bulwark's notables in G2 (2026-10-22).
   clusters: [
     {
@@ -103,26 +104,26 @@ export const rampart: AreaSpec = {
     },
     {
       id: 'stoneHeart',
-      name: 'Stone Heart',
-      why: "Life twice, then the life notable with stun threshold: a pocket off the tower road, whose life smalls lead to it, so west of the Gate is the life direction and north-west (the Bulwark) the armour (G2, 2026-10-22: it was the Bulwark's life side, and Ox Hide, which was here, went to the west rim).",
-      at: [-1931, 880],
+      name: 'Weak Spot',
+      why: "Melee crit chance twice, then the notable with melee physical damage and melee crit chance: the blow that finds the gap in the plate, for any melee weapon, a pocket off the tower road eight points from the start (G4 fix 1, 2026-10-22; the id is Stone Heart's, which sold life with stun threshold here). The home's west was life three times on the road and life again in this pocket, the Vanguard's steps 5 to 8 the least offence of any start (CONSTRAINTS §4.8), and the Vanguard sold almost no crit (§4.6); Scarred Hide, the Reaver's, kept the same pairing as Stone Heart (§5.1). Crit's other Wall homes have other partners: Crushing Blow sells it with a mace and the multiplier, Unbloodied on full life. Not the crit multiplier: that is the Reaver–Strider seam's partner. A straight chain from its road node, on the line the branch leaves the tower road by.",
+      at: [-1929, 717],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [life(5)],
-          at: [-1808, 846],
+          lines: [critChance(15, ['melee'])],
+          at: [-1805, 728],
           why: 'The entrance, from the road.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-1864, 861] },
+        { id: 'b', kind: 'small', lines: [critChance(15, ['melee'])], at: [-1860, 723] },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Stone Heart',
-          lines: [life(12), stunThreshold(16)],
-          at: [-1931, 880],
-          why: 'Life with the stun threshold life is for: 2.4 + 2 units, nothing conditional. The tip.',
+          name: 'Weak Spot',
+          lines: [meleePhys(20), critChance(22, ['melee'])],
+          at: [-1929, 717],
+          why: 'Melee physical damage with melee crit chance: 2 + 1.5 units, 3.5. The tip, a dead end off the life road.',
         },
       ],
       links: [
@@ -258,10 +259,10 @@ export const rampart: AreaSpec = {
     {
       id: 'toThickSkin',
       name: 'A road',
-      why: 'Strength once between the tower road and Stone Heart (the pocket was Ox Hide until G2, 2026-10-22).',
-      at: [-1669, 808],
+      why: 'Strength once between the tower road and Weak Spot (the pocket was Ox Hide until G2, Stone Heart until G4 fix 1, 2026-10-22). It leaves the road about 40° off its line (G4 fix 1: it left 20° off, so it read as a fork in the road rather than a branch), and the pocket runs straight on from it.',
+      at: [-1665, 740],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-1669, 808] }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-1665, 740] }],
       links: [],
     },
     {
@@ -281,9 +282,13 @@ export const rampart: AreaSpec = {
     {
       from: 'wall.home.roadM.b',
       to: 'wall.rampart.toThickSkin.a',
-      why: 'Strength once between the tower road and Stone Heart.',
+      why: 'Strength once between the tower road and Weak Spot.',
     },
-    { from: 'toThickSkin.a', to: 'stoneHeart.a', why: 'The far end of the road.' },
+    {
+      from: 'toThickSkin.a',
+      to: 'stoneHeart.a',
+      why: 'The far end of the road: Weak Spot, straight on.',
+    },
     { from: 'bulwark.a', to: 'ironLungs.a', why: "The wheel's entrance onto the sustain side." },
     { from: 'ironLungs.b', to: 'bulwark.e', why: 'The sustain side meets the armour side.' },
     {

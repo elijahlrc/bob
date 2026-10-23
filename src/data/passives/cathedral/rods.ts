@@ -10,6 +10,7 @@ import {
   eleDamageAll,
   int,
   shieldBlock,
+  shieldSpellBlock,
   spellBlock,
   staffDamage,
   str,
@@ -225,9 +226,54 @@ export const rods: AreaSpec = {
         ['b', 'k'],
       ],
     },
+    {
+      id: 'guard',
+      name: 'Twofold Guard',
+      why: "G4 fix 1 (2026-10-22), seam 5 of the fix brief (§1.1, the Zealot–Vanguard seam cluster; audit B2): a straight bridge south from Warding Staff across the border to the Vanguard's Graven Posts, block with a shield, the notable with block and spell block with a shield, block with a shield again. The shield caster's block (it stood flat from 100 to 140 points) and the mace-and-shield Vanguard's (flat from 80), both sides' want, on the line the G3 border pass tested. A pairing the tree did not have: shield block's other notables pair it with armour, the shield's defences, stun, evasion, life, cold or a weapon (Locked Shields about 7 steps away, Frozen Font 8, Iron Faith 10), spell block's with energy shield, mana on block, resistances, life on block or a staff. Warding Staff, one step back, is the staff's spell block: a staff or a shield, never both, since a staff takes two hands. Idle Hands' spur is untouched; Warding Staff and Graven Posts become junctions of three.",
+      at: P(1435, -1276),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [shieldBlock(2)],
+          at: P(1474, -1218),
+          why: 'The entrance from Warding Staff, on the straight line to Graven Posts.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Twofold Guard',
+          lines: [shieldBlock(4), shieldSpellBlock(4)],
+          at: P(1435, -1276),
+          why: 'Block and spell block with a shield: 2 + 2 units.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [shieldBlock(2)],
+          at: P(1396, -1334),
+          why: "The far node, onto the Vanguard's Graven Posts.",
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
+    },
   ],
   links: [
     { from: 'wheel.r4', to: 'jR.a', why: 'Through the wheel to the rods junction.' },
+    {
+      from: 'warding.n',
+      to: 'guard.a',
+      why: 'Warding Staff onto the shield-block bridge (G4 fix 1, seam 5), straight south.',
+    },
+    {
+      from: 'guard.b',
+      to: 'wall.resists.posts.n',
+      why: "Seam 5 (G4 fix 1; fix brief §1.1): Twofold Guard's far small lands on the Vanguard's Graven Posts, the one border link this seam lays. The shield caster and the mace-and-shield Vanguard meet on block; Graven Posts stays 16 steps from the Zealot start, so the seam is no near-home shortcut.",
+    },
     {
       from: 'jR.a',
       to: 'cathedral.pyre.wheel.f1',

@@ -3,7 +3,8 @@
  * junction to the Undercroft's shrine, so the two arms that each hung off one node are joined at their far ends, and a
  * second road from the Vestry's junction straight out to it. Clusters hang off it into the ground that was empty: the
  * staff caster and fire strikes outward, armour with a shield and the second brand cluster inward, and the melee
- * Zealot's leech on the Wall side between the Vestry's crossing road and the tower.
+ * Zealot's leech on the Wall side between the Vestry's crossing road and the tower. The Rampart road off the leech
+ * bridge ends in Battle Hymn, the warcry bridge to the Wall (G4 fix 1, 2026-10-22: its leg to Stagger was cut).
  */
 import {
   areaDamage,
@@ -242,7 +243,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'toWall',
       name: 'To the Rampart',
-      why: "A road of four attribute nodes from the leech bridge past Idle Hands to the Wall's Stagger, which was a dead end: the Wall and the Cathedral meet on their outer sides as well as at home. Cathedral attributes on the Cathedral half, strength on the Wall half.",
+      why: "A road of two attribute nodes from the leech bridge toward the Wall, its end turning into Battle Hymn, whose far small lands on the Wall's Hymn road: the Wall and the Cathedral meet on their outer sides as well as at home. G4 fix 1 (2026-10-22, audit N6, fix brief §1.2 item 4): it ran on by two strength nodes (`c`, `d`, retired) to the Wall's Stagger, a second bare crossing 300 units from Battle Hymn's for the same warcry corner, walked by no build; the corner's one crossing is now Battle Hymn, a bridge, and seam 5 (Twofold Guard, `rods.ts`) joins the two regions farther in.",
       at: P(1900, -1400),
       shape: { kind: 'hand' },
       nodes: [
@@ -251,39 +252,45 @@ export const ambulatory: AreaSpec = {
           id: 'b',
           kind: 'attribute',
           lines: [str(6), int(6)],
-          at: P(1900, -1400),
-          why: 'Where the warcry pocket leaves.',
+          at: P(2071, -1288),
+          why: 'The end of the road, on the straight line on into the warcry bridge (moved in G4 fix 1, when its leg to Stagger went).',
         },
-        { id: 'c', kind: 'attribute', lines: [str(7)], at: P(1868, -1521) },
-        { id: 'd', kind: 'attribute', lines: [str(7)], at: P(1835, -1644) },
       ],
-      links: [
-        ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'd'],
-      ],
+      links: [['a', 'b']],
     },
     {
       id: 'hymn',
       name: 'Battle Hymn',
-      why: "A pocket outward off the Rampart road: warcry effect twice, then warcries with aura effect, the Zealot's shout among its auras. The second warcry cluster; War Drums, in the Wall's Barrows, sells louder and longer shouts.",
-      at: P(2280, -1560),
+      why: "A bridge from the end of the Rampart road to the Wall's Hymn road: warcry effect, the notable with warcries and aura effect (the Zealot's shout among its auras), warcry effect. The second warcry cluster; War Drums, in the Wall's Barrows, sells louder and longer shouts. G4 fix 1 (2026-10-22, audit N6, fix brief §1.2 item 4): it was a pocket whose second small the Wall's road also reached, the notable a dead end beyond it; now the notable sits between its two smalls on one straight line from the Rampart road's junction to the Wall's Hymn road, so it is the corner's one crossing and a bridge.",
+      at: P(2087, -1447),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: P(2335, -1492) },
-        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: P(2391, -1505) },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: P(2080, -1377),
+          why: 'The entrance from the Rampart road, on the line to the notable.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: P(2094, -1517),
+          why: "The far node, on the line to the Wall's Hymn road, which lands here.",
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Battle Hymn',
           lines: [warcryEffect(15), auraEffect(10)],
-          at: P(2460, -1520),
+          at: P(2087, -1447),
           why: '1.5 + 1.7 units.',
         },
       ],
       links: [
-        ['a', 'b'],
-        ['b', 'n'],
+        ['a', 'n'],
+        ['n', 'b'],
       ],
     },
     {
@@ -335,7 +342,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'censer',
       name: 'Censer',
-      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with life, `rim.ts`) bridges it to the Vanguard's Grim Oath, so it is a junction of three; Brazier, off the far end of the outer walk, is burning with the sceptre.",
+      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with movement, `rim.ts`) bridges it to the Vanguard's Grim Oath, so it is a junction of three; Brazier, off the far end of the outer walk, is burning with the sceptre.",
       at: [-3554, -638],
       shape: { kind: 'hand' },
       nodes: [
@@ -362,11 +369,10 @@ export const ambulatory: AreaSpec = {
     { from: 'walk.w4', to: 'ossuary.a', why: 'The walk onto the minion pocket.' },
     { from: 'tithe.a', to: 'toWall.a', why: 'The leech bridge onto the Rampart road.' },
     {
-      from: 'toWall.d',
-      to: 'wall.rampart.stagger.n',
-      why: 'The Rampart road lands on Stagger, which now has a second way in.',
+      from: 'toWall.b',
+      to: 'hymn.a',
+      why: "The Rampart road onto the warcry bridge: Battle Hymn's first small, on the line to the notable.",
     },
-    { from: 'toWall.b', to: 'hymn.a', why: 'The Rampart road onto the warcry pocket.' },
     { from: 'cathedral.pyre.jF.a', to: 'walk.w1', why: 'The tower junction onto the walk.' },
     {
       from: 'walk.w7',

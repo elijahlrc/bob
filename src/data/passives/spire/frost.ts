@@ -8,6 +8,8 @@
  * the Cloister as a bridge from the east join to the arm's junction, and Snare Line became a bridge onto the Eaves (`rim.ts`).
  * G3 round 2 (2026-10-22): Piercing Word left the west climb for a chain from the east join to Harsh Weather, and High
  * Veil is reached from the north-west rim road only, so the climb is no longer one destination for the cold shield caster.
+ * G4 fix 1 (2026-10-22): Quickening (the shield recharge) moved here from the Cloister, an arc off the west climb, and
+ * the Prismatic spur lost its third small.
  */
 import {
   ailmentEffect,
@@ -20,6 +22,8 @@ import {
   es,
   esLeech,
   esOnHit,
+  esRecharge,
+  esRechargeDelay,
   freezeChance,
   freezeDuration,
   int,
@@ -104,25 +108,17 @@ export const frost: AreaSpec = {
     {
       id: 'prismatic',
       name: 'Prismatic Balance',
-      why: "Three nodes of elemental damage, then the trade: hits give +25% to the hit's elements and -50% to the others for 5 s. Only a two-element rotation profits, which is why it runs from the fire join toward the ignite room, with a way in from each.",
+      why: "Two nodes of elemental damage, then the trade: hits give +25% to the hit's elements and -50% to the others for 5 s. Only a two-element rotation profits. A spur off the west join toward the ignite room, a dead end. Its third small went in G4 fix 1 (2026-10-22, audit/growth-1/starts.md F5 and F8): the keystone was 20 steps out on a spur of three, one step nearer now; the keystone sits where the third small was pulled in along the spur's own line.",
       at: [-480, -3780],
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [-745, -3962] },
         { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [-790, -3999] },
-        {
-          id: 'c',
-          kind: 'small',
-          lines: [eleDamageAll(8)],
-          at: [-834, -4036],
-          why: 'Where the ignite room arrives.',
-        },
-        { id: 'k', kind: 'keystone', name: 'Prismatic Balance', lines: [], at: [-900, -4090] },
+        { id: 'k', kind: 'keystone', name: 'Prismatic Balance', lines: [], at: [-856, -4053] },
       ],
       links: [
         ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'k'],
+        ['b', 'k'],
       ],
     },
     {
@@ -141,8 +137,13 @@ export const frost: AreaSpec = {
       at: [0, -4080],
       shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [freezeChance(5)], why: 'The entrance, south.' },
-        { id: 'b', kind: 'small', lines: [freezeChance(5)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [freezeChance(8)],
+          why: 'The entrance, south. One unit of freeze chance (5% until G4 fix 1, 2026-10-22).',
+        },
+        { id: 'b', kind: 'small', lines: [freezeChance(8)] },
         {
           id: 'n',
           kind: 'notable',
@@ -150,7 +151,7 @@ export const frost: AreaSpec = {
           lines: [eleDamage('cold', 12), freezeChance(10), penetration('cold', 4)],
           why: '1.2 + 1.25 + 2 units. The north exit.',
         },
-        { id: 'c', kind: 'small', lines: [freezeChance(5)] },
+        { id: 'c', kind: 'small', lines: [freezeChance(8)] },
       ],
       links: [
         ['a', 'b'],
@@ -206,7 +207,7 @@ export const frost: AreaSpec = {
     {
       id: 'toShatter',
       name: 'The west climb to Shatter',
-      why: "Two intelligence nodes from the Lantern junction up to Shatter's west side: the top of the Spire, Shatter and Fever Pitch had one way in, through Thunderhead.",
+      why: "Two intelligence nodes from the Lantern junction up to Shatter's west side: the top of the Spire, Shatter and Fever Pitch had one way in, through Thunderhead. Since G4 fix 1 (2026-10-22) both nodes carry Quickening's arc, and the upper one Steady Stream as well, so the climb has a branch at each node.",
       at: [-255, -3773],
       shape: { kind: 'hand' },
       nodes: [
@@ -292,6 +293,41 @@ export const frost: AreaSpec = {
       ],
     },
     {
+      id: 'quickening',
+      name: 'Quickening',
+      why: "Recharge rate and a faster start of recharge: the energy-shield build's decision. Moved here in G4 fix 1 (2026-10-22, audit/growth-1/tradeoffs.md F6) from the Cloister, where it sat with Glass Skin and Composure on the walk west that was every intelligence caster's first half from both the Mystic and the Zealot starts (14 steps from the Zealot's, nearer than from the Mystic's own). Here it is the spine's second shield notable, seven steps from Siphon (shield from hitting) by the shortest way, so the shield caster's three directions are mana at the wheel, stun in the Cloister and recovery up the spine, and the recharge is a Mystic commitment of its own. A V hung outward between the two nodes of the west climb to Shatter, its notable at the tip in the open ground between the climb and the Prismatic spur, a small on the straight line to each road node: walking the climb costs none of it.",
+      at: [-397, -3938],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [esRecharge(15)],
+          at: [-351, -3885],
+          why: "The entrance from the climb's lower node, on the straight line to the notable.",
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Quickening',
+          lines: [esRechargeDelay(30), esRecharge(15), es(5)],
+          at: [-397, -3938],
+          why: '3 + 1 + 1 units; the faster start is the half the sheet shows least and the fight feels most. The tip of the V.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [esRecharge(15)],
+          at: [-327, -3934],
+          why: "The exit to the climb's upper node, on the straight line from the notable.",
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
+    },
+    {
       id: 'stream',
       name: 'Steady Stream',
       why: "A pocket outward off the road to Shatter: damage with channelling skills twice, then channelling with cheaper mana. The channelled spell drinks mana for as long as it is held; the Fosse's Ceaseless Blades sells channelling to attackers, with speed and footing. Round 4 (the user approved channelling as two notables, 2026-10-20).",
@@ -317,18 +353,18 @@ export const frost: AreaSpec = {
     {
       id: 'piercing',
       name: 'Piercing Word',
-      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went). Moved in G3 round 2 (2026-10-22, the user's ask) off the west climb to Shatter, where Hoarfrost, this, Shatter and High Veil lay 4 to 10 steps apart and read as one destination for a cold caster. Now a chain from the east join up to Harsh Weather's notable, in the open ground between Siphon, Harsh Weather and the Gallery: a cold caster at the top of the column chooses between the cold of the climb (Hoarfrost west, Shatter north) and spell damage north-east, 10 and 7 steps away, and Harsh Weather stops being a dead end. Measured against three other places (the west climb, the north-west rim road beside High Veil): this one left the casters hungriest for both spell damage and shield at 120 points without raising their tax. Spell damage's partners by direction: cast speed (Ready Wit), crit (Keen Verse), life (Living Verse), penetration here, mana regeneration on the Eaves (later). Two smalls on the join's side, one on Harsh Weather's.",
+      why: "Spell damage with elemental penetration (G3 round 1, 2026-10-22; G1/mystic.md MY-11, where the ledger's spell section MY-s1 went). Moved in G3 round 2 (2026-10-22, the user's ask) off the west climb to Shatter, where Hoarfrost, this, Shatter and High Veil lay 4 to 10 steps apart and read as one destination for a cold caster. Now a chain from the east join up to Harsh Weather's notable, in the open ground between Siphon, Harsh Weather and the Gallery: a cold caster at the top of the column chooses between the cold of the climb (Hoarfrost west, Shatter north) and spell damage north-east, 10 and 7 steps away, and Harsh Weather stops being a dead end. Measured against three other places (the west climb, the north-west rim road beside High Veil): this one left the casters hungriest for both spell damage and shield at 120 points without raising their tax. Spell damage's partners by direction: cast speed (Ready Wit), crit (Keen Verse), life (Living Verse), penetration here, mana regeneration on the Eaves (Long Chant). Two elemental damage smalls on the join's side, one on Harsh Weather's: they were plain spell damage until G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1), so every caster took the cluster whatever its partner; now they are the elemental caster's, the partner penetration serves, and the plain spell damage is on the notable.",
       at: [444, -3796],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [eleDamageAll(10)],
           at: [376, -3691],
           why: 'The entrance from the east join, on the straight line to the notable.',
         },
-        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [406, -3738] },
+        { id: 'c', kind: 'small', lines: [eleDamageAll(10)], at: [406, -3738] },
         {
           id: 'n',
           kind: 'notable',
@@ -340,7 +376,7 @@ export const frost: AreaSpec = {
         {
           id: 'b',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [eleDamageAll(10)],
           at: [482, -3855],
           why: "The exit, on the straight line to Harsh Weather's notable.",
         },
@@ -395,6 +431,16 @@ export const frost: AreaSpec = {
       from: 'toShatter.r2',
       to: 'stream.a',
       why: 'The road to Shatter onto the channelled spells.',
+    },
+    {
+      from: 'toShatter.r1',
+      to: 'quickening.a',
+      why: "The west climb's lower node onto Quickening (G4 fix 1): one leg of the arc.",
+    },
+    {
+      from: 'quickening.b',
+      to: 'toShatter.r2',
+      why: "Quickening onto the climb's upper node: the arc is a bridge between the climb's two nodes, so the climb has a branch at each and the recharge is never a toll on it.",
     },
     {
       from: 'jStorm.a',

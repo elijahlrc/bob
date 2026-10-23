@@ -291,7 +291,7 @@ export const edge: AreaSpec = {
     {
       from: 'rake.c',
       to: 'knife.snares.toBow.a',
-      why: "The fast claw lands on the Bow's dear road where the Strider's stub arrives: the claw cluster is a bridge between the Alleys and the Docks' south, so a claw Shade reaches Mercy Stroke and the Strider's poison without walking back to the trap junction.",
+      why: "The fast claw lands on the Bow's dear road where the Strider's stub arrives: the claw cluster is a bridge between the Alleys and the Docks' south, so a claw Shade reaches Wasp Sting (crit with poison) and the Strider's poison without walking back to the trap junction.",
     },
     { from: 'star.f', to: 'wheel.w5', why: 'The fire spoke lands on Fine Point.' },
     {

@@ -13,7 +13,6 @@
 import {
   castSpeed,
   costReduction,
-  curseArea,
   curseEffect,
   daggerSpellDamage,
   dex,
@@ -30,7 +29,6 @@ import {
   moveSpeed,
   reducedReservation,
   resOne,
-  skillDuration,
   spellCritMulti,
   spellDamage,
   wandAttack,
@@ -48,7 +46,7 @@ export const craft: AreaSpec = {
     {
       id: 'focus',
       name: 'Ready Wit',
-      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Mana at both ends, which every caster uses. Damage and cast speed on the north side (Ready Wit); chaos resistance and mana on the south (Warded Mind), the defence a caster forgets until a poisoner finds it. Until G3 (2026-10-22, G1/mystic.md MY-r1) the south side was energy shield, so the wheel handed a caster spell damage and energy shield on its two sides seven steps out; the near energy shield is west now (Glass Skin). The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms, Keen Verse on the east road.",
+      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Each notable's two smalls are its own lines (G4 fix 1, 2026-10-22, audit/growth-1/discipline.md F6: the north-east small was mana, so Ready Wit's side mixed spell damage and mana): Ready Wit, damage and cast speed, on the north side, with a spell damage small and a cast speed small; Warded Mind, chaos resistance and mana, on the south, with a mana small and a chaos resistance small, the defence a caster forgets until a poisoner finds it. Cast speed rather than a second spell damage small, so spell damage near home stays scarce. Until G3 (2026-10-22, G1/mystic.md MY-r1) the south side was energy shield, so the wheel handed a caster spell damage and energy shield on its two sides seven steps out; the near energy shield is west now (Glass Skin). The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms, Keen Verse on the east road.",
       at: [469, -2000],
       shape: { kind: 'ring', r: 80, a0: 150 },
       nodes: [
@@ -61,7 +59,12 @@ export const craft: AreaSpec = {
           lines: [spellDamage(20), castSpeed(6)],
           why: '2.5 + 1.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [mana(8)], why: 'The north-east exit, to the junction.' },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [castSpeed(4)],
+          why: "The north-east exit, to the junction: Ready Wit's cast speed (mana until G4 fix 1).",
+        },
         {
           id: 'd',
           kind: 'small',
@@ -203,7 +206,7 @@ export const craft: AreaSpec = {
     {
       id: 'hexwright',
       name: 'Hexwright',
-      why: "Curse effect twice, then the notable with curse effect, curse area and skill duration: the curse caster's pocket, the first of the east road, above the Kept Vows chain. It was the chain toward the Knife until round 3 (2026-10-20), three steps from the Stair's chaos-spell notable and seven from Second Curse, so a chaos hexer was done by point 17; now they are seven and eleven.",
+      why: "Curse effect twice, then the notable with curse effect and mana regeneration: the curse caster's pocket, the hexer who keeps casting its curses (G4 fix 1, 2026-10-22, audit/growth-1/discipline.md F2: its curse area was a dead line, since a cast curse uses its gem's own radius, and its skill duration probably does not reach a cast curse either; cast speed would copy Grim Oath's pairing). It is the first of the east road, above the Kept Vows chain. It was the chain toward the Knife until round 3 (2026-10-20), three steps from the Stair's chaos-spell notable and seven from Second Curse, so a chaos hexer was done by point 17; now they are seven and eleven.",
       at: [1260, -2750],
       shape: { kind: 'ring', r: 80, a0: 90 },
       nodes: [
@@ -219,8 +222,8 @@ export const craft: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Hexwright',
-          lines: [curseEffect(12), curseArea(15), skillDuration(10)],
-          why: '1.5 + 1.5 + 1 units.',
+          lines: [curseEffect(20), manaRegen(15)],
+          why: '2.5 + 1.5 units.',
         },
       ],
       links: [
@@ -359,18 +362,18 @@ export const craft: AreaSpec = {
     {
       id: 'keenVerse',
       name: 'Keen Verse',
-      why: "Spell damage with the spell crit multiplier (G3 round 1, 2026-10-22; G1/mystic.md MY-1): the crit caster's spell damage, on the east, the Mystic's crit side. A bridge across the gap between Wand Volley, Hexwright and Mist Walk, from the road to Wand Volley up to the road between Mist Walk and Hexwright, laid as a V with the notable at its tip and two spell damage smalls on each leg (the ledger's spell section MY-s2 folded in). Spell damage is the flattest stat of every caster; this is its east direction, with crit as the partner, where Ready Wit (8 steps) sells it with cast speed, the spine's Piercing Word with penetration, and the Eaves (G3, later round) with regeneration. Steps from the Mystic start: 17.",
+      why: "Spell damage with the spell crit multiplier (G3 round 1, 2026-10-22; G1/mystic.md MY-1): the crit caster's spell damage, on the east, the Mystic's crit side. A bridge across the gap between Wand Volley, Hexwright and Mist Walk, from the road to Wand Volley up to the road between Mist Walk and Hexwright, laid as a V with the notable at its tip and two spell crit multiplier smalls on each leg. The smalls were plain spell damage until G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1): every caster took the cluster whatever its partner, and spell damage at 120 points doubled; now the smalls are the partner, so the cluster is the crit caster's and the plain spell damage is on the notable only. Spell damage's directions: cast speed (Ready Wit, 8 steps), crit here, penetration (Piercing Word), regeneration (Long Chant), life (Living Verse). Steps from the Mystic start: 17.",
       at: [1000, -2930],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [spellCritMulti(12)],
           at: [957, -2813],
           why: 'The entrance from the road to Wand Volley, on the straight line to the notable.',
         },
-        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [976, -2864] },
+        { id: 'b', kind: 'small', lines: [spellCritMulti(12)], at: [976, -2864] },
         {
           id: 'n',
           kind: 'notable',
@@ -379,11 +382,11 @@ export const craft: AreaSpec = {
           at: [1000, -2930],
           why: '2.5 + 1.5 units. The tip of the V; the bend is here, at the notable.',
         },
-        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [1070, -2935] },
+        { id: 'c', kind: 'small', lines: [spellCritMulti(12)], at: [1070, -2935] },
         {
           id: 'd',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [spellCritMulti(12)],
           at: [1125, -2938],
           why: 'The exit, on the straight line to the road node between Mist Walk and Hexwright.',
         },

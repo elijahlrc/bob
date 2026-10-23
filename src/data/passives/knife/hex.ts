@@ -47,10 +47,10 @@ export const hex: AreaSpec = {
     {
       id: 'road',
       name: 'The barb road',
-      why: 'Energy shield once, between the junction and the wheel: the one road node of the barb.',
+      why: "One attribute node between the junction and the wheel: the barb's road reads as a road. G4 fix 1 (2026-10-22): it was a lone energy shield small belonging to no notable.",
       at: P(1350, -540),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'small', lines: [es(5)], at: P(1350, -540) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1350, -540) }],
       links: [],
     },
     {

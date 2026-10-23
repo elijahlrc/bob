@@ -8,6 +8,7 @@
 import {
   accuracy,
   attackSpeed,
+  avoidAilments,
   bowDamage,
   critMulti,
   dex,
@@ -22,7 +23,6 @@ import {
   fervourOnKill,
   life,
   maxFervour,
-  moveSpeed,
   physAttack,
   str,
   swordDamage,
@@ -40,7 +40,7 @@ export const dual: AreaSpec = {
     {
       id: 'twinFangs',
       name: 'Twin Fangs',
-      why: "The wheel off the second-hand road: attack speed at the entrance, then dual wield on the top side (Twin Fangs: damage, speed and the second blade's block) or evasion on the bottom side (Weaving), the Reaver's dexterity defence. Passed through to the gate on the east and the junction below, so the route takes one side.",
+      why: "The wheel off the second-hand road: attack speed at the entrance, then dual wield on the top side (Twin Fangs: damage, speed and the second blade's block) or evasion on the bottom side (Weaving: evasion with avoid elemental ailments since G4 fix 1), the Reaver's dexterity defence. Passed through to the gate on the east and the junction below, so the route takes one side.",
       at: [560, 1800],
       shape: { kind: 'hand' },
       nodes: [
@@ -78,9 +78,9 @@ export const dual: AreaSpec = {
           id: 'n2',
           kind: 'notable',
           name: 'Weaving',
-          lines: [evasion(20), life(5)],
+          lines: [evasion(20), avoidAilments(20)],
           at: [507, 1891],
-          why: 'Evasion and life: 2 + 1 units.',
+          why: "Evasion with avoid elemental ailments: 2 + 2 units. Life out since G4 fix 1 (2026-10-22): evasion with life was the pairing of Hard Target and Wanderer too, three of them about 7 steps from the Strider start in three directions, so the evasion choice there was which copy first (trade-offs audit F2). Slipping the blow and shaking off the burn and the chill is the Reaver's own evasion.",
         },
       ],
       links: [
@@ -179,7 +179,7 @@ export const dual: AreaSpec = {
     {
       id: 'sidestep',
       name: 'Sidestep',
-      why: "Dodge: a node, then the notable with movement and evasion, between the wheel's east side and the east junction. The Reaver who kites, and the Strider who came through the gate for a defence it knows.",
+      why: "Dodge: a node, then the notable with dodge and block while dual wielding, between the wheel's east side and the east junction: the Lists' dodge, for the Reaver with a blade in each hand who has no shield to block with. It sold dodge, movement and evasion until G4 fix 1 (2026-10-22), the same lines as the Shade home's Soft Step, both within 7 steps of the Strider start (trade-offs audit F5); Soft Step stays that evasion. The other dual-wield dodge, Feint and Cut on the Knife's Seawall, sells dual damage and is far.",
       at: [890, 1940],
       shape: { kind: 'hand' },
       nodes: [
@@ -188,9 +188,9 @@ export const dual: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Sidestep',
-          lines: [dodgeAttack(5), moveSpeed(4), evasion(8)],
+          lines: [dodgeAttack(5), dualBlock(4)],
           at: [900, 2020],
-          why: '1.7 + 1 + 0.8 units.',
+          why: 'Step aside, or catch it on the second blade: 1.7 + 2 units.',
         },
       ],
       links: [['a', 'n']],
@@ -307,7 +307,7 @@ export const dual: AreaSpec = {
     {
       id: 'hotBlood',
       name: 'Hot Blood',
-      why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs).",
+      why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs). A square, drawn tight since G4 fix 1 (scaled to 0.7 about its centre).",
       at: [830, 2340],
       shape: { kind: 'hand' },
       nodes: [
@@ -315,7 +315,7 @@ export const dual: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [fervourDuration(15)],
-          at: [780, 2290],
+          at: [795, 2305],
           why: 'The entrance, from the east road.',
         },
         {
@@ -323,11 +323,11 @@ export const dual: AreaSpec = {
           kind: 'notable',
           name: 'Hot Blood',
           lines: [maxFervour(1), fervourOnKill(10)],
-          at: [880, 2290],
+          at: [865, 2305],
           why: 'A fourth fervour charge (3 units by the table) and a way to gain them: 4.',
         },
-        { id: 'b', kind: 'small', lines: [fervourDuration(15)], at: [880, 2390] },
-        { id: 'c', kind: 'small', lines: [fervourDuration(15)], at: [780, 2390] },
+        { id: 'b', kind: 'small', lines: [fervourDuration(15)], at: [865, 2375] },
+        { id: 'c', kind: 'small', lines: [fervourDuration(15)], at: [795, 2375] },
       ],
       links: [
         ['a', 'n'],
