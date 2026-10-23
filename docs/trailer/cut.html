@@ -405,6 +405,112 @@
     txt(12, 28, `Level ${level}`, { size: 26, col: C.torch, weight: 600, font: 'display' }) +
     txt(308, 25, place, { size: 12, col: C.bone, anchor: 'end', font: 'display' });
 
+  /* "ARPG." drawn by hand on Jacquard 24's own grid (24 pixels to the em, capitals 15 tall, stems 3 wide): the face's
+     capitals set together are too ornate to read, so these keep its weight and pixels with plainer shapes. */
+  const ARPG = [
+    [
+      '....####...',
+      '...######..',
+      '..###.####.',
+      '..##...###.',
+      '.###...###.',
+      '.###...###.',
+      '.#########.',
+      '.#########.',
+      '.###...###.',
+      '.###...###.',
+      '.###...###.',
+      '.###...###.',
+      '.###...###.',
+      '.###...####',
+      '###.....##.',
+    ],
+    [
+      '.#######...',
+      '#########..',
+      '.###..####.',
+      '.###...###.',
+      '.###...###.',
+      '.###..###..',
+      '.#######...',
+      '.#######...',
+      '.###.###...',
+      '.###..###..',
+      '.###..###..',
+      '.###...###.',
+      '.###...###.',
+      '.###...####',
+      '###.....##.',
+    ],
+    [
+      '.#######..',
+      '#########.',
+      '.###..####',
+      '.###...###',
+      '.###...###',
+      '.###..###.',
+      '.########.',
+      '.#######..',
+      '.###......',
+      '.###......',
+      '.###......',
+      '.###......',
+      '.###......',
+      '.###......',
+      '###.......',
+    ],
+    [
+      '...######.',
+      '..##...###',
+      '.###....#.',
+      '.###......',
+      '###.......',
+      '###.......',
+      '###..####.',
+      '###...####',
+      '###....###',
+      '###....###',
+      '###....###',
+      '.###...###',
+      '.###...###',
+      '..#######.',
+      '...####...',
+    ],
+    [
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '###',
+      '###',
+      '###',
+    ],
+  ];
+  /* a word of pixel glyphs (rows top to bottom, on the baseline), centred on x; px is one pixel in stage units */
+  const pixWord = (glyphs, x, base, px, col = C.bone) => {
+    const gap = 2;
+    const wide = glyphs.reduce((s, g) => s + g[0].length, 0) + gap * (glyphs.length - 1);
+    let gx = x - (wide * px) / 2;
+    let s = `<g fill="${col}" shape-rendering="crispEdges">`;
+    for (const g of glyphs) {
+      g.forEach((row, r) => {
+        const y = base - (g.length - r) * px;
+        for (const m of row.matchAll(/#+/g))
+          s += `<rect x="${gx + m.index * px}" y="${y}" width="${m[0].length * px + 0.02}" height="${px + 0.02}"/>`;
+      });
+      gx += (g[0].length + gap) * px;
+    }
+    return s + '</g>';
+  };
+
   /* ---------- the shots ---------- */
   const SHOTS = [
     {
@@ -547,7 +653,9 @@
           const sc = lerp(1.5, 1, ease(k / 0.18));
           s +=
             `<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">` +
-            txt(cx, cy + 8, w, { size: 19, font: 'display', anchor: 'middle' }) +
+            (w === 'ARPG.'
+              ? pixWord(ARPG, cx, cy + 8, 19 / 24)
+              : txt(cx, cy + 8, w, { size: 19, font: 'display', anchor: 'middle' })) +
             '</g>';
           s += '</g></g>';
         });
