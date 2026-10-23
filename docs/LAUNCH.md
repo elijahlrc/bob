@@ -4,7 +4,7 @@ The public announcement of Battle of Builds, on **2026-10-24 at midday** (Pacifi
 
 - a video on YouTube;
 - posts on Reddit;
-- the game's one home becomes itch.io (`elijahlrc/battle-of-builds`), and the repository goes private.
+- the game's one home becomes itch.io (https://elijahlrc.itch.io/bob), and the repository goes private.
 
 ## 0. Decisions
 
@@ -119,7 +119,7 @@ r/roguelikes is strict about what counts as a roguelike.
 | All day  | Watch the Discord for crash reports. A crash a player can reproduce is fixed and shipped the same day, within the freeze. Anything else waits.    |
 | Evening  | Take stock (players, runs, deaths by map and class, crashes, comments) and write it in docs/PROGRESS.md.                                          |
 
-**Rollback:** keep the last good `bob-itch.zip`. Pushing it again to `elijahlrc/battle-of-builds:html5` restores it in minutes.
+**Rollback:** keep the last good `bob-itch.zip`. Pushing it again to `elijahlrc/bob:html5` restores it in minutes.
 
 ## 4. The two days after
 

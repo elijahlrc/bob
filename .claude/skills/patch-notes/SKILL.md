@@ -134,7 +134,7 @@ The notes commit stays local until the user says yes. Work out and show what wou
   the user rather than merging or rebasing).
 - The notes as filed (fenced plain text).
 - That the push deploys the game on GitHub Pages and that the same commit is then built and uploaded to itch.io
-  (`elijahlrc/battle-of-builds:html5`).
+  (`elijahlrc/bob:html5`).
 
 **Present the notes before asking, and make sure they were seen.** The user wants to read the notes before choosing
 (2026-10-20, twice: a fenced block and option previews in the same turn as the dialog were not enough, the dialog covers
@@ -167,8 +167,8 @@ uncommitted work may be in it), so build from an export of `HEAD`:
 3. Zip the `dist` folder with the script beside this file, never with `tar` (itch.io refused that zip):
    `pwsh -File .claude/skills/patch-notes/itch-zip.ps1 -Dist <dir>/dist -Out E:\Proj\Auto\bob-itch.zip`. Check that
    `index.html` is at the top level of the listing. `bob-itch.zip` is git-ignored.
-4. `C:\Users\littl\butler\butler.exe push bob-itch.zip elijahlrc/battle-of-builds:html5`, then one
-   `butler.exe status elijahlrc/battle-of-builds:html5` after a short wait to see that the build has processed. Do not poll.
+4. `C:\Users\littl\butler\butler.exe push bob-itch.zip elijahlrc/bob:html5`, then one
+   `butler.exe status elijahlrc/bob:html5` after a short wait to see that the build has processed. Do not poll.
 5. Remove the temporary directory (remove the `node_modules` junction with `rmdir` first, so the real folder is not deleted).
 
 If butler is missing, not logged in (`butler login`, which needs the user), or the push fails, say so and carry on to the
