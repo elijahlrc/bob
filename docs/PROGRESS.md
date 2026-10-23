@@ -1167,3 +1167,9 @@ once, so each started a new high score list and rival pool. The one bot sample (
 strider 34.5, mystic 15, reaver 20, zealot 20, shade 20, mean of all runs about 23.5 (24.2 at the last seed-7 sample,
 before the hand-written tree; not comparable run for run). Most deaths are the map-10 and map-20 bosses, as before. The
 mystic is the lowest; eight runs cannot tell that from noise.
+
+## Bot rivals for save version 23 (2026-10-23)
+
+Before the deploy of the grown network, the version 23 pool was seeded the same way as version 20's: `npm run sim` at seed 23,
+10 runs a class with `--strong-kit 0.5` and `--rivals-dump`, shown and sent with `scripts/postrivals.ts`. All 60 died below
+level 100 (kitted levels 20 to 90, plain 6 to 53; 48 above level 20). 57 were sent; the last three Zealots (levels 21, 21, 27) were refused by the table's limit of 60 a day from one address and can be sent another day.
