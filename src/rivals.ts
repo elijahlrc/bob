@@ -119,6 +119,17 @@ export type PostStatus =
 
 const IDLE: PostStatus = { status: 'idle' };
 
+/**
+ * What the end screen says of a post that failed for a reason other than the name: the server's own reason when it gave one (a
+ * cap from this browser or address, the pool's hourly limit, a block), "could not reach" only when nothing answered.
+ */
+export function postFailText(message: string | undefined): string {
+  if (!message) return 'Could not reach the rivals. Press the button to try again.';
+  if (/today/.test(message)) return 'Too many characters sent from here today. Try again tomorrow.';
+  if (/taking a rest/.test(message)) return 'The rivals are busy. Try again in a while.';
+  return 'The rivals refused this character.';
+}
+
 /** The run's identity for the keeper: its seed, with the class and the maps played so that a seed played twice is two runs. */
 export function runKey(run: RunState): string {
   return `${run.classId}:${run.seed}:${run.history.length}`;

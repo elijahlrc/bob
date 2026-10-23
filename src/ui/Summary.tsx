@@ -9,6 +9,7 @@ import {
   postStatus,
   rivalsConfigured,
   rivalsOn,
+  postFailText,
   sendName,
   setRivals,
   watchPost,
@@ -160,9 +161,7 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
           }}
         />
       )}
-      {failed?.reason === 'unreachable' && (
-        <p class="warn">Could not reach the rivals. Press the button to try again.</p>
-      )}
+      {failed?.reason === 'unreachable' && <p class="warn">{postFailText(failed.message)}</p>}
       {set && set.fought > 0 && (
         <p class="muted">
           You beat {set.beaten} of {set.fought} rival{set.fought === 1 ? '' : 's'}
