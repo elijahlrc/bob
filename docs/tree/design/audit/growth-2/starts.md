@@ -183,14 +183,14 @@ doing its job. **Proposal:** only F3's Hawk's Eye line; the rest is a reading fo
 
 **Distances** (own start / nearest start; working values 8 to 18, §16):
 
-| region   | keystones                                                                                          |
-| -------- | -------------------------------------------------------------------------------------------------- |
-| Strider  | Steady Draw **7**, Close Quarters 9, Plated Hide 10, Arrow Weave 11                                |
-| Shade    | Nimble Gambit 8, Shade Leech 13, Spellslip 16, Cruel Agony 18, Hollow Vessel 18                    |
-| Reaver   | Shieldwall 12, Wound Dance 15, Crimson Pact 15/14                                                  |
-| Vanguard | Unerring Discipline 11, Strongarm 15/10, Rooted Stance 18, Blood Rite **24/22**                    |
+| region   | keystones                                                                                                             |
+| -------- | --------------------------------------------------------------------------------------------------------------------- |
+| Strider  | Steady Draw **7**, Close Quarters 9, Plated Hide 10, Arrow Weave 11                                                   |
+| Shade    | Nimble Gambit 8, Shade Leech 13, Spellslip 16, Cruel Agony 18, Hollow Vessel 18                                       |
+| Reaver   | Shieldwall 12, Wound Dance 15, Crimson Pact 15/14                                                                     |
+| Vanguard | Unerring Discipline 11, Strongarm 15/10, Rooted Stance 18, Blood Rite **24/22**                                       |
 | Mystic   | Mind Bulwark 13/**11 (Ze)**, Mana Bastion 13/12, Prismatic Balance **19**, Pain Conduit **21/20**, Fever Pitch **23** |
-| Zealot   | Idle Hands 14, Lone Vow 14, Living Ward 14, Searing Avatar **20**, Volatile Servants **20**, Sigil Warden **22** |
+| Zealot   | Idle Hands 14, Lone Vow 14, Living Ward 14, Searing Avatar **20**, Volatile Servants **20**, Sigil Warden **22**      |
 
 Unchanged from round 1 but Prismatic Balance (20 → 19, M-6). Seven beyond 18, one under 8. Fix-1 §2.8 deferred these to
 G5's keystone-distance pass, which stands.
@@ -243,6 +243,7 @@ The Vanguard–Reaver band of round 1 is gone (Vanguard steps 5–8 now 31% offe
 **Mystic** (`home-mystic.png`). Unchanged since round 1 but for M-4. Point 1: energy shield or crit side; 2: First Light
 or a hub. West hub: Still Mind (mana, 4), Deft Wand (wand attacks, 6), Warm Blood (6), the Cloister (Glass Skin 7, Deep
 Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast speed, 8), Warded Mind (7).
+
 - Caster: side, First Light, east hub, Sharp Mind's pocket, two roads, Ready Wit's wheel: First Light, Sharp Mind,
   Ready Wit. **Gave up:** the west's mana and Deft Wand. **No-choice stretch:** the three attribute nodes of each hub
   road. **Nobody skips:** First Light.
@@ -250,6 +251,7 @@ Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast spe
 - Verdict: real choice, coherent, not committing; spell damage thin from 2 to 8 (F8).
 
 **Shade** (`home-shade.png`). Sides evasion and crit; Keen Instinct at 2.
+
 - Attacker: Keen Instinct, the blade road to **Quick Wrists** (attack speed, dodge, 4), on to the claw/dagger wheel
   (Talon 6, Fine Point 7). **Chose:** a weapon. **Gave up:** Soft Step, Spoils.
 - Dagger caster: north hub, Spoils (4) or the road to Quiet Knife (dagger spells with mana, 7).
@@ -259,6 +261,7 @@ Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast spe
   attacker has its own notable now.
 
 **Strider** (`home-strider.png`). Sides attack speed and evasion (three links each now). Hawk's Eye at 2.
+
 - North hub: Long Breath (life, 4), Hedge Magic (spells, 4), the bows road (Elemental Fletching 6, Steady Draw 7), the
   ring (Quick March 5).
 - South hub: Vital Aim (crit, 5), Wayfarer (evasion, resistances, 5), the Reaver's Lists (Twin Fangs 6, Footwork,
@@ -270,6 +273,7 @@ Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast spe
 - Verdict: varied and coherent, but the density means the first ten points take most of what is near, and a keystone.
 
 **Reaver** (`home-reaver.png`). Sides melee physical and attack speed; Quickened Steel (offence now) at 2.
+
 - West: life pocket to Stout Heart (4), Killing Pace (5), Keen Edge (swords, 7).
 - East: Buckler (block, 4), Fighting Breath (5), Weaving and Twin Fangs (6–7).
 - Middle: three life smalls; Drill Call (warcries, 5) off the first.
@@ -277,6 +281,7 @@ Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast spe
 - Verdict: real choice, coherent; defence-led in steps 1–4 (F8).
 
 **Vanguard** (`home-vanguard.png`). Sides armour and melee physical; Oathbound at 2.
+
 - North: Ringing Blows (melee, enemy stun, 4), Banner (5), Shield Ram (6), Iron Lungs and Elemental Ward (7).
 - South: Quartermaster (flasks, 4), Bracing (block, 6), Thunderstep (two-handed, 7), Unhurried (8).
 - Middle: three life smalls, then **Weak Spot** (melee crit, 8) or the maces (10).
@@ -285,6 +290,7 @@ Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast spe
   offence.
 
 **Zealot** (`home-zealot.png`, `zealot-mystic-text.png`). Sides armour and elemental damage; Zeal at 2.
+
 - West: Warlord's Banner (the Vanguard's, 3), Ardour (elemental attacks, 5), the nave wheel's block side (Iron Faith 6).
 - East: **Hymn** (spell, lightning, 4), whose far small is the Mystic crossing (Wandwork 7, Deep Well 9); the east road
   to `jT.a` (5), then Hearthfire (fire, cast speed, 7), Vigil (7), Choirmaster and Shepherd (8).
@@ -326,26 +332,26 @@ Well 8). East hub: Sharp Mind (spell crit, 4), Ready Wit (spell damage, cast spe
 
 ## 4. Round 1 follow-up (must and should findings in this subset)
 
-| round 1                                       | now                                                                                                                       |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| F1 Zealot casters share one opening (must)    | **partly**: Hymn gives the caster a home spell notable and the storm caster its lightning, but it is the door to the Mystic, and five casters now share a Cloister opening (F1) |
-| F2 Vanguard–Reaver defence band (should)      | **fixed**: Weak Spot, Field Dressing's movement; Vanguard 5–8 is 31% offence                                              |
-| F3 Strider start pockets, density (should)    | **partly**: the side pockets are gone (Long Breath 3 → 4, Clear Head → 6), but the density within 6 is 85 units against 43–61 (round 1: 92) and the north hub now carries two pockets (F3) |
-| F4 §4.6 gaps (should)                         | **fixed**: Strider reservation (Clear Head), Zealot movement (Procession), Vanguard melee crit (Weak Spot); the Zealot's flasks are the centre's Provisions, by the brief's decision |
-| F5–F8 (consider)                              | F5 keystone distances deferred to G5 (Prismatic 20 → 19); F6 partly (two of the rich start notables trimmed, Hawk's Eye not); F7 a lean, unchanged; F8 Prismatic's spur shortened |
+| round 1                                    | now                                                                                                                                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F1 Zealot casters share one opening (must) | **partly**: Hymn gives the caster a home spell notable and the storm caster its lightning, but it is the door to the Mystic, and five casters now share a Cloister opening (F1)            |
+| F2 Vanguard–Reaver defence band (should)   | **fixed**: Weak Spot, Field Dressing's movement; Vanguard 5–8 is 31% offence                                                                                                               |
+| F3 Strider start pockets, density (should) | **partly**: the side pockets are gone (Long Breath 3 → 4, Clear Head → 6), but the density within 6 is 85 units against 43–61 (round 1: 92) and the north hub now carries two pockets (F3) |
+| F4 §4.6 gaps (should)                      | **fixed**: Strider reservation (Clear Head), Zealot movement (Procession), Vanguard melee crit (Weak Spot); the Zealot's flasks are the centre's Provisions, by the brief's decision       |
+| F5–F8 (consider)                           | F5 keystone distances deferred to G5 (Prismatic 20 → 19); F6 partly (two of the rich start notables trimmed, Hawk's Eye not); F7 a lean, unchanged; F8 Prismatic's spur shortened          |
 
 ## 5. Checklist
 
-| item                                                                    | verdict                                                                                                                                       |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| §4.5 varied defences in every region                                    | holds                                                                                                                                         |
-| §4.6 every region sells what most builds want                           | holds with exceptions: the Zealot's flasks only through the centre (Ze6) and its movement only at Ze20; the Zealot sells little plain attack speed (Ardour) |
-| §4.7 the centre holds generic nodes only                                | holds (in no plan, F7, a weighting reading)                                                                                                   |
-| §4.8 no large all-defence or all-offence stretch near a start (a guide) | holds with exceptions: the Reaver's steps 1–4 (64% defence), the Mystic's 5–6 (57%) (F8)                                                      |
-| §6.2 first points: real choice, coherent, not committing                | holds with exceptions: the Zealot caster's first spell notable leads out of the region (F1); the Strider's density blunts its choice (F3); dexterity starts converge on Footwork (F4) |
-| §6.3 starts interesting, not prescriptive                               | holds; no weapon within three steps; every start's sides now have three links                                                                |
-| §6.4 specific porches optional                                          | holds (Deft Wand, Buckler, Quiet Knife, the Banner, Hymn)                                                                                     |
-| §6.5 first notables 3–4 out, fanning out before then                    | holds (signatures at 2, as §6.3 allows)                                                                                                       |
+| item                                                                    | verdict                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §4.5 varied defences in every region                                    | holds                                                                                                                                                                                                                 |
+| §4.6 every region sells what most builds want                           | holds with exceptions: the Zealot's flasks only through the centre (Ze6) and its movement only at Ze20; the Zealot sells little plain attack speed (Ardour)                                                           |
+| §4.7 the centre holds generic nodes only                                | holds (in no plan, F7, a weighting reading)                                                                                                                                                                           |
+| §4.8 no large all-defence or all-offence stretch near a start (a guide) | holds with exceptions: the Reaver's steps 1–4 (64% defence), the Mystic's 5–6 (57%) (F8)                                                                                                                              |
+| §6.2 first points: real choice, coherent, not committing                | holds with exceptions: the Zealot caster's first spell notable leads out of the region (F1); the Strider's density blunts its choice (F3); dexterity starts converge on Footwork (F4)                                 |
+| §6.3 starts interesting, not prescriptive                               | holds; no weapon within three steps; every start's sides now have three links                                                                                                                                         |
+| §6.4 specific porches optional                                          | holds (Deft Wand, Buckler, Quiet Knife, the Banner, Hymn)                                                                                                                                                             |
+| §6.5 first notables 3–4 out, fanning out before then                    | holds (signatures at 2, as §6.3 allows)                                                                                                                                                                               |
 | §9.1 keystones: 27, spurs off a junction, dead ends, distances 8–18     | holds with exceptions: seven beyond 18, Steady Draw at 7 (working values, G5); Close Quarters has no spur (the user's); Blood Rite and Sigil Warden hang off smalls; Cruel Agony and Hollow Vessel share one junction |
-| §9.2 a keystone is a trade the sheet shows                              | not re-checked (the three without a cost are in §16)                                                                                          |
-| §9.3 good late-build decisions                                          | holds with exceptions: Thick Blood is half the network's last stop (F2); the Strider's keystones are bought by 60, not late (F6)              |
+| §9.2 a keystone is a trade the sheet shows                              | not re-checked (the three without a cost are in §16)                                                                                                                                                                  |
+| §9.3 good late-build decisions                                          | holds with exceptions: Thick Blood is half the network's last stop (F2); the Strider's keystones are bought by 60, not late (F6)                                                                                      |

@@ -181,14 +181,14 @@ anyway. Shown to the user at stop 4 as it is.
 
 These pairs are level with each other and 120 to 250 units apart, so their names run together where names show:
 
-| pair                            | units apart | where                                                 | new in this pass?   |
-| ------------------------------- | ----------- | ----------------------------------------------------- | ------------------- |
-| Deep Cuts / Bright Shafts       | 118         | the S-9 swap put them on one wheel                    | new                 |
-| Crimson Pact / Clean Break      | 184         | seam 1, a keystone name across a notable's            | new                 |
-| Bad Company / Needlework        | 246         | seam 3                                                | new                 |
-| Rotting Word / Sapper           | 200         | the Shade's hex corner                                | new                 |
-| Longbow / Fleet Blade           |             | round 1                                               | from round 1        |
-| Athame / Long Knives            | 148         | round 1                                               | from round 1        |
+| pair                       | units apart | where                                      | new in this pass? |
+| -------------------------- | ----------- | ------------------------------------------ | ----------------- |
+| Deep Cuts / Bright Shafts  | 118         | the S-9 swap put them on one wheel         | new               |
+| Crimson Pact / Clean Break | 184         | seam 1, a keystone name across a notable's | new               |
+| Bad Company / Needlework   | 246         | seam 3                                     | new               |
+| Rotting Word / Sapper      | 200         | the Shade's hex corner                     | new               |
+| Longbow / Fleet Blade      |             | round 1                                    | from round 1      |
+| Athame / Long Knives       | 148         | round 1                                    | from round 1      |
 
 All of them read cleanly at the close-up zoom (`cu-reaver-seam1.png`). The fix brief (§2.8, L11) parked notable names as
 a display question. That is still right, but the list has grown by four. If the user wants it: turn the Deep Cuts wheel
@@ -279,16 +279,16 @@ Neither reads as touching at game zoom.
 
 ## 3. Round 1 follow-up
 
-| round 1 finding                                 | status | note                                                                                                                                                                                                                                                                               |
-| ----------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| round 1 finding                                  | status | note                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1. Must: the Strider home's rays and near-misses | partly | Fixed: `jb4` 17° → 52°, `s2` 20° → an even 29°/28° fan, the `life.a` double spoke, `n414` folded into the chain, `hubs.n`–`jb3` 623 → 472, and `n442` became a road node. Not fixed: `hub.t`–`wayfarer.d` 622 (finding 3) and the long `s2` spokes (finding 4). New fault: Hard Target's small (finding 1). |
-| 2. Must: Wanderer's small beside Round Shield   | fixed  | `wanderer.a` is 70 units from Wanderer.                                                                                                                                                                                                                                            |
-| 3. Must: Vanguard north hub and Banner          | fixed  | The fan is 170° / 207° / 243°, and the Banner smalls are compact. The 32° gap at `banner.a` is a plain triangle.                                                                                                                                                                  |
-| 4. Must: the Quartermaster ladder               | fixed  | Gaps at `hubs.s` are 53° / 122° / 57° / 128°, 33° at Quartermaster and 40° at `thunderstep.a`. A minor near-touch is left (finding 9).                                                                                                                                             |
-| 5. Should: Crushing Blow's near-parallel links  | fixed  | Positions only. The road leaves `crushing.a` at about 240° and runs straight.                                                                                                                                                                                                     |
-| 6. Should: the Strider's sparse outer band      | fixed  | The band holds 16 nodes and the rim links are 237 to 379. The outline notch is finding 8.                                                                                                                                                                                         |
-| 7. Should: the Reaver's loose four-node shapes  | fixed  | Scaled as wholes to 0.7.                                                                                                                                                                                                                                                          |
-| 8. Should: `roadM.b` branch 20° off the road    | fixed  | The branch is now 40° off the road, and Weak Spot's chain is straight.                                                                                                                                                                                                            |
+| 2. Must: Wanderer's small beside Round Shield    | fixed  | `wanderer.a` is 70 units from Wanderer.                                                                                                                                                                                                                                                                     |
+| 3. Must: Vanguard north hub and Banner           | fixed  | The fan is 170° / 207° / 243°, and the Banner smalls are compact. The 32° gap at `banner.a` is a plain triangle.                                                                                                                                                                                            |
+| 4. Must: the Quartermaster ladder                | fixed  | Gaps at `hubs.s` are 53° / 122° / 57° / 128°, 33° at Quartermaster and 40° at `thunderstep.a`. A minor near-touch is left (finding 9).                                                                                                                                                                      |
+| 5. Should: Crushing Blow's near-parallel links   | fixed  | Positions only. The road leaves `crushing.a` at about 240° and runs straight.                                                                                                                                                                                                                               |
+| 6. Should: the Strider's sparse outer band       | fixed  | The band holds 16 nodes and the rim links are 237 to 379. The outline notch is finding 8.                                                                                                                                                                                                                   |
+| 7. Should: the Reaver's loose four-node shapes   | fixed  | Scaled as wholes to 0.7.                                                                                                                                                                                                                                                                                    |
+| 8. Should: `roadM.b` branch 20° off the road     | fixed  | The branch is now 40° off the road, and Weak Spot's chain is straight.                                                                                                                                                                                                                                      |
 
 ## 4. Checklist (my subset)
 

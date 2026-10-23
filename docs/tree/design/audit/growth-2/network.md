@@ -120,14 +120,14 @@ the cul-de-sac as an exception because a loop narrowed three builds' choices; th
 **Re-tested.** With Quickening moved to the west climb and the seams in, the same trial link
 `spire.frost.stream.n`–High Veil now **widens** choice:
 
-| build        | choice at 60, today → trial | choice at 120, today → trial | tax at 120  |
-| ------------ | --------------------------- | ---------------------------- | ----------- |
-| caster-es    | 2 → **1**                   | 4 → 6                        | 33% → 33%   |
-| wand-attack  | 2 → 3                       | 3 → 3                        | 43% → 40%   |
-| channeller   | 3 → 4                       | 4 → 5                        | 29% → 28%   |
-| block-caster | 4 → 4                       | 3 → 8                        | 28% → 28%   |
-| summoner     | 3 → 3                       | 3 → 4                        | 40% → 40%   |
-| caster-life, fire-burn | unchanged         | unchanged                    | unchanged   |
+| build                  | choice at 60, today → trial | choice at 120, today → trial | tax at 120 |
+| ---------------------- | --------------------------- | ---------------------------- | ---------- |
+| caster-es              | 2 → **1**                   | 4 → 6                        | 33% → 33%  |
+| wand-attack            | 2 → 3                       | 3 → 3                        | 43% → 40%  |
+| channeller             | 3 → 4                       | 4 → 5                        | 29% → 28%  |
+| block-caster           | 4 → 4                       | 3 → 8                        | 28% → 28%  |
+| summoner               | 3 → 3                       | 3 → 4                        | 40% → 40%  |
+| caster-life, fire-burn | unchanged                   | unchanged                    | unchanged  |
 
 The one cost is caster-es's 60-point choice (2 → 1).
 
@@ -192,12 +192,12 @@ own fallback (its smalls to `physAttack(10)`, the notable's lead) is the change,
 toward the Zealot), Reaver 13 toward the Strider, Vanguard 11 (9 Reaver, 2 Zealot), Shade 6 toward the Strider. At 60
 points, plan composition (nodes in own region / in the neighbour's):
 
-| archetype                                           | round 1 | now                   |
-| --------------------------------------------------- | ------- | --------------------- |
-| mace-shield, sceptre-fire, spell-totem              | neighbour-majority | **home-majority** (39/18, 44/17, 42/19) |
-| fire-burn, staff-block, block-caster, storm-caster  | Mystic-majority    | still (23/38, 22/39, 26/35, 11/50) |
-| summoner (Mystic)                                   | home    | **now Zealot-majority** (29/32) |
-| dual-wield, dagger-crit, claw-poison, dodge-blades  | Strider-majority   | still, narrowly (29/32, 24/28, 25/30, 28/31) |
+| archetype                                          | round 1            | now                                          |
+| -------------------------------------------------- | ------------------ | -------------------------------------------- |
+| mace-shield, sceptre-fire, spell-totem             | neighbour-majority | **home-majority** (39/18, 44/17, 42/19)      |
+| fire-burn, staff-block, block-caster, storm-caster | Mystic-majority    | still (23/38, 22/39, 26/35, 11/50)           |
+| summoner (Mystic)                                  | home               | **now Zealot-majority** (29/32)              |
+| dual-wield, dagger-crit, claw-poison, dodge-blades | Strider-majority   | still, narrowly (29/32, 24/28, 25/30, 28/31) |
 
 **Trials (both rejected as fixes):**
 
@@ -282,36 +282,36 @@ should sell something archetypes weigh.
 
 ## 3. Round 1 follow-up
 
-| round 1                                  | status    | one line                                                                                                         |
-| ---------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| 1 south-east band (must)                 | partly    | 46 → 34 unused nodes; Bright Shafts in; `m56b`–`j8`, the Fosse east and Stormstruck's crossing still unwalked (F1). |
-| 2 five seam clusters (must)              | fixed     | laid, 49 border links; four of five walked, Clean Break not (F5).                                               |
-| 3 rim combs (should)                     | fixed     | rim dead ends 16 → 8, all deliberate tips.                                                                      |
-| 4 porous near-home borders (should)      | partly    | three archetypes came home; four Zealot casters and four dexterity attackers did not; 50 notables nearer a neighbour (F6). |
-| 5 attribute supply (should, G5)          | not (G5)  | unchanged; hybrids short at 60 (F7).                                                                            |
-| 6 Zealot–Vanguard corner (consider)      | partly    | Stagger leg cut, Battle Hymn a bridge; the corner still has two unwalked crossings (F4).                         |
-| 7 High Veil / Cold Light (consider)      | reverse   | re-tested: the loop now widens choice; make it (F3).                                            |
-| 8 Longbow / Fleet Blade (consider)       | kept      | still a one-entry weapon fork at 4 steps; fine.                                                                |
-| 9 ring unwalked (consider)               | unchanged | F10.                                                                                                            |
-| 10 junction smalls (consider)            | not       | untouched as allowed; 65 smalls join two or more clusters, most of them entrances or start nodes.               |
+| round 1                             | status    | one line                                                                                                                   |
+| ----------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 1 south-east band (must)            | partly    | 46 → 34 unused nodes; Bright Shafts in; `m56b`–`j8`, the Fosse east and Stormstruck's crossing still unwalked (F1).        |
+| 2 five seam clusters (must)         | fixed     | laid, 49 border links; four of five walked, Clean Break not (F5).                                                          |
+| 3 rim combs (should)                | fixed     | rim dead ends 16 → 8, all deliberate tips.                                                                                 |
+| 4 porous near-home borders (should) | partly    | three archetypes came home; four Zealot casters and four dexterity attackers did not; 50 notables nearer a neighbour (F6). |
+| 5 attribute supply (should, G5)     | not (G5)  | unchanged; hybrids short at 60 (F7).                                                                                       |
+| 6 Zealot–Vanguard corner (consider) | partly    | Stagger leg cut, Battle Hymn a bridge; the corner still has two unwalked crossings (F4).                                   |
+| 7 High Veil / Cold Light (consider) | reverse   | re-tested: the loop now widens choice; make it (F3).                                                                       |
+| 8 Longbow / Fleet Blade (consider)  | kept      | still a one-entry weapon fork at 4 steps; fine.                                                                            |
+| 9 ring unwalked (consider)          | unchanged | F10.                                                                                                                       |
+| 10 junction smalls (consider)       | not       | untouched as allowed; 65 smalls join two or more clusters, most of them entrances or start nodes.                          |
 
 ## 4. Checklist of the CONSTRAINTS items in this subset
 
-| item                                             | verdict                                                                                                                       |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| §3.1 a network, not a tree                       | holds                                                                                                                         |
-| §3.2 connect generously                          | holds; near the homes more than enough (F6)                                                                                   |
-| §3.3 mix regions by paying for highways          | holds; over-holds at 60 for seven archetypes (F6)                                                                             |
-| §3.4 clusters may connect directly               | holds                                                                                                                         |
-| §3.5 several ways in                             | holds with exceptions: High Veil and Cold Light (F3, should go), Longbow and Fleet Blade (kept)                               |
-| §3.6 most pockets are bridges                    | holds (38 dead-end pockets of about 270 clusters; rim fixed)                                                                  |
+| item                                             | verdict                                                                                                                                            |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §3.1 a network, not a tree                       | holds                                                                                                                                              |
+| §3.2 connect generously                          | holds; near the homes more than enough (F6)                                                                                                        |
+| §3.3 mix regions by paying for highways          | holds; over-holds at 60 for seven archetypes (F6)                                                                                                  |
+| §3.4 clusters may connect directly               | holds                                                                                                                                              |
+| §3.5 several ways in                             | holds with exceptions: High Veil and Cold Light (F3, should go), Longbow and Fleet Blade (kept)                                                    |
+| §3.6 most pockets are bridges                    | holds (38 dead-end pockets of about 270 clusters; rim fixed)                                                                                       |
 | §3.7 crossings with intent, not too few or many  | holds for count and intent; fails in use for Clean Break, Stormstruck–`j8`, the Spoils road, Battle Hymn and Procession–Grim Oath (F1, F4, F5, F8) |
-| §3.8 kinds of crossing                           | holds; the ring is walked by three builds, the dear crossings by the rim highway and Hare's Pace                              |
-| §7.1 highways plain and readable                 | holds                                                                                                                         |
-| §7.2 most clusters off attribute roads           | holds                                                                                                                         |
-| §7.3 no long road without clusters coming off it | holds in form; fails in use for the south band (F1), the Pits lattice (F2, also in form) and the west corner (F4)             |
-| §7.4 attribute values against gear               | fails: pure classes oversupplied, hybrids short at 60 (F7, G5)                                                                |
-| §7.5 gear requirements stay                      | holds                                                                                                                         |
+| §3.8 kinds of crossing                           | holds; the ring is walked by three builds, the dear crossings by the rim highway and Hare's Pace                                                   |
+| §7.1 highways plain and readable                 | holds                                                                                                                                              |
+| §7.2 most clusters off attribute roads           | holds                                                                                                                                              |
+| §7.3 no long road without clusters coming off it | holds in form; fails in use for the south band (F1), the Pits lattice (F2, also in form) and the west corner (F4)                                  |
+| §7.4 attribute values against gear               | fails: pure classes oversupplied, hybrids short at 60 (F7, G5)                                                                                     |
+| §7.5 gear requirements stay                      | holds                                                                                                                                              |
 
 No new rules are proposed. Nothing here felt like losing intent; the one place a number could lead is finding 1, and
 its proposal puts the missing archetypes first so that a cluster is judged by a player who wants it, not moved for the

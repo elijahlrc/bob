@@ -123,7 +123,7 @@ for the Zealot (its casters' life and energy shield in its own voice). Round 1 F
 4. **The second lever, if the re-measure still shows the Cloister:** two steps may not move the plans alone, because
    the Zealot home has no percent-life notable within 9 steps but Zeal's 5% (Vigil is regeneration and recharge), and
    Quiet Pulse's life is what the casters walk for. Re-line Vigil (`cathedral.nave.vigil.n`) toward `life(10),
-   esRecharge(15)`: the Zealot caster's life and shield at home, a re-line, not new supply.
+esRecharge(15)`: the Zealot caster's life and shield at home, a re-line, not new supply.
 
 **Must not break:** §3.5 (Wandwork keeps `j1.a`, `draught.a` and its small; Draught gains a second way in; the Cloister
 keeps its links north and the choir crossing), §11.5 (a regular tent, checked with `geometry.ts --region mystic`), §3.7 (no border link removed: the Hymn crossing stays, it
@@ -265,39 +265,39 @@ for the vocabulary pass; Hare's Pace becomes a real late direction once T1 thins
 
 ## 3. Round 1 follow-up
 
-| round 1                                       | grade        | now                                                                                                               |
-| --------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| F1 the Meadow (must)                          | fixed        | True Aim removed, Fleet Foot re-lined and 3 from Hard Target, not linked; what remains is T1                      |
-| F2 evasion around the Strider (must)          | partly       | pairings now differ; the seven attackers still open on the same six notables (T1)                                |
-| F3 out of reach (should)                      | fixed        | elemental attacks +38%, traps +18% past 120; Live Wire still in no plan (T8)                                      |
-| F4 Greatblade (should)                        | fixed        | smalls two-handed; sword +16% past 120                                                                            |
-| F5 Killing Eye = Mercy Stroke, Sidestep (should) | partly    | both ended; the fixes made Wasp Sting + Venom Fletching (T4) and Sidestep = Feint and Cut (T5)                    |
-| F6 the Cloister (should)                      | not          | energy shield thinned, but five Zealot casters' 60 points are still the Cloister (T2)                             |
-| F7 the Nave knot (should)                     | fixed        | Hearthfire has only its wheel's links; the openings differ; Vigil–Choirmaster 2 is left (T11)                     |
-| F8 spell with cast speed ×3 (should)          | fixed        | Thrown Voice is spell with spell dodge                                                                            |
-| F9 Scarred Hide = Stone Heart (consider)      | fixed        | Stone Heart is Weak Spot                                                                                          |
-| F10 Field Dressing (consider)                 | fixed        | life out, movement in                                                                                             |
-| F11 Homily ends (consider)                    | fixed        | spell block                                                                                                       |
-| F12 Zeal (consider)                           | closed       | named a convergence exception                                                                                     |
-| F13 Darting Steel (consider)                  | not (deferred) | unchanged; sword-str takes it at 60, dual-wield gives it up                                                     |
-| F14 accuracy as a partner (consider)          | not (deferred) | T1's Footwork fix makes accuracy a lead there                                                                   |
-| U4 Footwork (left for this round)             | condition met | in all seven dexterity attackers' 60-point plans: re-partner (T1)                                               |
+| round 1                                          | grade          | now                                                                                            |
+| ------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------- |
+| F1 the Meadow (must)                             | fixed          | True Aim removed, Fleet Foot re-lined and 3 from Hard Target, not linked; what remains is T1   |
+| F2 evasion around the Strider (must)             | partly         | pairings now differ; the seven attackers still open on the same six notables (T1)              |
+| F3 out of reach (should)                         | fixed          | elemental attacks +38%, traps +18% past 120; Live Wire still in no plan (T8)                   |
+| F4 Greatblade (should)                           | fixed          | smalls two-handed; sword +16% past 120                                                         |
+| F5 Killing Eye = Mercy Stroke, Sidestep (should) | partly         | both ended; the fixes made Wasp Sting + Venom Fletching (T4) and Sidestep = Feint and Cut (T5) |
+| F6 the Cloister (should)                         | not            | energy shield thinned, but five Zealot casters' 60 points are still the Cloister (T2)          |
+| F7 the Nave knot (should)                        | fixed          | Hearthfire has only its wheel's links; the openings differ; Vigil–Choirmaster 2 is left (T11)  |
+| F8 spell with cast speed ×3 (should)             | fixed          | Thrown Voice is spell with spell dodge                                                         |
+| F9 Scarred Hide = Stone Heart (consider)         | fixed          | Stone Heart is Weak Spot                                                                       |
+| F10 Field Dressing (consider)                    | fixed          | life out, movement in                                                                          |
+| F11 Homily ends (consider)                       | fixed          | spell block                                                                                    |
+| F12 Zeal (consider)                              | closed         | named a convergence exception                                                                  |
+| F13 Darting Steel (consider)                     | not (deferred) | unchanged; sword-str takes it at 60, dual-wield gives it up                                    |
+| F14 accuracy as a partner (consider)             | not (deferred) | T1's Footwork fix makes accuracy a lead there                                                  |
+| U4 Footwork (left for this round)                | condition met  | in all seven dexterity attackers' 60-point plans: re-partner (T1)                              |
 
 ## 4. Checklist of this subset
 
-| item                                                    | verdict                                                                                                                                         |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| §1.1 the tree forces trade-offs                         | holds with exceptions: the dexterity attackers' first 60 points (T1); the Zealot casters' first 60 (T2)                                        |
-| §5.1 two or three clusters, each a different partner    | holds with exceptions: Sidestep = Feint and Cut (T5), Glass Skin = Hoarded Breath (T7), the far pairs of T12                                    |
-| §5.2 twins about 5+ steps apart                         | holds with exceptions: Warding Staff / Twofold Guard 2 (T3); wheel variants by design                                                           |
-| §5.3 concentration by intent; generics never one place | fails for the dexterity middle (T1) and the Cloister for the Zealot (T2); holds for weapons, elements, minions, curses                          |
-| §5.4 weapons where their attributes are                 | holds                                                                                                                                           |
-| §5.5 neighbours compete                                 | holds with exceptions: Wasp Sting / Venom Fletching (T4), Warding Staff / Twofold Guard (T3)                                                    |
-| §5.6 specific paths optional                            | holds                                                                                                                                           |
-| §5.7 named builds exist                                 | holds (minions in four regions, Spirit Ward, five wand clusters)                                                                                |
-| §8.3 micro choices are real                             | holds with an exception: Warding Staff / Twofold Guard (T3); Greatweight / Broad Back and Deep Well / Glass Skin pass by the user's note        |
-| §13.1 connections against trade-offs                    | holds; the fixes proposed keep every crossing (T1 re-lines, T2 moves a landing)                                                                 |
-| §13.2 identity against spread                           | fails at T1 and T2                                                                                                                              |
-| convergence (spell + ES, life + armour, sword + either, near a home) | holds; the named exceptions are First Light, Oathbound, Zeal                                                                       |
+| item                                                                 | verdict                                                                                                                                  |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| §1.1 the tree forces trade-offs                                      | holds with exceptions: the dexterity attackers' first 60 points (T1); the Zealot casters' first 60 (T2)                                  |
+| §5.1 two or three clusters, each a different partner                 | holds with exceptions: Sidestep = Feint and Cut (T5), Glass Skin = Hoarded Breath (T7), the far pairs of T12                             |
+| §5.2 twins about 5+ steps apart                                      | holds with exceptions: Warding Staff / Twofold Guard 2 (T3); wheel variants by design                                                    |
+| §5.3 concentration by intent; generics never one place               | fails for the dexterity middle (T1) and the Cloister for the Zealot (T2); holds for weapons, elements, minions, curses                   |
+| §5.4 weapons where their attributes are                              | holds                                                                                                                                    |
+| §5.5 neighbours compete                                              | holds with exceptions: Wasp Sting / Venom Fletching (T4), Warding Staff / Twofold Guard (T3)                                             |
+| §5.6 specific paths optional                                         | holds                                                                                                                                    |
+| §5.7 named builds exist                                              | holds (minions in four regions, Spirit Ward, five wand clusters)                                                                         |
+| §8.3 micro choices are real                                          | holds with an exception: Warding Staff / Twofold Guard (T3); Greatweight / Broad Back and Deep Well / Glass Skin pass by the user's note |
+| §13.1 connections against trade-offs                                 | holds; the fixes proposed keep every crossing (T1 re-lines, T2 moves a landing)                                                          |
+| §13.2 identity against spread                                        | fails at T1 and T2                                                                                                                       |
+| convergence (spell + ES, life + armour, sword + either, near a home) | holds; the named exceptions are First Light, Oathbound, Zeal                                                                             |
 
 Area labels were not checked. No new rule is proposed (§14). The reference game is not named in this report.

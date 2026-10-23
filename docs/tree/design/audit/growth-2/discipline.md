@@ -39,7 +39,7 @@ the fix pass introduced are all live in the fight.
   `wieldingStaff` is a static weapon condition set exactly like `wieldingDagger` (`src/calc/staticConds.ts:13`), and
   `daggerSpellDamage` in `lines.ts` is the template. Quiet Knife's identical fault was fixed this way in K-4.
 - **Fix:** add `staffSpellDamage(v)` to `lines.ts` (`damage(v, { tags: ['spell'], condition: { id: 'wieldingStaff' },
-  unit: 8, label: '…% spell damage with a staff' })`). Crozier → `staffSpellDamage(20), castSpeed(6)` (2.5 + 1.5 = 4
+unit: 8, label: '…% spell damage with a staff' })`). Crozier → `staffSpellDamage(20), castSpeed(6)` (2.5 + 1.5 = 4
   units); `crozier.a`, `.b` → `staffSpellDamage(8)`. Rewrite the cluster `why` ("the staff in a caster's hand" becomes
   true). The staff's attack homes stay Quarterstaff (block, area) and Warding Staff (spell block).
 - **Must not break:** §5.1 (Crozier's partner, cast speed, is the generic caster's; Warding Staff 13 steps away keeps
@@ -53,7 +53,7 @@ the fix pass introduced are all live in the fight.
 - **Where:** `lines.ts` `UNIT.resOne: 8`. The 28 single-resistance smalls at 10% (the six resist stars: Elemental Ward,
   Four Winds, Prism Ward, Snakeskin, Litany, and Weathered's eight spoke smalls) are 1.25 units each; the two notables
   with a single resistance line are Warded Mind (`resOne('chaos', 16)`, 4.0 units) and Sound Body (`resOne('chaos', 16),
-  avoidAilments(10)`, exactly 3.0).
+avoidAilments(10)`, exactly 3.0).
 - **Breaks:** §8.1 (a small is one unit as `lines.ts` prices it).
 - **Evidence:** fix-1 §1.2 item 10 settled it ("`UNIT.resOne` becomes 10 (coordinator, `lines.ts`), no node changes;
   Sound Body's chaos resistance is raised to keep it at 3 units or more") and §3 item 3 listed it; `git log` shows no
@@ -213,21 +213,21 @@ Round 1's F12 and fix-1 §3 item 3, re-read:
 
 ## 3. Round 1 follow-up
 
-| round 1                                      | status                                                                                                                                                                                                                  |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F1 reference names (must)                    | **fixed** (8caa171; 458 names clean; `names.test.ts` added)                                                                                                                                                             |
-| F2 Hexwright's dead curse area (must)        | **fixed** (`curseEffect(20), manaRegen(15)`); the duration question is answered (D4): skill duration does reach a cast curse                                                                                            |
-| F3 lines the sheet does not count (should)   | **closed by the user** (U1, CONSTRAINTS §10.3: "a non issue"); every one of them is live in the fight                                                                                                                  |
+| round 1                                      | status                                                                                                                                                                                                                                     |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F1 reference names (must)                    | **fixed** (8caa171; 458 names clean; `names.test.ts` added)                                                                                                                                                                                |
+| F2 Hexwright's dead curse area (must)        | **fixed** (`curseEffect(20), manaRegen(15)`); the duration question is answered (D4): skill duration does reach a cast curse                                                                                                               |
+| F3 lines the sheet does not count (should)   | **closed by the user** (U1, CONSTRAINTS §10.3: "a non issue"); every one of them is live in the fight                                                                                                                                      |
 | F4 smalls off one unit, two-line smalls      | **partly**: the two-line smalls, `n442`, attack speed, bow speed, two-hand speed, block, one-handed, mace, freeze, evasion, wand and Finishing Cut re-sizes are done; left: `UNIT.resOne` ×28 (D2), two spurs ×4 (D3), totem speed ×3 (D4) |
-| F5 the Strider's editor bags (should)        | **fixed**: bags re-homed, 70 placeholder reasons replaced, Hard Target's and Quick Hands' reasons rewritten, `n414` laid on the line                                                                                    |
-| F6 Arcane Focus / Warded Mind sides (should) | **fixed** (`focus.c` cast speed)                                                                                                                                                                                        |
-| F7 bridge pockets (consider)                 | no change, as intended; read as two uniform sections (§2 above)                                                                                                                                                         |
-| F8 wheel entrances of a third stat           | **partly**: the Pyre's fixed; the life entrances (Nave, Snares, Unbroken) kept by decision                                                                                                                             |
-| F9 roads made of smalls                      | **fixed** for the blade road (Quick Wrists) and `knife.hex.road.a`; the three home life roads kept by decision                                                                                                          |
-| F10 Quiet Knife, Crozier                     | **partly**: Quiet Knife fixed; Crozier open (D1)                                                                                                                                                                        |
-| F11 G3 copies of pairings                    | Hasty Words changed; the rest re-measured and left (D7)                                                                                                                                                                 |
-| F12 `lines.ts` pricing and labels            | **not done**; the weapon-pricing part is withdrawn (D4)                                                                                                                                                                 |
-| F13 Greatweight, Broad Back                  | **fixed** (stun duration, stun recovery)                                                                                                                                                                                |
+| F5 the Strider's editor bags (should)        | **fixed**: bags re-homed, 70 placeholder reasons replaced, Hard Target's and Quick Hands' reasons rewritten, `n414` laid on the line                                                                                                       |
+| F6 Arcane Focus / Warded Mind sides (should) | **fixed** (`focus.c` cast speed)                                                                                                                                                                                                           |
+| F7 bridge pockets (consider)                 | no change, as intended; read as two uniform sections (§2 above)                                                                                                                                                                            |
+| F8 wheel entrances of a third stat           | **partly**: the Pyre's fixed; the life entrances (Nave, Snares, Unbroken) kept by decision                                                                                                                                                 |
+| F9 roads made of smalls                      | **fixed** for the blade road (Quick Wrists) and `knife.hex.road.a`; the three home life roads kept by decision                                                                                                                             |
+| F10 Quiet Knife, Crozier                     | **partly**: Quiet Knife fixed; Crozier open (D1)                                                                                                                                                                                           |
+| F11 G3 copies of pairings                    | Hasty Words changed; the rest re-measured and left (D7)                                                                                                                                                                                    |
+| F12 `lines.ts` pricing and labels            | **not done**; the weapon-pricing part is withdrawn (D4)                                                                                                                                                                                    |
+| F13 Greatweight, Broad Back                  | **fixed** (stun duration, stun recovery)                                                                                                                                                                                                   |
 
 Fix-1's tool items in my subset were not done: `passives:audit` listing smalls off one unit (§3 item 2), the `lines.ts`
 changes (§3 item 3: `UNIT.resOne`, `allAttr`, labels, `curseArea`), the staff-spell line (§3 item 5). D1 to D4 carry the
@@ -235,20 +235,20 @@ ones still worth doing.
 
 ## 4. Checklist
 
-| item                                                    | verdict                                                                                                                         |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| §2.4 names our own plain words                          | **holds** (458 names clean; gem-name overlaps are a reading question, D9)                                                      |
-| §8.1 a small is one stat at the reference size          | holds with exceptions: 28 resistance smalls at 1.25 (D2), 4 spur smalls at 0.8 (D3), 3 totem speed smalls at 1.14 (D4)          |
-| §8.2 every small in a section carries the same modifier | **holds**; three two-notable chains split by whose stat it is; wheel life entrances kept by decision                            |
-| §8.3 micro choices are real                             | holds in my subset (Ready Wit / Warded Mind fixed); the rest is the trade-offs audit's                                          |
-| §8.4–8.5 shapes and forks                               | holds                                                                                                                           |
-| §8.6 notables worth 3 to 5 units                        | **holds** (279 of 279); Wanderer and Well Rounded are attribute notables by design (D6)                                        |
-| §8.7 almost every small belongs to a notable            | holds with the decided exceptions (Shieldwall; three home life roads)                                                           |
-| §10.1 wide vocabulary                                   | **holds**; spell damage with cast speed six times (D5), G3 copies spread far apart (D7)                                         |
-| §10.2 one theme per cluster                             | holds with one exception: Crozier (D1)                                                                                          |
-| §10.3 every line obeyed by the fight                    | **holds**: no node carries a dead line; `curseArea` lingers in the vocabulary and the curser's weights (D4)                      |
-| §10.4–10.5 node kinds, the editor                       | holds, except three `allAttr(4)` smalls (D6)                                                                                    |
-| every node and link has a `why` that still matches      | holds with four small exceptions (D8); §14 rejects reasons as a rule, so this ranks last                                       |
+| item                                                    | verdict                                                                                                                |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| §2.4 names our own plain words                          | **holds** (458 names clean; gem-name overlaps are a reading question, D9)                                              |
+| §8.1 a small is one stat at the reference size          | holds with exceptions: 28 resistance smalls at 1.25 (D2), 4 spur smalls at 0.8 (D3), 3 totem speed smalls at 1.14 (D4) |
+| §8.2 every small in a section carries the same modifier | **holds**; three two-notable chains split by whose stat it is; wheel life entrances kept by decision                   |
+| §8.3 micro choices are real                             | holds in my subset (Ready Wit / Warded Mind fixed); the rest is the trade-offs audit's                                 |
+| §8.4–8.5 shapes and forks                               | holds                                                                                                                  |
+| §8.6 notables worth 3 to 5 units                        | **holds** (279 of 279); Wanderer and Well Rounded are attribute notables by design (D6)                                |
+| §8.7 almost every small belongs to a notable            | holds with the decided exceptions (Shieldwall; three home life roads)                                                  |
+| §10.1 wide vocabulary                                   | **holds**; spell damage with cast speed six times (D5), G3 copies spread far apart (D7)                                |
+| §10.2 one theme per cluster                             | holds with one exception: Crozier (D1)                                                                                 |
+| §10.3 every line obeyed by the fight                    | **holds**: no node carries a dead line; `curseArea` lingers in the vocabulary and the curser's weights (D4)            |
+| §10.4–10.5 node kinds, the editor                       | holds, except three `allAttr(4)` smalls (D6)                                                                           |
+| every node and link has a `why` that still matches      | holds with four small exceptions (D8); §14 rejects reasons as a rule, so this ranks last                               |
 
 Sections of CONSTRAINTS weighed for the fixes: §1.1 and §14 (no node placed for a number; every fix is a re-line, a
 price or a text), §4.5–4.6 (D1, D2), §5.1–5.3 (D1, D5, D6, D7), §8, §9.1 (D3), §10, §2.4.
