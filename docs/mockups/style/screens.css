@@ -367,12 +367,6 @@
   position: relative;
   z-index: 1;
 }
-[data-style='leaf'] .sk-foot {
-  margin: 0;
-  text-align: center;
-  color: var(--on-gold);
-  font-weight: 600;
-}
 [data-style='leaf'] .sk-pick {
   display: flex;
   align-items: center;

@@ -104,7 +104,6 @@
         <div class="sk-main">
           ${pickBar()}
           <div class="sk-grid">${ITEMS.map(card).join('')}</div>
-          <p class="sk-foot">Amulet, second ring and belt have no sockets.</p>
         </div>
         <section class="lf-panel sk-bag" data-paint="panel">
           <h4 class="lf-h">Gems</h4>
