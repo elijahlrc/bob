@@ -26,12 +26,16 @@ function Slot({ s }: { s: SkillSlot }) {
   );
 }
 
-/** Every equipped skill with its use and cooldown state (see skillStatus.ts for what each state means). */
+/**
+ * Every equipped skill with its use and cooldown state (see skillStatus.ts for what each state means). The slots change
+ * every frame, so they are styled by CSS alone and kept out of the painter's sight (`data-nopaint`); the plate they sit
+ * on is the HUD's dock.
+ */
 export function SkillBar({ w }: { w: World }) {
   const slots = skillSlots(w);
   if (slots.length === 0) return null;
   return (
-    <div class="skillbar">
+    <div class="skillbar" data-nopaint>
       {slots.map((s) => (
         <Slot key={s.key} s={s} />
       ))}

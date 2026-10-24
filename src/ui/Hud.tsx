@@ -32,7 +32,10 @@ import { infoProps } from './info';
 import { reprieveDef } from '../data/reprieves';
 import { SkillBar } from './SkillBar';
 
-/** A resource orb: the fill height shows the amount; the skin comes from CSS. */
+/**
+ * A resource orb: a painted medallion whose field is the liquid, with the empty part covered from the top down (so the
+ * liquid keeps its painted light and wear). The bezel is painted once; everything that moves is inside `data-nopaint`.
+ */
 function Orb(props: {
   value: number;
   max: number;
@@ -51,19 +54,23 @@ function Orb(props: {
   return (
     <div
       class={`orb ${kind}`}
+      data-paint="medal"
+      data-field={kind === 'life' ? 'vermilion,4' : 'lapis,5'}
+      data-medal={kind === 'mana' ? 'big stars' : 'big'}
       {...infoProps(
         `${label} ${Math.round(value)} / ${Math.round(max - reserved)}${
           reserved > 0 ? ` (${Math.round(reserved)} of ${Math.round(max)} reserved by auras)` : ''
         }`,
       )}
     >
-      <div class="orb-glass">
-        {resPct > 0 && <div class="orb-reserved" style={{ height: `${resPct}%` }} />}
-        <div class="orb-fill" style={{ height: `${pct}%` }} />
+      <div class="orb-glass" data-nopaint>
+        <div class="orb-empty" style={{ height: `${100 - pct}%` }} />
         {esPct > 0 && <div class="orb-es" style={{ height: `${esPct}%` }} />}
-        <div class="orb-gloss" />
+        {resPct > 0 && <div class="orb-reserved" style={{ height: `${resPct}%` }} />}
       </div>
-      <div class="orb-text">{Math.round(value)}</div>
+      <div class="orb-text" data-nopaint>
+        {Math.round(value)}
+      </div>
     </div>
   );
 }
@@ -100,11 +107,11 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
   const boss = spec && bossOfType(spec.type);
   const rival = a.isPlayer && a.side ? a.side : null;
   return (
-    <div class="inspect" style={{ '--rar': hex(RARITY_COLOR[rarity]) }}>
+    <div class="inspect" data-paint="panel" style={{ '--rar': hex(RARITY_COLOR[rarity]) }}>
       <button class="inspect-x" title="Close" onClick={() => c.bus.emit('select', { id: null })}>
         ×
       </button>
-      <div class="inspect-name">{a.name || (rarity === 'boss' ? BOSS_NAME : type)}</div>
+      <div class="inspect-name lf-h">{a.name || (rarity === 'boss' ? BOSS_NAME : type)}</div>
       <div class="muted inspect-sub">
         {rival ? (
           `${classDef(rival.build.classId).name} · Level ${rival.build.level}`
@@ -117,40 +124,11 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           </>
         )}
       </div>
-      {spec && boss && (
-        <>
-          <div class="muted inspect-sub">{TYPE_BLURBS[spec.type]}</div>
-          <BossCardOf type={spec.type} />
-        </>
-      )}
-      {spec && !boss && (
-        <div class="muted inspect-sub">
-          {FACTION_NAMES[MONSTER_TYPES[spec.type].faction]}: {TYPE_BLURBS[spec.type]}
-          {FACTION_RULES[MONSTER_TYPES[spec.type].faction] &&
-            ` ${FACTION_RULES[MONSTER_TYPES[spec.type].faction]}`}
-        </div>
-      )}
-      {spec &&
-        !boss &&
-        [
-          shapeText(MONSTER_TYPES[spec.type].shape),
-          ...encounterTexts(spec.type),
-          ...abilityTexts(abilitiesOf(spec.type)),
-          ...movementTexts(MONSTER_TYPES[spec.type].movement),
-          patternText(MONSTER_TYPES[spec.type].pattern),
-          ...phaseTexts(MONSTER_TYPES[spec.type].phases),
-          ...senseText(MONSTER_TYPES[spec.type].senses),
-          ...defenceTexts(typeProfile(MONSTER_TYPES[spec.type])),
-        ]
-          .filter((t): t is string => !!t)
-          .map((t) => (
-            <div key={t} class="muted inspect-sub">
-              {t}
-            </div>
-          ))}
+      {/* The life first; what the monster is and does scrolls under it, so the name and its frieze stay put. */}
       {a.def.maxEs > 0 && (
         <div
           class="inspect-life inspect-es"
+          data-nopaint
           title={`Energy shield ${Math.round(a.es)} / ${Math.round(a.def.maxEs)}`}
         >
           <div style={{ width: `${Math.max(0, Math.min(100, (a.es / a.def.maxEs) * 100))}%` }} />
@@ -159,35 +137,70 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           </span>
         </div>
       )}
-      <div class="inspect-life" title={`${Math.round(a.life)} / ${Math.round(maxLife)}`}>
+      <div
+        class="inspect-life"
+        data-nopaint
+        title={`${Math.round(a.life)} / ${Math.round(maxLife)}`}
+      >
         <div style={{ width: `${Math.max(0, Math.min(100, (a.life / maxLife) * 100))}%` }} />
         <span>
           {Math.round(a.life).toLocaleString()} / {Math.round(maxLife).toLocaleString()}
         </span>
       </div>
-      {a.hexes.map((h) => (
-        <div key={h.id} class="inspect-mod">
-          <span class="mchip ring" style={{ '--c': '#c070e0' }} />
-          <div>
-            <div class="inspect-mod-name">Hexed: {HEXES[h.id].name}</div>
-            <div class="muted">{hexText(h.id, h.effect)}</div>
+      <div class="inspect-body">
+        {spec && boss && (
+          <>
+            <div class="muted inspect-sub">{TYPE_BLURBS[spec.type]}</div>
+            <BossCardOf type={spec.type} />
+          </>
+        )}
+        {spec && !boss && (
+          <div class="muted inspect-sub">
+            {FACTION_NAMES[MONSTER_TYPES[spec.type].faction]}: {TYPE_BLURBS[spec.type]}
+            {FACTION_RULES[MONSTER_TYPES[spec.type].faction] &&
+              ` ${FACTION_RULES[MONSTER_TYPES[spec.type].faction]}`}
           </div>
-        </div>
-      ))}
-      {a.modIds.length === 0
-        ? !rival && <div class="muted">No affixes.</div>
-        : a.modIds.map((id) => (
-            <div key={id} class="inspect-mod">
-              <span
-                class={`mchip ${MOD_MARKS[id].shape}`}
-                style={{ '--c': hex(MOD_MARKS[id].color) }}
-              />
-              <div>
-                <div class="inspect-mod-name">{monsterModDef(id).name}</div>
-                <div class="muted">{MOD_MARKS[id].desc}</div>
+        )}
+        {spec &&
+          !boss &&
+          [
+            shapeText(MONSTER_TYPES[spec.type].shape),
+            ...encounterTexts(spec.type),
+            ...abilityTexts(abilitiesOf(spec.type)),
+            ...movementTexts(MONSTER_TYPES[spec.type].movement),
+            patternText(MONSTER_TYPES[spec.type].pattern),
+            ...phaseTexts(MONSTER_TYPES[spec.type].phases),
+            ...senseText(MONSTER_TYPES[spec.type].senses),
+            ...defenceTexts(typeProfile(MONSTER_TYPES[spec.type])),
+          ]
+            .filter((t): t is string => !!t)
+            .map((t) => (
+              <div key={t} class="muted inspect-sub">
+                {t}
               </div>
+            ))}
+        {a.hexes.map((h) => (
+          <div key={h.id} class="inspect-mod">
+            <span class="mchip ring" style={{ '--c': '#c070e0' }} />
+            <div>
+              <div class="inspect-mod-name">Hexed: {HEXES[h.id].name}</div>
+              <div class="muted">{hexText(h.id, h.effect)}</div>
             </div>
-          ))}
+          </div>
+        ))}
+        {a.modIds.map((id) => (
+          <div key={id} class="inspect-mod">
+            <span
+              class={`mchip ${MOD_MARKS[id].shape}`}
+              style={{ '--c': hex(MOD_MARKS[id].color) }}
+            />
+            <div>
+              <div class="inspect-mod-name">{monsterModDef(id).name}</div>
+              <div class="muted">{MOD_MARKS[id].desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -226,7 +239,7 @@ function BossLine({ w }: { w: World }) {
   }
   if (!s.boss || performance.now() - s.at > BOSS_LINE_MS) return null;
   return (
-    <div class="boss-line" key={s.boss.id}>
+    <div class="boss-line" key={s.boss.id} data-nopaint>
       {s.boss.says.map((t) => (
         <div key={t}>{t}</div>
       ))}
@@ -242,7 +255,7 @@ function BossBar({ w }: { w: World }) {
   const bosses = w.actors.filter((a) => a.alive && (isRival(a) || engagedBoss(w, a)));
   if (bosses.length === 0) return null;
   return (
-    <div class="boss-bars">
+    <div class="boss-bars" data-nopaint>
       {bosses.map((b) => {
         const max = Math.max(1, b.def.maxLife);
         const lines = b.isPlayer ? [] : bossReadout(w, b);
@@ -359,9 +372,9 @@ function Charges({ w }: { w: World }) {
   const kinds = CHARGE_KINDS.filter((k) => ch.chargeSource[k] || ch.charges[k] > 0);
   const hexes = w.sides[0].player.hexes;
   const debuffs = playerDebuffs(w);
-  if (!kinds.length && !hexes.length && !debuffs.length) return null;
+  // Always there (empty when nothing is on the character), so chips coming and going never wake the painter.
   return (
-    <div class="charges">
+    <div class="charges" data-nopaint>
       {debuffs.map((d) => (
         <div key={d.name} class="hexchip" {...infoProps(d.text)}>
           ⚠ {d.name}
@@ -452,6 +465,8 @@ function AbandonButton({ c, w }: { c: Controller; w: World }) {
     return (
       <div class="hud-abandon">
         <span
+          class="hud-note"
+          data-nopaint
           title={
             w.abandonAuto
               ? `A map is left on its own after about ${Math.round(autoAbandonAt(w) / 60)} minutes${w.plan.endKind === 'boss' ? ' (twice as long on a boss map)' : ''}.`
@@ -486,7 +501,10 @@ function AbandonButton({ c, w }: { c: Controller; w: World }) {
     <div class="hud-abandon">
       {asking ? (
         <>
-          <span title="You keep the loot and XP you have, but the level earns no clear rewards.">
+          <span
+            class="hud-note"
+            title="You keep the loot and XP you have, but the level earns no clear rewards."
+          >
             Leave this map?
           </span>
           <button
@@ -521,6 +539,12 @@ function formatLevelTime(t: number): string {
     : `${m}:${sec}`;
 }
 
+/**
+ * The map's HUD in Gold Leaf (src/ui/leaf/hud.css). The map stays visible: no gold wall, only a few painted things whose
+ * size holds for the whole map (the orbs' bezels, the dock of flasks and skills, the biome banner, the inspect card, the
+ * buttons). Everything that changes while playing sits inside `data-nopaint` or keeps its state in attributes the painter
+ * does not watch (a flask's `data-st`), so the HUD's ten renders a second never wake the painter.
+ */
 export function Hud({ c }: { c: Controller }) {
   useTicks(c);
   const w = c.world;
@@ -532,49 +556,55 @@ export function Hud({ c }: { c: Controller }) {
   // A duel (docs/DUEL.md 5) is the player's HUD with the map's chrome that does not apply left out: the rival is the boss bar.
   const duel = c.duel;
   const sel = c.selectedId !== null ? w.actors.find((x) => x.id === c.selectedId) : undefined;
+  const flasks = w.sides[0].flasks;
+  const sealed = flasksSealed(w);
   return (
     <div class="hud">
       {!sc && w.t < 5 && (
-        <div class="biome-banner" key={w.plan.seed}>
+        <div class="biome-banner" key={w.plan.seed} data-paint="panel">
           {/* A duel names its place, not the biome the arena borrowed: the banner's text describes a layout the arena has not. */}
-          <div class="biome-name">{duel ? 'Duelling arena' : w.plan.biome.name}</div>
+          <div class="biome-name lf-h">{duel ? 'Duelling arena' : w.plan.biome.name}</div>
           {!duel && <div class="biome-text">{w.plan.biome.text}</div>}
         </div>
       )}
-      <div class="hud-top">
-        <span>
-          {sc ? 'Showcase' : duel ? 'Duel' : `Map ${w.plan.map}`}
-          {!duel && ` · ${w.plan.theme.name}`}
-        </span>
-        {!duel && <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>}
-        {!duel && <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>}
-        <span>Level {w.sides[0].build.level}</span>
-        {!duel && <span>Kills {w.sides[0].stats.kills}</span>}
-        <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
-          {formatLevelTime(w.t)}
-        </span>
-        {w.plan.type !== 'plain' && (
-          <span {...infoProps(mapTypeDef(w.plan.type).text)}>
-            {mapTypeDef(w.plan.type).name}
-            {w.plan.type === 'crescendo' &&
-              ` +${Math.round(w.surge * CRESCENDO_STEP_BONUS * 100)}% (step ${w.surge})`}
-            {w.plan.type === 'collapse' &&
-              (w.collapseFront <= 0
-                ? ` in ${Math.max(0, Math.ceil(COLLAPSE_START - w.t))} s`
-                : ` ${Math.max(0, w.collapseGap).toFixed(0)} tiles behind you`)}
-            {w.plan.type === 'crawl' && ` ${w.plan.segment + 1}/${w.plan.segments}`}
-            {w.plan.type === 'holdout' &&
-              ` wave ${w.holdout.spawned}/${HOLDOUT_WAVES} (${w.holdout.cleared} survived)`}
-          </span>
-        )}
-        {!duel && <span>{w.exitOpen ? 'Exit open' : ''}</span>}
-        {!sc && !c.gallery && !duel && <ReprieveBadge w={w} />}
-        {duel && <ReprievePips s={w.sides[0]} />}
+      <div class="hud-head">
+        <div class="hud-top" data-nopaint>
+          <div class="hud-top-row">
+            <span>
+              {sc ? 'Showcase' : duel ? 'Duel' : `Map ${w.plan.map}`}
+              {!duel && ` · ${w.plan.theme.name}`}
+            </span>
+            {!duel && <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>}
+            {!duel && <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>}
+            <span>Level {w.sides[0].build.level}</span>
+            {!duel && <span>Kills {w.sides[0].stats.kills}</span>}
+            <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
+              {formatLevelTime(w.t)}
+            </span>
+            {w.plan.type !== 'plain' && (
+              <span {...infoProps(mapTypeDef(w.plan.type).text)}>
+                {mapTypeDef(w.plan.type).name}
+                {w.plan.type === 'crescendo' &&
+                  ` +${Math.round(w.surge * CRESCENDO_STEP_BONUS * 100)}% (step ${w.surge})`}
+                {w.plan.type === 'collapse' &&
+                  (w.collapseFront <= 0
+                    ? ` in ${Math.max(0, Math.ceil(COLLAPSE_START - w.t))} s`
+                    : ` ${Math.max(0, w.collapseGap).toFixed(0)} tiles behind you`)}
+                {w.plan.type === 'crawl' && ` ${w.plan.segment + 1}/${w.plan.segments}`}
+                {w.plan.type === 'holdout' &&
+                  ` wave ${w.holdout.spawned}/${HOLDOUT_WAVES} (${w.holdout.cleared} survived)`}
+              </span>
+            )}
+            {!duel && w.exitOpen && <span class="hud-exit">Exit open</span>}
+            {!sc && !c.gallery && !duel && <ReprieveBadge w={w} />}
+            {duel && <ReprievePips s={w.sides[0]} />}
+          </div>
+        </div>
+        <BossBar w={w} />
+        {!duel && <BossLine w={w} />}
+        {sel && sel.alive && (!sel.isPlayer || isRival(sel)) && <Inspect a={sel} c={c} />}
       </div>
       {!sc && !c.gallery && !duel && <AbandonButton c={c} w={w} />}
-      <BossBar w={w} />
-      {!duel && <BossLine w={w} />}
-      {sel && sel.alive && (!sel.isPlayer || isRival(sel)) && <Inspect a={sel} c={c} />}
       {duel && (
         <div class="hud-showcase">
           <div class="showcase-row">
@@ -586,7 +616,7 @@ export function Hud({ c }: { c: Controller }) {
       )}
       {c.gallery && (
         <div class="hud-showcase hud-gallery">
-          <div>
+          <div class="hud-note" data-nopaint>
             {c.gallery.entries[c.gallery.idx].name}
             <span class="muted">
               {' '}
@@ -619,9 +649,11 @@ export function Hud({ c }: { c: Controller }) {
           </div>
         </div>
       )}
-      {sc && (
+      {sc && !c.gallery && (
         <div class="hud-showcase">
-          <div class="muted">{CLASSES[sc.classIdx].name} · N next class</div>
+          <div class="showcase-who" data-paint="panel" data-thin>
+            {CLASSES[sc.classIdx].name}
+          </div>
           <div class="showcase-row">
             <button class="btn small" onClick={() => c.nextShowcaseClass()}>
               Next class (N)
@@ -644,41 +676,54 @@ export function Hud({ c }: { c: Controller }) {
         />
         <div class="hud-center">
           <Charges w={w} />
-          <SkillBar w={w} />
-          <div class="flasks">
-            {w.sides[0].flasks.map((f, i) => {
-              const pct = f.spec.maxCharges > 0 ? (f.charges / f.spec.maxCharges) * 100 : 0;
-              const ready = f.charges >= f.spec.perUse;
-              const kindLabel =
-                f.spec.kind === 'life'
-                  ? 'Life'
-                  : f.spec.kind === 'mana'
-                    ? 'Mana'
-                    : f.spec.kind === 'hybrid'
-                      ? 'Hybrid'
-                      : 'Utility';
-              return (
-                <div
-                  key={i}
-                  class={
-                    'flask' +
-                    (f.activeT > 0 ? ' active' : '') +
-                    (ready ? ' ready' : '') +
-                    (flasksSealed(w) ? ' sealed' : '')
-                  }
-                  {...infoProps(
-                    `${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${f.spec.perUse} per use. Used automatically.`,
-                  )}
-                >
-                  <div class="flask-neck" />
-                  <div class="flask-body">
-                    <div class={'flask-fill ' + f.spec.kind} style={{ height: `${pct}%` }} />
-                    <span class="flask-count">{Math.floor(f.charges)}</span>
-                  </div>
-                  <div class="flask-tag">{kindLabel[0]}</div>
-                </div>
-              );
-            })}
+          <div class="hud-dock" data-paint="panel">
+            {flasks.length > 0 && (
+              <div class="flasks">
+                {flasks.map((f, i) => {
+                  const pct =
+                    f.spec.maxCharges > 0
+                      ? Math.max(0, Math.min(100, (f.charges / f.spec.maxCharges) * 100))
+                      : 0;
+                  const ready = f.charges >= f.spec.perUse;
+                  const kindLabel =
+                    f.spec.kind === 'life'
+                      ? 'Life'
+                      : f.spec.kind === 'mana'
+                        ? 'Mana'
+                        : f.spec.kind === 'hybrid'
+                          ? 'Hybrid'
+                          : 'Utility';
+                  // The state is an attribute the painter does not watch: the bottle is painted once.
+                  const st = [f.activeT > 0 && 'active', ready && 'ready', sealed && 'sealed']
+                    .filter(Boolean)
+                    .join(' ');
+                  return (
+                    <div
+                      key={i}
+                      class="flask"
+                      data-st={st}
+                      {...infoProps(
+                        `${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${f.spec.perUse} per use. Used automatically.`,
+                      )}
+                    >
+                      <div
+                        class="flask-bottle"
+                        data-paint="bottle"
+                        data-liquid={f.spec.kind}
+                        data-fill="1"
+                      />
+                      <div class="flask-glass" data-nopaint>
+                        <div class="flask-empty" style={{ height: `${100 - pct}%` }} />
+                      </div>
+                      <span class="flask-count" data-nopaint>
+                        {Math.floor(f.charges)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <SkillBar w={w} />
           </div>
           <div class="speeds">
             <button class={'btn small' + (c.paused ? ' on' : '')} onClick={() => c.togglePause()}>

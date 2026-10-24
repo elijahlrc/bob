@@ -1,1 +1,750 @@
-/* Gold Leaf: hud (filled in by the port, docs/mockups/style/STYLE-GUIDE.md section 10). */
+/* Gold Leaf: the map's HUD (src/ui/Hud.tsx, SkillBar.tsx; docs/mockups/style/STYLE-GUIDE.md). The map stays in view:
+   no gold wall, only a few painted things that keep their size for the whole map (the orbs' medallions, the dock of
+   flasks and skills, the biome banner, the inspect card, the buttons). What changes while playing is styled here alone,
+   in the small-bar look (lapis texture, a gold ring, a hard shadow), and sits inside data-nopaint. Overrides the old
+   HUD rules of styles.css, skins.css and mobile.css. */
+
+html.leaf .hud {
+  color: var(--pearl);
+  font-size: var(--size);
+  text-shadow: var(--text-shadow);
+}
+
+/* ---- The head: a column down the top of the map, above the bottom HUD (--hud-bottom): the status line on the left,
+   the boss bars and the boss's words centred under it, the inspect card on the left, shrinking to the room left. ---- */
+html.leaf .hud {
+  --hud-bottom: 236px;
+}
+html.leaf .hud-head {
+  position: absolute;
+  top: calc(8px + var(--safe-top, 0px));
+  left: calc(12px + var(--safe-left, 0px));
+  right: calc(12px + var(--safe-right, 0px));
+  bottom: calc(var(--hud-bottom) + var(--safe-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+/* ---- The status line: one lapis strip, items set apart by small gold lozenges; a lozenge that would start a line is
+   clipped (the row reaches 36 px left of the strip's text and the clip cuts that margin off). ---- */
+html.leaf .hud-top {
+  position: static;
+  align-self: flex-start;
+  flex: none;
+  display: block;
+  max-width: calc(100% - 290px);
+  box-sizing: border-box;
+  padding: 6px 16px 7px;
+  font-size: var(--size);
+  line-height: 1.2;
+  background: var(--t-lapis, #172049);
+  box-shadow: var(--ring);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .hud-top-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 0;
+  margin-left: -36px;
+  clip-path: inset(-8px -8px -8px 36px);
+}
+html.leaf .hud-top-row > span {
+  display: inline-flex;
+  align-items: center;
+}
+html.leaf .hud-top-row > span::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin: 0 12px 0 18px;
+  background: #a23f2b;
+  box-shadow:
+    0 0 0 2px #d1b062,
+    2px 2px 0 2px #0b0805;
+  transform: rotate(45deg);
+}
+@media (pointer: coarse) {
+  html.leaf .hud-top-row > span {
+    pointer-events: auto;
+  }
+}
+html.leaf .hud-top-row > .hud-exit {
+  color: var(--gold-hi);
+}
+html.leaf .hud-reprieve {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--gold-hi);
+  font-size: var(--size);
+}
+html.leaf .hud-reprieve.used {
+  color: var(--dim);
+  animation: leaf-reprieve-flash 1s steps(4) both;
+}
+@keyframes leaf-reprieve-flash {
+  0% {
+    color: #eee8d6;
+  }
+  100% {
+    color: var(--dim);
+  }
+}
+/* A duel's reprieves: a gold pip each, a hollow one once used. */
+html.leaf .reprieve-pips {
+  gap: 6px;
+}
+html.leaf .reprieve-pips .pip {
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 0;
+  background: #d1b062;
+  box-shadow:
+    0 0 0 2px #7e622c,
+    2px 2px 0 2px #0b0805;
+  transform: rotate(45deg);
+}
+html.leaf .reprieve-pips .pip.used {
+  background: #0c1129;
+  animation: none;
+}
+
+/* ---- Abandon, the showcase and gallery rows: top right ---- */
+html.leaf .hud-abandon {
+  top: calc(8px + var(--safe-top, 0px));
+  right: calc(12px + var(--safe-right, 0px));
+  gap: 10px;
+  font-size: var(--size);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .hud-note {
+  padding: 7px 14px 8px;
+  background: var(--t-lapis, #172049);
+  box-shadow: var(--ring);
+  color: var(--pearl);
+}
+html.leaf .hud-showcase {
+  top: calc(8px + var(--safe-top, 0px));
+  right: calc(12px + var(--safe-right, 0px));
+  gap: 12px;
+  font-size: var(--size);
+}
+html.leaf .showcase-who {
+  padding: 6px 20px 7px;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+html.leaf .hud-gallery select {
+  max-width: 340px;
+}
+
+/* ---- Boss bars: the name in Jacquard over a ringed lapis bar ---- */
+html.leaf .boss-bars {
+  position: static;
+  flex: none;
+  transform: none;
+  width: min(620px, 100%);
+  gap: 24px;
+}
+html.leaf .boss-bar {
+  text-shadow: var(--text-shadow);
+}
+html.leaf .boss-bar-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  letter-spacing: 0;
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 var(--ink);
+}
+html.leaf .boss-bar-life {
+  height: 16px;
+  margin: 8px 2px 10px;
+  border: 0;
+  background: var(--t-lapis, #172049);
+  box-shadow: var(--ring);
+}
+html.leaf .boss-bar-life > div {
+  background: linear-gradient(#c87257 0 4px, #a23f2b 4px 10px, #702418 10px);
+}
+html.leaf .boss-bar-life > .boss-bar-es {
+  height: 6px;
+  background: linear-gradient(#d3dce5 0 2px, #99a9b9 2px);
+}
+html.leaf .boss-bar-state {
+  font-size: var(--size);
+  color: var(--pearl);
+}
+html.leaf .boss-line {
+  position: static;
+  flex: none;
+  transform: none;
+  width: min(620px, 100%);
+  font-size: var(--size);
+  color: var(--pearl);
+  text-shadow:
+    0 2px 0 var(--ink),
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink);
+}
+
+/* ---- The biome banner: a plaque with the name in Jacquard over a frieze ---- */
+html.leaf .biome-banner {
+  left: 50%;
+  right: auto;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+  padding: 22px 44px 24px;
+  transform: translateX(-50%);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .biome-name.lf-h {
+  margin: 0 0 6px;
+  font-size: 48px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+html.leaf .biome-text {
+  margin: 0;
+  font-size: var(--size);
+  color: var(--pearl);
+  opacity: 1;
+}
+
+/* ---- The bottom: the orbs at the corners, the dock between them ---- */
+html.leaf .hud-bottom {
+  bottom: calc(12px + var(--safe-bottom, 0px));
+  align-items: flex-end;
+}
+html.leaf .hud-bottom::before {
+  content: none;
+}
+html.leaf .hud-bottom {
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+html.leaf .hud-center {
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: 12px;
+}
+
+/* An orb is a painted medallion (data-paint="medal", big pearls) whose field is the liquid. The glass is the field's
+   disc (R = round(S * 0.38) art px for S = the orb's size / 2): the empty part covers it from the top down, energy
+   shield rises from the bottom as a pale film, and what auras reserve is a locked band at the top. */
+html.leaf .orb {
+  width: 120px;
+  height: 120px;
+  --surf: #c87257;
+}
+html.leaf .orb.mana {
+  --surf: #6893dd;
+}
+html.leaf .orb-glass {
+  inset: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+}
+html.leaf .orb-empty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: #17110b;
+  box-shadow: 0 2px 0 var(--surf);
+}
+html.leaf .orb-es {
+  border: 0;
+  background: #b7c4d150;
+  box-shadow: inset 0 2px 0 #d3dce5;
+}
+html.leaf .orb-reserved {
+  border: 0;
+  background: #0c1129;
+  box-shadow: inset 0 -2px 0 #977835;
+  opacity: 1;
+}
+html.leaf .orb-text {
+  font: 400 40px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+
+/* The dock: one lapis plate for the flasks and the skills (painted once; its size holds for the map). */
+html.leaf .hud-dock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px 22px;
+  max-width: min(760px, 100%);
+  box-sizing: border-box;
+  padding: 16px 22px 18px;
+  pointer-events: auto;
+}
+
+/* A flask: a painted bottle full of its liquid (data-paint="bottle", data-fill="1"), the empty part covered from the top
+   inside its glass, which the bottle draws at radius r - 1 art px, r = min(W/2 - 2, H * 0.32), centred at H - r - 2. */
+html.leaf .flasks {
+  gap: 6px;
+}
+html.leaf .flask {
+  width: 40px;
+  height: 60px;
+  display: block;
+  --surf: #c87257;
+}
+html.leaf .flask-bottle {
+  position: absolute;
+  inset: 0;
+}
+html.leaf .flask-glass {
+  position: absolute;
+  left: 6px;
+  top: 26px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+html.leaf .flask-empty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: #17110b;
+  box-shadow: 0 2px 0 var(--surf);
+}
+html.leaf .flask-count {
+  position: absolute;
+  inset: auto 0 6px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: var(--size);
+  font-weight: 600;
+  color: var(--pearl);
+  text-shadow:
+    0 2px 0 var(--ink),
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink);
+}
+html.leaf .flask:has([data-liquid='mana']) {
+  --surf: #3f5291;
+}
+html.leaf .flask:has([data-liquid='hybrid']) {
+  --surf: #88506d;
+}
+html.leaf .flask:has([data-liquid='utility']) {
+  --surf: #ddd2a8;
+}
+html.leaf .flask:not([data-st~='ready']) {
+  filter: brightness(0.7);
+}
+html.leaf .flask[data-st~='active'] {
+  animation: leaf-flask-pulse 0.6s steps(3) infinite alternate;
+}
+html.leaf .flask[data-st~='sealed'] {
+  filter: grayscale(1) brightness(0.5);
+  animation: none;
+}
+@keyframes leaf-flask-pulse {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.45);
+  }
+}
+
+/* ---- Skills: each a stone in a gold setting, tinted with its look colour (--c); all CSS, they change every frame ---- */
+html.leaf .skillbar {
+  gap: 18px 12px;
+  max-width: 560px;
+  padding: 4px;
+}
+html.leaf .skill {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--c) 30%, transparent),
+      color-mix(in srgb, var(--c) 30%, transparent)
+    ),
+    var(--t-lapis, #172049);
+  box-shadow:
+    inset 0 0 0 2px #0b0805,
+    0 0 0 2px #d1b062,
+    0 0 0 4px #7e622c,
+    3px 4px 0 4px #0b080566;
+}
+html.leaf .skill-init {
+  font: 400 26px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: color-mix(in srgb, var(--c) 50%, #eee8d6);
+  text-shadow: 0 2px 0 var(--ink);
+}
+html.leaf .skill-sweep {
+  background: conic-gradient(from 0deg, #0b0805b8 calc(var(--cd) * 1%), transparent 0);
+}
+html.leaf .skill.active .skill-sweep,
+html.leaf .skill.casting .skill-sweep {
+  background: conic-gradient(from 0deg, #e2c68150 calc(var(--cd) * 1%), transparent 0);
+}
+/* The seconds left sit over the dimmed initials. */
+html.leaf .skill-time {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: var(--size);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--pearl);
+  text-shadow:
+    0 2px 0 var(--ink),
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink);
+}
+html.leaf .skill:has(.skill-time) .skill-init {
+  opacity: 0.3;
+}
+/* A count (minions 3/4, a chance) on a small plaque hung from the slot's foot. */
+html.leaf .skill-badge {
+  top: auto;
+  right: auto;
+  left: 50%;
+  bottom: -16px;
+  z-index: 1;
+  padding: 1px 6px 2px;
+  border-radius: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: var(--size);
+  line-height: 1;
+  color: var(--pearl);
+  background: var(--t-lapis, #172049);
+  box-shadow:
+    0 0 0 2px #c09d4e,
+    2px 3px 0 2px #0b080566;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .skill.cooling .skill-init {
+  opacity: 0.35;
+}
+html.leaf .skill.active,
+html.leaf .skill.casting {
+  box-shadow:
+    inset 0 0 0 2px #0b0805,
+    0 0 0 2px #eee8d6,
+    0 0 0 4px var(--c),
+    3px 4px 0 4px #0b080566;
+}
+html.leaf .skill.casting {
+  animation: leaf-flask-pulse 0.5s steps(3) infinite alternate;
+}
+html.leaf .skill.nopay {
+  background: linear-gradient(#541a12b0, #541a12b0), var(--t-lapis, #172049);
+  box-shadow:
+    inset 0 0 0 2px #0b0805,
+    0 0 0 2px #c87257,
+    0 0 0 4px #702418,
+    3px 4px 0 4px #0b080566;
+}
+html.leaf .skill.nopay .skill-init {
+  color: var(--madder);
+}
+
+/* ---- Charges, hexes and ailments over the dock ---- */
+html.leaf .charges {
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  pointer-events: auto;
+}
+html.leaf .charges:empty {
+  display: none;
+}
+html.leaf .hexchip {
+  padding: 5px 12px 6px;
+  border: 0;
+  border-radius: 0;
+  font-size: var(--size);
+  line-height: 1.1;
+  color: var(--pearl);
+  background: #381a2a;
+  box-shadow: var(--ring);
+}
+html.leaf .charge {
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--t-lapis, #172049);
+  box-shadow: var(--ring);
+}
+html.leaf .charge .pip {
+  width: 10px;
+  height: 10px;
+  border: 0;
+  border-radius: 0;
+  opacity: 1;
+  background: #0c1129;
+  box-shadow: 0 0 0 2px var(--c);
+  transform: rotate(45deg);
+}
+html.leaf .charge .pip.on {
+  background: var(--c);
+  box-shadow:
+    0 0 0 2px var(--c),
+    inset 2px 2px 0 #eee8d688;
+}
+html.leaf .charge.grit {
+  --c: #d1b062;
+}
+html.leaf .charge.fervour {
+  --c: #b6553d;
+}
+html.leaf .charge.insight {
+  --c: #6893dd;
+}
+
+/* ---- The inspect card: a lapis panel, the name in Jacquard over a frieze, affixes divided by tesserae ---- */
+html.leaf .inspect {
+  position: relative;
+  inset: auto;
+  align-self: flex-start;
+  flex: 0 1 auto;
+  min-height: 210px;
+  max-height: none;
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 22px 26px 24px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--pearl);
+  font-size: var(--size);
+  line-height: 1.3;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .inspect-x {
+  right: 14px;
+  top: 12px;
+  padding: 0 4px;
+  font-size: var(--head-size);
+  line-height: 1;
+  color: var(--muted);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .inspect-x:hover {
+  color: var(--pearl);
+}
+html.leaf .inspect-name.lf-h {
+  margin: 0 0 6px;
+  padding: 0 24px 30px;
+  font-size: var(--head-size);
+  color: var(--rar, var(--gold-hi));
+}
+html.leaf .inspect-sub {
+  margin: 0 0 6px;
+}
+html.leaf .inspect > :not(.inspect-body) {
+  flex: none;
+}
+/* What the monster is and does: scrolls inside the panel when the room runs out. */
+html.leaf .inspect-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  margin-right: -10px;
+  padding-right: 10px;
+}
+html.leaf .inspect-body:empty {
+  display: none;
+}
+html.leaf .inspect .muted {
+  color: var(--muted);
+}
+html.leaf .inspect .boss-card {
+  font-size: var(--size);
+  color: var(--pearl);
+}
+html.leaf .inspect-life {
+  height: 22px;
+  margin: 12px 2px 12px;
+  border: 0;
+  background: var(--t-lapis, #172049);
+  box-shadow: var(--ring);
+}
+html.leaf .inspect-life > div {
+  background: linear-gradient(#a23f2b 0 4px, #8a3020 4px 14px, #702418 14px);
+}
+html.leaf .inspect-es {
+  margin-bottom: 8px;
+}
+html.leaf .inspect-es > div {
+  background: linear-gradient(#99a9b9 0 4px, #7c8d9f 4px 14px, #617081 14px);
+}
+html.leaf .inspect-life > span {
+  font-size: var(--size);
+  line-height: 22px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .inspect-mod {
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .inspect-mod-name {
+  font-weight: 400;
+  color: var(--gold-hi);
+}
+html.leaf .mchip {
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  outline: 0;
+  box-shadow: 0 0 0 2px #0b0805;
+}
+html.leaf .mchip:is(.diamond, .triUp, .triDown) {
+  box-shadow: none;
+}
+
+/* ---- Speeds ---- */
+html.leaf .speeds {
+  margin: 0;
+  gap: 6px;
+  pointer-events: auto;
+}
+html.leaf .speeds .btn.small {
+  min-width: 48px;
+  padding: 6px 10px 7px;
+}
+
+/* ---- Phone: the speed buttons are a column down the right edge, the head and the abandon or showcase row keep to
+   its left; the inspect card is a sheet over the lower map, above the dock. ---- */
+@media (max-width: 600px) {
+  html.leaf .hud {
+    --hud-bottom: 250px;
+  }
+  html.leaf .hud-head {
+    right: calc(64px + var(--safe-right, 0px));
+    gap: 10px;
+  }
+  html.leaf .hud-top {
+    max-width: 100%;
+    padding: 5px 12px 6px;
+  }
+  html.leaf .hud-top-row > span::before {
+    margin: 0 9px 0 21px;
+  }
+  html.leaf .speeds {
+    top: calc(8px + var(--safe-top, 0px));
+    right: calc(8px + var(--safe-right, 0px));
+    gap: 8px;
+  }
+  html.leaf .speeds .btn.small {
+    min-width: 48px;
+    padding: 6px 4px 7px;
+  }
+  html.leaf .hud-abandon,
+  html.leaf .hud-showcase {
+    top: calc(290px + var(--safe-top, 0px));
+    right: calc(8px + var(--safe-right, 0px));
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  html.leaf .showcase-row {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  html.leaf .orb {
+    width: 64px;
+    height: 64px;
+  }
+  html.leaf .orb-glass {
+    inset: 8px;
+  }
+  html.leaf .orb-text {
+    font-size: 24px;
+  }
+  html.leaf .hud-center {
+    flex: 1 1 0;
+  }
+  html.leaf .hud-dock {
+    gap: 10px 8px;
+    padding: 12px 8px 18px;
+  }
+  html.leaf .flask {
+    width: 32px;
+    height: 48px;
+  }
+  html.leaf .flask-glass {
+    left: 6px;
+    top: 22px;
+    width: 20px;
+    height: 20px;
+  }
+  html.leaf .flask-count {
+    bottom: 6px;
+    height: 20px;
+  }
+  html.leaf .skillbar {
+    gap: 16px 8px;
+    padding: 4px 0;
+  }
+  html.leaf .skill {
+    width: 40px;
+    height: 40px;
+  }
+  html.leaf .skill-init {
+    font-size: 22px;
+  }
+  /* Over the abandon and showcase column while it is open; its × closes it. */
+  html.leaf .inspect {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: -52px;
+    bottom: 0;
+    top: auto;
+    width: auto;
+    min-height: 0;
+    max-height: 42vh;
+    padding: 18px 18px 20px;
+  }
+  html.leaf .biome-banner {
+    left: calc(50% - 28px);
+    max-width: calc(100% - 96px);
+    padding: 18px 24px 20px;
+  }
+  html.leaf .biome-name.lf-h {
+    font-size: 40px;
+  }
+}
