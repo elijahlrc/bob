@@ -13,39 +13,67 @@
   margin-right: 8px;
 }
 
-/* The character's own numbers: pools and attributes. */
+/* The groups the stats come in, side by side: life, energy shield and mana; the attributes; the resistances. Each is one
+   framed strip of tiles, so the grouping reads before the numbers do. */
 .cs-top {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 18px;
 }
-/* The pools, then the attributes: each a row of equal tiles, the two side by side where they fit. */
-.cs-group {
-  flex: 1 1 280px;
+.cs-trio {
+  flex: 1 1 auto;
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  gap: 8px;
-}
-.cs-big {
-  display: flex;
-  flex-direction: column;
+  grid-auto-columns: minmax(max-content, 1fr);
   background: var(--panel2);
   border: 1px solid var(--border2);
+}
+.cs-tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   padding: 6px 10px;
 }
-.cs-big .cs-label {
+.cs-tile + .cs-tile {
+  border-left: 1px solid var(--border2);
+}
+.cs-tile .cs-label,
+.cs-tile .cs-raw {
+  white-space: nowrap;
+}
+.cs-tile .cs-label {
   font-size: 13px;
 }
-.cs-big b {
+.cs-tile b {
   font-weight: normal;
   font-size: 24px;
   line-height: 1.1;
   color: var(--hi);
 }
-.cs-big .cs-raw {
+.cs-tile .cs-raw {
   margin: 0;
+  font-size: 12px;
+}
+
+/* The resistances in dulled element colours; one under its maximum is marked. */
+.cs-four .cs-tile b {
+  color: var(--text);
+}
+.cs-four .cs-tile.cs-under b {
+  color: #b8695c;
+}
+.cs-res-fire .cs-label {
+  color: #b48068;
+}
+.cs-res-cold .cs-label {
+  color: #8497a8;
+}
+.cs-res-lightning .cs-label {
+  color: #ae9f72;
+}
+.cs-res-chaos .cs-label {
+  color: #97849f;
 }
 
 .cs-cols {
@@ -75,47 +103,6 @@
 .cs-value {
   text-align: right;
   white-space: nowrap;
-}
-
-/* The resistances as four tiles, in dulled element colours; one under its maximum is marked. */
-.cs-res {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  margin: 4px 0;
-}
-.cs-res > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4px 0;
-  background: var(--panel2);
-  border: 1px solid var(--border2);
-  font-size: 13px;
-}
-.cs-res b {
-  font-weight: normal;
-  font-size: 18px;
-  color: var(--text);
-}
-.cs-res b.cs-under {
-  color: #b8695c;
-}
-.cs-res .cs-raw {
-  margin: 0;
-  font-size: 12px;
-}
-.cs-res-fire > span:first-child {
-  color: #b48068;
-}
-.cs-res-cold > span:first-child {
-  color: #8497a8;
-}
-.cs-res-lightning > span:first-child {
-  color: #ae9f72;
-}
-.cs-res-chaos > span:first-child {
-  color: #97849f;
 }
 
 .cs-warn {

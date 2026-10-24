@@ -95,30 +95,52 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   const other = of('other');
   const move = plain(other, 'moveSpeed');
   const sc = s.scenarios;
-  const big = (label: string, value: number, of?: number) => (
-    <div class="cs-big">
+  const pools = of('pools');
+  const life = plain(pools, 'life');
+  const es = plain(pools, 'es');
+  const mana = plain(pools, 'mana');
+  /** A tile of a group at the top: name, value, and what is under it (the whole of a pool, a pool's multiplier). */
+  const tile = (label: string, value: string, notes: (string | false)[] = [], cls = '') => (
+    <div key={label} class={`cs-tile ${cls}`}>
       <span class="cs-label">{label}</span>
-      <b>{f0(value)}</b>
-      {of !== undefined && <span class="cs-raw">of {f0(of)}</span>}
+      <b>{value}</b>
+      {notes.filter((n) => n).length > 0 && (
+        <span class="cs-raw">{notes.filter((n) => n).join(' · ')}</span>
+      )}
     </div>
   );
   return (
     <div class="cs">
       <div class="cs-top">
-        <div class="cs-group">
-          {big('Life', s.life - s.reservedLife, s.reservedLife > 0 ? s.life : undefined)}
-          {big('Energy Shield', s.es)}
-          {big('Mana', s.mana - s.reservedMana, s.mana)}
+        <div class="cs-trio">
+          {tile('Life', f0(s.life - s.reservedLife), [
+            s.reservedLife > 0 && `of ${f0(s.life)}`,
+            times(life?.mult ?? 1),
+          ])}
+          {tile('Energy Shield', f0(s.es), [times(es?.mult ?? 1)])}
+          {tile('Mana', f0(s.mana - s.reservedMana), [`of ${f0(s.mana)}`, times(mana?.mult ?? 1)])}
         </div>
-        <div class="cs-group">
-          {big('Strength', s.attrs.str)}
-          {big('Dexterity', s.attrs.dex)}
-          {big('Intelligence', s.attrs.int)}
+        <div class="cs-trio">
+          {tile('Strength', f0(s.attrs.str))}
+          {tile('Dexterity', f0(s.attrs.dex))}
+          {tile('Intelligence', f0(s.attrs.int))}
+        </div>
+        <div class="cs-trio cs-four">
+          {RES.map(([i, name, cls]) =>
+            tile(
+              name,
+              `${s.res[i]}%`,
+              [`max ${s.maxRes[i]}%`],
+              `cs-res-${cls}${s.res[i] < s.maxRes[i] ? ' cs-under' : ''}`,
+            ),
+          )}
         </div>
       </div>
       <div class="cs-cols">
         <div class="cs-col">
-          <Section title="Life and Mana">{of('pools').map(totalRow)}</Section>
+          <Section title="Life and Mana">
+            {pools.filter((t) => t !== life && t !== es && t !== mana).map(totalRow)}
+          </Section>
           <Section title="Armour and Evasion">
             <Row
               label="Physical Damage Reduction"
@@ -140,18 +162,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} />
             {of('block').map(totalRow)}
           </Section>
-          <Section title="Resistances">
-            <div class="cs-res">
-              {RES.map(([i, name, cls]) => (
-                <div key={cls} class={`cs-res-${cls}`}>
-                  <span>{name}</span>
-                  <b class={s.res[i] < s.maxRes[i] ? 'cs-under' : ''}>{s.res[i]}%</b>
-                  <span class="cs-raw">max {s.maxRes[i]}%</span>
-                </div>
-              ))}
-            </div>
-            {of('defenceOther').map(totalRow)}
-          </Section>
+          <Section title="Damage Taken">{of('defenceOther').map(totalRow)}</Section>
           <Section title="Recovery">
             <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} />
             {lifeRate && totalRow(lifeRate)}
