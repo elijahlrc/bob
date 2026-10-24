@@ -56,23 +56,24 @@
   font-size: 12px;
 }
 
-/* The resistances in dulled element colours; one under its maximum is marked. */
-.cs-four .cs-tile b {
-  color: var(--text);
-}
-.cs-four .cs-tile.cs-under b {
+/* The resistances in dulled element colours, name and value; one under its maximum has its maximum marked. */
+.cs-four .cs-tile.cs-under .cs-raw {
   color: #b8695c;
 }
-.cs-res-fire .cs-label {
+.cs-res-fire .cs-label,
+.cs-res-fire b {
   color: #b48068;
 }
-.cs-res-cold .cs-label {
+.cs-res-cold .cs-label,
+.cs-res-cold b {
   color: #8497a8;
 }
-.cs-res-lightning .cs-label {
+.cs-res-lightning .cs-label,
+.cs-res-lightning b {
   color: #ae9f72;
 }
-.cs-res-chaos .cs-label {
+.cs-res-chaos .cs-label,
+.cs-res-chaos b {
   color: #97849f;
 }
 
