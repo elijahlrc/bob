@@ -726,23 +726,37 @@
         const out = clamp((lt - 2.6) / 0.4);
         let s =
           SHOTS.find((x) => x.name === 'The genres').draw(2 + lt) +
-          `<rect width="320" height="180" fill="#07070b" opacity="${THUMB_TITLE ? 0.55 : lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
+          `<rect width="320" height="180" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
         s += glow(160, 80, 130, C.torch, flick * (1 - out));
         s +=
           `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
           (THUMB_TITLE
-            ? `<rect y="58" width="320" height="64" fill="#000" opacity=".55"/>` +
-              txt(160, 105, 'Battle of Builds', { size: 52, font: 'display', anchor: 'middle' })
+            ? /* the title as the game's title screen sets it: pale gold down to ember in hard bands, ringed in ink */
+              `<defs><linearGradient id="hell" x1="0" y1="0" x2="0" y2="1">` +
+              [
+                ['#f4dc8c', 0, 34],
+                ['#e9b04f', 34, 50],
+                ['#d9772f', 50, 64],
+                ['#b4401f', 64, 78],
+                ['#7c2414', 78, 100],
+              ]
+                .map(
+                  ([c, a, b]) =>
+                    `<stop offset="${a}%" stop-color="${c}"/><stop offset="${b}%" stop-color="${c}"/>`,
+                )
+                .join('') +
+              `</linearGradient></defs>` +
+              `<text x="160" y="100" text-anchor="middle" font-family="'Jacquard 24', Georgia, serif" font-size="46" letter-spacing="1" stroke="#0b0805" stroke-width="4.5" stroke-linejoin="round" paint-order="stroke" fill="url(#hell)">Battle of Builds</text>` +
+              `<text x="160" y="100" text-anchor="middle" font-family="'Jacquard 24', Georgia, serif" font-size="46" letter-spacing="1" fill="url(#hell)">Battle of Builds</text>`
             : txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' })) +
           '</g>';
-        if (!THUMB_TITLE)
-          s += txt(160, 120, 'Free on itch.io', {
-            size: 17,
-            font: 'display',
-            col: C.torch,
-            anchor: 'middle',
-            o: clamp((lt - 0.4) / 0.2) * (1 - out),
-          });
+        s += txt(160, THUMB_TITLE ? 128 : 120, 'Free on itch.io', {
+          size: 17,
+          font: 'display',
+          col: C.torch,
+          anchor: 'middle',
+          o: clamp((lt - 0.4) / 0.2) * (1 - out),
+        });
         return s;
       },
     },

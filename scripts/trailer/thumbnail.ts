@@ -17,7 +17,7 @@ const OUT = path.resolve(
 /** After the fourth word has stamped in (27.5 s) and settled, before the title shot. */
 const AT = 27.95;
 /** The title shot, once the title is in. */
-const AT_TITLE = 29.8;
+const AT_TITLE = 29.7;
 
 async function main(): Promise<void> {
   const lib = 'playwright-core';
