@@ -178,5 +178,50 @@ swaps, undo, taking passives.
 
 - The empty stop niche wants an emblem or a figure.
 - Medallion pearls are still all white (the arches alternate).
-- Moving the style into the game: the painter is DOM and canvas code, so it belongs in `src/ui` (or `src/render`);
-  paintings are deterministic from a seed, so they can be cached per element size.
+
+## 10. Moving it into the game (the next step, asked for 2026-10-24)
+
+The study is the specification: open it beside the game (`?style=leaf&screen=…&width=desktop|phone`) and match it.
+Gold Leaf replaces the current look; there is no style switch in the game.
+
+**The painter.** `paint.js` + `paint-more.js` become a module in `src/ui/leaf/` (DOM and canvas code, so `src/ui`, not
+the headless layers). Keep it deterministic (its own seeded RNG keyed by a stable element key, never `Math.random`), cache
+paintings by key and size, repaint after fonts load and on resize (ResizeObserver, debounced). In Preact, paint from a
+small hook or a `data-paint` attribute pass after render (the study's `paintLeaf(root)` walks `JOBS`); key paintings by
+a stable name, not by DOM index. The tree's sprites and sky come with `tree.js`.
+
+**Where each tab lives in the game:** Character `src/ui/Sheet.tsx` (`sheet.css`); Next map `src/ui/Camp.tsx` and
+`OfferInfo.tsx` (`wayside.css`, `styles.css`); Items `Items.tsx`, `Gear.tsx`, `ItemList.tsx`, `ItemDetail.tsx`,
+`ItemCard.tsx`, `DiffCard.tsx` (`items.css`); Skills `Skills.tsx`, `SocketPicker.tsx`, `GemCard.tsx`; Strategy
+`Strategy.tsx` (`strategy.css`); Passive tree `TreeView.tsx`, `treeStyle.ts`, `treeHit.ts` (`tree.css`); tabs, footer,
+buttons and fonts `App.tsx`, `skins.css`, `styles.css`, `mobile.css`. (`src/ui/items.css` had someone else's uncommitted
+edits on 2026-10-24: check `git status` and leave them be.)
+
+**Behaviour that changes, not only looks** (each was the owner's call while mocking; check the code before changing it):
+
+- Next map: the "weak to" warning box goes; what a map pays is four fixed rows of pairs (Quantity · Rarity, Experience ·
+  Bonus, monsters · bosses, magic · rare) with the empty ones dimmed; armies on one line (15 px); the enemy types list,
+  the "hard to … soft to" line and the map type/density explanations go (explanations into tips).
+- Items: the worn gear on the soul (body positions as in `items.js` `SLOTS`); picking a bag item lights the slots it
+  fits and aims at the best; a lit slot re-aims, any other slot shows what is worn there; the comparison is a diptych
+  with the result plaque; the button reads "Wear in Off hand"; no "X goes to the bag" line, no two-hands warning, no
+  flask "this replaces your … flask" warning, no "usual pick" note, no "linked" after sockets; bag rows are plaques with no
+  item level, no affix line, a gold mark for new; the views are tabs (All, New, Upgrades, ★, Discarded) and the kinds
+  are glyph buttons; sort has a Favourites option and the "keep favourites on top" switch goes; no bag capacity bar or
+  count; the housekeeping is always visible at the foot of the bag (Mark all seen, Clean up old items…, then Salvage junk
+  (n) and Salvage discarded (n) on one line, no Dust amounts); on a phone the worn card always shows under the new one.
+- Skills: gems are stones in settings (round skills, lozenge supports), the level on the stone, chains between sockets;
+  pick a bag gem, then tap an empty socket ("Place it here"); a socketed gem gets Make main / Take out; DPS and EHP as
+  medallions with the rotation in a tip; no "not socketable" line.
+- Strategy: numbered medallions, one-line intros with tips, the frequency inside the Every menu ("Usual pause (3.2 s)")
+  instead of a line under it, DPS never split from its number, labels beside their menus on a phone.
+- Passive tree: the starry vault; tap to look, tap again (or Take) to take, **on desktop too**; the panel shows the
+  node, the path cost and what is on the way, then the running totals; a points medallion; search only (the colours
+  legend/"Light up" goes), and search also matches a colour group's name; frontier nodes ringed; small nodes get a gold
+  ring from medium zoom; words placed where they fit, runs of identical small nodes sharing one label.
+- Everywhere: dividers between rows of text are tesserae; section headings sit on friezes the panel paints.
+
+**How to check it:** the game's own data, in the browser pane at about 1100–1300 px and at phone width. To see a full
+bag, `window.__dev.loot(40, 44)` in a run; it is saved into that run, so copy the `bob.save*` keys of localStorage first
+and put them back after. The pane stops running `requestAnimationFrame` while it is hidden, so a canvas may look stale
+in a screenshot taken then; screenshots also come out softer than the real pixels.
