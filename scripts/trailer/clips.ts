@@ -448,6 +448,11 @@ export const CLIPS: Clip[] = [
           // item selected wears that item.)
           await t.page.click('.ix-close');
           await t.page.waitForTimeout(50);
+          // On a phone the worn gear is folded to one line: it is opened, so that the amulet is seen on the character.
+          if (await t.page.locator('.ix-gear-toggle').count()) {
+            await t.page.click('.ix-gear-toggle');
+            await t.page.waitForTimeout(100);
+          }
           await t.page.evaluate(() => {
             const slot = [...document.querySelectorAll('.ix-slot')].find(
               (s) => s.querySelector('.ix-slot-name')?.textContent === 'Night Locket',
