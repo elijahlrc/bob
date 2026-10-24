@@ -268,7 +268,7 @@ export const CLIPS: Clip[] = [
     css: `
       .socket-row:not([data-slot="body"]), .skill-summary.muted, .skills-help { display: none !important; }
       .skill-summary { font-size: 1.25em; }
-      .skills .hint { font-size: 1.3em; color: #d9cdb4; }
+      .skills .hint { font-size: 0.9em; color: #d9cdb4; }
       .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; border-color: #d98a3a !important; }
       .skill-summary.trailer-flash b, .skill-summary.trailer-flash .muted { color: #ffd27a !important; }
     `,
