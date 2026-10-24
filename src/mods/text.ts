@@ -122,6 +122,27 @@ export function modText(m: Mod): string {
   }
 }
 
+/**
+ * The name of what an increase or more multiplier scales, without its number ("Physical Damage", "Attack Speed while
+ * Fortified"), for lines that show a total beside it.
+ */
+export function modLabel(m: Mod): string {
+  let s: string;
+  if (m.stat === 'damage' && m.tags?.length === 1 && m.tags[0] === 'attack') {
+    const tp = typesPhrase(m.damageTypes);
+    const rest = suffix({ ...m, tags: [] });
+    s = tp ? `${tp} Damage with Attack Skills${rest}` : `Attack Damage${rest}`;
+  } else if (
+    m.stat === 'damage' &&
+    !m.damageTypes?.length &&
+    m.tags?.length === 1 &&
+    m.tags[0] === 'spell'
+  )
+    s = `Spell Damage${suffix({ ...m, tags: [] })}`;
+  else s = statName(m) + suffix(m);
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 const DEFENCE_NAME: Record<string, string> = {
   armour: 'Armour',
   evasion: 'Evasion',

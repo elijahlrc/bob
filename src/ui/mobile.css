@@ -215,8 +215,7 @@ body {
 
 /* ---- The panels of the camp tabs on a phone ---- */
 @media (max-width: 600px) {
-  .skills-wrap,
-  .sheet {
+  .skills-wrap {
     padding: 10px;
     gap: 10px;
   }
@@ -226,9 +225,6 @@ body {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
-  }
-  .sheet table {
-    width: 100%;
   }
   /* The item's name on a line of its own, its sockets always on the lines below. */
   .socket-item {

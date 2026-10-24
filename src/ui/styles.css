@@ -432,26 +432,6 @@ svg.tree {
   margin-top: 6px;
   color: var(--muted);
 }
-.sheet {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  padding: 16px;
-}
-.sheet table {
-  border-collapse: collapse;
-  font-size: 14px;
-}
-.sheet td {
-  padding: 3px 10px;
-  border-bottom: 1px solid var(--btn);
-}
-.sheet td:first-child {
-  color: var(--muted);
-}
-.auras {
-  width: 100%;
-}
 .skills {
   padding: 16px;
   display: flex;

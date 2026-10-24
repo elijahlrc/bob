@@ -463,7 +463,7 @@ export function Camp({ c }: { c: Controller }) {
         </div>
         <div class="tab-body">
           {shown === 'tree' && <TreeView c={c} />}
-          {shown === 'sheet' && <Sheet s={sheet} />}
+          {shown === 'sheet' && <Sheet s={sheet} ch={ch} />}
           {shown === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}
           {shown === 'strategy' && <Strategy c={c} ch={ch} />}
           {shown === 'items' && run.reward && (

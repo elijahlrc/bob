@@ -1,0 +1,153 @@
+/* The Character tab (src/ui/Sheet.tsx): the character's own numbers on top, defence and offence side by side, estimates last. */
+.cs {
+  padding: 16px;
+  max-width: 920px;
+  font-size: 15px;
+}
+.cs-label {
+  color: var(--muted);
+}
+.cs-raw {
+  color: var(--muted);
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+/* The character's own numbers: pools and attributes. */
+.cs-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+/* The pools, then the attributes: each a row of equal tiles, the two side by side where they fit. */
+.cs-group {
+  flex: 1 1 280px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.cs-big {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  padding: 6px 10px;
+}
+.cs-big .cs-label {
+  font-size: 13px;
+}
+.cs-big b {
+  font-weight: normal;
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--hi);
+}
+.cs-big .cs-raw {
+  margin: 0;
+}
+
+.cs-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 32px;
+}
+.cs-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--btn);
+}
+.cs-value {
+  text-align: right;
+  white-space: nowrap;
+}
+/* A list of summed modifiers sits apart from the stats above it. */
+.cs-totals {
+  margin-top: 14px;
+}
+.cs-col > .cs-totals:first-child {
+  margin-top: 0;
+}
+
+/* The resistances as four tiles, in dulled element colours; one under its maximum is marked. */
+.cs-res {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 10px 0;
+}
+.cs-res > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  font-size: 13px;
+}
+.cs-res b {
+  font-weight: normal;
+  font-size: 18px;
+  color: var(--text);
+}
+.cs-res b.cs-under {
+  color: #b8695c;
+}
+.cs-res .cs-raw {
+  margin: 0;
+  font-size: 12px;
+}
+.cs-res-fire > span:first-child {
+  color: #b48068;
+}
+.cs-res-cold > span:first-child {
+  color: #8497a8;
+}
+.cs-res-lightning > span:first-child {
+  color: #ae9f72;
+}
+.cs-res-chaos > span:first-child {
+  color: #97849f;
+}
+
+.cs-foot {
+  margin-top: 18px;
+  max-width: 50%;
+}
+.cs-foot .cs-totals {
+  margin-top: 0;
+}
+
+/* The estimates worked out from all of the above, quieter than the stats. */
+.cs-est {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin-top: 18px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border2);
+  color: var(--muted);
+}
+.cs-est b {
+  font-weight: normal;
+  color: var(--text);
+}
+
+@media (max-width: 600px) {
+  .cs {
+    padding: 10px;
+  }
+  .cs-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cs-cols > .cs-col + .cs-col {
+    margin-top: 14px;
+  }
+  .cs-foot {
+    max-width: none;
+  }
+}

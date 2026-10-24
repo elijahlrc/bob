@@ -1827,10 +1827,7 @@ export class Character {
    * physical, lightning, cold and fire (§8.1). The default is the typical mix of a map.
    */
   ehp(def: Defence = this.defence(), hitMix: readonly number[] = DEFAULT_HIT_MIX): number {
-    const level = this.config.areaLevel;
-    const d = this.config.difficulty;
-    const hit = monsterHit(statLevel(level, d)) * Math.sqrt(d.base);
-    const mon = referenceMonster(level, d);
+    const { hit, hc } = this.againstReference(def);
     const pool = def.maxLife - this.reservedLife + def.maxEs;
     let taken = 0;
     const resMult = (t: number) =>
@@ -1850,11 +1847,32 @@ export class Character {
     // Hexed monsters deal less damage and act more slowly.
     const hexed = this.hexTarget();
     taken *= hexed.damageMult * hexed.speedMult;
+    const avoid = hc * (1 - def.blockAttack);
+    return pool / Math.max(0.01, taken * def.damageTakenMult * avoid);
+  }
+
+  /** The reference monster of the area's hit and the chance its attacks hit the character (what `ehp` and the sheet use). */
+  private againstReference(def: Defence): { hit: number; hc: number } {
+    const level = this.config.areaLevel;
+    const d = this.config.difficulty;
+    const hit = monsterHit(statLevel(level, d)) * Math.sqrt(d.base);
+    const mon = referenceMonster(level, d);
     const hc = def.cannotEvade
       ? 1
       : hitChance(mon.defence.maxLife > 0 ? mon.profile(0).hands[0].accuracy : 0, def.evasion);
-    const avoid = hc * (1 - def.blockAttack);
-    return pool / Math.max(0.01, taken * def.damageTakenMult * avoid);
+    return { hit, hc };
+  }
+
+  /**
+   * What armour and evasion are worth against the area's monsters, for the Character tab: the share of a typical physical hit
+   * taken off (armour and flat reduction), and the chance to evade an attack.
+   */
+  mitigation(def: Defence = this.defence()): { physReduction: number; evade: number } {
+    const { hit, hc } = this.againstReference(def);
+    return {
+      physReduction: Math.min(0.9, armourReduction(def.armour, hit) + def.physReduction),
+      evade: 1 - hc,
+    };
   }
 
   /**
