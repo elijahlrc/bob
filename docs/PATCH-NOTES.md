@@ -13,6 +13,9 @@ change, and our own names only. Dash bullets under plain headings.
 - Wand attacks shoot a bolt at range instead of stabbing.
 - Pixel art on the map is no longer blurred on scaled-up screens.
 - On phones, the Strategy tab gives each skill's name its own line.
+- The end-of-run screen shows the high scores and where your character ranks.
+- Duel results read Victory or Defeat.
+- When a character cannot join the rivals, the end screen says why instead of showing a connection error.
 
 ## 2026-10-22
 
