@@ -347,8 +347,10 @@ export function TreeView({ c }: { c: Controller }) {
           h: H_LINE,
           // A fixed order among equals (not the distance from the middle of the view, which panning changes).
           p: smallP(st) + r.anchor * 1e-7,
-          far: true,
-          ids: r.ids,
+          group: r.ids.flatMap((id) => {
+            const g = byId.get(id);
+            return g ? [{ x: g.x * P, y: g.y * P, r: (g.d / 2 + 0.5) * P }] : [];
+          }),
         });
       }
     const placed = placeLabels(want, taken);
@@ -356,24 +358,18 @@ export function TreeView({ c }: { c: Controller }) {
       (b) =>
         `<span class="${b.want.cls}" style="left:${Math.round(b.x)}px;top:${Math.round(b.y)}px">${esc(b.want.text)}</span>`,
     );
-    // A word for several nodes has a thin line to each of them, from its nearest edge to the node's rim.
+    // A word for several nodes has a thin line to each of them, fanned out from the middle of its facing edge.
     const leaders: string[] = [];
     for (const b of placed) {
-      if (!b.want.ids || b.want.ids.length < 2) continue;
-      for (const id of b.want.ids) {
-        const v = byId.get(id);
-        if (!v) continue;
-        const cx = v.x * P;
-        const cy = v.y * P;
-        const nx = Math.max(b.x, Math.min(cx, b.x + b.w));
-        const ny = Math.max(b.y, Math.min(cy, b.y + b.h));
-        const len = Math.hypot(nx - cx, ny - cy);
-        const rim = (v.d / 2 + 0.5) * P;
-        if (len <= rim + 2) continue;
-        const sx = cx + ((nx - cx) / len) * rim;
-        const sy = cy + ((ny - cy) / len) * rim;
+      const tip = b.tip;
+      if (!tip || !b.want.group) continue;
+      for (const g of b.want.group) {
+        const len = Math.hypot(tip.x - g.x, tip.y - g.y);
+        if (len <= g.r + 2) continue;
+        const sx = g.x + ((tip.x - g.x) / len) * g.r;
+        const sy = g.y + ((tip.y - g.y) / len) * g.r;
         leaders.push(
-          `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" class="${b.want.cls}" />`,
+          `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${tip.x.toFixed(1)}" y2="${tip.y.toFixed(1)}" class="${b.want.cls}" />`,
         );
       }
     }

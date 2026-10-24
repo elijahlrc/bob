@@ -357,10 +357,11 @@ export type Want = {
   font: string;
   h: number;
   p: number;
-  /** May sit a step or two out from its node (a word with lines to its nodes): otherwise only right beside it. */
-  far?: boolean;
-  /** The nodes a word stands for, when it is one word for several (lines are drawn to each). */
-  ids?: number[];
+  /**
+   * The nodes a word stands for when it is one word for several ("×3"), in the view's pixels with their rims: the word
+   * sits off to one side of them all and a line runs from it to each.
+   */
+  group?: { x: number; y: number; r: number }[];
 };
 export type Box = { x: number; y: number; w: number; h: number };
 
@@ -410,12 +411,40 @@ export class BoxGrid {
   }
 }
 
-/** A word placed: its box and what it was. */
-export type Placed = Box & { want: Want };
+/** A word placed: its box, what it was, and for a word of a group the point its lines fan out from. */
+export type Placed = Box & { want: Want; tip?: { x: number; y: number } };
 
 /**
- * Place the words greedily, most wanted first, each where nothing else is: beside its node (eight places round it),
- * and for a word with lines to its nodes also a step and two steps further out. Positions are in the view's pixels at
+ * Where a group's word may go: above the group's highest node, then below its lowest (beside a tall group instead),
+ * a step further out each round, centred on the group, so the lines to the nodes fan out from it and none runs along
+ * a link. The tip is the middle of the word's edge that faces the group.
+ */
+function groupTries(
+  pts: { x: number; y: number }[],
+  tw: number,
+  th: number,
+): { x: number; y: number; tip: { x: number; y: number } }[] {
+  const xs = pts.map((q) => q.x);
+  const ys = pts.map((q) => q.y);
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const cx = (x0 + x1) / 2;
+  const cy = (y0 + y1) / 2;
+  const tall = y1 - y0 > (x1 - x0) * 1.5;
+  const out: { x: number; y: number; tip: { x: number; y: number } }[] = [];
+  for (const d of [26, 44, 66, 92])
+    if (tall) {
+      out.push({ x: x1 + d, y: cy - th / 2, tip: { x: x1 + d, y: cy } });
+      out.push({ x: x0 - d - tw, y: cy - th / 2, tip: { x: x0 - d, y: cy } });
+    } else {
+      out.push({ x: cx - tw / 2, y: y0 - d - th, tip: { x: cx, y: y0 - d } });
+      out.push({ x: cx - tw / 2, y: y1 + d, tip: { x: cx, y: y1 + d } });
+    }
+  return out;
+}
+
+/**
+ * Place the words greedily, most wanted first, each where nothing else is: beside its node (eight places round it), or
+ * a group's word off to one side of the group (groupTries). Positions are in the view's pixels at
  * this zoom with the camera at 0, so the whole tree is placed at once and panning only moves the result.
  */
 export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
@@ -426,30 +455,35 @@ export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
     const cx = it.v.x * P;
     const cy = it.v.y * P;
     const r0 = (it.v.d / 2 + 1.5) * P;
-    let done = false;
-    // The first step clears the node's own keep-out box (its radius is 1 px past r0).
-    for (const gap of it.far ? [3, 22, 40] : [3]) {
-      const r = r0 + gap;
-      const d = r * 0.7;
-      const tries = [
-        { x: cx - tw / 2, y: cy + r },
-        { x: cx - tw / 2, y: cy - r - th },
-        { x: cx + r, y: cy - th / 2 },
-        { x: cx - r - tw, y: cy - th / 2 },
-        { x: cx + d, y: cy + d },
-        { x: cx - d - tw, y: cy + d },
-        { x: cx + d, y: cy - d - th },
-        { x: cx - d - tw, y: cy - d - th },
-      ];
-      for (const t of tries) {
+    if (it.group) {
+      for (const t of groupTries(it.group, tw, th)) {
         const b = { x: t.x, y: t.y, w: tw, h: th };
         if (taken.hits(b)) continue;
         taken.add(b);
-        out.push({ ...b, want: it });
-        done = true;
+        out.push({ ...b, want: it, tip: t.tip });
         break;
       }
-      if (done) break;
+      continue;
+    }
+    // The first place clears the node's own keep-out box (its radius is 1 px past r0).
+    const r = r0 + 3;
+    const d = r * 0.7;
+    const tries = [
+      { x: cx - tw / 2, y: cy + r },
+      { x: cx - tw / 2, y: cy - r - th },
+      { x: cx + r, y: cy - th / 2 },
+      { x: cx - r - tw, y: cy - th / 2 },
+      { x: cx + d, y: cy + d },
+      { x: cx - d - tw, y: cy + d },
+      { x: cx + d, y: cy - d - th },
+      { x: cx - d - tw, y: cy - d - th },
+    ];
+    for (const t of tries) {
+      const b = { x: t.x, y: t.y, w: tw, h: th };
+      if (taken.hits(b)) continue;
+      taken.add(b);
+      out.push({ ...b, want: it });
+      break;
     }
   }
   return out;
