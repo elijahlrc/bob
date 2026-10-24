@@ -559,6 +559,8 @@
 
   /* the genre words' size: larger for the thumbnail (scripts/trailer/thumbnail.ts, ?thumb) */
   const GENRE_SIZE = /[?&]thumb/.test(location.search) ? 27 : 19;
+  /* the thumbnail with the title on it (scripts/trailer/thumbnail.ts --title, ?thumbtitle): the title shot, the title larger over a lighter dim */
+  const THUMB_TITLE = /[?&]thumbtitle/.test(location.search);
 
   /* ---------- the shots ---------- */
   const SHOTS = [
@@ -724,19 +726,23 @@
         const out = clamp((lt - 2.6) / 0.4);
         let s =
           SHOTS.find((x) => x.name === 'The genres').draw(2 + lt) +
-          `<rect width="320" height="180" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
+          `<rect width="320" height="180" fill="#07070b" opacity="${THUMB_TITLE ? 0.55 : lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
         s += glow(160, 80, 130, C.torch, flick * (1 - out));
         s +=
           `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
-          txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' }) +
+          (THUMB_TITLE
+            ? `<rect y="58" width="320" height="64" fill="#000" opacity=".55"/>` +
+              txt(160, 105, 'Battle of Builds', { size: 52, font: 'display', anchor: 'middle' })
+            : txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' })) +
           '</g>';
-        s += txt(160, 120, 'Free on itch.io', {
-          size: 17,
-          font: 'display',
-          col: C.torch,
-          anchor: 'middle',
-          o: clamp((lt - 0.4) / 0.2) * (1 - out),
-        });
+        if (!THUMB_TITLE)
+          s += txt(160, 120, 'Free on itch.io', {
+            size: 17,
+            font: 'display',
+            col: C.torch,
+            anchor: 'middle',
+            o: clamp((lt - 0.4) / 0.2) * (1 - out),
+          });
         return s;
       },
     },
