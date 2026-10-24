@@ -13,6 +13,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Slag Lob and Storm Arrow count as projectiles and several other skills' tags now match what they do, which changes which supports affect them.
 - The Tollkeeper hoists his bell before each toll and brings it down as the first ring strikes.
 - On the passive tree, a long row of alike passives gets a label per stretch, so no label draws lines across the whole tree.
+- On touch screens, tapping a gem on the Skills tab shows its card with what it does.
 
 ## 2026-10-23
 
