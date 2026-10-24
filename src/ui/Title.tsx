@@ -46,8 +46,8 @@ function SaveRow({ c, slot, first }: { c: Controller; slot: SlotSummary; first: 
   };
   if (res.status === 'incompatible')
     return (
-      <div class="save-row warn">
-        <span class="save-name">Save incompatible with this version</span>
+      <div class="save-row">
+        <span class="save-name warn">Save incompatible with this version</span>
         <CopySave c={c} id={slot.id} />
         <button class="btn small danger" onClick={() => c.discardSave(slot.id)}>
           Discard
@@ -90,7 +90,7 @@ function TelemetryNotice() {
           setOn(v);
         }}
       />{' '}
-      Send anonymous run results (what killed you, where, as which class) to help balance the game
+      Send anonymous run results to help balance the game
     </label>
   );
 }
@@ -130,35 +130,41 @@ export function Title({ c }: { c: Controller }) {
   return (
     <div class="screen title">
       <h1>Battle of Builds</h1>
-      <p class="subtitle">Craft your build, test its mettle, climb the ranks.</p>
+      <p class="subtitle" data-paint="panel" data-thin>
+        Craft your build, test its mettle, climb the ranks.
+      </p>
       <UpdateNotice />
-      {saves.length > 0 && (
-        <div class="saves">
-          {saves.map((s, i) => (
-            <SaveRow key={s.id} c={c} slot={s} first={i === 0} />
-          ))}
-        </div>
-      )}
-      <div class="menu">
-        <button class={anyOk ? 'btn' : 'btn primary'} onClick={() => c.goTo('classSelect')}>
-          New Run
-        </button>
-        <button class="btn" onClick={() => c.goTo('codex')}>
-          Codex
-        </button>
-        <button class="btn" onClick={() => c.goTo('patchNotes')}>
-          Patch notes
-        </button>
-        {rivalsConfigured() && (
-          <button class="btn" onClick={() => c.goTo('highScores')}>
-            High scores
-          </button>
+      <div class="title-board lf-panel" data-paint="panel">
+        {saves.length > 0 && (
+          <div class="saves">
+            {saves.map((s, i) => (
+              <SaveRow key={s.id} c={c} slot={s} first={i === 0} />
+            ))}
+          </div>
         )}
+        <div class="menu">
+          <button class={anyOk ? 'btn' : 'btn primary'} onClick={() => c.goTo('classSelect')}>
+            New Run
+          </button>
+          <button class="btn" onClick={() => c.goTo('codex')}>
+            Codex
+          </button>
+          <button class="btn" onClick={() => c.goTo('patchNotes')}>
+            Patch notes
+          </button>
+          {rivalsConfigured() && (
+            <button class="btn" onClick={() => c.goTo('highScores')}>
+              High scores
+            </button>
+          )}
+        </div>
       </div>
-      <DiscordInvite />
-      <TelemetryNotice />
-      <RivalsOptIn />
-      <UiScalePicker />
+      <div class="title-extras lf-panel" data-paint="panel">
+        <DiscordInvite />
+        <TelemetryNotice />
+        <RivalsOptIn />
+        <UiScalePicker />
+      </div>
       <DebugPanel c={c} />
     </div>
   );

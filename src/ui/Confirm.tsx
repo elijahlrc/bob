@@ -71,12 +71,12 @@ export function ConfirmHost() {
   return (
     <div class="modal confirm" onClick={() => answer(false)}>
       <div
-        class="modal-card confirm-card"
+        class="modal-card confirm-card lf-panel"
         role="alertdialog"
         aria-label={o.title}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3>{o.title}</h3>
+        <h3 class="lf-h">{o.title}</h3>
         {o.body && <div>{o.body}</div>}
         {o.facts && o.facts.length > 0 && (
           <ul class="confirm-facts">

@@ -62,18 +62,30 @@ export function Codex({ c }: { c: Controller }) {
   return (
     <div class="screen codex">
       <h1>Codex</h1>
-      <p class="muted">
+      <p class="codex-count">
         Gems {foundGems} / {ALL_GEMS.length} found · Uniques {foundUniques} /{' '}
         {UNIQUES.length + UNIQUE_FLASKS.length} found
       </p>
       <div class="menu row">
-        <button class={tab === 'gems' ? 'btn primary' : 'btn'} onClick={() => setTab('gems')}>
+        <button
+          class={tab === 'gems' ? 'btn on' : 'btn'}
+          aria-pressed={tab === 'gems'}
+          onClick={() => setTab('gems')}
+        >
           Gems
         </button>
-        <button class={tab === 'uniques' ? 'btn primary' : 'btn'} onClick={() => setTab('uniques')}>
+        <button
+          class={tab === 'uniques' ? 'btn on' : 'btn'}
+          aria-pressed={tab === 'uniques'}
+          onClick={() => setTab('uniques')}
+        >
           Uniques
         </button>
-        <button class={tab === 'look' ? 'btn primary' : 'btn'} onClick={() => setTab('look')}>
+        <button
+          class={tab === 'look' ? 'btn on' : 'btn'}
+          aria-pressed={tab === 'look'}
+          onClick={() => setTab('look')}
+        >
           Skill looks
         </button>
         <input
@@ -83,7 +95,7 @@ export function Codex({ c }: { c: Controller }) {
           value={q}
           onInput={(e) => setQ((e.target as HTMLInputElement).value)}
         />
-        <label class="muted">
+        <label class="codex-found" data-paint="panel" data-thin>
           <input
             type="checkbox"
             checked={foundOnly}
@@ -95,102 +107,106 @@ export function Codex({ c }: { c: Controller }) {
           Back
         </button>
       </div>
-      {tab === 'look' && (
-        <div class="codex-list look-legend">
-          <p class="muted">
-            On the map, colour says what a skill does to the enemy, and shape says how it gets
-            there. Attacks are sharp (crescents, streaks); spells are round (runes, rings, orbs);
-            areas grow as rings; lasting zones stay on the ground; upkeep skills use their own
-            colours.
-          </p>
-          <h3>Damage type</h3>
-          <div class="look-row">
-            {ELEMENT_COLOR.map((c, i) => (
-              <span key={i} class="look-swatch">
-                <span class="look-chip" style={{ background: css(c) }} /> {ELEMENT_NAME[i]}
-              </span>
-            ))}
-          </div>
-          <h3>Upkeep skills</h3>
-          <div class="look-row">
-            {(Object.keys(UTILITY_COLOR) as (keyof typeof UTILITY_COLOR)[]).map((k) => (
-              <span key={k} class="look-swatch">
-                <span class="look-chip" style={{ background: css(UTILITY_COLOR[k]) }} />{' '}
-                {DELIVERY_NAME[k]}
-              </span>
-            ))}
-          </div>
-          <h3>Shapes</h3>
-          {DELIVERIES.map((d) => (
-            <div key={d} class="codex-row">
-              <div class="look-shape">
-                <strong>{DELIVERY_NAME[d]}</strong>
-                <div class="muted">{DELIVERY_LOOK[d]}</div>
+      <div class="codex-panel lf-panel" data-paint="panel">
+        {tab === 'look' && (
+          <div class="look-legend">
+            <p class="muted">
+              On the map, colour says what a skill does to the enemy, and shape says how it gets
+              there. Attacks are sharp (crescents, streaks); spells are round (runes, rings, orbs);
+              areas grow as rings; lasting zones stay on the ground; upkeep skills use their own
+              colours.
+            </p>
+            <h3 class="lf-h">Damage type</h3>
+            <div class="look-row">
+              {ELEMENT_COLOR.map((c, i) => (
+                <span key={i} class="look-swatch">
+                  <span class="look-chip" style={{ background: css(c) }} /> {ELEMENT_NAME[i]}
+                </span>
+              ))}
+            </div>
+            <h3 class="lf-h">Upkeep skills</h3>
+            <div class="look-row">
+              {(Object.keys(UTILITY_COLOR) as (keyof typeof UTILITY_COLOR)[]).map((k) => (
+                <span key={k} class="look-swatch">
+                  <span class="look-chip" style={{ background: css(UTILITY_COLOR[k]) }} />{' '}
+                  {DELIVERY_NAME[k]}
+                </span>
+              ))}
+            </div>
+            <h3 class="lf-h">Shapes</h3>
+            {DELIVERIES.map((d) => (
+              <div key={d} class="codex-row">
+                <div class="look-shape">
+                  <strong>{DELIVERY_NAME[d]}</strong>
+                  <div class="muted">{DELIVERY_LOOK[d]}</div>
+                </div>
               </div>
-            </div>
-          ))}
-          <p class="muted">
-            Title screen, Skill gallery: watch any skill against training dummies.
-          </p>
-        </div>
-      )}
-      <div class="codex-list">
-        {tab === 'gems' &&
-          gems.map((g) => (
-            <div key={g.id} class="codex-row">
-              <button class="codex-head" onClick={() => setOpen(open === g.id ? null : g.id)}>
-                <span class={found.has(g.id) ? 'found' : 'muted'}>
-                  {found.has(g.id) ? '✓' : '·'}
-                </span>{' '}
-                {gemChip(g) && (
-                  <span class="look-chip" style={{ background: gemChip(g) as string }} />
-                )}
-                {g.name} <span class="muted">{gemCardData(g, 20).type}</span>
-              </button>
-              {open === g.id && <GemCard gemId={g.id} level={20} />}
-            </div>
-          ))}
-        {tab === 'uniques' &&
-          uniques.map((u) => {
-            const isFlask = u.baseId.startsWith('flask_');
-            return (
-              <div key={u.id} class="codex-row">
-                <button class="codex-head" onClick={() => setOpen(open === u.id ? null : u.id)}>
-                  <span class={found.has(u.id) ? 'found' : 'muted'}>
-                    {found.has(u.id) ? '✓' : '·'}
-                  </span>{' '}
-                  {u.name}{' '}
-                  <span class="muted">
-                    {isFlask ? 'Flask' : itemBase(u.baseId).name} · level {u.level}
-                  </span>
-                </button>
-                {open === u.id && (
-                  <div class="item-card rarity-unique">
-                    <div class="ic-name">{u.name}</div>
-                    {modsText(
-                      u.mods.map((m) => ({
-                        stat: m.stat,
-                        kind: m.kind,
-                        value: m.max,
-                        tags: m.tags,
-                        damageTypes: m.damageTypes,
-                      })),
-                    ).map((l, i) => (
-                      <div key={i} class="ic-mod explicit">
-                        {l}
+            ))}
+            <p class="muted">
+              Title screen, Skill gallery: watch any skill against training dummies.
+            </p>
+          </div>
+        )}
+        {tab !== 'look' && (
+          <div class="codex-list">
+            {tab === 'gems' &&
+              gems.map((g) => (
+                <div key={g.id} class="codex-row">
+                  <button class="codex-head" onClick={() => setOpen(open === g.id ? null : g.id)}>
+                    <span class={found.has(g.id) ? 'found' : 'muted'}>
+                      {found.has(g.id) ? '✓' : '·'}
+                    </span>{' '}
+                    {gemChip(g) && (
+                      <span class="look-chip" style={{ background: gemChip(g) as string }} />
+                    )}
+                    {g.name} <span class="muted">{gemCardData(g, 20).type}</span>
+                  </button>
+                  {open === g.id && <GemCard gemId={g.id} level={20} />}
+                </div>
+              ))}
+            {tab === 'uniques' &&
+              uniques.map((u) => {
+                const isFlask = u.baseId.startsWith('flask_');
+                return (
+                  <div key={u.id} class="codex-row">
+                    <button class="codex-head" onClick={() => setOpen(open === u.id ? null : u.id)}>
+                      <span class={found.has(u.id) ? 'found' : 'muted'}>
+                        {found.has(u.id) ? '✓' : '·'}
+                      </span>{' '}
+                      {u.name}{' '}
+                      <span class="muted">
+                        {isFlask ? 'Flask' : itemBase(u.baseId).name} · level {u.level}
+                      </span>
+                    </button>
+                    {open === u.id && (
+                      <div class="item-card rarity-unique">
+                        <div class="ic-name">{u.name}</div>
+                        {modsText(
+                          u.mods.map((m) => ({
+                            stat: m.stat,
+                            kind: m.kind,
+                            value: m.max,
+                            tags: m.tags,
+                            damageTypes: m.damageTypes,
+                          })),
+                        ).map((l, i) => (
+                          <div key={i} class="ic-mod explicit">
+                            {l}
+                          </div>
+                        ))}
+                        {((u as { triggers?: TriggerDef[] }).triggers ?? []).map((t, i) => (
+                          <div key={`t${i}`} class="ic-mod explicit">
+                            {triggerText(t)}
+                          </div>
+                        ))}
+                        <div class="ic-base">{u.flavour}</div>
                       </div>
-                    ))}
-                    {((u as { triggers?: TriggerDef[] }).triggers ?? []).map((t, i) => (
-                      <div key={`t${i}`} class="ic-mod explicit">
-                        {triggerText(t)}
-                      </div>
-                    ))}
-                    <div class="ic-base">{u.flavour}</div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+          </div>
+        )}
       </div>
     </div>
   );

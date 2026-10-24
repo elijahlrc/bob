@@ -139,8 +139,8 @@ export function Leaderboard({ run }: { run: RunState }) {
     };
   }, [run, posted]);
   return (
-    <div class="board">
-      <h3>High scores</h3>
+    <div class="board lf-panel" data-paint="panel">
+      <h3 class="lf-h">High scores</h3>
       <LeaderboardView got={got} />
     </div>
   );

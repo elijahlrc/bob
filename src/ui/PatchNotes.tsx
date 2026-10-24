@@ -63,7 +63,33 @@ function inline(text: string): ComponentChildren {
 
 const BLOCKS = parseNotes(notes);
 
-/** Every patch note, newest first, as kept in docs/PATCH-NOTES.md. */
+/** The notes in releases: each date with what follows it, up to the next date. */
+const RELEASES: { date: string; blocks: Block[] }[] = [];
+for (const b of BLOCKS) {
+  if (b.kind === 'date') RELEASES.push({ date: b.text, blocks: [] });
+  else RELEASES[RELEASES.length - 1]?.blocks.push(b);
+}
+
+function body(b: Block, i: number) {
+  switch (b.kind) {
+    case 'date':
+      return null;
+    case 'head':
+      return <h3 key={i}>{inline(b.text)}</h3>;
+    case 'para':
+      return <p key={i}>{inline(b.text)}</p>;
+    case 'list':
+      return (
+        <ul key={i}>
+          {b.items.map((t, j) => (
+            <li key={j}>{inline(t)}</li>
+          ))}
+        </ul>
+      );
+  }
+}
+
+/** Every patch note, newest first, as kept in docs/PATCH-NOTES.md: a lapis panel for each release. */
 export function PatchNotes({ c }: { c: Controller }) {
   return (
     <div class="screen patchnotes">
@@ -74,24 +100,12 @@ export function PatchNotes({ c }: { c: Controller }) {
         </button>
       </div>
       <div class="patch-list">
-        {BLOCKS.map((b, i) => {
-          switch (b.kind) {
-            case 'date':
-              return <h2 key={i}>{b.text}</h2>;
-            case 'head':
-              return <h3 key={i}>{inline(b.text)}</h3>;
-            case 'para':
-              return <p key={i}>{inline(b.text)}</p>;
-            case 'list':
-              return (
-                <ul key={i}>
-                  {b.items.map((t, j) => (
-                    <li key={j}>{inline(t)}</li>
-                  ))}
-                </ul>
-              );
-          }
-        })}
+        {RELEASES.map((r, i) => (
+          <section key={i} class="patch-release lf-panel" data-paint="panel">
+            <h2 class="lf-h">{r.date}</h2>
+            {r.blocks.map(body)}
+          </section>
+        ))}
       </div>
     </div>
   );

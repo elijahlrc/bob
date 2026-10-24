@@ -54,18 +54,22 @@ export function DuelResultView({ c }: { c: Controller }) {
   return (
     <div class="screen summary duel-result">
       <h2>{headline(o)}</h2>
-      <p class="muted">
+      <p class="sum-who">
         {result.time.toFixed(1)} s
         {survivor !== null &&
           ` · ${survivor === 0 ? 'you' : names[1]} left with ${Math.round(result.sides[survivor].lifeLeft * 100)}% of ${survivor === 0 ? 'your' : 'its'} life`}
       </p>
       {result.sides[0].reprievesHeld > 0 && (
-        <p class="muted duel-reprieves">
+        <p class="sum-who duel-reprieves">
           Reprieves used: you {result.sides[0].reprieves} of {result.sides[0].reprievesHeld} ·{' '}
           {names[1]} {result.sides[1].reprieves} of {result.sides[1].reprievesHeld}
         </p>
       )}
-      {o.rival && <p class="duel-standing">{standing(o.rival)}</p>}
+      {o.rival && (
+        <p class="duel-standing" data-paint="panel" data-thin>
+          {standing(o.rival)}
+        </p>
+      )}
       <div class="menu row">
         <button class="btn primary" onClick={() => c.againDuel()}>
           Again

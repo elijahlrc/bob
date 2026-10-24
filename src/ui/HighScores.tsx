@@ -135,8 +135,10 @@ export function HighScoresView({
   return (
     <div class={`screen highscores${showOlder ? ' hs-both' : ''}`}>
       <h2>High scores</h2>
-      <ScoreList got={got} onMore={onMore} />
-      <label class="muted hs-older-check">
+      <div class="hs-panel lf-panel" data-paint="panel">
+        <ScoreList got={got} onMore={onMore} />
+      </div>
+      <label class="hs-older-check" data-paint="panel" data-thin>
         <input
           type="checkbox"
           checked={showOlder}
@@ -146,11 +148,11 @@ export function HighScoresView({
       </label>
       {showOlder && (
         <>
-          <h3 class="hs-older">Older versions (outdated)</h3>
-          <p class="muted">
-            These characters were made in an earlier version and can no longer be fought.
-          </p>
-          <ScoreList got={older} onMore={onMoreOlder} />
+          <div class="hs-panel lf-panel" data-paint="panel">
+            <h3 class="lf-h">Older versions (outdated)</h3>
+            <p class="muted">These characters can no longer be fought.</p>
+            <ScoreList got={older} onMore={onMoreOlder} />
+          </div>
         </>
       )}
       <div class="menu row">

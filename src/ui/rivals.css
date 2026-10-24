@@ -1,181 +1,219 @@
-/* The rivals: the run summary's block, the Rivals screen (src/ui/Rivals.tsx) and the high scores (src/ui/HighScores.tsx). */
+/* The rivals, in Gold Leaf (docs/mockups/style/STYLE-GUIDE.md): the run summary's block (src/ui/Summary.tsx), the Rivals
+   screen (src/ui/Rivals.tsx), the high scores (src/ui/HighScores.tsx, src/ui/Leaderboard.tsx) and the duel's result
+   (src/ui/DuelResult.tsx). Lapis panels and plaques on the gold; rows of a table divided by tesserae; one text size. */
 
-/* The summary's block at the top of the screen: the duel button, always there and hard to miss, the opt-in while the character
-   is not sent, the tally. */
+/* The summary's block: the duel button, always there and hard to miss, the opt-in while the character is not sent, the
+   tally; on a lapis panel. */
 .rivals-block {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  max-width: 440px;
-  margin: 10px auto 6px;
+  gap: 12px;
+  width: min(100%, 520px);
+  margin: 0 auto;
+  padding: 24px 36px 26px;
   text-align: center;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
-.rivals-block .duel-cta {
-  font-size: 1.25em;
-  padding: 14px 28px;
-  min-width: min(100%, 360px);
-  background: var(--accent);
-  color: #111;
-  border-color: var(--accent);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 55%, transparent);
-}
-.rivals-block .duel-cta:hover {
-  background: var(--accent-d);
-  color: inherit;
-}
-.rivals-block .duel-cta:disabled {
-  opacity: 0.6;
-  cursor: default;
+html.leaf .rivals-block .duel-cta {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: min(100%, 380px);
+  padding: 14px 28px 15px;
+  font: 400 var(--head-size, 28px) / 1.05 var(--title-font);
+  font-size-adjust: none;
 }
 .rivals-block p {
   margin: 0;
 }
 .rivals-block .rivals-opt {
-  margin-top: 0;
+  width: 100%;
+  margin: 0;
+  padding-top: 12px;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
 }
 
-/* What the fight counted for, on the duel's result screen. */
+/* What the fight counted for, on the duel's result screen: a plaque. */
 .duel-result .duel-standing {
-  font-weight: bold;
-  color: var(--accent);
+  color: var(--gold-hi);
 }
 
-/* The Rivals screen: five cards, each a button that starts the duel. */
+/* The Rivals and high scores screens. */
 .rivals,
-.highscores {
+.highscores,
+.duel-result {
   justify-content: flex-start;
-  padding: 24px calc(12px + var(--safe-right, 0px)) 24px calc(12px + var(--safe-left, 0px));
+  gap: 16px;
+  padding: 24px calc(16px + var(--safe-right, 0px)) 32px calc(16px + var(--safe-left, 0px));
   box-sizing: border-box;
 }
-.rivals h2,
-.highscores h2,
-.rivals p {
+.rivals p,
+.highscores p,
+.duel-result p {
   margin: 0;
 }
-.rivals .menu.row,
-.highscores .menu.row {
+:is(.rivals, .highscores, .duel-result) .menu.row {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
 }
+
+/* Five rivals, each a plaque that starts the duel. */
 .rival-cards {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  gap: 18px;
   width: 100%;
-  max-width: 1120px;
+  max-width: 1180px;
 }
 .rival-card {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  flex: 1 1 200px;
-  max-width: 260px;
+  gap: 4px;
+  flex: 1 1 260px;
+  max-width: 320px;
   min-width: 0;
   box-sizing: border-box;
-  padding: 10px 12px;
+  padding: 18px 22px 20px;
   text-align: left;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  color: var(--pearl);
+  font-size: var(--size, 17px);
+  text-shadow: var(--text-shadow);
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 .rival-card:hover {
-  background: var(--panel2);
-  border-color: var(--accent);
+  filter: brightness(1.12);
 }
 .rc-head {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 10px;
   min-width: 0;
+  padding-bottom: 4px;
 }
 .rc-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--accent);
+  font: 400 var(--head-size, 28px) / 1.05 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
 }
 .rc-bot {
   flex: none;
-  padding: 0 5px;
-  font-size: 11px;
   color: var(--muted);
-  border: 1px solid var(--border2);
-  border-radius: 3px;
 }
 .rc-sig {
-  font-size: 12px;
   overflow-wrap: anywhere;
 }
 .rc-you {
-  font-size: 12px;
-  color: var(--hi);
+  margin-top: 4px;
+  padding-top: 8px;
+  color: var(--gold-hi);
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+
+/* The duel's two reports side by side. */
+.duel-sides {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 1880px;
+}
+.duel-sides .mreport {
+  flex: 1 1 560px;
+  width: auto;
 }
 
 /* The high scores at the foot of a run's end screen: the top, the rows around the player's character, and its rank. */
 .board {
-  width: min(560px, 100%);
+  box-sizing: border-box;
+  width: min(620px, 100%);
+  padding: 24px 36px 26px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
-.board h3,
 .board .board-rank {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
+  text-align: center;
+  color: var(--gold-hi);
 }
 .board .board-gap td {
   text-align: center;
   color: var(--muted);
 }
-
-/* The high scores: a table that scrolls; on a phone only the rank, name, class and rating stay. */
-.hs-scroll {
-  width: min(760px, 100%);
-  max-height: 70vh;
-  overflow: auto;
-}
-/* With the older versions' list shown, the two tables share the screen. */
-.hs-both .hs-scroll {
-  max-height: 34vh;
-}
-.highscores h3,
-.highscores p {
+.board > p {
   margin: 0;
+  text-align: center;
+}
+
+/* The high scores screen: each list on a lapis panel that grows with it (the screen scrolls); on a phone only the rank,
+   name, class and rating stay. */
+.hs-panel {
+  box-sizing: border-box;
+  width: min(860px, 100%);
+  padding: 24px 36px 26px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+.hs-panel > p {
+  margin: 0;
+  text-align: center;
+}
+.hs-panel > p + .hs-scroll {
+  margin-top: 10px;
+}
+.hs-scroll {
+  width: 100%;
+  overflow-x: auto;
 }
 .hs-more {
   display: block;
-  margin: 8px auto;
+  margin: 14px auto 0;
 }
-.hs-older {
-  font-size: 15px;
-  font-weight: normal;
-  color: var(--muted);
+.hs-older-check {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px 10px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
 }
 .hs-table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 14px;
+  font-size: var(--size, 17px);
   text-align: left;
+  font-variant-numeric: tabular-nums;
 }
 .hs-table th {
-  position: sticky;
-  top: 0;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: normal;
+  padding: 2px 10px 8px;
+  font-weight: 400;
   color: var(--muted);
   white-space: nowrap;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
 }
 .hs-table td {
-  padding: 3px 8px;
+  padding: 6px 10px;
   white-space: nowrap;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
 }
 .hs-table .num {
   text-align: right;
@@ -186,9 +224,12 @@
   text-overflow: ellipsis;
 }
 .hs-table tr.hs-me td {
-  color: var(--hi);
-  background: rgba(255, 216, 74, 0.08);
+  color: var(--gold-hi);
 }
+.hs-table tr.hs-me .hs-name {
+  font-weight: 600;
+}
+
 @media (max-width: 600px) {
   .hs-x {
     display: none;
@@ -196,5 +237,13 @@
   .rival-card {
     flex-basis: 100%;
     max-width: none;
+  }
+  :is(.rivals-block, .board, .hs-panel) {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  .hs-table :is(th, td) {
+    padding-left: 6px;
+    padding-right: 6px;
   }
 }

@@ -7,7 +7,7 @@ import { newBuild } from '../update';
 export function UpdateNotice() {
   if (newBuild() === null) return null;
   return (
-    <div class="notice update">
+    <div class="notice update" data-paint="panel" data-thin>
       <span>A new version is out.</span>
       <button class="btn small" onClick={() => window.location.reload()}>
         Reload

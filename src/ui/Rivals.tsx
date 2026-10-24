@@ -15,6 +15,8 @@ function RivalCard({ c, rival, myId }: { c: Controller; rival: Rival; myId: stri
   return (
     <button
       class="rival-card"
+      data-paint="panel"
+      data-thin
       onClick={() => {
         if (mine) c.startRivalDuel(rival, mine.id, mine.name);
       }}
@@ -65,11 +67,25 @@ export function Rivals({ c }: { c: Controller }) {
   return (
     <div class="screen rivals">
       <h2>{DUEL_TITLE}</h2>
-      {s.status === 'loading' && <p class="muted">Looking for rivals…</p>}
-      {s.status === 'offline' && <p>Could not reach the rivals</p>}
-      {s.status === 'empty' && <p>No rivals near this map</p>}
+      {s.status === 'loading' && (
+        <p class="rivals-status" data-paint="panel" data-thin>
+          Looking for rivals…
+        </p>
+      )}
+      {s.status === 'offline' && (
+        <p class="rivals-status" data-paint="panel" data-thin>
+          Could not reach the rivals
+        </p>
+      )}
+      {s.status === 'empty' && (
+        <p class="rivals-status" data-paint="panel" data-thin>
+          No rivals near this map
+        </p>
+      )}
       {s.status === 'unsent' && (
-        <p>{s.why === 'name' ? 'That name is not allowed' : 'Your character could not be sent'}</p>
+        <p class="rivals-status" data-paint="panel" data-thin>
+          {s.why === 'name' ? 'That name is not allowed' : 'Your character could not be sent'}
+        </p>
       )}
       {s.status === 'ready' && s.mine && (
         <div class="rival-cards">

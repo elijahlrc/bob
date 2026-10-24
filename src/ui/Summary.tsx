@@ -68,8 +68,8 @@ function Recap({ r }: { r: DeathRecap }) {
     );
   });
   return (
-    <div class="recap">
-      <h3>What happened</h3>
+    <div class="recap lf-panel" data-paint="panel">
+      <h3 class="lf-h">What happened</h3>
       <p>
         Killed by <b>{r.killer}</b> ({r.killerRarity}
         {mods}), {r.time.toFixed(0)} s into the map.
@@ -144,7 +144,7 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
     if (st.status === 'posted') c.openRivals();
   };
   return (
-    <div class="rivals-block">
+    <div class="rivals-block lf-panel" data-paint="panel">
       <button
         class="btn primary duel-cta"
         disabled={busy || (refused !== null && refused === sendName())}
@@ -173,6 +173,22 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
   );
 }
 
+/** One of the run's few big numbers: a medallion with its name and number, any note on a plaque hung from its foot. */
+function medal(label: string, value: number, field: string, notes: (string | false)[] = []) {
+  const shown = notes.filter((n) => n);
+  return (
+    <div key={label} class="sum-medal" data-paint="medal" data-field={field} data-medal="big">
+      <span class="sum-medal-label">{label}</span>
+      <b>{f0(value)}</b>
+      {shown.length > 0 && (
+        <span class="sum-medal-note" data-paint="panel" data-thin>
+          {shown.join(' · ')}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function Summary({ c }: { c: Controller }) {
   const run = c.run;
   if (!run) return null;
@@ -181,6 +197,10 @@ export function Summary({ c }: { c: Controller }) {
   const kills = run.history.reduce((s, h) => s + h.kills, 0);
   const reason = last?.status === 'timeout' ? ' (timed out)' : '';
   const slain = !won && last?.status === 'dead';
+  const count = (st: string) => run.history.filter((h) => h.status === st).length;
+  const cleared = count('cleared');
+  const abandoned = count('abandoned');
+  const stops = count('stop');
   return (
     <div class="screen summary">
       {slain ? (
@@ -188,27 +208,28 @@ export function Summary({ c }: { c: Controller }) {
       ) : (
         <h2>{won ? 'Victory!' : 'Your run has ended'}</h2>
       )}
-      <p>
-        {classDef(run.classId).name} · Level {run.build.level}
+      <p class="sum-who">
+        {classDef(run.classId).name}
+        {!slain &&
+          ` · ${won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}`}
       </p>
-      {!slain && (
-        <p>{won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}</p>
-      )}
-      <p class="muted">
-        Maps cleared: {run.history.filter((h) => h.status === 'cleared').length}
-        {run.history.some((h) => h.status === 'abandoned') &&
-          ` · abandoned: ${run.history.filter((h) => h.status === 'abandoned').length}`}
-        {run.history.some((h) => h.status === 'stop') &&
-          ` · stops: ${run.history.filter((h) => h.status === 'stop').length}`}{' '}
-        · Kills: {kills}
-      </p>
+      <div class="sum-medals">
+        {medal('Level', run.build.level, 'lapis,4')}
+        {medal('Maps cleared', cleared, 'green,4', [
+          abandoned > 0 && `${abandoned} abandoned`,
+          stops > 0 && `${stops} stop${stops === 1 ? '' : 's'}`,
+        ])}
+        {medal('Kills', kills, 'vermilion,4')}
+      </div>
       {!sameDifficulty(run.difficulty, DEFAULT) && (
-        <p class="muted">Difficulty: {difficultyText(run.difficulty)}</p>
+        <p class="sum-plaque" data-paint="panel" data-thin>
+          Difficulty: {difficultyText(run.difficulty)}
+        </p>
       )}
       <RivalsBlock c={c} run={run} />
       {!won && run.lastRecap && <Recap r={run.lastRecap} />}
       {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
-      <div class="menu">
+      <div class="menu row">
         <button
           class="btn primary"
           onClick={() => c.beginRun(run.classId, Math.floor(Math.random() * 0x7fffffff))}

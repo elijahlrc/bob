@@ -1,1 +1,568 @@
-/* Gold Leaf: screens (filled in by the port, docs/mockups/style/STYLE-GUIDE.md section 10). */
+/* Gold Leaf: the screens outside the camp (docs/mockups/style/STYLE-GUIDE.md): the title, the class choice, the end of
+   a run, the Codex, the patch notes, the high scores and the confirmation dialog. Screen titles are dark Jacquard on the
+   gold (like "Camp"); a short line on the gold is dark and bold or sits on a plaque; everything longer sits on a lapis
+   panel, its rows divided by tesserae. */
+
+/* ---- Shared: titles and short lines on the gold ---- */
+html.leaf
+  :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals)
+  > :is(h1, h2) {
+  margin: 0;
+  font: 400 48px / 1.05 var(--title-font);
+  font-size-adjust: none;
+  letter-spacing: 0.02em;
+  color: var(--on-gold);
+  text-align: center;
+  text-shadow: 0 2px 0 #e2c68166;
+}
+html.leaf :is(.sum-who, .codex-count) {
+  margin: 0;
+  color: #2e2010;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: none;
+}
+/* A thin plaque round one short line on the gold. */
+html.leaf :is(.sum-plaque, .duel-standing, .rivals-status, .notice.update, .title > .subtitle) {
+  align-self: center;
+  margin: 0;
+  padding: 9px 22px 10px;
+  color: var(--pearl);
+  text-align: center;
+  text-shadow: var(--text-shadow);
+}
+html.leaf :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals) .lf-panel,
+html.leaf .confirm-card.lf-panel {
+  box-sizing: border-box;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf
+  :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals)
+  .lf-panel
+  .muted,
+html.leaf .confirm-card .muted {
+  color: var(--muted);
+}
+html.leaf
+  :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals)
+  .lf-panel
+  .warn,
+html.leaf .confirm-card .warn {
+  color: var(--madder);
+}
+
+/* ---- The update notice: a plaque, the reload beside its line ---- */
+html.leaf .notice.update {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+/* ---- The title screen ---- */
+html.leaf .screen.title {
+  gap: 16px;
+  padding: 24px 16px 32px;
+}
+html.leaf .screen.title > h1 {
+  font-size: 96px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 3px 0 #e2c68188;
+}
+html.leaf .title-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(100%, 680px);
+  padding: 26px 36px 28px;
+  flex-shrink: 0;
+}
+html.leaf .title-board .saves {
+  width: 100%;
+  gap: 10px;
+  padding-bottom: 18px;
+  background: var(--s-dots);
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+html.leaf .save-row {
+  gap: 10px;
+}
+html.leaf span.save-name {
+  flex: 1;
+  padding: 0 4px;
+}
+html.leaf .title-board .menu {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+html.leaf .title-board .menu .btn {
+  min-width: 132px;
+}
+html.leaf .title-extras {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: min(100%, 680px);
+  padding: 18px 36px 22px;
+  flex-shrink: 0;
+}
+html.leaf .title-extras:empty {
+  display: none;
+}
+/* Rows of the lower panel, divided by tesserae. */
+html.leaf .title-extras > * {
+  max-width: none;
+  margin: 0;
+  padding: 12px 0;
+  font-size: var(--size);
+  text-align: center;
+}
+html.leaf .title-extras > * + * {
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .discord {
+  color: var(--pearl);
+}
+html.leaf .discord a {
+  color: var(--gold-hi);
+  font-weight: 600;
+}
+html.leaf .telemetry,
+html.leaf .rivals-opt {
+  display: block;
+  color: var(--pearl);
+  font-size: var(--size);
+}
+html.leaf .rivals-opt .rival-name {
+  gap: 8px;
+  margin-top: 10px;
+}
+html.leaf .rivals-opt .rival-name input {
+  width: 16em;
+  padding: 8px 12px;
+  background: var(--lapis-d);
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--ring);
+}
+html.leaf .rivals-opt .rival-name span {
+  color: var(--muted);
+}
+html.leaf .rivals-opt .rival-name span.warn {
+  color: var(--madder);
+}
+html.leaf .title-extras .ui-scale {
+  gap: 10px;
+  font-size: var(--size);
+}
+html.leaf .title-extras .ui-scale .muted {
+  color: var(--pearl);
+}
+
+/* ---- New Run: the classes as arched niches ---- */
+html.leaf .class-select {
+  gap: 20px;
+  padding: 24px 24px 32px;
+}
+html.leaf .class-grid {
+  grid-template-columns: repeat(3, minmax(0, 260px));
+  gap: 22px;
+  max-width: none;
+}
+html.leaf .class-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 300px;
+  padding: 72px 22px 40px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  color: var(--pearl);
+  font-size: var(--size);
+  text-align: center;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .class-card:hover {
+  background-color: transparent;
+  filter: brightness(1.12);
+}
+html.leaf .class-name {
+  font-size: 34px;
+  color: var(--gold-hi);
+}
+html.leaf .class-style {
+  margin: 0 0 4px;
+  font-size: var(--size);
+  color: var(--pearl);
+  text-wrap: balance;
+}
+html.leaf .class-attrs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 12px;
+  width: 100%;
+  font-size: var(--size);
+  color: var(--muted);
+  white-space: nowrap;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .class-attrs b {
+  font-weight: 400;
+  color: var(--gold-hi);
+}
+html.leaf .class-attrs .pay-sep {
+  margin: 0 8px;
+}
+html.leaf .class-skill {
+  font-size: var(--size);
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---- The end of a run ---- */
+html.leaf .screen.summary {
+  gap: 16px;
+  padding: 40px 16px 40px;
+}
+html.leaf .screen.summary > h1.slain {
+  font-size: 64px;
+  color: #6e1810;
+  text-shadow: 0 3px 0 #e2c68177;
+}
+/* The run's few big numbers. */
+html.leaf .sum-medals {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  margin: 4px 0 10px;
+}
+html.leaf .sum-medal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  text-align: center;
+}
+html.leaf .sum-medal-label {
+  max-width: 96px;
+  line-height: 1;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 #0b0805aa;
+}
+html.leaf .sum-medal b {
+  margin-top: 4px;
+  font: 400 40px / 1 var(--title-font);
+  color: var(--pearl);
+  text-shadow: 0 2px 0 #0b0805aa;
+}
+html.leaf .sum-medal-note {
+  position: absolute;
+  top: calc(100% - 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 16px 8px;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .summary .menu.row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+/* What happened: a lapis panel, its lines divided by tesserae. */
+html.leaf .summary .recap {
+  max-width: 660px;
+  margin: 0;
+  padding: 26px 36px 28px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+}
+html.leaf .recap > :is(p, div) {
+  margin: 0;
+  padding: 7px 0 8px;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .recap > p:first-of-type {
+  background: none;
+}
+html.leaf .recap b {
+  color: var(--gold-hi);
+  font-weight: 400;
+}
+html.leaf .recap table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  margin: 2px 0 4px;
+}
+html.leaf .recap table td {
+  padding: 5px 12px 6px 0;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .recap table td:last-child {
+  width: 100%;
+}
+html.leaf .recap table td:first-child {
+  color: var(--gold-hi);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+/* ---- The Codex ---- */
+html.leaf .screen.codex {
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 24px 16px 28px;
+}
+html.leaf .codex .menu.row {
+  justify-content: center;
+  gap: 10px;
+}
+html.leaf .codex .search {
+  min-width: 200px;
+}
+html.leaf .codex-found {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px 10px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+html.leaf .codex-panel {
+  width: min(780px, 100%);
+  padding: 22px 36px 24px;
+}
+html.leaf .codex-panel .codex-list {
+  width: 100%;
+  max-height: 62vh;
+}
+html.leaf .codex-row {
+  border: 0;
+}
+html.leaf .codex-row + .codex-row {
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .codex-head {
+  padding: 8px 6px 7px;
+  color: var(--pearl);
+  font-size: var(--size);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .codex-head:hover {
+  color: var(--gold-hi);
+}
+html.leaf .codex-head .found {
+  color: var(--gain);
+}
+html.leaf .codex-row > :not(.codex-head) {
+  margin: 4px 10px 12px;
+}
+html.leaf .look-chip {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  vertical-align: -1px;
+  box-shadow:
+    0 0 0 2px #c09d4e,
+    2px 3px 0 1px #0b080588;
+}
+html.leaf .look-legend > p {
+  margin: 0 0 26px;
+}
+html.leaf .look-legend .lf-h {
+  margin-top: 30px;
+}
+html.leaf .look-legend .lf-h:first-of-type {
+  margin-top: 0;
+}
+html.leaf .look-row {
+  justify-content: center;
+  gap: 10px 26px;
+  margin-bottom: 8px;
+}
+html.leaf .look-legend .codex-row {
+  background: none;
+}
+html.leaf .look-legend .codex-row + .codex-row {
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .look-shape {
+  padding: 8px 0;
+}
+html.leaf .look-shape strong {
+  color: var(--gold-hi);
+  font-weight: 600;
+}
+
+/* ---- Patch notes: a lapis panel for each release, one comfortable column ---- */
+html.leaf .screen.patchnotes {
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 24px 16px 32px;
+}
+html.leaf .patch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: min(760px, 100%);
+  max-height: none;
+  overflow: visible;
+}
+html.leaf .patch-release {
+  padding: 24px 40px 28px;
+  line-height: 1.45;
+}
+html.leaf .patch-release .lf-h {
+  font-size: var(--head-size);
+  border: 0;
+}
+html.leaf .patch-release h3 {
+  margin: 16px 0 4px;
+  font-size: var(--size);
+  font-weight: 600;
+  color: var(--gold-hi);
+}
+html.leaf .patch-release ul {
+  margin: 4px 0;
+  padding-left: 22px;
+}
+html.leaf .patch-release li::marker {
+  color: var(--gold);
+}
+html.leaf .patch-release :is(li, p) {
+  margin: 6px 0;
+}
+html.leaf .patch-release strong {
+  color: var(--gold-hi);
+  font-weight: 600;
+}
+html.leaf .patch-release code {
+  font: inherit;
+  color: var(--gold-hi);
+}
+
+/* ---- The confirmation dialog: its title over a frieze, the facts as rows ---- */
+html.leaf .confirm-card {
+  text-align: center;
+}
+html.leaf .confirm-card .lf-h {
+  padding-right: 0;
+}
+html.leaf .confirm-facts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html.leaf .confirm-facts li {
+  padding: 7px 0 8px;
+  color: var(--gold-hi);
+  text-align: center;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .confirm-card .item-actions {
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* ---- Phones ---- */
+@media (max-width: 600px) {
+  html.leaf
+    :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals)
+    > :is(h1, h2) {
+    font-size: 40px;
+  }
+  html.leaf .screen.title > h1 {
+    font-size: 54px;
+    letter-spacing: 0.02em;
+  }
+  html.leaf :is(.title-board, .title-extras) {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  html.leaf .save-row {
+    flex-wrap: wrap;
+  }
+  html.leaf .save-row .save-name {
+    flex-basis: 100%;
+  }
+  html.leaf .save-row .btn.small {
+    flex: 1;
+  }
+  html.leaf .class-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 360px;
+    gap: 16px;
+  }
+  html.leaf .class-card {
+    min-height: 0;
+    padding: 64px 18px 36px;
+  }
+  html.leaf .screen.summary {
+    padding-top: 24px;
+  }
+  html.leaf .screen.summary > h1.slain {
+    font-size: 44px;
+  }
+  html.leaf .sum-medals {
+    gap: 26px 10px;
+  }
+  html.leaf .sum-medal {
+    width: 112px;
+    height: 112px;
+  }
+  html.leaf .sum-medal-label {
+    font-size: 14px;
+    max-width: 60px;
+  }
+  html.leaf .sum-medal b {
+    font-size: 30px;
+  }
+  html.leaf :is(.summary .recap, .codex-panel) {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  html.leaf .codex .search {
+    min-width: 0;
+    flex: 1 1 160px;
+  }
+  html.leaf .patch-release {
+    padding: 20px 30px 24px;
+  }
+}
