@@ -18,6 +18,8 @@ The trailer, 31 seconds, planned with the owner on 2026-10-21. Nothing here ship
   `scripts/trailer/clips.ts`. The frames go to `footage/` (git-ignored); `cut.html` picks which frames each shot uses (its `IN`
   table; `npx tsx scripts/trailer/events.ts` shows where the kills fall in each clip).
 
+- [VERTICAL.md](VERTICAL.md): the plan for a 9:16 recut for short-form feeds (same shots and timings, re-filmed in the phone layout).
+
 **Filming the footage:**
 
 1. Once: `npm i --no-save playwright-core`, then `npx playwright install chromium`.
