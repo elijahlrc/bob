@@ -1,0 +1,283 @@
+{
+  "title": "Reaver (the Yard): G1b sketch",
+  "region": "reaver",
+  "clusters": [
+    {
+      "id": "RE-1",
+      "label": "sword + attack speed with swords",
+      "at": [790, 2580],
+      "nodes": 4
+    },
+    {
+      "id": "RE-2",
+      "label": "sword + block with a shield",
+      "at": [-1270, 2990],
+      "nodes": 4
+    },
+    {
+      "id": "RE-3",
+      "label": "sword + life leech",
+      "at": [610, 3620],
+      "nodes": 4
+    },
+    {
+      "id": "RE-4",
+      "label": "armour + life regeneration",
+      "at": [-640, 2420],
+      "nodes": 4
+    },
+    {
+      "id": "RE-5",
+      "label": "attack speed + warcry effect",
+      "at": [140, 1470],
+      "nodes": 4
+    },
+    {
+      "id": "RE-6",
+      "label": "evasion + accuracy",
+      "at": [880, 1640],
+      "nodes": 4
+    },
+    {
+      "id": "RE-7|9",
+      "label": "wheel: two-handed + life | dual wield + life",
+      "at": [-760, 3610],
+      "nodes": 6
+    },
+    {
+      "id": "RE-8",
+      "label": "bleed + bleed duration",
+      "at": [-270, 3800],
+      "nodes": 4
+    }
+  ],
+  "roads": [
+    {
+      "label": "west road",
+      "points": ["yard.home.roadW.b", [-720, 1800], "yard.blades.j1.a"],
+      "nodes": 1
+    },
+    {
+      "points": ["yard.blades.j1.a", [-950, 2230], [-960, 2460], "yard.blades.toHeadsman.r1"],
+      "nodes": 2
+    },
+    {
+      "points": ["yard.blades.toHeadsman.r1", [-900, 2890], "yard.blood.toWall.a"],
+      "nodes": 1
+    },
+    {
+      "label": "west road to the Fosse",
+      "points": ["yard.blood.toWall.a", [-760, 3400], "RE-7|9"],
+      "nodes": 1
+    },
+    {
+      "points": ["RE-7|9", [-780, 3860], "yard.fosse.road.f6"],
+      "nodes": 1
+    },
+    {
+      "label": "the crossroad",
+      "points": ["yard.blades.j1.a", [-620, 2010], [-350, 2010], "yard.shield.hub.a"],
+      "nodes": 2
+    },
+    {
+      "points": ["yard.shield.hub.a", [180, 2030], [420, 2060], "yard.dual.j1.a"],
+      "nodes": 2
+    },
+    {
+      "label": "the spine",
+      "points": ["yard.shield.hub.a", [-40, 2240], "yard.shield.steelRim.a"],
+      "nodes": 1
+    },
+    {
+      "points": ["yard.blood.toHarvest.a", [0, 3220]],
+      "nodes": 0
+    },
+    {
+      "label": "spine to the Fosse",
+      "points": [[0, 3220], [-20, 3520], [-60, 3800], "yard.fosse.road.f4"],
+      "nodes": 2
+    },
+    {
+      "label": "the Pits rim road",
+      "points": ["yard.blood.j3.a", [-200, 3190], [0, 3220], [210, 3190], "yard.blood.j2.a"],
+      "nodes": 3
+    },
+    {
+      "label": "east road",
+      "points": ["yard.dual.j1.a", [640, 2330], [620, 2580], [540, 2850], "yard.blood.j2.a"],
+      "nodes": 3
+    }
+  ],
+  "links": [
+    {
+      "from": "yard.shield.j1.a",
+      "to": "yard.blood.toHarvest.a"
+    },
+    {
+      "from": "RE-1",
+      "to": [620, 2580]
+    },
+    {
+      "from": "RE-1",
+      "to": "bow.steel.toBlood.c",
+      "label": "X: fast sword / Ford speed"
+    },
+    {
+      "from": "RE-2",
+      "to": "yard.blades.toHeadsman.r2"
+    },
+    {
+      "from": "RE-2",
+      "to": "wall.grit.east.e6",
+      "label": "X: sword and board"
+    },
+    {
+      "from": "RE-3",
+      "to": "yard.fosse.road.f2"
+    },
+    {
+      "from": "RE-3",
+      "to": "yard.blood.festering.b"
+    },
+    {
+      "from": "RE-4",
+      "to": "yard.blades.lightBlades.c"
+    },
+    {
+      "from": "RE-4",
+      "to": "yard.blades.elementalEdge.b"
+    },
+    {
+      "from": "RE-5",
+      "to": "yard.home.roadS.a"
+    },
+    {
+      "from": "RE-5",
+      "to": "yard.home.roadE.a"
+    },
+    {
+      "from": "yard.home.roadS.c",
+      "to": "yard.home.fightingBreath.a"
+    },
+    {
+      "from": "RE-6",
+      "to": "yard.dual.j2.a"
+    },
+    {
+      "from": "RE-6",
+      "to": "bow.steel.hub.t",
+      "label": "X: evasion + accuracy"
+    },
+    {
+      "from": "RE-8",
+      "to": [-60, 3800]
+    },
+    {
+      "from": "RE-8",
+      "to": "yard.fosse.road.f5"
+    },
+    {
+      "from": [-20, 3520],
+      "to": "yard.blood.spellsword.a"
+    },
+    {
+      "from": "yard.blood.spellsword.b",
+      "to": "yard.fosse.road.f1"
+    },
+    {
+      "from": "yard.shield.shieldwall.c",
+      "to": [-900, 2890]
+    },
+    {
+      "from": [620, 2580],
+      "to": "yard.dual.crossedBlades.a"
+    },
+    {
+      "from": [540, 2850],
+      "to": "yard.dual.crossedBlades.b"
+    },
+    {
+      "from": "yard.fosse.storm.n",
+      "to": [1180, 3600],
+      "label": "X: lightning strikes (Strider)"
+    },
+    {
+      "from": "yard.dual.ironDraw.c",
+      "to": [180, 2030]
+    },
+    {
+      "from": "yard.blades.lightBlades.b",
+      "to": [-350, 2010]
+    },
+    {
+      "from": "yard.blades.killingPace.n",
+      "to": [-350, 2010]
+    },
+    {
+      "from": [-900, 2890],
+      "to": "yard.blades.executioner.a"
+    },
+    {
+      "from": [-900, 2890],
+      "to": "yard.shield.shieldwall.d"
+    },
+    {
+      "from": "yard.blades.executioner.n",
+      "to": "yard.blood.toWall.a"
+    }
+  ],
+  "cuts": [
+    ["yard.blades.elementalEdge.n", "yard.shield.shieldwall.c"],
+    ["yard.shield.shieldwall.c", "yard.blades.executioner.a"],
+    ["yard.blades.executioner.n", "yard.blades.toStandard.a"],
+    ["yard.blades.toStandard.a", "yard.shield.standard.n"],
+    ["yard.shield.steelRim.b", "yard.shield.toIronDraw.a"],
+    ["yard.shield.toIronDraw.a", "yard.dual.ironDraw.c"],
+    ["yard.dual.hotBlood.c", "yard.dual.toCrossed.a"],
+    ["yard.dual.toCrossed.a", "yard.dual.crossedBlades.a"],
+    ["yard.blood.redHarvest.a", "yard.blood.toCrossed.a"],
+    ["yard.blood.toCrossed.a", "yard.dual.crossedBlades.b"],
+    ["yard.dual.hotBlood.a", "yard.dual.toSidestep.a"],
+    ["yard.dual.toSidestep.a", "yard.dual.sidestep.n"],
+    ["yard.blood.j3.a", "yard.blood.spellsword.a"],
+    ["yard.blood.spellsword.b", "yard.blood.j2.a"],
+    ["yard.home.roadS.b", "yard.home.fightingBreath.a"],
+    ["yard.dual.j2.a", "bow.steel.hub.t"],
+    ["yard.dual.j2.a", "bow.home.added.n414"],
+    ["yard.blades.lightBlades.b", "yard.shield.hub.a"],
+    ["yard.blades.killingPace.n", "yard.shield.hub.a"],
+    ["yard.dual.ironDraw.c", "yard.shield.hub.a"],
+    ["yard.shield.shieldwall.c", "yard.shield.shieldwall.d"],
+    ["yard.shield.hub.a", "yard.shield.steelRim.a"]
+  ],
+  "moves": [
+    {
+      "id": "yard.dual.hotBlood.n",
+      "to": [880, 2300]
+    },
+    {
+      "id": "yard.blood.spellsword.n",
+      "to": [190, 3560]
+    },
+    {
+      "id": "yard.blood.woundDance.k",
+      "to": [-447, 3610]
+    },
+    {
+      "id": "yard.blood.crimsonPact.k",
+      "to": [925, 3262]
+    },
+    {
+      "id": "yard.shield.shieldwall.k",
+      "to": [-1070, 2955]
+    },
+    {
+      "id": "yard.dual.hotBlood.a",
+      "to": [780, 2290]
+    },
+    {
+      "id": "yard.shield.shieldwall.d",
+      "to": [-985, 2925]
+    }
+  ]
+}

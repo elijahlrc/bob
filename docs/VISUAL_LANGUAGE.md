@@ -16,7 +16,11 @@ One colour says what a skill does to the enemy; one shape says how it gets there
 | Chaos     | green    |
 
 The colour comes from the damage the skill deals at that moment (supports that add or convert damage change it). Hit
-sparks, projectile trails, rings, zones and numbers all use it.
+sparks, projectile trails, rings, zones and numbers all use it. It is the type with the most damage in total (an element
+wins a tie with physical, so half converted is the element); a skill that never hits (Searing Lance) is the type of its
+damage over time, whatever its gear adds (`profileElement`, `src/calc/skillLook.ts`). `npm run fxaudit` plays every gem
+and lists the ones whose pictures, damage and description disagree (`--added lightning` puts a little added damage on the
+gear).
 
 ## Shape: delivery
 

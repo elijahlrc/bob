@@ -4,6 +4,32 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-23
+
+- The passive tree is reworked again, and spent passive points are handed back once more; Wasp Sting becomes Cutpurse's Luck, crit with daggers and claws instead of poison.
+- The Mystic's start trades crit chance for mana regeneration.
+- Passive stats that apply to one kind of skill now say which, such as melee crit chance or two-handed attack speed.
+- The high score list starts over with this version, with a fresh field of rivals to duel.
+- Wand attacks shoot a bolt at range instead of stabbing.
+- Pixel art on the map is no longer blurred on scaled-up screens.
+- On phones, the Strategy tab gives each skill's name its own line.
+
+## 2026-10-22
+
+- The passive tree grows by more than a third, with new clusters in every class region; its clusters sit tighter and some existing nodes change.
+- Zoomed in on the passive tree, every node shows its stat lines.
+- Saved characters get their spent passive points back to spend on the new tree.
+- The high score list starts over with this version; a checkbox on its screen shows the older versions' scores, whose characters can no longer be fought.
+- Collapse maps no longer appear in new offers; they were far deadlier than the other map types.
+- Skills that convert or add damage, such as Storm Quill, Venom Cut and Searing Lance, are drawn in the element they deal.
+- Rime Rebuke is renamed Iron Rebuke, as it deals physical damage.
+- Gems found on the level just played are marked NEW on the Skills tab.
+- New fonts for the interface and headings, and a pixel font for damage numbers and drop labels on the map.
+- Dropdown options are readable without hovering over them.
+- The passive tree changes again, with five new clusters where class regions meet and several notables renamed; spent passive points are handed back once more.
+- Scroll bars are drawn in the game's colours.
+- The closed Workbench tab is hidden for now, and several hints and tooltips are shorter.
+
 ## 2026-10-21
 
 - Orbiting Blades is cast on the move, and its ring of blades widens with every blade.

@@ -13,7 +13,8 @@ export function createGame(parent: string, bus: Emitter<BusEvents>): Phaser.Game
     width: window.innerWidth,
     height: window.innerHeight,
     backgroundColor: '#0f1016',
-    render: { maxLights: 32 },
+    // Pixel art: nearest-neighbour textures, and a crisp canvas when the browser scales it (any screen above 100%).
+    render: { maxLights: 32, pixelArt: true },
     // The game has no sound. Without this Phaser opens a Web Audio context anyway, and iOS
     // Safari rejects its resume() ("Failed to start the audio device") when the audio
     // session is busy, e.g. during a call or with another app playing.

@@ -4,9 +4,11 @@
  * recovery) from the slams' radius node to the totems, the Vampiric Strikes chain from the Unbloodied notable to the
  * warcries' far side, Ground Shaker from the two-hander wheel, the totems, the tip junction with the Strongarm spur and the
  * near crossing from the Yard, and Bracing (shield block) as a bridge from the slam road to the slam wheel and the Yard.
- * Re-lined on 2026-10-20 (PHILOSOPHY §2a): Thick Skin and Unbloodied came here, Iron Lungs and Stagger went north. Round
- * 3 (2026-10-20): Bracing and Thick Skin traded places, so the shield leaves the start south-east, toward the Yard's
- * shields, and the mace west.
+ * Re-lined on 2026-10-20 (PHILOSOPHY §2a): Ox Hide and Unbloodied came here, Iron Lungs and Stagger went north. Round
+ * 3 (2026-10-20): Bracing and Ox Hide traded places, so the shield leaves the start south-east, toward the Yard's
+ * shields, and the mace west. G2 (2026-10-22): Second Wind came here from the Rampart, below Unbloodied, with a road node
+ * toward the Yard's Thirsting Blade; the Quarry floor road runs from the slam junction toward Ground Shaker. G3 round 2:
+ * Sledge and Sinew (mace with life) on the Quarry floor.
  */
 import {
   aoe,
@@ -17,8 +19,10 @@ import {
   dex,
   knockback,
   leechLife,
+  life,
   lifeOnHit,
   lifeOnKill,
+  lifeRegen,
   manaLeech,
   meleeArea,
   meleeRange,
@@ -29,6 +33,7 @@ import {
   stunThreshold,
   totemDamage,
   twoHandDamage,
+  weaponDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -36,15 +41,15 @@ export const slams: AreaSpec = {
   id: 'wall.slams',
   region: 'vanguard',
   name: 'The Quarry',
-  why: "The Wall's south-west: the two-handed slam, armour by the slam road, the full-life diamond, pace, leech, area damage, the totems and Strongarm. Every cluster here has two doors.",
-  at: [-1250, 1600], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  why: "The Wall's south-west: the two-handed slam, armour by the slam road, the full-life diamond, pace, leech and regeneration, area damage, the totems and Strongarm, with the Quarry floor road across the middle. Every cluster here has two doors.",
+  at: [-1250, 1575], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); nudged up in G3 (2026-10-22) off Unhurried.
   clusters: [
     {
       id: 'thunderstep',
       name: 'Thunderstep',
       why: 'Melee area first, then the notable with two-handed damage, melee area and radius: the two-handed slam, three steps below the south hub. Passed through to the junction; the pace chain leaves from its radius node.',
       at: [-1300, 1350],
-      shape: { kind: 'ring', r: 110, a0: -90 },
+      shape: { kind: 'ring', r: 55, a0: -90 },
       nodes: [
         { id: 'a', kind: 'small', lines: [meleeArea(8)], why: 'The entrance, from the slam road.' },
         {
@@ -73,27 +78,30 @@ export const slams: AreaSpec = {
       id: 'bracing',
       name: 'Bracing',
       why: "Block with a shield twice, then the notable with block, block recovery and stun threshold: the Wall's shield, on the slam road at the Yard border (round 3, 2026-10-20; it was a step from the Bulwark wheel and the maces). The shield Vanguard leaves the start south-east, toward the Yard's Steel Rim and Buckler, and the mace player west; a step from Thunderstep, so the shield and the two-hander are neighbours that compete. Passed through to the slam wheel's east small and the Yard's flask pocket, but a build bound for the Yard can go round by Thunderstep's smalls (thunderstep.a, thunderstep.b) without buying it.",
-      at: [-900, 1200],
-      shape: { kind: 'ring', r: 75, a0: 150 },
+      at: [-900, 1125],
+      shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           why: 'The entrance, facing the slam road.',
+          at: [-970, 1125],
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Bracing',
           lines: [shieldBlock(5), blockRecovery(20), stunThreshold(8)],
-          why: '2.5 + 1 + 1 units: the shield that does not buckle.',
+          at: [-900, 1125],
+          why: '2.5 + 1 + 1 units: the shield that does not buckle. Its smalls are one unit each, 2% (3% until G4 fix 1, 2026-10-22).',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           why: 'The exit, to the slam wheel and the Yard.',
+          at: [-912, 1194],
         },
       ],
       links: [
@@ -117,7 +125,7 @@ export const slams: AreaSpec = {
       at: [-1200, 1620],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [moveSpeed(4)], at: [-1060, 1560] },
+        { id: 'a', kind: 'small', lines: [moveSpeed(4)], at: [-1040, 1643] },
         {
           id: 'n',
           kind: 'notable',
@@ -133,30 +141,30 @@ export const slams: AreaSpec = {
       id: 'unbloodied',
       name: 'Unbloodied',
       why: "Damage on full life three times round the notable with damage and crit on full life and life on kill: the Vanguard whose armour means the first hit never lands, the Wall's conditional damage. Its own diamond off the slam junction, passed through toward the warcries; the leech chain leaves from its notable. The crit mace is far off in the tower (Crushing Blow).",
-      at: [-1620, 1720],
+      at: [-1580, 1690],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [damageOnFullLife(8)],
-          at: [-1520, 1620],
+          at: [-1580, 1635],
           why: 'The entrance, from the junction.',
         },
-        { id: 'b', kind: 'small', lines: [damageOnFullLife(8)], at: [-1660, 1600] },
+        { id: 'b', kind: 'small', lines: [damageOnFullLife(8)], at: [-1635, 1690] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Unbloodied',
-          lines: [damageOnFullLife(16), critOnFullLife(25), lifeOnKill(10)],
-          at: [-1720, 1740],
+          lines: [damageOnFullLife(16), critOnFullLife(19), lifeOnKill(10)],
+          at: [-1580, 1745],
           why: '2 + 1 + 1 units.',
         },
         {
           id: 'c',
           kind: 'small',
           lines: [damageOnFullLife(8)],
-          at: [-1600, 1830],
+          at: [-1525, 1690],
           why: 'The exit, to the warcries.',
         },
       ],
@@ -174,7 +182,7 @@ export const slams: AreaSpec = {
       at: [-1950, 1760],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['melee'])], at: [-1880, 1720] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['melee'])], at: [-1968, 1767] },
         {
           id: 'n',
           kind: 'notable',
@@ -197,7 +205,7 @@ export const slams: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [areaDamage(10)],
-          at: [-2650, 1380],
+          at: [-2506, 1475],
           why: 'The entrance, from the road down from the tower junction.',
         },
         {
@@ -212,7 +220,7 @@ export const slams: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [areaDamage(10)],
-          at: [-2300, 1680],
+          at: [-2421, 1578],
           why: 'The exit, to Vampiric Strikes.',
         },
       ],
@@ -226,7 +234,7 @@ export const slams: AreaSpec = {
       name: 'Standing Cairns',
       why: "Totems: damage, speed (a totem skill's speed is both how fast it is placed and how fast it fires), duration. Reached from the junction and from the pace chain.",
       at: [-1100, 1850],
-      shape: { kind: 'ring', r: 110, a0: -90 },
+      shape: { kind: 'ring', r: 55, a0: -90 },
       nodes: [
         { id: 'a', kind: 'small', lines: [totemDamage(12)], why: 'The entrance, top.' },
         {
@@ -262,13 +270,101 @@ export const slams: AreaSpec = {
       at: [-1120, 2180],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [projectileAttack(10)], at: [-1120, 2180] },
-        { id: 'b', kind: 'small', lines: [projectileAttack(10)], at: [-1131, 2310] },
+        { id: 'a', kind: 'small', lines: [projectileAttack(10)], at: [-1120, 2299] },
+        { id: 'b', kind: 'small', lines: [projectileAttack(10)], at: [-1129, 2356] },
         { id: 'k', kind: 'keystone', name: 'Strongarm', lines: [], at: [-1142, 2440] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'k'],
+      ],
+    },
+    {
+      id: 'secondWind',
+      name: 'Second Wind',
+      why: "Regeneration twice, then the notable with regeneration and life: the recovery decision, south of Unbloodied between the Quarry and the Barrows (G2, 2026-10-22; it was in the Rampart, a step off the home's road). With Vampiric Strikes and the Yard's Thirsting Blade beside it, regeneration or leech is a fork: one of them is enough for most builds.",
+      at: [-1650, 2070],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [lifeRegen(0.4)],
+          at: [-1624, 1948],
+          why: 'The entrance, from Unbloodied.',
+        },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1635, 2002] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Second Wind',
+          lines: [lifeRegen(1), life(8)],
+          at: [-1650, 2070],
+          why: "2.5 units of regeneration and a little life: 4.1 units. The Barrows' middle road leaves south-west, the road to the Yard east.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+      ],
+    },
+    {
+      id: 'toThirst',
+      name: 'A road',
+      why: "Strength and dexterity once east of Second Wind, where the near crossing to the Yard's Thirsting Blade lands (G2, 2026-10-22).",
+      at: [-1460, 2140],
+      shape: { kind: 'hand' },
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [-1460, 2140] }],
+      links: [],
+    },
+    {
+      id: 'floor',
+      name: 'The Quarry floor',
+      why: 'Strength across the empty Quarry floor, from the slam junction west toward Ground Shaker (G2, 2026-10-22): a third way between the Quarry and the Barbican. Sledge and Sinew (mace with life) joins the two nodes since G3 round 2.',
+      at: [-1850, 1455],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-1590, 1480] },
+        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-2113, 1475] },
+      ],
+      links: [],
+    },
+    {
+      id: 'sledge',
+      name: 'Sledge and Sinew',
+      why: "Mace damage three times on the Quarry floor, with the notable of mace damage and life in a triangle off the road: the slammer's mace with the body to swing it (G3 round 2, 2026-10-22; the ledger's VA-5). The smalls lie on the straight line between the floor's two road nodes, so the road is whole; the notable is a step north of it. South of the Gate by the slam road, where Weight of Iron (the stun) is west by the tower road: two plain maces, two directions, two partners. A mace build passing through takes the smalls; anyone else crossing the floor pays them as road.",
+      at: [-1846, 1436],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [weaponDamage('mace', 10)],
+          at: [-1780, 1458],
+          why: 'The east end, from the slam junction side.',
+        },
+        { id: 'b', kind: 'small', lines: [weaponDamage('mace', 10)], at: [-1837, 1458] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Sledge and Sinew',
+          lines: [weaponDamage('mace', 20), life(8)],
+          at: [-1875, 1393],
+          why: "2 + 1.6 units: 3.6. Mace damage with life, a weapon with a defence (the ledger's good kind of pair). The triangle's apex, north of the road.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [weaponDamage('mace', 10)],
+          at: [-1912, 1459],
+          why: 'The west end, toward Ground Shaker.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -317,6 +413,25 @@ export const slams: AreaSpec = {
       why: "The slams' radius node onto the pace chain.",
     },
     { from: 'j1.a', to: 'unbloodied.a', why: 'Junction to the full-life diamond.' },
+    {
+      from: 'unbloodied.n',
+      to: 'secondWind.a',
+      why: "The full-life diamond's tip onto Second Wind: a third way into Unbloodied.",
+    },
+    { from: 'secondWind.n', to: 'toThirst.a', why: "Second Wind east, toward the Yard's leech." },
+    {
+      from: 'toThirst.a',
+      to: 'yard.blades.thirst.n',
+      why: 'Regeneration or leech (a near crossing; G1-brief.md §2.4, laid in the G2 border pass): Second Wind through one node onto Thirsting Blade, in one straight line. One of the two is enough for most builds, so they sit a fork apart, and the route from the Quarry to the Pits passes through one or the other, not both. Thirsting Blade stops being a dead end, and the leech is 15 steps from the Vanguard start by this road (it was 19).',
+    },
+    { from: 'j1.a', to: 'floor.a', why: 'The slam junction onto the Quarry floor, west.' },
+    { from: 'groundShaker.b', to: 'floor.b', why: 'Ground Shaker onto the Quarry floor, east.' },
+    { from: 'floor.a', to: 'sledge.a', why: 'The Quarry floor west onto the mace smalls.' },
+    {
+      from: 'sledge.c',
+      to: 'floor.b',
+      why: 'And on west to the floor road: the floor is whole, the slam junction to Ground Shaker.',
+    },
     {
       from: 'wall.slams.j1.a',
       to: 'wall.slams.toCairns.a',

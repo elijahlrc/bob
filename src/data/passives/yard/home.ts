@@ -4,7 +4,7 @@
  * small is one stat at the reference's size; nothing within three steps names a shield or a second sword.
  *
  * West side: melee physical damage, toward the blades. East side: attack speed, toward the second hand and the speed
- * cluster. The signature (speed, melee damage, life, both attributes) is the loop's tip, and the shield road leaves from
+ * cluster. The signature (speed, melee damage, both attributes) is the loop's tip, and the shield road leaves from
  * it straight down to the hub (it is life, since the user\'s review: block belongs to the shield area). Off the west hub, a life pocket pointing at the Wall; off the east hub, a block pocket
  * pointing at the Bow, both tight orbits. The hubs carry both attributes: a hybrid's sword asks for both.
  * The west and second-hand roads leaving the hubs are strength-and-dexterity highways (2026-10-20).
@@ -20,8 +20,10 @@ import {
   manaLeech,
   manaOnHit,
   meleePhys,
+  moveSpeed,
   shieldBlock,
   str,
+  warcryEffect,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -36,8 +38,8 @@ export const home: AreaSpec = {
   id: 'yard.home',
   region: 'reaver',
   name: 'The Yard Gate',
-  why: 'Two stat nodes off the start (melee damage west, attack speed east), the signature between them, two hubs one step out with a pocket each, and three roads: the blades highway west, the second-hand highway east, the middle road (life) straight down; and the mana pocket between the middle road and the second-hand road.',
-  at: [-80, 1356], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  why: 'Two stat nodes off the start (melee damage west, attack speed east), the signature between them, two hubs one step out with a pocket each, and three roads: the blades highway west, the second-hand highway east, the middle road (life) straight down; and between the middle road and the second-hand road the warcry chain (Drill Call, G3 round 2) and the mana pocket.',
+  at: [-30, 1575], // Where the area's name is drawn: clear of every other area's name; moved down over the home's roads in G3 round 2, off Drill Call (it was at (-80, 1347)).
   clusters: [
     {
       id: 'sig',
@@ -50,23 +52,23 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [meleePhys(10)],
-          at: [-150, 1120],
+          at: [-70, 1242],
           why: 'The west side: damage.',
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Quickened Steel',
-          lines: [attackSpeed(4), meleePhys(10), life(6), str(10), dex(10)],
+          lines: [attackSpeed(7), meleePhys(10), str(10), dex(10)],
           at: [0, 1240],
-          why: 'The signature: the Reaver is the fast melee class. Speed, melee damage, life and both attributes: 4.9 units. The shield road leaves from here.',
+          why: 'The signature: the Reaver is the fast melee class. Speed, melee damage and both attributes: 3.7 units. Its 6% life went in G4 fix 1 (2026-10-22): at 4.9 units it was among the richest generic notables, one ring step from two other homes, and late builds of other classes walked over to collect it (starts audit F6); the middle road below it sells life. The middle road leaves from here.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [attackSpeed(5)],
-          at: [150, 1120],
-          why: 'The east side: speed.',
+          at: [70, 1242],
+          why: 'The east side: speed, one unit (5% since G4 fix 1; it was 8%).',
         },
       ],
       links: [
@@ -93,7 +95,13 @@ export const home: AreaSpec = {
       at: [-470, 1150],
       shape: { kind: 'ring', r: 75, a0: 30 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], why: 'The entrance, facing the hub.' },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          why: 'The entrance, facing the hub.',
+          at: [-411, 1221],
+        },
         {
           id: 'n',
           kind: 'notable',
@@ -101,7 +109,7 @@ export const home: AreaSpec = {
           lines: [life(10), lifeRegen(0.6), str(10)],
           why: '2 + 1.5 + 0.7 units.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-467, 1206] },
       ],
       links: [
         ['a', 'b'],
@@ -111,18 +119,24 @@ export const home: AreaSpec = {
     {
       id: 'block',
       name: 'Buckler',
-      why: "The east hub's pocket, a tight orbit pointing at the Bow: two block nodes and a block-and-shield-defences notable. Optional: the dual-wield Reaver walks past it.",
+      why: "The east hub's pocket, a tight orbit pointing at the Bow: two block nodes and a notable of block and evasion. Optional: the dual-wield Reaver walks past it.",
       at: [450, 1380],
       shape: { kind: 'ring', r: 75, a0: -139 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [shieldBlock(3)], why: 'The entrance, facing the hub.' },
-        { id: 'b', kind: 'small', lines: [shieldBlock(3)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [shieldBlock(2)],
+          why: 'The entrance, facing the hub.',
+          at: [365, 1347],
+        },
+        { id: 'b', kind: 'small', lines: [shieldBlock(2)], at: [397, 1396] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Buckler',
-          lines: [shieldBlock(5), evasion(16), life(5)],
-          why: 'The light shield: 2.5 + 1.3 + 1 units.',
+          lines: [shieldBlock(5), evasion(13)],
+          why: "The light shield: 2.5 + 1.3 units. Its 5% life went in G4 fix 1 (2026-10-22): a start notable at 4.8 units was a late stop for other classes' builds (starts audit F6).",
         },
       ],
       links: [
@@ -133,7 +147,7 @@ export const home: AreaSpec = {
     {
       id: 'fightingBreath',
       name: 'Fighting Breath',
-      why: "Mana on hit with attacks twice, then the notable with mana on hit, mana leech and life: the Yard's only mana notable, for a Reaver with three gems who runs dry by map five. A tight orbit between the middle road's second node and the second-hand road's second node: a bridge, so the two roads are a loop before the hub.",
+      why: "Mana on hit with attacks twice, then the notable with mana on hit, mana leech and life: the Yard's only mana notable, for a Reaver with three gems who runs dry by map five. A tight orbit between the middle road's third node and the second-hand road's second node: a bridge, so the two roads are a loop before the hub.",
       at: [170, 1640],
       shape: { kind: 'hand' },
       nodes: [
@@ -141,10 +155,10 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [manaOnHit(4, ['attack'])],
-          at: [80, 1610],
+          at: [209, 1641],
           why: 'The entrance, from the middle road.',
         },
-        { id: 'b', kind: 'small', lines: [manaOnHit(4, ['attack'])], at: [180, 1700] },
+        { id: 'b', kind: 'small', lines: [manaOnHit(4, ['attack'])], at: [246, 1686] },
         {
           id: 'n',
           kind: 'notable',
@@ -160,30 +174,70 @@ export const home: AreaSpec = {
       ],
     },
     {
+      id: 'drill',
+      name: 'Drill Call',
+      why: "Warcry effect twice, then the notable with warcry effect and attack speed, then warcry effect once more (RE-5, G3 round 2, 2026-10-22): the shout on the training ground, a bridge from the middle road's first node to the second-hand road's first, so the home's middle is not a corridor of life alone (CONSTRAINTS §4.8: the signature, three life smalls and the shield wheel ran straight down from the start). Warcry-led, not attack-speed-led as the brief had it: stop 2 (question B) said to flip it back if the sword build's attack speed stopped climbing, and at 120 points it was near flat (21 to 22 units); attack speed is the notable's partner, so the Reaver's speed stays a direction (the Strider's Meadow, Darting Steel) and not a pocket five steps from the start. Warcries' third home, with its own partner: War Drums (the Wall) sells duration, the Wall's armoured shout armour, Battle Hymn (the Cathedral) auras.",
+      at: [174, 1393],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: [70, 1345],
+          why: 'The entrance, from the middle road.',
+        },
+        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: [122, 1369] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Drill Call',
+          lines: [warcryEffect(20), attackSpeed(8)],
+          at: [174, 1393],
+          why: 'The shout that sets the pace: 2 + 1.6 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: [226, 1416],
+          why: 'The exit, to the second-hand road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'fieldDressing',
       name: 'Field Dressing',
-      why: "Flask recovery twice, then the notable with recovery, duration and life: the Yard sold no flask lines, and the early game is life flasks. A tight orbit west of Stout Heart, pointing at the Wall, passed through to Fencer's Eye: the life pocket and the crit pocket are joined along the Wall border.",
-      at: [-670, 1310],
-      shape: { kind: 'ring', r: 70, a0: -30 },
+      why: "Flask recovery twice, then the notable with recovery, duration and movement: the Yard sold no flask lines, and the early game is life flasks. A pocket west of Stout Heart, its smalls on the way to the Wall: a bridge from Stout Heart to the Wall's Bracing (a near crossing), with the notable at the tip off the second small. Movement, not life, since G4 fix 1 (2026-10-22): flasks with life was Quartermaster's pairing five steps away in the Vanguard home (trade-offs audit F10), and the band between the two strength starts was all defence and flasks (starts audit F2); a flask that keeps you moving is the Reaver's.",
+      at: [-700, 1290],
+      shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [flaskRecovery(10)],
           why: 'The entrance, facing Stout Heart.',
+          at: [-676, 1251],
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Field Dressing',
-          lines: [flaskRecovery(15), flaskDuration(10), life(5)],
-          why: "1.5 + 1 + 1 units. The exit, to Fencer's Eye.",
+          lines: [flaskRecovery(15), flaskDuration(10), moveSpeed(4)],
+          why: "Drink on the run: 1.5 + 1 + 1 units. The pocket's tip, off its west small.",
+          at: [-693, 1340],
         },
         {
           id: 'b',
           kind: 'small',
           lines: [flaskRecovery(10)],
           why: "The west side, where the Wall's Bracing is one step away.",
+          at: [-731, 1275],
         },
       ],
       links: [
@@ -218,13 +272,13 @@ export const home: AreaSpec = {
     {
       id: 'roadS',
       name: 'The middle road',
-      why: 'Life three times: the road straight down from the signature to the hub, where the blades, the bow chain and the shield wheel meet again. It was block, and a two-sword Reaver paid three block nodes for the generic way down; life is what every Reaver wants on the way.',
+      why: 'Life three times: the road straight down from the signature to the hub, where the crossroad and the spine meet it (G2). It was block, and a two-sword Reaver paid three block nodes for the generic way down; life is what every Reaver wants on the way.',
       at: [-50, 1560],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-40, 1400] },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-60, 1560] },
-        { id: 'c', kind: 'small', lines: [life(5)], at: [-70, 1720] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-7, 1310] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-13, 1367] },
+        { id: 'c', kind: 'small', lines: [life(5)], at: [-19, 1425] },
       ],
       links: [
         ['a', 'b'],
@@ -289,8 +343,22 @@ export const home: AreaSpec = {
       to: 'roadE.a',
       why: 'The block pocket is also a way onto the second-hand road.',
     },
-    { from: 'roadS.b', to: 'fightingBreath.a', why: 'The middle road onto the mana pocket.' },
+    {
+      from: 'roadS.c',
+      to: 'fightingBreath.a',
+      why: "The middle road's third node onto the mana pocket (G2, 2026-10-22; it was the second): the first node is left free for the warcry chain that bridges the middle road and the second-hand road (Drill Call, G3 round 2), whose link would otherwise cross this one.",
+    },
     { from: 'life.n', to: 'fieldDressing.a', why: 'Stout Heart onto the flask pocket.' },
+    {
+      from: 'roadS.a',
+      to: 'drill.a',
+      why: "The middle road's first node onto the warcry chain (G3 round 2, RE-5): the home's middle offers a shout beside the life.",
+    },
+    {
+      from: 'drill.c',
+      to: 'roadE.a',
+      why: 'The warcry chain lands on the second-hand road: the middle and east roads are a loop at the home, above the mana pocket.',
+    },
     {
       from: 'fieldDressing.b',
       to: 'wall.slams.bracing.b',

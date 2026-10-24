@@ -11,6 +11,15 @@ import type { Line } from './types';
 
 const line = (label: string, units: number, ...mods: Mod[]): Line => ({ label, units, mods });
 
+/** A tagged line's tags as the words a node card shows before the stat ("two-handed melee", "brand"). */
+const TAG_WORDS: Partial<Record<SkillTag, string>> = {
+  oneHand: 'one-handed',
+  twoHand: 'two-handed',
+  channelling: 'channelling',
+};
+const tagWords = (tags?: SkillTag[]): string =>
+  tags ? tags.map((t) => TAG_WORDS[t] ?? t).join(' ') + ' ' : '';
+
 /**
  * Names a line function and records, on every line it makes, which function and arguments made it (`Line.spec`), so the
  * tree editor can show and change a node's lines in this vocabulary and a patch can be folded back into an area file.
@@ -40,17 +49,17 @@ export const UNIT = {
   es: 5,
   mana: 8,
   armour: 12,
-  evasion: 12,
+  evasion: 10,
   resAll: 4,
-  resOne: 8,
+  resOne: 10,
   lifeRegen: 0.4,
   manaRegen: 10,
   stunThreshold: 8,
   moveSpeed: 4,
-  attackSpeed: 3,
+  attackSpeed: 5,
   castSpeed: 4,
   accuracy: 10,
-  critChance: 20,
+  critChance: 15,
   critMulti: 12,
   aoe: 8,
   stunDuration: 15,
@@ -119,7 +128,7 @@ export const blockAttack = def('blockAttack', (v: number, cond?: Condition): Lin
 // ---- Offence, generic ----
 export const attackSpeed = def('attackSpeed', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% attack speed${tags ? ' ' + tags.join('+') : ''}`,
+    `${v}% ${tagWords(tags)}attack speed`,
     v / UNIT.attackSpeed,
     mod('attackSpeed', 'inc', v, tags ? { tags } : undefined),
   ),
@@ -135,21 +144,21 @@ export const accuracyFlat = def('accuracyFlat', (v: number): Line =>
 );
 export const critChance = def('critChance', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% crit chance`,
+    `${v}% ${tagWords(tags)}crit chance`,
     v / UNIT.critChance,
     mod('critChance', 'inc', v, tags ? { tags } : undefined),
   ),
 );
 export const critMulti = def('critMulti', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `+${v}% crit multiplier`,
+    `+${v}% ${tagWords(tags)}crit multiplier`,
     v / UNIT.critMulti,
     mod('critMulti', 'base', v, tags ? { tags } : undefined),
   ),
 );
 export const aoe = def('aoe', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% area${tags ? ' ' + tags.join('+') : ''}`,
+    `${v}% ${tagWords(tags)}area`,
     v / UNIT.aoe,
     mod('aoe', 'inc', v, tags ? { tags } : undefined),
   ),
@@ -297,13 +306,17 @@ export const totemDuration = def('totemDuration', (v: number): Line =>
 // ---- Recovery ----
 export const leechLife = def('leechLife', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% life leech`,
+    `${v}% ${tagWords(tags)}life leech`,
     v / UNIT.leechLife,
     mod('leech.life', 'base', v, tags ? { tags } : undefined),
   ),
 );
 export const lifeOnHit = def('lifeOnHit', (v: number, tags?: SkillTag[]): Line =>
-  line(`+${v} life on hit`, v / 4, mod('lifeOnHit', 'base', v, tags ? { tags } : undefined)),
+  line(
+    `+${v} life on ${tagWords(tags)}hit`,
+    v / 4,
+    mod('lifeOnHit', 'base', v, tags ? { tags } : undefined),
+  ),
 );
 export const lifeOnKill = def('lifeOnKill', (v: number): Line =>
   line(`+${v} life on kill`, v / 10, mod('lifeOnKill', 'base', v)),
@@ -332,7 +345,7 @@ export const dualDamage = def('dualDamage', (v: number): Line =>
 export const dualSpeed = def('dualSpeed', (v: number): Line =>
   line(
     `${v}% attack speed while dual wielding`,
-    v / 3,
+    v / UNIT.attackSpeed,
     mod('attackSpeed', 'inc', v, { condition: DUAL }),
   ),
 );
@@ -438,7 +451,11 @@ export const bowDamage = def('bowDamage', (v: number): Line =>
   weaponLine(`${v}% bow damage`, v, 10, ['bow'], 'wieldingBow'),
 );
 export const bowSpeed = def('bowSpeed', (v: number): Line =>
-  line(`${v}% bow attack speed`, v / 3, mod('attackSpeed', 'inc', v, { tags: ['bow'] })),
+  line(
+    `${v}% bow attack speed`,
+    v / UNIT.attackSpeed,
+    mod('attackSpeed', 'inc', v, { tags: ['bow'] }),
+  ),
 );
 export const physAttack = def('physAttack', (v: number): Line =>
   damage(v, {
@@ -467,6 +484,16 @@ export const daggerSpellDamage = def('daggerSpellDamage', (v: number): Line =>
     condition: DAGGER,
     unit: 8,
     label: `${v}% spell damage with a dagger`,
+  }),
+);
+const STAFF: Condition = { id: 'wieldingStaff' };
+/** Spell damage while wielding a staff: the staff caster's line, apart from the staff attacker's `staffDamage`. */
+export const staffSpellDamage = def('staffSpellDamage', (v: number): Line =>
+  damage(v, {
+    tags: ['spell'],
+    condition: STAFF,
+    unit: 8,
+    label: `${v}% spell damage with a staff`,
   }),
 );
 export const daggerSpellCrit = def('daggerSpellCrit', (v: number): Line =>
@@ -689,13 +716,21 @@ export const weaponDamage = def('weaponDamage', (w: Weapon, v: number): Line =>
   weaponLine(`${v}% ${w} damage`, v, 10, [w], WIELD[w]),
 );
 export const weaponCrit = def('weaponCrit', (w: Weapon, v: number): Line =>
-  line(`${v}% crit chance with ${w}s`, v / 20, mod('critChance', 'inc', v, { tags: [w] })),
+  line(
+    `${v}% crit chance with ${w}s`,
+    v / UNIT.critChance,
+    mod('critChance', 'inc', v, { tags: [w] }),
+  ),
 );
 export const weaponCritMulti = def('weaponCritMulti', (w: Weapon, v: number): Line =>
   line(`+${v}% crit multiplier with ${w}s`, v / 12, mod('critMulti', 'base', v, { tags: [w] })),
 );
 export const weaponSpeed = def('weaponSpeed', (w: Weapon, v: number): Line =>
-  line(`${v}% attack speed with ${w}s`, v / 3, mod('attackSpeed', 'inc', v, { tags: [w] })),
+  line(
+    `${v}% attack speed with ${w}s`,
+    v / UNIT.attackSpeed,
+    mod('attackSpeed', 'inc', v, { tags: [w] }),
+  ),
 );
 export const weaponAccuracy = def('weaponAccuracy', (w: Weapon, v: number): Line =>
   line(`${v}% accuracy with ${w}s`, v / 10, mod('accuracy', 'inc', v, { tags: [w] })),
@@ -712,14 +747,14 @@ export const shieldAttack = def('shieldAttack', (v: number): Line =>
 export const shieldSpeed = def('shieldSpeed', (v: number): Line =>
   line(
     `${v}% attack speed with a shield`,
-    v / 3,
+    v / UNIT.attackSpeed,
     mod('attackSpeed', 'inc', v, { condition: SHIELD }),
   ),
 );
 export const dualCrit = def('dualCrit', (v: number): Line =>
   line(
     `${v}% crit chance while dual wielding`,
-    v / 20,
+    v / UNIT.critChance,
     mod('critChance', 'inc', v, { condition: DUAL }),
   ),
 );
@@ -732,6 +767,14 @@ export const dualAccuracy = def('dualAccuracy', (v: number): Line =>
 );
 export const spellBlock = def('spellBlock', (v: number): Line =>
   line(`+${v}% spell block`, v / 2, mod('blockSpell', 'base', v)),
+);
+/** Spell block while wielding a staff: the staff's answer to a shield's `shieldSpellBlock`. */
+export const staffSpellBlock = def('staffSpellBlock', (v: number): Line =>
+  line(
+    `+${v}% spell block with a staff`,
+    v / 2,
+    mod('blockSpell', 'base', v, { condition: { id: 'wieldingStaff' } }),
+  ),
 );
 export const blockRecovery = def('blockRecovery', (v: number): Line =>
   line(`${v}% block recovery`, v / 20, mod('blockRecovery', 'inc', v)),
@@ -843,14 +886,16 @@ export const damageOnLowLife = def('damageOnLowLife', (v: number): Line =>
 export const attackSpeedOnKill = def('attackSpeedOnKill', (v: number): Line =>
   line(
     `${v}% attack speed if you killed recently`,
-    v / 4,
+    // Conditional, so a third cheaper than plain attack speed.
+    v / ((UNIT.attackSpeed * 4) / 3),
     mod('attackSpeed', 'inc', v, { condition: { id: 'killedRecently' } }),
   ),
 );
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(
     `${v}% crit chance while on full life`,
-    v / 25,
+    // Conditional, so a quarter cheaper than plain crit chance.
+    v / ((UNIT.critChance * 5) / 4),
     mod('critChance', 'inc', v, { condition: { id: 'onFullLife' } }),
   ),
 );

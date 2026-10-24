@@ -2,7 +2,7 @@
  * The Stair (the Knife's north barb, hooking up toward the Spire): the curse junction off the venom junction (where
  * the life chain and the Second Curse chain also arrive), a shield small, the wheel (chaos spells on one notable since
  * round 3, mines on the other), the climb to the Spellslip junction, and the dear road of two attribute nodes from there to the
- * Spire's east arm. The near crossing from the Spire's Devotion chain lands on the wheel's north node. The id `knife.hex`
+ * Spire's east arm. The near crossing from the Spire's Kept Vows chain lands on the wheel's north node. The id `knife.hex`
  * predates the change and is kept.
  */
 import {
@@ -17,7 +17,9 @@ import {
   dotDamage,
   eleDamage,
   es,
+  evasion,
   int,
+  life,
   leechLife,
   mineDamage,
   mineSpeed,
@@ -31,7 +33,7 @@ export const hex: AreaSpec = {
   region: 'shade',
   name: 'The Stair',
   why: "The Knife's north barb, climbing toward the Spire: chaos spells or mines on one wheel, the climb to Spellslip, and the dear road to the Spire.",
-  at: [1700, -2560], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [1880, -2790], // Where the area's name is drawn: clear of every other area's name (label pass, round 4; nudged west in G2 for Static Edge; moved up to the Stair's top in G3 round 1, off Wiry Frame; moved down and east in G3 round 2, off Shifting Ward and the Spire's Hexwright).
   clusters: [
     {
       id: 'jH',
@@ -45,18 +47,18 @@ export const hex: AreaSpec = {
     {
       id: 'road',
       name: 'The barb road',
-      why: 'Energy shield once, between the junction and the wheel: the one road node of the barb.',
+      why: "One attribute node between the junction and the wheel: the barb's road reads as a road. G4 fix 1 (2026-10-22): it was a lone energy shield small belonging to no notable.",
       at: P(1350, -540),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'small', lines: [es(5)], at: P(1350, -540) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(1350, -540) }],
       links: [],
     },
     {
       id: 'wheel',
       name: 'Rotting Word',
-      why: "The wheel of four on the Stair: attribute nodes at the south entrance and the north exit, so the Stair is a road and the wheel a fork on it. Chaos spells on the west (Rotting Word, round 3: the tree had no chaos-spell notable; here chaos comes with damage over time and cast speed, the Undercroft's Tomb Dust sells it with energy shield and area, and the Spire's Withering sells the damage-over-time multiplier). It carries no curse line, and Hexwright traded places with Devotion in round 3, so the curse notables are seven (Hexwright) and five (Second Curse) steps away: a chaos hexer had found Rotting Word, Hexwright and Second Curse by point 17, mines on the east (Sapper). The Spire's Hexwright lands on the north node, where the climb to Spellslip leaves. Festering (poison) was the west side until round 3, when it went to the Yard: the poison claw found all its notables round the Rookery.",
+      why: "The wheel of four on the Stair: attribute nodes at the south entrance and the north exit, so the Stair is a road and the wheel a fork on it. Chaos spells on the west (Rotting Word, round 3: the tree had no chaos-spell notable; here chaos comes with damage over time and cast speed, the Undercroft's Tomb Dust sells it with energy shield and area, and the Spire's Withering sells the damage-over-time multiplier). It carries no curse line, and Hexwright traded places with Kept Vows in round 3, so the curse notables are seven (Hexwright) and five (Second Curse) steps away: a chaos hexer had found Rotting Word, Hexwright and Second Curse by point 17, mines on the east (Sapper). The Spire's Hexwright lands on the north node, where the climb to Spellslip leaves. Festering (poison) was the west side until round 3, when it went to the Yard: the poison claw found all its notables round the Rookery.",
       at: [1509, -2026],
-      shape: { kind: 'ring', r: 150, a0: 90 },
+      shape: { kind: 'ring', r: 100, a0: 90 },
       nodes: [
         {
           id: 's',
@@ -75,7 +77,7 @@ export const hex: AreaSpec = {
           id: 'n',
           kind: 'attribute',
           lines: [dex(6), int(6)],
-          why: "The north node: the near crossing from the Spire's Devotion chain lands here, and the climb to Spellslip leaves.",
+          why: "The north node: the near crossing from the Spire's Kept Vows chain lands here, and the climb to Spellslip leaves.",
         },
         {
           id: 'n2',
@@ -117,8 +119,8 @@ export const hex: AreaSpec = {
       at: [1760, -3080],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dodgeSpell(3)], at: [1700, -2900] },
-        { id: 'b', kind: 'small', lines: [dodgeSpell(3)], at: [1760, -3080] },
+        { id: 'a', kind: 'small', lines: [dodgeSpell(3)], at: P(2093, -1826) },
+        { id: 'b', kind: 'small', lines: [dodgeSpell(3)], at: P(2139, -1861) },
         { id: 'k', kind: 'keystone', name: 'Spellslip', lines: [], at: [1820, -3260] },
       ],
       links: [
@@ -141,24 +143,104 @@ export const hex: AreaSpec = {
     {
       id: 'static',
       name: 'Static Edge',
-      why: 'A pocket east off the Spellslip junction, into the ground beside the Stair: lightning twice, then lightning with crit; since round 3 the second small carries the Rooftops road on, and the notable is a leaf. The Spire sells lightning with cast speed (Thunderhead) and with shock (Overcharge); here it comes with crit, for the crit-spell Shade and the lightning trapper the dear road to the Spire was built for.',
+      why: 'A pocket east off the Spellslip junction, into the ground beside the Stair: lightning twice, then lightning with crit; since round 3 the second small carries the Rooftops road on, and the notable is a leaf. The Spire sells lightning with cast speed (Thunderhead) and with shock (Live Current); here it comes with crit, for the crit-spell Shade and the lightning trapper the dear road to the Spire was built for.',
       at: [1950, -2600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [1780, -2650] },
-        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [1950, -2600] },
+        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [1975, -2661] },
+        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [2033, -2652] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Static Edge',
-          lines: [eleDamage('lightning', 16), critChance(20), shockChance(10)],
-          at: [2110, -2670],
-          why: '1.6 + 1 + 1 units.',
+          lines: [eleDamage('lightning', 16), critChance(15), shockChance(10)],
+          at: [2090, -2585],
+          why: "1.6 + 1 + 1 units. G2 (2026-10-22): moved below the static road (G1/shade.md §3.6), clear of the line north-east from the second small, where the energy shield cluster at the Stair's top (SH-1) will join it.",
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
+      ],
+    },
+    {
+      id: 'wiry',
+      name: 'Wiry Frame',
+      why: "Life with evasion in the Stair's middle (G3 round 1, 2026-10-22; the ledger's SH-15 with the folded life and evasion sections SH-s2 and SH-s4): a bridge from the climb to the Static Edge pocket, so the Stair's middle is a loop (the climb, the Spellslip junction, the lightning pocket). Life three times on the climb side, the notable, evasion twice on the lightning side. The Shade's life was the thinnest of any region and sat in one place, Thick Blood by the start; here it is a direction north, away from the daggers and claws, so the attacker who wants it gives up offence to walk here (G1/shade.md §1.2). Thick Blood is nine steps from here; the Strider's Hard Target (life with evasion) is far south.",
+      at: P(1833, -1220),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'l3',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(1670, -1297),
+          why: 'The entrance, from the climb.',
+        },
+        { id: 'l2', kind: 'small', lines: [life(5)], at: P(1719, -1274) },
+        { id: 'l1', kind: 'small', lines: [life(5)], at: P(1769, -1250) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Wiry Frame',
+          lines: [life(12), evasion(15)],
+          at: P(1833, -1220),
+          why: "2.4 + 1.5 units. The corner of the bridge: the life chain runs east from the climb, the evasion chain leaves toward the lightning pocket's first small at a clean angle to its road.",
+        },
+        { id: 'e1', kind: 'small', lines: [evasion(10)], at: P(1896, -1249) },
+        {
+          id: 'e2',
+          kind: 'small',
+          lines: [evasion(10)],
+          at: P(1946, -1272),
+          why: 'The exit, to the lightning pocket.',
+        },
+      ],
+      links: [
+        ['l3', 'l2'],
+        ['l2', 'l1'],
+        ['l1', 'n'],
+        ['n', 'e1'],
+        ['e1', 'e2'],
+      ],
+    },
+    {
+      id: 'ward',
+      name: 'Shifting Ward',
+      why: "Energy shield with the chance to dodge spells, at the top of the Stair beside Spellslip (G3 round 2, 2026-10-22; the ledger's SH-1): a bridge north from the lightning pocket's second small to the ridge road's second node, so the Stair's top has a second way onto the Rooftops besides the rooftop road. Shield twice from the Stair, the notable, spell dodge twice toward the ridge. A fork with the keystone a few steps west, which dodges spells at the cost of shield: the shield Shade takes this, the dodger takes the keystone, and a build that wants both pays twice. The Shade's third shield direction, each with its own partner: Shroud on the blade (stun, recharge), Hoarded Breath over the Rookery (mana), and this one north, where a caster who comes for it gives up the Rookery and the Knife's middle. Ritual Blade (spells with a dagger, a little shield) is six steps on along the ridge.",
+      at: [2156, -2990],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'e2',
+          kind: 'small',
+          lines: [es(5)],
+          at: [2113, -2873],
+          why: 'The entrance, from the lightning pocket.',
+        },
+        { id: 'e1', kind: 'small', lines: [es(5)], at: [2132, -2924] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Shifting Ward',
+          lines: [es(12), dodgeSpell(6)],
+          at: [2156, -2990],
+          why: '2.4 + 2 units.',
+        },
+        { id: 's1', kind: 'small', lines: [dodgeSpell(3)], at: [2180, -3056] },
+        {
+          id: 's2',
+          kind: 'small',
+          lines: [dodgeSpell(3)],
+          at: [2199, -3108],
+          why: 'The exit, to the ridge road.',
+        },
+      ],
+      links: [
+        ['e2', 'e1'],
+        ['e1', 'n'],
+        ['n', 's1'],
+        ['s1', 's2'],
       ],
     },
     {
@@ -168,8 +250,8 @@ export const hex: AreaSpec = {
       at: [1640, -3540],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mineDamage(12)], at: [1520, -3420] },
-        { id: 'b', kind: 'small', lines: [mineDamage(12)], at: [1640, -3540] },
+        { id: 'a', kind: 'small', lines: [mineDamage(12)], at: P(2231, -2257) },
+        { id: 'b', kind: 'small', lines: [mineDamage(12)], at: P(2289, -2272) },
         {
           id: 'n',
           kind: 'notable',
@@ -191,8 +273,8 @@ export const hex: AreaSpec = {
       at: [1800, -2210],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [1680, -2330] },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [1800, -2210] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1675, -973) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(1690, -916) },
         {
           id: 'n',
           kind: 'notable',
@@ -225,7 +307,23 @@ export const hex: AreaSpec = {
       why: 'The Stair foot onto the small of the curse chain, so Second Curse hangs as a leaf and is not a road to Shade Leech.',
     },
     { from: 'climb.a', to: 'bloodletter.a', why: 'The road onto Bloodletter.' },
+    { from: 'climb.a', to: 'wiry.l3', why: 'The climb onto the life chain (G3).' },
+    {
+      from: 'wiry.e2',
+      to: 'static.a',
+      why: "The evasion side lands on the lightning pocket's first small: the Stair's middle becomes a loop, and Wiry Frame a bridge rather than a dead end (G1/shade.md §3.3).",
+    },
     { from: 'toSpire.b', to: 'powder.a', why: 'The road onto Black Powder.' },
+    {
+      from: 'static.b',
+      to: 'ward.e2',
+      why: "The lightning pocket's second small north onto the shield-and-spell-dodge bridge, square to its road (G3 round 2).",
+    },
+    {
+      from: 'ward.s2',
+      to: 'knife.roofs.ridge.y2',
+      why: "The bridge lands on the ridge road's second node: the Stair's top and the ridge are joined a second way (G1/shade.md §3.3).",
+    },
     { from: 'j4.a', to: 'static.a', why: 'The Spellslip junction onto the lightning pocket.' },
     { from: 'jH.a', to: 'road.a', why: 'The junction to the barb road.' },
     { from: 'road.a', to: 'wheel.s', why: 'The barb road to the wheel.' },

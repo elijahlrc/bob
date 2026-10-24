@@ -200,16 +200,30 @@ export function auraLook(def: AuraGemDef): SkillLook {
   return { delivery: 'aura', element: -1, color: UTILITY_COLOR.aura, initials };
 }
 
-/** The element a skill profile is dealing right now: the type of the biggest chunk of its first hand. */
+/**
+ * The element a skill profile is dealing right now, the one every picture of it is drawn in: the type of the biggest chunk of
+ * the hand; for a skill that never hits (Searing Lance), the type of its damage over time, whatever flat damage its profile
+ * carries; for one with no damage in its hand, its gem's element.
+ */
 export function profileElement(p: SkillProfile, hand = 0): number {
-  let dtype = 0;
-  let best = -1;
+  const sd = p.skillDot?.spec;
+  if (sd?.hitless) return DAMAGE_TYPES.indexOf(sd.type);
+  // A type's damage is the sum of its chunks: a skill that converts half its physical carries the converted part and its own
+  // added damage as two chunks of the new type.
+  const sum = [0, 0, 0, 0, 0];
   for (const c of p.hands[Math.min(hand, p.hands.length - 1)]?.chunks ?? [])
-    if (c.max > best) {
-      best = c.max;
-      dtype = c.type;
+    sum[c.type] += c.min + c.max;
+  let dtype = -1;
+  let best = 0;
+  // An element wins a tie with physical (half of it converted is a lightning skill).
+  for (let t = 0; t < sum.length; t++)
+    if (sum[t] > best || (t > 0 && sum[t] > 0 && sum[t] >= best * 0.999)) {
+      best = sum[t];
+      dtype = t;
     }
-  return dtype;
+  if (dtype >= 0) return dtype;
+  if (sd) return DAMAGE_TYPES.indexOf(sd.type);
+  return elementOfTags(p.skill.tags, p.skill.spellDamage);
 }
 
 /** The look of a skill being used, with the element it deals at the moment (supports can change it). */
@@ -221,7 +235,8 @@ export function profileLook(p: SkillProfile): SkillLook {
     const kind = delivery as keyof typeof UTILITY_COLOR;
     return { delivery, element: -1, color: UTILITY_COLOR[kind], initials };
   }
-  const element = profileElement(p);
+  // A skill that picks an element for each use has none between uses: its icon is its gem's.
+  const element = s.element ? elementOfTags(s.tags, s.spellDamage) : profileElement(p);
   return { delivery, element, color: ELEMENT_COLOR[element], initials };
 }
 

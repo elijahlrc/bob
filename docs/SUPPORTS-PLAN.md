@@ -183,7 +183,7 @@ Open:
 
 4. **Wide Crush and the free lunches.** Wide Crush is a melee support: 40-59% more damage that only applies to skills with the `area`
    tag, 25-34% increased area, 15% less attack speed, 1.4x cost. A skill with no area (the audit lists 12: Crushing Blow, Venom Cut, Twin Cut,
-   Twin Blades, Rime Splinter, Rime Mallet, Bolt Cleave, Gouge Shot, Rime Rebuke, Guarded Strike, Blinking Cut, Guardian Cairn) gets neither the damage (tag gate) nor the area (nothing to widen), so only the attack-speed penalty is left. It is not
+   Twin Blades, Rime Splinter, Rime Mallet, Bolt Cleave, Gouge Shot, Iron Rebuke, Guarded Strike, Blinking Cut, Guardian Cairn) gets neither the damage (tag gate) nor the area (nothing to widen), so only the attack-speed penalty is left. It is not
    half dead there, it is fully dead with its price intact, and section 4.1 refuses it on those 12 skills; on area-tagged melee skills it
    is fully live. The "half dead" cases are the reverse, a dead price with a live bonus (Lingering Shots on a ground skill: the slower
    projectiles never matter, the extra damage does). Recommend accepting those, flagging them in the balance script, and moving each

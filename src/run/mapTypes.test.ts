@@ -55,6 +55,13 @@ describe('which types are offered (docs/MAPS.md 4.2 and 9)', () => {
     expect(anchorTyped).toBeGreaterThan(0);
   });
 
+  it('a withheld type is never offered', () => {
+    expect(typesFor(75).map((t) => t.id)).not.toContain('collapse');
+    for (let seed = 1; seed <= 300; seed++)
+      for (const map of [35, 45, 75])
+        expect(rollOffers(seed, map).some((o) => o.type === 'collapse')).toBe(false);
+  });
+
   it('no offer is typed on a gate level, and the same seed gives the same types', () => {
     for (let seed = 1; seed <= 60; seed++) {
       for (const map of [10, 20, 50, 100])

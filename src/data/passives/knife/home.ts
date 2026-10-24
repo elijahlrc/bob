@@ -4,16 +4,15 @@
  * within three steps names a dagger or a claw.
  *
  * North side (toward the Spire): energy shield. South side (toward the Bow): critical strikes. The signature (crit,
- * evasion, shield, both attributes) is the loop's tip, and the blade road leaves from it straight out: attack speed
- * three times to the daggers-and-claws wheel. Off the north hub, a mana pocket; off the south hub, an evasion pocket;
+ * evasion, shield, both attributes) is the loop's tip, and the blade road leaves from it straight out to the
+ * daggers-and-claws wheel: attack speed, the attacker's notable (Quick Wrists, attack speed with dodge), attack speed. Off the north hub, a mana pocket; off the south hub, an evasion pocket;
  * each is also a way onto its road. The hubs carry both attributes (a dagger asks for both); the north and south roads
  * leaving them are dexterity-and-intelligence highways (2026-10-20).
  */
 import {
   attackSpeed,
-  castSpeed,
   critChance,
-  daggerDamage,
+  daggerSpellDamage,
   dex,
   dodgeAttack,
   es,
@@ -23,7 +22,6 @@ import {
   manaOnKill,
   manaRegen,
   moveSpeed,
-  spellDamage,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -52,23 +50,23 @@ export const home: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [evasion(12)],
-          at: P(120, -150),
+          lines: [evasion(10)],
+          at: P(100, -120),
           why: "The north side: defence. Evasion here; the Spire's start opens on energy shield.",
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Keen Instinct',
-          lines: [critChance(20), evasion(12), es(5), dex(10), int(10)],
-          at: P(240, 0),
+          lines: [critChance(15), evasion(10), es(5), dex(10), int(10)],
+          at: P(200, 0),
           why: 'The signature: the Shade is the crit class with two defences and two attributes. 4.3 units. The blade road leaves from here.',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [critChance(20)],
-          at: P(120, 150),
+          lines: [critChance(15)],
+          at: P(100, 120),
           why: 'The south side: offence.',
         },
       ],
@@ -100,7 +98,7 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [manaRegen(10)],
-          at: P(220, -440),
+          at: P(316, -494),
           why: 'The entrance, facing the hub.',
         },
         {
@@ -115,7 +113,7 @@ export const home: AreaSpec = {
           id: 'b',
           kind: 'small',
           lines: [manaRegen(10)],
-          at: P(440, -630),
+          at: P(389, -610),
           why: 'The far node, onto the north road.',
         },
       ],
@@ -134,23 +132,23 @@ export const home: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [evasion(12)],
-          at: P(220, 440),
+          lines: [evasion(10)],
+          at: P(317, 493),
           why: 'The entrance, facing the hub.',
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Soft Step',
-          lines: [evasion(20), moveSpeed(4), dodgeAttack(3)],
+          lines: [evasion(17), moveSpeed(4), dodgeAttack(3)],
           at: P(340, 560),
           why: '1.7 + 1 + 1 units.',
         },
         {
           id: 'b',
           kind: 'small',
-          lines: [evasion(12)],
-          at: P(440, 630),
+          lines: [evasion(10)],
+          at: P(407, 540),
           why: "The far node: the Bow's near crossing lands here, and the south road is one step on.",
         },
       ],
@@ -162,13 +160,32 @@ export const home: AreaSpec = {
     {
       id: 'roadB',
       name: 'The blade road',
-      why: 'Attack speed three times: the road straight out from the signature to the daggers-and-claws wheel, which a two-dagger Shade and a claw Shade walk alike.',
-      at: P(580, 0),
+      why: "The road straight out from the signature to the daggers-and-claws wheel, which a two-dagger Shade and a claw Shade walk alike: attack speed, the notable Quick Wrists, attack speed. G4 fix 1 (2026-10-22): it was three 8% attack speed smalls with no notable; its middle node is now the Shade attacker's home notable, four points out on the signature's own road, so a Shade who wants to attack has a first choice at home and not only in the Strider's garden. Its two smalls are one unit each.",
+      at: P(360, 0),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(5)], at: P(420, 0) },
-        { id: 'b', kind: 'small', lines: [attackSpeed(5)], at: P(580, 0) },
-        { id: 'c', kind: 'small', lines: [attackSpeed(5)], at: P(740, 0) },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [attackSpeed(5)],
+          at: P(290, 0),
+          why: 'From the signature.',
+        },
+        {
+          id: 'b',
+          kind: 'notable',
+          name: 'Quick Wrists',
+          lines: [attackSpeed(10), dodgeAttack(3)],
+          at: P(360, 0),
+          why: "2 + 1 units: the Shade attacker's own speed, with the dodge that comes of never standing still. Soft Step (evasion, movement, dodge) is the home's defence, Raking Hand claw speed, Rat Bite poison with speed far out.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [attackSpeed(5)],
+          at: P(430, 0),
+          why: 'On to the wheel.',
+        },
       ],
       links: [
         ['a', 'b'],
@@ -194,7 +211,7 @@ export const home: AreaSpec = {
       at: P(515, 405),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(430, 330) },
+        { id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: P(425, 390) },
         {
           id: 'b',
           kind: 'attribute',
@@ -226,19 +243,19 @@ export const home: AreaSpec = {
     {
       id: 'quietKnife',
       name: 'Quiet Knife',
-      why: "A dead-end pocket north off the north highway's second node, into the empty ground toward the Spire: spell damage twice, then the dagger caster's notable. Daggers have two homes with different partners: crit at the Alleys (Fine Point) and spells here, and the Shade picks one.",
+      why: "A dead-end pocket north off the north highway's second node, into the empty ground toward the Spire: spell damage with a dagger twice, then the dagger caster's door, spells with a dagger and mana regeneration. Daggers have two homes by the start with different partners: crit at the Alleys (Fine Point) for the attacker, spells here for the caster, and the Shade picks one. G4 fix 1 (2026-10-22): it paired dagger attack damage with spell damage, half a notable for each of two builds (§10.2); now it is the caster's alone, and its partner is mana, which the dagger caster's three other clusters do not sell (the Spire's Sharp Tongue cast speed, Ritual Blade energy shield, Athame spell crit).",
       at: [1240, -1430],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellDamage(8)], at: [1290, -1270] },
-        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [1240, -1430] },
+        { id: 'a', kind: 'small', lines: [daggerSpellDamage(8)], at: P(793, -658) },
+        { id: 'b', kind: 'small', lines: [daggerSpellDamage(8)], at: P(807, -714) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Quiet Knife',
-          lines: [daggerDamage(16), spellDamage(16), castSpeed(4)],
+          lines: [daggerSpellDamage(20), manaRegen(15)],
           at: [1190, -1590],
-          why: "The dagger in the caster's hand: 1.6 + 2 + 1 units.",
+          why: "The dagger in the caster's hand, and the calm to keep casting: 2.5 + 1.5 units.",
         },
       ],
       links: [
@@ -250,9 +267,9 @@ export const home: AreaSpec = {
       id: 'toHedge',
       name: 'To Hedge Magic',
       why: "One attribute node from the Knife Gate's ring road to the Strider's Hedge Magic: a near bridge between the two homes for the spell Strider and the dagger caster.",
-      at: [1065, -64],
+      at: [1116, -94],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'r1', kind: 'attribute', lines: [dex(6), int(6)], at: [1065, -64] }],
+      nodes: [{ id: 'r1', kind: 'attribute', lines: [dex(6), int(6)], at: [1116, -94] }],
       links: [],
     },
   ],

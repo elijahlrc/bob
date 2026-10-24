@@ -1,0 +1,1431 @@
+{
+  "title": "G1 joined: whole map, ids only (the close-ups name the pairings)",
+  "clusters": [
+    {
+      "id": "ZE-1",
+      "label": "ZE-1",
+      "at": [-2290, -2090],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-2",
+      "label": "ZE-2",
+      "at": [-2450, -1520],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-3",
+      "label": "ZE-3",
+      "at": [-1650, -3800],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-4",
+      "label": "ZE-4",
+      "at": [-2540, -870],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-5",
+      "label": "ZE-5",
+      "at": [-2240, -600],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-6",
+      "label": "ZE-6",
+      "at": [-4040, -1570],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-7",
+      "label": "ZE-7",
+      "at": [-2770, -250],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-8",
+      "label": "ZE-8",
+      "at": [-4230, -330],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-9",
+      "label": "ZE-9",
+      "at": [-2330, -3520],
+      "nodes": 4
+    },
+    {
+      "id": "ZE-10",
+      "label": "ZE-10",
+      "at": [-3990, -1000],
+      "nodes": 5
+    },
+    {
+      "id": "ZE-11",
+      "label": "ZE-11",
+      "at": [-2860, -3240],
+      "nodes": 4
+    },
+    {
+      "id": "ST-6",
+      "label": "ST-6",
+      "at": [4150, 470],
+      "nodes": 6
+    },
+    {
+      "id": "ST-9",
+      "label": "ST-9",
+      "at": [3420, 400],
+      "nodes": 6
+    },
+    {
+      "id": "ST-1",
+      "label": "ST-1",
+      "at": [4060, 1020],
+      "nodes": 7
+    },
+    {
+      "id": "ST-5",
+      "label": "ST-5",
+      "at": [3720, 1960],
+      "nodes": 4
+    },
+    {
+      "id": "ST-3",
+      "label": "ST-3",
+      "at": [3450, 2450],
+      "nodes": 6
+    },
+    {
+      "id": "ST-2",
+      "label": "ST-2",
+      "at": [3010, 2960],
+      "nodes": 4
+    },
+    {
+      "id": "ST-7",
+      "label": "ST-7",
+      "at": [1850, 2830],
+      "nodes": 6
+    },
+    {
+      "id": "ST-4",
+      "label": "ST-4",
+      "at": [2110, 3520],
+      "nodes": 4
+    },
+    {
+      "id": "ST-10",
+      "label": "ST-10",
+      "at": [1560, 3080],
+      "nodes": 4
+    },
+    {
+      "id": "MY-1",
+      "label": "MY-1",
+      "at": [1000, -2960],
+      "nodes": 5
+    },
+    {
+      "id": "MY-2",
+      "label": "MY-2",
+      "at": [-1300, -2960],
+      "nodes": 4
+    },
+    {
+      "id": "MY-3",
+      "label": "MY-3",
+      "at": [660, -4570],
+      "nodes": 4
+    },
+    {
+      "id": "MY-4",
+      "label": "MY-4",
+      "at": [-540, -4500],
+      "nodes": 4
+    },
+    {
+      "id": "MY-5",
+      "label": "MY-5",
+      "at": [-650, -3760],
+      "nodes": 4
+    },
+    {
+      "id": "MY-6",
+      "label": "MY-6",
+      "at": [1330, -4040],
+      "nodes": 4
+    },
+    {
+      "id": "MY-7",
+      "label": "MY-7",
+      "at": [-1330, -4440],
+      "nodes": 4
+    },
+    {
+      "id": "MY-8",
+      "label": "MY-8",
+      "at": [-540, -2500],
+      "nodes": 4
+    },
+    {
+      "id": "MY-9",
+      "label": "MY-9",
+      "at": [400, -2560],
+      "nodes": 5
+    },
+    {
+      "id": "MY-10",
+      "label": "MY-10",
+      "at": [1350, -3100],
+      "nodes": 4
+    },
+    {
+      "id": "MY-11",
+      "label": "MY-11",
+      "at": [-140, -3790],
+      "nodes": 4
+    },
+    {
+      "id": "SH-1",
+      "label": "SH-1",
+      "at": [2120, -3000],
+      "nodes": 4
+    },
+    {
+      "id": "SH-2",
+      "label": "SH-2",
+      "at": [3000, -650],
+      "nodes": 5
+    },
+    {
+      "id": "SH-3",
+      "label": "SH-3",
+      "at": [3900, -2350],
+      "nodes": 4
+    },
+    {
+      "id": "SH-4",
+      "label": "SH-4",
+      "at": [2650, -280],
+      "nodes": 4
+    },
+    {
+      "id": "SH-6",
+      "label": "SH-6",
+      "at": [2230, -170],
+      "nodes": 4
+    },
+    {
+      "id": "SH-7",
+      "label": "SH-7",
+      "at": [3950, -850],
+      "nodes": 4
+    },
+    {
+      "id": "SH-8",
+      "label": "SH-8",
+      "at": [2800, -2720],
+      "nodes": 4
+    },
+    {
+      "id": "SH-9",
+      "label": "SH-9",
+      "at": [3250, -1450],
+      "nodes": 4
+    },
+    {
+      "id": "SH-10",
+      "label": "SH-10",
+      "at": [3750, -380],
+      "nodes": 5
+    },
+    {
+      "id": "SH-11",
+      "label": "SH-11",
+      "at": [2780, -3300],
+      "nodes": 5
+    },
+    {
+      "id": "SH-12",
+      "label": "SH-12",
+      "at": [3150, 80],
+      "nodes": 4
+    },
+    {
+      "id": "SH-13",
+      "label": "SH-13",
+      "at": [2380, -1980],
+      "nodes": 4
+    },
+    {
+      "id": "SH-14",
+      "label": "SH-14",
+      "at": [1480, -790],
+      "nodes": 5
+    },
+    {
+      "id": "SH-15",
+      "label": "SH-15",
+      "at": [1780, -2420],
+      "nodes": 6
+    },
+    {
+      "id": "SH-16",
+      "label": "SH-16",
+      "at": [3150, -3330],
+      "nodes": 4
+    },
+    {
+      "id": "VA-2",
+      "label": "VA-2",
+      "at": [-2990, 864],
+      "nodes": 5
+    },
+    {
+      "id": "VA-3",
+      "label": "VA-3",
+      "at": [-1900, 2830],
+      "nodes": 5
+    },
+    {
+      "id": "VA-4",
+      "label": "VA-4",
+      "at": [-2450, 2320],
+      "nodes": 4
+    },
+    {
+      "id": "VA-5",
+      "label": "VA-5",
+      "at": [-1830, 1420],
+      "nodes": 4
+    },
+    {
+      "id": "VA-6",
+      "label": "VA-6",
+      "at": [-3900, 620],
+      "nodes": 4
+    },
+    {
+      "id": "VA-7",
+      "label": "VA-7",
+      "at": [-2935, 2017],
+      "nodes": 4
+    },
+    {
+      "id": "VA-8",
+      "label": "VA-8",
+      "at": [-1560, 560],
+      "nodes": 4
+    },
+    {
+      "id": "RE-1",
+      "label": "RE-1",
+      "at": [790, 2580],
+      "nodes": 4
+    },
+    {
+      "id": "RE-2",
+      "label": "RE-2",
+      "at": [-1270, 2990],
+      "nodes": 4
+    },
+    {
+      "id": "RE-3",
+      "label": "RE-3",
+      "at": [610, 3620],
+      "nodes": 4
+    },
+    {
+      "id": "RE-4",
+      "label": "RE-4",
+      "at": [-640, 2420],
+      "nodes": 4
+    },
+    {
+      "id": "RE-5",
+      "label": "RE-5",
+      "at": [140, 1470],
+      "nodes": 4
+    },
+    {
+      "id": "RE-6",
+      "label": "RE-6",
+      "at": [880, 1640],
+      "nodes": 4
+    },
+    {
+      "id": "RE-7|9",
+      "label": "RE-7|9",
+      "at": [-760, 3610],
+      "nodes": 6
+    },
+    {
+      "id": "RE-8",
+      "label": "RE-8",
+      "at": [-270, 3800],
+      "nodes": 4
+    },
+    {
+      "id": "CE-1",
+      "label": "CE-1",
+      "at": [306, -530],
+      "nodes": 3
+    },
+    {
+      "id": "CE-2",
+      "label": "CE-2",
+      "at": [306, 530],
+      "nodes": 3
+    },
+    {
+      "id": "CE-3",
+      "label": "CE-3",
+      "at": [-306, 530],
+      "nodes": 3
+    },
+    {
+      "id": "CE-4",
+      "label": "CE-4",
+      "at": [-306, -530],
+      "nodes": 3
+    }
+  ],
+  "roads": [
+    {
+      "label": "",
+      "points": [
+        "cathedral.nave.toChoir.a",
+        [-2030, -1540],
+        [-2270, -1670],
+        [-2510, -1800],
+        "cathedral.ambulatory.plate.n"
+      ],
+      "nodes": 3,
+      "region": "zealot"
+    },
+    {
+      "label": "",
+      "points": [
+        "cathedral.ambulatory.censer.n",
+        [-4020, -790],
+        [-4230, -1060],
+        [-4300, -1360],
+        [-4230, -1660],
+        "cathedral.ambulatory.peal.n"
+      ],
+      "nodes": 4,
+      "region": "zealot"
+    },
+    {
+      "label": "",
+      "points": [
+        "cathedral.ambulatory.kindled.n",
+        [-3300, -3200],
+        [-2950, -3520],
+        [-2560, -3760],
+        [-2150, -3930],
+        [-1800, -4050]
+      ],
+      "nodes": 5,
+      "region": "zealot"
+    },
+    {
+      "label": "",
+      "points": [
+        [3800, 150],
+        [3700, 820],
+        [3480, 1480],
+        [3150, 2100],
+        [2720, 2640],
+        [2220, 3060],
+        [1680, 3390],
+        [1180, 3600]
+      ],
+      "nodes": 15,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": ["bow.flight.ricochet.b", [2972, 585], "bow.steel.wheel.n2"],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": [
+        [2972, 585],
+        [3330, 700],
+        [3700, 820]
+      ],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": ["bow.flight.wheel.n2", [2790, 1610], "bow.quiver.skewer.a"],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": [
+        [2790, 1610],
+        [3480, 1480]
+      ],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": ["bow.quiver.skewer.n", [2670, 2045], "bow.quiver.quickSip.a"],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": [
+        [2670, 2045],
+        [2720, 2640]
+      ],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": ["ST-5", [3640, 2260], "ST-3"],
+      "nodes": 1,
+      "region": "strider"
+    },
+    {
+      "label": "",
+      "points": [
+        "spire.frost.toHarsh.a",
+        [520, -4330],
+        [850, -4470],
+        [1230, -4470],
+        [1520, -4170],
+        [1950, -3900],
+        "knife.roofs.ridge.y1"
+      ],
+      "nodes": 5,
+      "region": "mystic"
+    },
+    {
+      "label": "",
+      "points": ["MY-4", [-850, -4500], [-1120, -4390], [-1380, -4150], [-1800, -4050]],
+      "nodes": 3,
+      "region": "mystic"
+    },
+    {
+      "label": "",
+      "points": ["spire.craft.hexwright.n", [1470, -2760], "knife.hex.j4.a"],
+      "nodes": 1,
+      "region": "mystic"
+    },
+    {
+      "label": "",
+      "points": [
+        "knife.roofs.walk.r5",
+        [3600, -2250],
+        [3950, -1950],
+        [4150, -1500],
+        [4250, -1050],
+        [4250, -600],
+        [4100, -150],
+        [3800, 150]
+      ],
+      "nodes": 7,
+      "region": "shade"
+    },
+    {
+      "label": "",
+      "points": ["knife.roofs.ridge.y3", [2780, -3020], [3080, -3010], "knife.roofs.carrion.a"],
+      "nodes": 2,
+      "region": "shade"
+    },
+    {
+      "label": "",
+      "points": ["knife.edge.j1.a", [1990, -370], "SH-6"],
+      "nodes": 1,
+      "region": "shade"
+    },
+    {
+      "label": "",
+      "points": [
+        "wall.maces.oath.n",
+        [-4000, 320],
+        "VA-6",
+        [-3960, 860],
+        [-3830, 1150],
+        "wall.maces.j2.a"
+      ],
+      "nodes": 3,
+      "region": "vanguard"
+    },
+    {
+      "label": "",
+      "points": [
+        "wall.slams.j1.a",
+        [-1610, 1490],
+        "VA-5",
+        [-2100, 1500],
+        [-2260, 1540],
+        "wall.slams.groundShaker.b"
+      ],
+      "nodes": 2,
+      "region": "vanguard"
+    },
+    {
+      "points": [[-1650, 2070], "wall.grit.ward.n"],
+      "nodes": 1,
+      "region": "vanguard",
+      "label": ""
+    },
+    {
+      "label": "",
+      "points": ["wall.grit.ward.n", [-1830, 2580], "VA-3"],
+      "nodes": 1,
+      "region": "vanguard"
+    },
+    {
+      "label": "",
+      "points": [[-1650, 2070], "yard.blades.thirst.n"],
+      "nodes": 1,
+      "region": "vanguard"
+    },
+    {
+      "label": "",
+      "points": ["yard.home.roadW.b", [-720, 1800], "yard.blades.j1.a"],
+      "nodes": 1,
+      "region": "reaver"
+    },
+    {
+      "points": ["yard.blades.j1.a", [-950, 2230], [-960, 2460], "yard.blades.toHeadsman.r1"],
+      "nodes": 2,
+      "region": "reaver",
+      "label": ""
+    },
+    {
+      "points": ["yard.blades.toHeadsman.r1", [-900, 2890], "yard.blood.toWall.a"],
+      "nodes": 1,
+      "region": "reaver",
+      "label": ""
+    },
+    {
+      "label": "",
+      "points": ["yard.blood.toWall.a", [-760, 3400], "RE-7|9"],
+      "nodes": 1,
+      "region": "reaver"
+    },
+    {
+      "points": ["RE-7|9", [-780, 3860], "yard.fosse.road.f6"],
+      "nodes": 1,
+      "region": "reaver",
+      "label": ""
+    },
+    {
+      "label": "",
+      "points": ["yard.blades.j1.a", [-620, 2010], [-350, 2010], "yard.shield.hub.a"],
+      "nodes": 2,
+      "region": "reaver"
+    },
+    {
+      "points": ["yard.shield.hub.a", [180, 2030], [420, 2060], "yard.dual.j1.a"],
+      "nodes": 2,
+      "region": "reaver",
+      "label": ""
+    },
+    {
+      "label": "",
+      "points": ["yard.shield.hub.a", [-40, 2240], "yard.shield.steelRim.a"],
+      "nodes": 1,
+      "region": "reaver"
+    },
+    {
+      "points": ["yard.blood.toHarvest.a", [0, 3220]],
+      "nodes": 0,
+      "region": "reaver",
+      "label": ""
+    },
+    {
+      "label": "",
+      "points": [[0, 3220], [-20, 3520], [-60, 3800], "yard.fosse.road.f4"],
+      "nodes": 2,
+      "region": "reaver"
+    },
+    {
+      "label": "",
+      "points": ["yard.blood.j3.a", [-200, 3190], [0, 3220], [210, 3190], "yard.blood.j2.a"],
+      "nodes": 3,
+      "region": "reaver"
+    },
+    {
+      "label": "",
+      "points": ["yard.dual.j1.a", [640, 2330], [620, 2580], [540, 2850], "yard.blood.j2.a"],
+      "nodes": 3,
+      "region": "reaver"
+    }
+  ],
+  "links": [
+    {
+      "from": [-2510, -1800],
+      "to": "ZE-1"
+    },
+    {
+      "from": "ZE-1",
+      "to": "cathedral.ambulatory.brand.n"
+    },
+    {
+      "from": [-2270, -1670],
+      "to": "ZE-2"
+    },
+    {
+      "from": "ZE-2",
+      "to": "cathedral.rods.jR.a"
+    },
+    {
+      "from": "cathedral.nave.toWall.a",
+      "to": "ZE-5"
+    },
+    {
+      "from": "cathedral.nave.jN.a",
+      "to": "ZE-4"
+    },
+    {
+      "from": "ZE-4",
+      "to": "cathedral.rods.toWall.c"
+    },
+    {
+      "from": "cathedral.rods.toWall.a",
+      "to": "ZE-7"
+    },
+    {
+      "from": "ZE-7",
+      "to": "cathedral.rods.toWall.b"
+    },
+    {
+      "from": "cathedral.ambulatory.censer.n",
+      "to": "ZE-8"
+    },
+    {
+      "from": [-4230, -1060],
+      "to": "ZE-10"
+    },
+    {
+      "from": [-4230, -1660],
+      "to": "ZE-6"
+    },
+    {
+      "from": [-2950, -3520],
+      "to": "ZE-11"
+    },
+    {
+      "from": [-2560, -3760],
+      "to": "ZE-9"
+    },
+    {
+      "from": [-1800, -4050],
+      "to": "ZE-3"
+    },
+    {
+      "from": "cathedral.crypt.tomb.n",
+      "to": [-1800, -4050]
+    },
+    {
+      "from": "ZE-8",
+      "to": "wall.maces.oath.n"
+    },
+    {
+      "from": [-2270, -1670],
+      "to": [-2268, -1745]
+    },
+    {
+      "from": "ZE-5",
+      "to": "wall.resists.j.a"
+    },
+    {
+      "from": "cathedral.crypt.rite.n",
+      "to": "ZE-3"
+    },
+    {
+      "from": "ST-6",
+      "to": [3750, 485]
+    },
+    {
+      "from": "ST-9",
+      "to": [3800, 150]
+    },
+    {
+      "from": "ST-1",
+      "to": [3700, 820]
+    },
+    {
+      "from": "ST-1",
+      "to": [3480, 1480]
+    },
+    {
+      "from": "ST-5",
+      "to": [3315, 1790]
+    },
+    {
+      "from": "ST-3",
+      "to": [3150, 2100]
+    },
+    {
+      "from": "ST-2",
+      "to": [2720, 2640]
+    },
+    {
+      "from": "ST-7",
+      "to": "bow.steel.sentryPost.n"
+    },
+    {
+      "from": "ST-7",
+      "to": [2220, 3060]
+    },
+    {
+      "from": "ST-4",
+      "to": [1950, 3225]
+    },
+    {
+      "from": [1180, 3600],
+      "to": "yard.fosse.storm.n"
+    },
+    {
+      "from": "ST-10",
+      "to": [1680, 3390]
+    },
+    {
+      "from": "ST-9",
+      "to": "knife.snares.toRicochet.r4"
+    },
+    {
+      "from": "ST-10",
+      "to": "bow.steel.pitch.n"
+    },
+    {
+      "from": "spire.craft.toVolley.r2",
+      "to": "MY-1"
+    },
+    {
+      "from": "MY-1",
+      "to": "spire.craft.toDev2.a"
+    },
+    {
+      "from": "spire.well.toCrypt.r2",
+      "to": "MY-2"
+    },
+    {
+      "from": "MY-2",
+      "to": "cathedral.crypt.toSpire.b"
+    },
+    {
+      "from": [520, -4330],
+      "to": "MY-3"
+    },
+    {
+      "from": "MY-3",
+      "to": [850, -4470]
+    },
+    {
+      "from": "spire.frost.stream.n",
+      "to": "MY-4"
+    },
+    {
+      "from": "spire.fire.jArm.a",
+      "to": "MY-5"
+    },
+    {
+      "from": "MY-5",
+      "to": "spire.frost.jFire.a"
+    },
+    {
+      "from": "spire.storm.overcharge.c",
+      "to": "MY-6"
+    },
+    {
+      "from": "MY-6",
+      "to": [1520, -4170]
+    },
+    {
+      "from": [-1120, -4390],
+      "to": "MY-7"
+    },
+    {
+      "from": "MY-7",
+      "to": [-1380, -4150]
+    },
+    {
+      "from": "spire.fire.cinder.b",
+      "to": [-1380, -4150]
+    },
+    {
+      "from": "spire.frost.snare.n",
+      "to": [1230, -4470]
+    },
+    {
+      "from": "spire.well.toPulse.a",
+      "to": "MY-8"
+    },
+    {
+      "from": "MY-8",
+      "to": "spire.column.broadWeave.a"
+    },
+    {
+      "from": "spire.craft.roadN.a",
+      "to": "MY-9"
+    },
+    {
+      "from": "MY-9",
+      "to": "spire.craft.wandVolley.a"
+    },
+    {
+      "from": "spire.craft.mistWalk.n",
+      "to": "MY-10"
+    },
+    {
+      "from": "MY-10",
+      "to": "knife.hex.toSpire.a"
+    },
+    {
+      "from": "spire.frost.toShatter.r1",
+      "to": "MY-11"
+    },
+    {
+      "from": "MY-11",
+      "to": "spire.frost.jArm.a"
+    },
+    {
+      "from": "spire.frost.jStorm.a",
+      "to": [190, -3770]
+    },
+    {
+      "from": [190, -3770],
+      "to": "spire.frost.jArm.a"
+    },
+    {
+      "from": "spire.well.toTap.a",
+      "to": [-950, -2640]
+    },
+    {
+      "from": [-950, -2640],
+      "to": "spire.well.toCrypt.r2"
+    },
+    {
+      "from": "SH-1",
+      "to": "knife.hex.static.b"
+    },
+    {
+      "from": "SH-1",
+      "to": "knife.roofs.ridge.y2"
+    },
+    {
+      "from": "SH-2",
+      "to": "knife.roofs.walk.r9"
+    },
+    {
+      "from": "SH-2",
+      "to": "knife.snares.toRicochet.r1"
+    },
+    {
+      "from": "SH-3",
+      "to": [3600, -2250]
+    },
+    {
+      "from": "SH-3",
+      "to": [3950, -1950]
+    },
+    {
+      "from": "SH-4",
+      "to": "knife.snares.toBow.b"
+    },
+    {
+      "from": "SH-4",
+      "to": "knife.snares.toRicochet.r2"
+    },
+    {
+      "from": "SH-6",
+      "to": "knife.snares.toBow.a"
+    },
+    {
+      "from": "SH-7",
+      "to": [4250, -1050]
+    },
+    {
+      "from": "SH-7",
+      "to": [4250, -600]
+    },
+    {
+      "from": "SH-8",
+      "to": "knife.roofs.ridge.y4"
+    },
+    {
+      "from": "SH-8",
+      "to": "knife.roofs.walk.r3"
+    },
+    {
+      "from": "SH-9",
+      "to": "knife.snares.quietShot.a"
+    },
+    {
+      "from": "SH-9",
+      "to": "knife.roofs.walk.r7"
+    },
+    {
+      "from": "SH-10",
+      "to": [4100, -150]
+    },
+    {
+      "from": "SH-10",
+      "to": "knife.snares.herald.n"
+    },
+    {
+      "from": "SH-11",
+      "to": [2780, -3020]
+    },
+    {
+      "from": "SH-13",
+      "to": "knife.venom.jN.a"
+    },
+    {
+      "from": "SH-13",
+      "to": "knife.venom.j5.a"
+    },
+    {
+      "from": "SH-14",
+      "to": "knife.home.roadB.c"
+    },
+    {
+      "from": "SH-14",
+      "to": "knife.edge.j1.a"
+    },
+    {
+      "from": "SH-16",
+      "to": [3080, -3010]
+    },
+    {
+      "from": "SH-16",
+      "to": "knife.roofs.carrion.n"
+    },
+    {
+      "from": "knife.roofs.sleet.n",
+      "to": [4150, -1500]
+    },
+    {
+      "from": "knife.roofs.whet.n",
+      "to": [4250, -1050]
+    },
+    {
+      "from": "knife.snares.mercy.n",
+      "to": "bow.flight.venom.a"
+    },
+    {
+      "from": "SH-15",
+      "to": "knife.hex.climb.a"
+    },
+    {
+      "from": "SH-15",
+      "to": "knife.hex.static.a"
+    },
+    {
+      "from": "SH-12",
+      "to": "knife.snares.toRicochet.r4"
+    },
+    {
+      "from": "SH-12",
+      "to": "knife.snares.herald.n"
+    },
+    {
+      "from": [1990, -370],
+      "to": "bow.bows.toKnife.a"
+    },
+    {
+      "from": "VA-3",
+      "to": "wall.grit.east.e2"
+    },
+    {
+      "from": "VA-4",
+      "to": "wall.grit.north.a"
+    },
+    {
+      "from": "VA-4",
+      "to": "wall.grit.southWest.b"
+    },
+    {
+      "from": "VA-6",
+      "to": "wall.maces.toHymn.r2"
+    },
+    {
+      "from": "VA-7",
+      "to": "wall.grit.west.c"
+    },
+    {
+      "from": "VA-7",
+      "to": "wall.grit.reach.a"
+    },
+    {
+      "from": "VA-8",
+      "to": "wall.home.roadR.b"
+    },
+    {
+      "from": "VA-8",
+      "to": "wall.home.roadM.b"
+    },
+    {
+      "from": "wall.slams.unbloodied.n",
+      "to": [-1650, 2070]
+    },
+    {
+      "from": [-2540, -20],
+      "to": "cathedral.rods.toWall.a"
+    },
+    {
+      "from": "wall.rampart.j1.a",
+      "to": [-2540, -20]
+    },
+    {
+      "from": "wall.resists.star.c",
+      "to": "wall.rampart.toWind.a"
+    },
+    {
+      "from": "wall.rampart.bulwark.b",
+      "to": "wall.rampart.toWind.a"
+    },
+    {
+      "from": "wall.grit.east.e6",
+      "to": [-1160, 3420]
+    },
+    {
+      "from": [-1160, 3420],
+      "to": "yard.fosse.road.f7"
+    },
+    {
+      "from": "VA-2",
+      "to": "wall.maces.toCleaver.a"
+    },
+    {
+      "from": "VA-2",
+      "to": "wall.maces.crushing.a"
+    },
+    {
+      "from": "VA-2",
+      "to": "wall.rampart.steadyHands.b"
+    },
+    {
+      "from": "wall.rampart.bulwark.n1",
+      "to": "wall.rampart.thickSkin.b"
+    },
+    {
+      "from": "wall.rampart.ironLungs.n",
+      "to": "wall.rampart.bulwark.f"
+    },
+    {
+      "from": "wall.rampart.ironLungs.n",
+      "to": "wall.rampart.bulwark.b"
+    },
+    {
+      "from": "wall.rampart.ironLungs.n",
+      "to": "wall.rampart.j1.a"
+    },
+    {
+      "from": "yard.shield.j1.a",
+      "to": "yard.blood.toHarvest.a"
+    },
+    {
+      "from": "RE-1",
+      "to": [620, 2580]
+    },
+    {
+      "from": "RE-1",
+      "to": "bow.steel.toBlood.c"
+    },
+    {
+      "from": "RE-2",
+      "to": "yard.blades.toHeadsman.r2"
+    },
+    {
+      "from": "RE-2",
+      "to": "wall.grit.east.e6"
+    },
+    {
+      "from": "RE-3",
+      "to": "yard.fosse.road.f2"
+    },
+    {
+      "from": "RE-3",
+      "to": "yard.blood.festering.b"
+    },
+    {
+      "from": "RE-4",
+      "to": "yard.blades.lightBlades.c"
+    },
+    {
+      "from": "RE-4",
+      "to": "yard.blades.elementalEdge.b"
+    },
+    {
+      "from": "RE-5",
+      "to": "yard.home.roadS.a"
+    },
+    {
+      "from": "RE-5",
+      "to": "yard.home.roadE.a"
+    },
+    {
+      "from": "yard.home.roadS.c",
+      "to": "yard.home.fightingBreath.a"
+    },
+    {
+      "from": "RE-6",
+      "to": "yard.dual.j2.a"
+    },
+    {
+      "from": "RE-6",
+      "to": "bow.steel.hub.t"
+    },
+    {
+      "from": "RE-8",
+      "to": [-60, 3800]
+    },
+    {
+      "from": "RE-8",
+      "to": "yard.fosse.road.f5"
+    },
+    {
+      "from": [-20, 3520],
+      "to": "yard.blood.spellsword.a"
+    },
+    {
+      "from": "yard.blood.spellsword.b",
+      "to": "yard.fosse.road.f1"
+    },
+    {
+      "from": "yard.shield.shieldwall.c",
+      "to": [-900, 2890]
+    },
+    {
+      "from": [620, 2580],
+      "to": "yard.dual.crossedBlades.a"
+    },
+    {
+      "from": [540, 2850],
+      "to": "yard.dual.crossedBlades.b"
+    },
+    {
+      "from": "yard.dual.ironDraw.c",
+      "to": [180, 2030]
+    },
+    {
+      "from": "yard.blades.lightBlades.b",
+      "to": [-350, 2010]
+    },
+    {
+      "from": "yard.blades.killingPace.n",
+      "to": [-350, 2010]
+    },
+    {
+      "from": [-900, 2890],
+      "to": "yard.blades.executioner.a"
+    },
+    {
+      "from": [-900, 2890],
+      "to": "yard.shield.shieldwall.d"
+    },
+    {
+      "from": "yard.blades.executioner.n",
+      "to": "yard.blood.toWall.a"
+    },
+    {
+      "from": "centre.ring.road.r2",
+      "to": "CE-1"
+    },
+    {
+      "from": "centre.ring.road.r1",
+      "to": "CE-1"
+    },
+    {
+      "from": "centre.ring.road.r3",
+      "to": "CE-1"
+    },
+    {
+      "from": "centre.ring.road.r10",
+      "to": "CE-2"
+    },
+    {
+      "from": "centre.ring.road.r9",
+      "to": "CE-2"
+    },
+    {
+      "from": "centre.ring.road.r11",
+      "to": "CE-2"
+    },
+    {
+      "from": "centre.ring.road.r14",
+      "to": "CE-3"
+    },
+    {
+      "from": "centre.ring.road.r13",
+      "to": "CE-3"
+    },
+    {
+      "from": "centre.ring.road.r15",
+      "to": "CE-3"
+    },
+    {
+      "from": "centre.ring.road.r22",
+      "to": "CE-4"
+    },
+    {
+      "from": "centre.ring.road.r21",
+      "to": "CE-4"
+    },
+    {
+      "from": "centre.ring.road.r23",
+      "to": "CE-4"
+    }
+  ],
+  "cuts": [
+    ["cathedral.choir.jC.a", "cathedral.choir.loneVow.a"],
+    ["bow.flight.ricochet.b", "bow.steel.wheel.n2"],
+    ["bow.flight.wheel.n2", "bow.quiver.skewer.a"],
+    ["bow.quiver.skewer.n", "bow.quiver.quickSip.a"],
+    ["bow.home.added.n414", "yard.dual.j2.a"],
+    ["spire.well.deepWell.d", "spire.well.recharge.a"],
+    ["spire.well.recharge.b", "spire.well.siphon.a"],
+    ["spire.column.broadWeave.a", "spire.well.siphon.n"],
+    ["spire.well.siphon.a", "spire.well.toPulse.a"],
+    ["wall.rampart.secondWind.n", "wall.resists.star.c"],
+    ["wall.rampart.secondWind.b", "wall.rampart.toWind.a"],
+    ["wall.rampart.bulwark.b", "wall.rampart.secondWind.a"],
+    ["wall.maces.cleaver.a", "wall.maces.toCleaver.a"],
+    ["wall.maces.cleaver.b", "wall.maces.crushing.a"],
+    ["wall.maces.cleaver.c", "wall.rampart.steadyHands.b"],
+    ["wall.maces.hammer.a", "wall.maces.toHymn.r2"],
+    ["wall.rampart.bulwark.n1", "wall.rampart.bulwark.f"],
+    ["wall.rampart.bulwark.n1", "wall.rampart.bulwark.b"],
+    ["wall.rampart.bulwark.n1", "wall.rampart.j1.a"],
+    ["wall.rampart.thickSkin.n", "wall.rampart.thickSkin.b"],
+    ["wall.rampart.ironLungs.n", "wall.rampart.ironLungs.b"],
+    ["yard.blades.elementalEdge.n", "yard.shield.shieldwall.c"],
+    ["yard.shield.shieldwall.c", "yard.blades.executioner.a"],
+    ["yard.blades.executioner.n", "yard.blades.toStandard.a"],
+    ["yard.blades.toStandard.a", "yard.shield.standard.n"],
+    ["yard.shield.steelRim.b", "yard.shield.toIronDraw.a"],
+    ["yard.shield.toIronDraw.a", "yard.dual.ironDraw.c"],
+    ["yard.dual.hotBlood.c", "yard.dual.toCrossed.a"],
+    ["yard.dual.toCrossed.a", "yard.dual.crossedBlades.a"],
+    ["yard.blood.redHarvest.a", "yard.blood.toCrossed.a"],
+    ["yard.blood.toCrossed.a", "yard.dual.crossedBlades.b"],
+    ["yard.dual.hotBlood.a", "yard.dual.toSidestep.a"],
+    ["yard.dual.toSidestep.a", "yard.dual.sidestep.n"],
+    ["yard.blood.j3.a", "yard.blood.spellsword.a"],
+    ["yard.blood.spellsword.b", "yard.blood.j2.a"],
+    ["yard.home.roadS.b", "yard.home.fightingBreath.a"],
+    ["yard.dual.j2.a", "bow.steel.hub.t"],
+    ["yard.blades.lightBlades.b", "yard.shield.hub.a"],
+    ["yard.blades.killingPace.n", "yard.shield.hub.a"],
+    ["yard.dual.ironDraw.c", "yard.shield.hub.a"],
+    ["yard.shield.shieldwall.c", "yard.shield.shieldwall.d"],
+    ["yard.shield.hub.a", "yard.shield.steelRim.a"]
+  ],
+  "moves": [
+    {
+      "id": "cathedral.choir.loneVow.a",
+      "to": [-2268, -1745]
+    },
+    {
+      "id": "cathedral.choir.loneVow.b",
+      "to": [-2265, -1805]
+    },
+    {
+      "id": "spire.well.recharge.n",
+      "to": [-950, -2640]
+    },
+    {
+      "id": "spire.well.siphon.n",
+      "to": [190, -3770]
+    },
+    {
+      "id": "knife.hex.static.n",
+      "to": [2110, -2560]
+    },
+    {
+      "id": "knife.roofs.sleet.a",
+      "to": [3700, -1665]
+    },
+    {
+      "id": "knife.roofs.sleet.b",
+      "to": [3765, -1675]
+    },
+    {
+      "id": "knife.roofs.sleet.n",
+      "to": [3840, -1690]
+    },
+    {
+      "id": "wall.maces.cleaver.n",
+      "to": [-1160, 3420]
+    },
+    {
+      "id": "wall.maces.hammer.n",
+      "to": [-2540, -20]
+    },
+    {
+      "id": "wall.rampart.thickSkin.n",
+      "to": [-3830, 1150]
+    },
+    {
+      "id": "wall.rampart.bulwark.n1",
+      "to": [-1931, 880]
+    },
+    {
+      "id": "wall.rampart.ironLungs.n",
+      "to": [-2179, 380]
+    },
+    {
+      "id": "wall.rampart.secondWind.n",
+      "to": [-1650, 2070]
+    },
+    {
+      "id": "wall.rampart.unerring.k",
+      "to": [-2860, 175]
+    },
+    {
+      "id": "wall.rampart.unerring.a",
+      "to": [-2680, 230]
+    },
+    {
+      "id": "wall.rampart.unerring.b",
+      "to": [-2760, 205]
+    },
+    {
+      "id": "yard.dual.hotBlood.n",
+      "to": [880, 2300]
+    },
+    {
+      "id": "yard.blood.spellsword.n",
+      "to": [190, 3560]
+    },
+    {
+      "id": "yard.blood.woundDance.k",
+      "to": [-447, 3610]
+    },
+    {
+      "id": "yard.blood.crimsonPact.k",
+      "to": [925, 3262]
+    },
+    {
+      "id": "yard.shield.shieldwall.k",
+      "to": [-1070, 2955]
+    },
+    {
+      "id": "yard.dual.hotBlood.a",
+      "to": [780, 2290]
+    },
+    {
+      "id": "yard.shield.shieldwall.d",
+      "to": [-985, 2925]
+    }
+  ]
+}

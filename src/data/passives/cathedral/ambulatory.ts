@@ -3,7 +3,8 @@
  * junction to the Undercroft's shrine, so the two arms that each hung off one node are joined at their far ends, and a
  * second road from the Vestry's junction straight out to it. Clusters hang off it into the ground that was empty: the
  * staff caster and fire strikes outward, armour with a shield and the second brand cluster inward, and the melee
- * Zealot's leech on the Wall side between the Vestry's crossing road and the tower.
+ * Zealot's leech on the Wall side between the Vestry's crossing road and the tower. The Rampart road off the leech
+ * bridge ends in Battle Hymn, the warcry bridge to the Wall (G4 fix 1, 2026-10-22: its leg to Stagger was cut).
  */
 import {
   areaDamage,
@@ -12,9 +13,9 @@ import {
   brandDamage,
   burnDamage,
   castSpeed,
+  critChance,
   eleAttackOne,
   eleDamage,
-  eleDamageAll,
   es,
   igniteChance,
   igniteDuration,
@@ -24,9 +25,9 @@ import {
   manaRegen,
   minionDamage,
   shockDuration,
-  spellDamage,
-  staffDamage,
+  staffSpellDamage,
   str,
+  stunRecovery,
   warcryEffect,
 } from '../lines';
 import type { AreaSpec } from '../types';
@@ -94,27 +95,27 @@ export const ambulatory: AreaSpec = {
       at: P(2330, -165),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2210, -180) },
-        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(2450, -150) },
+        { id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2227, -150) },
+        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: P(2463, -150) },
       ],
       links: [['a', 'b']],
     },
     {
       id: 'crozier',
       name: 'Crozier',
-      why: "A pocket outward off the walk: staff damage twice, then the staff in a caster's hand. The Zealot's second staff cluster; Quarterstaff, at the Vestry, is the staff with block.",
+      why: "A pocket outward off the walk: spell damage with a staff twice, then the notable with spell damage with a staff and cast speed: the staff in a caster's hand. G4 fix 2 (2026-10-23, audit D1): it was staff damage, which reaches only attacks, beside spell damage, so the staff attacker and the staff caster each got half; now the whole cluster is the caster's. The staff attacker's homes are Quarterstaff (staff damage with attack block, at the Vestry) and Warding Staff (staff damage with spell block with a staff, by the dear road).",
       at: P(3050, 30),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [staffDamage(12)], at: P(2900, 60) },
-        { id: 'b', kind: 'small', lines: [staffDamage(12)], at: P(3080, 40) },
+        { id: 'a', kind: 'small', lines: [staffSpellDamage(8)], at: P(3132, 29) },
+        { id: 'b', kind: 'small', lines: [staffSpellDamage(8)], at: P(3190, 25) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Crozier',
-          lines: [staffDamage(16), spellDamage(16), castSpeed(4)],
+          lines: [staffSpellDamage(20), castSpeed(6)],
           at: P(3260, 20),
-          why: '1.3 + 2 + 1 units.',
+          why: 'Spell damage with a staff and cast speed: 2.5 + 1.5 units.',
         },
       ],
       links: [
@@ -125,20 +126,20 @@ export const ambulatory: AreaSpec = {
     {
       id: 'plate',
       name: 'Consecrated Plate',
-      why: "A bridge inward from the walk to the back road: armour twice and the notable with armour and energy shield, the Zealot's two defences in one place. Its armour was thin before.",
+      why: 'A bridge inward from the walk to the back road: armour twice and the notable with armour and stun recovery (energy shield until G3). Its armour was thin before. Since G2 the aisle arrives too, so it is a crossroads.',
       at: P(2380, 260),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [armour(12)], at: P(2540, 330) },
+        { id: 'a', kind: 'small', lines: [armour(12)], at: P(2440, 277) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Consecrated Plate',
-          lines: [armour(24), es(10)],
+          lines: [armour(24), stunRecovery(30)],
           at: P(2370, 280),
-          why: '2 + 2 units.',
+          why: "Armour, and stuns shaken off sooner: 2 + 2 units. G3 (2026-10-22, G1-brief.md §4.3): its energy shield went, because with Lectern four steps away on the aisle every Zealot caster took both (the allocator's plans for five casters), spell damage and energy shield in one stop. Ox Hide, in the Wall, is armour with stun threshold.",
         },
-        { id: 'b', kind: 'small', lines: [armour(12)], at: P(2380, 60) },
+        { id: 'b', kind: 'small', lines: [armour(12)], at: P(2385, 212) },
       ],
       links: [
         ['a', 'n'],
@@ -148,24 +149,40 @@ export const ambulatory: AreaSpec = {
     {
       id: 'brand',
       name: 'Brandwright',
-      why: 'A pocket inward off the walk: brand damage twice, then brands with elemental damage and cast speed. The second brand cluster; Runecarver, at the shrine, sells duration and area.',
+      why: "A bridge inward from the walk to Lectern: brand damage twice either side of the notable with brand damage and brand crit. The second brand cluster; Runecarver, at the shrine, sells brands with duration and area. G3 round 2 (2026-10-22, the user's decision): it sold elemental damage and cast speed, so every Zealot caster that took Lectern took it one step on, for those and not its brands; now it is the brand cluster only, and the two smalls between it and Lectern (spell damage, Lectern's until then) carry brand damage, so the bridge reads spell, Lectern, brand, Brandwright, brand.",
       at: P(2420, 560),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2530, 500) },
-        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2370, 560) },
+        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2360, 613) },
+        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2305, 634) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Brandwright',
-          lines: [brandDamage(20), eleDamageAll(10), castSpeed(4)],
+          lines: [brandDamage(24), critChance(30, ['brand'])],
           at: P(2240, 660),
-          why: '1.7 + 1 + 1 units.',
+          why: 'Brand damage and crit chance with brands: 2 + 2 units (G3 round 2; it was brand damage, elemental damage and cast speed, which drew every caster).',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [brandDamage(12)],
+          at: P(2211, 588),
+          why: 'Toward Lectern (was `cathedral.nave.lectern.d`, spell damage, until G3 round 2).',
+        },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [brandDamage(12)],
+          at: P(2191, 536),
+          why: 'The far node, onto Lectern (was `cathedral.nave.lectern.c`, spell damage, until G3 round 2).',
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
       ],
     },
     {
@@ -175,8 +192,8 @@ export const ambulatory: AreaSpec = {
       at: P(3020, 720),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(2870, 720) },
-        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3050, 760) },
+        { id: 'a', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3102, 716) },
+        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: P(3160, 718) },
         {
           id: 'n',
           kind: 'notable',
@@ -198,7 +215,7 @@ export const ambulatory: AreaSpec = {
       at: P(2380, -1000),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2180, -960) },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2350, -1083) },
         {
           id: 'n',
           kind: 'notable',
@@ -207,12 +224,12 @@ export const ambulatory: AreaSpec = {
           at: P(2380, -1020),
           why: '2 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2560, -900) },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: P(2410, -957) },
         {
           id: 'c',
           kind: 'attribute',
           lines: [str(6), int(6)],
-          at: P(2590, -720),
+          at: P(2507, -748),
           why: 'A road node onto the tower junction.',
         },
       ],
@@ -225,7 +242,7 @@ export const ambulatory: AreaSpec = {
     {
       id: 'toWall',
       name: 'To the Rampart',
-      why: "A road of four attribute nodes from the leech bridge past Idle Hands to the Wall's Stagger, which was a dead end: the Wall and the Cathedral meet on their outer sides as well as at home. Cathedral attributes on the Cathedral half, strength on the Wall half.",
+      why: "A road of two attribute nodes from the leech bridge toward the Wall, its end turning into Battle Hymn, whose far small lands on the Wall's Hymn road: the Wall and the Cathedral meet on their outer sides as well as at home. G4 fix 1 (2026-10-22, audit N6, fix brief §1.2 item 4): it ran on by two strength nodes (`c`, `d`, retired) to the Wall's Stagger, a second bare crossing 300 units from Battle Hymn's for the same warcry corner, walked by no build; the corner's one crossing is now Battle Hymn, a bridge, and seam 5 (Twofold Guard, `rods.ts`) joins the two regions farther in.",
       at: P(1900, -1400),
       shape: { kind: 'hand' },
       nodes: [
@@ -234,39 +251,45 @@ export const ambulatory: AreaSpec = {
           id: 'b',
           kind: 'attribute',
           lines: [str(6), int(6)],
-          at: P(1900, -1400),
-          why: 'Where the warcry pocket leaves.',
+          at: P(2071, -1288),
+          why: 'The end of the road, on the straight line on into the warcry bridge (moved in G4 fix 1, when its leg to Stagger went).',
         },
-        { id: 'c', kind: 'attribute', lines: [str(7)], at: P(1720, -1640) },
-        { id: 'd', kind: 'attribute', lines: [str(7)], at: P(1500, -1650) },
       ],
-      links: [
-        ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'd'],
-      ],
+      links: [['a', 'b']],
     },
     {
       id: 'hymn',
       name: 'Battle Hymn',
-      why: "A pocket outward off the Rampart road: warcry effect twice, then warcries with aura effect, the Zealot's shout among its auras. The second warcry cluster; War Drums, in the Wall's Barrows, sells louder and longer shouts.",
-      at: P(2280, -1560),
+      why: "A bridge from the end of the Rampart road to the Wall's Hymn road: warcry effect, the notable with warcries and aura effect (the Zealot's shout among its auras), warcry effect. The second warcry cluster; War Drums, in the Wall's Barrows, sells louder and longer shouts. G4 fix 1 (2026-10-22, audit N6, fix brief §1.2 item 4): it was a pocket whose second small the Wall's road also reached, the notable a dead end beyond it; now the notable sits between its two smalls on one straight line from the Rampart road's junction to the Wall's Hymn road, so it is the corner's one crossing and a bridge.",
+      at: P(2087, -1447),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: P(2100, -1500) },
-        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: P(2280, -1590) },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: P(2080, -1377),
+          why: 'The entrance from the Rampart road, on the line to the notable.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: P(2094, -1517),
+          why: "The far node, on the line to the Wall's Hymn road, which lands here.",
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Battle Hymn',
           lines: [warcryEffect(15), auraEffect(10)],
-          at: P(2460, -1520),
+          at: P(2087, -1447),
           why: '1.5 + 1.7 units.',
         },
       ],
       links: [
-        ['a', 'b'],
-        ['b', 'n'],
+        ['a', 'n'],
+        ['n', 'b'],
       ],
     },
     {
@@ -276,8 +299,8 @@ export const ambulatory: AreaSpec = {
       at: [-3327, -2334],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionDamage(12)], at: [-3207, -2214] },
-        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: [-3327, -2334] },
+        { id: 'a', kind: 'small', lines: [minionDamage(12)], at: P(3089, 369) },
+        { id: 'b', kind: 'small', lines: [minionDamage(12)], at: P(3147, 384) },
         {
           id: 'n',
           kind: 'notable',
@@ -295,12 +318,12 @@ export const ambulatory: AreaSpec = {
     {
       id: 'peal',
       name: 'Thunder Peal',
-      why: "A pocket west off the walk's first node, under the Bell Tower: lightning twice, then lightning with mana and long shocks. The lightning caster's late cluster, far from the Spire's two (Thunderhead sells lightning with cast speed, Overcharge with shock effect) and the Knife's Static Edge (with crit). Round 3 (2026-10-20).",
+      why: "A pocket west off the walk's first node, under the Bell Tower: lightning twice, then lightning with mana and long shocks. The lightning caster's late cluster, far from the Spire's two (Thunderhead sells lightning with cast speed, Live Current with shock effect) and the Knife's Static Edge (with crit). Round 3 (2026-10-20).",
       at: [-3664, -1648],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: [-3507, -1583] },
-        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: [-3664, -1648] },
+        { id: 'a', kind: 'small', lines: [eleDamage('lightning', 10)], at: P(3039, -410) },
+        { id: 'b', kind: 'small', lines: [eleDamage('lightning', 10)], at: P(3096, -418) },
         {
           id: 'n',
           kind: 'notable',
@@ -318,18 +341,18 @@ export const ambulatory: AreaSpec = {
     {
       id: 'censer',
       name: 'Censer',
-      why: 'A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20).',
+      why: "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with movement, `rim.ts`) hangs off it, so it is a junction of three (Procession's crossing on to the Vanguard's Grim Oath was cut in G4 fix 2); Brazier, off the far end of the outer walk, is burning with the sceptre.",
       at: [-3554, -638],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [burnDamage(12)], at: [-3397, -573] },
-        { id: 'b', kind: 'small', lines: [burnDamage(12)], at: [-3554, -638] },
+        { id: 'a', kind: 'small', lines: [burnDamage(12)], at: P(2424, -1295) },
+        { id: 'b', kind: 'small', lines: [burnDamage(12)], at: P(2479, -1313) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Censer',
           lines: [burnDamage(24), areaDamage(10), igniteDuration(15)],
-          at: [-3711, -703],
+          at: P(2546, -1334),
           why: '2 + 1 + 1 units.',
         },
       ],
@@ -345,11 +368,10 @@ export const ambulatory: AreaSpec = {
     { from: 'walk.w4', to: 'ossuary.a', why: 'The walk onto the minion pocket.' },
     { from: 'tithe.a', to: 'toWall.a', why: 'The leech bridge onto the Rampart road.' },
     {
-      from: 'toWall.d',
-      to: 'wall.rampart.stagger.n',
-      why: 'The Rampart road lands on Stagger, which now has a second way in.',
+      from: 'toWall.b',
+      to: 'hymn.a',
+      why: "The Rampart road onto the warcry bridge: Battle Hymn's first small, on the line to the notable.",
     },
-    { from: 'toWall.b', to: 'hymn.a', why: 'The Rampart road onto the warcry pocket.' },
     { from: 'cathedral.pyre.jF.a', to: 'walk.w1', why: 'The tower junction onto the walk.' },
     {
       from: 'walk.w7',

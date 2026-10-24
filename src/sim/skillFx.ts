@@ -1,5 +1,6 @@
 import type { SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
+import { profileElement } from '../calc/skillLook';
 import type { BuffId } from '../data/buffs';
 import { levelValue } from '../calc/gems';
 import { launch, scaleProfile } from './shots';
@@ -21,16 +22,7 @@ import type { Side } from './side';
  */
 
 /** The type index a skill is mostly made of, for the picture of it. */
-function mainType(act: Action): number {
-  let best = -1;
-  let type = 0;
-  for (const c of act.profile.hands[0].chunks)
-    if (c.max > best) {
-      best = c.max;
-      type = c.type;
-    }
-  return type;
-}
+const mainType = (act: Action): number => profileElement(act.profile);
 
 /**
  * A wave along the ground from the caster toward the target hits everything on its way; then a shockwave goes out, about each
@@ -271,16 +263,7 @@ function detonate(w: World, s: Side, e: Actor): void {
   s.inFx = false;
 }
 
-function mainTypeOf(p: SkillProfile): number {
-  let best = -1;
-  let type = 0;
-  for (const c of p.hands[0].chunks)
-    if (c.max > best) {
-      best = c.max;
-      type = c.type;
-    }
-  return type;
-}
+const mainTypeOf = (p: SkillProfile): number => profileElement(p);
 
 /** An enemy with the debuff dies: it goes off, and the body bursts for a share of its life as fire. */
 export function chargedDeath(w: World, dead: Actor): void {

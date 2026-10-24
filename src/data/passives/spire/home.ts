@@ -9,7 +9,6 @@
  * Blood bridge (life) joins the two highways across the gate.
  */
 import {
-  critChance,
   es,
   int,
   life,
@@ -37,12 +36,12 @@ export const home: AreaSpec = {
   region: 'mystic',
   name: 'The Spire gate',
   why: 'Two stat nodes off the start (shield west, crit east), the signature between them, two hubs one step out with a pocket each, and two intelligence highways: the well up the left, the craft up the right, bridged by Warm Blood.',
-  at: [-40, -890], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-40, -860], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved 30 down in G3 round 2 off the start.
   clusters: [
     {
       id: 'sig',
       name: 'First Light',
-      why: 'The loop the start opens onto: energy shield on the west side, spell damage on the east, the signature at the tip. Point one is a side; point two is the signature, a hub, or a road.',
+      why: 'The loop the start opens onto: energy shield on the west side, mana regeneration on the east, the signature at the tip. Point one is a side; point two is the signature, a hub, or a road.',
       at: [0, -1180],
       shape: { kind: 'hand' },
       nodes: [
@@ -50,7 +49,7 @@ export const home: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [es(5)],
-          at: [-150, -1120],
+          at: [-70, -1242],
           why: 'The west side: defence.',
         },
         {
@@ -64,9 +63,9 @@ export const home: AreaSpec = {
         {
           id: 'b',
           kind: 'small',
-          lines: [critChance(20)],
-          at: [150, -1120],
-          why: 'The east side: offence, for any hit, spell or wand.',
+          lines: [manaRegen(20)],
+          at: [70, -1242],
+          why: "The east side: a generous mana regeneration, two units on one small, so a caster's first point keeps its spells going (the user, 2026-10-23; it was 15% crit chance).",
         },
       ],
       links: [
@@ -89,17 +88,24 @@ export const home: AreaSpec = {
     {
       id: 'stillMind',
       name: 'Still Mind',
-      why: "The west hub's pocket, a tight orbit: two mana regeneration nodes and a notable with regeneration and flat mana. A caster's first worry is running dry; three points after the hub it stops being one.",
-      at: [-470, -1150],
-      shape: { kind: 'ring', r: 75, a0: -30 },
+      why: "The west hub's pocket, a tight orbit: two mana regeneration nodes and a notable with regeneration and flat mana, on a half circle west of the hub and the road's first node. A caster's first worry is running dry; three points after the hub it stops being one.",
+      at: [-425, -1275],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [manaRegen(10)], why: 'The entrance, facing the hub.' },
-        { id: 'b', kind: 'small', lines: [manaRegen(10)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          why: 'The entrance, facing the hub.',
+          at: [-368, -1237],
+        },
+        { id: 'b', kind: 'small', lines: [manaRegen(10)], at: [-425, -1275] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Still Mind',
           lines: [manaRegen(20), manaFlat(30)],
+          at: [-438, -1343],
           why: '2 + 1.5 units.',
         },
       ],
@@ -111,19 +117,26 @@ export const home: AreaSpec = {
     {
       id: 'sharpMind',
       name: 'Sharp Mind',
-      why: "The east hub's pocket, a tight orbit: two spell crit nodes and a notable with spell crit and spell crit multiplier. The crit caster's first three points after the hub, and the way the insight charges start paying.",
-      at: [470, -1150],
-      shape: { kind: 'ring', r: 75, a0: -150 },
+      why: "The east hub's pocket, a tight orbit: two spell crit nodes and a notable with spell crit and spell crit multiplier, on a half circle east of the hub and the road's first node. The crit caster's first three points after the hub, and the way the insight charges start paying.",
+      at: [425, -1275],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellCrit(15)], why: 'The entrance, facing the hub.' },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellCrit(15)],
+          why: 'The entrance, facing the hub.',
+          at: [368, -1237],
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Sharp Mind',
           lines: [spellCrit(30), spellCritMulti(15)],
+          at: [438, -1343],
           why: '2 + 1.25 units.',
         },
-        { id: 'b', kind: 'small', lines: [spellCrit(15)] },
+        { id: 'b', kind: 'small', lines: [spellCrit(15)], at: [425, -1275] },
       ],
       links: [
         ['a', 'b'],
@@ -137,9 +150,9 @@ export const home: AreaSpec = {
       at: [-380, -1600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [int(7)], at: [-380, -1400] },
+        { id: 'a', kind: 'attribute', lines: [int(7)], at: [-400, -1400] },
         { id: 'b', kind: 'attribute', lines: [int(7)], at: [-400, -1600] },
-        { id: 'c', kind: 'attribute', lines: [int(7)], at: [-240, -1820] },
+        { id: 'c', kind: 'attribute', lines: [int(7)], at: [-400, -1780] },
       ],
       links: [
         ['a', 'b'],
@@ -153,9 +166,9 @@ export const home: AreaSpec = {
       at: [380, -1600],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [int(7)], at: [380, -1400] },
+        { id: 'a', kind: 'attribute', lines: [int(7)], at: [400, -1400] },
         { id: 'b', kind: 'attribute', lines: [int(7)], at: [400, -1600] },
-        { id: 'c', kind: 'attribute', lines: [int(7)], at: [240, -1820] },
+        { id: 'c', kind: 'attribute', lines: [int(7)], at: [400, -1780] },
       ],
       links: [
         ['a', 'b'],
@@ -187,7 +200,7 @@ export const home: AreaSpec = {
       at: [0, -1700],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-210, -1650] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-68, -1683] },
         {
           id: 'n',
           kind: 'notable',
@@ -196,7 +209,7 @@ export const home: AreaSpec = {
           at: [0, -1700],
           why: 'Life and a little shield: 2.4 + 1.2 units.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [210, -1650] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [68, -1683] },
       ],
       links: [
         ['a', 'n'],
@@ -206,12 +219,12 @@ export const home: AreaSpec = {
     {
       id: 'deftWand',
       name: 'Deft Wand',
-      why: "A pocket east off the west road's first node, into the ground between the signature and Warm Blood: wand attacks twice, then wand attacks with accuracy and projectile speed. The second wand-attack cluster, six steps from the start, so the Mystic who starts with a wand attack has one near home; Wand Volley, thirteen out on the east side, sells wand attacks with speed and crit. Round 3 (2026-10-20); it also breaks the home's mirror.",
+      why: "A pocket east off the west road's first node, into the ground between the signature and Warm Blood: wand attacks twice, then wand attacks with accuracy and projectile speed. The second wand-attack cluster, six steps from the start, so the Mystic who starts with a wand attack has one near home; Wand Volley, thirteen out on the east side, sells wand attacks with speed (its crit went in G3), and Bright Wand in the Lantern wand attacks with elements. Round 3 (2026-10-20); it also breaks the home's mirror.",
       at: [-42, -1400],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [wandAttack(12)], at: [-212, -1400] },
-        { id: 'b', kind: 'small', lines: [wandAttack(12)], at: [-42, -1400] },
+        { id: 'a', kind: 'small', lines: [wandAttack(12)], at: [0, -1400] },
+        { id: 'b', kind: 'small', lines: [wandAttack(12)], at: [58, -1400] },
         {
           id: 'n',
           kind: 'notable',

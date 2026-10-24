@@ -19,12 +19,66 @@
   --on-accent: #1a0e06;
   --tree-bg: #0a0809;
   --radius: 2px;
-  --font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
-  --title-font: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  /* Grenze for running text, Jacquard 24 for headings and names (both shipped with the game, src/main.ts); the map
+     draws its own text in a bitmap font (render/style/pixelGlyphs.ts). The faces are evened out to one lowercase height. */
+  --font: 'Grenze', 'Palatino Linotype', Georgia, serif;
+  --title-font: 'Jacquard 24', 'Palatino Linotype', Georgia, serif;
+  font-size-adjust: 0.5;
+  /* Lining figures: Grenze's default old-style digits bob up and down in stat lines. */
+  font-feature-settings: 'lnum' 1;
+}
+:root h1,
+:root h2,
+:root .ix-title,
+:root .ic-name,
+:root .class-name,
+:root .theme-name,
+:root .stop-name,
+:root .boss-offer-name,
+:root .biome-name,
+:root .inspect-name,
+:root .boss-bar-name {
+  font-family: var(--title-font);
+  font-weight: 400;
+  font-size-adjust: none;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+}
+:root h2 {
+  font-size: 30px;
+}
+:root .patch-list h2 {
+  font-size: 26px;
+}
+:root .ix-title {
+  font-size: 26px;
+}
+:root .ic-name {
+  font-size: 22px;
+}
+:root .inspect-name {
+  font-size: 22px;
+}
+:root .class-name {
+  font-size: 30px;
+}
+:root .theme-name,
+:root .stop-name {
+  font-size: 26px;
+}
+:root .boss-offer-name {
+  font-size: 30px;
+}
+:root .boss-bar-name {
+  font-size: 20px;
+}
+:root .biome-name {
+  font-size: 48px;
 }
 :root .title h1 {
   font-family: var(--title-font);
-  letter-spacing: 0.35em;
+  font-size: 84px;
+  letter-spacing: 0.08em;
   text-shadow:
     0 0 22px #c8742a88,
     0 3px 0 #000;

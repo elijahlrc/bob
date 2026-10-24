@@ -17,12 +17,19 @@ import type {
   World,
 } from '../../../sim/types';
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
-import { isViewer } from '../../style/who';
+import { holdsWand, isViewer } from '../../style/who';
 import type { Side } from '../../../sim/side';
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
+import {
+  ensurePixelFonts,
+  PIXEL_FONT,
+  pixelFontSize,
+  pixelSafe,
+  type PixelFontKey,
+} from '../../style/pixelFont';
 import { CollapseFx } from './collapseFx';
 import { MOTIF_DECAL } from './areaMotifs';
 import { SkillFx, type FxHost } from './skillFx';
@@ -138,7 +145,7 @@ export class GrimStyle extends StyleBase {
     b: Phaser.GameObjects.Image;
     light: Phaser.GameObjects.Light;
   } | null = null;
-  private floaters: Phaser.GameObjects.Text[] = [];
+  private floaters: Phaser.GameObjects.BitmapText[] = [];
   private labelFrame = -1;
   private placed: { x: number; y: number; w: number; h: number }[] = [];
   private punch = 0;
@@ -200,6 +207,7 @@ export class GrimStyle extends StyleBase {
   }
 
   private ensureProps(): void {
+    ensurePixelFonts(this.scene);
     const props = buildProps();
     for (const [k, cv] of Object.entries(props))
       this.addTex('g_' + k, cv, k !== 'glow' && k !== 'smoke' && k !== 'beam');
@@ -881,7 +889,10 @@ export class GrimStyle extends StyleBase {
   protected createProjectile(p: Projectile) {
     const s = this.scene;
     const col = DTYPE_COLOR[p.dtype];
-    const state = newProjectileState(p);
+    const state = newProjectileState(
+      p,
+      p.profile.skill.type === 'attack' && holdsWand(this.world, p.owner),
+    );
     // A thrown thing of a monster's sidearm (docs/ENCOUNTERS.md 3) flies as itself, with a halo so it is seen coming.
     const look = p.profile.skill.look;
     if (look) {
@@ -898,9 +909,10 @@ export class GrimStyle extends StyleBase {
       this.owned.push(img, glow);
       return { img, glow, light, acc: 0, spin: projectileSpins(look), state, col };
     }
-    // Everything else is drawn by ProjectileFx: an arrow for an attack, an orb for a spell, and the odd flights as themselves.
+    // Everything else is drawn by ProjectileFx: an arrow for an attack, an orb for a spell or a wand's bolt, and the odd flights
+    // as themselves.
     const light =
-      p.dtype === 0 && p.profile.skill.type === 'attack'
+      p.dtype === 0 && p.profile.skill.type === 'attack' && !state.bolt
         ? null
         : this.addLight(0, 0, 110, col, 1.2);
     return { img: null, glow: null, light, acc: 0, state, col };
@@ -987,18 +999,22 @@ export class GrimStyle extends StyleBase {
             .setDepth(2001)
             .setAlpha(big ? 0.85 : 0.5)
             .setScale(1, big ? 0.9 : 0.5);
+    // The name in the map's bitmap font on a dark plate, both on whole pixels.
+    const font = PIXEL_FONT.text;
+    const text = s.add
+      .bitmapText(0, -1, font, pixelSafe(dropLabel(d.item), font), pixelFontSize(font))
+      .setOrigin(0, 1)
+      .setTint(tint);
+    const tw = Math.round(text.width);
+    const th = Math.round(text.height);
+    text.setX(-Math.floor(tw / 2));
+    const plate = s.add
+      .rectangle(-Math.floor(tw / 2) - 1, 0, tw + 2, th, 0x0a0608, 0.72)
+      .setOrigin(0, 1);
     const label = s.add
-      .text(0, 0, dropLabel(d.item), {
-        fontFamily: '"Palatino Linotype", Georgia, serif',
-        fontSize: big ? '8px' : '7px',
-        fontStyle: big ? 'bold' : 'normal',
-        color: '#' + tint.toString(16).padStart(6, '0'),
-        backgroundColor: 'rgba(10,6,8,0.72)',
-        padding: { x: 2, y: 1 },
-      })
-      .setOrigin(0.5, 1)
-      .setDepth(2002)
-      .setResolution(this.zoom * 2);
+      .container(0, 0, [plate, text])
+      .setSize(tw + 2, th)
+      .setDepth(2002);
     this.owned.push(img, glow, label);
     if (beam) this.owned.push(beam);
     const o = {
@@ -1021,7 +1037,7 @@ export class GrimStyle extends StyleBase {
       img: Phaser.GameObjects.Image;
       glow: Phaser.GameObjects.Image;
       beam: Phaser.GameObjects.Image | null;
-      label: Phaser.GameObjects.Text;
+      label: Phaser.GameObjects.Container;
       ph: number;
       tint: number;
       light: Phaser.GameObjects.Light | null;
@@ -1040,7 +1056,7 @@ export class GrimStyle extends StyleBase {
       img: Phaser.GameObjects.Image;
       glow: Phaser.GameObjects.Image;
       beam: Phaser.GameObjects.Image | null;
-      label: Phaser.GameObjects.Text;
+      label: Phaser.GameObjects.Container;
       light: Phaser.GameObjects.Light | null;
       tint: number;
     };
@@ -1056,7 +1072,9 @@ export class GrimStyle extends StyleBase {
   }
 
   /** Put a ground label at (x, y), nudged upward until it clears the labels already placed this frame. */
-  private placeLabel(label: Phaser.GameObjects.Text, x: number, y: number): void {
+  private placeLabel(label: Phaser.GameObjects.Container, x: number, y: number): void {
+    x = Math.round(x);
+    y = Math.round(y);
     if (this.labelFrame !== this.time) {
       this.labelFrame = this.time;
       this.placed = [];
@@ -1360,26 +1378,31 @@ export class GrimStyle extends StyleBase {
 
   private floater(x: number, y: number, text: string, color: number, big: boolean): void {
     if (this.floaters.length > 36) this.floaters.shift()!.destroy();
+    // The map's bitmap font: bold for big hits and names, small digits for small hits. It is kept on whole pixels (and
+    // never scaled) so it stays as crisp as the art round it.
+    const font: PixelFontKey = big
+      ? PIXEL_FONT.bold
+      : /^[0-9+-]+$/.test(text)
+        ? PIXEL_FONT.small
+        : PIXEL_FONT.text;
     const t = this.scene.add
-      .text(x + (Math.random() - 0.5) * 10, y - 12, text, {
-        fontFamily: '"Palatino Linotype", Georgia, serif',
-        fontSize: big ? '9px' : '6px',
-        fontStyle: 'bold',
-        color: '#' + color.toString(16).padStart(6, '0'),
-        stroke: '#0a0608',
-        strokeThickness: 2,
-      })
-      .setOrigin(0.5)
-      .setDepth(95000)
-      .setResolution(this.zoom * 2);
+      .bitmapText(0, 0, font, pixelSafe(text, font), pixelFontSize(font))
+      .setTint(color)
+      .setDepth(95000);
+    const x0 = Math.round(x + (Math.random() - 0.5) * 10 - t.width / 2);
+    const y0 = Math.round(y - 12 - t.height / 2);
+    t.setPosition(x0, y0);
     this.floaters.push(t);
+    const rise = { v: 0 };
     this.scene.tweens.add({
-      targets: t,
-      y: t.y - (big ? 22 : 14),
-      alpha: 0,
-      scale: big ? 1.35 : 1,
+      targets: rise,
+      v: 1,
       duration: big ? 900 : 650,
       ease: 'Cubic.easeOut',
+      onUpdate: () => {
+        t.setY(Math.round(y0 - rise.v * (big ? 22 : 14)));
+        t.setAlpha(1 - rise.v);
+      },
       onComplete: () => t.destroy(),
     });
   }

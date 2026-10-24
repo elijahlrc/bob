@@ -1,5 +1,6 @@
 import type { SkillProfile } from '../calc/skill';
 import { formedProfile } from '../calc/skill';
+import { profileElement } from '../calc/skillLook';
 import { levelValue } from '../calc/gems';
 import { PROJECTILE_SPEED } from '../data/constants';
 import { actorById } from './actions';
@@ -47,16 +48,7 @@ const BARRAGE_SPREAD = (20 * Math.PI) / 180;
 const BURST_RANGE = 6;
 const TORNADO_SECONDARIES = 3;
 
-function dominantType(p: SkillProfile, hand: number): number {
-  let dtype = 0;
-  let best = -1;
-  for (const c of p.hands[Math.min(hand, p.hands.length - 1)].chunks)
-    if (c.max > best) {
-      best = c.max;
-      dtype = c.type;
-    }
-  return dtype;
-}
+const dominantType = (p: SkillProfile, hand: number): number => profileElement(p, hand);
 
 const scaled = new WeakMap<SkillProfile, Map<number, SkillProfile>>();
 /** The profile with its hits multiplied by a factor (the bolts of a strike deal less than the strike). */

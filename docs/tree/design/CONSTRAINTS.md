@@ -25,6 +25,12 @@ Each item states the rule or the workflow, not how it was learned. History lives
    "bow" area and a "physical attack" area holding most of what it wants makes no decision by going there. That is just
    what the build requires, and then there is no reason to have a tree. The tree is worth having only when a build has
    to give something up to get something.
+   - **Measured as what more points would still buy.** [user, 10-22] A finished build that 40 more points would barely
+     help has everything it wanted, so the tree made no decision for it. The measure and its targets are in
+     `G0-baseline.md` (stop 1), and `npm run passives:builds` reports them.
+   - **It is one constraint among all the others, never at their expense.** [user, 10-22] "This is one more of many,
+     many constraints that all must be fulfilled." More tension never excuses a worse start, a thinner vocabulary, a
+     region without varied defences, filler roads, or a messier picture.
 2. **It must serve tens of archetypes and tens of thousands of specific builds.** [user, 10-18] Builds cannot be
    enumerated: the combinatorics make that impossible, and there is no bot that plays like a decent player. [user, 10-19]
    So the design is about what the tree supplies and the choices it offers, never about a list of builds it supports.
@@ -142,6 +148,12 @@ Each item states the rule or the workflow, not how it was learned. History lives
    means mana and reservation, leech, crit, attack and cast speed, movement, flasks, cost, duration, and the weapon lines
    of the weapons its skills can hold.
 7. **The centre holds generic nodes** for things everyone or many classes may want. [user, 10-19]
+8. **No large stretch that is all defence or all offence, above all near a start.** [user, 10-22] "I want to push to
+   not having huge regions that are all similar defense or all similar offense. I remember seeing large regions that
+   were only health and armor and maybe a bit of es or flask recharge near one of the starts, And it's not good to have
+   only offense or only defense in a region, especially near the start where it feels very limiting. None of this
+   should be construed as a hard rule." A guide, not a rule: an area, and above all a home, mixes offence and defence,
+   so the first points never feel like a corridor of one kind.
 
 ## 5. Specializations and trade-offs
 
@@ -224,7 +236,8 @@ The core of section 1, made concrete.
 
 ## 8. Clusters, notables and small nodes
 
-1. **A small node is one stat at the reference's size:** 5% life, 10% evasion, 5% attack speed, 15% crit. [derived]
+1. **A small node is one stat at the reference's size:** 5% life, 10% evasion, 5% attack speed, 15% crit. [derived;
+   the user confirmed these sizes, 10-22, and `UNIT` in `lines.ts` follows them]
 2. **Within a section, every small carries the same modifier.** [user, 10-20, "sections of small nodes are mixing
    different modifiers when they should be the same"] A section is a road, a wheel's side, a pocket's smalls or a keystone
    spur. Mixes live on notables. The exceptions are the two sides of a start loop and clusters whose point is variety,
@@ -241,11 +254,20 @@ The core of section 1, made concrete.
    - 3% attack speed against 2% attack speed with 5% accuracy.
    - Two bow notables on opposite sides of one circle. "If I'm playing a bow character I obviously want both."
 
+   **Not every choice must be interesting for every build.** [user, 10-22] On Deep Well's wheel (cast speed or
+   energy shield), which a classic caster takes both sides of: "some builds want non-es, some want wand attacks. Not
+   every single choice needs to be interesting for every single build, It's more about All builds make interesting
+   choices most of the time." A wheel is fake when the builds of its theme all want both sides; one build taking both
+   is not a fault if others choose.
+
 4. **Cluster shapes are flexible.** [user, 10-19] Small four-node clusters of the same shape are fine, as long as they
    are not the only kind of cluster and are placed with care. [user, 10-20]
 5. **Forks inside an area are good.** [user, 10-19] They let an area hold two variants of one idea, such as shield or
    two-hander in a melee area. Forks between nodes that belong to no named area are fine too.
 6. **A notable is worth 3 to 5 units,** where a unit is the reference small node of that stat. [ref; adopted]
+7. **Almost every small belongs to a notable.** [user, 10-22] "Almost all small nodes should have associated notables,
+   but it's not a hard rule": a run of smalls with no notable is for when another constraint needs it (a bridge, a
+   road's character), not a cheap way to add supply. Road nodes are attributes (§7).
 
 ## 9. Keystones and the late game
 
@@ -277,9 +299,11 @@ The core of section 1, made concrete.
    inside them. A cluster or a notable may pair two things that belong together in a build, such as "axes and bleed" or
    "staff damage and block". It may not pair two that do not, such as "poison damage and staff damage". The one
    exception is a wheel's two sides (§8 item 3).
-3. **Every line a node carries must be read by the sheet and obeyed by the simulation.** [adopted] Dead lines are never
-   written: `skillDuration` tagged mine, `aoe` tagged minion, `cooldownRecovery` tagged warcry. [adopted, from the
-   engine-stat investigation the user delegated]
+3. **Every line a node carries must be obeyed by the simulation.** [adopted] Dead lines are never written:
+   `skillDuration` tagged mine, `aoe` tagged minion, `cooldownRecovery` tagged warcry. [adopted, from the engine-stat
+   investigation the user delegated] **The character sheet need not count every line**: conditional lines (against
+   bleeding enemies, while on full life, on kill) are fine where the fight uses them. "There is no rule that all stats
+   are on the character sheet. This is a non issue." [user, 10-22]
 4. **Node kinds.** [adopted] The kinds are small, notable, keystone, attribute and start. New nodes may use existing
    stats, and new engine stats are added where a theme clearly needs one. [user, 10-19] Masteries, jewel sockets, ranked
    nodes and points-in-region gates are declined for now. [adopted]
@@ -289,7 +313,7 @@ The core of section 1, made concrete.
 ## 11. Looks and communication
 
 1. **It must be aesthetically appealing.** [user, 10-18]
-2. **No overlapping lines.** [user, 10-20] No edge crossings, no two unlinked nodes closer than 100 units, and no area name
+2. **No overlapping lines.** [user, 10-20] No edge crossings, no two nodes drawn over each other, and no area name
    over another. An area name may lie over small nodes and links: some overlap is inevitable, and the names fade as
    the view closes in (item 4). [user, 10-20, the label pass]
 3. **Geometry.** [ref; adopted]
@@ -307,12 +331,38 @@ The core of section 1, made concrete.
      editor and the renders).
    - Colour says what a node gives, and shape says its rank.
    - The keystone card shows on tap, along with the path cost and search.
+5. **Clusters are drawn tight, and angles have reasons.** [user, 10-21] "Cluster the clusters more tightly, so that
+   notables and their associated small nodes are visibly placed in clusters", and "avoid arbitrary and ugly angles being
+   introduced without a good layout reason". In detail:
+   - **A cluster reads as one.** A notable's own smalls sit close round it: the first about 70 tree units out (85 from a
+     keystone, whose frame is larger), the next 50 to 60 apart. The game draws a small at radius 10 and a notable's
+     frame at 30, so that is tight without touching. The room goes on the links between clusters, never inside them.
+   - **A chain is straight.** A chain of smalls runs on the line from its notable toward the node it leads on to, every
+     small beside the notable and the rest of the distance on the link out. It bends only where the layout has a reason:
+     at a junction (three or more links), round a ring, or to clear something. A bend at a node with two links and no
+     such reason is a fault (a road → small → small → notable zig-zag is the user's example).
+   - **Shapes are regular, and shrink as a whole.** A wheel or loop is a regular polygon or circle at an even spacing
+     (octagons and hexagons at radius 75 to 105, four-node squares and diamonds at about 55, triangles with sides of
+     about 80), notables on the rim, its entrance facing the road it hangs off. A cluster is tightened by scaling its
+     shape about its centre, never by pulling its nodes in one by one.
+   - **Smalls between two notables are a judgement call, made by looking.** [user, 10-21] Usually the stat says whose a
+     small is (the same stat as the notable's other smalls or its theme), and it goes to that notable. Sometimes the two
+     notables are one group (a wheel, a pair), and the shape is laid out as one. A small that belongs to neither stays on
+     the straight line between them.
+   - **Roads keep their lines.** Road nodes are straight runs that turn at junctions; where several links leave one
+     node, they leave at clean angles (a cross, a right angle, an even fan), not a near-miss of one.
+   - **Empty space is welcome; spacing rules are not.** [user, 10-21] More nodes are coming. There is no minimum
+     distance between nodes beyond not drawing one over another (`drawnOver` in `src/data/passives/build.ts`, which
+     the build, the scripts and the checks share). Keep a region's footprint and its border with its neighbours.
+   - **The user's hand edits are a starting point, not a fixture.** [user, 10-22] They may be reshaped like any other
+     part of the network when that makes it better.
 
 ## 12. Size and balance
 
-1. **Size falls out of the constraints.** [user, 10-19] Quality always beats count. If removing nodes improves the tree,
+1. **Size falls out of the constraints.** Any agent may add nodes where another constraint needs them, beyond what a
+   plan or ledger assigns (the user, 10-22). [user, 10-19] Quality always beats count. If removing nodes improves the tree,
    remove them. If adding nodes improves it, add them. For balance, the network will probably end up around 1,500
-   nodes. [user, 10-20]
+   nodes. [user, 10-20] The growth of 2026-10-22/23 (G-growth.md) took it from 1,009 to 1,396 live nodes.
    - A network too small for that has too few kinds of node, or high-value nodes packed too densely with too few
      trade-offs between them; the user leans to the second. [user, 10-20]
    - The reference's nearest other notable is a median 5 steps away (IQR 3 to 6). [ref]
@@ -320,6 +370,9 @@ The core of section 1, made concrete.
      big pass. [user, 10-20]
 2. **The node count is not final.** [user, 10-20] New nodes will keep being added, so a specialization that needs another
    home can get a new cluster rather than re-lining an old one.
+   - **Growing may move, remove or change existing clusters.** [user, 10-22] "Feel free to move, remove, or otherwise
+     modify existing clusters as you balance the added clusters." No existing cluster is fixed because it was there
+     first.
 3. **Balance is a property of what the tree supplies, not of bot results.** [adopted, after the user's note that no bot
    plays like a decent player] Each axis value a start is meant to reach should buy comparable power per point. Price
    every node in units.
@@ -381,6 +434,18 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   only kind and are placed with care.
 - **Build-named sections and area labels** ("Bows", "Physical attacks", "Fire", "Minions"), and one wheel per theme.
   [10-20]
+- **A minimum distance between nodes** ("no two unlinked nodes within 100 units", and the build's 60-unit check).
+  [10-21] Invented, never the user's; it kept clusters loose. The only spacing rule is not drawing one node over another.
+- **A step-count radius for what a build can reach** (measuring tension as the share of what lies within so many steps
+  of the start). [10-22] "Not a coherent concept": a build may stay compact near its start or run long narrow branches
+  to pick up widely spread stats, and both are valid. What a build can reach is the allocator's to decide, by paying
+  each path's cost; tension is measured as what more points would still buy (G-growth §1).
+- **Laying out wheels, loops and other shapes by algorithm alone.** [10-21] Tightening node by node squashed every wheel
+  and loop it touched, took a road's smalls for a pocket and put kinks into the roads out of a start. A script places
+  the simple cases (a chain off one notable); every cluster is then looked at.
+- **New rules proposed by audits.** [10-22] G4 audit round 1 proposed fifteen additions (G4/fix-1.md §4, C1–C15); the
+  user adopted none: "Literally none of these should be adopted." Audits report findings against the rules as they
+  stand, with fixes; they do not propose new rules.
 - **Section ideas that confused the user, earlier** [10-19]:
   - Delivery categories that are not meaningful to a player (melee, projectile, area, chaining, channelled, triggered,
     slam, strike, nova).
@@ -404,27 +469,46 @@ Each was tried or proposed and struck by the user. The date is when it was struc
    them in your own words. [user, 10-20]
 8. **Ask questions plainly,** without jargon you invented, using the question dialog. [user, 10-19] The user is often on
    a phone, so send files there.
-9. **The Strider region is the user's edit.** [user] Changes there are allowed but are not the priority. [user, 10-20]
-   Fold the user's editor patches before registering new ids.
-10. **Repository rules.** [user, earlier sessions] Commit locally only, and push only when asked. Never use `git stash`.
+9. **The Strider is a region like the others.** [user, 10-22] It began as the user's hand edit, but it needs no special
+   deference: grow and rewire it like every other region. Fold the user's editor patches before registering new ids.
+10. **Laying out the network: a script first, then eyes on every cluster.** [user, 10-21] "The programmatic approach is
+    a decent first pass, but you're going to need to spin off agents to manually audit the whole tree."
+    - `scripts/passives/tighten.ts` (reports only; `--write` rewrites each moved node's `at` in its area file, in the
+      file's own notation) pulls every chain of one stat that hangs off a single notable in onto a straight line toward
+      where it leads. It moves smalls only and leaves every chain that reaches two notables alone. It is never the last
+      step.
+    - Then one agent per region (and one for the centre) audits every cluster by eye and fixes it by hand, against §11
+      item 5. Each works only in its region's folder and may move any node there (notables, keystones, road nodes).
+      It renders its region and close-ups (`npm run passives:pic -- out.png --box x0,y0,x1,y1`) before and after each
+      batch of edits, and runs `npx tsx scripts/passives/geometry.ts --region <r> --bends`: crossings and nodes drawn
+      over each other must be zero, and every bend of over 20° at a two-link node is listed as a candidate, not a
+      verdict. It hands back start/end pictures of the region and of the spots it changed most, with a short report of
+      its judgement calls.
+    - Last, check the whole tree (`geometry.ts` with no region) once every agent is done, because agents re-aim border
+      links at nodes a neighbour may still be moving. Show the user the before/after pictures before baking.
+11. **Repository rules.** [user, earlier sessions] Commit locally only, and push only when asked. Never use `git stash`.
     Screenshots of the reference never go in the repo.
 
 ## 16. Open, not yet decided
 
-- **Exact numbers.** Attribute node size, twin distance, and keystone distances from the starts (8 to 18 steps today;
-  the reference's nearest is 6 to 10) are working values, not decisions.
-- **The size of the finished network.** It is about 1,009 nodes now, heading for about 1,500 (§12 item 1).
-- **Attribute values (§7.4).** Roads are +7 and +6/+6 since 2026-10-20, hubs +20 and +15/+15; to be checked against
-  the gear by walks again once the network is near its final size, since more roads per walk means more supply.
+- **Exact numbers.** Attribute node size, twin distance, and keystone distances from the starts are working values, not
+  decisions. After the growth (2026-10-23) the keystones sit 7 (Steady Draw) to 23 (Fever Pitch) steps from their
+  nearest start; the far ones serve as second keystones (§9.3). The reference's nearest is 6 to 10.
+- **The size of the finished network.** 1,396 live nodes after the growth (2026-10-23; §12 item 1).
+- **Attribute values (§7.4).** Roads are +7 and +6/+6 since 2026-10-20, hubs +20 and +15/+15. Checked after the growth
+  (2026-10-23, `G4/builds-final.txt`): at 120 points every archetype meets its weapon's late requirement, its main
+  attribute at 200 to 320 against asks of 120 to 180, about what the pre-growth tree supplied; unchanged. At 60 points
+  seven hybrids are a little short of their late gear (the Shade's attackers 17 to 34 intelligence, Zealot casters 4 to
+  28 strength), a fact for playtesting.
 - **The Knife and the Cathedral were thin.** After the fourth round the Knife has 28 notables and the Cathedral 28,
   against 29 to 40 elsewhere. The Knife gained an outer road (the Rooftops) in round 3 and a centre wheel (Athame) in
   round 4, and a ridge road along its north rim (Ritual Blade).
 - **The road skeleton.** Every home's two hub roads are highways; the Spire, the Cathedral (the Ambulatory), the Wall
   (the Barrows road, the tower road, the barrow stair) and the Knife have real roads. The Yard's centre is still a
-  lattice, joined cluster to cluster with single road nodes; it needs re-laying like the Cathedral's. The Strider is the
-  user's and is untouched.
-- **Roads between regions.** Every border now has 4 to 6 links, against the reference's 10 to 13 per neighbouring
-  pair; more are needed as the regions grow toward their borders.
+  lattice, joined cluster to cluster with single road nodes; it needs re-laying like the Cathedral's. The Strider is grown
+  like the others (§15 item 9).
+- **Roads between regions.** 48 links across the six borders after the growth (7 to 9 a border, with a seam cluster on
+  each; G2/borders.md, G4/fix-1.md), against the reference's 10 to 13 per neighbouring pair.
 - **One-stop shops after round 3.** Fixed in round 3: the mace-and-shield Vanguard (Bracing and Thick Skin traded
   places; Bracing is 14 steps from Weight of Iron), the fire sceptre (Kindled Steel went to the Ambulatory; Gilded Rod,
   Kindled Steel and Searing Avatar are 11 to 13 apart), the Reaver's leech (Thirsting Blade went west, 15 from Red
@@ -436,8 +520,6 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   and Mist Walk / Tumble (Tumble re-lined). Grave Host stays every summoner's farthest minion notable (user, 10-20).
 - **Keystone costs.** Pain Conduit and Volatile Servants have none, and Mind Bulwark has none the sheet shows. Their
   effects live in `src/data/tree/keystones.ts`, which has other uncommitted work.
-- **The unit table.** `UNIT` in `lines.ts` sets the reference small at 3% attack speed, 20% crit and 12% evasion; §8.1
-  says 5%, 15% and 10%. Both trace to the user's Strider. Which one stands is the user's call.
 - **The Strider's one-stop shops** (the user's region): the projectile notables along one rim, and the Far Flight /
   Split Volley fork. The audit's proposals are in `audit/audit-tradeoffs.md`. Round 3 added: Close Quarters' spur is a
   road, the same pairings True Aim / Quick Hands, Vital Aim / Killing Eye and Hatchet Work / Hewing, and a fire-attack
@@ -447,8 +529,9 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   is still a road, by the user's choice.
 - **In the game.** Since 2026-10-20 the game loads this tree (phase F): change an area file, `lines.ts`, the registry or
   the editor's patch, then run `npm run passives:bake`. Retired ids stay as holes so saved ids keep their meaning.
-- **Labels.** Done in round 4 (`E-round4.md`, "The label pass"): every area name sits over its own area, no two
-  overlap, none covers a notable, keystone or start. Move one when an area grows under another's name.
+- **Labels.** Done in round 4 (`E-round4.md`, "The label pass"): every area name sits over its own area and no two
+  overlap. After the growth (2026-10-23) no two of the 44 overlap; some now cover node names, which is allowed since they
+  fade as the view closes in. Move one when an area grows under another's name.
 - **Weapon placement against attributes (§5 item 4).** Every weapon cluster sits in a region that supplies at least one
   of its attributes. One sits poorly: the Wall's axe cluster (Cleaver) is in the west tower, the side farthest from the
   Yard, so an axe build there gets strength but no dexterity nearby; Headsman (2026-10-20) is the axe on the Wall-Yard

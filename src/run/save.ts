@@ -44,6 +44,14 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
  */
 export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
+  // Version 20 has the hand-written tree before the growth of docs/tree/design/G-growth.md, version 21 the grown tree
+  // before G4 fix pass 1 and version 22 before fix pass 2: nodes were moved and retired, so the allocated passives are
+  // handed back as unspent points.
+  if (version === 20 || version === 21 || version === 22) {
+    run.version = SAVE_VERSION;
+    run.build = { ...run.build, allocated: [] };
+    return run;
+  }
   // Versions 18 and 19 have the generated passive tree, before the hand-written one (docs/PASSIVE-TREE.md, phase F): their
   // node ids mean other nodes now, so the allocated passives are handed back as unspent points. Version 18 also lacks the
   // Wayside state (docs/WAYSIDE.md), which every reader fills in with `waysideOf`.

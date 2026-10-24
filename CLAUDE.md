@@ -28,7 +28,7 @@
 - **Equipping plan** (2026-10-16): [docs/EQUIP.md](docs/EQUIP.md) (milestones Q0–Q8), built: a swap says what it does to the gems (`SocketOutcome` from `dryEquip`, shown by `SocketsRow`, `src/run/socketText.ts`), the phone compare is a peek with the changed lines and a full view with a merged card (`DiffCard`, `itemDiff.ts`), gear slots and bag rows carry socket pips, the phone toolbar is a search plus a Filter sheet with Clear filters, a bag gem has a `SocketPicker`, and the Skills tab names what a gem replaces and asks first. Section 8 lists what was left (swipe, real-device pass).
 - **Mobile and inventory plan:** [docs/MOBILE.md](docs/MOBILE.md) (milestones P0–P9): make every screen usable in phone and tablet
   browsers (touch rules, small-screen layouts, tree pinch zoom, HUD and map zoom), plus inventory tools (persistent New list, Clean up old items, favourites; P8–P9). P0 to P9 are built; the real-device pass is left (its section 9).
-- **Passive tree, designed from scratch** (2026-10-18): [docs/PASSIVE-TREE.md](docs/PASSIVE-TREE.md) (phases A–F; drafts in `docs/tree/design/`). **Phase D since 2026-10-19:** the tree is hand-written, area by area, in `src/data/passives/<region>/*.ts` (every node's lines and every link carry a `why`; `docs/tree/design/D-method.md`); `npm run passives:pic|list|audit` draw, list and check it; nothing generates nodes or links. **The game loads it since 2026-10-20 (phase F):** `getTree()` reads `src/data/passives/baked.ts`; after any change to an area file, `lines.ts`, the registry or the editor's patch run `npm run passives:bake` (a test fails while the bake is stale). Saves of version 19 and older had their passives handed back once. The old generator in `src/data/tree/` (layout, `treeBaked.ts`) is no longer loaded and waits for a cleanup; `src/data/tree/keystones.ts`, `types.ts` and `index.ts` are still the live ones. Read `docs/tree/design/CONSTRAINTS.md` first. Design first, then the authoring method and the
+- **Passive tree, designed from scratch** (2026-10-18): [docs/PASSIVE-TREE.md](docs/PASSIVE-TREE.md) (phases A–F; drafts in `docs/tree/design/`). **Phase D since 2026-10-19:** the tree is hand-written, area by area, in `src/data/passives/<region>/*.ts` (every node's lines and every link carry a `why`; `docs/tree/design/D-method.md`); `npm run passives:pic|list|audit` draw, list and check it; nothing generates nodes or links. **The game loads it since 2026-10-20 (phase F):** `getTree()` reads `src/data/passives/baked.ts`; after any change to an area file, `lines.ts`, the registry or the editor's patch run `npm run passives:bake` (a test fails while the bake is stale). Saves of version 19 and older had their passives handed back once. **Grown 2026-10-22/23** ([docs/tree/design/G-growth.md](docs/tree/design/G-growth.md), phase G, done): 1,009 to 1,396 nodes so builds must trade; `npm run passives:builds` measures tension over 32 archetypes (`scripts/passives/archetypes.ts`); a tree change that moves or retires nodes in a deployed save needs a save-version bump with a passive refund (`migrate` in `src/run/save.ts`). The old generator in `src/data/tree/` (layout, `treeBaked.ts`) is no longer loaded and waits for a cleanup; `src/data/tree/keystones.ts`, `types.ts` and `index.ts` are still the live ones. Read `docs/tree/design/CONSTRAINTS.md` first. Design first, then the authoring method and the
   node count; balance is a property of the tree's supply along a few build axes (never an enumerated list of builds; the bot is only a smoke test); the user's
   stops are the design brief (C) and the finished tree (F). It does not continue TREE-REDESIGN.md, whose decisions D1–D6 are dropped. **Pause and ask the user
   whenever the work starts to feel like it is losing intent** (the user, 2026-10-19): another tree without intentionality is the one outcome to avoid.
@@ -89,6 +89,9 @@
 - **In-game text is concise** (2026-10-14): a screen, card or tooltip says what the player gets and what they choose, in as few
   words as it takes. Never say what a level, stop or feature does _not_ do ("no loot, no XP"), restate what the UI already
   shows, or explain the obvious. One short line beats a paragraph. Check new text against this before adding it.
+  **Voice** (the owner, 2026-10-23): names, headings and flavour may be overwrought, Diablo-style hellfire about souls and
+  damnation ("Duel for your damned soul's fate"); rules text stays plain. Privacy text says "No personal information is
+  collected", never a list of what is not. Loose ends of this kind are in [TODO.md](TODO.md).
 - **Architecture boundaries (§14.2):**
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
@@ -124,7 +127,9 @@
 ## Visual style
 
 The map is rendered as isometric Grimdark: crunchy pixel art, a diagonal 2:1 camera, real-time lights and
-particles (`src/render/styles/grim/`, shared figure rig in `src/render/style/`). Three other styles were
+particles (`src/render/styles/grim/`, shared figure rig in `src/render/style/`). Fonts (2026-10-22): Grenze for
+interface text and Jacquard 24 for headings and names (`@fontsource`, imported in `src/main.ts`, set in `skins.css`);
+text on the map is a bitmap font of our own (`src/render/style/pixelGlyphs.ts`). Three other styles were
 explored and removed; see `docs/VISUAL_STYLES.md`. _Showcase_ mode on the Title screen auto-plays a demo
 (N = next class). Uncaught errors are saved to `localStorage['bob.crashlog']` and shown as a copyable report
 (`src/crashlog.ts`). Known bugs to revisit are in `docs/BUGS.md`.

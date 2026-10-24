@@ -1,16 +1,15 @@
 /**
- * The Spire's left (the well road): the wheel off the well road, the recharge room (now also the foot of the Siphon
- * chain up to the column's area cluster), the wand chain from the mana notable west to the flask chain that points at
+ * The Spire's left (the well road): the wheel off the well road (the recharge room, Quickening, sat west of Quiet Pulse
+ * from G2 until G4 fix 1, 2026-10-22, when it moved to the Belfry's west climb, `frost.ts`, as Siphon had in G2), Composure (G3: energy
+ * shield with avoid stun, a bridge from Quiet Pulse's road up to Broad Weave), the wand chain from the mana notable west to the flask chain that points at
  * the Cathedral (both swapped in from the east side on 2026-10-20), the junction, the Mind Bulwark spur, and the west road
  * (2026-10-19): a life pocket and a mana-leech pocket climbing from the junction to the fire arm's junction, so the well
- * reaches the arms without the column and the Spire sells life and mana leech at all.
+ * reaches the arms without the column and the Spire sells life and mana leech at all. G3 round 2 (2026-10-22): Living
+ * Verse (spell damage with life) bridges the road to the Undercroft and the Zealot's crossing road.
  */
 import {
+  castSpeed,
   es,
-  esLeech,
-  esOnHit,
-  esRecharge,
-  esRechargeDelay,
   flaskDuration,
   flaskEffect,
   int,
@@ -20,11 +19,12 @@ import {
   manaLeech,
   manaOnBlock,
   manaOnHit,
-  manaOnKill,
   manaRegen,
   shieldDef,
   shieldSpellBlock,
+  spellDamage,
   str,
+  stunAvoid,
   wandCastSpeed,
   wandSpellDamage,
 } from '../lines';
@@ -40,27 +40,27 @@ export const well: AreaSpec = {
     {
       id: 'deepWell',
       name: 'Deep Well',
-      why: 'The wheel: entered from the well road on the east, left to the junction on the west and to the column through the shield notable. Mana on the south side, shield on the north.',
-      at: [-450, -2000],
-      shape: { kind: 'ring', r: 150, a0: 0 },
+      why: 'The wheel: entered from the well road on the south-east, left to the junction on the west and to the column through the shield notable. Mana and cast speed on the south side, shield on the north (since G3 round 2: speed or shield).',
+      at: [-469, -2000],
+      shape: { kind: 'ring', r: 80, a0: 30 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mana(8)], why: 'The entrance, east.' },
+        { id: 'a', kind: 'small', lines: [mana(8)], why: 'The entrance, south-east.' },
         { id: 'b', kind: 'small', lines: [mana(8)] },
         {
           id: 'n1',
           kind: 'notable',
           name: 'Deep Well',
-          lines: [mana(20), manaRegen(20)],
-          why: 'Mana and its regeneration: 2.5 + 2 units. The Frugal chain leaves here.',
+          lines: [mana(16), castSpeed(8)],
+          why: "Mana and the cast speed it pays for: 2 + 2 units. Mana and its regeneration (4.5) until G3 round 2 (2026-10-22, CONSTRAINTS §4.8): the Cloister within 14 steps of the start held 6 units of offence against 42 of defence and sustain (shield, life, block, flasks, mana), the wand caster's cluster its only offence, so a caster's first points west were a corridor of one kind. Now the wheel's two sides are speed or shield, as the east wheel's are spell damage or chaos resistance. The regeneration stays at home (Still Mind) and in Frugal, Draught and Warded Mind. The wand chain leaves here.",
         },
-        { id: 'c', kind: 'small', lines: [es(5)], why: 'The west exit, to the junction.' },
-        { id: 'd', kind: 'small', lines: [es(5)], why: 'Where the recharge room opens.' },
+        { id: 'c', kind: 'small', lines: [es(5)], why: 'The north-west exit, to the junction.' },
+        { id: 'd', kind: 'small', lines: [es(5)] },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Glass Skin',
-          lines: [es(16), esRecharge(20)],
-          why: 'Shield and its recharge: 3.2 + 1.3 units. The north exit, to the column.',
+          lines: [es(16), mana(10)],
+          why: "Shield and the mana it sits beside: 3.2 + 1.25 units. The north-east exit, to the column. ES with recharge until G3 (2026-10-22, G1/mystic.md MY-r2): with Quickening moved away, the two would have been one pairing twice; Glass Skin is now the wheel's shield with mana, beside both mana keystones, and Quickening keeps the recharge, up the Belfry's west climb since G4 fix 1.",
         },
       ],
       links: [
@@ -73,54 +73,19 @@ export const well: AreaSpec = {
       ],
     },
     {
-      id: 'recharge',
-      name: 'Quickening',
-      why: "Recharge rate and a faster start of recharge: the energy-shield build's decision, off the wheel's shield small, and the foot of the Siphon chain.",
-      at: [-560, -2320],
-      shape: { kind: 'ring', r: 100, a0: 90 },
-      nodes: [
-        { id: 'a', kind: 'small', lines: [esRecharge(15)] },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Quickening',
-          lines: [esRechargeDelay(30), esRecharge(20), es(5)],
-          why: '3 + 1.3 + 1 units; the faster start is the half the sheet shows least and the fight feels most.',
-        },
-        { id: 'b', kind: 'small', lines: [esRecharge(15)], why: 'Where the Siphon chain leaves.' },
-      ],
-      links: [
-        ['a', 'n'],
-        ['n', 'b'],
-      ],
-    },
-    {
-      id: 'siphon',
-      name: 'Siphon',
-      why: "Energy shield on hit, then the notable with shield leech, shield on hit and mana on kill: the caster's recovery from hitting, which no other Spire node sells, as a chain from the recharge room up to the column's area cluster. The well's own way up, without the wheel's notable.",
-      at: [-480, -2600],
-      shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'small', lines: [esOnHit(4)], at: [-520, -2520] },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Siphon',
-          lines: [esLeech(0.8), esOnHit(6), manaOnKill(10)],
-          at: [-440, -2680],
-          why: '2 + 1.5 + 1 units.',
-        },
-      ],
-      links: [['a', 'n']],
-    },
-    {
       id: 'wandwork',
       name: 'Wandwork',
       why: "The wand caster's cluster, here beside the mana and not beside the spell damage: spell damage and cast speed while wielding a wand, off the mana notable. A wand caster who comes west for this passes the mana and the shield; the east wheel's spell damage is the other way to spend the same points. (Until 2026-10-20 it sat on the east wheel, one step from every other spell node, and the cost chain was here.)",
       at: [-750, -1780],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [wandSpellDamage(10)], at: [-680, -1800] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [wandSpellDamage(8)],
+          at: [-772, -1800],
+          why: 'One unit of wand spell damage (10% until G4 fix 1, 2026-10-22: a small is one unit).',
+        },
         {
           id: 'n',
           kind: 'notable',
@@ -135,30 +100,42 @@ export const well: AreaSpec = {
     {
       id: 'draught',
       name: 'Draught',
-      why: "Flask effect twice, then the notable with flask effect, flask duration and movement speed: the caster's flasks and pace, from the junction west to the near crossing with the Cathedral's choir. The aura cluster that sat here moved east (2026-10-20), so the crossing joins two different things, not two aura clusters a step apart.",
-      at: [-1150, -1920],
+      why: "Flask effect twice, then the notable with flask effect, flask duration and mana regeneration: the caster's flasks. A bridge since G4 fix 2 (2026-10-23, fix-2.md M-3; audit/growth-2 trade-offs T2): a tent with the notable at its tip, one small on each leg. The south leg's small is the junction where both crossings from the Cathedral land (the east road's, from Hymn's side, and the choir's, from Shepherd); the east leg's small goes on to the Cloister junction and to Wandwork. Until then Draught was a dead end off a small that the crossing reached through Wandwork, and five Zealot casters walked that road into the Cloister for their first 60 points; now a Zealot coming this way pays a flask notable first (CONSTRAINTS §5.5's fair price), and the Mystic's own Draught is a step nearer. The aura cluster that sat here moved east (2026-10-20), so the crossings join two different things, not two aura clusters a step apart.",
+      at: [-1180, -1985],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [flaskEffect(5)], at: [-1000, -1900] },
-        { id: 'b', kind: 'small', lines: [flaskEffect(5)], at: [-1150, -1950] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [flaskEffect(5)],
+          at: [-1146, -2014],
+          why: "The east leg, on the line from the notable to the Cloister junction; Wandwork's link arrives here too.",
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [flaskEffect(5)],
+          at: [-1180, -1940],
+          why: 'The south leg: the head of the east-road crossing, and where the choir crossing lands.',
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Draught',
           lines: [flaskEffect(10), flaskDuration(10), manaRegen(10)],
-          at: [-1300, -2000],
-          why: "The caster's flasks: 2 + 1 + 1 units.",
+          at: [-1215, -2001],
+          why: "The caster's flasks: 2 + 1 + 1 units. The tip of the tent.",
         },
       ],
       links: [
-        ['a', 'b'],
         ['b', 'n'],
+        ['n', 'a'],
       ],
     },
     {
       id: 'j1',
       name: 'Junction',
-      why: "The well's junction, west of the wheel: the Mind Bulwark spur north-west, and Wandwork, where the near crossing to the Cathedral leaves.",
+      why: "The well's junction, west of the wheel: the Mind Bulwark spur north-west, Wandwork, and Draught, where the near crossings to the Cathedral land (since G4 fix 2).",
       at: [-800, -2080],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-800, -2080] }],
@@ -167,12 +144,18 @@ export const well: AreaSpec = {
     {
       id: 'quietPulse',
       name: 'Quiet Pulse',
-      why: 'Life: the Spire had none. Two life nodes and a notable with life, regeneration and a little shield, a tight orbit above the junction and the first step of the west road; its far node also reaches the Siphon chain.',
+      why: 'Life: the Spire had none. Two life nodes and a notable with life, regeneration and a little shield, a tight orbit above the junction and the first step of the west road; its notable also leads toward the Column (`toPulse`).',
       at: [-800, -2480],
       shape: { kind: 'ring', r: 80, a0: 90 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], why: 'The entrance, facing the junction.' },
-        { id: 'b', kind: 'small', lines: [life(5)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          why: 'The entrance, facing the junction.',
+          at: [-751, -2394],
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-742, -2451] },
         {
           id: 'n',
           kind: 'notable',
@@ -198,8 +181,9 @@ export const well: AreaSpec = {
           kind: 'small',
           lines: [manaLeech(0.4, ['spell'])],
           why: 'The entrance, facing Quiet Pulse.',
+          at: [-851, -2960],
         },
-        { id: 'b', kind: 'small', lines: [manaLeech(0.4, ['spell'])] },
+        { id: 'b', kind: 'small', lines: [manaLeech(0.4, ['spell'])], at: [-805, -2996] },
         {
           id: 'n',
           kind: 'notable',
@@ -224,7 +208,7 @@ export const well: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [shieldDef(15)],
-          at: [-250, -2160],
+          at: [-221, -2272],
           why: 'The entrance, from Glass Skin.',
         },
         {
@@ -232,14 +216,14 @@ export const well: AreaSpec = {
           kind: 'notable',
           name: 'Spirit Ward',
           lines: [shieldSpellBlock(4), manaOnBlock(8), shieldDef(15)],
-          at: [-14, -2205],
+          at: [-152, -2263],
           why: "2 + 1 + 1 units; spell block is what a caster's shield is for.",
         },
         {
           id: 'b',
           kind: 'small',
           lines: [shieldDef(15)],
-          at: [-60, -2440],
+          at: [-179, -2328],
           why: "The exit, to the column's junction.",
         },
       ],
@@ -255,8 +239,8 @@ export const well: AreaSpec = {
       at: [-1030, -2270],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [mana(8)], at: [-930, -2200] },
-        { id: 'b', kind: 'small', lines: [mana(8)], at: [-1026, -2315] },
+        { id: 'a', kind: 'small', lines: [mana(8)], at: [-1025, -2325] },
+        { id: 'b', kind: 'small', lines: [mana(8)], at: [-1064, -2367] },
         { id: 'k', kind: 'keystone', name: 'Mind Bulwark', lines: [], at: [-1122, -2430] },
       ],
       links: [
@@ -267,12 +251,24 @@ export const well: AreaSpec = {
     {
       id: 'toCathedral',
       name: 'To the Cathedral',
-      why: 'The near crossing to the Cathedral (audit 2026-10-20). Two attribute nodes from Wandwork down to the Hymn pocket of the Narthex: the wand caster and the energy-shield Zealot cross here.',
-      at: [-864, -1595],
+      why: "The near crossing to the Cathedral (audit 2026-10-20). Two attribute nodes on one straight run from Draught's south leg down to the second node of the Zealot's east road. G4 fix 2 (2026-10-23) moved both ends. The Zealot end left Hymn's far small (fix-2.md M-1; audit/growth-2 starts F1, trade-offs T2, builds F2): the Zealot caster's first spell notable and the way out of its region were one purchase, and five Zealot casters spent their first 60 points in this Cloister; now Hymn is a porch off the road. With that alone four still did, so the Mystic end left Wandwork for Draught (M-3): the road reaches the Cloister through the flask notable, and Wandwork, Deep Well and Glass Skin are three steps farther from the Zealot.",
+      at: [-1235, -1523],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'attribute', lines: [int(7)], at: [-864, -1595] },
-        { id: 'b', kind: 'attribute', lines: [str(6), int(6)], at: [-898, -1431] },
+        {
+          id: 'a',
+          kind: 'attribute',
+          lines: [int(7)],
+          at: [-1217, -1662],
+          why: "Two thirds of the way from the east road to Draught's small, on the straight line.",
+        },
+        {
+          id: 'b',
+          kind: 'attribute',
+          lines: [str(6), int(6)],
+          at: [-1253, -1384],
+          why: 'A third of the way, on the same line; half strength, the last node before the Zealot.',
+        },
       ],
       links: [['a', 'b']],
     },
@@ -306,18 +302,107 @@ export const well: AreaSpec = {
     {
       id: 'toPulse',
       name: 'A road',
-      why: 'Intelligence once between Siphon and Quiet Pulse.',
-      at: [-625, -2520],
+      why: "Intelligence once off Quiet Pulse toward the Column. It led to Siphon until G2 (2026-10-22), when Siphon moved to the Belfry; since G3 it leads on to Composure (G1/mystic.md MY-8), the Cloister's way up to Broad Weave.",
+      at: [-612, -2577],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-625, -2520] }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [-612, -2577] }],
       links: [],
+    },
+    {
+      id: 'composure',
+      name: 'Composure',
+      why: "Energy shield with avoid stun (G3 round 1, 2026-10-22; G1/mystic.md MY-8, the ledger's shield section MY-s3 folded in): the shield for the caster who gets knocked out of its casts. A bridge from Quiet Pulse's road node up to Broad Weave, laid straight on the line between them, two avoid-stun smalls before the notable and one after, so it is the Cloister's way up to the Column now that Siphon has moved north. The smalls were energy shield until G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1, fix-1.md §1.2 item 9): every shield build took them, so the shield is on the notable and the smalls are its partner. Not linked to the Deep Well wheel: Glass Skin (shield with mana) is six steps away; the recharge (Quickening) moved to the Belfry's west climb in the same pass, so the shield caster's shield notables lie in three directions with three partners (mana at the wheel, stun here, recharge and hit recovery up the spine). 13 steps from the Mystic start.",
+      at: [-442, -2714],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [stunAvoid(20)],
+          at: [-540, -2635],
+          why: "The entrance, from Quiet Pulse's road node.",
+        },
+        { id: 'b', kind: 'small', lines: [stunAvoid(20)], at: [-497, -2670] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Composure',
+          lines: [es(15), stunAvoid(20)],
+          at: [-442, -2714],
+          why: '3 + 1 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [stunAvoid(20)],
+          at: [-388, -2758],
+          why: "The exit, on the straight line to Broad Weave's entrance.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
+      id: 'livingVerse',
+      name: 'Living Verse',
+      why: "Spell damage with life (G3 round 2, 2026-10-22; G1/mystic.md MY-2): the life caster's own pair, kept far from both homes as the convergence rule asks of such pairs. A bridge from the second node of the road to the Undercroft over to the Zealot's crossing road (the Undercroft bridge, G2/borders.md §4), laid straight on the line between the two, so the wedge between the two crossing roads becomes a loop. All three smalls are life since G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1): the Mystic side's two were plain spell damage, so every caster took the cluster whatever its partner; now the smalls are the partner, the cluster is the life caster's, and the spell damage is on the notable. Spell damage in the west at last: the Cloister was shield, mana and life with only the wand caster's cluster for offence. 20 steps from the Mystic start, about 18 from the Zealot's; Quiet Pulse (life) is 8 away and Keen Verse (spell) the far side of the map.",
+      at: [-1321, -2947],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [life(5)],
+          at: [-1242, -2849],
+          why: 'The entrance from the road to the Undercroft, on the straight line to the notable.',
+        },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-1277, -2892] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Living Verse',
+          lines: [spellDamage(20), life(8)],
+          at: [-1321, -2947],
+          why: '2.5 + 1.6 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [life(5)],
+          at: [-1365, -3001],
+          why: 'The Zealot side, on the straight line to the crossing road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
     },
   ],
   links: [
     {
-      from: 'toCathedral.a',
-      to: 'draught.a',
-      why: 'The crossing from the Narthex goes on to Draught as well as Wandwork, so a Zealot crossing here is not forced into the wand notable (build audit 2026-10-20).',
+      from: 'toCrypt.r2',
+      to: 'livingVerse.a',
+      why: "The road to the Undercroft onto Living Verse (MY-2): the road's branch at its second node (Quickening also hung here until G4 fix 1).",
+    },
+    {
+      from: 'livingVerse.c',
+      to: 'cathedral.crypt.toSpire.b',
+      why: "The Undercroft bridge (G2/borders.md §4, laid in G3 round 2): Living Verse onto the Zealot's crossing road from the Undercroft to Familiars, so a Zealot life caster reaches spell damage with life and the Mystic caster reaches Glass Wall, Homily and the crypt's spells. It joins the two crossing roads into a loop.",
+    },
+    {
+      from: 'toPulse.a',
+      to: 'composure.a',
+      why: "Quiet Pulse's road node onto Composure (MY-8): the road toward the Column stops being a stub.",
+    },
+    {
+      from: 'composure.c',
+      to: 'spire.column.broadWeave.a',
+      why: "Composure lands on Broad Weave's entrance: the Cloister's way up to the Column (it was Siphon's until G2), so Quiet Pulse and the Column are a loop again.",
     },
     {
       from: 'spiritWard.a',
@@ -339,22 +424,15 @@ export const well: AreaSpec = {
       to: 'cathedral.crypt.wheel.m6',
       why: 'The far end of the road.',
     },
-    { from: 'wandwork.n', to: 'toCathedral.a', why: 'Wandwork onto the crossing.' },
+    {
+      from: 'toCathedral.a',
+      to: 'draught.b',
+      why: "The crossing road's head lands on Draught's south leg (G4 fix 2, M-3; audit/growth-2 trade-offs T2). It led onto Wandwork and Draught's small until then (the Wandwork knot, looks finding 2): a Zealot caster now passes Draught's notable to reach the Cloister, 3 steps more to Wandwork and Deep Well.",
+    },
     {
       from: 'toCathedral.b',
-      to: 'cathedral.home.hymn.b',
-      why: 'The crossing lands on the Hymn pocket of the Narthex.',
-    },
-    {
-      from: 'deepWell.d',
-      to: 'recharge.a',
-      why: "The recharge room opens off the wheel's shield small.",
-    },
-    { from: 'recharge.b', to: 'siphon.a', why: 'The recharge room onto the Siphon chain.' },
-    {
-      from: 'spire.column.broadWeave.a',
-      to: 'siphon.n',
-      why: 'Broad Weave and Siphon, joined directly.',
+      to: 'cathedral.home.roadE.b',
+      why: "The crossing lands on the second node of the Zealot's east road (G4 fix 2, M-1): Hymn's far small until then, which made the Zealot caster's first spell notable its door out.",
     },
     { from: 'deepWell.n1', to: 'wandwork.a', why: 'The mana notable onto the wand chain.' },
     { from: 'wandwork.n', to: 'draught.a', why: 'The wand chain lands on the flask chain.' },
@@ -378,14 +456,9 @@ export const well: AreaSpec = {
     },
     { from: 'j1.a', to: 'quietPulse.a', why: 'The junction onto the west road: life first.' },
     {
-      from: 'spire.well.siphon.a',
-      to: 'spire.well.toPulse.a',
-      why: 'Intelligence once between Siphon and Quiet Pulse.',
-    },
-    {
       from: 'spire.well.toPulse.a',
       to: 'spire.well.quietPulse.n',
-      why: 'The far end of the road.',
+      why: "Quiet Pulse's road node toward the Column, on to Composure and Broad Weave (G3).",
     },
     {
       from: 'spire.well.quietPulse.n',

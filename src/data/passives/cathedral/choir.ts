@@ -21,7 +21,7 @@ export const choir: AreaSpec = {
   region: 'zealot',
   name: 'The Choir',
   why: 'Off the transept toward the Spire: auras or minions on one wheel, Lone Vow and Living Ward.',
-  at: [-1592, -1670], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [-1662, -1830], // Where the area's name is drawn: clear of every other area's name and every notable (moved in G3 round 1, 2026-10-22: it lay over Shepherd).
   clusters: [
     {
       id: 'wheel',
@@ -34,14 +34,14 @@ export const choir: AreaSpec = {
           id: 'c1',
           kind: 'small',
           lines: [mana(8)],
-          at: P(955, 600),
+          at: P(1050, 600),
           why: 'The west entrance, from the transept.',
         },
         {
           id: 'c2',
           kind: 'small',
           lines: [reducedReservation(3)],
-          at: P(1053, 431),
+          at: P(1079, 529),
           why: 'The reservation side; the Vigil chain arrives.',
         },
         {
@@ -49,14 +49,14 @@ export const choir: AreaSpec = {
           kind: 'notable',
           name: 'Choirmaster',
           lines: [reducedReservation(5), auraEffect(10), mana(8)],
-          at: P(1248, 431),
+          at: P(1150, 500),
           why: "Less reserved, more effect, more mana: 1.7 + 1.7 + 1 units. The star's chaos spoke lands here.",
         },
         {
           id: 'c4',
           kind: 'small',
           lines: [mana(8)],
-          at: P(1345, 600),
+          at: P(1250, 600),
           why: 'The east exit, to the choir junction.',
         },
         {
@@ -64,18 +64,18 @@ export const choir: AreaSpec = {
           kind: 'notable',
           name: 'Shepherd',
           lines: [minionLife(24), minionDamage(12), minionSpeed(5)],
-          at: P(1248, 769),
+          at: P(1150, 700),
           why: "Minions that last: 2 + 1 + 1 units. The near crossing to the Spire's flasks leaves here.",
         },
         {
           id: 'c6',
           kind: 'small',
           lines: [minionLife(12)],
-          at: P(1053, 769),
+          at: P(1079, 671),
           why: 'The minion side.',
         },
-        { id: 'c7', kind: 'small', lines: [reducedReservation(3)], at: P(1334, 494) },
-        { id: 'c8', kind: 'small', lines: [minionLife(12)], at: P(1334, 706) },
+        { id: 'c7', kind: 'small', lines: [reducedReservation(3)], at: P(1221, 529) },
+        { id: 'c8', kind: 'small', lines: [minionLife(12)], at: P(1221, 671) },
       ],
       links: [
         ['c1', 'c2'],
@@ -91,7 +91,7 @@ export const choir: AreaSpec = {
     {
       id: 'jC',
       name: 'Choir junction',
-      why: 'East of the wheel: the minions ahead, the Lone Vow spur out along the tower, the Living Ward spur toward the Spire.',
+      why: 'East of the wheel: the minions ahead and the Living Ward spur toward the Spire. (The Lone Vow spur left here until G2, 2026-10-22; it hangs off the aisle now.)',
       at: P(1480, 850),
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(1480, 850) }],
@@ -100,12 +100,12 @@ export const choir: AreaSpec = {
     {
       id: 'loneVow',
       name: 'Lone Vow',
-      why: 'Two nodes of aura effect, then the trade: only the first aura is active, and it reserves nothing. The one-aura build with every point of mana free; the approach says what the keystone asks.',
-      at: P(1760, 600),
+      why: "Two nodes of aura effect, then the trade: only the first aura is active, and it reserves nothing. The one-aura build with every point of mana free; the approach says what the keystone asks. Since G2 (2026-10-22) the spur leaves the aisle's middle node, on a straight line from it to the keystone, which did not move.",
+      at: P(1860, 400),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [auraEffect(6)], at: P(1620, 700) },
-        { id: 'b', kind: 'small', lines: [auraEffect(6)], at: P(1760, 600) },
+        { id: 'a', kind: 'small', lines: [auraEffect(6)], at: P(1840, 361) },
+        { id: 'b', kind: 'small', lines: [auraEffect(6)], at: P(1864, 418) },
         { id: 'k', kind: 'keystone', name: 'Lone Vow', lines: [], at: P(1900, 500) },
       ],
       links: [
@@ -120,8 +120,8 @@ export const choir: AreaSpec = {
       at: P(1430, 1270),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: P(1450, 1060) },
-        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: P(1430, 1270) },
+        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: P(1426, 1338) },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: P(1419, 1396) },
         { id: 'k', kind: 'keystone', name: 'Living Ward', lines: [], at: P(1410, 1480) },
       ],
       links: [
@@ -133,9 +133,9 @@ export const choir: AreaSpec = {
       id: 'toSpire',
       name: 'A road node',
       why: "A road node on the near crossing from Shepherd to the Spire's Draught: two notables were joined directly across the border.",
-      at: [-1431, -1872],
+      at: P(1104, 898),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: [-1431, -1872] }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(1104, 898) }],
       links: [],
     },
   ],
@@ -146,7 +146,11 @@ export const choir: AreaSpec = {
       to: 'cathedral.choir.toSpire.a',
       why: "A road node on the near crossing from Shepherd to the Spire's Draught: two notables were joined directly across the border.",
     },
-    { from: 'jC.a', to: 'loneVow.a', why: 'Junction to the Lone Vow spur.' },
+    {
+      from: 'cathedral.nave.aisle.a2',
+      to: 'loneVow.a',
+      why: "G2 (2026-10-22): the Lone Vow spur hangs off the aisle's middle node (it left the choir junction before), so the keystone that makes reservation moot and the reservation cluster Lectern (G3, one node on) are a fork off one road.",
+    },
     { from: 'jC.a', to: 'livingWard.a', why: 'Junction to the Living Ward spur.' },
     {
       from: 'jC.a',

@@ -6,18 +6,22 @@
  * North side: armour, toward the rampart and the Zealot. South side: melee physical damage, toward the slams and the
  * Reaver. The signature (life, melee damage, strength) is the loop's tip, and the tower road (life) leaves from it west;
  * the rampart and slam roads leaving the hubs are strength highways (2026-10-20). Off the
- * north hub, a stun-threshold pocket and, farther north, the reservation chain that points at the Zealot; off the south
- * hub, a flask pocket. The hubs carry strength and join the ring one node to either side.
+ * north hub, a melee damage pocket (stun threshold until G3 round 2) and, farther north, the reservation chain that
+ * points at the Zealot; off the south
+ * hub, a flask pocket. The hubs carry strength and join the ring one node to either side. G3 round 3 (2026-10-22):
+ * Shield Ram (shield attacks, stun duration), a diamond pocket off the rampart road.
  */
 import {
   armour,
+  enemyStunThreshold,
   flaskEffect,
   flaskRecovery,
   life,
+  meleeDamage,
   meleePhys,
+  shieldAttack,
   str,
-  stunRecovery,
-  stunThreshold,
+  stunDuration,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -83,20 +87,27 @@ export const home: AreaSpec = {
       links: [],
     },
     {
-      id: 'unshakable',
-      name: 'Unshakable',
-      why: "The north hub's pocket, a tight orbit: two stun threshold nodes and a notable with threshold and stun recovery. The Vanguard who stands in the hit, three points after the hub.",
-      at: [-1180, 160],
-      shape: { kind: 'ring', r: 75, a0: 28 },
+      id: 'ringing',
+      name: 'Ringing Blows',
+      why: "The north hub's pocket, a straight chain: melee damage twice and a notable with melee damage and the blow that rocks them (lower enemy stun threshold): the Vanguard's first offence on the north side, for any melee weapon, named for none, two to four points out. It was Unshakable (stun threshold, stun recovery) until G3 round 2 (2026-10-22): within six steps of the start every notable but Oathbound and the Banner was defence or utility, and the north side ran stun threshold, resistances, mana and armour before any offence (CONSTRAINTS §4.8). Stun threshold is still sold by Ox Hide (with armour, the far west), and as lines on Bracing and Unhurried (Stone Heart sold it with life until G4 fix 1, 2026-10-22, and became Weak Spot, melee crit). Its chain leaves the north hub about 36° from the rampart road and from the Banner's link, an even fan (G4 fix 1: it left 21° from the Banner's, a sliver).",
+      at: [-1220, 143],
+      shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [stunThreshold(8)], why: 'The entrance, facing the hub.' },
-        { id: 'b', kind: 'small', lines: [stunThreshold(8)] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [meleeDamage(8)],
+          why: 'The entrance, facing the hub.',
+          at: [-1109, 200],
+        },
+        { id: 'b', kind: 'small', lines: [meleeDamage(8)], at: [-1158, 175] },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Unshakable',
-          lines: [stunThreshold(16), stunRecovery(20)],
-          why: '2 + 1.3 units.',
+          name: 'Ringing Blows',
+          lines: [meleeDamage(16), enemyStunThreshold(12)],
+          at: [-1220, 143],
+          why: '2 + 1.5 units: harder blows, and stuns that come sooner. The stun clusters farther out sell it with a weapon (Weight of Iron, the mace; Headsman, the two-hander) or with duration (Stagger, Hot Iron).',
         },
       ],
       links: [
@@ -107,24 +118,26 @@ export const home: AreaSpec = {
     {
       id: 'quartermaster',
       name: 'Quartermaster',
-      why: "The south hub's pocket, a tight orbit: two flask recovery nodes and a notable with flask effect and recovery. The early game is life flasks; this is the cheap way to make them matter, for any class that crosses here.",
-      at: [-1230, 920],
-      shape: { kind: 'ring', r: 75, a0: -38 },
+      why: "The south hub's pocket, a straight chain: two flask recovery nodes and a notable with flask effect and recovery. The early game is life flasks; this is the cheap way to make them matter, for any class that crosses here. Swung west into the hub's empty side in G4 fix 1 (2026-10-22): it hung south between the hub and the slam road, and the pocket, the road and the rung between them were a ladder of slivers (near-misses of 25° to 28° at the hub, the notable and Thunderstep). Now the rung to the slam road runs nearly level and the link to Thunderstep straight down.",
+      at: [-1300, 880],
+      shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [flaskRecovery(10)],
           why: 'The entrance, facing the hub.',
+          at: [-1186, 829],
         },
         {
           id: 'n',
           kind: 'notable',
           name: 'Quartermaster',
           lines: [flaskEffect(8), flaskRecovery(15), life(5)],
+          at: [-1300, 880],
           why: '1.6 + 1.5 + 1 units.',
         },
-        { id: 'b', kind: 'small', lines: [flaskRecovery(10)] },
+        { id: 'b', kind: 'small', lines: [flaskRecovery(10)], at: [-1236, 851] },
       ],
       links: [
         ['a', 'b'],
@@ -150,13 +163,45 @@ export const home: AreaSpec = {
       at: [-1490, 790],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-1300, 640] },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-1500, 800] },
-        { id: 'c', kind: 'small', lines: [life(5)], at: [-1680, 930] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-1300, 628] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-1481, 756] },
+        { id: 'c', kind: 'small', lines: [life(5)], at: [-1662, 884] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'c'],
+      ],
+    },
+    {
+      id: 'ram',
+      name: 'Shield Ram',
+      why: "Attack damage with a shield three times round the notable with shield attack damage and stun duration: the shield used as a weapon, a diamond pocket off the rampart road's second node, in the room between the rampart road and the tower road (G3 round 3, 2026-10-22; the ledger's VA-8). An optional porch for the shield Vanguard, five or six points out: Bracing (block with a shield) leaves the start south-east, this leaves it north-west, so the shield's offence and its block are two directions. Its twin is the Yard's Shield Bash (shield attacks with shield speed and life on block), far east in the Muster. A pocket, not the bridge the brief drew: as a bridge to the tower road its three smalls let a build on the tower road join the rampart highway without the north hub, a stat connector standing in for the highway beside the start (CONSTRAINTS §7.1), and the allocator found one mace-and-shield plan far ahead of every other at 120 points. A shield is not a weapon, so nothing within three steps of the start names one (§6.3). Ringing Blows, round the north hub, lowers the enemy's stun threshold for any melee weapon; this lengthens the stun for a shield: a build that wants both stuns may take both (§8.3).",
+      at: [-1506, 498],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [shieldAttack(10)],
+          at: [-1511, 443],
+          why: 'The north corner, the entrance from the rampart road.',
+        },
+        { id: 'b', kind: 'small', lines: [shieldAttack(10)], at: [-1451, 493] },
+        { id: 'c', kind: 'small', lines: [shieldAttack(10)], at: [-1501, 553] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Shield Ram',
+          lines: [shieldAttack(20), stunDuration(25)],
+          at: [-1561, 503],
+          why: '2 + 1.7 units: 3.7. The rim of the shield brought down: harder blows with it, and the stun they leave lasts longer. The west corner, a step from the entrance either way round.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+        ['n', 'a'],
       ],
     },
     {
@@ -186,7 +231,7 @@ export const home: AreaSpec = {
     { from: 'start.vanguard', to: 'sig.b', why: 'Point one, the south side.' },
     { from: 'sig.a', to: 'hubs.n', why: 'The north side to the north hub.' },
     { from: 'sig.b', to: 'hubs.s', why: 'The south side to the south hub.' },
-    { from: 'hubs.n', to: 'unshakable.a', why: "The north hub's pocket." },
+    { from: 'hubs.n', to: 'ringing.a', why: "The north hub's pocket." },
     { from: 'hubs.s', to: 'quartermaster.a', why: "The south hub's pocket." },
     {
       from: 'hubs.n',
@@ -221,9 +266,14 @@ export const home: AreaSpec = {
     { from: 'wall.maces.toHome.b', to: 'wall.home.roadM.c', why: 'The far end of the road.' },
     { from: 'roadS.b', to: 'wall.slams.thunderstep.a', why: 'The slam road reaches the slams.' },
     {
-      from: 'unshakable.n',
+      from: 'roadR.b',
+      to: 'ram.a',
+      why: "The rampart road's second node south onto Shield Ram's entrance: the shield pocket.",
+    },
+    {
+      from: 'ringing.n',
       to: 'roadR.a',
-      why: 'The stun pocket is also a way onto the rampart road: a pocket as a bridge.',
+      why: 'The melee pocket is also a way onto the rampart road: a pocket as a bridge.',
     },
     {
       from: 'quartermaster.n',
@@ -236,9 +286,9 @@ export const home: AreaSpec = {
       why: 'And straight on to the slams: the pocket is a loop with the slam road.',
     },
     {
-      from: 'unshakable.n',
+      from: 'ringing.n',
       to: 'wall.resists.banner.a',
-      why: 'The stun pocket to the Banner chain: a loop with the north hub.',
+      why: 'The melee pocket to the Banner chain: a loop with the north hub.',
     },
   ],
 };

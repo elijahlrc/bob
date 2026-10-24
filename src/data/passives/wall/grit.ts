@@ -1,17 +1,25 @@
 /**
  * The Barrows (the Wall's south rim): the warcries, reached from the Unbloodied diamond and from the Vampiric Strikes
  * chain; the junction where the Yard's dear crossing lands; the grit wheel (a grit charge one side, Tempered the other);
- * Heavy Hands (two-handed speed, 2026-10-20); and Blood Rite at the rim.
+ * Heavy Hands (two-handed speed, 2026-10-20); and Blood Rite at the rim. G3 (2026-10-22): Iron Voice (armour, warcry
+ * effect) on the middle road between Stone Ward and the Barrows road. G3 round 2: Hammer Rhythm (the fast mace) between
+ * the north road and the barrow stair, Long Watch (totem speed, duration) between the west road and Long Reach; the
+ * middle road passes Stone Ward and Iron Voice beside their notables; Tempered took Elemental Ward's armour. G3 round
+ * 3: Bellows (fire attacks, melee area) south of the Barrows road, on to Grave Host's chain. G4 fix 1: Iron Voice's
+ * smalls became warcry effect (armour stays on the notable), Greatblade's two-handed damage (the sword stays on the
+ * notable), Heavy Hands' smalls one unit of two-handed speed.
  */
 import {
   accuracy,
   aoe,
   armour,
   attackSpeed,
+  axeDamage,
   castSpeed,
   critMulti,
   dex,
   dualDamage,
+  eleAttackOne,
   enemyStunThreshold,
   gritDuration,
   life,
@@ -29,9 +37,13 @@ import {
   str,
   stunDuration,
   swordDamage,
+  totemDuration,
+  totemSpeed,
   twoHandDamage,
   warcryDuration,
   warcryEffect,
+  weaponDamage,
+  weaponSpeed,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -39,15 +51,15 @@ export const grit: AreaSpec = {
   id: 'wall.grit',
   region: 'vanguard',
   name: 'The Barrows',
-  why: "The Wall's south rim: the warcries, the grit wheel with maximum resistances on its other side, the fast two-hander, and Blood Rite, the biggest trade in the region.",
-  at: [-2330, 2886], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  why: "The Wall's south rim: the warcries, the grit wheel with maximum resistances on its other side, the fast two-hander, Cleaver by the Fosse, the middle road through Stone Ward, and Blood Rite, the biggest trade in the region.",
+  at: [-2405, 2761], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); moved in G3 (2026-10-22) off Tempered and Iron Voice.
   clusters: [
     {
       id: 'drums',
       name: 'War Drums',
       why: 'Warcries: duration and buff effect. Entered from the road down from Vampiric Strikes; passed through to the Barrows junction.',
       at: [-2210, 2554],
-      shape: { kind: 'ring', r: 110, a0: -60 },
+      shape: { kind: 'ring', r: 55, a0: -45 },
       nodes: [
         { id: 'a', kind: 'small', lines: [warcryDuration(15)], why: 'An entrance.' },
         {
@@ -86,7 +98,7 @@ export const grit: AreaSpec = {
       name: 'Unbroken',
       why: 'The grit wheel: life at the entrance and the exit, a charge more on one side (Unbroken), a point of maximum resistance on the other (Tempered). Passed through, and neither side pays for the other.',
       at: [-2704, 2970],
-      shape: { kind: 'ring', r: 162, a0: -50 },
+      shape: { kind: 'ring', r: 90, a0: -30 },
       nodes: [
         { id: 'a', kind: 'small', lines: [life(5)] },
         {
@@ -97,13 +109,18 @@ export const grit: AreaSpec = {
           why: 'A fourth grit charge: 3 units by the table and the node the whole area is for.',
         },
         { id: 'b', kind: 'small', lines: [life(5)] },
-        { id: 'c', kind: 'small', lines: [resAll(4)], why: 'The resistance side.' },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [resAll(4)],
+          why: 'The resistance side.',
+        },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Tempered',
-          lines: [maxResAll(1), resAll(6)],
-          why: '+1% to maximum resistances (2 units by the table, more in play) and 1.5 units of resistance.',
+          lines: [maxResAll(1), resAll(4), armour(16)],
+          why: "+1% to maximum resistances (2 units by the table, more in play), 1 unit of resistance and 1.3 of armour: 4.3. The armour is Elemental Ward's, which stop 3 (2026-10-22) sent to a farther cluster, placed in G3 round 2: armour with resistances on the far south-west grit wheel (20 steps from the Vanguard start, 21 from the Reaver's), not seven steps from the start; a strength build that comes here for it leaves the west tower's armour behind.",
         },
         {
           id: 'd',
@@ -124,20 +141,20 @@ export const grit: AreaSpec = {
     {
       id: 'heavyHands',
       name: 'Heavy Hands',
-      why: "Two-handed attack speed three times, then the notable with speed and accuracy: the fast two-hander, far south beside the warcries and the grit (it was a side of the tower's wheel until 2026-10-20, a step from every other two-hander node). The approach to Blood Rite, whose own spur sells the life it asks for.",
+      why: "Two-handed attack speed three times, then the notable with speed and accuracy: the fast two-hander, far south beside the warcries and the grit (it was a side of the tower's wheel until 2026-10-20, a step from every other two-hander node). The approach to Blood Rite, whose own spur sells the life it asks for. The smalls are one unit each, 5% (7% until G4 fix 1, 2026-10-22).",
       at: [-2496, 3386],
-      shape: { kind: 'ring', r: 110, a0: -120 },
+      shape: { kind: 'ring', r: 55, a0: -135 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
-        { id: 'b', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
+        { id: 'a', kind: 'small', lines: [attackSpeed(5, ['twoHand'])] },
+        { id: 'b', kind: 'small', lines: [attackSpeed(5, ['twoHand'])] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Heavy Hands',
-          lines: [attackSpeed(8, ['twoHand', 'melee']), accuracy(15)],
+          lines: [attackSpeed(13, ['twoHand', 'melee']), accuracy(15)],
           why: '2.7 + 1.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [attackSpeed(4, ['twoHand'])] },
+        { id: 'c', kind: 'small', lines: [attackSpeed(5, ['twoHand'])] },
       ],
       links: [
         ['a', 'b'],
@@ -153,8 +170,8 @@ export const grit: AreaSpec = {
       at: [-2665, 3581],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [life(5)], at: [-2665, 3581] },
-        { id: 'b', kind: 'small', lines: [life(5)], at: [-2749, 3681] },
+        { id: 'a', kind: 'small', lines: [life(5)], at: [-2741, 3671] },
+        { id: 'b', kind: 'small', lines: [life(5)], at: [-2778, 3716] },
         { id: 'k', kind: 'keystone', name: 'Blood Rite', lines: [], at: [-2833, 3781] },
       ],
       links: [
@@ -174,7 +191,7 @@ export const grit: AreaSpec = {
     {
       id: 'north',
       name: 'A road',
-      why: "Strength three times: the road from the Barrows north to Vampiric Strikes, with the strength caster's pocket off its middle.",
+      why: "Strength three times: the road from the Barrows north to Vampiric Strikes, with the strength caster's pocket off its middle; its top node is a cross since G3 round 2 (Hammer Rhythm west, Stone Ward east, War Drums south).",
       at: [-2236, 2324],
       shape: { kind: 'hand' },
       nodes: [
@@ -190,7 +207,7 @@ export const grit: AreaSpec = {
     {
       id: 'east',
       name: 'The Barrows road',
-      why: "Eight attribute nodes from Heavy Hands east to the west side of the Yard's Pits: the Barrows had one way in, through War Drums, and the Wall and the Yard met only near home. Strength on the Wall half, strength and dexterity on the Yard half. The big axe leaves north from the third node, the regeneration pocket south from the fifth.",
+      why: "Eight attribute nodes from Heavy Hands east to the west side of the Yard's Pits: the Barrows had one way in, through War Drums, and the Wall and the Yard met only near home. Strength on the Wall half, strength and dexterity on the Yard half. The big axe leaves north from the third node, the regeneration pocket south from the fifth, Cleaver south from the sixth (G2, 2026-10-22).",
       at: [-1600, 3150],
       shape: { kind: 'hand' },
       nodes: [
@@ -220,8 +237,8 @@ export const grit: AreaSpec = {
       at: [-1690, 2860],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [twoHandDamage(12)], at: [-1760, 3000] },
-        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-1690, 2840] },
+        { id: 'a', kind: 'small', lines: [twoHandDamage(12)], at: [-1633, 2816] },
+        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-1609, 2764] },
         {
           id: 'n',
           kind: 'notable',
@@ -243,8 +260,8 @@ export const grit: AreaSpec = {
       at: [-1400, 3380],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-1430, 3340] },
-        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1420, 3510] },
+        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-1347, 3533] },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-1340, 3591] },
         {
           id: 'n',
           kind: 'notable',
@@ -266,8 +283,8 @@ export const grit: AreaSpec = {
       at: [-2540, 2010],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellDamage(8)], at: [-2370, 2090] },
-        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [-2540, 2020] },
+        { id: 'a', kind: 'small', lines: [spellDamage(8)], at: [-2590, 1994] },
+        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [-2644, 1974] },
         {
           id: 'n',
           kind: 'notable',
@@ -285,7 +302,7 @@ export const grit: AreaSpec = {
     {
       id: 'west',
       name: 'The tower road',
-      why: 'Three strength nodes from the Greatweight wheel down to Iron Liturgy: the west towers and the Barrows were joined only through the middle.',
+      why: 'Three strength nodes from the Greatweight wheel down to Iron Liturgy: the west towers and the Barrows were joined only through the middle. Long Watch (the totems) leaves south from its last node since G3 round 2.',
       at: [-2975, 1667],
       shape: { kind: 'hand' },
       nodes: [
@@ -301,7 +318,7 @@ export const grit: AreaSpec = {
     {
       id: 'southWest',
       name: 'The barrow stair',
-      why: 'Four strength nodes from Iron Liturgy down to the grit wheel: a second way into the Barrows on their west side. Long Reach leaves west from the second node.',
+      why: 'Four strength nodes from Iron Liturgy down to the grit wheel: a second way into the Barrows on their west side. Long Reach leaves west from the second node, and Hammer Rhythm arrives there from the east (G3 round 2).',
       at: [-2672, 2317],
       shape: { kind: 'hand' },
       nodes: [
@@ -319,12 +336,12 @@ export const grit: AreaSpec = {
     {
       id: 'reach',
       name: 'Long Reach',
-      why: 'A pocket west off the barrow stair: melee area twice, then reach and area, for the slam and the sweep.',
+      why: 'A chain west off the barrow stair: melee area twice, then reach and area, for the slam and the sweep. A bridge since G3 round 2: Long Watch lands on its first small from the north.',
       at: [-3000, 2330],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [meleeArea(8)], at: [-2860, 2330] },
-        { id: 'b', kind: 'small', lines: [meleeArea(8)], at: [-3030, 2360] },
+        { id: 'a', kind: 'small', lines: [meleeArea(8)], at: [-3072, 2327] },
+        { id: 'b', kind: 'small', lines: [meleeArea(8)], at: [-3130, 2328] },
         {
           id: 'n',
           kind: 'notable',
@@ -342,12 +359,12 @@ export const grit: AreaSpec = {
     {
       id: 'greatblade',
       name: 'Greatblade',
-      why: 'A pocket south off the Barrows road, where it turns hybrid toward the Yard: sword damage twice, then the two-handed sword. The Yard had no home for it; this one sits on the Wall-Yard road, where its strength and dexterity are both supplied. It hung off the second road node, beside Headsman and Heavy Hands, until round 4 (2026-10-20), which made the three two-hander notables a row on adjacent road nodes.',
+      why: "A pocket south off the Barrows road, where it turns hybrid toward the Yard: two-handed damage twice, then the two-handed sword. The smalls were sword damage until G4 fix 1 (2026-10-22): the sword-and-shield build bought the whole pocket as more sword and the two-handed half never mattered; now a one-handed sword pays two two-handed smalls for the notable's sword, and the two-handed sword finds its home. The Yard had no home for it; this one sits on the Wall-Yard road, where its strength and dexterity are both supplied. It hung off the second road node, beside Headsman and Heavy Hands, until round 4 (2026-10-20), which made the three two-hander notables a row on adjacent road nodes.",
       at: [-1010, 3460],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3330] },
-        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3460] },
+        { id: 'a', kind: 'small', lines: [twoHandDamage(12)], at: [-1010, 3482] },
+        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-1010, 3540] },
         {
           id: 'n',
           kind: 'notable',
@@ -363,14 +380,217 @@ export const grit: AreaSpec = {
       ],
     },
     {
+      id: 'cleaver',
+      name: 'Cleaver',
+      why: "Axe damage twice, then axe damage with axe speed: a chain south off the Barrows road where it turns strength-and-dexterity, facing the Yard's Fosse, so an axe build finds both its attributes on the way (G2, 2026-10-22; it was in the Barbican's west, the side farthest from any dexterity). The Yard's Hewing is the other axe, about ten steps east.",
+      at: [-1160, 3420],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [axeDamage(12)],
+          at: [-1179, 3296],
+          why: 'The entrance, from the Barrows road.',
+        },
+        { id: 'b', kind: 'small', lines: [axeDamage(12)], at: [-1171, 3351] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Cleaver',
+          lines: [axeDamage(24), attackSpeed(10, ['axe'])],
+          at: [-1160, 3420],
+          why: 'Axe damage and axe speed: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [axeDamage(12)],
+          at: [-1149, 3489],
+          why: "The far small, facing the Yard's Fosse road.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
+      id: 'middle',
+      name: "The Barrows' middle road",
+      why: "Strength twice on a line across Stone Ward's chain (G2, 2026-10-22): north to Second Wind, south down Iron Voice's warcry smalls to the Barrows road. Before it, the only ways between the Quarry and the Barrows road went round by War Drums or the Pits. Since G3 round 2 it crosses Stone Ward at a small and passes Iron Voice beside its notable, so the road buys no notable it does not want.",
+      at: [-1810, 2400],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: 'a', kind: 'attribute', lines: [str(7)], at: [-1730, 2188] },
+        { id: 'b', kind: 'attribute', lines: [str(7)], at: [-1856, 2571] },
+      ],
+      links: [],
+    },
+    {
+      id: 'ironVoice',
+      name: 'Iron Voice',
+      why: "Warcry buff effect four times on the Barrows' middle road, with the notable of armour and warcry buff effect in a triangle off its middle: the shouting Vanguard in plate, for the warcry and totem build (G3, 2026-10-22; the ledger's VA-3). The smalls were armour until G4 fix 1 (2026-10-22): a cluster whose smalls are the generic stat is taken by every build that wants armour, and Iron Voice was in six of the seven armour builds' plans, so the strength builds' armour at 120 points rose by half over G0; the smalls now carry the partner, the armour stays on the notable, and a build passing south pays warcry smalls as road. The smalls lie on the straight line from Stone Ward's road node down to the Barrows road, so the road is whole and the Quarry reaches the Barrows through the middle; the notable is a step off it (G3 round 2: it sat in the line, a toll on the road). The strength defence's south-west direction, far from both strength starts; War Drums (warcry duration and effect) is the warcry twin, seven steps west by the junction.",
+      at: [-1928, 2901],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: [-1908, 2809],
+          why: 'The north end, from the middle road.',
+        },
+        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: [-1920, 2864] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Iron Voice',
+          lines: [armour(24), warcryEffect(20)],
+          at: [-1865, 2915],
+          why: "2 + 2 units: 4. Armour and the warcry in even measure (the round-1 allocator showed the strength builds' armour doubling at 120 points with a heavier armour line). The triangle's apex, east of the road.",
+        },
+        { id: 'c', kind: 'small', lines: [warcryEffect(10)], at: [-1936, 2937] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [warcryEffect(10)],
+          at: [-1948, 2992],
+          why: 'The south end, toward the Barrows road.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
+      ],
+    },
+    {
+      id: 'rhythm',
+      name: 'Hammer Rhythm',
+      why: "Mace attack speed three times round the notable with mace damage and mace attack speed: the fast mace, a square bridging the Barrows' north road and the barrow stair (G3 round 2, 2026-10-22; the ledger's VA-4). Entered from the east and the west, the notable the south corner, so the way across takes a small and the notable is a step's detour. The Vanguard's other plain maces sell the stun (Weight of Iron, the tower), life (Sledge and Sinew, the Quarry floor), crit (Crushing Blow) and elemental damage (Hallowed Hammer); this one, south-west and far, sells speed, which the Vanguard otherwise sends its maces to the Strider for.",
+      at: [-2454, 2320],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [weaponSpeed('mace', 5)],
+          at: [-2399, 2320],
+          why: 'The east corner, the door from the north road.',
+        },
+        { id: 'b', kind: 'small', lines: [weaponSpeed('mace', 5)], at: [-2454, 2265] },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [weaponSpeed('mace', 5)],
+          at: [-2509, 2320],
+          why: 'The west corner, the door from the barrow stair.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Hammer Rhythm',
+          lines: [weaponDamage('mace', 20), weaponSpeed('mace', 8)],
+          at: [-2454, 2375],
+          why: '2 + 1.6 units: 3.6. The south corner.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+        ['n', 'a'],
+      ],
+    },
+    {
+      id: 'watch',
+      name: 'Long Watch',
+      why: "Totem speed three times round the notable with totem speed and totem duration: totems that are set down quickly and stand long, a diamond bridging the west road (by Iron Liturgy) and Long Reach's chain (G3 round 2, 2026-10-22; the ledger's VA-7). The warcry and totem build's far totem: Standing Cairns (totem damage with area) is ten steps from the start by the Quarry, this one about eighteen by the west, and the Strider's Sentry Post and the Cathedral's Reliquary sell totems with bows and with spells. Long Reach stops being a dead end.",
+      at: [-2958, 2068],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [totemSpeed(4)],
+          at: [-2935, 2018],
+          why: 'The north corner, the door from the west road.',
+        },
+        { id: 'b', kind: 'small', lines: [totemSpeed(4)], at: [-2907, 2090] },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [totemSpeed(4)],
+          at: [-2980, 2118],
+          why: "The south corner, the door from Long Reach's chain.",
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Long Watch',
+          lines: [totemSpeed(8), totemDuration(20)],
+          at: [-3008, 2046],
+          why: '2.3 + 1.3 units: 3.6. The west corner. A small is 4% (1.1 units): totem speed is priced at 3.5% a unit.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['c', 'n'],
+        ['n', 'a'],
+      ],
+    },
+    {
+      id: 'bellows',
+      name: 'Bellows',
+      why: "Fire damage with attacks three times on a straight chain south from the Barrows road to Grave Host's chain, with the notable of fire attacks and melee area in a triangle off it: the swing that throws a sheet of fire, below the Barrows road in its empty south (G3 round 3, 2026-10-22; added beyond the brief because the two-handed fire build held the strength side's only fire-attack cluster, Hot Iron, by 60 points and its fire attacks were flat after 120: out of supply). The second fire-attack direction: Hot Iron (fire with stun) is on the far west rim beside the Cathedral's burning (Censer, Brazier, Searing Avatar), this one is south, a build that wants both crosses the region; the Cathedral's Kindled Steel sells fire attacks with ignite. Six steps from Headsman by the road, so the two-hander's stun and this are not one stop. Grave Host stops being a dead end.",
+      at: [-1990, 3440],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [eleAttackOne('fire', 12)],
+          at: [-1955, 3389],
+          why: 'The north end, from the Barrows road.',
+        },
+        { id: 'b', kind: 'small', lines: [eleAttackOne('fire', 12)], at: [-1987, 3433] },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Bellows',
+          lines: [eleAttackOne('fire', 24), meleeArea(16)],
+          at: [-1952, 3494],
+          why: "2 + 2 units: 4. Fire with the swing's reach, for the slam and the cleave alike (Hot Iron's partner is stun, Kindled Steel's ignite, Elemental Edge's accuracy). The triangle's apex, south-east of the chain.",
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [eleAttackOne('fire', 12)],
+          at: [-2020, 3477],
+          why: "The south end, toward Grave Host's chain.",
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'c'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
+    {
       id: 'host',
       name: 'Grave Host',
-      why: "A pocket south off the Barrows road: minion life twice, then minion life with the summoner's armour. The strength summoner's cluster and every summoner's farthest: the other minion notables are in the Cathedral (Shepherd, Ossuary), on the Spire's Cathedral side (Familiars) and on the Knife's Docks wheel (Black Flock). Round 3 (2026-10-20).",
+      why: "A pocket south off the Barrows road: minion life twice, then minion life with the summoner's armour. The strength summoner's cluster and every summoner's farthest: the other minion notables are in the Cathedral (Shepherd, Ossuary), on the Spire's Cathedral side (Familiars) and on the Knife's Docks wheel (Black Flock). Round 3 (2026-10-20). Since G3 round 3 (2026-10-22) Bellows' chain lands on its second small, so the pocket is a loop with the Barrows road, no longer a dead end.",
       at: [-2200, 3620],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionLife(12)], at: [-2200, 3450] },
-        { id: 'b', kind: 'small', lines: [minionLife(12)], at: [-2200, 3620] },
+        { id: 'a', kind: 'small', lines: [minionLife(12)], at: [-2200, 3662] },
+        { id: 'b', kind: 'small', lines: [minionLife(12)], at: [-2200, 3720] },
         {
           id: 'n',
           kind: 'notable',
@@ -388,19 +608,25 @@ export const grit: AreaSpec = {
     {
       id: 'ward',
       name: 'Stone Ward',
-      why: "A pocket east off the Barrows' north road, under War Drums: spell block twice, then spell block with life on block. Spell block for any build, shield or none, on the strength side: the tree's other two are shield-only and on the intelligence side (Spirit Ward in the Spire, Glass Wall in the Crypt). Round 4 (2026-10-20).",
-      at: [-1960, 2315],
+      why: "A chain east off the Barrows' north road, under War Drums: spell block twice, then spell block with life on block. Spell block for any build, shield or none, on the strength side: the tree's other two are shield-only and on the intelligence side (Spirit Ward in the Spire, Glass Wall in the Crypt). Round 4 (2026-10-20). The Barrows' middle road crosses it at its second small, so the chain is a bridge and the notable a step's detour off the road (G3 round 2, 2026-10-22: since G2 the road ran through the notable, so anyone going south by the middle bought a spell block notable).",
+      at: [-1760, 2305],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [spellBlock(2)], at: [-2090, 2320] },
-        { id: 'b', kind: 'small', lines: [spellBlock(2)], at: [-1960, 2315] },
+        { id: 'a', kind: 'small', lines: [spellBlock(2)], at: [-1826, 2307] },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: [-1768, 2305],
+          why: "Where the middle road crosses: on the straight line between the road's two nodes.",
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Stone Ward',
           lines: [spellBlock(4), lifeOnBlock(30)],
-          at: [-1810, 2305],
-          why: '2 + 2 units.',
+          at: [-1698, 2302],
+          why: '2 + 2 units. The tip, east of the road.',
         },
       ],
       links: [
@@ -415,8 +641,8 @@ export const grit: AreaSpec = {
       at: [-3205, 1832],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dualDamage(10)], at: [-3100, 1757] },
-        { id: 'b', kind: 'small', lines: [dualDamage(10)], at: [-3205, 1832] },
+        { id: 'a', kind: 'small', lines: [dualDamage(10)], at: [-3226, 1847] },
+        { id: 'b', kind: 'small', lines: [dualDamage(10)], at: [-3273, 1881] },
         {
           id: 'n',
           kind: 'notable',
@@ -436,7 +662,44 @@ export const grit: AreaSpec = {
     { from: 'north.a', to: 'ward.a', why: 'The north road onto spell block.' },
     { from: 'west.b', to: 'fists.a', why: 'The west road onto the strength dual wield.' },
     { from: 'east.e1', to: 'host.a', why: 'The Barrows road onto the minion pocket.' },
+    {
+      from: 'east.e3',
+      to: 'bellows.a',
+      why: "The Barrows road's third node south onto Bellows (Headsman leaves it north): the node is a cross.",
+    },
+    {
+      from: 'bellows.c',
+      to: 'host.b',
+      why: "Bellows on to Grave Host's second small, in the chain's own line: the fire and the minions are a loop with the Barrows road, and neither is a dead end.",
+    },
     { from: 'east.e7', to: 'greatblade.a', why: 'The Barrows road onto the two-handed sword.' },
+    {
+      from: 'east.e6',
+      to: 'cleaver.a',
+      why: 'The Barrows road onto the axe, south toward the Fosse.',
+    },
+    {
+      from: 'cleaver.c',
+      to: 'yard.fosse.road.f7',
+      why: "Axes by the Fosse (a near crossing; G1-brief.md §2.4, laid in the G2 border pass): Cleaver's far small onto the Yard's outer road, in the chain's own line, so Cleaver is a bridge between the Barrows road and the Fosse. The Reaver's axe and bleed build reaches Cleaver by the rim (Hewing to Cleaver about 10 steps), and the Vanguard reaches the Fosse's lightning and curses. Far from both starts (22 from the Vanguard, 17 from the Reaver).",
+    },
+    {
+      from: 'wall.slams.secondWind.n',
+      to: 'middle.a',
+      why: "Second Wind onto the Barrows' middle road.",
+    },
+    {
+      from: 'middle.a',
+      to: 'ward.b',
+      why: "The middle road crosses Stone Ward's chain at its second small: the chain is a bridge and the notable a detour, not a toll (G3 round 2).",
+    },
+    { from: 'ward.b', to: 'middle.b', why: 'And on south, toward the Barrows road.' },
+    { from: 'middle.b', to: 'ironVoice.a', why: 'The middle road onto Iron Voice, straight on.' },
+    {
+      from: 'ironVoice.d',
+      to: 'east.e2',
+      why: "Iron Voice onto the Barrows road: the middle road is whole, Second Wind to the Barrows' second road node.",
+    },
     {
       from: 'wall.maces.greatweight.b',
       to: 'west.a',
@@ -454,6 +717,26 @@ export const grit: AreaSpec = {
       why: "The barrow stair lands on the grit wheel's entrance.",
     },
     { from: 'southWest.b', to: 'reach.a', why: 'The barrow stair onto the long reach.' },
+    {
+      from: 'north.a',
+      to: 'rhythm.a',
+      why: 'The north road west onto Hammer Rhythm: north.a is a cross now (the road north, War Drums south, Stone Ward east, the fast mace west).',
+    },
+    {
+      from: 'rhythm.c',
+      to: 'southWest.b',
+      why: 'Hammer Rhythm onto the barrow stair, straight on to Long Reach: a second way between the north road and the stair besides Iron Liturgy.',
+    },
+    {
+      from: 'west.c',
+      to: 'watch.a',
+      why: 'The west road, where it meets Iron Liturgy, south onto Long Watch.',
+    },
+    {
+      from: 'watch.c',
+      to: 'reach.a',
+      why: "Long Watch onto Long Reach's chain: the totems bridge the west road and the stair, and Long Reach has two doors.",
+    },
     { from: 'heavyHands.b', to: 'east.e1', why: 'Heavy Hands onto the Barrows road.' },
     {
       from: 'east.e8',

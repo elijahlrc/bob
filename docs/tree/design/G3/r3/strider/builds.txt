@@ -1,0 +1,78 @@
+
+== bow-crit (strider): Physical bow: bow damage, attack speed, crit, evasion and life.
+  60 points: choice 1 [100%], tax 22% (13; roads 13), attributes str 26 dex 181 int 10
+  120 points: choice 3 [100% 98% 97%], tax 23% (27; roads 25), attributes str 60 dex 289 int 35
+                              points     60     80    100    120    140    160
+                         life, units     13   18.4   28.4   34.6   36.6     42
+                                life     65     92    137    168    178    205
+                            lifeFlat      0      0     20     20     20     20
+                      evasion, units   17.5   23.6   27.6   28.6   31.6   35.7
+                             evasion    175    236    276    286    316    357
+                   bow damage, units   14.4   23.8   23.8   31.4   36.4   39.4
+                           bowDamage     26     98     98    154    204    204
+                          physAttack     50     62     62     62     62     62
+                    projectileDamage     68     78     78     98     98    128
+                         crit, units    5.5    5.5    8.5   11.4   11.4   14.4
+                           critMulti     30     30     30     30     30     30
+                          critChance     45     45     90     90     90    135
+                      weaponCrit:bow      0      0      0     25     25     25
+                 weaponCritMulti:bow      0      0      0     15     15     15
+  gave up at 60 (what 40 more points would add): Iron Draw (3.8), Thick Blood (3), Hardy Stock (2.8), Rapid Fire (2.6), Sea Legs (2.4)
+  gave up at 120 (what 40 more points would add): Wiry Frame (3.9), Tall Grass (2.8), Skewer (2.8), Hot Pursuit (2.2), Telling Shot (2), Four Winds (1.6)
+
+== bow-elemental (strider): Elemental bow: elemental damage with attacks, penetration, attack speed, evasion.
+  60 points: choice 1 [100%], tax 20% (12; roads 10), attributes str 6 dex 137 int 0
+  120 points: choice 4 [100% 100% 98% 96%], tax 25% (30; roads 23), attributes str 81 dex 267 int 47
+                              points     60     80    100    120    140    160
+                         life, units      9   17.4   25.4   34.2     44     44
+                                life     45     82    122    166    215    215
+                            lifeFlat      0     20     20     20     20     20
+                      evasion, units   22.4   25.2   29.3   27.3     34     39
+                             evasion    224    252    293    273    340    390
+      elemental attack damage, units      6      6      6      6      6      6
+                           eleAttack     60     60     60     60     60     60
+                   bow damage, units     12     12   16.6   22.2   22.2   27.2
+                           bowDamage     52     52     98    144    144    194
+                    projectileDamage     68     68     68     78     78     78
+  gave up at 60 (what 40 more points would add): Wiry Frame (3.9), Thick Blood (3), Iron Draw (2.3), Vital Aim (1.8)
+  gave up at 120 (what 40 more points would add): Wiry Frame (3.9), Tall Grass (2.8), Sea Legs (2.4), Hot Pursuit (2.2), Telling Shot (1.6), Light Hand (1.3)
+
+== bow-poison (strider): Poison bow, across the map: poison and chaos with bow attacks, evasion and life.
+  60 points: choice 2 [100% 99%], tax 25% (15; roads 14), attributes str 53 dex 189 int 10
+  120 points: choice 3 [100% 99% 97%], tax 28% (34; roads 27), attributes str 65 dex 288 int 83
+                              points     60     80    100    120    140    160
+                         life, units   14.8   25.2   30.2   40.6     47     49
+                                life     74    126    151    198    230    240
+                            lifeFlat      0      0      0     20     20     20
+                       poison, units      6    8.5   10.2   13.5   16.2   22.3
+                         chaosAttack     48     48     48     48     48     48
+                        poisonChance     10     10     10     20     20     35
+                        poisonDamage     12     42     62     90    110    166
+                           dotDamage      0      0      0      0     10     10
+                   bow damage, units    2.6    3.6    7.2    7.2    8.2    9.4
+                           bowDamage     16     16     52     52     52     64
+                    projectileDamage     10     20     20     20     30     30
+  gave up at 60 (what 40 more points would add): Rat Bite (3.3), Hardy Stock (2.8), Sea Legs (2.4), Scarred Hide (2), Iron Draw (2), Four Winds (1.6)
+  gave up at 120 (what 40 more points would add): Fouled Tips (3.9), Rat Bite (3.3), Stout Heart (2.6), Field Kit (2)
+
+== trap-mine (shade): Traps and mines: trap and mine damage, throwing speed, area, energy shield and evasion.
+  60 points: choice 3 [100% 99% 96%], tax 32% (19; roads 16), attributes str 0 dex 115 int 115
+  120 points: choice 2 [100% 98%], tax 37% (44; roads 32), attributes str 16 dex 234 int 168
+                              points     60     80    100    120    140    160
+         trap and mine damage, units    9.7   13.7   13.7   13.7   13.7   13.7
+                          trapDamage     48     96     96     96     96     96
+                          mineDamage     68     68     68     68     68     68
+                energy shield, units   21.8   24.8   36.8     31     39   49.4
+                                  es    109    124    184    155    195    242
+                              esFlat      0      0      0      0      0     15
+                      evasion, units     14   19.6   19.6   33.3   33.3   33.3
+                             evasion    140    196    196    333    333    333
+  gave up at 60 (what 40 more points would add): Tripwire (4), Glass Skin (3.2), Quickening (3), Composure (3), Hard Target (2.7), Quiet Pulse (1.8), Arcane Focus (1.5)
+  gave up at 120 (what 40 more points would add): High Veil (3.6), Hoarded Breath (2.8), Warm Blood (2.4), Hale Scribe (1.2), Prism Ward (0.8)
+
+== Against the targets (4 archetypes)
+  1. at 120, what 40 more points add to the typical main stat: 25% (target about 30%+); main stats gaining 10% or less: 21% (target about 10%); archetypes whose every main stat gains 20%+: 2 (target about two in three)
+  2. at 60, the typical main stat: 65% (target about 50%); gaining 10% or less: 7%
+  3. at 120, notables worth 2.5+ units that 40 more points add: typically 3, 0 builds with none (target two or more for most)
+  4. at 120, choice: 0 builds with one plan, 3 with three or more (target two or more for all, three for about half)
+  5. at 120, tax: typically 28%, 1 builds above a third (target a third or less for most)

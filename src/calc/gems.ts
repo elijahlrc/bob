@@ -391,3 +391,9 @@ export const DEFAULT_BOW_ATTACK: SkillDef = {
   types: ['attack', 'projectile'],
   behaviour: { kind: 'projectile', count: 1, spread: 0, range: 9 },
 };
+
+/** Default attack variant for wands: a bolt, shot as a bow shoots an arrow. */
+export const DEFAULT_WAND_ATTACK: SkillDef = {
+  ...DEFAULT_BOW_ATTACK,
+  id: 'defaultWandAttack',
+};

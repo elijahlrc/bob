@@ -2,7 +2,8 @@
  * The Undercroft (the deep end, toward the Spire): the wheel (minion damage on its north side, spell block and energy
  * shield on its south since 2026-10-20), the junction with Volatile Servants, the shrine (totems one side, brands the
  * other) with Sigil Warden, and the dear road of two attribute nodes to the Spire's minion notable. The id
- * `cathedral.crypt` predates the change and is kept.
+ * `cathedral.crypt` predates the change and is kept. The north walk and Rood Screen moved to `walk.ts` (the Lychway) in
+ * G3 round 2.
  */
 import {
   areaDamage,
@@ -13,6 +14,7 @@ import {
   es,
   esFlat,
   int,
+  manaRegen,
   minionLife,
   physSpell,
   shieldDef,
@@ -20,6 +22,7 @@ import {
   skillDuration,
   spellArea,
   spellBlock,
+  spellCrit,
   spellDamage,
   str,
   totemDamage,
@@ -32,22 +35,28 @@ export const crypt: AreaSpec = {
   id: 'cathedral.crypt',
   region: 'zealot',
   name: 'The Undercroft',
-  why: 'The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, and the dear road to the Spire.',
+  why: 'The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, and the dear road to the Spire with Tomb Dust and Shattering Rite off it. The north walk round its back (G2) is its own place since G3 round 2, the Lychway (`walk.ts`).',
   at: [-1976, -2996], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
   clusters: [
     {
       id: 'wheel',
       name: 'Homily',
-      why: "The wheel of eight in the crypt: spell damage on the north side (Homily, the Zealot's caster notable past the nave), spell block behind a shield on the south (Glass Wall), energy shield at the ends. The summoner on the way to Volatile Servants passes one of them; its minions are at the choir and across the Spire border.",
+      why: "The wheel of eight in the crypt: spell damage on the north side (Homily, the Zealot's caster notable past the nave), spell block behind a shield on the south (Glass Wall, with its flat energy shield), spell block at the ends. The summoner on the way to Volatile Servants passes one of them; its minions are at the choir and across the Spire border. G4 fix 1 (2026-10-22, audit T6.2 and T11): the ends were energy shield, so every caster who took the detour to Homily got spell damage and energy shield in one cluster; now the wheel reads spell damage one way, spell block with energy shield the other, and Glass Wall's side is the Zealot's own energy shield direction, away from the Mystic's Cloister.",
       at: P(1850, 1150),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'm1', kind: 'small', lines: [es(5)], at: P(1629, 1150), why: 'The west entrance.' },
+        {
+          id: 'm1',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: P(1750, 1150),
+          why: 'The west entrance: spell block (energy shield until G4 fix 1).',
+        },
         {
           id: 'm2',
           kind: 'small',
           lines: [spellDamage(8)],
-          at: P(1740, 959),
+          at: P(1779, 1079),
           why: 'The spell side.',
         },
         {
@@ -55,33 +64,33 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Homily',
           lines: [spellDamage(16), eleDamageAll(10), castSpeed(4)],
-          at: P(1961, 959),
+          at: P(1850, 1050),
           why: '2 + 1 + 1 units.',
         },
         {
           id: 'm4',
           kind: 'small',
-          lines: [es(5)],
-          at: P(2071, 1150),
-          why: 'The east exit, to the crypt junction.',
+          lines: [spellBlock(2)],
+          at: P(1950, 1150),
+          why: 'The east exit, to the crypt junction: spell block (energy shield until G4 fix 1).',
         },
         {
           id: 'm5',
           kind: 'notable',
           name: 'Glass Wall',
           lines: [shieldSpellBlock(4), shieldDef(15), esFlat(15)],
-          at: P(1961, 1341),
+          at: P(1850, 1250),
           why: 'Spell block behind a shield, shield defences and flat shield: 2 + 1 + 1 units.',
         },
         {
           id: 'm6',
           kind: 'small',
           lines: [spellBlock(2)],
-          at: P(1740, 1341),
+          at: P(1779, 1221),
           why: 'The spell-block side.',
         },
-        { id: 'm7', kind: 'small', lines: [spellDamage(8)], at: P(2058, 1030) },
-        { id: 'm8', kind: 'small', lines: [spellBlock(2)], at: P(2058, 1270) },
+        { id: 'm7', kind: 'small', lines: [spellDamage(8)], at: P(1921, 1079) },
+        { id: 'm8', kind: 'small', lines: [spellBlock(2)], at: P(1921, 1221) },
       ],
       links: [
         ['m1', 'm2'],
@@ -98,9 +107,9 @@ export const crypt: AreaSpec = {
       id: 'jV',
       name: 'Crypt junction',
       why: 'East of the wheel: the shrine ahead, the Volatile Servants spur toward the Spire side.',
-      at: P(2200, 1250),
+      at: P(2190, 1150),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2200, 1250) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2190, 1150) }],
       links: [],
     },
     {
@@ -110,8 +119,8 @@ export const crypt: AreaSpec = {
       at: P(2300, 1650),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [minionLife(12)], at: P(2250, 1450) },
-        { id: 'b', kind: 'small', lines: [minionLife(12)], at: P(2300, 1650) },
+        { id: 'a', kind: 'small', lines: [minionLife(12)], at: P(2318, 1711) },
+        { id: 'b', kind: 'small', lines: [minionLife(12)], at: P(2331, 1767) },
         { id: 'k', kind: 'keystone', name: 'Volatile Servants', lines: [], at: P(2350, 1850) },
       ],
       links: [
@@ -130,7 +139,7 @@ export const crypt: AreaSpec = {
           id: 'w',
           kind: 'small',
           lines: [skillDuration(10)],
-          at: P(2350, 1150),
+          at: P(2425, 1150),
           why: 'The west entrance, from the crypt junction: duration, which both sides use.',
         },
         {
@@ -138,14 +147,14 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Reliquary',
           lines: [totemDamage(24), spellDamage(8), totemDuration(15)],
-          at: P(2500, 1000),
+          at: P(2500, 1075),
           why: 'The casting totem: 2 + 1 + 1 units.',
         },
         {
           id: 'e',
           kind: 'small',
           lines: [skillDuration(10)],
-          at: P(2650, 1150),
+          at: P(2575, 1150),
           why: 'The far node; the Sigil Warden spur leaves here.',
         },
         {
@@ -153,7 +162,7 @@ export const crypt: AreaSpec = {
           kind: 'notable',
           name: 'Runecarver',
           lines: [brandDamage(24), skillDuration(10), areaDamage(10)],
-          at: P(2500, 1300),
+          at: P(2500, 1225),
           why: 'Brands: damage, duration and area. 2 + 1 + 1 units.',
         },
       ],
@@ -171,8 +180,8 @@ export const crypt: AreaSpec = {
       at: P(2990, 1110),
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(2820, 1130) },
-        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(2990, 1110) },
+        { id: 'a', kind: 'small', lines: [brandDamage(12)], at: P(3019, 1107) },
+        { id: 'b', kind: 'small', lines: [brandDamage(12)], at: P(3076, 1099) },
         { id: 'k', kind: 'keystone', name: 'Sigil Warden', lines: [], at: P(3160, 1090) },
       ],
       links: [
@@ -202,9 +211,9 @@ export const crypt: AreaSpec = {
       id: 'stair',
       name: 'The crypt stair',
       why: 'One attribute node from the Spire crossing down to the crypt junction (2026-10-20): the junction, the shrine and Volatile Servants had one way in, through the wheel.',
-      at: P(2090, 1470),
+      at: P(2085, 1420),
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2090, 1470) }],
+      nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), int(6)], at: P(2085, 1420) }],
       links: [],
     },
     {
@@ -214,8 +223,8 @@ export const crypt: AreaSpec = {
       at: [-1736, -3294],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [chaosSpell(12)], at: [-1736, -3124] },
-        { id: 'b', kind: 'small', lines: [chaosSpell(12)], at: [-1736, -3294] },
+        { id: 'a', kind: 'small', lines: [chaosSpell(12)], at: P(2171, 2021) },
+        { id: 'b', kind: 'small', lines: [chaosSpell(12)], at: P(2200, 2071) },
         {
           id: 'n',
           kind: 'notable',
@@ -233,19 +242,19 @@ export const crypt: AreaSpec = {
     {
       id: 'rite',
       name: 'Shattering Rite',
-      why: "A pocket north off the crossing road to the Spire, beside Tomb Dust: physical damage with spells twice, then physical spells with the elements. For the spells that turn part of their physical damage into an element (physical increases follow the part that turns), and the earthen spells. The Rooftops' Whetted Will sells physical spells with duration. Round 4 (2026-10-20).",
+      why: "A pocket north off the crossing road to the Spire, beside Tomb Dust: physical damage with spells twice, then physical spells with the elements. For the spells that turn part of their physical damage into an element (physical increases follow the part that turns), and the earthen spells. The Rooftops' Whetted Will sells physical spells with duration. Round 4 (2026-10-20). Since G3 round 3 (2026-10-22) a bridge: Plainsong (channelling, `walk.ts`) carries its chain on to the north walk.",
       at: [-1505, -3420],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [physSpell(12)], at: [-1490, -3290] },
-        { id: 'b', kind: 'small', lines: [physSpell(12)], at: [-1505, -3420] },
+        { id: 'a', kind: 'small', lines: [physSpell(12)], at: P(2030, 2226) },
+        { id: 'b', kind: 'small', lines: [physSpell(12)], at: P(2064, 2273) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Shattering Rite',
-          lines: [physSpell(16), eleDamageAll(16)],
+          lines: [physSpell(20), eleDamageAll(16)],
           at: [-1525, -3570],
-          why: '1.3 + 1.6 units.',
+          why: '1.7 + 1.6 units (G3, 2026-10-22: physical spells raised from 16%, so the notable is worth 3 units; ledger ZE-p1).',
         },
       ],
       links: [
@@ -253,9 +262,54 @@ export const crypt: AreaSpec = {
         ['b', 'n'],
       ],
     },
+    {
+      id: 'omen',
+      name: 'Bright Omen',
+      why: "G4 fix 1 (2026-10-22), seam 2 of the fix brief (§1.1, the Mystic–Zealot seam cluster): a straight bridge from Shattering Rite across the border to the Mystic's Cinder, mana regeneration, the notable with spell crit chance and mana regeneration, mana regeneration again. The casters' crossroads at the far loop already sells spell damage, energy shield, minions and channelling (Shattering Rite, Tomb Dust, Plainsong, Familiars, Cinder), so this is neither: spell crit, which casters on both sides weigh and the life caster leaves unfinished at 120 points, with the mana to keep casting. A pairing the tree did not have: spell crit's other notables pair it with damage (Cold Light), crit multiplier (Keen Verse), penetration, insight or generic damage. Mana regeneration's others pair it with spell damage (Long Chant), lightning (Thunder Peal) or curses (Hexwright). Shattering Rite becomes a junction of three and Cinder a bridge.",
+      at: [-1361, -3696],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          at: [-1417, -3653],
+          why: 'The entrance from Shattering Rite, on the straight line to Cinder.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Bright Omen',
+          lines: [spellCrit(30), manaRegen(15)],
+          at: [-1361, -3696],
+          why: 'Spell crit chance and mana regeneration: 2 + 1.5 units.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          at: [-1306, -3739],
+          why: "The far node, onto the Mystic's Cinder.",
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
+    },
   ],
   links: [
     { from: 'toSpire.b', to: 'rite.a', why: 'The crossing road onto the physical spells.' },
+    {
+      from: 'rite.n',
+      to: 'omen.a',
+      why: 'Shattering Rite onto the spell crit bridge (G4 fix 1, seam 2).',
+    },
+    {
+      from: 'omen.b',
+      to: 'spire.fire.cinder.n',
+      why: "Seam 2 (G4 fix 1; fix brief §1.1): Bright Omen's far small lands on the Mystic's Cinder, the one border link this seam lays. A far crossing, 21 steps from the Zealot start and 23 from the Mystic's: the casters of both sides find spell crit with mana here, between the Zealot's physical spells and the Mystic's burning, and Cinder becomes a bridge.",
+    },
     { from: 'toSpire.a', to: 'tomb.a', why: 'The crossing road onto the chaos pocket.' },
     { from: 'toSpire.a', to: 'stair.a', why: 'The Spire crossing onto the crypt stair.' },
     { from: 'stair.a', to: 'jV.a', why: 'The stair onto the crypt junction.' },

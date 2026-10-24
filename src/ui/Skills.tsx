@@ -9,6 +9,7 @@ import { EQUIP_SLOTS, type EquipSlot, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { setPrimary, socketGem, unsocketGem } from '../run/inventory';
 import { sheetOf } from '../run/bot';
+import { foundLastLevel } from '../run/found';
 import { gemStatus } from '../run/gemStatus';
 import {
   bestPlacement,
@@ -116,6 +117,8 @@ export function Skills({
   const forResolved = forDef?.kind === 'active' ? resolveActive(forDef, 20) : null;
   const counts = new Map<string, number>();
   for (const g of gems) counts.set(g.gemId, (counts.get(g.gemId) ?? 0) + 1);
+  // Gems found on the level just played are marked NEW (with one of each, when any copy is).
+  const newIds = new Set(gems.filter((g) => foundLastLevel(run, g.uid)).map((g) => g.gemId));
   const seen = new Set<string>();
   const shownGems = gems.filter((g) => {
     const def = gemDef(g.gemId);
@@ -302,9 +305,6 @@ export function Skills({
         )}
         {hint && (
           <p class="muted hint">
-            Every skill you have equipped is used: the ★ primary is the main skill, used over and
-            over, and every other active skill is used every so often. The Strategy tab sets what
-            each skill is for, when it is used and in what order. Every socket on an item is linked.{' '}
             {coarse
               ? 'Tap a gem, then a socket. Tap a placed gem for its options. ★ sets the primary skill.'
               : 'Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove). Double-click a gem to auto-place or remove it. ★ sets the primary skill.'}
@@ -552,6 +552,9 @@ export function Skills({
                     }}
                   >
                     <span>
+                      {(oneEach ? newIds.has(g.gemId) : foundLastLevel(run, g.uid)) && (
+                        <span class="new-tag">NEW</span>
+                      )}
                       {d.name}
                       {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
                         <span class="muted"> ×{counts.get(g.gemId)}</span>

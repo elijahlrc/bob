@@ -124,6 +124,7 @@ import { armourReduction, effectiveRes, hitChance, monsterHit } from './formulas
 import {
   DEFAULT_ATTACK,
   DEFAULT_BOW_ATTACK,
+  DEFAULT_WAND_ATTACK,
   gemLevel,
   gemMods,
   gemTagsOf,
@@ -898,8 +899,11 @@ export class Character {
         costsLife: usesLife(sg.slot),
       });
     }
-    const isBow = weaponTags.has('bow');
-    const dflt = isBow ? DEFAULT_BOW_ATTACK : DEFAULT_ATTACK;
+    const dflt = weaponTags.has('bow')
+      ? DEFAULT_BOW_ATTACK
+      : weaponTags.has('wand')
+        ? DEFAULT_WAND_ATTACK
+        : DEFAULT_ATTACK;
     this.defaultAttack = {
       key: 'default',
       gemUid: null,

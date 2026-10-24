@@ -308,7 +308,7 @@ export function Items({
       return;
     const next = stepAfter(uid);
     c.act((r) => discardToPile(r, uid));
-    say(`Discarded ${itemTitle(it)}. It waits in Discarded until you salvage them or put it back.`);
+    say(`Discarded ${itemTitle(it)}.`);
     setSel(next);
   };
   const doPutBack = (uid: number) => {

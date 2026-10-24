@@ -1,5 +1,5 @@
 /**
- * The east arm of the Spire (north-east, toward the Knife): Flashpoint (fire as the crit hit), Overcharge (lightning as
+ * The east arm of the Spire (north-east, toward the Knife): Flashpoint (fire as the crit hit), Live Current (lightning as
  * shock), and Pain Conduit at the tip (30% more spell damage on low life). Joined to the middle arm by the inter-arm
  * junction. Since 2026-10-20 the arm is a place, not the lightning arm (see `fire.ts`); the id `spire.storm` is kept.
  */
@@ -13,14 +13,14 @@ export const storm: AreaSpec = {
   why:
     'The arm toward the Knife, the sharp end of the Spire: fire for the crit caster, lightning for the shocker, and Pain Conduit for the ' +
     "caster who lives on low life. The Shade borrows its root; the dear crossing from the Knife's curses lands on the keystone spur.",
-  at: [880, -3719], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+  at: [820, -3740], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); nudged in G3 round 1 off Pain Conduit.
   clusters: [
     {
       id: 'flashpoint',
       name: 'Flashpoint',
       why: "Fire with spell crit and fire penetration: fire as the big crit hit, the first cluster of the east arm, beside the Spire's other crit (Sharp Mind below, Fever Pitch above). The other fire cluster (Cinder, west) sells the burn; a fire build picks the hit here or the burn there. Passed through from the fork to the arm's junction; its west side takes the join from the middle arm.",
       at: [650, -3420],
-      shape: { kind: 'ring', r: 105, a0: 150 },
+      shape: { kind: 'ring', r: 56, a0: 150 },
       nodes: [
         {
           id: 'a',
@@ -66,10 +66,10 @@ export const storm: AreaSpec = {
     },
     {
       id: 'overcharge',
-      name: 'Overcharge',
+      name: 'Live Current',
       why: "Lightning damage, the effect of shock and lightning penetration: lightning as the shock that makes every later hit bigger, beside the low-life keystone. The other lightning cluster (Thunderhead, the middle arm) sells speed. The middle arm's ailment bridge arrives at its notable.",
       at: [960, -3900],
-      shape: { kind: 'ring', r: 105, a0: 90 },
+      shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
         {
           id: 'a',
@@ -80,7 +80,7 @@ export const storm: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Overcharge',
+          name: 'Live Current',
           lines: [eleDamage('lightning', 12), shockEffect(20), penetration('lightning', 3)],
           why: '1.2 + 2 + 1.5 units. The west side, where the ailment bridge arrives.',
         },
@@ -106,8 +106,8 @@ export const storm: AreaSpec = {
       at: [1100, -3560],
       shape: { kind: 'line', heading: -15, gap: 150 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [damageOnLowLife(6)] },
-        { id: 'b', kind: 'small', lines: [damageOnLowLife(6)] },
+        { id: 'a', kind: 'small', lines: [damageOnLowLife(6)], at: [1248, -3626] },
+        { id: 'b', kind: 'small', lines: [damageOnLowLife(6)], at: [1305, -3631] },
         { id: 'k', kind: 'keystone', name: 'Pain Conduit', lines: [] },
       ],
       links: [

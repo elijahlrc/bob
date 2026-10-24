@@ -47,11 +47,11 @@ const ARMOUR_SLOTS: ArmourSlot[] = ['helmet', 'gloves', 'boots', 'body'];
 const DEF_TYPES: DefenceType[] = ['ar', 'ev', 'es', 'arev', 'ares', 'eves'];
 
 /**
- * A bow's reach is the map's, and a wand's the short reach Bob's wand attack has always had (the reference's 120 units is its
- * projectile, which Bob's wand attack is not); a melee weapon's is the reference reach in tiles (about 8.5 units to a tile).
+ * A bow's reach is the map's, and so is a wand's: both shoot (2026-10-22; a wand's attack was a short stab before); a melee
+ * weapon's is the reference reach in tiles (about 8.5 units to a tile).
  */
 const BOW_RANGE = 9;
-const WAND_RANGE = 1.2;
+const WAND_RANGE = BOW_RANGE;
 const UNITS_PER_TILE = 8.5;
 
 const req = (r: [number, number, number]): Attrs => ({

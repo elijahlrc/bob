@@ -10,6 +10,7 @@ import { hex } from './ClassSelect';
 import { useViewport } from './device';
 import {
   fitView,
+  K_MAX,
   nearestNode,
   pinchView,
   zoomAt,
@@ -24,13 +25,16 @@ import {
   LABEL_K_KEYSTONE,
   LABEL_K_NOTABLE,
   NODE_RADIUS,
+  NODE_TEXT,
   edgePath,
   octagon,
   shapeScale,
   TONE_COLOR,
   TONE_GLYPH,
   TONE_LABEL,
+  textZoom,
   toneOf,
+  wrapLine,
 } from './treeStyle';
 
 /** On a coarse pointer a node is hit within this many screen pixels, however small it is drawn. */
@@ -41,6 +45,17 @@ const FIT_MIN_K = 0.15;
 /** The outer edge of a notable's and a keystone's frame, in tree units (labels sit below it). */
 const FRAME_R = { notable: 30, keystone: 47, start: 42 } as const;
 const KINDS = ['small', 'travel', 'hub', 'notable', 'keystone', 'start'] as const;
+/** The stat lines under a node are redrawn when the zoom passes a step of this size, not on every frame of a zoom. */
+const TEXT_STEP = 0.05;
+
+/** How wide a row of a node's stat lines is on screen, in pixels (an estimate where there is no canvas to measure with). */
+function rowWidth(): (row: string) => number {
+  const ctx =
+    typeof document !== 'undefined' ? document.createElement('canvas').getContext('2d') : null;
+  if (!ctx) return (row) => row.length * NODE_TEXT.px * 0.55;
+  ctx.font = `${NODE_TEXT.px}px ${getComputedStyle(document.body).fontFamily}`;
+  return (row) => ctx.measureText(row).width;
+}
 
 /** Where a node is, how large it is drawn at this zoom (the --s-* variables of the svg) and what colour it has. */
 function nodeStyle(n: TreeNode, tone: string): string {
@@ -63,6 +78,8 @@ export function TreeView({ c }: { c: Controller }) {
   const pointers = useRef(new Map<number, Pt>());
   const pinch = useRef<{ from: [Pt, Pt]; v: View } | null>(null);
   const size = useRef({ w: 0, h: 0 });
+  // The zoom, in steps of TEXT_STEP: which nodes' stat lines fit under them.
+  const [textStep, setTextStep] = useState(0);
   const [hover, setHover] = useState<{ id: number; mx: number; my: number } | null>(null);
   // On a coarse pointer the first tap on a node shows it (the dock below); the second tap or the button commits.
   const [picked, setPicked] = useState<number | null>(null);
@@ -90,6 +107,19 @@ export function TreeView({ c }: { c: Controller }) {
     [tree],
   );
   const toneIds = useMemo(() => tree.nodes.map(toneOf), [tree]);
+  // Every node's lines wrapped into rows, and the zoom from which they fit under it.
+  const rows = useMemo(() => {
+    const width = rowWidth();
+    const live = tree.nodes.filter(isLive);
+    return tree.nodes.map((n) => {
+      if (!isLive(n) || n.kind === 'start') return null;
+      const r = modsText(n.mods).flatMap((l) => wrapLine(l));
+      if (!r.length) return null;
+      let room = Infinity;
+      for (const m of live) if (m !== n) room = Math.min(room, Math.hypot(m.x - n.x, m.y - n.y));
+      return { rows: r, k: textZoom(Math.max(...r.map(width)), room, K_MAX) };
+    });
+  }, [tree]);
   const tones = useMemo(() => toneIds.map((t) => TONE_COLOR[t]), [toneIds]);
 
   /** Position the tree and set what depends on the zoom: how large each kind of shape is drawn and the labels. */
@@ -104,6 +134,8 @@ export function TreeView({ c }: { c: Controller }) {
       s.setProperty(`--s-${kind}`, sc.toFixed(3));
       if (kind === 'notable' || kind === 'keystone' || kind === 'start')
         s.setProperty(`--lo-${kind}`, `${((FRAME_R[kind] * sc * v.k + 13) / v.k).toFixed(1)}px`);
+      else
+        s.setProperty(`--lo-${kind}`, `${((NODE_RADIUS[kind] * sc * v.k + 4) / v.k).toFixed(1)}px`);
     }
     s.setProperty('--fs', `${(13 / v.k).toFixed(1)}px`);
     s.setProperty('--fs-s', `${(11 / v.k).toFixed(1)}px`);
@@ -112,6 +144,7 @@ export function TreeView({ c }: { c: Controller }) {
     s.setProperty('--al', areaLabelAlpha(v.k).toFixed(3));
     svg.classList.toggle('z-n', v.k >= LABEL_K_NOTABLE);
     svg.classList.toggle('z-k', v.k >= LABEL_K_KEYSTONE);
+    setTextStep(Math.floor(v.k / TEXT_STEP + 1e-9));
   };
   const local = (e: PointerEvent): Pt => {
     const r = svgRef.current!.getBoundingClientRect();
@@ -282,6 +315,37 @@ export function TreeView({ c }: { c: Controller }) {
       </g>
     );
   }, [allocSet, reachable]);
+
+  // The stat lines of the nodes they fit under at this zoom: below the name of a notable or keystone, else below the node.
+  const textLayer = useMemo(() => {
+    const k = textStep * TEXT_STEP;
+    const out: preact.JSX.Element[] = [];
+    for (const n of tree.nodes) {
+      const t = rows[n.id];
+      if (!t || t.k > k) continue;
+      const named = n.kind === 'notable' || n.kind === 'keystone';
+      out.push(
+        <text
+          key={n.id}
+          class={`nt ${n.kind}${allocSet.has(n.id) ? ' on' : ''}`}
+          x={n.x}
+          y={n.y}
+          text-anchor="middle"
+        >
+          {t.rows.map((r, i) => (
+            <tspan
+              key={i}
+              x={n.x}
+              dy={i ? '1.2em' : named ? (n.kind === 'keystone' ? '1.5em' : '1.35em') : '1em'}
+            >
+              {r}
+            </tspan>
+          ))}
+        </text>,
+      );
+    }
+    return <g>{out}</g>;
+  }, [textStep, allocSet, rows]);
 
   // The node being looked at: the hovered one with a mouse, the tapped one with a finger.
   const focusId = coarse ? picked : (hover?.id ?? null);
@@ -510,6 +574,7 @@ export function TreeView({ c }: { c: Controller }) {
       >
         <g ref={gRef}>
           {layer}
+          {textLayer}
           {matches.length > 0 && (
             <g class="search">
               {matches.map((id) => (

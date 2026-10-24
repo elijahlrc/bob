@@ -256,3 +256,32 @@ svg.tree.z-k .lb.start {
   r: calc(var(--fs) * 0.95);
   pointer-events: none;
 }
+
+/* A node's stat lines (TreeView, NODE_TEXT): once the view is close enough that they fit, under its name or under it. */
+.nt {
+  pointer-events: none;
+  font-size: var(--fs-s);
+  fill: #b8c0cc;
+  stroke: #05040a;
+  stroke-width: var(--sw);
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.nt.on {
+  fill: #e8d8a8;
+}
+.nt.small {
+  transform: translateY(var(--lo-small, 14px));
+}
+.nt.travel {
+  transform: translateY(var(--lo-travel, 12px));
+}
+.nt.hub {
+  transform: translateY(var(--lo-hub, 14px));
+}
+.nt.notable {
+  transform: translateY(var(--lo-notable, 30px));
+}
+.nt.keystone {
+  transform: translateY(var(--lo-keystone, 40px));
+}
