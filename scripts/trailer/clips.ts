@@ -195,8 +195,9 @@ export const CLIPS: Clip[] = [
       });
       const N = 90;
       // Close in, and the view follows the newest nodes as they are taken (the build is not shown whole: it is the first
-      // `FOLLOW_LIT` nodes of the plan, and the level counter runs as far as they take it).
-      const FOLLOW_LIT = 24;
+      // `FOLLOW_LIT` nodes of the plan, and the level counter runs as far as they take it). The plan's first 21 nodes run one way
+      // (down, then east); the 22nd goes back west to another branch, so the shot stops before it.
+      const FOLLOW_LIT = 21;
       const cams = treeCamera(start, pts, W, H, N, {
         first: 0.5,
         around: 7,
