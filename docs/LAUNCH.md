@@ -1,6 +1,6 @@
 # Launch day (plan, 2026-10-23)
 
-The public announcement of Battle of Builds, on **2026-10-24 at midday** (Pacific):
+The public announcement of Battle of Builds, on **2026-10-24 in the morning** (Pacific; the first Reddit post at 8:00):
 
 - a video on YouTube;
 - posts on Reddit;
@@ -10,7 +10,7 @@ The public announcement of Battle of Builds, on **2026-10-24 at midday** (Pacifi
 
 **Taken (the owner, 2026-10-23):**
 
-- **Date:** tomorrow, 2026-10-24, midday.
+- **Date:** tomorrow, 2026-10-24, the morning (moved from midday the same evening: see §3).
 - **Video:** the real footage cut, which is done.
 - **Repository:** goes private.
 - **Rivals limits:** raised substantially.
@@ -104,17 +104,19 @@ r/roguelikes is strict about what counts as a roguelike.
 
 ## 3. Tomorrow, 2026-10-24 (Pacific)
 
-| Time     | Step                                                                                                                                              |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 9:00     | The end-to-end run (gate 9), if it wasn't done tonight.                                                                                           |
-| 10:00    | `/patch-notes`: the final build to itch.io. Check from a fresh browser and a phone: a run starts, there is no update nudge, the patch notes open. |
-| 11:00    | The itch.io page goes public. The Pages "moved" notice is live.                                                                                   |
-| 11:30    | The YouTube video goes public. Pin a comment with the itch.io and Discord links.                                                                  |
-| 12:00    | The first Reddit post, to the best fit. Stay with it for an hour and answer every comment.                                                        |
-| 13:30    | The second post. Check refusals by reason, the run statistics and the rivals pool.                                                                |
-| 15:00 on | The rest, an hour or more apart.                                                                                                                  |
-| All day  | Watch the Discord for crash reports. A crash a player can reproduce is fixed and shipped the same day, within the freeze. Anything else waits.    |
-| Evening  | Take stock (players, runs, deaths by map and class, crashes, comments) and write it in docs/PROGRESS.md.                                          |
+Timed for Reddit, where a post's first hour of votes decides whether it rises: at 8:00 Pacific it catches Europe's afternoon and has the whole US day ahead (at noon, the first plan, it is evening in Europe and half the US day is gone). A Saturday has fewer readers but fewer posts to compete with. YouTube's timing matters least; it only needs to be public before the posts link to it.
+
+| Time     | Step                                                                                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Tonight  | The end-to-end run (gate 9), and each subreddit's self-promotion rules (some allow it only on a set day or a weekly thread).                           |
+| 6:30     | `/patch-notes`: the final build to itch.io. Check from a fresh browser and a phone: a run starts, there is no update nudge, the patch notes open.      |
+| 7:15     | The itch.io page goes public (not earlier: its new-and-popular lists reward visits that come in a burst soon after). The Pages "moved" notice is live. |
+| 7:30     | The YouTube video goes public. Pin a comment with the itch.io and Discord links.                                                                       |
+| 8:00     | The first Reddit post, to the best fit. Stay with it for an hour and answer every comment.                                                             |
+| 9:30     | The second post. Check refusals by reason, the run statistics and the rivals pool.                                                                     |
+| 11:00 on | The rest, an hour or more apart.                                                                                                                       |
+| All day  | Watch the Discord for crash reports. A crash a player can reproduce is fixed and shipped the same day, within the freeze. Anything else waits.         |
+| Evening  | Take stock (players, runs, deaths by map and class, crashes, comments) and write it in docs/PROGRESS.md.                                               |
 
 **Rollback:** keep the last good `bob-itch.zip`. Pushing it again to `elijahlrc/bob:html5` restores it in minutes.
 
