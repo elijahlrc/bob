@@ -2,7 +2,6 @@ import type { ComponentChildren } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import type { SheetDiff } from '../calc/character';
 import { CRAFTING_OPEN } from '../data/constants';
-import { flaskBase } from '../data/flasks';
 import type { Build, EquipSlot, FlaskItem, GemItem, InventoryItem, Item } from '../data/types';
 import { gemDef } from '../data/gems';
 import { joinNames } from '../run/socketText';
@@ -10,7 +9,6 @@ import { salvageValue } from '../run/craft';
 import {
   compareFlasks,
   compareSlots,
-  slotName,
   type SocketRef,
   type FlaskCompare,
   type ItemInfo,
@@ -18,10 +16,11 @@ import {
 } from '../run/inventoryOps';
 import type { EquipCheck, SocketOutcome } from '../run/inventory';
 import type { RunState } from '../run/run';
-import { ItemCard, itemTitle, lineMarks, rarityClass } from './ItemCard';
-import { DiffCard, DiffLines } from './DiffCard';
+import { ItemCard, itemTitle, lineMarks, rarityClass, Stones } from './ItemCard';
+import { infoProps } from './info';
+import { DiffLines } from './DiffCard';
 import { diffRows, type DiffRow } from './itemDiff';
-import { SocketPips, SocketsRow } from './SocketPips';
+import { SocketsRow } from './SocketPips';
 import { SocketPicker } from './SocketPicker';
 
 export type Sel =
@@ -64,19 +63,35 @@ function Chip({
   );
 }
 
-/** What wearing the item does to the character: DPS and effective HP first, then the rest. */
+/** A large change on the result plaque: "−3% damage". */
+function Big({ v, label }: { v: number; label: string }) {
+  const r = Math.round(v);
+  return (
+    <span class="ix-big">
+      <b class={r > 0 ? 'up' : r < 0 ? 'down' : ''}>
+        {r > 0 ? '+' : r < 0 ? '−' : '±'}
+        {Math.abs(r)}%
+      </b>{' '}
+      {label}
+    </span>
+  );
+}
+
+/** What wearing the item does to the character, on a plaque: damage and effective HP large, then the rest. */
 export function Delta({ d, dpsPct, ehpPct }: { d: SheetDiff; dpsPct: number; ehpPct: number }) {
   return (
-    <div class="ix-delta">
-      <Chip v={dpsPct} label="damage" unit="%" digits={0} />
-      <Chip v={ehpPct} label="effective HP" unit="%" digits={0} />
-      <Chip v={d.life} label="life" digits={0} />
-      <Chip v={d.es} label="energy shield" digits={0} />
-      <Chip v={d.mana} label="mana" digits={0} />
-      <Chip v={d.res[3]} label="fire res" unit="%" />
-      <Chip v={d.res[2]} label="cold res" unit="%" />
-      <Chip v={d.res[1]} label="lightning res" unit="%" />
-      <Chip v={d.res[4]} label="chaos res" unit="%" />
+    <div class="ix-delta" data-paint="panel" data-field="porphyry" data-thin>
+      <Big v={dpsPct} label="damage" />
+      <Big v={ehpPct} label="effective HP" />
+      <span class="ix-delta-more">
+        <Chip v={d.life} label="life" digits={0} />
+        <Chip v={d.es} label="energy shield" digits={0} />
+        <Chip v={d.mana} label="mana" digits={0} />
+        <Chip v={d.res[3]} label="fire res" unit="%" />
+        <Chip v={d.res[2]} label="cold res" unit="%" />
+        <Chip v={d.res[1]} label="lightning res" unit="%" />
+        <Chip v={d.res[4]} label="chaos res" unit="%" />
+      </span>
     </div>
   );
 }
@@ -110,6 +125,10 @@ type Props = Actions & {
   status: Status;
   upgrades: number;
   onBestUpgrade: () => void;
+  /** Where the picked item is aimed (lifted to the Items tab, so the reliquary and the tabs agree). */
+  aimSlot: EquipSlot | null;
+  aimFlask: number | null;
+  onAim: (slot: EquipSlot | undefined, idx: number | undefined) => void;
   coarse: boolean;
   phone: boolean;
 };
@@ -137,16 +156,20 @@ function Pair({
 }) {
   return (
     <div class="ix-pair">
-      <div>
+      <div class="ix-leaf" data-paint="panel">
         <div class="muted cmp-title">New</div>
         <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
       </div>
-      <div>
+      <span class="ix-hinge" aria-hidden="true">
+        <i data-paint="chain" />
+        <i data-paint="chain" />
+      </span>
+      <div class="ix-leaf" data-paint="panel">
         <div class="muted cmp-title">{empty}</div>
         {against ? (
           <ItemCard it={against} marks={lineMarks(against, item, 'old')} />
         ) : (
-          <div class="item-card empty-card muted">Empty slot</div>
+          <div class="item-card empty-card muted">Nothing worn here.</div>
         )}
       </div>
     </div>
@@ -179,6 +202,10 @@ function SlotTabs({
           role="tab"
           aria-selected={s.slot === active}
           class={'ix-tab' + (s.slot === active ? ' on' : '') + (s.check.ok ? '' : ' blocked')}
+          data-paint="panel"
+          data-thin
+          data-field={s.slot === active ? 'gold' : 'lapis'}
+          data-pk={s.slot === active ? 'on' : 'off'}
           onClick={() => pick(s.slot)}
         >
           <b>{s.label}</b>
@@ -222,8 +249,6 @@ function ActionRow({
   phone,
   full,
   setFull,
-  both,
-  setBoth,
 }: {
   swap: string;
   title?: string;
@@ -236,9 +261,6 @@ function ActionRow({
   phone: boolean;
   full: boolean;
   setFull: (f: boolean) => void;
-  /** The phone's "show both cards" switch (the full view only). */
-  both?: boolean;
-  setBoth?: (b: boolean) => void;
 }) {
   return (
     <div class="item-actions ix-actions">
@@ -258,16 +280,6 @@ function ActionRow({
         </button>
       )}
       <DiscardButton it={it} a={a} />
-      {phone && full && both !== undefined && setBoth && (
-        <button
-          class={'btn small ix-both' + (both ? ' on' : '')}
-          aria-label="Show both cards"
-          aria-pressed={both}
-          onClick={() => setBoth(!both)}
-        >
-          Both
-        </button>
-      )}
       {phone && (
         <button
           class="btn small ix-expand"
@@ -291,7 +303,6 @@ function PhoneCompare({
   against,
   rows,
   full,
-  both,
   build,
   extra,
   sockets,
@@ -300,33 +311,32 @@ function PhoneCompare({
   against: Item | FlaskItem | undefined;
   rows: DiffRow[];
   full: boolean;
-  /** Both cards shown under the merged one. */
-  both: boolean;
   build: Build;
-  /** The calculated changes: with both cards shown, under them. */
+  /** The calculated changes, on their plaque. */
   extra?: ComponentChildren;
   sockets?: ComponentChildren;
 }) {
+  // The result first; then the changed lines (the peek) or both cards, the worn one always in sight (the full view).
   if (!full)
     return (
       <>
+        {extra}
         <DiffLines rows={rows} />
         {sockets}
       </>
     );
   return (
     <>
+      {extra}
       {sockets}
-      {against ? <DiffCard it={it} rows={rows} /> : <ItemCard it={it} build={build} />}
-      {both && (
-        <>
-          <Pair item={it} against={against} empty="Worn" build={build} />
-          {extra}
-        </>
-      )}
+      <Pair item={it} against={against} empty="Worn" build={build} />
     </>
   );
 }
+
+/** What the wear button says: "Wear in Off hand", "Wear as Ring 1". */
+const wearLabel = (label: string) =>
+  /^Ring/.test(label) ? `Wear as ${label}` : `Wear in ${label}`;
 
 function ItemBody({
   run,
@@ -336,6 +346,8 @@ function ItemBody({
   phone,
   full,
   setFull,
+  aim,
+  onAim,
 }: {
   run: RunState;
   item: Item;
@@ -344,12 +356,13 @@ function ItemBody({
   phone: boolean;
   full: boolean;
   setFull: (f: boolean) => void;
+  /** The slot the item is aimed at (a lit slot on the reliquary, or a tab); unset, the best one. */
+  aim: EquipSlot | null;
+  onAim: (slot: EquipSlot) => void;
 }) {
   const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
-  const [pick, setPick] = useState<{ uid: number; slot: EquipSlot } | null>(null);
-  const [both, setBoth] = useState(false);
   const best = slots.find((s) => s.best) ?? slots[0];
-  const active = (pick?.uid === item.uid && slots.find((s) => s.slot === pick.slot)) || best;
+  const active = (aim && slots.find((s) => s.slot === aim)) || best;
   if (!active) return null;
   const ok = active.check.ok;
   const chips =
@@ -364,49 +377,33 @@ function ItemBody({
       names={!phone || full}
     />
   ) : null;
-  const also = active.alsoMoves.length > 0 && (
-    <div class="ix-note">
-      Also sends back to the bag: {active.alsoMoves.map((x) => x.name).join(', ')}.
-    </div>
-  );
   return (
     <>
-      <SlotTabs
-        slots={slots}
-        active={active.slot}
-        pick={(s) => setPick({ uid: item.uid, slot: s })}
-      />
-      <div class="ix-vs">
-        {active.equipped ? (
-          <>
-            vs <b>{active.equipped.name}</b> · worn in {active.label}
-          </>
-        ) : (
-          <>{active.label} is empty</>
-        )}
-      </div>
-      {!ok && <div class="warn">{whyNot(active.check)}</div>}
+      <SlotTabs slots={slots} active={active.slot} pick={onAim} />
+      {!ok && (
+        <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
+          {whyNot(active.check)}
+        </div>
+      )}
       {phone ? (
         <PhoneCompare
           it={item}
           against={active.equipped}
           rows={diffRows(item, active.equipped)}
           full={full}
-          both={both}
           build={run.build}
           extra={chips}
           sockets={sockets}
         />
       ) : (
         <>
-          {sockets}
-          <Pair item={item} against={active.equipped} empty={`Worn: ${active.label}`} />
           {chips}
+          <Pair item={item} against={active.equipped} empty={`Worn: ${active.label}`} />
+          {sockets}
         </>
       )}
-      {also}
       <ActionRow
-        swap={active.equipped ? 'Swap' : 'Equip'}
+        swap={wearLabel(active.label)}
         title={ok ? `Into ${active.label}` : whyNot(active.check)}
         disabled={!ok}
         onSwap={() => a.onEquip(item.uid, active.slot)}
@@ -417,8 +414,6 @@ function ItemBody({
         phone={phone}
         full={full}
         setFull={setFull}
-        both={both}
-        setBoth={setBoth}
       />
     </>
   );
@@ -432,6 +427,8 @@ function FlaskBody({
   phone,
   full,
   setFull,
+  aim,
+  onAim,
 }: {
   run: RunState;
   flask: FlaskItem;
@@ -440,14 +437,12 @@ function FlaskBody({
   phone: boolean;
   full: boolean;
   setFull: (f: boolean) => void;
+  aim: number | null;
+  onAim: (idx: number) => void;
 }) {
   const slots = useMemo(() => compareFlasks(run, flask.uid), [run.build, run.inventory, flask.uid]);
-  const [pick, setPick] = useState<{ uid: number; idx: number } | null>(null);
-  const [both, setBoth] = useState(false);
   const chosen = slots.find((s) => s.chosen) ?? slots[0];
-  const active: FlaskCompare =
-    (pick?.uid === flask.uid && slots.find((s) => s.idx === pick.idx)) || chosen;
-  const kind = flaskBase(flask.baseId).kind;
+  const active: FlaskCompare = (aim !== null && slots.find((s) => s.idx === aim)) || chosen;
   return (
     <>
       <div class="ix-tabs" role="tablist" aria-label="Flask slot">
@@ -457,7 +452,11 @@ function FlaskBody({
             role="tab"
             aria-selected={s.idx === active.idx}
             class={'ix-tab' + (s.idx === active.idx ? ' on' : '')}
-            onClick={() => setPick({ uid: flask.uid, idx: s.idx })}
+            data-paint="panel"
+            data-thin
+            data-field={s.idx === active.idx ? 'gold' : 'lapis'}
+            data-pk={s.idx === active.idx ? 'on' : 'off'}
+            onClick={() => onAim(s.idx)}
           >
             <b>Flask {s.idx + 1}</b>
             <span class="muted">{s.equipped ? s.equipped.name : 'empty'}</span>
@@ -465,22 +464,12 @@ function FlaskBody({
           </button>
         ))}
       </div>
-      <div class="ix-vs">
-        {active.equipped ? (
-          <>
-            vs <b>{active.equipped.name}</b> · worn in Flask {active.idx + 1}
-          </>
-        ) : (
-          <>Flask {active.idx + 1} is empty</>
-        )}
-      </div>
       {phone ? (
         <PhoneCompare
           it={flask}
           against={active.equipped ?? undefined}
           rows={diffRows(flask, active.equipped ?? undefined)}
           full={full}
-          both={both}
           build={run.build}
         />
       ) : (
@@ -491,14 +480,13 @@ function FlaskBody({
           build={run.build}
         />
       )}
-      {!active.ok && <div class="warn">{active.reason}.</div>}
-      {active.ok && active.equipped && flaskBase(active.equipped.baseId).kind !== kind && (
-        <div class="ix-note">
-          This replaces a {flaskBase(active.equipped.baseId).kind} flask with a {kind} one.
+      {!active.ok && (
+        <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
+          {active.reason}.
         </div>
       )}
       <ActionRow
-        swap={active.equipped ? 'Swap' : 'Equip'}
+        swap={`Carry as Flask ${active.idx + 1}`}
         title={`Into Flask ${active.idx + 1}`}
         disabled={!active.ok}
         onSwap={() => a.onEquipFlask(flask.uid, active.idx)}
@@ -508,8 +496,6 @@ function FlaskBody({
         phone={phone}
         full={full}
         setFull={setFull}
-        both={both}
-        setBoth={setBoth}
       />
     </>
   );
@@ -530,7 +516,7 @@ function WornGems({
   const free = it.sockets.length - gems.length;
   return (
     <div class="ix-worngems">
-      <SocketPips sockets={it.sockets} primary={primary} />
+      <Stones sockets={it.sockets} />
       <span class="ix-note">
         {gems.length
           ? joinNames(gems.map((g) => (g.uid === primary ? '★ ' : '') + gemDef(g.gemId).name))
@@ -585,10 +571,10 @@ export function ItemDetail(p: Props) {
     </div>
   );
   const status = p.status && (
-    <div class="ix-status" role="status">
-      {p.status.text}{' '}
+    <div class="ix-status" role="status" data-paint="panel" data-thin>
+      <span>{p.status.text}</span>
       {p.status.undo && (
-        <button class="link" onClick={a.onUndo}>
+        <button class="btn small" onClick={a.onUndo}>
           Undo
         </button>
       )}
@@ -600,20 +586,23 @@ export function ItemDetail(p: Props) {
       <div class="ix-detail ix-empty">
         {status}
         <div class="ix-guide">
-          <b>Pick something</b>
-          <div class="muted">
-            {p.coarse ? 'Tap' : 'Click'} an item in the bag to see how it changes you, slot by slot.
+          <div class="ix-hint" data-paint="panel" data-thin>
+            {p.coarse ? 'Tap' : 'Pick'} something in the bag to see it beside what you wear.
+            {!p.coarse && (
+              <span
+                class="ix-keys"
+                {...infoProps(
+                  'Keys: ↑/↓ browse · Enter equip · F favourite · Del discard · U take off · Ctrl+Z undo. Drag an item onto a slot to equip it.',
+                )}
+              >
+                ?
+              </span>
+            )}
           </div>
           {p.upgrades > 0 && (
-            <button class="btn small primary" onClick={p.onBestUpgrade}>
+            <button class="btn primary" onClick={p.onBestUpgrade}>
               {p.upgrades} upgrade{p.upgrades > 1 ? 's' : ''} in the bag: show the best
             </button>
-          )}
-          {!p.coarse && (
-            <div class="muted hint">
-              Keys: ↑/↓ browse · Enter equip · F favourite · Del discard · U take off · Ctrl+Z undo.
-              Drag an item onto a slot to equip it.
-            </div>
           )}
         </div>
       </div>
@@ -655,6 +644,8 @@ export function ItemDetail(p: Props) {
             phone={p.phone}
             full={full}
             setFull={setFull}
+            aim={p.aimSlot}
+            onAim={(slot) => p.onAim(slot, undefined)}
           />
         )}
         {inBag && selected.kind === 'flask' && (
@@ -666,6 +657,8 @@ export function ItemDetail(p: Props) {
             phone={p.phone}
             full={full}
             setFull={setFull}
+            aim={p.aimFlask}
+            onAim={(idx) => p.onAim(undefined, idx)}
           />
         )}
         {inBag && selected.kind === 'gem' && (
@@ -719,7 +712,6 @@ export function ItemDetail(p: Props) {
                 onEdit={() => a.onEditGems?.(sel.slot)}
               />
             )}
-            {sel.from === 'slot' && <div class="ix-note">Worn in {slotName(sel.slot)}.</div>}
           </>
         )}
         {p.info &&

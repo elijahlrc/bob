@@ -26,7 +26,6 @@ import {
   type SocketRef,
   slotName,
   sortItems,
-  type SortKey,
 } from '../run/inventoryOps';
 import { isFavourite, markSeen, toggleFavourite } from '../run/found';
 import { joinNames } from '../run/socketText';
@@ -36,7 +35,7 @@ import { CleanUp } from './CleanUp';
 import { useViewport } from './device';
 import { Gear, gearSummary, type SlotMark } from './Gear';
 import { ItemDetail, type Sel, type Status } from './ItemDetail';
-import { ItemList, type View, type What } from './ItemList';
+import { ItemList, type ListSort, type View, type What } from './ItemList';
 import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 
@@ -88,17 +87,18 @@ export function Items({
   const [drag, setDrag] = useState<Drag>(null);
   const [status, setStatus] = useState<Status>(null);
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortKey>(() => loadPref<SortKey>('inv.sort', 'newest'));
+  const [sort, setSort] = useState<ListSort>(() => loadPref<ListSort>('inv.sort', 'newest'));
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
   const [what, setWhat] = useState<What>(() => (startView ? 'all' : loadWhat()));
   const [view, setView] = useState<View>(() => startView ?? loadView());
   // A visit opened on `startView` saves the filters only once the player changes them.
   const keepWhat = useRef(startView !== undefined);
   const keepView = useRef(startView !== undefined);
-  const [pinFav, setPinFav] = useState<boolean>(() => loadPref<boolean>('inv.pinFav', true));
   const [cleaning, setCleaning] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
-  useEffect(() => savePref('inv.pinFav', pinFav), [pinFav]);
+  // Where the picked bag item is aimed (a slot, or a flask slot): a lit slot on the reliquary or a tab re-aims it, and
+  // Wear puts it there. Unset, it is the best slot.
+  const [aim, setAim] = useState<{ uid: number; slot?: EquipSlot; idx?: number } | null>(null);
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);
   useEffect(() => {
@@ -147,9 +147,9 @@ export function Items({
     else if (view === 'upgrades') pool = filterItems(pool, infos, 'upgrades');
     if (what !== 'all') pool = filterItems(pool, listInfos, what);
     if (q) pool = pool.filter((x) => searchText(x).includes(q));
-    const sorted = sortItems(pool, listInfos, sort, desc);
-    // Starred items go on top of whatever the sort is, keeping the sort inside both groups.
-    return pinFav && view !== 'fav'
+    const sorted = sortItems(pool, listInfos, sort === 'fav' ? 'newest' : sort, desc);
+    // Sorted by favourites: the starred ones first, newest first inside both groups.
+    return sort === 'fav'
       ? [...sorted.filter((x) => favs.has(x.uid)), ...sorted.filter((x) => !favs.has(x.uid))]
       : sorted;
   }, [
@@ -165,7 +165,6 @@ export function Items({
     lastDrops,
     unseen,
     favs,
-    pinFav,
   ]);
   const junk = useMemo(() => junkItems(run), [run.build, run.inventory, rev]);
 
@@ -218,7 +217,7 @@ export function Items({
       const back = dry.toBag;
       const gems = dry.sockets.out.map((g) => gemDef(g.gemId).name);
       say(
-        `Equipped ${itemTitle(item)} in ${slotName(slot)}.` +
+        `Wearing ${itemTitle(item)} in ${slotName(slot)}.` +
           (back.length ? ` ${joinNames(back.map((x) => x.name))} went to the bag.` : '') +
           (gems.length ? ` ${joinNames(gems)} ${gems.length > 1 ? 'are' : 'is'} in the bag.` : ''),
       );
@@ -232,7 +231,7 @@ export function Items({
     const r = c.act((rn) => equipFlask(rn, uid, idx));
     after(r === undefined ? undefined : { ok: !!r }, () => {
       say(
-        `Equipped ${f?.kind === 'flask' ? f.name : 'the flask'} in Flask ${idx + 1}.` +
+        `Carrying ${f?.kind === 'flask' ? f.name : 'the flask'} as Flask ${idx + 1}.` +
           (old ? ` ${old.name} went to the bag.` : ''),
       );
       setSel(old ? { from: 'inv', uid: old.uid } : { from: 'flask', idx });
@@ -406,19 +405,26 @@ export function Items({
     } else if (e.key === 'Escape') setSel(null);
   };
 
+  // A slot the picked bag item fits is a place to aim it (the comparison follows; Wear puts it there); any other slot
+  // shows what is worn there.
   const onSlot = (slot: EquipSlot) => {
-    const t = targets.get(slot);
-    if (sel?.from === 'inv' && t) {
-      if (t.ok) equipTo(sel.uid, slot);
-      else say(t.reason ?? 'Cannot be worn there.', false);
-    } else setSel({ from: 'slot', slot });
+    if (sel?.from === 'inv' && targets.get(slot)) setAim({ uid: sel.uid, slot });
+    else setSel({ from: 'slot', slot });
   };
   const onFlask = (idx: number) => {
-    if (sel?.from === 'inv' && flaskTargets) equipFlaskTo(sel.uid, idx);
+    if (sel?.from === 'inv' && flaskTargets) setAim({ uid: sel.uid, idx });
     else setSel({ from: 'flask', idx });
   };
 
   const info = sel?.from === 'inv' ? infos.get(sel.uid) : undefined;
+  const aimed = sel?.from === 'inv' && aim?.uid === sel.uid ? aim : null;
+  const aimSlot =
+    aimed?.slot ?? (sel?.from === 'inv' && targets.size ? (info?.slot ?? null) : null);
+  const aimFlask =
+    aimed?.idx ??
+    (sel?.from === 'inv' && flaskTargets && selected?.kind === 'flask'
+      ? flaskTarget(run, selected)
+      : null);
   const showGear = !phone || gearOpen;
   return (
     <div class="ix" tabIndex={0} onKeyDown={onKey}>
@@ -441,6 +447,8 @@ export function Items({
             targets={targets}
             peek={peekSlots}
             flaskTargets={flaskTargets}
+            aimSlot={aimSlot}
+            aimFlask={aimFlask}
             dragging={drag !== null}
             onSlot={onSlot}
             onFlask={onFlask}
@@ -461,6 +469,9 @@ export function Items({
           status={status}
           upgrades={counts.upgrades}
           onBestUpgrade={bestUpgrade}
+          aimSlot={aimed?.slot ?? null}
+          aimFlask={aimed?.idx ?? null}
+          onAim={(slot, idx) => sel?.from === 'inv' && setAim({ uid: sel.uid, slot, idx })}
           coarse={coarse}
           phone={phone}
           onEquip={equipTo}
@@ -505,8 +516,6 @@ export function Items({
           setWhat={setWhat}
           view={view}
           setView={setView}
-          pinFav={pinFav}
-          setPinFav={setPinFav}
           unseenCount={counts.new}
           junkCount={junk.length}
           onMarkSeen={() => c.act((r) => markSeen(r, 'all'))}
@@ -514,7 +523,6 @@ export function Items({
           onSalvageJunk={() => void salvageJunk()}
           onSelect={(uid) => setSel({ from: view === 'discarded' ? 'pile' : 'inv', uid })}
           onQuick={doQuick}
-          onStar={star}
           onPeek={setPeek}
           onDrag={(uid) => setDrag(uid === null ? null : { kind: 'inv', uid })}
           onDropOnList={() => {

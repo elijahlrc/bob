@@ -1,17 +1,57 @@
+import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
+import { gemDef } from '../data/gems';
 import type { EquipSlot, FlaskItem, Item } from '../data/types';
 import type { RunState } from '../run/run';
 import { slotName } from '../run/inventoryOps';
 import { rarityClass } from './ItemCard';
-import { SocketPips } from './SocketPips';
 
-/** Where each slot sits, drawn roughly as a body (docs/ITEMS.md 3.3). Empty strings are gaps. */
-const LAYOUT: (EquipSlot | '')[][] = [
-  ['mainHand', 'helmet', 'offHand'],
-  ['gloves', 'body', 'boots'],
-  ['ring1', 'amulet', 'ring2'],
-  ['', 'belt', ''],
-];
+/**
+ * Where each slot sits on the soul's shadow in the reliquary (docs/mockups/style/STYLE-GUIDE.md section 10): column and
+ * row of a five by five grid, helmet at the head, rings beside the amulet, a hand at either side, boots at the feet.
+ */
+const PLACE: Record<EquipSlot, [number, number]> = {
+  helmet: [3, 1],
+  ring1: [2, 2],
+  amulet: [3, 2],
+  ring2: [4, 2],
+  mainHand: [1, 3],
+  body: [3, 3],
+  offHand: [5, 3],
+  gloves: [1, 4],
+  belt: [3, 4],
+  boots: [3, 5],
+};
+const SLOTS = Object.keys(PLACE) as EquipSlot[];
+/** The row centres of head, shoulders, hands, waist and feet, as fractions of the reliquary's height (gear.css). */
+const ROWS = '0.214,0.343,0.471,0.6,0.729';
+
+/** The glyph a slot shows: its kind, or for the off hand what is held there. */
+function glyphOf(slot: EquipSlot, it: Item | undefined): string {
+  if (slot === 'mainHand') return 'blade';
+  if (slot === 'offHand')
+    return !it || itemBase(it.baseId).itemClass === 'shield' ? 'shield' : 'blade';
+  return (
+    {
+      helmet: 'helm',
+      body: 'body',
+      gloves: 'gloves',
+      boots: 'boots',
+      amulet: 'amulet',
+      belt: 'belt',
+    }[slot as string] ?? 'ring'
+  );
+}
+/** A slot's sockets for its roundel: a letter per socket, the gem's colour or o for empty. */
+const socketCode = (it: Item) =>
+  it.sockets
+    .map((g) =>
+      g
+        ? (({ str: 'r', dex: 'g', int: 'b' } as Record<string, string>)[gemDef(g.gemId).attr] ??
+          'w')
+        : 'o',
+    )
+    .join('');
 
 export type SlotMark = { ok: boolean; reason?: string };
 
@@ -27,6 +67,9 @@ type Props = {
   flaskTargets: boolean;
   /** Whether a drag is under way, and which slots it may be dropped on. */
   dragging: boolean;
+  /** The slot or flask the picked bag item is aimed at (its comparison is shown; Wear puts it there). */
+  aimSlot?: EquipSlot | null;
+  aimFlask?: number | null;
   onSlot: (slot: EquipSlot) => void;
   onFlask: (idx: number) => void;
   onUnequip: (slot: EquipSlot) => void;
@@ -35,32 +78,44 @@ type Props = {
   onDropSlot: (slot: EquipSlot) => void;
 };
 
-function slotSummary(it: Item): string {
-  const n = it.affixes.length;
-  return n ? `${n} affix${n > 1 ? 'es' : ''}` : '';
-}
-
-/** The ten worn slots and five flask slots. Each is a button; a worn one carries a × that takes it off. */
+/**
+ * The ten worn slots and five flasks, in the reliquary. Each slot is a roundel in its item's rarity colour with its
+ * glyph and its sockets; its name shows on hover. A worn one carries a × that takes it off. Slots the picked bag item
+ * fits are ringed, the one it is aimed at solidly.
+ */
 export function Gear(p: Props) {
   const { run } = p;
+  const aiming = p.targets.size > 0 || p.flaskTargets;
   const slot = (id: EquipSlot) => {
     const it = run.build.equipment[id];
     const t = p.targets.get(id);
+    const aimed = p.aimSlot === id || p.selSlot === id;
+    const state = aimed ? 'aim' : t?.ok ? 'target' : '';
     const classes = [
       'ix-slot',
       it ? rarityClass(it) : 'empty',
       p.selSlot === id ? 'sel' : '',
       t ? (t.ok ? 'target' : 'blocked') : '',
+      aimed ? 'aimed' : '',
+      aiming && !t ? 'dim' : '',
       !t && p.peek.has(id) ? 'peek' : '',
       p.dragging && t?.ok ? 'drop' : '',
     ]
       .filter(Boolean)
       .join(' ');
+    const [col, row] = PLACE[id];
+    const tip = t && !t.ok ? t.reason : it ? it.name : `${slotName(id)}: empty`;
+    const code = it ? socketCode(it) : '';
     return (
-      <div key={id} class="ix-slot-wrap">
+      <div key={id} class="ix-slot-wrap" style={{ gridColumn: col, gridRow: row }}>
         <button
           class={classes}
-          title={t && !t.ok ? t.reason : it ? `${it.name}\n${slotSummary(it)}` : slotName(id)}
+          data-paint="slot"
+          data-rar={it ? (it.kind === 'item' ? it.rarity : 'normal') : 'empty'}
+          data-glyph={glyphOf(id, it)}
+          data-sockets={code}
+          data-state={state}
+          data-pk={`${it?.uid ?? 'none'}${code}${state}`}
           draggable={!!it}
           onDragStart={(e) => {
             e.dataTransfer?.setData('text/plain', `slot:${id}`);
@@ -77,15 +132,9 @@ export function Gear(p: Props) {
           onClick={() => p.onSlot(id)}
           aria-label={`${slotName(id)}: ${it ? it.name : 'empty'}`}
         >
-          <span class="ix-slot-label">{slotName(id)}</span>
-          <span class="ix-slot-name">{it ? it.name : '—'}</span>
-          {it && it.sockets.length > 0 && (
-            <span class="ix-slot-pips">
-              <SocketPips sockets={it.sockets} primary={run.build.primaryGem} />
-            </span>
-          )}
+          <span class="ix-slot-tip">{tip}</span>
         </button>
-        {it && !t && (
+        {it && !aiming && (
           <button
             class="ix-slot-x"
             aria-label={`Take off ${it.name}`}
@@ -101,41 +150,45 @@ export function Gear(p: Props) {
       </div>
     );
   };
-  const flask = (f: FlaskItem | null, i: number) => (
-    <div key={i} class="ix-slot-wrap">
-      <button
-        class={`ix-slot ix-flask ${f ? 'flaskitem' : 'empty'}${
-          p.selFlask === i ? ' sel' : ''
-        }${p.flaskTargets ? ' target' : ''}`}
-        title={f ? f.name : `Flask ${i + 1}`}
-        onClick={() => p.onFlask(i)}
-        aria-label={`Flask ${i + 1}: ${f ? f.name : 'empty'}`}
-      >
-        <span class={'ix-bottle' + (f ? ' ' + flaskBase(f.baseId).kind : '')} />
-        <span class="ix-slot-name">{f ? f.name : '—'}</span>
-      </button>
-      {f && !p.flaskTargets && (
+  const flask = (f: FlaskItem | null, i: number) => {
+    const aimed = p.aimFlask === i || p.selFlask === i;
+    return (
+      <div key={i} class="ix-slot-wrap ix-flask-wrap">
         <button
-          class="ix-slot-x"
-          aria-label={`Take off ${f.name}`}
-          title="Take off"
-          onClick={(e) => {
-            e.stopPropagation();
-            p.onUnequipFlask(i);
-          }}
+          class={`ix-slot ix-flask ${f ? 'flaskitem' : 'empty'}${p.selFlask === i ? ' sel' : ''}${
+            p.flaskTargets ? ' target' : ''
+          }${aimed ? ' aimed' : ''}${aiming && !p.flaskTargets ? ' dim' : ''}`}
+          onClick={() => p.onFlask(i)}
+          aria-label={`Flask ${i + 1}: ${f ? f.name : 'empty'}`}
         >
-          ×
+          <i
+            class="ix-bottle-art"
+            data-paint="bottle"
+            data-liquid={f ? flaskBase(f.baseId).kind : 'empty'}
+            data-fill={f ? '0.8' : '0'}
+            data-pk={f ? String(f.uid) : 'empty'}
+          />
+          <span class="ix-slot-tip">{f ? f.name : `Flask ${i + 1}: empty`}</span>
         </button>
-      )}
-    </div>
-  );
-  return (
-    <div class="ix-gear">
-      <div class="ix-doll">
-        {LAYOUT.flat().map((id, i) =>
-          id ? slot(id) : <div key={`gap${i}`} class="ix-gap" aria-hidden="true" />,
+        {f && !aiming && (
+          <button
+            class="ix-slot-x"
+            aria-label={`Take off ${f.name}`}
+            title="Take off"
+            onClick={(e) => {
+              e.stopPropagation();
+              p.onUnequipFlask(i);
+            }}
+          >
+            ×
+          </button>
         )}
       </div>
+    );
+  };
+  return (
+    <div class="ix-gear ix-reliq" data-paint="soul" data-rows={ROWS}>
+      <div class={'ix-doll' + (aiming ? ' aiming' : '')}>{SLOTS.map(slot)}</div>
       <div class="ix-flasks">{run.build.flasks.map(flask)}</div>
     </div>
   );

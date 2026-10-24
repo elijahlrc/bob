@@ -1,1 +1,905 @@
-/* Gold Leaf: items (filled in by the port, docs/mockups/style/STYLE-GUIDE.md section 10). */
+/* Gold Leaf: the Items tab (Items.tsx, Gear.tsx, ItemDetail.tsx, ItemList.tsx, ItemCard.tsx, DiffCard.tsx, CleanUp.tsx),
+   over the old layout in items.css. The worn gear hangs on a damned soul's shadow in an arched niche; the picked item
+   and the worn one open as a diptych with the result on a porphyry plaque; the bag is a lapis panel of small plaques
+   with its housekeeping always at the foot. The doc: docs/mockups/style/STYLE-GUIDE.md sections 8 and 10. */
+
+html.leaf .ix {
+  grid-template-columns: 300px minmax(0, 1fr) 340px;
+  gap: 20px;
+  padding: 16px 20px 28px;
+  font-size: var(--size);
+}
+
+/* ---- The reliquary ---- */
+html.leaf .ix-gear.ix-reliq {
+  position: relative;
+  display: block;
+  width: 300px;
+  height: 560px;
+  margin: 0 auto;
+  padding: 84px 8px 0;
+  box-sizing: border-box;
+}
+html.leaf .ix-doll {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-auto-rows: 72px;
+  gap: 0;
+  justify-items: center;
+  align-items: center;
+}
+html.leaf .ix-slot-wrap {
+  position: relative;
+}
+html.leaf .ix-slot {
+  position: relative;
+  display: block;
+  width: 56px;
+  min-height: 0;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  overflow: visible;
+  cursor: pointer;
+}
+html.leaf .ix-slot:hover {
+  filter: brightness(1.15);
+}
+/* The painting rings a slot the picked item fits (and the aimed one solidly): no box round it. */
+html.leaf .ix-slot:is(.sel, .target, .peek, .drop) {
+  outline: 0;
+  background-color: transparent;
+}
+html.leaf .ix-slot.peek {
+  filter: brightness(1.25);
+}
+html.leaf .ix-slot.dim,
+html.leaf .ix-slot.blocked {
+  opacity: 0.45;
+  filter: saturate(0.5);
+}
+html.leaf .ix-slot.drop {
+  filter: brightness(1.3);
+}
+/* A slot's name, on hover or focus: a lapis tip with a gold ring. */
+html.leaf .ix-slot-tip {
+  display: none;
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 240px;
+  padding: 8px 12px;
+  font-size: var(--size);
+  line-height: 1.3;
+  color: var(--pearl);
+  text-align: center;
+  text-shadow: var(--text-shadow);
+  white-space: normal;
+  background: var(--t-lapis, #172049);
+  box-shadow:
+    0 0 0 2px #c09d4e,
+    4px 6px 0 2px #0b080555;
+  pointer-events: none;
+}
+html.leaf .ix-slot:is(:hover, :focus-visible) .ix-slot-tip {
+  display: block;
+}
+html.leaf .ix-slot-x {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 20px;
+  color: var(--pearl);
+  text-align: center;
+  background: #2f417e;
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 0 0 2px #c09d4e,
+    2px 3px 0 1px #0b080555;
+  text-shadow: var(--text-shadow);
+  opacity: 0;
+  cursor: pointer;
+}
+html.leaf .ix-slot-wrap:hover .ix-slot-x,
+html.leaf .ix-slot-x:focus-visible {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  html.leaf .ix-slot-x {
+    opacity: 1;
+  }
+}
+html.leaf .ix-flasks {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+html.leaf .ix-slot.ix-flask {
+  width: 40px;
+  height: 60px;
+}
+html.leaf .ix-bottle-art {
+  position: absolute;
+  inset: 0;
+}
+html.leaf .ix-slot.ix-flask:is(.target, .aimed) {
+  outline: 2px dashed #eee8d6;
+  outline-offset: 4px;
+}
+html.leaf .ix-slot.ix-flask.aimed {
+  outline-style: solid;
+}
+html.leaf .ix-gear-toggle {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 18px;
+  font: inherit;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  border: 0;
+  border-radius: 0;
+  background: #172049;
+  box-shadow: var(--ring);
+  cursor: pointer;
+}
+
+/* ---- The selection ---- */
+html.leaf .ix-detailcol {
+  top: 0;
+  max-height: none;
+  overflow: visible;
+}
+html.leaf .ix-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+html.leaf .ix-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* The header repeats the card's name on a desktop: only its star and close stay. */
+html.leaf .ix-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0;
+}
+html.leaf .ix-head .ix-title {
+  display: none;
+}
+html.leaf .ix-head :is(.ix-star, .ix-close) {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 22px;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+  background: #172049;
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--ring);
+  cursor: pointer;
+}
+html.leaf .ix-head .ix-close {
+  display: block;
+}
+html.leaf .ix-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding-top: 40px;
+}
+html.leaf .ix-hint {
+  padding: 12px 22px;
+  text-align: center;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .ix-keys {
+  display: inline-block;
+  margin-left: 10px;
+  color: var(--gold-hi);
+  border-bottom: 2px dotted #e2c68188;
+  cursor: help;
+}
+html.leaf .ix-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px 10px 20px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  border: 0;
+  background-color: transparent;
+}
+/* The slots it fits, as plaques; the aimed one gold. */
+html.leaf .ix-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border: 0;
+}
+html.leaf .ix-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 8px 16px 9px;
+  font: inherit;
+  text-align: left;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+html.leaf .ix-tab b {
+  font: 400 24px/1 var(--title-font);
+  font-size-adjust: none;
+}
+html.leaf .ix-tab .muted {
+  color: var(--muted);
+}
+html.leaf .ix-tab-d {
+  font-size: var(--size);
+}
+html.leaf .ix-tab-d.up {
+  color: var(--gain);
+}
+html.leaf .ix-tab-d.down,
+html.leaf .ix-tab-d.warn {
+  color: var(--madder);
+}
+html.leaf .ix-tab.on,
+html.leaf .ix-tab.on :is(.muted, .ix-tab-d) {
+  color: var(--on-gold);
+  text-shadow: none;
+}
+/* What it changes: damage and effective HP large on a porphyry plaque, the rest under them. */
+html.leaf .ix-delta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px 34px;
+  padding: 14px 24px 16px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .ix-big b {
+  font: 400 40px/1 var(--title-font);
+  font-size-adjust: none;
+}
+html.leaf .ix-big b.up {
+  color: var(--gain);
+}
+html.leaf .ix-big b.down {
+  color: var(--madder);
+}
+html.leaf .ix-delta-more {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 16px;
+  flex-basis: 100%;
+}
+html.leaf .ix-delta-more:empty {
+  display: none;
+}
+html.leaf .ix-chip {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--size);
+}
+html.leaf .ix-chip.up {
+  color: var(--gain);
+}
+html.leaf .ix-chip.down {
+  color: var(--madder);
+}
+html.leaf .ix-chip .ix-arr {
+  display: none;
+}
+html.leaf .ix-warn {
+  padding: 12px 20px;
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+/* The diptych: two hinged leaves. */
+html.leaf .ix-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+}
+html.leaf .ix-leaf {
+  min-width: 0;
+  padding: 18px 20px 22px;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .ix-hinge {
+  position: relative;
+}
+html.leaf .ix-hinge i {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  height: 16px;
+}
+html.leaf .ix-hinge i:first-child {
+  top: 50px;
+}
+html.leaf .ix-hinge i:last-child {
+  bottom: 50px;
+}
+html.leaf .ix-leaf .cmp-title {
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+/* The sockets and the gems a swap moves */
+html.leaf .ix-sockets {
+  padding: 12px 18px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background: #172049cc;
+  box-shadow: var(--ring);
+}
+html.leaf .ix-sk-lab {
+  color: var(--muted);
+  font-size: var(--size);
+}
+html.leaf .ix-gc {
+  font-size: var(--size);
+  border: 0;
+  background: none;
+  padding: 0 8px 0 0;
+}
+html.leaf .ix-sk-note {
+  font-size: var(--size);
+}
+html.leaf .ix-sk-note.warn,
+html.leaf .ix-sk-note.bad {
+  color: var(--madder);
+}
+html.leaf .ix-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+html.leaf .ix-note {
+  color: var(--on-gold);
+  font-weight: 600;
+  font-size: var(--size);
+}
+html.leaf .ix-worngems {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background: #172049cc;
+  box-shadow: var(--ring);
+}
+html.leaf .ix-worngems .ix-note {
+  color: var(--pearl);
+  font-weight: 400;
+}
+/* A worn item or a gem shown alone sits on a leaf of its own. */
+html.leaf .ix-body > .item-card,
+html.leaf .ix-body > .gem-card {
+  padding: 18px 20px 22px;
+  background: var(--t-lapis, #172049);
+  box-shadow:
+    0 0 0 3px #c09d4e,
+    5px 7px 0 2px #0b080566;
+}
+
+/* ---- An item card (inside a leaf) ---- */
+html.leaf .item-card {
+  padding: 0;
+  font-size: var(--size);
+  color: var(--pearl);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .item-card .ic-name {
+  margin: 0 -6px 10px;
+  padding: 9px 14px 10px;
+  font-size: 24px;
+  line-height: 1.05;
+  color: var(--on-gold);
+  text-shadow: 0 1px 0 #ffffff33;
+}
+html.leaf .item-card.unique .ic-name,
+html.leaf .gem-card .ic-name {
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .item-card :is(.ic-base, .ic-type, .muted) {
+  color: var(--muted);
+  font-size: var(--size);
+}
+html.leaf .item-card .ic-aug {
+  color: var(--gold-hi);
+}
+html.leaf .ic-sockets {
+  margin: 8px 0 2px;
+}
+html.leaf .ic-stones {
+  display: inline-flex;
+  gap: 2px;
+}
+html.leaf .ic-stone {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+html.leaf .item-card .ic-mod,
+html.leaf .item-card .ic-mod:is(.mark-gain, .mark-lost, .mark-diff) {
+  position: relative;
+  padding-left: 18px;
+  box-shadow: none;
+  font-size: var(--size);
+  color: var(--pearl);
+  background: none;
+}
+html.leaf .item-card .ic-mod:first-of-type {
+  margin-top: 6px;
+}
+html.leaf .item-card .ic-mod.implicit {
+  color: var(--muted);
+}
+html.leaf .item-card .ic-mod.rule {
+  color: var(--gold-hi);
+  font-style: italic;
+}
+html.leaf .item-card .ic-mod::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  background: #c09d4e66;
+}
+html.leaf .item-card .ic-mod.mark-gain::before,
+html.leaf .item-card .ic-mod.mark-lost::before,
+html.leaf .item-card .ic-mod.mark-diff::before {
+  width: 8px;
+  height: 8px;
+  left: 1px;
+  top: 0.5em;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+html.leaf .item-card .ic-mod.mark-gain::before {
+  background: #a3d293;
+}
+html.leaf .item-card .ic-mod.mark-lost {
+  color: var(--madder);
+}
+html.leaf .item-card .ic-mod.mark-lost::before {
+  background: #c4553d;
+}
+html.leaf .item-card .ic-mod.mark-diff::before {
+  background: #e2c681;
+}
+html.leaf .item-card.empty-card {
+  color: var(--muted);
+}
+
+/* ---- The bag ---- */
+html.leaf .ix-list-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 18px 22px;
+  background-color: transparent;
+}
+html.leaf .ix-list-col.drop {
+  filter: brightness(1.12);
+}
+html.leaf .ix-baghead {
+  margin: 0;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .ix-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 4px;
+}
+html.leaf .ix-view {
+  padding: 6px 10px 7px;
+  font: inherit;
+  color: var(--muted);
+  text-shadow: var(--text-shadow);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+html.leaf .ix-view .n {
+  color: var(--gold-hi);
+}
+html.leaf .ix-view.on,
+html.leaf .ix-view.on .n {
+  color: var(--on-gold);
+  text-shadow: none;
+}
+html.leaf .ix-kinds {
+  display: flex;
+  justify-content: space-between;
+}
+html.leaf .ix-kind {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+html.leaf .ix-kind i {
+  position: absolute;
+  inset: 8px;
+}
+html.leaf .ix-tools {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: center;
+}
+html.leaf .ix-tools .ix-search {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+html.leaf .ix-sort {
+  width: 130px;
+  flex: none;
+}
+html.leaf .ix-rev {
+  flex: none;
+  width: 40px;
+  padding: 8px 0 9px;
+}
+html.leaf .ix-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html.leaf .ix-rm {
+  padding: 4px 10px;
+  font: inherit;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background: #172049;
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--ring);
+  cursor: pointer;
+}
+html.leaf .ix-rm.clr {
+  color: var(--gold-hi);
+}
+html.leaf .ix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 470px;
+  overflow-y: auto;
+  margin: 0 -8px;
+  padding: 2px 8px 4px;
+  border: 0;
+}
+/* An item of the bag: a plaque of its own. */
+html.leaf .ix-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  margin: 0;
+  padding: 10px 14px 11px;
+  font: inherit;
+  font-size: var(--size);
+  text-align: left;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+html.leaf .ix-row:hover:not(.sel) {
+  filter: brightness(1.15);
+}
+html.leaf .ix-row.unusable {
+  opacity: 0.75;
+}
+html.leaf .ix-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
+html.leaf .ix-row-name {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+html.leaf .ix-row.magic .ix-row-name {
+  color: #b9cbe6;
+}
+html.leaf .ix-row.rare .ix-row-name {
+  color: var(--gold-hi);
+}
+html.leaf .ix-row.unique .ix-row-name {
+  color: #e8a07c;
+}
+html.leaf .ix-row.gem .ix-row-name {
+  color: var(--gain);
+}
+html.leaf .ix-new {
+  flex: none;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 10px 0 2px;
+  background: #e2c681;
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 2px #7e622c;
+}
+html.leaf .ix-favmark {
+  margin-right: 6px;
+  color: var(--gold-hi);
+}
+html.leaf .ix-row-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  font-size: var(--size);
+}
+html.leaf .ix-best {
+  color: var(--pearl);
+}
+html.leaf .ix-row .badge,
+html.leaf .ix-detail .badge {
+  padding: 0;
+  font-size: var(--size);
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+html.leaf .badge.up {
+  color: var(--gain);
+}
+html.leaf .badge.down,
+html.leaf .badge.warn {
+  color: var(--madder);
+}
+html.leaf .ix-nothing {
+  padding: 8px 4px;
+  color: var(--muted);
+}
+/* The housekeeping, always at the foot: two lines of two buttons. */
+html.leaf .ix-tidy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .ix-tidy-row {
+  display: flex;
+  gap: 8px;
+}
+html.leaf .ix-tidy-row .btn {
+  flex: 1 1 0;
+  padding: 8px 6px 9px;
+  white-space: nowrap;
+}
+
+/* ---- The clean-up dialog ---- */
+html.leaf .modal-card.clean {
+  font-size: var(--size);
+}
+html.leaf .clean-row,
+html.leaf .clean-group {
+  font-size: var(--size);
+  border-color: transparent;
+  background: var(--s-dots);
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+
+/* ---- A tablet: the bag below the reliquary, the selection beside both ---- */
+@media (max-width: 1099px) {
+  html.leaf .ix {
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    grid-template-areas:
+      'gear detail'
+      'list detail';
+  }
+}
+
+/* ---- A phone: the gear folded into one line, the bag, the selection as a sheet above the camp bar ---- */
+@media (max-width: 600px) {
+  html.leaf .ix {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'gear'
+      'list';
+    gap: 12px;
+    padding: 12px;
+  }
+  html.leaf .ix-gear.ix-reliq {
+    margin-top: 12px;
+  }
+  html.leaf .ix-list {
+    max-height: none;
+  }
+  html.leaf .ix-detailcol.has-sel {
+    padding: 18px 16px 20px;
+    border-top: 0;
+    background: var(--t-lapis, #172049);
+    box-shadow:
+      0 -3px 0 #c09d4e,
+      0 -6px 0 #7e622c,
+      0 -10px 18px #000a;
+  }
+  html.leaf .ix-head {
+    justify-content: flex-start;
+  }
+  html.leaf .ix-head .ix-title {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    font: 400 24px/1.05 var(--title-font);
+    color: var(--gold-hi);
+    text-shadow: var(--text-shadow);
+  }
+  html.leaf .ix-detail .ix-head .btn.small {
+    color: var(--gold-hi);
+  }
+  html.leaf .ix-grab::after {
+    background: #c09d4e;
+    border-radius: 0;
+  }
+  html.leaf .ix-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  html.leaf .ix-hinge {
+    display: none;
+  }
+  html.leaf .ix-actions {
+    position: sticky;
+    bottom: -20px;
+    margin: 0 -16px -20px;
+    padding: 10px 16px 14px;
+    background: var(--t-lapis, #172049);
+    border-top: 0;
+    box-shadow: 0 -2px 0 #c09d4e;
+  }
+  html.leaf .ix-detail .ix-actions .btn {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: var(--size);
+  }
+  html.leaf .ix-big b {
+    font-size: 32px;
+  }
+  html.leaf .ix-fsheet {
+    padding: 22px 18px 20px;
+    color: var(--pearl);
+    text-shadow: var(--text-shadow);
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+  html.leaf .ix-fsheet {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  html.leaf .ix-fhead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font: 400 24px/1 var(--title-font);
+    color: var(--gold-hi);
+  }
+  html.leaf .ix-fsort,
+  html.leaf .ix-ffoot {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+/* ---- The phone's changed lines and merged card (DiffCard): a marker square, old values beside the new ---- */
+html.leaf .ix-dls {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: var(--size);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .ix-dl {
+  position: relative;
+  padding: 0 0 0 18px;
+  font-size: var(--size);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--pearl);
+}
+html.leaf .ix-dl::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  background: #c09d4e66;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+html.leaf .ix-dl.mark-gain::before {
+  background: #a3d293;
+}
+html.leaf .ix-dl.mark-lost::before {
+  background: #c4553d;
+}
+html.leaf .ix-dl.mark-diff::before {
+  background: #e2c681;
+}
+html.leaf .ix-dl.mark-lost .t {
+  color: var(--madder);
+}
+html.leaf .ix-dl .was {
+  font-size: var(--size);
+  color: var(--dim);
+}
+html.leaf .ix-fold {
+  font-size: var(--size);
+  color: var(--gold-hi);
+}

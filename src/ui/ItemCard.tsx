@@ -12,7 +12,6 @@ import type { Mod } from '../mods/types';
 import { modsText } from '../mods/text';
 import { slotsFor, withEquipped } from '../run/inventory';
 import { GemCard } from './GemCard';
-import { SocketPips } from './SocketPips';
 
 export function rarityClass(it: InventoryItem): string {
   return it.kind === 'item'
@@ -22,6 +21,43 @@ export function rarityClass(it: InventoryItem): string {
         ? 'unique'
         : 'flaskitem'
       : 'gem';
+}
+
+/** The ramp an item's name plaque is painted in, by rarity (leaf/ramps.ts): plaster, sky, gold, vermilion. */
+export function rarityField(it: InventoryItem): string {
+  if (it.kind === 'gem') return 'green';
+  if (it.kind === 'flask') return it.uniqueId ? 'vermilion' : it.affixes.length ? 'sky' : 'plaster';
+  return { normal: 'plaster', magic: 'sky', rare: 'gold', unique: 'vermilion' }[it.rarity];
+}
+
+/** An item's name on its rarity's plaque, at the head of its card. */
+function NamePlaque({ it, name }: { it: InventoryItem; name: string }) {
+  return (
+    <div class="ic-name" data-paint="panel" data-thin data-field={rarityField(it)}>
+      {name}
+    </div>
+  );
+}
+
+/** A row of painted gem stones in their settings, one per socket, in the gem's colour (empty sockets dark). */
+export function Stones({ sockets }: { sockets: Item['sockets'] }) {
+  return (
+    <span
+      class="ic-stones"
+      aria-label={`${sockets.length} socket${sockets.length === 1 ? '' : 's'}`}
+    >
+      {sockets.map((g, i) => (
+        <span
+          key={i}
+          class="ic-stone"
+          data-paint="gem"
+          data-gem={g ? gemDef(g.gemId).attr : 'empty'}
+          data-shape={g && gemDef(g.gemId).kind === 'support' ? 'support' : 'skill'}
+          data-pk={g ? g.gemId : 'empty'}
+        />
+      ))}
+    </span>
+  );
 }
 
 export function itemTitle(it: InventoryItem): string {
@@ -194,7 +230,7 @@ export function ItemCard({
     const b = flaskBase(it.baseId);
     return (
       <div class={`item-card ${it.uniqueId ? 'unique' : 'flaskitem'}`}>
-        <div class="ic-name">{it.name}</div>
+        <NamePlaque it={it} name={it.name} />
         <div class="muted">
           Requires level {b.level} · {b.perUse}/{b.maxCharges} charges · {b.duration} s
         </div>
@@ -234,7 +270,7 @@ export function ItemCard({
   const rules = all.filter(isRule);
   return (
     <div class={`item-card ${it.rarity}`}>
-      <div class="ic-name">{it.name}</div>
+      <NamePlaque it={it} name={it.name} />
       {it.name !== b.name && <div class="ic-base">{b.name}</div>}
       {isWeaponClass(b.itemClass) && <div class="ic-type">{WEAPON_TYPE_NAME[b.itemClass]}</div>}
       {wl && (
@@ -256,11 +292,11 @@ export function ItemCard({
         </div>
       )}
       <div class="muted">
-        Requires {req} · ilvl {it.ilvl}
+        Requires {req} · item level {it.ilvl}
       </div>
       {it.sockets.length > 0 && (
-        <div class="muted ic-sockets">
-          <SocketPips sockets={it.sockets} size="sm" /> {it.sockets.length} linked
+        <div class="ic-sockets">
+          <Stones sockets={it.sockets} />
         </div>
       )}
       {modsText(it.implicits).map((l, i) => (
