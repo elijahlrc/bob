@@ -258,35 +258,146 @@
       x.fillRect(0, 0, S, S);
     },
     /*
-     * Behind the game before it is run, 1920 × 1080: the room of the opening shot, the fight up and left of the middle,
-     * where the Run button is drawn on only floor, shaded a little. Whatever part of it a frame of any shape shows, nothing
-     * that matters is under the button. No title: the banner has it.
+     * Behind the game before it is run, 2560 × 1130, shown at its own size and cropped to the frame's middle: a wall of
+     * fire along the bottom with smoke rising off it into the dark, in pixels `P` to a side and a few colours a band. The
+     * flames burn lowest under the Run button and tallest at the sides, so whatever part a frame shows has fire at its foot
+     * and nothing bright under the button. Nothing is filmed: a seeded generator draws it the same every time. No title:
+     * the banner has it.
      */
     async embed(c) {
-      // The pulled-back clip (zoom 1: a game pixel is 2 of its pixels), at its own size, which is what the page shows; a
-      // frame crops the middle of it. The room, the HUD below 1130 left out; the pack (about 1260, 660) is moved right of the
-      // middle, which falls on the floor and the wall left of it. The void is black.
       const W = (c.width = 2560),
         H = (c.height = 1130);
+      const P = 4;
+      const w = W / P,
+        h = Math.ceil(H / P);
+      let seed = 0x0b0b;
+      const rand = () => {
+        seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+      // Smooth noise: a lattice of random values, eased between, in octaves.
+      const lattice = new Float32Array(256 * 256).map(() => rand());
+      const noise = (u, v) => {
+        const i = Math.floor(u),
+          j = Math.floor(v);
+        const at = (a, b) => lattice[((b & 255) << 8) | (a & 255)];
+        let fu = u - i,
+          fv = v - j;
+        fu = fu * fu * (3 - 2 * fu);
+        fv = fv * fv * (3 - 2 * fv);
+        const top = at(i, j) + (at(i + 1, j) - at(i, j)) * fu;
+        const bot = at(i, j + 1) + (at(i + 1, j + 1) - at(i, j + 1)) * fu;
+        return top + (bot - top) * fv;
+      };
+      const fbm = (u, v) =>
+        0.5 * noise(u, v) +
+        0.27 * noise(u * 2.1 + 17, v * 2.1) +
+        0.15 * noise(u * 4.3 + 41, v * 4.3) +
+        0.08 * noise(u * 8.7 + 83, v * 8.7);
+      // Ordered dithering, so that a band's edge breaks up in a fixed pattern rather than a smooth fade.
+      const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+      const dither = (i, j) => (BAYER[(j & 3) * 4 + (i & 3)] + 0.5) / 16;
+      const rgb = (hex) => [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+      const VOID = rgb('#050406');
+      const HAZE = ['#0d0507', '#160609'].map(rgb);
+      const FIRE = [
+        '#2a0605',
+        '#420a06',
+        '#5e1007',
+        '#7d1807',
+        '#9c2407',
+        '#ba3509',
+        '#d2490c',
+        '#e3621a',
+        '#ef7f22',
+        '#f5a032',
+        '#f9c454',
+        '#fde79a',
+      ].map(rgb);
+      // Smoke lit from below near the fire, cold above it.
+      const SMOKE_WARM = ['#1c100d', '#2b1914', '#3c241b'].map(rgb);
+      const SMOKE_COLD = ['#130f12', '#1d181c', '#292226'].map(rgb);
+      const EMBER = ['#fde79a', '#f9c454', '#ef7f22', '#d2490c', '#7d1807'].map(rgb);
+      // How near (i, j) is to where the Run button sits: 1 under it, 0 well clear.
+      const nearButton = (i, j) =>
+        Math.max(0, 1 - Math.hypot((i - w / 2) / (w * 0.2), (j - h / 2) / (h * 0.22)));
+
+      // The fire: how hot each pixel is, 1 at the foot and 0 where the flames end. The flames' height follows the column
+      // (tall at the sides, low in the middle); noise stretched upward and bent sideways cuts that into tongues, more so
+      // toward their tips.
+      const reach = new Float32Array(w);
+      for (let i = 0; i < w; i++) {
+        const side = Math.abs(i / w - 0.5) * 2;
+        reach[i] = h * (0.3 + 0.32 * Math.min(1, 0.55 * fbm(i / 40, 3.7) + 0.6 * side * side));
+      }
+      const heat = new Float32Array(w * h);
+      for (let j = 0; j < h; j++)
+        for (let i = 0; i < w; i++) {
+          const y = (h - 1 - j) / reach[i];
+          const u = i / 6 + 1.6 * noise(i / 26, j / 22 + 5);
+          const tongue = fbm(u, j / 15) - 0.5;
+          // Past a third above the column's height, no flame: no blobs adrift in the smoke.
+          heat[j * w + i] = y > 1.3 ? 0 : 1 - y + 1.25 * tongue * (0.35 + y);
+        }
+      // Where each column's flames end.
+      const top = reach.map((r) => h - 1 - r);
+
+      const img = new ImageData(w, h);
+      const put = (i, j, c) => {
+        if (i < 0 || j < 0 || i >= w || j >= h) return;
+        const p = (j * w + i) * 4;
+        img.data[p] = c[0];
+        img.data[p + 1] = c[1];
+        img.data[p + 2] = c[2];
+        img.data[p + 3] = 255;
+      };
+      for (let j = 0; j < h; j++)
+        for (let i = 0; i < w; i++) {
+          const t = dither(i, j);
+          // How far above the flames' end, as a share of the picture.
+          const a = (top[i] - j) / h;
+          // A red haze just over the fire, in two steps.
+          const haze = Math.floor((1 - a / 0.3) * 2 + 0.5 + 0.6 * (t - 0.5));
+          let col = haze > 0 ? HAZE[Math.min(1, haze - 1)] : VOID;
+          // Smoke: billows stretched upward, thickest just over the flames, gone by the top, thin over the button.
+          const u = i / 26 + 1.4 * noise(i / 50, j / 34);
+          const v = j / 15 + 0.8 * noise(i / 41 + 7, j / 29);
+          const rise =
+            Math.min(1, (a + 0.04) / 0.08) *
+            Math.max(0, 1 - a / 0.62) *
+            Math.min(1, j / (h * 0.18));
+          const env = Math.max(0, rise) * (1 - 0.65 * nearButton(i, j));
+          const s = (fbm(u, v) - 0.38) * 3.2 * env;
+          const level = Math.min(3, Math.floor(s * 3 + 0.5 + 0.6 * (t - 0.5)));
+          if (level > 0) col = (a + 0.1 * (t - 0.5) < 0.16 ? SMOKE_WARM : SMOKE_COLD)[level - 1];
+          // The flames, over the rest.
+          const f = heat[j * w + i];
+          const band =
+            f > 0 ? Math.min(12, Math.floor(Math.pow(f, 1.15) * 13 + 0.8 * (t - 0.5))) : 0;
+          if (band > 0) col = FIRE[band - 1];
+          put(i, j, col);
+        }
+      // Embers thrown up out of the flames, fewer the higher they go, none over the button; the brighter ones trail a
+      // dimmer pixel below.
+      for (let n = 0; n < 260; n++) {
+        const i = Math.floor(rand() * w);
+        const up = -Math.log(1 - rand()) * h * 0.12;
+        const j = Math.round(top[i] + reach[i] * 0.35 * rand() - up);
+        if (j < 2 || nearButton(i, j) > 0) continue;
+        const k = Math.min(EMBER.length - 1, Math.floor((up / (h * 0.35)) * EMBER.length + rand()));
+        put(i, j, EMBER[k]);
+        if (k < 3) put(i + (rand() < 0.5 ? -1 : 1), j + 1, EMBER[k + 2]);
+      }
+
+      const small = document.createElement('canvas');
+      small.width = w;
+      small.height = h;
+      small.getContext('2d').putImageData(img, 0, 0);
       const x = c.getContext('2d');
-      x.fillStyle = '#050406';
-      x.fillRect(0, 0, W, H);
-      const bg = await load('footage/promo/f0075.jpg');
-      x.filter = 'brightness(1.3) saturate(1.1)';
-      x.drawImage(bg, 0, 0, 2182, 1130, 380, 0, 2182, 1130);
-      x.filter = 'none';
-      // The shot's left edge fades into the void.
-      const fade = x.createLinearGradient(380, 0, 700, 0);
-      fade.addColorStop(0, '#050406');
-      fade.addColorStop(1, 'rgba(5,4,6,0)');
-      x.fillStyle = fade;
-      x.fillRect(380, 0, 320, H);
-      const d = x.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.hypot(W, H) / 2);
-      d.addColorStop(0, 'rgba(7,5,8,.5)');
-      d.addColorStop(0.35, 'rgba(7,5,8,.3)');
-      d.addColorStop(1, 'rgba(7,5,8,.12)');
-      x.fillStyle = d;
-      x.fillRect(0, 0, W, H);
+      x.imageSmoothingEnabled = false;
+      x.drawImage(small, 0, 0, w * P, h * P);
     },
     /* the logo, on nothing: bone with a dark outline and drop, so it reads on white and on black */
     async logo(c) {

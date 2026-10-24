@@ -6,8 +6,8 @@
  *
  * social.png 1200 × 630 (shown when the page is linked), wide.png 2520 × 1080 (21:9, home page featuring), favicon.png
  * 512 × 512, logo.png (transparent, for light and dark backgrounds); for the page's theme, banner.png 960 × 300,
- * background.png a 560 × 560 tile (repeat both ways) and embed.png 2560 × 1130 (behind the game before it is run, empty in
- * the middle and cropped to any frame).
+ * background.png a 560 × 560 tile (repeat both ways) and embed.png 2560 × 1130 (behind the game before it is run: pixel
+ * fire and smoke, drawn rather than filmed, with nothing bright in the middle, cropped to any frame).
  */
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
