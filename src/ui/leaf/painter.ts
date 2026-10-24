@@ -8,7 +8,7 @@
 import { age, type AgeOpts } from './age';
 import { KINDS } from './kinds';
 import { canvas, col, ctx2d, isRamp, P, rng, seedOf, type Ramp } from './ramps';
-import { medallion, mixBar, panel, STRIPS, type PanelOpts } from './shapes';
+import { bitumenGround, medallion, mixBar, panel, STRIPS, type PanelOpts } from './shapes';
 
 type Job = [selector: string, kind: string, opts?: Record<string, unknown>];
 
@@ -34,7 +34,7 @@ const JOBS: Job[] = [
     { field: 'gold', rim: 'ink', thin: true, loss: 0, cracks: 0, texture: 0.45, goldLoss: 0 },
   ],
   ['.btn.primary', 'panel', { field: 'vermilion', thin: true, loss: 0.05, cracks: 1 }],
-  ['.btn.danger', 'panel', { field: 'porphyry', thin: true, loss: 0.05, cracks: 1 }],
+  ['.btn.danger', 'panel', { field: 'bitumen', thin: true, loss: 0.03, cracks: 1 }],
   [
     '.btn.on',
     'panel',
@@ -212,10 +212,15 @@ function draw(
       foot: 'foot' in d || !!o.foot,
       friezes: friezesOf(el),
     };
-    return age(panel(W, H, opts), r, {
+    // The dark material: its ground laid on, then aged in its own ramps, worn to the red bole.
+    const dark = field === 'bitumen';
+    const cv = panel(W, H, opts);
+    if (dark) bitumenGround(cv, r);
+    return age(cv, r, {
       ...PANEL_AGE,
-      loss: 0.035,
+      loss: dark ? 0.016 : 0.035,
       cracks: Math.min(8, Math.round((W * H) / 6000)),
+      ...(dark ? { dark: true, texture: 0.5 } : {}),
       ...(o as AgeOpts),
       ...(d.loss !== undefined ? { loss: num('loss', 0) } : {}),
     }).toDataURL();

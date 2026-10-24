@@ -28,7 +28,7 @@ export function BossAhead({ map }: { map: number }) {
   if (!ahead || ahead.maps === 0) return null;
   const { boss, maps } = ahead;
   return (
-    <div class="boss-ahead" data-paint="panel" data-thin data-field="vermilion">
+    <div class="boss-ahead" data-paint="panel" data-thin data-field="bitumen">
       <div class="boss-ahead-name">{boss.name[0].toUpperCase() + boss.name.slice(1)}</div>
       <div class="boss-ahead-when">
         in {maps} map{maps > 1 ? 's' : ''} (map {boss.map})

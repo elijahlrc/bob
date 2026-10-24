@@ -3,7 +3,7 @@
  * panels (maybe arched, with pearls, a tile foot, friezes under headings), medallions, the damage-type bar and the
  * repeating border strips.
  */
-import { canvas, col, ctx2d, type Ramp } from './ramps';
+import { canvas, col, ctx2d, nearest, noise, RGB, RI, type Rand, type Ramp } from './ramps';
 
 /** A soft light from the top left across a field, which the ramps turn into hard steps. */
 export function lit(
@@ -154,7 +154,7 @@ function panelCore(W: number, H: number, o: PanelOpts): HTMLCanvasElement {
       W * 0.3,
       ar ? ar * 0.5 : H * 0.1,
       Math.max(W, H) * 1.1,
-      o.field === 'gold' ? 5 : 4,
+      o.field === 'gold' ? 5 : o.field === 'bitumen' ? 3 : 4,
     ),
   );
   if (o.foot) tileRow(ctx, t + 1, W - t - 1, H - t - 6);
@@ -195,6 +195,70 @@ function panelCore(W: number, H: number, o: PanelOpts): HTMLCanvasElement {
       pearl(ctx, W - ins, Math.round(y), true, k % 2 === 1);
     }
   }
+  return cv;
+}
+
+/**
+ * The dark material's ground, laid over the bitumen of a painting before it is aged: faint brush strokes on a slant,
+ * a craquelure a step or two darker, a few of its seams opening onto red. The aging then mottles it, cracks it and
+ * wears it through to the red bole (LOSS_TO).
+ */
+export function bitumenGround(cv: HTMLCanvasElement, r: Rand): HTMLCanvasElement {
+  const W = cv.width;
+  const H = cv.height;
+  const ctx = ctx2d(cv);
+  const img = ctx.getImageData(0, 0, W, H);
+  const d = img.data;
+  // The craquelure: a point jittered in each cell of a grid; a pixel's seam is how much nearer its nearest point is
+  // than the next.
+  const S = 9;
+  const gw = Math.ceil(W / S) + 2;
+  const gh = Math.ceil(H / S) + 2;
+  const pts = Float32Array.from({ length: gw * gh * 2 }, () => 0.15 + r() * 0.7);
+  const seam = (x: number, y: number) => {
+    const cx = Math.floor(x / S);
+    const cy = Math.floor(y / S);
+    let d1 = 1e9;
+    let d2 = 1e9;
+    for (let gy = cy - 1; gy <= cy + 1; gy++)
+      for (let gx = cx - 1; gx <= cx + 1; gx++) {
+        const c = ((gy + 1) * gw + (gx + 1)) * 2;
+        if (c < 0 || c >= pts.length) continue;
+        const dd = Math.hypot(x - (gx + pts[c]) * S, y - (gy + pts[c + 1]) * S);
+        if (dd < d1) {
+          d2 = d1;
+          d1 = dd;
+        } else if (dd < d2) d2 = dd;
+      }
+    return d2 - d1;
+  };
+  const stroke = noise(r, W, H, 3);
+  const red = noise(r, W, H, 16);
+  const ramp = RGB[RI.bitumen];
+  const cracks = RGB[RI.crackred];
+  const a = 0.5;
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const p = (y * W + x) * 4;
+      if (d[p + 3] < 128) continue;
+      const hit = nearest(d[p], d[p + 1], d[p + 2], true);
+      if (hit >> 4 !== RI.bitumen) continue;
+      const u = x * Math.cos(a) + y * Math.sin(a);
+      const v = -x * Math.sin(a) + y * Math.cos(a);
+      let i = (hit & 15) + Math.round((stroke((u / 9) % W, (v * 2) % H) - 0.5) * 1.1);
+      const s = seam(x, y);
+      let c: [number, number, number];
+      if (s < 0.42 && red(x, y) > 0.35)
+        c = cracks[Math.min(cracks.length - 1, Math.floor(r() * 3))];
+      else {
+        if (s < 0.55) i -= 2;
+        c = ramp[Math.max(0, Math.min(ramp.length - 1, i))];
+      }
+      d[p] = c[0];
+      d[p + 1] = c[1];
+      d[p + 2] = c[2];
+    }
+  ctx.putImageData(img, 0, 0);
   return cv;
 }
 

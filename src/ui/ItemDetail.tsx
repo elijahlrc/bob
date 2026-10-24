@@ -137,7 +137,7 @@ type Props = Actions & {
 /** The one way to get rid of something: put it aside in the discarded pile (it can be put back, or salvaged with the rest). */
 function DiscardButton({ it, a }: { it: InventoryItem; a: Actions }) {
   return (
-    <button class="btn small" onClick={() => a.onDiscard(it.uid)}>
+    <button class="btn small danger" onClick={() => a.onDiscard(it.uid)}>
       Discard
     </button>
   );

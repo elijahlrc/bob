@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dark Material Study</title>
+    <link rel="stylesheet" href="/node_modules/@fontsource/jacquard-24/index.css" />
+    <link rel="stylesheet" href="/node_modules/@fontsource/grenze/index.css" />
+    <link rel="stylesheet" href="/node_modules/@fontsource/grenze/600.css" />
+    <style>
+      /* A third material beside the lapis and the gold leaf, as flexible as they are: a field that tiles and takes text,
+         buttons and frames. Each candidate is made the way the painter makes its own (a base on a short ramp, mottled,
+         grimed, flaked to an under-layer, cracked), at half resolution and doubled. Open from the dev server:
+         /docs/mockups/style/dark.html. The gold wall and the lapis panel beside them are the game's own painter. */
+      :root {
+        --ink: #0b0805;
+        --pearl: #eee8d6;
+        --muted: #b6ad95;
+        --gold-hi: #e2c681;
+      }
+      body {
+        margin: 0;
+        padding: 24px 16px 48px;
+        background: #0b0805;
+        color: var(--pearl);
+        font: 17px/1.3 Grenze, Georgia, serif;
+      }
+      h1 {
+        margin: 0 0 6px;
+        font: 400 40px/1 'Jacquard 24', Georgia, serif;
+        color: var(--gold-hi);
+      }
+      .intro {
+        margin: 0 0 28px;
+        color: var(--muted);
+      }
+      section {
+        margin-bottom: 44px;
+      }
+      h2 {
+        margin: 0 0 4px;
+        font: 400 30px/1 'Jacquard 24', Georgia, serif;
+        color: var(--gold-hi);
+      }
+      .why {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+      }
+      @media (max-width: 760px) {
+        .row {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      .tex {
+        position: relative;
+        image-rendering: pixelated;
+        background-repeat: repeat;
+      }
+      .swatch {
+        height: 300px;
+      }
+      .uses {
+        display: grid;
+        gap: 14px;
+      }
+      .card {
+        padding: 20px 22px 22px;
+      }
+      .card h3 {
+        margin: 0 0 8px;
+        font: 400 28px/1 'Jacquard 24', Georgia, serif;
+        color: var(--gold-hi);
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      .card p {
+        margin: 0;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      .card .m {
+        color: var(--muted);
+      }
+      .bits {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        padding: 10px 22px 11px;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      .strip {
+        flex: 1;
+        min-width: 120px;
+        height: 22px;
+      }
+      .ref {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 44px;
+      }
+      .ref > div {
+        height: 160px;
+        display: grid;
+        place-items: center;
+        font: 400 28px/1 'Jacquard 24', Georgia, serif;
+      }
+      .ref .screen {
+        position: static;
+        color: #1a1208;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>A dark material</h1>
+    <p class="intro">
+      The bitumen and four ways of bringing red into it, each a field like the gold and the lapis: on its own, framed with text, as a button and as a strip.
+    </p>
+    <div class="ref">
+      <div class="screen">Gold leaf (the wall)</div>
+      <div data-paint="panel">Lapis (a panel)</div>
+    </div>
+    <div id="out"></div>
+    <script type="module">
+      import { paintAll } from '/src/ui/leaf/painter.ts';
+      paintAll(document);
+
+      const P = 2;
+      const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+      const ramp = (...hs) => hs.map(hex);
+
+      function rng(seed) {
+        let a = seed >>> 0;
+        return () => {
+          a = (a + 0x6d2b79f5) >>> 0;
+          let t = a;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      // Value noise that tiles over W x H (so a field repeats without a seam).
+      function noise(r, W, H, cell) {
+        const gw = Math.max(1, Math.round(W / cell));
+        const gh = Math.max(1, Math.round(H / cell));
+        const g = Float32Array.from({ length: gw * gh }, r);
+        const s = (t) => t * t * (3 - 2 * t);
+        const at = (x, y) => g[(((y % gh) + gh) % gh) * gw + (((x % gw) + gw) % gw)];
+        return (x, y) => {
+          const fx = (x / W) * gw;
+          const fy = (y / H) * gh;
+          const ix = Math.floor(fx);
+          const iy = Math.floor(fy);
+          const tx = s(fx - ix);
+          const ty = s(fy - iy);
+          const a = at(ix, iy) + (at(ix + 1, iy) - at(ix, iy)) * tx;
+          const b = at(ix, iy + 1) + (at(ix + 1, iy + 1) - at(ix, iy + 1)) * tx;
+          return a + (b - a) * ty;
+        };
+      }
+      // Distance from each pixel to the seam between its two nearest scattered points (tiling): craquelure.
+      function seams(r, W, H, n) {
+        const pts = Array.from({ length: n }, () => [r() * W, r() * H]);
+        const out = new Float32Array(W * H);
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++) {
+            let d1 = 1e9;
+            let d2 = 1e9;
+            for (const [px, py] of pts)
+              for (const ox of [-W, 0, W])
+                for (const oy of [-H, 0, H]) {
+                  const d = Math.hypot(x - px - ox, y - py - oy);
+                  if (d < d1) {
+                    d2 = d1;
+                    d1 = d;
+                  } else if (d < d2) d2 = d;
+                }
+            out[y * W + x] = d2 - d1;
+          }
+        return out;
+      }
+
+      /**
+       * A material tile, W x H art pixels, that repeats: a base step on `ramp`, mottled along it by soft noise (and,
+       * with `streak`, by brush strokes at an angle), darkened in grimy patches; flakes lost to `under` (a dark lip
+       * above, a lit one below); craquelure a step or two darker, or glowing when `glow` is a ramp; a few glints.
+       */
+      function material(o, W = 128, H = 128) {
+        const r = rng(o.seed);
+        const n1 = noise(r, W, H, o.cell ?? 16);
+        const n2 = noise(r, W, H, 4);
+        const g1 = noise(r, W, H, 26);
+        const b1 = noise(r, W, H, o.blotch ?? 5);
+        const b2 = noise(r, W, H, (o.blotch ?? 5) * 4);
+        const st = o.streak ? noise(r, W, H, 3) : null;
+        const sm = o.cracks ? seams(r, W, H, o.cracks) : null;
+        const cv = document.createElement('canvas');
+        cv.width = W;
+        cv.height = H;
+        const ctx = cv.getContext('2d');
+        const img = ctx.createImageData(W, H);
+        const lost = new Uint8Array(W * H);
+        const vals = [];
+        for (let p = 0; p < W * H; p++) vals.push(b1(p % W, (p / W) | 0) * 0.5 + b2(p % W, (p / W) | 0) * 0.5);
+        const cut = [...vals].sort((a, b) => a - b)[Math.floor(vals.length * (1 - (o.loss ?? 0)))] ?? 2;
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++) {
+            const p = y * W + x;
+            if ((o.loss ?? 0) > 0 && vals[p] >= cut) lost[p] = 1;
+          }
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++) {
+            const p = y * W + x;
+            let c;
+            if (lost[p]) {
+              const up = lost[((y - 1 + H) % H) * W + x];
+              const u = o.under;
+              c = !up ? u[0] : u[Math.min(u.length - 1, 1 + Math.floor(r() * (u.length - 1)))];
+            } else {
+              let s = ((n1(x, y) - 0.5) * 2.2 + (n2(x, y) - 0.5) * 1.2 + (r() - 0.5) * 1.0) * (o.tex ?? 1);
+              if (st) {
+                // Brush strokes: noise sampled along a slant, stretched long.
+                const a = o.streak;
+                const u = x * Math.cos(a) + y * Math.sin(a);
+                const v = -x * Math.sin(a) + y * Math.cos(a);
+                s += (st(((u / 9) % W + W) % W, ((v * 2) % H + H) % H) - 0.5) * (o.streakAmp ?? 2.2);
+              }
+              // Grime gathers softly (a hard threshold reads as camouflage).
+              const gt = o.grimeAt ?? 0.66;
+              const gk = Math.max(0, Math.min(1, (g1(x, y) - (gt - 0.12)) / 0.24));
+              s -= (o.grime ?? 1) * gk * gk * (3 - 2 * gk);
+              const below = lost[((y + 1) % H) * W + x] === 0 && y > 0 && lost[((y - 1 + H) % H) * W + x];
+              if (below) s += 1;
+              let i = Math.round(o.base + s);
+              if (sm && sm[p] < (o.crackW ?? 0.7)) {
+                if (o.glow) {
+                  c = o.glow[Math.min(o.glow.length - 1, Math.floor(r() * 2 + n1(x, y) * (o.glow.length - 1)))];
+                } else i -= o.crackDark ?? 2;
+              }
+              if (!c) {
+                i = Math.max(0, Math.min(o.ramp.length - 1, i));
+                if (o.glint && r() < o.glint) i = o.ramp.length - 1;
+                c = o.ramp[i];
+              }
+            }
+            img.data.set([c[0], c[1], c[2], 255], p * 4);
+          }
+        ctx.putImageData(img, 0, 0);
+        return cv;
+      }
+
+      // A frame like the game's panels: a gold rim, an ink line, then the field, painted at the element's own size.
+      function framed(o, w, h) {
+        const W = Math.ceil(w / P);
+        const H = Math.ceil(h / P);
+        const cv = material(o, W, H);
+        const ctx = cv.getContext('2d');
+        ctx.fillStyle = '#977835';
+        ctx.fillRect(0, 0, W, 4);
+        ctx.fillRect(0, H - 4, W, 4);
+        ctx.fillRect(0, 0, 4, H);
+        ctx.fillRect(W - 4, 0, 4, H);
+        ctx.fillStyle = '#d1b062';
+        ctx.fillRect(1, 1, W - 2, 1);
+        ctx.fillRect(1, 1, 1, H - 2);
+        ctx.fillStyle = '#634a21';
+        ctx.fillRect(1, H - 2, W - 2, 1);
+        ctx.fillRect(W - 2, 1, 1, H - 2);
+        ctx.strokeStyle = '#0b0805';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(4.5, 4.5, W - 9, H - 9);
+        return cv;
+      }
+
+      // The bitumen, and four ways of bringing red into it.
+      const UMBER = ramp('#0d0907', '#140e0a', '#1b130d', '#231911', '#2c2016', '#37281b', '#443221');
+      const OXUMBER = ramp('#0e0807', '#170c0a', '#21100d', '#2c1410', '#391813', '#471d16', '#57231a');
+      const PALE = ramp('#0b0805', '#6e604c', '#857561', '#9b8a72');
+      const BOLE = ramp('#2e140d', '#5a2414', '#7a2e18', '#93391f');
+      const BITUMEN = {
+        seed: 101,
+        ramp: UMBER,
+        base: 2.6,
+        tex: 0.7,
+        streak: 0.5,
+        streakAmp: 1.1,
+        grime: 1,
+        loss: 0.012,
+        under: PALE,
+        cracks: 90,
+        crackW: 0.55,
+        crackDark: 2,
+        glint: 0.002,
+      };
+      const MATERIALS = [
+        {
+          name: 'Bitumen',
+          why: 'As before, the strokes fainter: umber-black glaze, craquelure, small losses to a pale ground.',
+          o: BITUMEN,
+        },
+        {
+          name: 'Bitumen over red bole',
+          why: 'The worn places show a red ground instead of pale gesso, the way the gold leaf flakes to its bole.',
+          o: { ...BITUMEN, under: BOLE, loss: 0.02 },
+        },
+        {
+          name: 'Blood glaze',
+          why: 'The umber leans to oxblood: the lighter mottling glows dark red, the deep shadows stay black.',
+          o: { ...BITUMEN, ramp: OXUMBER, base: 2.8, tex: 0.85 },
+        },
+        {
+          name: 'Red in the cracks',
+          why: 'The craquelure opens onto a red underlayer, in fine lines, as old paintings over a red ground do.',
+          o: { ...BITUMEN, glow: ramp('#3a120c', '#561a10', '#6e2214'), crackW: 0.5 },
+        },
+        {
+          name: 'All three, softly',
+          why: 'A slight oxblood lean, losses to red bole and a few red cracks together.',
+          o: {
+            ...BITUMEN,
+            ramp: ramp('#0e0907', '#160d0a', '#1f120d', '#291711', '#341c15', '#412318', '#4f2a1e'),
+            under: BOLE,
+            loss: 0.016,
+            glow: ramp('#2c0f0a', '#431710', '#561a10'),
+            crackW: 0.42,
+          },
+        },
+      ];
+
+      const out = document.getElementById('out');
+      const paintAt = (el, cv) => {
+        el.style.backgroundImage = `url(${cv.toDataURL()})`;
+        el.style.backgroundSize = `${cv.width * P}px ${cv.height * P}px`;
+        el.style.backgroundRepeat = 'no-repeat';
+      };
+      const jobs = [];
+      for (const m of MATERIALS) {
+        const sec = document.createElement('section');
+        sec.innerHTML = `
+          <h2>${m.name}</h2><p class="why">${m.why}</p>
+          <div class="row">
+            <div class="tex swatch"></div>
+            <div class="uses">
+              <div class="tex card"><h3>The Soul's Reliquary</h3><p>Pick an item to see it beside what you wear. <span class="m">Requires level 42.</span></p></div>
+              <div class="bits"><div class="tex btn">Wear in Main hand</div><div class="tex strip"></div></div>
+            </div>
+          </div>`;
+        out.appendChild(sec);
+        jobs.push([sec, m.o]);
+      }
+      // After layout and fonts, so each surface is painted at the size it has.
+      await document.fonts.ready;
+      await new Promise((r) => setTimeout(r, 50));
+      for (const [sec, o] of jobs) {
+        const sw = sec.querySelector('.swatch');
+        const r = sw.getBoundingClientRect();
+        paintAt(sw, material(o, Math.ceil(r.width / P), Math.ceil(r.height / P)));
+        for (const el of sec.querySelectorAll('.card, .btn, .strip')) {
+          const q = el.getBoundingClientRect();
+          paintAt(el, framed(o, q.width, q.height));
+        }
+      }
+    </script>
+  </body>
+</html>

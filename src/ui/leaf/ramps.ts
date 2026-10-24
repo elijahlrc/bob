@@ -22,6 +22,11 @@ export const RAMPS = {
   violet: ['#221930', '#312445', '#433359', '#57456f', '#6d5a87', '#8672a0', '#a08db8'],
   sky: ['#485564', '#617081', '#7c8d9f', '#99a9b9', '#b7c4d1', '#d3dce5'],
   azure: ['#1d3672', '#264993', '#335fb2', '#4877cb', '#6893dd', '#93b4ec'],
+  // The dark material (the owner, 2026-10-24): an umber-black glaze leaning to oxblood, worn to a red bole, its
+  // craquelure opening onto red. Only a painting of it snaps to these (DARK, `age`'s `dark`).
+  bitumen: ['#0e0907', '#160d0a', '#1f120d', '#291711', '#341c15', '#412318', '#4f2a1e'],
+  blood: ['#2e140d', '#5a2414', '#7a2e18', '#93391f'],
+  crackred: ['#2c0f0a', '#431710', '#561a10'],
 } as const;
 export type Ramp = keyof typeof RAMPS;
 export const RAMP_NAMES = Object.keys(RAMPS) as Ramp[];
@@ -54,17 +59,23 @@ export const LOSS_TO: Partial<Record<Ramp, Ramp>> = {
   sky: 'plaster',
   violet: 'plaster',
   azure: 'plaster',
+  bitumen: 'blood',
 };
 
-const nearCache = new Map<number, number>();
-/** The nearest ramp step to a colour, as ramp index × 16 + step. */
-export function nearest(r: number, g: number, b: number): number {
+/** The dark material's ramps: a painting snaps to them only when it asks (`age`'s `dark`), so no other painting moves. */
+export const DARK: ReadonlySet<Ramp> = new Set<Ramp>(['bitumen', 'blood', 'crackred']);
+
+const nearCache = [new Map<number, number>(), new Map<number, number>()];
+/** The nearest ramp step to a colour, as ramp index × 16 + step; the dark material's ramps only when `dark`. */
+export function nearest(r: number, g: number, b: number, dark = false): number {
   const k = (r << 16) | (g << 8) | b;
-  const had = nearCache.get(k);
+  const cache = nearCache[dark ? 1 : 0];
+  const had = cache.get(k);
   if (had !== undefined) return had;
   let best = 1e9;
   let hit = 0;
-  for (let ri = 0; ri < RGB.length; ri++)
+  for (let ri = 0; ri < RGB.length; ri++) {
+    if (!dark && DARK.has(RAMP_NAMES[ri])) continue;
     for (let i = 0; i < RGB[ri].length; i++) {
       const c = RGB[ri][i];
       const e = (r - c[0]) ** 2 + (g - c[1]) ** 2 + (b - c[2]) ** 2;
@@ -73,7 +84,8 @@ export function nearest(r: number, g: number, b: number): number {
         hit = ri * 16 + i;
       }
     }
-  nearCache.set(k, hit);
+  }
+  cache.set(k, hit);
   return hit;
 }
 

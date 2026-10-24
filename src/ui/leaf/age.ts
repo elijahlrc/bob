@@ -24,6 +24,8 @@ export type AgeOpts = {
   shadow?: boolean;
   wrapX?: boolean;
   wrapY?: boolean;
+  /** Snap to the dark material's ramps too (a bitumen painting). */
+  dark?: boolean;
   /** Boxes kept calm (no flakes, no cracks, less grime): where text sits straight on the surface. */
   calm?: { x: number; y: number; w: number; h: number }[];
 };
@@ -57,7 +59,7 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
   const idx = new Int8Array(N);
   for (let p = 0; p < N; p++) {
     if (d[p * 4 + 3] < 128) continue;
-    const hit = nearest(d[p * 4], d[p * 4 + 1], d[p * 4 + 2]);
+    const hit = nearest(d[p * 4], d[p * 4 + 1], d[p * 4 + 2], o.dark);
     ramp[p] = hit >> 4;
     idx[p] = hit & 15;
   }

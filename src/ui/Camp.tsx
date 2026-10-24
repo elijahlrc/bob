@@ -73,7 +73,7 @@ function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
   return (
     <div class="boss-offer-wrap">
       <div class="boss-offer" data-paint="panel" data-arch data-pearls data-foot>
-        <div class="boss-offer-banner" data-paint="panel" data-thin data-field="vermilion">
+        <div class="boss-offer-banner" data-paint="panel" data-thin data-field="bitumen">
           Boss · map {run.map}
           {id === 'unmaker' ? ' · the last' : ''}
         </div>

@@ -55,6 +55,15 @@ adding a loose colour.
 | porphyry  | stops, the estimates plaque, chaos resistance                                            |
 | violet    | lightning damage in the damage-type bar                                                  |
 | sky       | energy shield (a pale field; its text is dark)                                           |
+| bitumen   | the dark material: anything with negative weight (see below)                             |
+
+**The dark material** (the owner, 2026-10-24, after a study in `dark.html`; inspired by Bosch's dark grounds): an
+umber-black glaze leaning to oxblood (`bitumen`), its craquelure opening onto red in places (`crackred`), worn through to
+a red bole (`blood`). It is for what has negative weight: buttons that destroy, abandon or undo (every `.btn.danger`:
+Delete, Discard, Salvage, Abandon run, Leave this map, Refund, a dialog's dangerous confirm), the boss banners, and the
+reliquary's niche, where the soul stands in ink with a blood-red rim. Never a Cancel button: that is the safe choice.
+Ask for it with `data-field="bitumen"` on a panel. Only a painting of it snaps to its ramps (`DARK`, `age`'s `dark`), so
+it moves no other painting; `bitumenGround` (shapes.ts) lays its ground before the aging.
 
 Text colours on lapis: pearl for labels, gold-hi for values, `--muted #a8adc4` for secondary words, `--dim #7c84a4`
 for values at their default (×1.00 rows), `--madder #dca196` for map modifiers and "short of the maximum", `#a3d293` for

@@ -4,8 +4,8 @@
  * the worn gear, and the small gold setting that separates items on one line.
  */
 import type { AgeOpts } from './age';
-import { lit, panel, pearl } from './shapes';
-import { canvas, col, ctx2d, isRamp, type Ramp } from './ramps';
+import { bitumenGround, lit, panel, pearl } from './shapes';
+import { canvas, col, ctx2d, isRamp, rng, seedOf, type Ramp } from './ramps';
 
 export type Kind = (el: HTMLElement, W: number, H: number) => [HTMLCanvasElement, AgeOpts | false];
 
@@ -411,7 +411,12 @@ const slot: Kind = (el, W, H) => {
  * hell, not holy). data-rows: the row centres of head, shoulders, hands, waist and feet, as fractions of the height.
  */
 const soul: Kind = (el, W, H) => {
-  const cv = panel(W, H, { field: 'lapis', arch: true, pearls: true, foot: true });
+  // The niche is the dark material (the owner, 2026-10-24); the figure is laid on after its ground, an ink-black soul
+  // with a blood-red rim light.
+  const cv = bitumenGround(
+    panel(W, H, { field: 'bitumen', arch: true, pearls: true, foot: true }),
+    rng(seedOf('soul')),
+  );
   const ctx = ctx2d(cv);
   const [rHead, rSh, rHand, rWaist, rFeet] = (el.dataset.rows ?? '0.2,0.33,0.46,0.6,0.73')
     .split(',')
@@ -443,21 +448,22 @@ const soul: Kind = (el, W, H) => {
   ctx.save();
   ctx.translate(1, 1);
   body();
-  ctx.fillStyle = col('lapis', 3);
+  ctx.fillStyle = col('blood', 1);
   ctx.fill();
   ctx.restore();
   body();
-  ctx.fillStyle = col('lapis', 0);
+  ctx.fillStyle = col('ink', 0);
   ctx.fill();
   return [
     cv,
     {
-      texture: 0.55,
+      dark: true,
+      texture: 0.5,
       edgeBias: 0.45,
       edgeReach: 12,
       goldLoss: 0.08,
       shadow: true,
-      loss: 0.035,
+      loss: 0.02,
       cracks: 4,
     },
   ];
