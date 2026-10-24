@@ -223,9 +223,20 @@ function paintEl(el: HTMLElement, kind: string, o: Record<string, unknown>, key:
   s.backgroundPosition = '0 0';
 }
 
-/** Paint everything under `root` that wants a painting. */
+/** Take a painting off an element that no longer wants one (a tab that is no longer open, a row no longer picked). */
+function unpaint(el: HTMLElement) {
+  delete el.dataset.painted;
+  const s = el.style;
+  s.backgroundImage = '';
+  s.backgroundSize = '';
+  s.backgroundRepeat = '';
+  s.backgroundPosition = '';
+}
+
+/** Paint everything under `root` that wants a painting, and unpaint what no longer does. */
 export function paintAll(root: ParentNode = document) {
   makeShared();
+  const before = root.querySelectorAll<HTMLElement>('[data-painted]');
   const done = new Set<HTMLElement>();
   const seen = new Map<string, number>();
   root.querySelectorAll<HTMLElement>('[data-paint]').forEach((el) => {
@@ -246,6 +257,9 @@ export function paintAll(root: ParentNode = document) {
       paintEl(el, kind, o ?? {}, `${sel}#${i++}`);
     });
   }
+  before.forEach((el) => {
+    if (!done.has(el) || el.dataset.paint === 'none') unpaint(el);
+  });
 }
 
 /** The strips, for the debug sample sheet. */

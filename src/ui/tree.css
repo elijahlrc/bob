@@ -1,287 +1,252 @@
-/*
- * The passive tree (TreeView.tsx). Colours follow what a node gives (treeStyle.ts sets --t on each node); sizes follow
- * the zoom (TreeView sets --s-<kind>, --lo-<kind>, --fs and --sw on the svg), so a node never shrinks below a few
- * pixels and a name is never smaller than text. Lines and frames keep their width in screen pixels.
- */
-svg.tree {
-  --node-bg: #14111a;
-  --edge: #4a4458;
-  --gold: #e6b84a;
-  --gold-hi: #ffe6a0;
-}
-svg.tree line,
-svg.tree path,
-svg.tree circle,
-svg.tree polygon {
-  vector-effect: non-scaling-stroke;
-}
-
-/* Paths between nodes. */
-.edge {
-  fill: none;
-  stroke: var(--edge);
-  stroke-width: 1.6px;
-  pointer-events: none;
-}
-.edge.on {
-  stroke: var(--gold);
-  stroke-width: 2.6px;
-}
-.edge.glow {
-  stroke: var(--gold);
-  stroke-width: 8px;
-  stroke-opacity: 0.22;
-  stroke-linecap: round;
-}
-.edge.path {
-  stroke: #7af0ff;
-  stroke-width: 3.2px;
-  stroke-opacity: 0.9;
-}
-
-/* A node is one group; TreeView puts it in place and sizes it by the zoom (a floor on its size on screen). */
-.tn {
-  cursor: pointer;
-}
-.tn .pip,
-.tn .rim,
-.tn .halo,
-.tn.pr {
-  pointer-events: none;
-}
-.tn .ring {
-  fill: var(--node-bg);
-  stroke: var(--t);
-  stroke-opacity: 0.55;
-  stroke-width: 1.6px;
-}
-.tn .pip {
-  fill: var(--t);
-  fill-opacity: 0.6;
-}
-.tn .rim {
-  fill: none;
-  stroke: #8f7e5c;
-  stroke-opacity: 0.85;
-  stroke-width: 1.4px;
-}
-.tn .halo {
-  fill: var(--gold);
-  fill-opacity: 0.2;
-  pointer-events: none;
-}
-.tn.notable .ring {
-  stroke-opacity: 0.9;
-  stroke-width: 2.2px;
-}
-.tn.notable .pip {
-  fill-opacity: 0.85;
-}
-.tn.keystone .ring {
-  fill: #1c1226;
-  stroke-opacity: 1;
-  stroke-width: 2.6px;
-}
-.tn.keystone .rim {
-  stroke: #b58cf0;
-  stroke-width: 1.8px;
-}
-.tn.keystone .pip {
-  fill-opacity: 1;
-}
-.tn.travel .ring {
-  stroke-opacity: 0.5;
-  stroke-width: 1.4px;
-}
-.tn.can .ring {
-  stroke-opacity: 1;
-  stroke-width: 2.4px;
-}
-.tn.can .pip {
-  fill-opacity: 0.95;
-}
-.tn.can.notable .rim,
-.tn.can.keystone .rim {
-  stroke: var(--gold-hi);
-}
-.tn.on .ring {
-  fill: color-mix(in srgb, var(--t) 55%, #1a1408);
-  stroke: var(--gold-hi);
-  stroke-opacity: 1;
-  stroke-width: 2.2px;
-}
-.tn.on .pip {
-  fill: #fff7dc;
-  fill-opacity: 1;
-}
-.tn.on .rim {
-  stroke: var(--gold);
-  stroke-opacity: 1;
-  stroke-width: 2px;
-}
-.tn.start .ring {
-  fill: #2a2630;
-  stroke: #8a8494;
-  stroke-opacity: 0.7;
-  stroke-width: 2px;
-}
-.tn.start.mine .ring {
-  stroke: #fff;
-  stroke-opacity: 1;
-  stroke-width: 3px;
-}
-.tn.start .rim {
-  stroke: #6e6577;
-}
-.tn.start.mine .rim {
-  stroke: var(--gold-hi);
-}
-.path-ring {
-  fill: none;
-  stroke: #7af0ff;
-  stroke-width: 2.4px;
-  pointer-events: none;
-}
-
-/* Area names (the hand-written tree): sized in tree units (AREA_LABEL) behind the nodes, faded by zoom (--al, set by TreeView). */
-.al {
-  pointer-events: none;
-  font-weight: bold;
-  opacity: calc(var(--al, 1) * 0.5);
-}
-
-/* Names: keystones and class starts from far out, notables once the view is close enough to read them. */
-.lb {
-  display: none;
-  pointer-events: none;
-  font-size: var(--fs);
-  fill: #d8cdb4;
-  stroke: #05040a;
-  stroke-width: var(--sw);
-  stroke-linejoin: round;
-  paint-order: stroke;
-}
-.lb.notable {
-  transform: translateY(var(--lo-notable, 30px));
-}
-.lb.keystone {
-  font-size: var(--fs-b);
-  fill: #cba8ff;
-  font-weight: bold;
-  transform: translateY(var(--lo-keystone, 40px));
-}
-.lb.start {
-  font-size: var(--fs-b);
-  fill: #fff;
-  font-weight: bold;
-  transform: translateY(var(--lo-start, 40px));
-}
-.lb.on {
-  fill: var(--gold-hi);
-}
-svg.tree.z-n .lb.notable,
-svg.tree.z-k .lb.keystone,
-svg.tree.z-k .lb.start {
-  display: inline;
-}
-
-/* The colour key, over the corner of the tree. */
-.tree-legend {
+/* The passive tree as a starry vault (src/ui/TreeView.tsx, src/ui/leaf/vault.ts; docs/mockups/style/STYLE-GUIDE.md):
+   the sky and the canvas fill the tab; the words are placed on top by the view; the points medallion, the search and
+   the zoom buttons float over the sky; the panel (the node looked at, then the totals) sits at the right, or at the foot
+   on a phone. */
+.tv {
   position: absolute;
-  left: 8px;
-  bottom: 8px;
-  z-index: 2;
-  background: #0d0b11ee;
-  border: 1px solid #4a3f33;
-  border-radius: var(--radius);
-  padding: 4px 8px;
-  font-size: 12px;
+  inset: 4px 14px 14px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  image-rendering: pixelated;
 }
-.tree-legend summary {
-  cursor: pointer;
+.tv-sky,
+.tv-labels {
+  position: absolute;
+  inset: 0;
+}
+.tv-art {
+  position: absolute;
+  left: 0;
+  top: 0;
+  cursor: grab;
+}
+.tv-labels {
+  pointer-events: none;
+  --o: 0 2px 0 var(--ink), 2px 0 0 var(--ink), -2px 0 0 var(--ink), 0 -2px 0 var(--ink);
+}
+.tv-labels span {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 17px;
+  line-height: 21px;
+  text-shadow: var(--o);
+}
+.tv-area {
+  transform: translate(-50%, -50%);
+  font: 400 48px/1 var(--title-font) !important;
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+.tv-key {
+  font: 400 24px/26px var(--title-font) !important;
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+.tv-note {
+  font-weight: 600;
+  color: #cfc8b2;
+}
+.tv-note.on {
+  color: var(--gold-hi);
+}
+.tv-note:is(.lit, .path) {
+  color: var(--pearl);
+}
+.tv-note.dim,
+.tv-small {
   color: var(--muted);
 }
-.tree-legend ul {
-  list-style: none;
-  margin: 6px 0 2px;
-  padding: 0;
+.tv-small.on {
+  color: #d9c38c;
 }
-.tree-legend li {
+.tv-small.path {
+  color: var(--pearl);
+}
+
+/* ---- What floats over the sky ---- */
+.tv-hud > * {
+  position: absolute;
+  z-index: 2;
+}
+.tv-points {
+  left: 22px;
+  top: 18px;
+  width: 128px;
+  height: 128px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  line-height: 1.5;
+  justify-content: center;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 #0b0805aa;
 }
-.tree-legend i {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+.tv-points span {
+  font-size: 15px;
 }
-/* The colour of a tone with the emblem its notables carry. */
-.tree-legend svg.glyph {
-  width: 13px;
-  height: 13px;
+.tv-points b {
+  font: 400 48px/1 var(--title-font);
+  font-size-adjust: none;
+}
+.tv-refunds {
+  position: absolute;
+  top: calc(100% - 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 16px 8px;
+  font-style: normal;
+  white-space: nowrap;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+.tv-find {
+  left: 172px;
+  top: 22px;
+  right: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.tv-find input {
+  flex: 1 1 220px;
+  max-width: 320px;
+}
+.tv-count {
+  padding: 8px 14px 9px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+.tv-zoom {
+  left: 22px;
+  bottom: 22px;
+  display: flex;
+  gap: 8px;
+}
+.tv-zoom .btn.small {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--gold-hi);
+  font-size: 20px;
+}
+.tv-sumbtn {
+  left: 12px;
+  bottom: 12px;
+}
+
+/* ---- The panel ---- */
+.tv-ledger {
+  position: absolute;
+  z-index: 2;
+  right: 16px;
+  top: 16px;
+  width: 360px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px 28px 26px;
+  font-size: var(--size, 17px);
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+.tv-look {
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  background: var(--s-dots);
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+.tv-look:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  background: none;
+}
+.tv-lookhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.tv-name {
+  font: 400 var(--head-size, 28px) / 1.05 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+.tv-x {
   flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 20px;
 }
-.tree-legend i.sq {
-  border: 2px solid #9a8a6a;
-  background: transparent;
+.tv-lines {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
 }
-.tree-legend i.oct {
-  border: 2px solid #b58cf0;
-  background: transparent;
-  border-radius: 3px;
+.tv-lines li + li {
+  margin-top: 3px;
 }
-
-/* The search: a ring on every match (docs/TREE-REDESIGN.md, T6.2: players could not tell where a theme lives), and its box. */
-.tree-search {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.tv-act {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
 }
-.tree-search input {
-  min-width: 190px;
-  padding: 3px 8px;
-  background: var(--panel);
-  color: inherit;
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  font: inherit;
+.tv-way {
+  color: var(--pearl);
 }
-.tree .sr {
-  fill: none;
-  stroke: #66f0ff;
-  stroke-width: calc(var(--sw) * 0.5);
-  r: calc(var(--fs) * 0.95);
-  pointer-events: none;
+.tv-why {
+  margin: 0;
+  color: var(--muted);
+}
+.tv-sum .tv-lines {
+  margin-bottom: 12px;
+  color: var(--gold-hi);
 }
 
-/* A node's stat lines (TreeView, NODE_TEXT): once the view is close enough that they fit, under its name or under it. */
-.nt {
-  pointer-events: none;
-  font-size: var(--fs-s);
-  fill: #b8c0cc;
-  stroke: #05040a;
-  stroke-width: var(--sw);
-  stroke-linejoin: round;
-  paint-order: stroke;
-}
-.nt.on {
-  fill: #e8d8a8;
-}
-.nt.small {
-  transform: translateY(var(--lo-small, 14px));
-}
-.nt.travel {
-  transform: translateY(var(--lo-travel, 12px));
-}
-.nt.hub {
-  transform: translateY(var(--lo-hub, 14px));
-}
-.nt.notable {
-  transform: translateY(var(--lo-notable, 30px));
-}
-.nt.keystone {
-  transform: translateY(var(--lo-keystone, 40px));
+/* ---- A phone: the search across the top, the points and zoom below it, the panel at the foot ---- */
+@media (max-width: 600px) {
+  .tv {
+    inset: 2px 6px 8px;
+  }
+  .tv-find {
+    left: 12px;
+    right: 12px;
+    top: 12px;
+  }
+  .tv-find input {
+    max-width: none;
+  }
+  .tv-points {
+    left: 12px;
+    top: 70px;
+    width: 96px;
+    height: 96px;
+  }
+  .tv-points b {
+    font-size: 36px;
+  }
+  .tv-refunds {
+    display: none;
+  }
+  .tv-zoom {
+    left: auto;
+    right: 12px;
+    bottom: auto;
+    top: 70px;
+    flex-direction: column;
+  }
+  .tv-ledger {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: 8px;
+    width: auto;
+    max-height: 55%;
+    padding: 18px 18px 20px;
+  }
 }
