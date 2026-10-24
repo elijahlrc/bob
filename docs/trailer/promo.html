@@ -48,6 +48,11 @@
       drop-shadow(0 var(--o) 0 var(--ink)) drop-shadow(0 calc(-1 * var(--o)) 0 var(--ink))
       drop-shadow(0 calc(2 * var(--o)) 0 #0b080599);
   }
+  /* No drop below the ring (the favicon). */
+  .hf.flat {
+    filter: drop-shadow(var(--o) 0 0 var(--ink)) drop-shadow(calc(-1 * var(--o)) 0 0 var(--ink))
+      drop-shadow(0 var(--o) 0 var(--ink)) drop-shadow(0 calc(-1 * var(--o)) 0 var(--ink));
+  }
   /* A plaque: one short line on a thin-rimmed panel. */
   .plq {
     display: inline-block;
@@ -233,11 +238,14 @@
         `<div data-paint="panel" data-arch data-pearls style="position:absolute;left:430px;top:110px;width:420px;height:500px"></div>`,
       );
     },
-    /* the browser tab: a "B" in hellfire on a lapis medallion, 512 × 512 */
+    /*
+     * The browser tab, 512 × 512, seen at 16 to 32 pixels: one "B" in hellfire as large as the square allows, on a plain
+     * flat lapis field to the edges. No rim, pearls, wear or drop: nothing that small survives.
+     */
     favicon() {
-      box(512, 512);
-      add(`<div data-paint="medal" data-field="lapis,4" data-medal="big" style="position:absolute;left:-44px;top:-44px;width:600px;height:600px;display:flex;align-items:center;justify-content:center">
-        ${title(['B'], 440, 10)}
+      box(512, 512, false);
+      add(`<div style="position:absolute;inset:0;background:var(--lapis);display:flex;align-items:center;justify-content:center">
+        <h1 class="hf flat" style="font-size:680px;--o:16px;margin-left:42px">B</h1>
       </div>`);
     },
     /* the logo, on nothing: the hellfire title alone */
