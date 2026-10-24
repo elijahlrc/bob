@@ -90,6 +90,9 @@
   import '@fontsource/jacquard-24/400.css';
   import '/src/ui/leaf/leaf.css';
   import { paintAll } from '/src/ui/leaf/painter.ts';
+  import { STRIPS, tileRow, wave, pearl } from '/src/ui/leaf/shapes.ts';
+  import { col, rng, seedOf, P } from '/src/ui/leaf/ramps.ts';
+  import { age } from '/src/ui/leaf/age.ts';
 
   document.documentElement.classList.add('leaf');
   const c = document.getElementById('c');
@@ -134,6 +137,146 @@
   };
   const GENRES = 'Arcade · ARPG · Roguelike · Autobattler';
 
+  /*
+   * Borders built from the interface's strips (src/ui/leaf/shapes.ts), in art pixels: each layer draws a band along a
+   * strip of length n at depth y (from the outer edge in) and says how deep it is.
+   */
+  const LAYER = {
+    ink: (x, n, y) => {
+      x.fillStyle = col('ink', 0);
+      x.fillRect(0, y, n, 1);
+      return 1;
+    },
+    // A gold bar, darker on the outer side, lit on the inner (`goldIn` the other way round).
+    gold: (x, n, y) => {
+      x.fillStyle = col('gold', 4);
+      x.fillRect(0, y, n, 1);
+      x.fillStyle = col('gold', 6);
+      x.fillRect(0, y + 1, n, 1);
+      return 2;
+    },
+    goldIn: (x, n, y) => {
+      x.fillStyle = col('gold', 6);
+      x.fillRect(0, y, n, 1);
+      x.fillStyle = col('gold', 4);
+      x.fillRect(0, y + 1, n, 1);
+      return 2;
+    },
+    tiles: (x, n, y) => {
+      tileRow(x, 0, n, y);
+      return 5;
+    },
+    wave: (x, n, y) => {
+      wave(x, 0, n, y, 7);
+      return 9;
+    },
+    teeth: (x, n, y) => {
+      x.save();
+      x.translate(0, y);
+      STRIPS.triangles[3](x, n);
+      x.restore();
+      return 7;
+    },
+    dots: (x, n, y) => {
+      x.fillStyle = col('lapis', 2);
+      x.fillRect(0, y, n, 5);
+      x.save();
+      x.translate(0, y + 1);
+      STRIPS.dots[3](x, n);
+      x.restore();
+      return 5;
+    },
+  };
+  const BORDERS = {
+    // Gold, the tile row and the wave scroll: the camp's footer and a section heading's frieze in one.
+    frieze: ['ink', 'gold', 'tiles', 'goldIn', 'wave'],
+    // The same, with the tab band's triangles hanging inside it.
+    teeth: ['ink', 'gold', 'tiles', 'goldIn', 'wave', 'teeth'],
+    // Lighter: the tesserae on lapis between gold, then the tile row.
+    tesserae: ['ink', 'gold', 'dots', 'goldIn', 'tiles', 'ink'],
+  };
+  /** One band of `layers`, `n` long, its outer edge at the top. */
+  function band(layers, n) {
+    const probe = document.createElement('canvas').getContext('2d');
+    const t = layers.reduce((d, l) => d + LAYER[l](probe, 0, d), 0);
+    const cv = document.createElement('canvas');
+    cv.width = n;
+    cv.height = t;
+    const x = cv.getContext('2d');
+    layers.reduce((d, l) => d + LAYER[l](x, n, d), 0);
+    return cv;
+  }
+  /** A corner rosette `t` square: gold framed in ink, a lapis lozenge in it with a pearl at its heart. */
+  function rosette(x, x0, y0, t) {
+    x.fillStyle = col('ink', 0);
+    x.fillRect(x0, y0, t, t);
+    x.fillStyle = col('gold', 5);
+    x.fillRect(x0 + 1, y0 + 1, t - 2, t - 2);
+    x.fillStyle = col('gold', 6);
+    x.fillRect(x0 + 1, y0 + 1, t - 2, 1);
+    x.fillRect(x0 + 1, y0 + 1, 1, t - 2);
+    const cx = x0 + t / 2,
+      cy = y0 + t / 2;
+    const lozenge = (r, fill) => {
+      x.fillStyle = fill;
+      x.beginPath();
+      x.moveTo(cx, cy - r);
+      x.lineTo(cx + r, cy);
+      x.lineTo(cx, cy + r);
+      x.lineTo(cx - r, cy);
+      x.closePath();
+      x.fill();
+    };
+    lozenge(t / 2 - 2, col('ink', 0));
+    lozenge(t / 2 - 3, col('lapis', 4));
+    lozenge(t / 2 - 6, col('vermilion', 4));
+    pearl(x, Math.round(cx), Math.round(cy), true);
+    for (const [dx, dy] of [
+      [3, 3],
+      [t - 4, 3],
+      [3, t - 4],
+      [t - 4, t - 4],
+    ])
+      pearl(x, x0 + dx, y0 + dy, false, true);
+  }
+  /**
+   * The border of a W × H (art pixels) picture: bands of `layers` down both sides (on out of the top) and along the
+   * bottom, a rosette in each bottom corner, aged as the interface is (wear, grime, the pixel shadow on the wall).
+   */
+  function border(W, H, layers) {
+    const side = band(layers, H);
+    const t = side.height;
+    const cv = document.createElement('canvas');
+    cv.width = W;
+    cv.height = H;
+    const x = cv.getContext('2d');
+    x.imageSmoothingEnabled = false;
+    const put = (img, tx, ty, a) => {
+      x.save();
+      x.translate(tx, ty);
+      x.rotate(a);
+      x.drawImage(img, 0, 0);
+      x.restore();
+    };
+    // The outer edge of a band is its top: turned so it faces out on each side.
+    put(band(layers, H - t), 0, H - t, -Math.PI / 2);
+    put(band(layers, H - t), W, 0, Math.PI / 2);
+    put(band(layers, W - 2 * t), W - t, H, Math.PI);
+    rosette(x, 0, H - t, t);
+    rosette(x, W - t, H - t, t);
+    age(cv, rng(seedOf('banner-border')), {
+      loss: 0.03,
+      cracks: 4,
+      crackLen: 8,
+      texture: 0.6,
+      goldLoss: 0.12,
+      edgeBias: 0.3,
+      shadow: true,
+    });
+    cv.thick = t;
+    return cv;
+  }
+
   const KINDS = {
     /* when the page is linked: 1200 × 630. The title and the lines at the left, the tree's build framed at the right. */
     social() {
@@ -164,34 +307,25 @@
       add(frame(SHOT.fight, 40, 236, 550, 248, [775, 350, 1100], 12));
     },
     /*
-     * The page's banner, 960 × 300 (the page's width), over the wall tile and above the lapis body: the wall framed by a
-     * panel's gold rim on the sides and the bottom (the panel runs on past the top, so no rim there), its pixel shadow
-     * falling outside; the title and the genres on a plaque inside.
+     * The page's banner, 960 × 300 (the page's width), over the wall tile and above the lapis body: the wall inside a border
+     * built from the interface's own strips (`BORDERS`, ?v= picks one) down the sides and along the bottom, a rosette in
+     * each bottom corner; the sides run on out of the top. The title and the genres on a plaque inside.
      */
     banner() {
       box(960, 300, false);
-      // A panel's rim and ink line take 9 art pixels from its edge (its shadow's room, then the rim): the wall goes inside.
-      // The panel runs 4 px past the picture at the sides and the bottom, so its rim and an ink line outside it meet the
-      // picture's edges with no gap, as wide as the body below.
-      const rim = 14;
-      const foot = rim;
-      // An ink line round the rim's outside, so the edge reads on the gold page and on the lapis body alike.
+      const v = new URLSearchParams(location.search).get('v') ?? 'frieze';
+      const cv = border(960 / P, 300 / P, BORDERS[v]);
+      const t = cv.thick * P;
+      const wall = add(`<div class="screen" style="position:absolute;inset:0"></div>`);
       add(
-        `<div style="position:absolute;left:0;right:0;top:0;bottom:0;background:var(--ink)"></div>`,
-      );
-      add(
-        `<div data-paint="panel" style="position:absolute;left:-4px;top:-40px;width:968px;height:344px"></div>`,
-      );
-      const wall = add(
-        `<div class="screen" style="position:absolute;left:${rim}px;right:${rim}px;top:0;bottom:${foot}px"></div>`,
-      );
-      add(
-        `<div class="col" style="left:0;top:36px;width:${960 - 2 * rim}px;gap:24px">
+        `<div class="col" style="left:${t}px;top:${32 - t / 4}px;width:${960 - 2 * t}px;gap:22px">
         ${title(['Battle of Builds'], 100, 4)}
         ${plaque(GENRES, 24)}
       </div>`,
         wall,
       );
+      cv.style.cssText = `position:absolute;left:0;top:0;width:960px;height:300px;image-rendering:pixelated`;
+      c.append(cv);
     },
     /*
      * The page's background, a 560 × 560 tile that repeats both ways: the wall painted twice that size and folded onto

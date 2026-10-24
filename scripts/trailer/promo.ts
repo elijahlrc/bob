@@ -30,23 +30,25 @@ const KINDS = [
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const out = path.resolve(
-    args.find((a) => !KINDS.includes(a)) ?? path.join(ROOT, 'docs/trailer/promo'),
-  );
-  const kinds = args.filter((a) => KINDS.includes(a));
+  // A kind may name a variant after a colon (banner:teeth, written as banner-teeth.png).
+  const isKind = (a: string) => KINDS.includes(a.split(':')[0]);
+  const out = path.resolve(args.find((a) => !isKind(a)) ?? path.join(ROOT, 'docs/trailer/promo'));
+  const kinds = args.filter(isKind);
   const lib = 'playwright-core';
   const { chromium } = await import(lib);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   mkdirSync(out, { recursive: true });
   const page = await browser.newPage({ viewport: { width: 2600, height: 1200 } });
   page.on('pageerror', (e: Error) => console.error(`  page error: ${e.message}`));
-  for (const kind of kinds.length ? kinds : KINDS) {
-    await page.goto(new URL(`docs/trailer/promo.html?kind=${kind}`, DEV).href);
+  for (const arg of kinds.length ? kinds : KINDS) {
+    const [kind, v] = arg.split(':');
+    const name = v ? `${kind}-${v}` : kind;
+    await page.goto(new URL(`docs/trailer/promo.html?kind=${kind}${v ? `&v=${v}` : ''}`, DEV).href);
     await page.waitForFunction(() => document.title === 'ready', null, { timeout: 30000 });
     await page
       .locator('#c')
-      .screenshot({ path: path.join(out, `${kind}.png`), omitBackground: true });
-    console.log(`wrote ${path.join(out, `${kind}.png`)}`);
+      .screenshot({ path: path.join(out, `${name}.png`), omitBackground: true });
+    console.log(`wrote ${path.join(out, `${name}.png`)}`);
   }
   await browser.close();
 }
