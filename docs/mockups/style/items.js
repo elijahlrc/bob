@@ -711,7 +711,8 @@
       const c = it.cmp[b] ?? {};
       sub = `${slotsOf(it).length > 1 && it.kind !== 'flask' ? `→ ${SLOTS[b][0]} ` : ''}${verdict(c)}${c.warn ? ' <span class="ix-w">⚠</span>' : ''}`;
     }
-    return `<button class="ix-row${on ? ' on' : ''}" data-pick="${it.id}" ${on ? 'data-paint="panel" data-thin data-field="lapis" data-pk="on"' : ''}>
+    // Each item is its own small plaque with a thin gold rim; the picked one has the heavy double rim.
+    return `<button class="ix-row${on ? ' on' : ''}" data-pick="${it.id}" data-paint="panel" ${on ? '' : 'data-thin'} data-field="lapis" data-pk="${on ? 'on' : 'off'}">
       <span class="ix-rowname r-${it.rar}">${it.isNew ? '<i class="ix-new" title="New"></i>' : ''}${it.fav ? '<span class="ix-favmark">★</span> ' : ''}${it.name}</span>
       <span class="ix-rowsub"><span class="muted">${it.type ?? ''}</span> ${sub}</span>
     </button>`;
@@ -722,7 +723,7 @@
   const isOld = (it) => !it.fav && it.listOnly && !isJunk(it);
   const goneRow = (
     it,
-  ) => `<div class="ix-row gone"><span class="ix-rowname r-${it.rar}">${it.name}</span>
+  ) => `<div class="ix-row gone" data-paint="panel" data-thin data-pk="off"><span class="ix-rowname r-${it.rar}">${it.name}</span>
       <span class="ix-rowsub"><span class="muted">${it.type ?? ''}</span><button class="btn small" data-paint="panel" data-thin data-putback="${it.id}">Put back</button></span></div>`;
   function bagPanel() {
     const list = (view === 'gone' ? gone : bag).filter(

@@ -886,21 +886,18 @@
   flex-direction: column;
   gap: 1px;
   width: 100%;
-  padding: 9px 12px 10px;
+  margin-bottom: 6px;
+  padding: 10px 14px 11px;
   font: inherit;
   text-align: left;
   color: inherit;
   text-shadow: 0 2px 0 var(--ink);
-  background: var(--s-dots);
-  background-position: left bottom;
+  background: none;
   border: 0;
   cursor: pointer;
 }
 [data-style='leaf'] .ix-row:hover:not(.on) {
-  background-color: #ffffff0a;
-}
-[data-style='leaf'] .ix-row.on {
-  background-image: none;
+  filter: brightness(1.15);
 }
 [data-style='leaf'] .ix-rowsub {
   display: flex;

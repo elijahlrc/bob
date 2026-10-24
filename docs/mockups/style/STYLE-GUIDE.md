@@ -167,7 +167,7 @@ swaps, undo, taking passives.
   (not a cross: the player is in hell, not Christ). Picking a bag item lights every slot it fits and aims at the best;
   the new and the worn item open as a **diptych** with the result on a porphyry plaque; the button names the outcome
   ("Wear in Off hand", "Spidersilk Wall goes to the bag") and a status line with Undo follows. Card headers carry the
-  rarity (plaster, sky, gold, vermilion). On a phone the gear folds into one line and the comparison is a sheet.
+  rarity (plaster, sky, gold, vermilion). Bag rows are objects, not lines of text: each is a small plaque with a thin gold rim (the picked one has the heavy double rim); the tesserae are for rows of text inside a panel. On a phone the gear folds into one line and the comparison is a sheet.
 - **Passive tree, the starry vault:** a worn lapis sky with a gold rim; taken passives are gold stars and gold lines,
   the rest enamel in the colour of what they give (colour is the family, the glyph says exactly what). Drawn each frame
   on a half-resolution canvas (sprites painted once per kind, colour, state and size; lines one art pixel, alpha snapped)
