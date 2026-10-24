@@ -1,221 +1,380 @@
-/* The Wayside (docs/WAYSIDE.md): stops, provisions and the Reprieve. */
+/* The Wayside (docs/WAYSIDE.md): stops, provisions, the Satchel and the one-time tips, in Gold Leaf
+   (docs/mockups/style/STYLE-GUIDE.md). A stop's screen is the porphyry niche of its offer, enlarged; what the player
+   picks on it (an item, a blessing, a gem, a ware, a reprieve) is a small lapis plaque with a thin gold rim, the chosen
+   one with the heavy rim. The Satchel is a lapis panel of provision plaques; a tip is a plaque. */
 
-.theme.stop-card {
-  border-style: dotted;
+/* ---- A stop's screen ---- */
+html.leaf .stop {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 52px 40px 48px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .stop-name {
+  font: 400 48px / 1 var(--title-font);
+  font-size-adjust: none;
+  text-align: center;
+  color: var(--gold-hi);
+}
+html.leaf .stop-level {
+  margin-top: -8px;
+  text-align: center;
+}
+html.leaf .stop p {
+  margin: 0;
+}
+html.leaf .stop-flavour {
+  font-style: italic;
+  text-align: center;
+  color: #d8c8d4;
+}
+html.leaf .stop-how {
+  text-align: center;
+}
+html.leaf .stop-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+html.leaf .stop-body > .muted {
+  text-align: center;
+}
+html.leaf .stop .muted {
+  color: #c7b8c6;
+}
+/* A warning on a stop (the Ferryman's price, a problem with the cart): a vermilion plaque. */
+html.leaf .stop-warn {
+  align-self: center;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 9px 20px 10px;
+  text-align: center;
+  color: var(--pearl);
 }
 
-.stop {
+/* The things to choose: plaques */
+html.leaf .stop-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+html.leaf .stop-item,
+html.leaf .stop-gem,
+html.leaf .ware {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 12px 16px 14px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font: inherit;
+  font-size: var(--size);
+  line-height: 1.3;
+  text-align: left;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .stop-item,
+html.leaf .stop-gem {
+  cursor: pointer;
+}
+html.leaf :is(.stop-item, .stop-gem):hover:not(.sel) {
+  filter: brightness(1.15);
+}
+html.leaf .stop-item .muted,
+html.leaf .ware .muted,
+html.leaf .stop-gem .muted {
+  color: var(--muted);
+}
+html.leaf .stop-item-name {
+  font-weight: 600;
+  color: var(--gold-hi);
+  overflow-wrap: anywhere;
+}
+html.leaf .stop-item-name.normal {
+  color: var(--pearl);
+}
+html.leaf .stop-item-name.magic {
+  color: #b9cbe6;
+}
+html.leaf .stop-item-name.unique {
+  color: #e8a07c;
+}
+html.leaf .stop-item .provision {
+  width: 100%;
+}
+
+/* Filters, search and the extra sockets */
+html.leaf .stop-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+html.leaf .stop-body .ix-search {
+  flex: none;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+html.leaf .stop-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+html.leaf .stop-extra strong {
+  min-width: 24px;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  text-align: center;
+  color: var(--gold-hi);
+}
+
+/* The Gem Hoard's gems */
+html.leaf .stop-gems {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+html.leaf .stop-gem {
+  align-items: stretch;
+}
+html.leaf .stop-gem :is(.item-card, .gem-card) {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+html.leaf .stop-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+/* ---- A stop's emblem: the objects it deals in, standing in the niche ---- */
+html.leaf .stop-emblem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 72px;
+  pointer-events: none;
+}
+html.leaf .stop-emblem .se-gem {
+  flex: none;
+  width: 40px;
+  height: 40px;
+}
+html.leaf .stop-emblem .se-chain {
+  flex: none;
+  width: 24px;
+  height: 12px;
+  margin: 0 -6px;
+}
+html.leaf .se-gemHoard {
+  gap: 10px;
+}
+html.leaf .se-gemHoard .se-gem:nth-child(2) {
+  margin-bottom: 28px;
+}
+html.leaf .stop-emblem .se-medal {
+  flex: none;
+  width: 72px;
+  height: 72px;
+}
+html.leaf .stop-emblem .se-bottle {
+  flex: none;
+  width: 32px;
+  height: 52px;
+}
+html.leaf .se-quartermaster .se-bottle:nth-child(2) {
+  height: 64px;
+}
+html.leaf .stop-emblem .se-coin {
+  flex: none;
+  width: 44px;
+  height: 44px;
+}
+html.leaf .se-ferryman .se-coin + .se-coin {
+  margin: 20px 0 0 -14px;
+}
+
+/* ---- The Quartermaster's wares ---- */
+html.leaf .wares-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+html.leaf .wares-head strong {
+  font-weight: 400;
+  color: var(--gold-hi);
+}
+html.leaf .ware-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+html.leaf .ware {
+  gap: 10px;
+  padding: 16px 18px 16px;
+  align-items: stretch;
+}
+html.leaf .ware .item-card {
+  flex: 1;
+}
+html.leaf .ware-buy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  background: var(--s-dots);
+  background-position: left top;
+}
+html.leaf .ware-price {
+  color: var(--gold-hi);
+}
+
+/* ---- Provisions ---- */
+html.leaf .provision {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .provision[data-paint] {
+  padding: 12px 16px 14px;
+}
+html.leaf .provision-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 10px;
+}
+html.leaf .provision-title {
+  font-weight: 600;
+  color: var(--gold-hi);
+}
+html.leaf .provision-sep {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+html.leaf .provision .muted {
+  color: var(--muted);
+}
+html.leaf .provision-text {
+  overflow-wrap: anywhere;
+}
+html.leaf .provision-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+  background: var(--s-dots);
+  background-position: left top;
+}
+html.leaf .provision-buttons .muted {
+  margin-right: auto;
+}
+
+/* ---- The Satchel: a lapis panel of provision plaques ---- */
+html.leaf .satchel {
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-sizing: border-box;
   width: 100%;
+  max-width: 960px;
   min-width: 0;
+  margin: 0 auto;
+  padding: 24px 26px 28px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
-.stop-name {
-  margin: 0;
+html.leaf .satchel .lf-h {
+  margin-bottom: 0;
 }
-.stop p {
-  margin: 0;
+html.leaf .satchel-count {
+  text-align: center;
 }
-.stop-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
+html.leaf .satchel > .notice {
+  text-align: center;
+  color: var(--gold-hi);
 }
-.stop-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+html.leaf .satchel-curse {
+  padding: 9px 18px 10px;
+  text-align: center;
+  color: var(--pearl);
 }
-.stop-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  text-align: left;
-  padding: 6px 10px;
-  min-width: 0;
+html.leaf .satchel-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 360px));
+  justify-content: center;
+  gap: 10px;
 }
-.stop-item-name {
-  font-weight: bold;
-  overflow-wrap: anywhere;
-}
-.stop-extra {
+
+/* ---- One-time tips: a plaque, its text and "Got it" on one line when they fit ---- */
+html.leaf .tip {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-}
-.stop-kinds {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.stop-gems {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 8px;
-}
-.stop-gem {
-  padding: 4px;
-  text-align: left;
+  justify-content: center;
+  gap: 8px 16px;
+  box-sizing: border-box;
+  align-self: center;
+  width: fit-content;
+  max-width: min(100%, 760px);
   min-width: 0;
+  padding: 12px 20px 13px;
+  font-size: var(--size);
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
-.stop-gem .item-card {
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-.stop-gem.on {
-  outline: 2px solid var(--accent);
-  background: var(--panel2);
-  color: inherit;
-}
-.stop-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+html.leaf .tip-text {
+  flex: 1 1 280px;
 }
 
 @media (max-width: 600px) {
-  .stop-gems {
+  html.leaf .stop {
+    padding: 44px 26px 40px;
+  }
+  html.leaf .stop-name {
+    font-size: 40px;
+  }
+  html.leaf .stop-list,
+  html.leaf .stop-gems,
+  html.leaf .ware-grid,
+  html.leaf .satchel-list {
     grid-template-columns: 1fr;
   }
-  .stop-buttons .btn {
+  html.leaf .stop-buttons .btn {
     flex: 1 1 100%;
   }
-}
-
-/* The Quartermaster's wares */
-.wares-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-.ware-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
-}
-.ware {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-.ware-buy {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.ware-price {
-  color: #e6c07a;
-}
-@media (max-width: 600px) {
-  .ware-grid {
-    grid-template-columns: 1fr;
+  html.leaf .satchel {
+    padding: 22px 24px 26px;
   }
-}
-
-/* Provisions and the Satchel */
-.satchel {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  padding: 8px 10px;
-  border: 1px solid #3a3a48;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
-}
-.satchel-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
-}
-.satchel-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 6px;
-}
-.provision {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 6px 8px;
-  border: 1px solid #3a3a48;
-  border-left-width: 3px;
-  border-radius: 4px;
-  background: #14131a;
-  min-width: 0;
-}
-.provision.staple {
-  border-left-color: #8d8fa8;
-}
-.provision.bet {
-  border-left-color: #e6b84a;
-}
-.provision.specialist {
-  border-left-color: #70d090;
-}
-.provision-name {
-  font-weight: bold;
-}
-.provision-text {
-  overflow-wrap: anywhere;
-}
-.provision-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-
-.provision.reprieve.retreat {
-  border-left-color: #8fb8e6;
-}
-.provision.reprieve.revive {
-  border-left-color: #e68f8f;
-}
-
-.ware.chosen {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* A card inside a selected button keeps its own colours (a button that is on has dark text). */
-.btn.on .provision {
-  color: #d8d4c8;
-}
-.btn.on .provision .muted {
-  color: #8d8fa8;
-}
-
-/* One-time explainers */
-.tip {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  padding: 8px 10px;
-  border: 1px dashed #6a6a80;
-  border-radius: 6px;
-  background: rgba(120, 140, 200, 0.07);
-  font-size: 14px;
-}
-.stop-body .ix-search {
-  width: 100%;
 }

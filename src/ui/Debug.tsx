@@ -227,6 +227,8 @@ export function DebugPanel({ c }: { c: Controller }) {
   return (
     <details
       class="debug-panel"
+      data-paint="panel"
+      data-thin
       open={open}
       onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
     >

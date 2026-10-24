@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { gemDef } from '../data/gems';
-import { HOARD_TAKE, stopDef } from '../data/stops';
+import { HOARD_TAKE, stopDef, type StopId } from '../data/stops';
 import type { Item } from '../data/types';
 import type { Controller } from '../run/controller';
 import {
@@ -22,6 +22,91 @@ import { waysideOf } from '../run/wayside';
 import { ReprieveCard } from './Satchel';
 import { WareCard } from './WareCard';
 import { itemTitle, rarityClass } from './ItemCard';
+
+/**
+ * A stop's emblem: a few of the painted objects it deals in, standing in its niche (the empty middle of a stop card,
+ * docs/mockups/style/STYLE-GUIDE.md section 9). The Awlsmith adds a socket to a linked row, the Gem Hoard lays out
+ * gems, the Shrine is a starry roundel, the Quartermaster sells provisions, the Ferryman takes two coins.
+ */
+export function StopEmblem({ stop }: { stop: StopId }) {
+  const gem = (g: string, shape = 'skill', state?: string) => (
+    <i
+      class="se-gem"
+      data-paint="gem"
+      data-gem={g}
+      data-shape={shape}
+      data-state={state}
+      data-pk={g + shape + (state ?? '')}
+    />
+  );
+  const link = <i class="se-chain" data-paint="chain" data-dir="x" />;
+  let inner;
+  if (stop === 'awlsmith')
+    inner = (
+      <>
+        {gem('int')}
+        {link}
+        {gem('str')}
+        {link}
+        {gem('empty', 'skill', 'target')}
+      </>
+    );
+  else if (stop === 'gemHoard')
+    inner = (
+      <>
+        {gem('dex')}
+        {gem('int', 'support')}
+        {gem('str')}
+      </>
+    );
+  else if (stop === 'shrine')
+    inner = <i class="se-medal" data-paint="medal" data-field="lapis,3" data-medal="stars" />;
+  else if (stop === 'quartermaster')
+    inner = (
+      <>
+        <i
+          class="se-bottle"
+          data-paint="bottle"
+          data-liquid="life"
+          data-fill="0.8"
+          data-pk="life"
+        />
+        <i
+          class="se-bottle"
+          data-paint="bottle"
+          data-liquid="util"
+          data-fill="0.6"
+          data-pk="util"
+        />
+        <i
+          class="se-bottle"
+          data-paint="bottle"
+          data-liquid="mana"
+          data-fill="0.9"
+          data-pk="mana"
+        />
+      </>
+    );
+  else
+    inner = (
+      <>
+        <i class="se-coin" data-paint="medal" data-field="gold,4" data-medal="plain" />
+        <i class="se-coin" data-paint="medal" data-field="gold,4" data-medal="plain" />
+      </>
+    );
+  return (
+    <div class={'stop-emblem se-' + stop} aria-hidden="true">
+      {inner}
+    </div>
+  );
+}
+
+/** A thing to choose on a stop: a small plaque with a thin gold rim, the chosen one with the heavy rim. */
+const plaque = (on: boolean) => ({
+  'data-paint': 'panel',
+  'data-thin': on ? undefined : '',
+  'data-pk': on ? 'on' : '',
+});
 
 /** The screen of a stop the player has chosen (docs/WAYSIDE.md section 5): nothing is done until it is confirmed. */
 export function StopScreen({
@@ -62,11 +147,12 @@ export function StopScreen({
   };
 
   return (
-    <div class="stop">
-      <h3 class="stop-name">{def.name}</h3>
-      <div class="muted">Level {offer.areaLevel}</div>
+    <div class="stop" data-paint="panel" data-field="porphyry" data-arch data-foot data-loss="0.02">
+      <div class="stop-name">{def.name}</div>
+      <div class="muted stop-level">Level {offer.areaLevel}</div>
+      <StopEmblem stop={offer.stop!} />
       {def.flavour && <p class="stop-flavour">{def.flavour}</p>}
-      <p>{def.how}</p>
+      <p class="stop-how">{def.how}</p>
       {offer.stop === 'awlsmith' && (
         <Awlsmith
           run={run}
@@ -99,7 +185,11 @@ export function StopScreen({
         <Quartermaster run={run} slot={slot} cart={cart} onCart={setCart} />
       )}
       {offer.stop === 'ferryman' && <Ferryman run={run} reprieve={reprieve} onPick={setReprieve} />}
-      {error && <div class="warn">{error}</div>}
+      {error && (
+        <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
+          {error}
+        </div>
+      )}
       <div class="stop-buttons">
         <button
           class="btn primary"
@@ -153,7 +243,8 @@ function Awlsmith({
   const row = (it: Item) => (
     <button
       key={it.uid}
-      class={'stop-item btn' + (it.uid === itemUid ? ' on' : '')}
+      class={'stop-item' + (it.uid === itemUid ? ' sel' : '')}
+      {...plaque(it.uid === itemUid)}
       onClick={() => onPick(it.uid)}
     >
       <span class={'stop-item-name ' + rarityClass(it)}>{itemTitle(it)}</span>
@@ -256,7 +347,8 @@ function Hoard({
             {laid.map((id) => (
               <button
                 key={id}
-                class={'stop-gem btn' + (picks.includes(id) ? ' on' : '')}
+                class={'stop-gem' + (picks.includes(id) ? ' sel' : '')}
+                {...plaque(picks.includes(id))}
                 onClick={() => toggle(id)}
                 title={gemDef(id).name}
               >
@@ -294,7 +386,8 @@ function Shrine({
         {ids.map((id) => (
           <button
             key={id}
-            class={'stop-item btn' + (id === blessing ? ' on' : '')}
+            class={'stop-item' + (id === blessing ? ' sel' : '')}
+            {...plaque(id === blessing)}
             onClick={() => onPick(id)}
           >
             <span class="stop-item-name">{blessingDef(id).name}</span>
@@ -330,10 +423,18 @@ function Quartermaster({
           <strong>{run.dust.toLocaleString()}</strong> Bone Dust
         </span>
       </div>
-      {why && cart.length > 0 && <div class="warn">{why}</div>}
+      {why && cart.length > 0 && (
+        <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
+          {why}
+        </div>
+      )}
       <div class="ware-grid">
         {stock.map((w) => (
-          <div key={w.id} class={'ware' + (cart.includes(w.id) ? ' chosen' : '')}>
+          <div
+            key={w.id}
+            class={'ware' + (cart.includes(w.id) ? ' chosen' : '')}
+            {...plaque(cart.includes(w.id))}
+          >
             <WareCard w={w} run={run} />
             <div class="ware-buy">
               <span class="ware-price">{w.price} Bone Dust</span>
@@ -363,13 +464,20 @@ function Ferryman({
   const blocked = reprieveBlocker(run);
   return (
     <div class="stop-body">
-      <div class="warn">Price: 15% less maximum life for five levels.</div>
-      {blocked && <div class="warn">{blocked}</div>}
+      <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
+        Price: 15% less maximum life for five levels.
+      </div>
+      {blocked && (
+        <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
+          {blocked}
+        </div>
+      )}
       <div class="stop-list">
         {REPRIEVES.map((r) => (
           <button
             key={r.id}
-            class={'stop-item btn' + (r.id === reprieve ? ' on' : '')}
+            class={'stop-item' + (r.id === reprieve ? ' sel' : '')}
+            {...plaque(r.id === reprieve)}
             onClick={() => onPick(r.id)}
           >
             <ReprieveCard id={r.id} />

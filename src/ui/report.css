@@ -1,112 +1,180 @@
-/* The map report: damage dealt by skill and damage taken, split by type (src/ui/MapReport.tsx). */
-.mreport {
+/* The map report (src/ui/MapReport.tsx), in Gold Leaf (docs/mockups/style/STYLE-GUIDE.md): the title dark on the gold,
+   a few big numbers as medallions (time, dealt, per second, took), then what was dealt and what was taken on two lapis
+   panels, each a Jacquard heading over its frieze, a painted damage-type bar and a table whose rows are divided by
+   tesserae. */
+html.leaf .mreport {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  padding: 16px;
-  max-width: 920px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
   text-align: left;
+  font-size: var(--size);
 }
-.mreport h3 {
-  margin: 0 0 4px;
+html.leaf .mreport p {
+  margin: 6px 0;
 }
-.mreport h4 {
-  margin: 18px 0 6px;
-  color: var(--accent);
+html.leaf .mreport h3.mr-title {
+  margin: 0 0 18px;
+  font: 400 48px / 1 var(--title-font);
+  font-size-adjust: none;
+  text-align: center;
+  color: var(--on-gold);
+  text-shadow: 0 2px 0 #e2c68166;
 }
-.mreport p {
-  margin: 4px 0;
-}
-.mr-scroll {
-  overflow-x: auto;
-}
-.mr-table {
-  border-collapse: collapse;
-  font-size: 14px;
-  width: 100%;
-}
-.mr-table th {
-  font-weight: normal;
-  font-size: 12px;
-  color: var(--muted);
-  text-align: right;
-  padding: 2px 8px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-.mr-table th:first-child {
-  text-align: left;
-}
-.mr-table td {
-  padding: 3px 8px;
-  border-bottom: 1px solid var(--btn);
-}
-.mr-table td.num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.mr-name {
-  white-space: nowrap;
-}
-.mr-barcell {
-  width: 100%;
-  min-width: 90px;
-}
-.mr-bar {
-  height: 10px;
-  background: #1a1922;
-  border-radius: 2px;
-  overflow: hidden;
-}
-.mr-fill {
-  display: flex;
-  height: 100%;
-}
-.mr-fill > span {
-  display: block;
-  height: 100%;
-}
-.mr-split {
-  margin: 4px 0 8px;
-}
-.mr-split .mr-bar {
-  height: 14px;
-}
-.mr-legend {
+
+/* ---- The few big numbers ---- */
+html.leaf .mr-medals {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 16px;
+  justify-content: center;
+  gap: 16px 20px;
+  margin: 0 0 26px;
+}
+html.leaf .mr-medal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 136px;
+  height: 136px;
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 #0b0805aa;
+}
+html.leaf .mr-medal-label {
+  line-height: 1;
+}
+html.leaf .mr-medal b {
   margin-top: 4px;
-  font-size: 13px;
+  font: 400 34px / 1 var(--title-font);
+  font-size-adjust: none;
+  white-space: nowrap;
 }
-.mr-legend i {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 5px;
-  border-radius: 2px;
+
+/* ---- The two panels ---- */
+html.leaf .mr-panel {
+  padding: 26px 28px 30px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
-.mr-line {
-  font-size: 13px;
+html.leaf .mr-panel + .mr-panel {
+  margin-top: 24px;
 }
+html.leaf .mr-panel .muted {
+  color: var(--muted);
+}
+html.leaf .mr-scroll {
+  overflow-x: auto;
+}
+html.leaf .mr-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--size);
+}
+html.leaf .mr-table th {
+  padding: 4px 10px 8px;
+  font-weight: 400;
+  color: var(--muted);
+  text-align: right;
+  white-space: nowrap;
+}
+html.leaf .mr-table th:first-child {
+  text-align: left;
+}
+html.leaf .mr-table thead tr,
+html.leaf .mr-table tbody tr {
+  background: var(--s-dots);
+  background-position: left bottom;
+}
+html.leaf .mr-table td {
+  padding: 5px 10px 9px;
+  color: var(--gold-hi);
+}
+html.leaf .mr-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+html.leaf .mr-table td.mr-name {
+  color: var(--pearl);
+  white-space: nowrap;
+}
+html.leaf .mr-barcell {
+  width: 100%;
+  min-width: 100px;
+}
+
+/* The damage-type bars: painted strips of tiles in the types' colours (the offer cards' bar) */
+html.leaf .mr-bar {
+  height: 18px;
+}
+html.leaf .mr-fill {
+  height: 100%;
+}
+html.leaf .mr-split {
+  margin: 0 0 14px;
+}
+html.leaf .mr-split .mr-bar {
+  height: 22px;
+}
+html.leaf .mr-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 8px;
+}
+html.leaf .mr-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+html.leaf .mr-stone {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
 @media (max-width: 600px) {
-  .mreport {
-    padding: 10px 0;
+  html.leaf .mreport {
+    padding: 12px 8px 24px;
   }
-  .mr-table {
-    font-size: 13px;
+  html.leaf .mreport h3.mr-title {
+    font-size: 40px;
+  }
+  /* Four small medallions on one line: their names at 14 px, the one place smaller text is allowed. */
+  html.leaf .mr-medals {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  html.leaf .mr-medal {
+    width: 86px;
+    height: 86px;
+  }
+  html.leaf .mr-medal-label {
+    max-width: 64px;
+    font-size: 14px;
+  }
+  html.leaf .mr-medal b {
+    margin-top: 2px;
+    font-size: 22px;
+  }
+  html.leaf .mr-panel {
+    padding: 22px 20px 24px;
   }
   /* Phones: the bars, hit counts and misses go, so the table fits (the numbers that matter stay), and names may wrap. */
-  .mr-opt {
+  html.leaf .mr-opt {
     display: none;
   }
-  .mr-name {
+  html.leaf .mr-table td.mr-name {
     white-space: normal;
   }
-  .mr-table th,
-  .mr-table td {
-    padding-left: 5px;
-    padding-right: 5px;
+  html.leaf .mr-table th,
+  html.leaf .mr-table td {
+    padding-left: 4px;
+    padding-right: 4px;
   }
 }
 

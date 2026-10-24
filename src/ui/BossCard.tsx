@@ -19,7 +19,8 @@ export function BossCardOf({ type }: { type: MonsterTypeId }) {
 }
 
 /**
- * The next boss, at camp, from five maps before it (docs/BOSSES.md 10): its name, how far off it is and its warning.
+ * The next boss, at camp, from five maps before it (docs/BOSSES.md 10): its name, how far off it is and its warning, on
+ * a vermilion plaque.
  */
 export function BossAhead({ map }: { map: number }) {
   const ahead = bossAhead(map);
@@ -27,12 +28,10 @@ export function BossAhead({ map }: { map: number }) {
   if (!ahead || ahead.maps === 0) return null;
   const { boss, maps } = ahead;
   return (
-    <div class="boss-ahead">
-      <div class="boss-ahead-name">
-        {boss.name[0].toUpperCase() + boss.name.slice(1)}{' '}
-        <span class="muted">
-          in {maps} map{maps > 1 ? 's' : ''} (map {boss.map})
-        </span>
+    <div class="boss-ahead" data-paint="panel" data-thin data-field="vermilion">
+      <div class="boss-ahead-name">{boss.name[0].toUpperCase() + boss.name.slice(1)}</div>
+      <div class="boss-ahead-when">
+        in {maps} map{maps > 1 ? 's' : ''} (map {boss.map})
       </div>
       <BossCard boss={boss} />
     </div>

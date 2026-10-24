@@ -16,7 +16,6 @@ import { chalkAdd, chalkOptions, chalkRemove } from '../run/craft';
 import { passivePoints, type RunState } from '../run/run';
 import { markSeen, unseenItems } from '../run/found';
 import { ask } from './Confirm';
-import { useViewport } from './device';
 import { infoProps } from './info';
 import { Items } from './Items';
 import { MapReportView } from './MapReport';
@@ -30,7 +29,7 @@ import { CRAFTING_OPEN } from '../data/constants';
 import { Workbench } from './Workbench';
 import { Skills } from './Skills';
 import { Strategy } from './Strategy';
-import { StopScreen } from './Stop';
+import { StopEmblem, StopScreen } from './Stop';
 import { reprieveDef } from '../data/reprieves';
 import { Satchel } from './Satchel';
 import { Tip } from './Tip';
@@ -61,8 +60,9 @@ function nextStep(tab: Tab, points: number): Tab {
 }
 
 /**
- * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others. The boss's
- * portrait and name, a short description, then the map that leads to it.
+ * A boss map's offer (docs/BOSSES.md 10): the one way on, presented as a level apart from all the others: a wide arched
+ * niche with a vermilion plaque hung over its arch, the boss's name and portrait, a short description, then the map that
+ * leads to it.
  */
 function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
   const run = c.run!;
@@ -71,25 +71,20 @@ function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
   const name = boss.name[0].toUpperCase() + boss.name.slice(1);
   const t = themeDef(o.themeId);
   return (
-    <div class="boss-offer">
-      <div class="boss-offer-banner">
-        <span>Boss</span>
-        <span class="boss-offer-map">
-          Map {run.map}
+    <div class="boss-offer-wrap">
+      <div class="boss-offer" data-paint="panel" data-arch data-pearls data-foot>
+        <div class="boss-offer-banner" data-paint="panel" data-thin data-field="vermilion">
+          Boss · map {run.map}
           {id === 'unmaker' ? ' · the last' : ''}
-        </span>
-      </div>
-      <div class="boss-offer-body">
-        {c.portrait && <img class="boss-portrait" src={c.portrait(boss.type)} alt={name} />}
-        <div class="boss-offer-text">
-          <div class="boss-offer-name">{name}</div>
-          <BossCard boss={boss} />
         </div>
-      </div>
-      <div class="boss-offer-map-info">
-        <div class="boss-offer-way">
-          The way there: <strong>{t.name}</strong>, level {o.areaLevel}. {name} waits alone in an
-          arena past its last room.
+        <div class="boss-offer-name">{name}</div>
+        {c.portrait && <img class="boss-portrait" src={c.portrait(boss.type)} alt={name} />}
+        <BossCard boss={boss} />
+        <div
+          class="boss-offer-way"
+          {...infoProps(`${name} waits alone in an arena past its last room.`)}
+        >
+          <strong>{t.name}</strong>, level {o.areaLevel}
         </div>
         <OfferTable o={o} />
         {o.affixes.map((aid) => {
@@ -100,10 +95,10 @@ function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
             </div>
           );
         })}
+        <button class="btn primary boss-go" onClick={() => c.startMap(0)}>
+          Face {boss.name}
+        </button>
       </div>
-      <button class="btn boss-go" onClick={() => c.startMap(0)}>
-        Face {boss.name}
-      </button>
       {(run.currency.chalk ?? 0) > 0 && <Chalk c={c} offer={0} />}
     </div>
   );
@@ -117,7 +112,7 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
   const chalk = run.currency.chalk ?? 0;
   return (
     <div class="chalk">
-      <div class="muted">Wayfinder's Chalk × {chalk}</div>
+      <div class="chalk-count">Wayfinder's Chalk × {chalk}</div>
       {chalkOptions(run, offer).map((id) => (
         <button
           key={id}
@@ -221,17 +216,13 @@ export function Camp({ c }: { c: Controller }) {
     setFocus((f) => ({ uid, n: (f?.n ?? 0) + 1, to }));
     setTab(to);
   };
-  // The next map is a tab of its own at every width, with a bar at the bottom. On a narrow screen the offer cards also
-  // fold their detail lines until asked for (docs/MOBILE.md 3.3).
-  const narrow = useViewport().layout !== 'desktop';
+  // The next map is a tab of its own at every width, with a bar at the bottom.
   const tabsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     tabsRef.current
       ?.querySelector('.tab.on')
       ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
   }, [tab]);
-  // On a narrow screen the types, rules and gate line of an offer card stay folded until asked for.
-  const [opened, setOpened] = useState<Record<string, boolean>>({});
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
   // Ctrl+Z undoes the last camp change (equip, socket, passive point, reward pick ...).
@@ -354,6 +345,7 @@ export function Camp({ c }: { c: Controller }) {
                   >
                     <div class="theme-name">{d.name}</div>
                     <div class="muted">Level {o.areaLevel}</div>
+                    <StopEmblem stop={o.stop!} />
                     <div class="affix">{d.text}</div>
                   </button>
                 </div>
@@ -384,11 +376,7 @@ export function Camp({ c }: { c: Controller }) {
                   )}
                   <Density d={densityFor(run.seed, o.id, run.map, o.type)} />
                   <OfferTable o={o} />
-                  <OfferInfo
-                    o={o}
-                    boss={bossForMap(run.map) ?? undefined}
-                    more={!narrow || !!opened[o.id]}
-                  />
+                  <OfferInfo o={o} boss={bossForMap(run.map) ?? undefined} more />
                   {o.affixes.map((id) => {
                     const a = mapAffixDef(id);
                     return (
@@ -399,14 +387,6 @@ export function Camp({ c }: { c: Controller }) {
                     );
                   })}
                 </button>
-                {narrow && (
-                  <button
-                    class="btn small"
-                    onClick={() => setOpened({ ...opened, [o.id]: !opened[o.id] })}
-                  >
-                    {opened[o.id] ? 'Fewer details' : 'Details'}
-                  </button>
-                )}
                 {(run.currency.chalk ?? 0) > 0 && o.kind === 'map' && <Chalk c={c} offer={i} />}
               </div>
             );

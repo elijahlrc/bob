@@ -1,1 +1,361 @@
-/* Gold Leaf: camp-extra (filled in by the port, docs/mockups/style/STYLE-GUIDE.md section 10). */
+/* Gold Leaf: the camp's other pieces round the Next map tab (docs/mockups/style/STYLE-GUIDE.md): the reward pick (Next
+   map and Items tabs), the boss offer and the boss ahead, Wayfinder's Chalk, the Debug panel and a stop's emblem in its
+   niche. The stops, the Satchel and the tips are in wayside.css, the map report in report.css. */
+
+/* ---- The reward pick: the offers are objects on small plaques with a thin gold rim ---- */
+html.leaf .reward {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+html.leaf .reward-head {
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--on-gold);
+  text-shadow: 0 2px 0 #e2c68166;
+}
+html.leaf .reward-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+html.leaf .reward-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 72px;
+  padding: 12px 18px 13px 14px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font: inherit;
+  font-size: var(--size);
+  line-height: 1.2;
+  text-align: left;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+html.leaf .reward-card:hover:not(.sel) {
+  filter: brightness(1.15);
+}
+html.leaf .reward-icon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+}
+html.leaf .reward-icon[data-paint='bottle'] {
+  width: 32px;
+  height: 48px;
+  margin: 0 6px;
+}
+html.leaf .reward-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+html.leaf .reward-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+html.leaf .reward-name.normal {
+  color: var(--pearl);
+}
+html.leaf .reward-name.gem {
+  color: var(--pearl);
+}
+html.leaf .reward-name.flaskitem {
+  color: var(--gold-hi);
+}
+html.leaf .reward-card .muted {
+  color: var(--muted);
+}
+html.leaf .reward-buttons {
+  display: flex;
+  gap: 10px;
+}
+html.leaf .reward > .warn {
+  color: var(--on-gold);
+  font-weight: 600;
+}
+/* The preview: a lapis leaf with a gold ring (the item card inside is transparent). */
+html.leaf .reward-preview {
+  box-sizing: border-box;
+  width: min(380px, 100%);
+  padding: 18px 20px 22px;
+  background: var(--t-lapis, #172049);
+  box-shadow:
+    0 0 0 3px #c09d4e,
+    5px 7px 0 2px #0b080566;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .reward-preview.float {
+  width: min(380px, 92vw);
+}
+html.leaf .reward-preview .provision .muted {
+  color: var(--muted);
+}
+/* Above the Items tab, after a map: the same pick, so the drops stay in view below. */
+html.leaf .items-reward {
+  margin: 4px 0 14px;
+  padding: 0 20px;
+}
+html.leaf .items-reward .reward {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+html.leaf .items-reward .reward .reward-preview {
+  flex-basis: auto;
+}
+
+/* ---- The boss's own map: a wide arched niche with a vermilion plaque hung over its arch ---- */
+html.leaf .boss-offer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 580px;
+  margin: 20px auto 6px;
+}
+html.leaf .boss-offer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 0;
+  padding: 70px 34px 44px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  animation: none;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .boss-offer-banner {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 8px 22px 9px;
+  border: 0;
+  background-color: transparent;
+  font-size: var(--size);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  color: var(--pearl);
+}
+html.leaf .boss-offer-name {
+  font: 400 48px / 1 var(--title-font);
+  font-size-adjust: none;
+  text-align: center;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .boss-portrait {
+  align-self: center;
+  width: 160px;
+  height: 160px;
+  margin: 8px 0 4px;
+  object-fit: contain;
+  object-position: bottom;
+  image-rendering: pixelated;
+  background: none;
+  border: 0;
+}
+html.leaf .boss-offer .boss-card {
+  margin: 0 0 12px;
+  font-size: var(--size);
+  text-align: center;
+  color: var(--pearl);
+}
+html.leaf .boss-offer-way {
+  margin: 0 0 4px;
+  padding-top: 12px;
+  background: var(--s-dots);
+  background-position: left top;
+  text-align: center;
+  color: var(--pearl);
+}
+html.leaf .boss-offer-way strong {
+  font-weight: 600;
+  color: var(--gold-hi);
+  border-bottom: 2px dotted #e2c68188;
+  cursor: help;
+}
+html.leaf .boss-offer .affix {
+  margin: 6px 0;
+  padding-top: 10px;
+  background: var(--s-dots);
+  background-position: left top;
+  color: var(--madder);
+}
+html.leaf .boss-offer .affix .muted {
+  color: var(--dim);
+}
+html.leaf .btn.boss-go {
+  display: block;
+  align-self: center;
+  margin: 18px 0 0;
+  padding: 12px 30px 13px;
+  border: 0;
+  background: transparent;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  letter-spacing: 0;
+  color: var(--pearl);
+}
+html.leaf .btn.boss-go:hover {
+  background: transparent;
+}
+
+/* The next boss, from five maps before it: a vermilion plaque, its warning in plain words. */
+html.leaf .boss-ahead {
+  align-self: center;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: min(100%, 640px);
+  margin: 4px 0;
+  padding: 12px 24px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .boss-ahead-name {
+  font: 400 var(--head-size) / 1.1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+}
+html.leaf .boss-ahead-when {
+  color: #f2d6c8;
+}
+html.leaf .boss-ahead .boss-card {
+  margin: 6px 0 0;
+  font-size: var(--size);
+  color: var(--pearl);
+}
+
+/* ---- Wayfinder's Chalk under an offer ---- */
+html.leaf .chalk {
+  justify-content: center;
+  gap: 8px;
+}
+html.leaf .chalk-count {
+  flex-basis: 100%;
+  text-align: center;
+  color: #2e2010;
+  font-weight: 600;
+}
+
+/* ---- The Debug panel: plain, on a thin lapis plaque ---- */
+html.leaf .debug-panel {
+  box-sizing: border-box;
+  max-width: min(640px, 100%);
+  padding: 12px 20px 14px;
+  border: 0;
+  border-radius: 0;
+  font-size: var(--size);
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .debug-panel summary {
+  color: var(--pearl);
+}
+html.leaf .debug-panel .muted {
+  margin: 6px 0;
+  color: var(--muted);
+}
+html.leaf .debug-row {
+  grid-template-columns: 96px minmax(0, 1fr) 84px;
+  gap: 10px;
+  margin: 10px 0;
+}
+html.leaf .debug-row:is(:has(select), :has(.btn)) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+html.leaf .debug-panel :is(input, select) {
+  font-size: var(--size);
+}
+html.leaf .debug-row input[type='number'] {
+  box-sizing: border-box;
+  width: 84px;
+}
+html.leaf .debug-row input[type='range'] {
+  accent-color: #c09d4e;
+}
+html.leaf .debug-label {
+  color: var(--muted);
+}
+html.leaf .debug-buttons {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+html.leaf .debug-table {
+  margin: 10px 0;
+}
+html.leaf .debug-table th,
+html.leaf .debug-table td {
+  padding: 4px 8px 7px;
+  border: 0;
+  background: var(--s-dots);
+  background-position: left bottom;
+  font-weight: 400;
+  color: var(--gold-hi);
+}
+html.leaf .debug-table th,
+html.leaf .debug-table td:first-child {
+  color: var(--muted);
+}
+
+/* ---- A stop card's emblem, standing in the empty middle of its niche (StopEmblem in Stop.tsx) ---- */
+html.leaf .stop-card .stop-emblem {
+  flex: 1;
+  min-height: 72px;
+  margin: 8px 0;
+}
+
+@media (max-width: 600px) {
+  html.leaf .reward-cards {
+    grid-template-columns: 1fr;
+  }
+  html.leaf .items-reward {
+    padding: 0 12px;
+  }
+  html.leaf .boss-offer {
+    padding: 64px 32px 40px;
+  }
+  html.leaf .boss-offer-name {
+    font-size: 40px;
+  }
+  html.leaf .boss-portrait {
+    width: 128px;
+    height: 128px;
+  }
+  html.leaf .debug-row {
+    grid-template-columns: 80px minmax(0, 1fr) 72px;
+  }
+  html.leaf .debug-row input[type='number'] {
+    width: 72px;
+  }
+}

@@ -17,8 +17,8 @@ export type TipId = keyof typeof TIPS;
 export function Tip({ c, id, extra }: { c: Controller; id: TipId; extra?: ComponentChildren }) {
   if (!c.run || waysideOf(c.run).seen[id]) return null;
   return (
-    <div class="tip">
-      <div>{TIPS[id]}</div>
+    <div class="tip" data-paint="panel" data-thin>
+      <div class="tip-text">{TIPS[id]}</div>
       {extra}
       <button class="btn small" onClick={() => c.see(id)}>
         Got it

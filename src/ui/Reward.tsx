@@ -1,8 +1,13 @@
 import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { currencyLabel, currencyText } from '../data/currency';
+import { itemBase } from '../data/bases';
+import { flaskBase } from '../data/flasks';
+import { gemDef } from '../data/gems';
+import type { ItemClass } from '../data/types';
 import type { Controller } from '../run/controller';
 import { takeReward } from '../run/run';
 import { useViewport } from './device';
+import { gemCardData } from './gemText';
 import { ItemCard, itemTitle, rarityClass } from './ItemCard';
 import { ProvisionCard } from './Satchel';
 import { provisionDef } from '../data/provisions';
@@ -18,10 +23,83 @@ function cardClass(o: RewardCard): string {
   return o.kind === 'pouch' ? 'flaskitem' : o.kind === 'currency' ? 'flaskitem' : rarityClass(o);
 }
 
+/** The slot glyph (leaf/kinds.ts) of an item class. */
+const GLYPH: Partial<Record<ItemClass, string>> = {
+  shield: 'shield',
+  helmet: 'helm',
+  body: 'body',
+  gloves: 'gloves',
+  boots: 'boots',
+  ring: 'ring',
+  amulet: 'amulet',
+  belt: 'belt',
+};
+
+/** The small painted object at the head of a card: the gem's stone, the flask's bottle, the item's roundel. */
+function CardIcon({ o }: { o: RewardCard }) {
+  if (o.kind === 'gem') {
+    const g = gemDef(o.gemId);
+    return (
+      <i
+        class="reward-icon"
+        data-paint="gem"
+        data-gem={g.attr}
+        data-shape={g.kind === 'support' ? 'support' : 'skill'}
+        data-pk={o.gemId}
+      />
+    );
+  }
+  if (o.kind === 'flask')
+    return (
+      <i
+        class="reward-icon"
+        data-paint="bottle"
+        data-liquid={flaskBase(o.baseId).kind}
+        data-fill="0.8"
+        data-pk={flaskBase(o.baseId).kind}
+      />
+    );
+  if (o.kind === 'pouch')
+    return (
+      <i
+        class="reward-icon"
+        data-paint="bottle"
+        data-liquid="util"
+        data-fill="0.6"
+        data-pk="pouch"
+      />
+    );
+  if (o.kind === 'item') {
+    const cls = itemBase(o.baseId).itemClass;
+    return (
+      <i
+        class="reward-icon"
+        data-paint="slot"
+        data-rar={o.rarity}
+        data-glyph={GLYPH[cls] ?? 'blade'}
+        data-pk={`${o.rarity}${cls}`}
+      />
+    );
+  }
+  return <i class="reward-icon" data-paint="medal" data-field="gold,4" data-medal="plain" />;
+}
+
+/** The second line of a card: what kind of thing it is, when its name does not say. */
+function cardKind(o: RewardCard): string | null {
+  if (o.kind === 'gem') return gemCardData(gemDef(o.gemId), 1).tags.join(', ') || null;
+  if (o.kind === 'pouch') return 'Provision';
+  if (o.kind === 'item') {
+    const b = itemBase(o.baseId).name;
+    return b !== o.name ? b : null;
+  }
+  return null;
+}
+
 /**
  * The 1-of-3 reward pick (§5.3). With a mouse, hovering previews an offer and a click takes it. On a coarse pointer
  * there is no hover, so the first tap previews (and marks) an offer and a Take button commits it: a tap must never
- * take a reward the player has not been able to read.
+ * take a reward the player has not been able to read. Each offer is an object on a small plaque with a thin gold rim;
+ * the marked one has the heavy rim.
  */
 export function Reward({ c }: { c: Controller }) {
   const run = c.run!;
@@ -53,38 +131,53 @@ export function Reward({ c }: { c: Controller }) {
   useLayoutEffect(place, [shown?.uid]);
   return (
     <div class="reward">
-      <div class="notice">
+      <div class="reward-head">
         {offers.length > 0 && offers.every((o) => o.kind === 'gem')
-          ? 'Choose a skill gem:'
-          : 'Choose a reward:'}
+          ? 'Choose a skill gem'
+          : 'Choose a reward'}
       </div>
-      {offers.map((o) => (
-        <button
-          key={o.uid}
-          class={`inv-item ${cardClass(o)}${coarse && picked === o.uid ? ' sel' : ''}`}
-          onMouseEnter={(e) => {
-            mouse.current = { x: e.clientX, y: e.clientY };
-            setHover(o.uid);
-          }}
-          onMouseMove={(e) => {
-            mouse.current = { x: e.clientX, y: e.clientY };
-            place();
-          }}
-          onMouseLeave={() => setHover(null)}
-          onClick={() => (coarse ? setPicked(o.uid) : take(o.uid))}
-        >
-          {cardTitle(o)}
-        </button>
-      ))}
+      <div class="reward-cards">
+        {offers.map((o) => {
+          const sel = coarse && picked === o.uid;
+          const kind = cardKind(o);
+          return (
+            <button
+              key={o.uid}
+              class={`reward-card${sel ? ' sel' : ''}`}
+              data-paint="panel"
+              data-thin={sel ? undefined : ''}
+              data-pk={sel ? 'sel' : ''}
+              onMouseEnter={(e) => {
+                mouse.current = { x: e.clientX, y: e.clientY };
+                setHover(o.uid);
+              }}
+              onMouseMove={(e) => {
+                mouse.current = { x: e.clientX, y: e.clientY };
+                place();
+              }}
+              onMouseLeave={() => setHover(null)}
+              onClick={() => (coarse ? setPicked(o.uid) : take(o.uid))}
+            >
+              <CardIcon o={o} />
+              <span class="reward-text">
+                <span class={`reward-name ${cardClass(o)}`}>{cardTitle(o)}</span>
+                {kind && <span class="muted">{kind}</span>}
+              </span>
+            </button>
+          );
+        })}
+      </div>
       {note && <div class="warn">{note}</div>}
-      {coarse && (
-        <button class="btn small primary" disabled={picked === null} onClick={() => take(picked)}>
-          Take
+      <div class="reward-buttons">
+        {coarse && (
+          <button class="btn small primary" disabled={picked === null} onClick={() => take(picked)}>
+            Take
+          </button>
+        )}
+        <button class="btn small" onClick={() => take(null)}>
+          Skip
         </button>
-      )}
-      <button class="btn small" onClick={() => take(null)}>
-        Skip
-      </button>
+      </div>
       {shown && (
         <div class={coarse ? 'reward-preview' : 'reward-preview float'} ref={tip}>
           {shown.kind === 'pouch' ? (

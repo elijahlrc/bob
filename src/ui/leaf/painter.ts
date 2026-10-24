@@ -205,7 +205,12 @@ function paintEl(el: HTMLElement, kind: string, o: Record<string, unknown>, key:
     H = Math.ceil(el.clientHeight / P);
   }
   const fz = kind === 'panel' ? friezesOf(el).join(',') : '';
-  const pk = el.dataset.pk ?? '';
+  // Everything the painting reads from the element is in its key (field, thin, arch, mix, state, pk ...); not the HUD's
+  // flask state (data-st), which changes during play without changing the painting.
+  const pk = Object.entries(el.dataset)
+    .filter(([k]) => k !== 'painted' && k !== 'st')
+    .map(([k, v]) => `${k}=${v}`)
+    .join(';');
   const ck = `${key}|${pk}|${fz}|${W}x${H}`;
   if (el.dataset.painted === ck) return;
   let url = cache.get(ck);

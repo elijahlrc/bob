@@ -5,27 +5,38 @@ const f0 = (v: number) => Math.round(v).toLocaleString();
 const pct = (v: number) => `${v >= 10 ? Math.round(v) : v.toFixed(1)}%`;
 const sum = (d: number[]) => d[0] + d[1] + d[2] + d[3] + d[4];
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+/** A big number short enough for a medallion: 9,876, 12.3k, 456k, 1.23M. */
+const short = (v: number) => {
+  const n = Math.round(v);
+  if (n < 10_000) return n.toLocaleString();
+  if (n < 1_000_000) return `${n < 100_000 ? (n / 1000).toFixed(1) : Math.round(n / 1000)}k`;
+  return `${(n / 1_000_000).toFixed(n < 10_000_000 ? 2 : 1)}M`;
+};
 
-/** Colour of each damage type (physical, lightning, cold, fire, chaos), the same as the numbers over the monsters. */
-const TYPE_COLOR = ['#eadfc8', '#c89cff', '#9ad8ff', '#ff9a40', '#9ae05a'];
+/**
+ * The ramp of each damage type (physical, lightning, cold, fire, chaos) in the painted bar and the legend's stones, as
+ * the offer cards' damage bar paints them (leaf/shapes.ts).
+ */
+const TYPE_STONE = ['pearl', 'violet', 'teal', 'vermilion', 'green'];
 
-/** A bar split by damage type; `scale` is how much of the full width the whole bar takes (1 for the largest row). */
+/** A painted bar split by damage type; `scale` is how much of the full width the whole bar takes (1 for the largest row). */
 function TypeBar({ dmg, scale = 1 }: { dmg: number[]; scale?: number }) {
   const total = sum(dmg);
   if (total <= 0) return <div class="mr-bar" />;
+  const parts = dmg
+    .map((d, i) => (d > 0 ? `${cap(DAMAGE_TYPES[i])} ${f0(d)} (${pct((d / total) * 100)})` : ''))
+    .filter(Boolean)
+    .join(', ');
+  const mix = dmg.map((d) => (d / total).toFixed(3)).join(',');
   return (
-    <div class="mr-bar">
-      <div class="mr-fill" style={{ width: `${Math.max(1, scale * 100)}%` }}>
-        {dmg.map((d, i) =>
-          d > 0 ? (
-            <span
-              key={i}
-              style={{ width: `${(d / total) * 100}%`, background: TYPE_COLOR[i] }}
-              title={`${cap(DAMAGE_TYPES[i])} ${f0(d)} (${pct((d / total) * 100)})`}
-            />
-          ) : null,
-        )}
-      </div>
+    <div class="mr-bar" title={parts}>
+      <div
+        class="mr-fill"
+        data-paint="mix"
+        data-mix={mix}
+        data-pk={mix}
+        style={{ width: `max(16px, ${scale * 100}%)` }}
+      />
     </div>
   );
 }
@@ -43,7 +54,12 @@ function TypeSplit({ rows }: { rows: LedgerRow[] }) {
         {dmg.map((d, i) =>
           d > 0 ? (
             <span key={i}>
-              <i style={{ background: TYPE_COLOR[i] }} />
+              <i
+                class="mr-stone"
+                data-paint="sep"
+                data-stone={TYPE_STONE[i]}
+                data-pk={TYPE_STONE[i]}
+              />
               {cap(DAMAGE_TYPES[i])} {pct((d / total) * 100)}
             </span>
           ) : null,
@@ -85,7 +101,9 @@ function Dealt({ r }: { r: MapReport }) {
               <th class="mr-opt" />
               <th>Damage</th>
               <th>Share</th>
-              <th title="Average damage a second over the whole map">Per second</th>
+              <th class="mr-opt" title="Average damage a second over the whole map">
+                Per second
+              </th>
               <th class="mr-opt">Hits</th>
               <th>Crit</th>
               <th title="The biggest single hit">Biggest</th>
@@ -106,7 +124,7 @@ function Dealt({ r }: { r: MapReport }) {
                   </td>
                   <td class="num">{f0(t)}</td>
                   <td class="num">{pct((t / all) * 100)}</td>
-                  <td class="num">{r.time > 0 ? f0(t / r.time) : '–'}</td>
+                  <td class="num mr-opt">{r.time > 0 ? f0(t / r.time) : '–'}</td>
                   <td class="num mr-opt">{x.hits > 0 ? f0(x.hits) : '–'}</td>
                   <td class="num">{x.hits > 0 ? pct((x.crits / x.hits) * 100) : '–'}</td>
                   <td class="num">{x.max > 0 ? f0(x.max) : '–'}</td>
@@ -205,17 +223,30 @@ export function MapReportView({
 }) {
   const dealt = r.dealt.reduce((s, x) => s + sum(x.dmg), 0);
   const taken = r.taken.reduce((s, x) => s + sum(x.dmg), 0);
+  /** One of the few big numbers at the top: a medallion with its name and value. */
+  const medal = (label: string, value: string, field = 'lapis,4') => (
+    <div class="mr-medal" data-paint="medal" data-field={field} data-medal="big" data-pk={label}>
+      <span class="mr-medal-label">{label}</span>
+      <b>{value}</b>
+    </div>
+  );
   return (
     <div class="mreport">
-      {title && <h3>{title}</h3>}
-      <p class="muted">
-        {r.time.toFixed(0)} s · dealt {f0(dealt)}
-        {r.time > 0 && ` (${f0(dealt / r.time)} a second)`} · took {f0(taken)}
-      </p>
-      <h4>Damage {who} dealt</h4>
-      <Dealt r={r} />
-      <h4>Damage {who} took</h4>
-      <Taken r={r} who={who} />
+      {title && <h3 class="mr-title">{title}</h3>}
+      <div class="mr-medals">
+        {medal('Time', `${r.time.toFixed(0)} s`, 'green,4')}
+        {medal('Dealt', short(dealt))}
+        {r.time > 0 && medal('Per second', short(dealt / r.time))}
+        {medal('Took', short(taken), 'vermilion,4')}
+      </div>
+      <div class="mr-panel" data-paint="panel">
+        <h4 class="lf-h">Damage {who} dealt</h4>
+        <Dealt r={r} />
+      </div>
+      <div class="mr-panel" data-paint="panel">
+        <h4 class="lf-h">Damage {who} took</h4>
+        <Taken r={r} who={who} />
+      </div>
     </div>
   );
 }
