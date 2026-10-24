@@ -113,7 +113,3 @@ replaced by a longer gem (+0.5 s), amulet (+0.5 s) and equip shot (+1.0 s), whic
 screen the cut and the score are the landscape cut's; the end screen is held 1 s longer, and the cut is 32 s. The score maps sound effects
 (`T`) and music (`TM`) separately: the groove runs on unbroken. Open: the equip scene's UX on a phone (waits for the UI work), and the
 `cut-vertical.html` helpers are a copy of `cut.html`'s.
-
-Scenes with text at the top or the bottom (the tree, skills, equip, fall, end screen, duel, rating, board) are filmed 360×420
-(`SAFE` in `clips.ts`) and set in the middle of the frame, from 13 % to 79 % of its height, so the feed apps' buttons don't cover
-their text; the climb and the opening are full-frame.
