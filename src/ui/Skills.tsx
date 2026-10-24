@@ -440,9 +440,7 @@ export function Skills({
             </div>
             {confirm}
           </div>
-        ) : (
-          <p class="sk-idle">Pick a gem in the bag to see what it would add.</p>
-        )}
+        ) : null}
         <button
           class="btn small sk-help"
           aria-label="How this works"
@@ -729,14 +727,7 @@ export function Skills({
                         </span>
                         {b && (
                           <span class="sk-sub sk-badges">
-                            <Badge
-                              p={{
-                                ...b,
-                                idle: b.idle?.replace('on this item', 'on one of your items'),
-                              }}
-                            />
-                            {(Math.abs(b.dpsPct) >= 0.5 || Math.abs(b.ehpPct) >= 0.5) &&
-                              ` in ${slotLabel(b.slot)}`}
+                            <Badge p={{ ...b, idle: b.idle?.replace(' on this item', '') }} />
                           </span>
                         )}
                       </span>

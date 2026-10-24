@@ -274,15 +274,6 @@ html.leaf .sk .sk-badges .small {
   padding: 10px 14px 10px 20px;
   text-shadow: 0 2px 0 var(--ink);
 }
-.sk-idle {
-  flex: 1 1 0;
-  max-width: 300px;
-  margin: 0;
-  align-self: center;
-  color: var(--muted);
-  font-size: 14px;
-  text-shadow: 0 2px 0 var(--ink);
-}
 .sk-acts .btn.small {
   white-space: normal;
 }
@@ -469,8 +460,7 @@ html.leaf .item-card.gem .ic-mod.explicit {
     padding: 2px 8px 3px;
     font-size: 12px;
   }
-  .sk-pick,
-  .sk-idle {
+  .sk-pick {
     align-self: stretch;
   }
   .sk-cols {
