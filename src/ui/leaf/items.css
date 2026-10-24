@@ -364,6 +364,14 @@ html.leaf .ix-pair {
   gap: 0;
   align-items: stretch;
 }
+html.leaf .ix-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+html.leaf .ix-side > .ix-leaf {
+  flex: 1;
+}
 html.leaf .ix-leaf {
   min-width: 0;
   padding: 18px 20px 22px;
@@ -379,15 +387,18 @@ html.leaf .ix-hinge i {
   height: 16px;
 }
 html.leaf .ix-hinge i:first-child {
-  top: 50px;
+  top: 80px;
 }
 html.leaf .ix-hinge i:last-child {
   bottom: 50px;
 }
-html.leaf .ix-leaf .cmp-title {
-  margin-bottom: 8px;
-  font-size: var(--size);
-  color: var(--muted);
+/* A leaf's caption ("New", "Worn: Main hand") sits on the gold above it, dark, like the camp's headings. */
+html.leaf .ix-cap {
+  padding: 0 4px 6px;
+  font: 400 24px/1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--ink);
+  text-shadow: 0 2px 0 #e2c68166;
 }
 /* The sockets and the gems a swap moves */
 html.leaf .ix-sockets {
@@ -808,6 +819,11 @@ html.leaf .clean-group {
 
 /* ---- A phone: the gear folded into one line, the bag, the selection as a sheet above the camp bar ---- */
 @media (max-width: 600px) {
+  /* The sheet is lapis: the leaves' captions are light on it. */
+  html.leaf .ix-cap {
+    color: var(--gold-hi);
+    text-shadow: var(--text-shadow);
+  }
   /* Smaller type on a phone: the cards and the compare need the room. */
   html.leaf .ix {
     --size: 15px;

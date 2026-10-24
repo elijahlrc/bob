@@ -635,7 +635,10 @@ export function TreeView({ c }: { c: Controller }) {
         onPointerCancel={onCancel}
         onPointerLeave={() => hover !== null && setHover(null)}
       />
-      <div class="tv-labels" ref={labelsRef} data-nopaint aria-hidden="true" />
+      {/* The words move as one layer (tv-words); the still layer around it clips them inside the sky's rim. */}
+      <div class="tv-labels" data-nopaint aria-hidden="true">
+        <div class="tv-words" ref={labelsRef} />
+      </div>
       <div class="tv-hud">
         {/* The points to spend; more taken than earned (a changed tree) reads as how many to refund. */}
         <div

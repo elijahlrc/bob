@@ -160,21 +160,26 @@ function Pair({
 }) {
   return (
     <div class="ix-pair">
-      <div class="ix-leaf" data-paint="panel">
-        <div class="muted cmp-title">{fresh}</div>
-        <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
+      {/* What each leaf is to you sits on the gold above it: not a property of the item. */}
+      <div class="ix-side">
+        <div class="ix-cap">{fresh}</div>
+        <div class="ix-leaf" data-paint="panel">
+          <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
+        </div>
       </div>
       <span class="ix-hinge" aria-hidden="true">
         <i data-paint="chain" />
         <i data-paint="chain" />
       </span>
-      <div class="ix-leaf" data-paint="panel">
-        <div class="muted cmp-title">{empty}</div>
-        {against ? (
-          <ItemCard it={against} marks={lineMarks(against, item, 'old')} />
-        ) : (
-          <div class="item-card empty-card muted">Nothing worn here.</div>
-        )}
+      <div class="ix-side">
+        <div class="ix-cap">{empty}</div>
+        <div class="ix-leaf" data-paint="panel">
+          {against ? (
+            <ItemCard it={against} marks={lineMarks(against, item, 'old')} />
+          ) : (
+            <div class="item-card empty-card muted">Nothing worn here.</div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -400,7 +405,8 @@ function ItemBody({
   );
   return (
     <>
-      <SlotTabs slots={slots} active={active.slot} pick={onAim} />
+      {/* On a wider screen the reliquary's lit slots aim the item; the tabs are a phone's way. */}
+      {phone && <SlotTabs slots={slots} active={active.slot} pick={onAim} />}
       {!ok && (
         <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
           {whyNot(active.check)}
@@ -419,7 +425,6 @@ function ItemBody({
       ) : (
         <>
           {chips}
-          {action}
           {sockets}
           <Pair
             item={item}
@@ -427,6 +432,7 @@ function ItemBody({
             empty={`Worn: ${active.label}`}
             fresh={justOff ? 'Just taken off' : 'New'}
           />
+          {action}
         </>
       )}
       {phone && action}
@@ -467,23 +473,25 @@ function FlaskBody({
   const active: FlaskCompare = (aim !== null && slots.find((s) => s.idx === aim)) || chosen;
   return (
     <>
-      <div class="ix-tabs" role="tablist" aria-label="Flask slot">
-        {slots.map((s) => (
-          <button
-            key={s.idx}
-            role="tab"
-            aria-selected={s.idx === active.idx}
-            class={'ix-tab ix-ftab' + (s.idx === active.idx ? ' on' : '')}
-            data-paint="panel"
-            data-thin
-            data-field={s.idx === active.idx ? 'gold' : undefined}
-            aria-label={`Flask ${s.idx + 1}`}
-            onClick={() => onAim(s.idx)}
-          >
-            <b>{flaskTab(s.equipped)}</b>
-          </button>
-        ))}
-      </div>
+      {phone && (
+        <div class="ix-tabs" role="tablist" aria-label="Flask slot">
+          {slots.map((s) => (
+            <button
+              key={s.idx}
+              role="tab"
+              aria-selected={s.idx === active.idx}
+              class={'ix-tab ix-ftab' + (s.idx === active.idx ? ' on' : '')}
+              data-paint="panel"
+              data-thin
+              data-field={s.idx === active.idx ? 'gold' : undefined}
+              aria-label={`Flask ${s.idx + 1}`}
+              onClick={() => onAim(s.idx)}
+            >
+              <b>{flaskTab(s.equipped)}</b>
+            </button>
+          ))}
+        </div>
+      )}
       {phone ? (
         <PhoneCompare
           it={flask}

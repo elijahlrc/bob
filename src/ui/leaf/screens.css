@@ -107,10 +107,26 @@ html.leaf .screen.title {
   gap: 16px;
   padding: 24px 16px 32px;
 }
+/* The title in hellfire (the owner, 2026-10-24): letters stepping from pale gold down to ember in hard bands, a band
+   set for each line (1lh), ringed in ink so they stand off the mottled gold. */
 html.leaf .screen.title > h1 {
   font-size: 96px;
   letter-spacing: 0.06em;
-  text-shadow: 0 3px 0 #e2c68188;
+  color: transparent;
+  text-shadow: none;
+  background-image: linear-gradient(
+    #f4dc8c 0 34%,
+    #e9b04f 34% 50%,
+    #d9772f 50% 64%,
+    #b4401f 64% 78%,
+    #7c2414 78%
+  );
+  background-size: 100% 1lh;
+  background-repeat: repeat-y;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(3px 0 0 var(--ink)) drop-shadow(-3px 0 0 var(--ink))
+    drop-shadow(0 3px 0 var(--ink)) drop-shadow(0 -3px 0 var(--ink)) drop-shadow(0 6px 0 #0b080599);
 }
 html.leaf .title-board {
   display: flex;

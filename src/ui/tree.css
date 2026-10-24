@@ -22,6 +22,16 @@
   top: 0;
   cursor: grab;
 }
+/* Nodes and words stay inside the sky's rim (a gold band and an ink line, 4 art px), never over it. */
+.tv-art,
+.tv-labels {
+  clip-path: inset(8px);
+}
+.tv-words {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
 .tv-labels {
   pointer-events: none;
   --o: 0 2px 0 var(--ink), 2px 0 0 var(--ink), -2px 0 0 var(--ink), 0 -2px 0 var(--ink);
