@@ -557,6 +557,9 @@
     return s + '</g>';
   };
 
+  /* the genre words' size: larger for the thumbnail (scripts/trailer/thumbnail.ts, ?thumb) */
+  const GENRE_SIZE = /[?&]thumb/.test(location.search) ? 27 : 19;
+
   /* ---------- the shots ---------- */
   const SHOTS = [
     {
@@ -701,8 +704,8 @@
           s +=
             `<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">` +
             (w === 'ARPG.'
-              ? pixWord(ARPG, cx, cy + 8, 19 / 40)
-              : txt(cx, cy + 8, w, { size: 19, font: 'display', anchor: 'middle' })) +
+              ? pixWord(ARPG, cx, cy + 8, GENRE_SIZE / 40)
+              : txt(cx, cy + 8, w, { size: GENRE_SIZE, font: 'display', anchor: 'middle' })) +
             '</g>';
           s += '</g></g>';
         });
