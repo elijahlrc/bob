@@ -163,13 +163,35 @@
       );
       add(frame(SHOT.fight, 40, 236, 550, 248, [775, 350, 1100], 12));
     },
-    /* the page's banner, 960 × 300 (the page's width): the title, the genres on a plaque under it */
+    /*
+     * The page's banner, 960 × 300 (the page's width), over the wall tile and above the lapis body: the wall framed by a
+     * panel's gold rim on the sides and the bottom (the panel runs on past the top, so no rim there), its pixel shadow
+     * falling outside; the title and the genres on a plaque inside.
+     */
     banner() {
-      box(960, 300);
-      add(`<div class="col" style="left:0;top:44px;width:960px;gap:26px">
+      box(960, 300, false);
+      // A panel's rim and ink line take 9 art pixels from its edge (its shadow's room, then the rim): the wall goes inside.
+      // The panel runs 4 px past the picture at the sides and the bottom, so its rim and an ink line outside it meet the
+      // picture's edges with no gap, as wide as the body below.
+      const rim = 14;
+      const foot = rim;
+      // An ink line round the rim's outside, so the edge reads on the gold page and on the lapis body alike.
+      add(
+        `<div style="position:absolute;left:0;right:0;top:0;bottom:0;background:var(--ink)"></div>`,
+      );
+      add(
+        `<div data-paint="panel" style="position:absolute;left:-4px;top:-40px;width:968px;height:344px"></div>`,
+      );
+      const wall = add(
+        `<div class="screen" style="position:absolute;left:${rim}px;right:${rim}px;top:0;bottom:${foot}px"></div>`,
+      );
+      add(
+        `<div class="col" style="left:0;top:36px;width:${960 - 2 * rim}px;gap:24px">
         ${title(['Battle of Builds'], 100, 4)}
         ${plaque(GENRES, 24)}
-      </div>`);
+      </div>`,
+        wall,
+      );
     },
     /*
      * The page's background, a 560 × 560 tile that repeats both ways: the wall painted twice that size and folded onto
