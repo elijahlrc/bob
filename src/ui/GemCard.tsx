@@ -7,7 +7,9 @@ export function GemCard({ gemId, level, tip }: { gemId: string; level: number; t
   const kind = gemDef(gemId).kind;
   return (
     <div class={`item-card gem gem-${kind}${tip ? ' gem-tip' : ''}`}>
-      <div class="ic-name">{d.name}</div>
+      <div class="ic-name" data-paint="panel" data-thin data-field="green">
+        {d.name}
+      </div>
       <div class="muted">
         {d.type} · Level {d.level}
       </div>

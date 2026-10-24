@@ -69,22 +69,6 @@ html.leaf .highscores {
 html.leaf .rivals {
   --col: 1180px;
 }
-/* The Rivals screen keeps its buttons in one row (src/ui/Rivals.tsx): moved under the title, Back first. */
-html.leaf .rivals > * {
-  order: 2;
-}
-html.leaf .rivals > :is(h1, h2) {
-  order: 0;
-}
-html.leaf .rivals > .menu.row {
-  order: 1;
-  align-self: center;
-  justify-content: flex-start;
-  width: min(var(--col), 100%);
-}
-html.leaf .rivals > .menu.row > .btn:last-child {
-  order: -1;
-}
 html.leaf :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals) .lf-panel,
 html.leaf .confirm-card.lf-panel {
   box-sizing: border-box;

@@ -67,6 +67,7 @@ export function Rivals({ c }: { c: Controller }) {
   return (
     <div class="screen rivals">
       <h2>{DUEL_TITLE}</h2>
+      <div class="lf-back">{back}</div>
       {s.status === 'loading' && (
         <p class="rivals-status" data-paint="panel" data-thin>
           Looking for rivals…
@@ -112,7 +113,6 @@ export function Rivals({ c }: { c: Controller }) {
             Try again
           </button>
         )}
-        {back}
       </div>
     </div>
   );

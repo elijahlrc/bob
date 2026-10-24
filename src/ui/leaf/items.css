@@ -474,7 +474,7 @@ html.leaf .item-card .ic-name {
   text-shadow: 0 1px 0 #ffffff33;
 }
 html.leaf .item-card.unique .ic-name,
-html.leaf .gem-card .ic-name {
+html.leaf .item-card.gem .ic-name {
   color: var(--pearl);
   text-shadow: var(--text-shadow);
 }

@@ -249,7 +249,7 @@ describe('the Rivals screen', () => {
     expect(labels(Rivals({ c }))).toEqual(['Back']);
     vi.stubGlobal('fetch', async () => ({ ok: false, status: 503 }));
     await postRun(c.run!, null);
-    expect(labels(Rivals({ c }))).toEqual(['Try again', 'Back']);
+    expect(labels(Rivals({ c }))).toEqual(['Back', 'Try again']);
     c.failRivals('unsent', 'name');
     expect(labels(Rivals({ c }))).toEqual(['Back']);
   });
@@ -303,7 +303,7 @@ describe('the Rivals screen', () => {
     expect(words[1]).not.toContain('you:');
     expect(all(view)).not.toMatch(/difficulty|scaling|9\.99|7\.77|0\.55/i);
     // Show others: only when the pool has more than the cards.
-    expect(controls(view)).toEqual(['Show others', 'Back']);
+    expect(controls(view)).toEqual(['Back', 'Show others']);
     const before = c.rivals!.shown.map((r) => r.id);
     click(button(view, 'Show others'));
     expect(c.rivals!.shown.map((r) => r.id)).not.toEqual(before);
