@@ -311,7 +311,10 @@ html.leaf .screen.summary {
 html.leaf .screen.summary > h1.slain {
   font-size: 64px;
   color: #6e1810;
-  text-shadow: 0 3px 0 #e2c68177;
+  /* A black edge, so that the dark red stands off the gold (the stroke is painted under the fill, so only its outer half shows). */
+  -webkit-text-stroke: 6px #0b0805;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 0 #0b0805;
 }
 /* The run's few big numbers. */
 html.leaf .sum-medals {

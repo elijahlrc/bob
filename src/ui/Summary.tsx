@@ -210,15 +210,13 @@ export function Summary({ c }: { c: Controller }) {
       ) : (
         <h2>{won ? 'Victory!' : 'Your run has ended'}</h2>
       )}
-      <p class="sum-who" data-paint="panel" data-thin>
-        {classDef(run.classId).name}
-        {!slain && (
-          <>
-            <i class="pay-sep" data-paint="sep" />
-            {won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}
-          </>
-        )}
-      </p>
+      {!slain && (
+        <p class="sum-who" data-paint="panel" data-thin>
+          {classDef(run.classId).name}
+          <i class="pay-sep" data-paint="sep" />
+          {won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}
+        </p>
+      )}
       <div class="sum-medals">
         {medal('Level', run.build.level, 'lapis,4')}
         {medal('Maps cleared', cleared, 'green,4', [

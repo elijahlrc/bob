@@ -22,7 +22,7 @@ import {
 } from '../run/inventoryOps';
 
 import { useViewport } from './device';
-import { GemCard, GemTip } from './GemCard';
+import { GemTip } from './GemCard';
 import { infoProps } from './info';
 import { Badge } from './SocketPicker';
 import { gemCardData } from './gemText';
@@ -407,6 +407,17 @@ export function Skills({
             <b>{f0(whole.ehp)}</b>
           </div>
         </div>
+        {sel && selDef ? (
+          <div class="sk-pick" data-paint="panel" data-thin>
+            <div class="sk-pickrow">
+              {pickLine}
+              {!confirm && <span class="sk-acts">{actions}</span>}
+            </div>
+            {confirm}
+          </div>
+        ) : (
+          <p class="sk-idle">Pick a gem in the bag to see what it would add.</p>
+        )}
         <button
           class="btn small sk-help"
           aria-label="How this works"
@@ -423,15 +434,6 @@ export function Skills({
       </div>
       <div class="sk-cols">
         <div class="sk-main">
-          {!coarse && sel && selDef && (
-            <div class="sk-pick" data-paint="panel" data-thin>
-              <div class="sk-pickrow">
-                {pickLine}
-                {!confirm && <span class="sk-acts">{actions}</span>}
-              </div>
-              {confirm}
-            </div>
-          )}
           {ch.primary.gemUid === null && (
             <div class="sk-warn" data-paint="panel" data-field="vermilion" data-thin>
               No usable active skill: using the default attack.
@@ -722,20 +724,6 @@ export function Skills({
         </section>
       </div>
       {tip && <GemTip {...tip} />}
-      {coarse && selGem && sel && (
-        <div class="gem-sheet sk-sheet" data-paint="panel">
-          <button class="sheet-x" aria-label="Close" onClick={() => setSel(null)}>
-            ×
-          </button>
-          <div class="sk-pickrow">
-            {pickLine}
-            <span class="sk-acts">{actions}</span>
-          </div>
-          {msg && <div class="sk-bad">{msg}</div>}
-          {confirm}
-          <GemCard gemId={selGem.gemId} level={selGem.level} />
-        </div>
-      )}
     </div>
   );
 }
