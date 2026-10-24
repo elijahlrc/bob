@@ -32,6 +32,11 @@ export function treeCamera(
     pace?: number;
     /** How much of the view the finished build fills (default 0.92). */
     frac?: number;
+    /**
+     * A close, steady view that follows the newest nodes instead of zooming out to the whole build: the zoom `k` is held, and
+     * only the first `lit` nodes are ever lit, a steady few a frame.
+     */
+    follow?: { k: number; lit: number };
   } = {
     first: 0.28,
   },
@@ -50,22 +55,23 @@ export function treeCamera(
   /** The zoom at which a box fills `frac` of the view. */
   const fit = (b: ReturnType<typeof box>, frac: number) =>
     frac * Math.min(w / (b.x1 - b.x0 + 2 * PAD), h / (b.y1 - b.y0 + 2 * PAD));
-  const k1 = fit(box(pts.length), opts.frac ?? 0.92);
-  const k0 = Math.max(opts.first, k1);
+  const follow = opts.follow;
+  const k1 = follow ? follow.k : fit(box(pts.length), opts.frac ?? 0.92);
+  const k0 = follow ? follow.k : Math.max(opts.first, k1);
   const ks = Array.from({ length: frames }, (_, i) =>
     Math.exp(Math.log(k0) + (Math.log(k1) - Math.log(k0)) * smoothstep(i / (frames - 1))),
   );
   // How many nodes are lit on each frame.
   const lit: number[] = [];
+  const total = follow ? Math.min(follow.lit, pts.length) : pts.length;
   for (let i = 0; i < frames; i++) {
-    const want = Math.max(
-      3,
-      Math.round(pts.length * Math.pow(smoothstep(i / (frames - 8)), opts.pace ?? 1)),
-    );
+    // Following, the nodes come at an even pace; zooming out, they ease in and out with the zoom.
+    const t = follow ? i / (frames - 1) : smoothstep(i / (frames - 8));
+    const want = Math.max(3, Math.round(3 + (total - 3) * Math.pow(t, opts.pace ?? 1)));
     const prev = i ? lit[i - 1] : 3;
-    lit.push(Math.min(Math.max(want, prev), prev + step, pts.length));
+    lit.push(Math.min(Math.max(want, prev), prev + step, total));
   }
-  lit[frames - 1] = pts.length;
+  lit[frames - 1] = total;
   const boxes = lit.map(box);
   // The middle aimed at: the middle of the lit box, drawn toward the newest nodes (where the eye is) early on and not at all at the
   // end.
@@ -74,7 +80,8 @@ export function treeCamera(
     const p = r.length ? r : [start];
     return [p.reduce((a, q) => a + q[0], 0) / p.length, p.reduce((a, q) => a + q[1], 0) / p.length];
   });
-  const lead = (i: number) => (opts.lead ?? 0.8) * (1 - smoothstep(i / (frames - 1)));
+  const lead = (i: number) =>
+    follow ? 1 : (opts.lead ?? 0.8) * (1 - smoothstep(i / (frames - 1)));
   const mx = boxes.map((b, i) => (b.x0 + b.x1) / 2 + (front[i][0] - (b.x0 + b.x1) / 2) * lead(i));
   const my = boxes.map((b, i) => (b.y0 + b.y1) / 2 + (front[i][1] - (b.y0 + b.y1) / 2) * lead(i));
   const at = (i: number) => Math.min(frames - 1, Math.max(0, i));

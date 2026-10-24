@@ -194,12 +194,13 @@ export const CLIPS: Clip[] = [
         return [Math.round(w.clientWidth), Math.round(w.clientHeight)];
       });
       const N = 90;
+      // Close in, and the view follows the newest nodes as they are taken (the build is not shown whole: it is the first
+      // `FOLLOW_LIT` nodes of the plan, and the level counter runs as far as they take it).
+      const FOLLOW_LIT = 24;
       const cams = treeCamera(start, pts, W, H, N, {
-        first: 0.2,
-        around: 8,
-        lead: 1,
-        pace: 1.5,
-        frac: 0.8,
+        first: 0.5,
+        around: 7,
+        follow: { k: 0.5, lit: FOLLOW_LIT },
       });
       // `home`: the start and the nodes lit so far, fitted with 450 tree units around them, never closer than 0.42.
       const homeBox = [start, ...pts.slice(0, 3)];
@@ -291,26 +292,29 @@ export const CLIPS: Clip[] = [
     async film(t) {
       await t.stage((S, c) => {
         const run = S.stagedRun(
-          { classId: 'shade', level: 60, body: ['spireTrap', 'swiftSnares'], seed: 5 },
+          {
+            classId: 'shade',
+            level: 60,
+            helmet: ['spireTrap', 'swiftSnares'],
+            body: ['orbitingBlades', 'echoingCast'],
+            gloves: ['arcChain'],
+            boots: ['toxinCoat'],
+            primary: 'spireTrap',
+            seed: 5,
+          },
           30,
         );
-        const body = run.build.equipment.body;
-        body.sockets = body.sockets.concat([null]);
+        // The Spire Trap's helmet gets a third, empty socket; the weapons' sockets are left out, so that the list begins there.
+        const helm = run.build.equipment.helmet;
+        helm.sockets = helm.sockets.concat([null]);
+        for (const w of [run.build.equipment.mainHand, run.build.equipment.offHand])
+          if (w) w.sockets = [];
         const uid = () => run.nextUid++;
         run.inventory = run.inventory.concat({ kind: 'gem', uid: uid(), gemId: 'wiredHarm' });
         S.toCamp(c, run);
       });
       await tab(t, 'Skills');
       await t.page.waitForTimeout(200);
-      // Only the body armour's row (the Spire Trap's), so that the gem list under it is on screen too.
-      await t.page.evaluate(() => {
-        const grid = document.querySelector('.sk-grid');
-        if (!grid) return;
-        [...grid.children].forEach((e) => {
-          if (!/Grimsteel/.test(e.textContent ?? '')) (e as HTMLElement).style.display = 'none';
-        });
-      });
-      await t.page.waitForTimeout(100);
       // 2 s: the gem and the empty socket (0.4 s), both lit with the arrow between them (0.6 s), placed, the DPS up (1 s).
       for (let i = 0; i < 60; i++) {
         if (i === 12) {
