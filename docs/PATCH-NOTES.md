@@ -4,6 +4,17 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-24
+
+- A new look across the whole game: worn gold leaf and lapis in crisp pixels, under a hellfire title.
+- The Items tab is rebuilt around your worn gear, with a new item and the one it replaces side by side before you wear it.
+- On the passive tree, the first click or tap on a node shows it and the second takes it; labels no longer pop in and out as you pan.
+- The Character tab is regrouped, with each stat beside its modifiers.
+- The map HUD is sharper and less cluttered, and boss and rival bars stay centred on phones.
+- The interface size buttons now work on the itch.io page.
+- Slag Lob and Storm Arrow count as projectiles and several other skills' tags now match what they do, which changes which supports affect them.
+- The Tollkeeper hoists his bell before each toll and brings it down as the first ring strikes.
+
 ## 2026-10-23
 
 - The passive tree is reworked again, and spent passive points are handed back once more; Wasp Sting becomes Cutpurse's Luck, crit with daggers and claws instead of poison.
