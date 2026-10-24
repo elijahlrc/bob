@@ -423,11 +423,11 @@
       type: 'Flask',
       best: 'f5',
       cmp: {
-        f5: { note: 'The usual pick: the utility flask it does most for.' },
+        f5: { note: true },
         f4: {},
-        f3: { warn: 'This replaces your mana flask with a utility one.' },
-        f2: { warn: 'This replaces a life flask with a utility one.' },
-        f1: { warn: 'This replaces a life flask with a utility one.' },
+        f3: {},
+        f2: {},
+        f1: {},
       },
     }),
     I({
@@ -655,7 +655,6 @@
       : `<div class="ix-diptych">${card(it, { vs: w, side: 'new', label: it.justOff ? 'Just taken off' : 'New' })}<span class="ix-hinge"><i data-paint="chain"></i><i data-paint="chain"></i></span>${card(w, { vs: it, side: 'worn', label: `Worn: ${SLOTS[s][0]}` })}</div>`;
     return `${st}${tabs}${changes}
       ${c.warn ? `<div class="ix-warn" data-paint="panel" data-thin data-field="vermilion">${c.warn}</div>` : ''}
-      ${c.note ? `<p class="ix-goes">${c.note}</p>` : ''}
       ${phone() ? action + leaves : leaves + action}`;
   }
 
