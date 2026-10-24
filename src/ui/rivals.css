@@ -119,6 +119,19 @@
   color: var(--hi);
 }
 
+/* The high scores at the foot of a run's end screen: the top, the rows around the player's character, and its rank. */
+.board {
+  width: min(560px, 100%);
+}
+.board h3,
+.board .board-rank {
+  margin: 0 0 6px;
+}
+.board .board-gap td {
+  text-align: center;
+  color: var(--muted);
+}
+
 /* The high scores: a table that scrolls; on a phone only the rank, name, class and rating stay. */
 .hs-scroll {
   width: min(760px, 100%);

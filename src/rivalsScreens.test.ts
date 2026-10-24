@@ -6,6 +6,7 @@ import {
   installRivals,
   loadHighScores,
   loadRivals,
+  loadStanding,
   postRun,
   resetPostKeeper,
   retryRivals,
@@ -503,5 +504,29 @@ describe('the high scores', () => {
     const noMine = await loadHighScores(server({ high_scores: () => ok([row(7, 900)]) }).deps);
     expect(noMine.scores).toHaveLength(1);
     expect(noMine.mine.size).toBe(0);
+  });
+
+  it('on the end screen, the player’s character is the run’s own newest snapshot, and no other', async () => {
+    browser();
+    const { run } = opened();
+    const got = await loadStanding(
+      run,
+      server({
+        high_scores: () => ok([row(7, 900)]),
+        my_snapshots: () => ok([snapshotRow(run, { id: 8 })]),
+      }).deps,
+    );
+    expect(got.scores!.map((s) => s.id)).toEqual(['7']);
+    expect(got.me?.id).toBe('8');
+    const other = await loadStanding(
+      run,
+      server({
+        high_scores: () => ok([]),
+        my_snapshots: () => ok([snapshotRow(run, { id: 8, level: run.build.level + 1 })]),
+      }).deps,
+    );
+    expect(other.me).toBeNull();
+    const offline = await loadStanding(run, server({}).deps);
+    expect(offline).toEqual({ scores: null, me: null });
   });
 });

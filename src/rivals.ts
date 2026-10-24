@@ -13,6 +13,7 @@ import {
   validName,
   type FetchAny,
   type HighScore,
+  type MySnapshot,
 } from './run/rivals';
 import { SAVE_VERSION, type RunState } from './run/run';
 import type { MapResult } from './sim/runMap';
@@ -363,6 +364,30 @@ export async function loadHighScores(
     return { scores, mine: new Set((rows ?? []).map((r) => r.id)) };
   } catch {
     return { scores: null, mine: new Set() };
+  }
+}
+
+/**
+ * The high scores for a run's end screen: the top of this version's list and the run's own character in it (the newest snapshot of
+ * this save version, if it is the run's), once any post still on its way has landed. `scores` is null when the rivals could not be
+ * reached; `me` is null when the character was not sent or the player's snapshots could not be read.
+ */
+export async function loadStanding(
+  run: RunState,
+  deps: () => RivalDeps = realDeps,
+): Promise<{ scores: HighScore[] | null; me: MySnapshot | null }> {
+  try {
+    await (pendingPost(run) ?? Promise.resolve());
+    const d = deps();
+    const tokenHash = await hashToken(rivalToken());
+    const [scores, rows] = await Promise.all([
+      fetchHighScoresOrNull(d.fetch, d.sink, 100, { saveVersion: SAVE_VERSION, outdated: false }),
+      fetchMySnapshots(d.fetch, d.sink, tokenHash),
+    ]);
+    const newest = (rows ?? []).find((r) => r.saveVersion === SAVE_VERSION);
+    return { scores, me: newest && matchesRun(newest, run) ? newest : null };
+  } catch {
+    return { scores: null, me: null };
   }
 }
 

@@ -21,6 +21,7 @@ import { themeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
 import type { MapTypeId } from '../data/mapTypes';
 import { MapReportView } from './MapReport';
+import { Leaderboard } from './Leaderboard';
 import { DUEL_TITLE } from './Rivals';
 import { RivalsOptIn } from './RivalsOptIn';
 
@@ -211,6 +212,7 @@ export function Summary({ c }: { c: Controller }) {
           Back to title
         </button>
       </div>
+      {rivalsConfigured() && <Leaderboard run={run} />}
     </div>
   );
 }

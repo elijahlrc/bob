@@ -458,6 +458,11 @@ empty or unreachable pool, is dropped (an empty pool is a line and Back). Diffic
   save version's; a box, "Show high scores from older versions", adds the older versions' list below it under "Older versions
   (outdated)" and a line saying those characters can no longer be fought (2026-10-20, when the new passive tree made every
   earlier snapshot unfightable).
+- **High scores on a run's end screen** (`src/ui/Leaderboard.tsx`, 2026-10-23): at the foot of the summary, the top five of
+  this version's list, then the two rows either side of the run's own character (its newest snapshot, when it is the run's) with a
+  gap between when they do not meet, and "Your rank: #N". A character not yet rated is placed by its rating without a rank
+  ("Unranked until your first rated duel"); one below the hundred rows `high_scores` returns reads "below #100". It is read again
+  each time the summary opens (so after every duel) and when the post lands.
 - **Camp** (later, out of this plan): the same screens from a "Spar" button, with the character as it stands.
 
 In-game text: a card says who the rival is and what they reached; the result says what the fight counted for, who won, how, and the
