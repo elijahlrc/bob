@@ -58,7 +58,6 @@ Nothing is announced until every gate is green.
    "Could not reach the rivals" only when nothing answered.
 4. **Polish (your list).** Candidates written down elsewhere:
    - `TODO.md`'s writing items (the class blurbs and the death screen are what a newcomer meets first);
-   - `docs/BUGS.md` #2 (the Strider kept dodging a Spitter rare's pools);
    - one start-to-death pass on a real phone (docs/MOBILE.md §9).
 5. **Freeze.** No change that moves passive nodes or the save format until after launch. A save-version bump would empty the
    seeded rivals pool and the high scores overnight.

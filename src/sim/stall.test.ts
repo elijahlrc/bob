@@ -40,7 +40,7 @@ describe('bow campaign regression', () => {
   it('a strider never stands shooting at something it cannot hit (multi-arrow fans used to miss at range)', () => {
     // Seed 7001 used to stall repeatedly from map 11: an even arrow fan passed either side of targets ~7 tiles away.
     // The maps are of the usual density: a packed map brings a Spitter rare on map 4 that the bot dances away from for a
-    // minute (docs/BUGS.md), which is another thing from arrows missing at range.
+    // minute, which is another thing from arrows missing at range.
     forceDensity('standard');
     const run = newRun('strider', 7001);
     let stalls = 0;
