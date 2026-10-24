@@ -258,15 +258,17 @@
       x.fillRect(0, 0, S, S);
     },
     /*
-     * Behind the game before it is run, 2560 × 1130, shown at its own size and cropped to the frame's middle: a wall of
-     * fire along the bottom with smoke rising off it into the dark, in pixels `P` to a side and a few colours a band. The
-     * flames burn lowest under the Run button and tallest at the sides, so whatever part a frame shows has fire at its foot
-     * and nothing bright under the button. Nothing is filmed: a seeded generator draws it the same every time. No title:
-     * the banner has it.
+     * Behind the game before it is run, 1280 × 720 (the page shows the game's frame small; a smaller frame crops the
+     * middle): a wall of fire along the bottom with smoke rising off it into the dark, in pixels `P` to a side and a few
+     * colours a band. The scene is drawn 2560 × 1130 and its middle bottom kept, so the flames still burn lowest under the
+     * Run button and taller toward the sides. Nothing is filmed: a seeded generator draws it the same every time. No
+     * title: the banner has it.
      */
     async embed(c) {
-      const W = (c.width = 2560),
-        H = (c.height = 1130);
+      const W = 2560,
+        H = 1130;
+      const OW = (c.width = 1280),
+        OH = (c.height = 720);
       const P = 4;
       const w = W / P,
         h = Math.ceil(H / P);
@@ -321,8 +323,18 @@
       const SMOKE_COLD = ['#130f12', '#1d181c', '#292226'].map(rgb);
       const EMBER = ['#fde79a', '#f9c454', '#ef7f22', '#d2490c', '#7d1807'].map(rgb);
       // How near (i, j) is to where the Run button sits: 1 under it, 0 well clear.
+      // The kept window, in the scene's pixels: the middle, at the bottom.
+      const x0 = (W - OW) / 2 / P,
+        y0 = h - OH / P;
       const nearButton = (i, j) =>
-        Math.max(0, 1 - Math.hypot((i - w / 2) / (w * 0.2), (j - h / 2) / (h * 0.22)));
+        Math.max(
+          0,
+          1 -
+            Math.hypot(
+              (i - x0 - OW / P / 2) / (OW / P / 2.5),
+              (j - y0 - OH / P / 2) / (OH / P / 2.9),
+            ),
+        );
 
       // The fire: how hot each pixel is, 1 at the foot and 0 where the flames end. The flames' height follows the column
       // (tall at the sides, low in the middle); noise stretched upward and bent sideways cuts that into tongues, more so
@@ -397,7 +409,7 @@
       small.getContext('2d').putImageData(img, 0, 0);
       const x = c.getContext('2d');
       x.imageSmoothingEnabled = false;
-      x.drawImage(small, 0, 0, w * P, h * P);
+      x.drawImage(small, -x0 * P, -y0 * P, w * P, h * P);
     },
     /* the logo, on nothing: bone with a dark outline and drop, so it reads on white and on black */
     async logo(c) {
