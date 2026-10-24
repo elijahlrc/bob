@@ -1,0 +1,430 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>Promo images</title>
+<!-- The store page's images (docs/trailer/README.md, "Promo images"), drawn by scripts/trailer/promo.ts: ?kind=social|wide|favicon|logo.
+     The title is Jacquard 24 in its own pixels (40 to the em), scaled up whole, so it stays crisp at any size. -->
+<link rel="stylesheet" href="../../node_modules/@fontsource/grenze/600.css" />
+<link rel="stylesheet" href="../../node_modules/@fontsource/jacquard-24/400.css" />
+<style>
+  html,
+  body {
+    margin: 0;
+    background: transparent;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+<canvas id="c"></canvas>
+<script>
+  const BONE = '#e8dcc0';
+  const TORCH = '#d98a3a';
+  const INK = '#0f1016';
+  /* the frame the backgrounds come from: the tree shot's last, a Vanguard's whole build at level 100 (2562 × 1440: the tabs
+     above 150, the bottom bar below 1280, the build between x 650 and 1900), its level tag painted out */
+  const BG = {
+    src: 'footage/tree3/f0089.jpg',
+    erase: [[40, 165, 480, 150]],
+    tree: '#0a0809',
+  };
+
+  const load = (src) =>
+    new Promise((ok, no) => {
+      const i = new Image();
+      i.onload = () => ok(i);
+      i.onerror = no;
+      i.src = src;
+    });
+
+  /**
+   * Text in Jacquard 24's own pixels: drawn at 40px (one font pixel to a canvas pixel), cut to whole pixels, given an
+   * outline `out` pixels wide (and a drop of `drop` pixels below it), then scaled up `k` times with no smoothing.
+   */
+  function pixText(
+    text,
+    { k, fill = BONE, outline = INK, out = 1, drop = 1, font = "40px 'Jacquard 24'" },
+  ) {
+    const m = document.createElement('canvas').getContext('2d');
+    m.font = font;
+    const w = Math.ceil(m.measureText(text).width) + 2 * (out + 2);
+    const h = 52 + 2 * out + drop;
+    const g = document.createElement('canvas');
+    g.width = w;
+    g.height = h;
+    const x = g.getContext('2d');
+    x.font = font;
+    x.fillStyle = '#fff';
+    x.fillText(text, out + 2, 40 + out);
+    const src = x.getImageData(0, 0, w, h).data;
+    const on = (i, j) => i >= 0 && j >= 0 && i < w && j < h && src[(j * w + i) * 4 + 3] >= 128;
+    const img = x.createImageData(w, h);
+    const put = (i, j, hex) => {
+      const p = (j * w + i) * 4;
+      img.data[p] = parseInt(hex.slice(1, 3), 16);
+      img.data[p + 1] = parseInt(hex.slice(3, 5), 16);
+      img.data[p + 2] = parseInt(hex.slice(5, 7), 16);
+      img.data[p + 3] = 255;
+    };
+    for (let j = 0; j < h; j++)
+      for (let i = 0; i < w; i++) {
+        if (on(i, j)) {
+          put(i, j, fill);
+          continue;
+        }
+        let near = false;
+        for (let dj = -out; dj <= out + drop && !near; dj++)
+          for (let di = -out; di <= out && !near; di++) if (on(i - di, j - dj)) near = true;
+        if (near) put(i, j, outline);
+      }
+    x.putImageData(img, 0, 0);
+    // Trim to the ink.
+    let x0 = w,
+      y0 = h,
+      x1 = 0,
+      y1 = 0;
+    for (let j = 0; j < h; j++)
+      for (let i = 0; i < w; i++)
+        if (img.data[(j * w + i) * 4 + 3]) {
+          x0 = Math.min(x0, i);
+          y0 = Math.min(y0, j);
+          x1 = Math.max(x1, i);
+          y1 = Math.max(y1, j);
+        }
+    const o = document.createElement('canvas');
+    o.width = (x1 - x0 + 1) * k;
+    o.height = (y1 - y0 + 1) * k;
+    const ox = o.getContext('2d');
+    ox.imageSmoothingEnabled = false;
+    ox.drawImage(g, x0, y0, x1 - x0 + 1, y1 - y0 + 1, 0, 0, o.width, o.height);
+    // How far below the image's top the baseline is, so that words can be set on a line.
+    o.base = (40 + out - y0) * k;
+    return o;
+  }
+
+  /**
+   * The title stacked, one word to a line (Battle / of / Builds), left-aligned at `left`: the first baseline at `base`, each
+   * next one `step` font pixels below. Returns the bottom of the ink.
+   */
+  function stackedTitle(x, left, base, k, step = 30) {
+    let bottom = 0;
+    ['Battle', 'of', 'Builds'].forEach((w, i) => {
+      const t = pixText(w, { k });
+      const y = base + i * step * k - t.base;
+      x.drawImage(t, left, y);
+      bottom = Math.max(bottom, y + t.height);
+    });
+    return bottom;
+  }
+
+  /* the footage, darkened toward the side the title sits on */
+  async function backdrop(x, W, H, crop, side = 'left') {
+    const bg = await load(BG.src);
+    // Past the frame's edge (a crop may reach out of it, to give the title room) the tree's own black goes on.
+    x.fillStyle = BG.tree;
+    x.fillRect(0, 0, W, H);
+    const k = W / crop[2];
+    x.imageSmoothingEnabled = true;
+    x.drawImage(bg, -crop[0] * k, -crop[1] * k, bg.width * k, bg.height * k);
+    x.fillStyle = BG.tree;
+    for (const [ex, ey, ew, eh] of BG.erase)
+      x.fillRect((ex - crop[0]) * k, (ey - crop[1]) * k, ew * k, eh * k);
+    // Nothing of the screen's tabs or bottom bar.
+    x.fillRect(0, 0, W, (150 - crop[1]) * k);
+    x.fillRect(0, (1280 - crop[1]) * k, W, H);
+    if (side) {
+      const gr =
+        side === 'left' ? x.createLinearGradient(0, 0, W, 0) : x.createLinearGradient(0, H, 0, 0);
+      gr.addColorStop(0, 'rgba(10,8,9,.85)');
+      gr.addColorStop(0.4, 'rgba(10,8,9,.45)');
+      gr.addColorStop(0.65, 'rgba(10,8,9,0)');
+      x.fillStyle = gr;
+      x.fillRect(0, 0, W, H);
+    }
+    const v = x.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.75);
+    v.addColorStop(0, 'rgba(0,0,0,0)');
+    v.addColorStop(1, 'rgba(0,0,0,.45)');
+    x.fillStyle = v;
+    x.fillRect(0, 0, W, H);
+  }
+
+  function glow(x, cx, cy, r, a = 0.35) {
+    const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, `rgba(217,138,58,${a})`);
+    g.addColorStop(1, 'rgba(217,138,58,0)');
+    x.fillStyle = g;
+    x.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  }
+
+  function line(x, text, px, cx, y, color = TORCH, align = 'left') {
+    x.font = `600 ${px}px 'Grenze', Georgia, serif`;
+    x.textAlign = align;
+    x.fillStyle = 'rgba(0,0,0,.8)';
+    x.fillText(text, cx + px * 0.04, y + px * 0.06);
+    x.fillStyle = color;
+    x.fillText(text, cx, y);
+  }
+
+  const KINDS = {
+    /* when the page is linked: 1200 × 630 */
+    async social(c) {
+      const W = (c.width = 1200),
+        H = (c.height = 630);
+      const x = c.getContext('2d');
+      // The build fills the right; the title and the lines under it the left, by its start.
+      await backdrop(x, W, H, [-230, 142, 2182, 1145]);
+      glow(x, 200, 260, 380, 0.32);
+      const end = stackedTitle(x, 40, 34 + 26 * 4, 4);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 36, 46, end + 52);
+      line(x, 'Free in your browser', 32, 46, end + 100, BONE);
+    },
+    /* home page featuring: 21:9, 2520 × 1080 */
+    async wide(c) {
+      const W = (c.width = 2520),
+        H = (c.height = 1080);
+      const x = c.getContext('2d');
+      // The build at the right, the whole of it; the title and the genres at the left.
+      await backdrop(x, W, H, [-560, 150, 2637, 1130]);
+      glow(x, 480, 460, 760, 0.3);
+      const end = stackedTitle(x, 130, 110 + 26 * 7, 7);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 84, 140, end + 112);
+      line(x, 'Free in your browser', 72, 140, end + 206, BONE);
+    },
+    /* the browser tab: one "B", 32 font pixels square, scaled to 512 */
+    async favicon(c) {
+      const W = (c.width = 512),
+        H = (c.height = 512);
+      const x = c.getContext('2d');
+      x.fillStyle = INK;
+      x.fillRect(0, 0, W, H);
+      glow(x, W / 2, H / 2, W * 0.6, 0.45);
+      const t = pixText('B', { k: 16, fill: TORCH, outline: '#000', out: 1, drop: 0 });
+      x.drawImage(t, Math.round((W - t.width) / 32) * 16, Math.round((H - t.height) / 32) * 16);
+    },
+    /* the page's banner, 960 × 300 (the page's width): the logo over the middle of the lit build */
+    async banner(c) {
+      const W = (c.width = 960),
+        H = (c.height = 300);
+      const x = c.getContext('2d');
+      await backdrop(x, W, H, [560, 420, 1440, 450], null);
+      const d = x.createRadialGradient(W / 2, H / 2, 40, W / 2, H / 2, W * 0.55);
+      d.addColorStop(0, 'rgba(10,8,9,.7)');
+      d.addColorStop(1, 'rgba(10,8,9,.25)');
+      x.fillStyle = d;
+      x.fillRect(0, 0, W, H);
+      glow(x, W / 2, H / 2, 380, 0.3);
+      const t = pixText('Battle of Builds', { k: 4, out: 1 });
+      x.drawImage(t, Math.round((W - t.width) / 2), Math.round((H - t.height) / 2) - 18);
+      line(x, 'Arcade · ARPG · Roguelike · Autobattler', 30, W / 2, H / 2 + 92, TORCH, 'center');
+    },
+    /*
+     * The page's background, a 560 × 560 tile that repeats both ways: a square of the tree twice that size (below the tabs,
+     * right of the level tag), folded onto itself so that each edge meets the opposite one. Down the tile the lower half
+     * fades into the upper, then across it the right half into the left: at every edge only the pixels the next tile starts
+     * with show. Dimmed far down, so the page's text reads over it.
+     */
+    async background(c) {
+      const S = 560;
+      c.width = c.height = S;
+      const bg = await load(BG.src);
+      const sq = document.createElement('canvas');
+      sq.width = sq.height = 2 * S;
+      sq.getContext('2d').drawImage(bg, 700, 160, 2 * S, 2 * S, 0, 0, 2 * S, 2 * S);
+      // Out of `from` (w × 2h, or 2w × h across): the second half, and over it the first, coming in from nothing at the
+      // start of the fold to whole at its end.
+      const fold = (from, w, h, across) => {
+        const out = document.createElement('canvas');
+        out.width = w;
+        out.height = h;
+        const o = out.getContext('2d');
+        o.drawImage(from, across ? w : 0, across ? 0 : h, w, h, 0, 0, w, h);
+        const first = document.createElement('canvas');
+        first.width = w;
+        first.height = h;
+        const f = first.getContext('2d');
+        f.drawImage(from, 0, 0, w, h, 0, 0, w, h);
+        const m = across ? f.createLinearGradient(0, 0, w, 0) : f.createLinearGradient(0, 0, 0, h);
+        m.addColorStop(0, 'rgba(0,0,0,0)');
+        m.addColorStop(1, 'rgba(0,0,0,1)');
+        f.globalCompositeOperation = 'destination-in';
+        f.fillStyle = m;
+        f.fillRect(0, 0, w, h);
+        o.drawImage(first, 0, 0);
+        return out;
+      };
+      const tile = fold(fold(sq, 2 * S, S, false), S, S, true);
+      const x = c.getContext('2d');
+      x.drawImage(tile, 0, 0);
+      x.fillStyle = 'rgba(7,5,8,.8)';
+      x.fillRect(0, 0, S, S);
+    },
+    /*
+     * Behind the game before it is run, 1280 × 720 (the page shows the game's frame small; a smaller frame crops the
+     * middle): a wall of fire along the bottom with smoke rising off it into the dark, in pixels `P` to a side and a few
+     * colours a band. The scene is drawn 2560 × 1130 and its middle bottom kept, so the flames still burn lowest under the
+     * Run button and taller toward the sides. Nothing is filmed: a seeded generator draws it the same every time. No
+     * title: the banner has it.
+     */
+    async embed(c) {
+      const W = 2560,
+        H = 1130;
+      const OW = (c.width = 1280),
+        OH = (c.height = 720);
+      const P = 4;
+      const w = W / P,
+        h = Math.ceil(H / P);
+      let seed = 0x0b0b;
+      const rand = () => {
+        seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+      // Smooth noise: a lattice of random values, eased between, in octaves.
+      const lattice = new Float32Array(256 * 256).map(() => rand());
+      const noise = (u, v) => {
+        const i = Math.floor(u),
+          j = Math.floor(v);
+        const at = (a, b) => lattice[((b & 255) << 8) | (a & 255)];
+        let fu = u - i,
+          fv = v - j;
+        fu = fu * fu * (3 - 2 * fu);
+        fv = fv * fv * (3 - 2 * fv);
+        const top = at(i, j) + (at(i + 1, j) - at(i, j)) * fu;
+        const bot = at(i, j + 1) + (at(i + 1, j + 1) - at(i, j + 1)) * fu;
+        return top + (bot - top) * fv;
+      };
+      const fbm = (u, v) =>
+        0.5 * noise(u, v) +
+        0.27 * noise(u * 2.1 + 17, v * 2.1) +
+        0.15 * noise(u * 4.3 + 41, v * 4.3) +
+        0.08 * noise(u * 8.7 + 83, v * 8.7);
+      // Ordered dithering, so that a band's edge breaks up in a fixed pattern rather than a smooth fade.
+      const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+      const dither = (i, j) => (BAYER[(j & 3) * 4 + (i & 3)] + 0.5) / 16;
+      const rgb = (hex) => [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+      const VOID = rgb('#050406');
+      const HAZE = ['#0d0507', '#160609'].map(rgb);
+      const FIRE = [
+        '#2a0605',
+        '#420a06',
+        '#5e1007',
+        '#7d1807',
+        '#9c2407',
+        '#ba3509',
+        '#d2490c',
+        '#e3621a',
+        '#ef7f22',
+        '#f5a032',
+        '#f9c454',
+        '#fde79a',
+      ].map(rgb);
+      // Smoke lit from below near the fire, cold above it.
+      const SMOKE_WARM = ['#1c100d', '#2b1914', '#3c241b'].map(rgb);
+      const SMOKE_COLD = ['#130f12', '#1d181c', '#292226'].map(rgb);
+      const EMBER = ['#fde79a', '#f9c454', '#ef7f22', '#d2490c', '#7d1807'].map(rgb);
+      // How near (i, j) is to where the Run button sits: 1 under it, 0 well clear.
+      // The kept window, in the scene's pixels: the middle, at the bottom.
+      const x0 = (W - OW) / 2 / P,
+        y0 = h - OH / P;
+      const nearButton = (i, j) =>
+        Math.max(
+          0,
+          1 -
+            Math.hypot(
+              (i - x0 - OW / P / 2) / (OW / P / 2.5),
+              (j - y0 - OH / P / 2) / (OH / P / 2.9),
+            ),
+        );
+
+      // The fire: how hot each pixel is, 1 at the foot and 0 where the flames end. The flames' height follows the column
+      // (tall at the sides, low in the middle); noise stretched upward and bent sideways cuts that into tongues, more so
+      // toward their tips.
+      const reach = new Float32Array(w);
+      for (let i = 0; i < w; i++) {
+        const side = Math.abs(i / w - 0.5) * 2;
+        reach[i] = h * (0.3 + 0.32 * Math.min(1, 0.55 * fbm(i / 40, 3.7) + 0.6 * side * side));
+      }
+      const heat = new Float32Array(w * h);
+      for (let j = 0; j < h; j++)
+        for (let i = 0; i < w; i++) {
+          const y = (h - 1 - j) / reach[i];
+          const u = i / 6 + 1.6 * noise(i / 26, j / 22 + 5);
+          const tongue = fbm(u, j / 15) - 0.5;
+          // Past a third above the column's height, no flame: no blobs adrift in the smoke.
+          heat[j * w + i] = y > 1.3 ? 0 : 1 - y + 1.25 * tongue * (0.35 + y);
+        }
+      // Where each column's flames end.
+      const top = reach.map((r) => h - 1 - r);
+
+      const img = new ImageData(w, h);
+      const put = (i, j, c) => {
+        if (i < 0 || j < 0 || i >= w || j >= h) return;
+        const p = (j * w + i) * 4;
+        img.data[p] = c[0];
+        img.data[p + 1] = c[1];
+        img.data[p + 2] = c[2];
+        img.data[p + 3] = 255;
+      };
+      for (let j = 0; j < h; j++)
+        for (let i = 0; i < w; i++) {
+          const t = dither(i, j);
+          // How far above the flames' end, as a share of the picture.
+          const a = (top[i] - j) / h;
+          // A red haze just over the fire, in two steps.
+          const haze = Math.floor((1 - a / 0.3) * 2 + 0.5 + 0.6 * (t - 0.5));
+          let col = haze > 0 ? HAZE[Math.min(1, haze - 1)] : VOID;
+          // Smoke: billows stretched upward, thickest just over the flames, gone by the top, thin over the button.
+          const u = i / 26 + 1.4 * noise(i / 50, j / 34);
+          const v = j / 15 + 0.8 * noise(i / 41 + 7, j / 29);
+          const rise =
+            Math.min(1, (a + 0.04) / 0.08) *
+            Math.max(0, 1 - a / 0.62) *
+            Math.min(1, j / (h * 0.18));
+          const env = Math.max(0, rise) * (1 - 0.65 * nearButton(i, j));
+          const s = (fbm(u, v) - 0.38) * 3.2 * env;
+          const level = Math.min(3, Math.floor(s * 3 + 0.5 + 0.6 * (t - 0.5)));
+          if (level > 0) col = (a + 0.1 * (t - 0.5) < 0.16 ? SMOKE_WARM : SMOKE_COLD)[level - 1];
+          // The flames, over the rest.
+          const f = heat[j * w + i];
+          const band =
+            f > 0 ? Math.min(12, Math.floor(Math.pow(f, 1.15) * 13 + 0.8 * (t - 0.5))) : 0;
+          if (band > 0) col = FIRE[band - 1];
+          put(i, j, col);
+        }
+      // Embers thrown up out of the flames, fewer the higher they go, none over the button; the brighter ones trail a
+      // dimmer pixel below.
+      for (let n = 0; n < 260; n++) {
+        const i = Math.floor(rand() * w);
+        const up = -Math.log(1 - rand()) * h * 0.12;
+        const j = Math.round(top[i] + reach[i] * 0.35 * rand() - up);
+        if (j < 2 || nearButton(i, j) > 0) continue;
+        const k = Math.min(EMBER.length - 1, Math.floor((up / (h * 0.35)) * EMBER.length + rand()));
+        put(i, j, EMBER[k]);
+        if (k < 3) put(i + (rand() < 0.5 ? -1 : 1), j + 1, EMBER[k + 2]);
+      }
+
+      const small = document.createElement('canvas');
+      small.width = w;
+      small.height = h;
+      small.getContext('2d').putImageData(img, 0, 0);
+      const x = c.getContext('2d');
+      x.imageSmoothingEnabled = false;
+      x.drawImage(small, -x0 * P, -y0 * P, w * P, h * P);
+    },
+    /* the logo, on nothing: bone with a dark outline and drop, so it reads on white and on black */
+    async logo(c) {
+      const t = pixText('Battle of Builds', { k: 6, out: 2, drop: 1 });
+      c.width = t.width;
+      c.height = t.height;
+      c.getContext('2d').drawImage(t, 0, 0);
+    },
+  };
+
+  (async () => {
+    await document.fonts.load("40px 'Jacquard 24'");
+    await document.fonts.load("600 40px 'Grenze'");
+    const kind = new URLSearchParams(location.search).get('kind') ?? 'social';
+    await KINDS[kind](document.getElementById('c'));
+    document.title = 'ready';
+  })();
+</script>

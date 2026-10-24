@@ -44,7 +44,15 @@ describe('kits and palettes (docs/ENEMIES.md section 6)', () => {
   it('every monster type builds in every pose, with finite shapes', () => {
     for (const id of types) {
       const body = MONSTER_TYPES[id].body;
-      for (const anim of ['idle', 'walk', 'attack', 'stun', 'death'] as const) {
+      for (const anim of [
+        'idle',
+        'walk',
+        'attack',
+        'stun',
+        'death',
+        'windup',
+        'release',
+      ] as const) {
         const prims = buildFigure(body, poseForType(id, anim, 0.4), id, 0.4);
         expect(prims.length, `${id} ${anim}`).toBeGreaterThan(4);
         for (const p of prims) {

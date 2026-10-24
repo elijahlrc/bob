@@ -21,7 +21,15 @@ import {
 /** Figure design units → pixels (small pixels, wide view). */
 export const FIG_PX = 0.6;
 
-export const FRAMES: Record<AnimName, number> = { idle: 4, walk: 8, attack: 6, stun: 4, death: 7 };
+export const FRAMES: Record<AnimName, number> = {
+  idle: 4,
+  walk: 8,
+  attack: 6,
+  stun: 4,
+  death: 7,
+  windup: 8,
+  release: 8,
+};
 
 export const SCALE_OF: Record<FigureKind, number> = {
   warrior: 1,

@@ -1,0 +1,907 @@
+<title>Battle of Builds Cut</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<!-- The game's own faces (SIL Open Font License), from the repo's dependencies: Grenze for text, Jacquard 24 for headings. -->
+<link rel="stylesheet" href="../../node_modules/@fontsource/grenze/400.css" />
+<link rel="stylesheet" href="../../node_modules/@fontsource/grenze/600.css" />
+<link rel="stylesheet" href="../../node_modules/@fontsource/jacquard-24/400.css" />
+<style>
+  /* Layout: a 16:9 stage, a transport bar under it (play, scrubber with shot marks, time), the shot's notes below. */
+  :root {
+    --bg: #0f1016;
+    --panel: #171821;
+    --rule: #2b2c3a;
+    --ink: #e6dcc6;
+    --muted: #9a927f;
+    --torch: #d98a3a;
+    --display: 'Jacquard 24', Georgia, serif;
+    --body: 'Grenze', Georgia, serif;
+    --mono: 'Grenze', Georgia, serif;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-block: 28px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    gap: 14px;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(26px, 4vw, 38px);
+    margin: 0;
+  }
+  .sub {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    background: #000;
+    border: 1px solid var(--rule);
+    overflow: hidden;
+  }
+  .stage svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .big-play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.45);
+    border: 0;
+    color: var(--ink);
+    font-family: var(--display);
+    font-size: clamp(20px, 4vw, 34px);
+    cursor: pointer;
+  }
+  .big-play span {
+    border: 1px solid var(--torch);
+    padding: 10px 26px;
+    background: rgba(15, 16, 22, 0.8);
+  }
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .transport button {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 7px 12px;
+    cursor: pointer;
+    min-width: 76px;
+  }
+  .transport button:focus-visible,
+  #scrub:focus-visible {
+    outline: 2px solid var(--torch);
+    outline-offset: 2px;
+  }
+  .scrub {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+  }
+  .scrub .marks {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 30px;
+    display: flex;
+    pointer-events: none;
+  }
+  .scrub .mark {
+    border-left: 1px solid var(--rule);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    padding: 2px 0 0 3px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .scrub .mark.on {
+    color: var(--torch);
+  }
+  #scrub {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    margin: 0;
+    accent-color: var(--torch);
+  }
+  .time {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 92px;
+    text-align: right;
+  }
+  .now {
+    display: grid;
+    gap: 4px;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+  }
+  .now h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 22px;
+    margin: 0;
+  }
+  .now h2 small {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .now p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 75ch;
+    line-height: 1.5;
+  }
+  .note {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+  /* render mode: the stage alone, for recording */
+  body.render .wrap {
+    padding: 0;
+    max-width: none;
+  }
+  body.render .wrap > :not(.stage) {
+    display: none;
+  }
+  body.render .stage {
+    border: 0;
+    width: 1280px;
+    height: 720px;
+  }
+  body.render .big-play {
+    display: none;
+  }
+</style>
+
+<div class="wrap">
+  <h1>Battle of Builds: first cut</h1>
+  <p class="sub">
+    The animatic's cut with footage from the game in place of the sketches: every shot filmed from a
+    staged run by
+    <code>scripts/trailer/capture.ts</code>. The footage lives in <code>footage/</code>, which is
+    not committed; film it first.
+  </p>
+  <div class="stage" id="stage">
+    <svg id="svg" viewBox="0 0 320 180" role="img" aria-label="Trailer, first cut"></svg>
+    <button class="big-play" id="bigplay" type="button"><span>▶ Play with sound</span></button>
+  </div>
+  <div class="transport">
+    <button id="play" type="button">▶ Play</button>
+    <div class="scrub">
+      <div class="marks" id="marks"></div>
+      <input id="scrub" type="range" min="0" max="31" step="0.01" value="0" aria-label="Position" />
+    </div>
+    <div class="time" id="time">0:00.0 / 0:31</div>
+  </div>
+  <div class="now" aria-live="polite">
+    <h2 id="nowname"></h2>
+    <p id="nowtext"></p>
+  </div>
+  <p class="note">
+    Score: one chiptune groove in D minor at 120 bpm, a pulsing bass on D and a noise kit with a
+    quiet four-note phrase, stopping only for the fall, with chip sound effects on the picture;
+    generated by
+    <code>docs/trailer/audio/chip_score.py</code>. Space plays and pauses; the arrow keys step by a
+    beat.
+  </p>
+  <audio id="audio" src="animatic.mp3" preload="auto"></audio>
+</div>
+
+<script>
+  /* ---------- palette and drawing helpers (viewBox 320×180) ---------- */
+  const C = {
+    bone: '#e8dcc0',
+    fire: '#ff8a3a',
+    cold: '#8fd3ff',
+    light: '#a97cf2',
+    chaos: '#74d36c',
+    gold: '#e8c45a',
+    life: '#c23a32',
+    mana: '#3b6fd2',
+    torch: '#d98a3a',
+    wall: '#6b3a2c',
+    floor: '#2d3a32',
+    dim: '#4a4b5c',
+    ui: '#1d1e29',
+    uiLine: '#3a3b4c',
+    mute: '#9a927f',
+    ink: '#0f1016',
+  };
+  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+  const ease = (x) => 1 - Math.pow(1 - clamp(x), 3);
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const fmtN = (n) => Math.round(n).toLocaleString('en-US');
+
+  const DEFS = `<defs>${[C.fire, C.cold, C.light, C.chaos, C.bone, C.torch, C.gold]
+    .map(
+      (c) =>
+        `<radialGradient id="g${c.slice(1)}"><stop offset="0" stop-color="${c}" stop-opacity=".6"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`,
+    )
+    .join(
+      '',
+    )}<radialGradient id="redEdge" r=".72"><stop offset=".3" stop-color="#c0141a" stop-opacity="0"/><stop offset=".7" stop-color="#c0141a" stop-opacity=".45"/><stop offset="1" stop-color="#c0141a" stop-opacity=".9"/></radialGradient></defs>`;
+  const glow = (x, y, r, col, o = 1) =>
+    `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#g${col.slice(1)})" opacity="${o}"/>`;
+  const floor = (cx, cy, w, h, fill = C.floor) =>
+    `<polygon points="${cx},${cy - h} ${cx + w},${cy} ${cx},${cy + h} ${cx - w},${cy}" fill="${fill}" opacity=".6"/>`;
+  const hero = (x, y, col = C.bone, rot = 0) =>
+    `<g transform="rotate(${rot} ${x} ${y + 8})"><ellipse cx="${x}" cy="${y + 12}" rx="7" ry="2.5" fill="#000" opacity=".5"/><rect x="${x - 4}" y="${y - 6}" width="8" height="14" rx="2" fill="${col}"/><circle cx="${x}" cy="${y - 10}" r="4" fill="${col}"/></g>`;
+  const skel = (x, y, o = 1) =>
+    o <= 0
+      ? ''
+      : `<g opacity="${o}"><rect x="${x - 3}" y="${y - 4}" width="6" height="11" fill="none" stroke="${C.bone}" stroke-width="1.2"/><circle cx="${x}" cy="${y - 8}" r="3" fill="none" stroke="${C.bone}" stroke-width="1.2"/><circle cx="${x - 1}" cy="${y - 8}" r=".8" fill="${C.fire}"/><circle cx="${x + 1.2}" cy="${y - 8}" r=".8" fill="${C.fire}"/></g>`;
+  const ring = (x, y, rx, col, w = 1.5, o = 1) =>
+    `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${rx / 2}" fill="none" stroke="${col}" stroke-width="${w}" opacity="${o}"/>`;
+  const txt = (
+    x,
+    y,
+    t,
+    { size = 10, col = C.bone, font = 'mono', anchor = 'start', weight = 400, o = 1 } = {},
+  ) => {
+    /* the game's faces: Jacquard 24 for headings and names (one weight only, so none is faked), Grenze for the rest */
+    const display = font === 'display';
+    const f = display ? "'Jacquard 24', Georgia, serif" : "'Grenze', Georgia, serif";
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="${f}" font-size="${size}" font-weight="${display ? 400 : weight}" fill="${col}" opacity="${o}">${t}</text>`;
+  };
+  const panel = (x, y, w, h, stroke = C.uiLine) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${C.ui}" stroke="${stroke}"/>`;
+  const globes = (life = 1) =>
+    `<circle cx="20" cy="162" r="13" fill="${C.ui}" stroke="${C.uiLine}"/>` +
+    `<clipPath id="lg"><rect x="7" y="${175 - 26 * life}" width="26" height="${26 * life}"/></clipPath>` +
+    `<circle cx="20" cy="162" r="13" fill="${C.life}" clip-path="url(#lg)"/>` +
+    `<circle cx="300" cy="162" r="13" fill="${C.mana}"/>`;
+  /* an area going off at time t0: a ring that grows and fades */
+  const burst = (x, y, col, t0, lt, size = 50, w = 2) => {
+    const k = lt - t0;
+    if (k < 0 || k > 0.7) return '';
+    return (
+      ring(x, y, 6 + ease(k / 0.5) * size, col, w, 1 - k / 0.7) +
+      glow(x, y, size * 0.9, col, (1 - k / 0.7) * 0.9)
+    );
+  };
+  /* a damage number that floats up from t0 */
+  const floatNum = (x, y, t, col, t0, lt, size = 11) => {
+    const k = lt - t0;
+    if (k < 0 || k > 1.1) return '';
+    return txt(x, y - k * 18, t, {
+      size: size * (k < 0.08 ? 1.4 : 1),
+      col,
+      weight: 600,
+      o: 1 - clamp((k - 0.6) / 0.5),
+    });
+  };
+  /* a text card that stamps in from t0 */
+  const caption = (t, lt, t0 = 0.05, y = 150, size = 17) => {
+    const k = clamp((lt - t0) / 0.18);
+    if (k <= 0) return '';
+    return (
+      `<rect x="0" y="${y - 24}" width="320" height="34" fill="#000" opacity="${0.65 * k}"/>` +
+      `<g transform="translate(160 ${y - 5}) scale(${lerp(1.25, 1, ease(k))}) translate(-160 ${-(y - 5)})">${txt(160, y, t, { size, font: 'display', anchor: 'middle', o: k })}</g>`
+    );
+  };
+  const label = (x, y, t) => txt(x, y, t, { size: 6.5, col: C.mute });
+  const deadAfter = (t0, lt) => clamp(1 - (lt - t0) / 0.25);
+  const crack = (x, y, o) =>
+    `<path d="M${x} ${y} l-18 6 l-10 -4 M${x} ${y} l14 9 l12 -2 M${x} ${y} l4 -12 l10 -4" stroke="#000" stroke-width="1.5" fill="none" opacity="${o}"/>`;
+  /* enemies, one shape per kind */
+  const foe = (kind, x, y, o = 1, sc = 1) => {
+    if (o <= 0) return '';
+    let b = '';
+    if (kind === 'rat')
+      b = `<ellipse cx="${x}" cy="${y}" rx="4.5" ry="2.6" fill="#8a7a6a"/><circle cx="${x + 4}" cy="${y - 1}" r="1.8" fill="#8a7a6a"/><path d="M${x - 4} ${y} q-4 -1 -6 2" stroke="#8a7a6a" fill="none"/><circle cx="${x + 4.6}" cy="${y - 1.4}" r=".6" fill="${C.fire}"/>`;
+    if (kind === 'knight')
+      b = `<rect x="${x - 4}" y="${y - 4}" width="8" height="13" fill="#6f7480"/><rect x="${x - 3.5}" y="${y - 10}" width="7" height="6" fill="#8a909c"/><rect x="${x - 2.5}" y="${y - 8}" width="5" height="1" fill="#000"/><rect x="${x + 4}" y="${y - 2}" width="2" height="10" fill="#9aa0aa"/>`;
+    if (kind === 'wraith')
+      b = `<path d="M${x - 5} ${y + 8} Q${x - 6} ${y - 8} ${x} ${y - 10} Q${x + 6} ${y - 8} ${x + 5} ${y + 8} l-2.5 -3 l-2.5 3 l-2.5 -3 z" fill="#b8c4d8" opacity=".7"/><circle cx="${x - 2}" cy="${y - 5}" r=".9" fill="#000"/><circle cx="${x + 2}" cy="${y - 5}" r=".9" fill="#000"/>`;
+    if (kind === 'spider')
+      b =
+        `<circle cx="${x}" cy="${y}" r="3.5" fill="#5a4a5a"/>` +
+        [-1, 1]
+          .map(
+            (d) =>
+              `<path d="M${x} ${y} l${d * 6} -4 l${d * 2} 6 M${x} ${y} l${d * 7} 1 l${d * 2} 5" stroke="#5a4a5a" fill="none"/>`,
+          )
+          .join('');
+    if (kind === 'brute')
+      b = `<g transform="translate(${x} ${y}) scale(${sc}) translate(${-x} ${-y})"><rect x="${x - 9}" y="${y - 6}" width="18" height="22" rx="3" fill="#7a4a3a"/><circle cx="${x}" cy="${y - 10}" r="6" fill="#7a4a3a"/><rect x="${x - 14}" y="${y - 4}" width="5" height="16" fill="#6a3a2a"/><rect x="${x + 9}" y="${y - 4}" width="5" height="16" fill="#6a3a2a"/><circle cx="${x - 2}" cy="${y - 11}" r="1" fill="${C.fire}"/><circle cx="${x + 2}" cy="${y - 11}" r="1" fill="${C.fire}"/></g>`;
+    return `<g opacity="${o}">${b}</g>`;
+  };
+
+  /* ---------- footage (docs/trailer/footage, filmed by scripts/trailer/capture.ts) ---------- */
+  const FPS = 30;
+  /* the length of the cut, in seconds */
+  const DUR = 31;
+  /* frames filmed of each clip (the last is held past the end) */
+  const LEN = {
+    endgame: 150,
+    tree3: 90,
+    vanguard: 150,
+    skills: 60,
+    shade: 210,
+    equip: 45,
+    strider: 90,
+    reaver: 90,
+    zealot: 90,
+    climb1: 45,
+    climb2: 45,
+    climb4: 45,
+    climb5: 45,
+    fall: 150,
+    summary: 36,
+    duel: 106,
+    result: 30,
+    board: 45,
+    auto: 60,
+  };
+  /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame; picked by eye from the events */
+  const IN = {
+    endgame: 37,
+    vanguard: 24,
+    shade: 129,
+    strider: 0,
+    reaver: 0,
+    zealot: 16,
+    climb1: 2,
+    climb2: 0,
+    climb4: 0,
+    climb5: 0,
+    fall: 38.5,
+    duel: 0,
+    auto: 0,
+  };
+  const src = (clip, i) =>
+    `footage/${clip}/f${String(clamp(Math.floor(i), 0, LEN[clip] - 1)).padStart(4, '0')}.jpg`;
+  /* the frame of `clip` at `lt` seconds into its use */
+  const at = (clip, lt, from = IN[clip] || 0) => src(clip, from + lt * FPS + 1e-6);
+  const img = (href, x = 0, y = 0, w = 320, h = 180, extra = '') =>
+    `<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" ${extra}/>`;
+  /* part of a 1280×720 frame (`box`, in its pixels) shown in `to` (stage units) */
+  const crop = (href, box, to = [0, 0, 320, 180], fw = 1280, fh = 720) =>
+    `<svg x="${to[0]}" y="${to[1]}" width="${to[2]}" height="${to[3]}" viewBox="${box.join(' ')}" preserveAspectRatio="xMidYMid slice">` +
+    `<image href="${href}" width="${fw}" height="${fh}"/></svg>`;
+  /* a slow push in on a frame: the zoom grows from 1 to `z` over the use */
+  const push = (href, k, z = 1.06) => {
+    const s = lerp(1, z, k);
+    return `<g transform="translate(160 90) scale(${s}) translate(-160 -90)">${img(href)}</g>`;
+  };
+
+  /* the level in large type at the top of a map shot, and the place at the right: the climb's, and the fall's that follows it */
+  const levelTag = (level, place, bands = [[0, 320]]) =>
+    bands
+      .map(([x, w]) => `<rect x="${x}" width="${w}" height="38" fill="#000" opacity=".5"/>`)
+      .join('') +
+    txt(12, 28, `Level ${level}`, { size: 26, col: C.torch, weight: 600, font: 'display' }) +
+    txt(308, 25, place, { size: 12, col: C.bone, anchor: 'end', font: 'display' });
+
+  /* "ARPG." in the face's own pixels (Jacquard 24: 40 to the em, read from the font), a few pixels cleaned so that the
+     capitals read: no curl on the A, no spurs or inner hairlines on R, P and G, the P's bowl closed half way and its stem
+     on the baseline, the G opened above an inward bar. Rows run down to the baseline. */
+  const ARPG = [
+    [
+      '......########.....##...',
+      '.....##########....###..',
+      '..........######..#####.',
+      '...........#############',
+      '............######..###.',
+      '.............#####...#..',
+      '..............####......',
+      '..............####......',
+      '..............####......',
+      '.............#####......',
+      '............######......',
+      '...........###.####.....',
+      '..........###..####.....',
+      '.........########.......',
+      '........#########.......',
+      '.......###....####......',
+      '......###.....####......',
+      '......##......####......',
+      '.....##.......####......',
+      '...###........####...#..',
+      '..#####.......####..##..',
+      '.##########...#######...',
+      '##...#####.....#####....',
+      '#.....###.......###.....',
+    ],
+    [
+      '.#...###........###......',
+      '.##.#####......#####.....',
+      '..########....########...',
+      '...########..########....',
+      '......########..####.....',
+      '......#######....###.....',
+      '.......#####.....###.....',
+      '.......####......###.....',
+      '.......####......###.....',
+      '.......####......###.....',
+      '.......####......##......',
+      '.......####......#.......',
+      '.......##########........',
+      '.......####......##......',
+      '.......####......###.....',
+      '.......####......###.....',
+      '.......####......###.....',
+      '.......####......###.....',
+      '.......####......###.....',
+      '.......####......###.....',
+      '..#######........###...#.',
+      '.############....####.##.',
+      '##...#######......#####..',
+      '#.....#####........###...',
+    ],
+    [
+      '...####.......###....',
+      '#.######.....#####...',
+      '########....##.######',
+      '.########..##..#####.',
+      '....########...####..',
+      '.....######....####..',
+      '......####.....####..',
+      '......###......####..',
+      '......###......####..',
+      '......###......####..',
+      '......###......####..',
+      '......###.....####...',
+      '......##########.....',
+      '......#########......',
+      '......###............',
+      '......###............',
+      '......###............',
+      '......###............',
+      '......###............',
+      '......###............',
+      '......###............',
+      '......###............',
+      '.....#####...........',
+      '....#######..........',
+    ],
+    [
+      '.......###...###.......',
+      '.....###....#####......',
+      '....###.....#######....',
+      '...###.....#######.....',
+      '..####....###..........',
+      '..###......##..........',
+      '.####..................',
+      '.###...................',
+      '####...................',
+      '####......#############',
+      '####......#############',
+      '####...............####',
+      '####...............####',
+      '####......###......####',
+      '####......###......####',
+      '####......###......####',
+      '####......###......###.',
+      '#####....###.......###.',
+      '.####...####.......##..',
+      '.#####............###..',
+      '..######.........###...',
+      '...################....',
+      '.....#############.....',
+      '.......#########.......',
+    ],
+    [
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '...',
+      '###',
+      '###',
+      '###',
+      '###',
+    ],
+  ];
+  /* a word of pixel glyphs (rows top to bottom, on the baseline), centred on x; px is one pixel in stage units */
+  const pixWord = (glyphs, x, base, px, col = C.bone) => {
+    const gap = 2;
+    const wide = glyphs.reduce((s, g) => s + g[0].length, 0) + gap * (glyphs.length - 1);
+    let gx = x - (wide * px) / 2;
+    let s = `<g fill="${col}" shape-rendering="crispEdges">`;
+    for (const g of glyphs) {
+      g.forEach((row, r) => {
+        const y = base - (g.length - r) * px;
+        for (const m of row.matchAll(/#+/g))
+          s += `<rect x="${gx + m.index * px}" y="${y}" width="${m[0].length * px + 0.02}" height="${px + 0.02}"/>`;
+      });
+      gx += (g[0].length + gap) * px;
+    }
+    return s + '</g>';
+  };
+
+  /* the genre words' size: larger for the thumbnail (scripts/trailer/thumbnail.ts, ?thumb) */
+  const GENRE_SIZE = /[?&]thumb/.test(location.search) ? 27 : 19;
+
+  /* ---------- the shots ---------- */
+  const SHOTS = [
+    {
+      t: [0, 2],
+      name: 'Endgame',
+      what: 'Cold open on a late Shade: Spire Traps and orbiting blades through a packed room. No text.',
+      draw: (lt) => img(at('endgame', lt)),
+    },
+    {
+      t: [2, 5],
+      name: 'The tree',
+      what: 'One build growing from level 1 to 100 on the passive tree, zoomed out so the whole constellation reads as big; the level counts up in large type.',
+      draw: (lt) => img(at('tree3', lt, 0)),
+    },
+    {
+      t: [5, 6],
+      name: 'Run one: the Vanguard',
+      what: 'Magma Crack in a Forge: the slam lands on the cut, on 5 s.',
+      draw: (lt) => img(at('vanguard', lt)),
+    },
+    {
+      t: [6, 10.5],
+      name: 'Run two: the Shade',
+      what: 'The gem list, the socket and the DPS in one view: Wired Harm is picked up, its socket lights, and the Spire Trap’s damage jumps; then the traps, a trap thrown at a Slag Brute that falls and drops a rare amulet, held a second; the card against the worn locket, and Swap.',
+      draw(lt) {
+        if (lt < 2) return img(at('skills', lt, 0));
+        /* one shot: a trap thrown at the big one (8.17), it falls on 8.5 and the amulet lies there a second */
+        if (lt < 3.5) return img(at('shade', lt - 2));
+        /* the camp screen, from under its tabs to under the Swap button (the clip is filmed 1280 × 990); Swap on 10.0 */
+        return crop(at('equip', lt - 3.5, 15), [0, 100, 1280, 720], [0, 0, 320, 180], 1280, 990);
+      },
+    },
+    {
+      t: [10.5, 12.5],
+      name: 'Three more builds',
+      what: 'The other three classes in phone-shaped panels, each fighting its own way: Strider, Reaver, Zealot.',
+      draw(lt) {
+        let s =
+          `<rect width="320" height="180" fill="#0b0b10"/>` + glow(160, 90, 160, C.torch, 0.25);
+        ['strider', 'reaver', 'zealot'].forEach((clip, i) => {
+          const k = ease((lt - i * 0.1) / 0.3);
+          const w = 81,
+            h = 176,
+            x = 160 - w * 1.5 - 7 + i * (w + 7),
+            y = 2 + (1 - k) * 176;
+          s += `<clipPath id="ph${i}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9"/></clipPath>`;
+          s += `<g clip-path="url(#ph${i})">${img(at(clip, lt), x, y, w, h)}</g>`;
+          s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="9" fill="none" stroke="${C.uiLine}" stroke-width="1.2"/>`;
+        });
+        return s;
+      },
+    },
+    {
+      t: [12.5, 15],
+      name: 'Level 1 to 100',
+      what: 'Four cuts on the beat, each a different build in a different place against different monsters, the level in large type: the first a beat longer, the other three a beat each.',
+      draw(lt) {
+        /* where each cut starts (s), its clip, its level and its place */
+        const CUTS = [
+          [0, 'climb1', 12, 'Crypt'],
+          [1, 'climb2', 20, 'Forge'],
+          [1.5, 'climb4', 42, 'Ruins'],
+          [2, 'climb5', 52, 'Marsh'],
+        ];
+        let i = 0;
+        CUTS.forEach((c, j) => {
+          if (lt >= c[0]) i = j;
+        });
+        const [from, clip, level, place] = CUTS[i];
+        let s = img(at(clip, lt - from));
+        s += levelTag(level, place);
+        return s + caption('Grind to level 100 in a sitting.', lt, 0.15, 150, 17);
+      },
+    },
+    {
+      t: [15, 20],
+      name: 'The fall',
+      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, opening on the bell already rising over his head, held while its six rings show from 16.75, brought down as the first ring strikes and kills the Shade on 17.5 (the screen edged red); the body held; the end screen, Slain on level 63, held, the duel button pressed on 19.25.',
+      draw(lt) {
+        if (lt < 3.35) {
+          let s = img(at('fall', lt));
+          /* the room goes dark while the body is held */
+          s += `<rect width="320" height="180" fill="#000" opacity="${clamp((lt - 2.8) / 0.55) * 0.55}"/>`;
+          /* the level stays on screen, as in the climb (the boss's bar keeps the middle of the top clear) */
+          return (
+            s +
+            levelTag(72, 'Warren', [
+              [0, 104],
+              [250, 70],
+            ])
+          );
+        }
+        /* from "Slain on level 63" down to "Killed by the Tollkeeper" */
+        /* held on its first frame until the duel button is pressed on 19.25 (the clip's frame 12) */
+        return crop(at('summary', lt - 3.35, -15), [100, 68, 1080, 607.5]);
+      },
+    },
+    {
+      t: [20, 23.5],
+      name: 'The duel',
+      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 23.25, with no hold.',
+      draw: (lt) =>
+        img(at('duel', lt, 0)) + caption('Duel against other slain builds.', lt, 0.1, 150, 16),
+    },
+    {
+      t: [23.5, 24.5],
+      name: 'The rating',
+      what: 'The result screen: the rating counts up, 712 to 748.',
+      draw: (lt) => crop(at('result', lt, 0), [400, 0, 480, 270]),
+    },
+    {
+      t: [24.5, 26],
+      name: 'The board',
+      what: 'The high scores, Sin on top; our row climbs past two players.',
+      draw: (lt) => img(at('board', lt, 0)) + caption('Take the top spot.', lt, 0.35, 150, 16),
+    },
+    {
+      t: [26, 28],
+      name: 'The genres',
+      what: 'All four words on screen at once, appearing one per beat, each over footage that proves it.',
+      draw(lt) {
+        const cells = [
+          ['Arcade.', () => src('board', LEN.board - 1)],
+          ['ARPG.', () => src('tree3', LEN.tree3 - 1)],
+          ['Roguelike.', () => src('summary', 6)],
+          ['Autobattler.', (l) => at('auto', l)],
+        ];
+        let s = '';
+        cells.forEach(([w, foot], i) => {
+          const k = lt - i * 0.5;
+          if (k < 0) return;
+          const x = (i % 2) * 160,
+            y = Math.floor(i / 2) * 90,
+            cx = x + 80,
+            cy = y + 45;
+          s += `<g opacity="${clamp(k / 0.06)}">`;
+          s += `<clipPath id="gc${i}"><rect x="${x + 1}" y="${y + 1}" width="158" height="88"/></clipPath><g clip-path="url(#gc${i})">`;
+          s += img(foot(lt), x, y, 160, 90);
+          s += `<rect x="${x}" y="${y}" width="160" height="90" fill="#000" opacity=".5"/>`;
+          s += glow(cx, cy, 70, C.torch, 0.5 * clamp(1 - k / 0.4));
+          const sc = lerp(1.5, 1, ease(k / 0.18));
+          s +=
+            `<g transform="translate(${cx} ${cy}) scale(${sc}) translate(${-cx} ${-cy})">` +
+            (w === 'ARPG.'
+              ? pixWord(ARPG, cx, cy + 8, GENRE_SIZE / 40)
+              : txt(cx, cy + 8, w, { size: GENRE_SIZE, font: 'display', anchor: 'middle' })) +
+            '</g>';
+          s += '</g></g>';
+        });
+        return (
+          s +
+          `<line x1="160" y1="0" x2="160" y2="180" stroke="#07070b" stroke-width="2"/><line x1="0" y1="90" x2="320" y2="90" stroke="#07070b" stroke-width="2"/>`
+        );
+      },
+    },
+    {
+      t: [28, 31],
+      name: 'Battle of Builds',
+      what: 'The title and “Free on itch.io” over the dimmed genre grid, held; the torch gutters out.',
+      draw(lt) {
+        const flick = 0.55 + 0.1 * Math.sin(lt * 23) + 0.06 * Math.sin(lt * 51);
+        const out = clamp((lt - 2.6) / 0.4);
+        let s =
+          SHOTS.find((x) => x.name === 'The genres').draw(2 + lt) +
+          `<rect width="320" height="180" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
+        s += glow(160, 80, 130, C.torch, flick * (1 - out));
+        s +=
+          `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
+          txt(160, 86, 'Battle of Builds', { size: 32, font: 'display', anchor: 'middle' }) +
+          '</g>';
+        s += txt(160, 120, 'Free on itch.io', {
+          size: 17,
+          font: 'display',
+          col: C.torch,
+          anchor: 'middle',
+          o: clamp((lt - 0.4) / 0.2) * (1 - out),
+        });
+        return s;
+      },
+    },
+  ];
+
+  /* hard cuts that land on a hit get a short flash */
+  const FLASH = [1.5, 5.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
+  /* the toll's ring lands on the Shade (fall frame 114, drawn from 17.53): the screen's edge goes red, strong at once and fading, until the end screen */
+  const HURT = [17.52, 18.35];
+  const hurt = (t) => {
+    const k = t - HURT[0];
+    if (k < 0 || t >= HURT[1]) return '';
+    const o = lerp(0.9, 0.35, ease(k / 0.5));
+    return (
+      `<rect width="320" height="180" fill="url(#redEdge)" opacity="${o}"/>` +
+      `<rect x="2" y="2" width="316" height="176" fill="none" stroke="#e0242a" stroke-width="3" opacity="${o}"/>`
+    );
+  };
+
+  const svg = document.getElementById('svg');
+  function draw(t) {
+    t = clamp(t, 0, DUR - 0.001);
+    const i = SHOTS.findIndex((s) => t >= s.t[0] && t < s.t[1]);
+    const shot = SHOTS[i];
+    const lt = t - shot.t[0],
+      d = shot.t[1] - shot.t[0];
+    const z = 1 + (shot.push || 0.02) * (lt / d);
+    let body = shot.draw(lt);
+    let fl = 0;
+    FLASH.forEach((f) => {
+      const k = t - f;
+      if (k >= 0 && k < 0.15) fl = Math.max(fl, 0.35 * (1 - k / 0.15));
+    });
+    svg.innerHTML =
+      DEFS +
+      `<rect width="320" height="180" fill="#07070b"/>` +
+      `<g transform="translate(160 90) scale(${z}) translate(-160 -90)">${body}</g>` +
+      hurt(t) +
+      (fl ? `<rect width="320" height="180" fill="#fff4e0" opacity="${fl}"/>` : '');
+    return i;
+  }
+  /* the recorder waits for the footage images of the frame before it captures it */
+  window.seek = async (t) => {
+    const i = draw(t);
+    await Promise.all(
+      [...svg.querySelectorAll('image')].map((im) =>
+        new Promise((ok) => {
+          const p = new Image();
+          p.onload = p.onerror = () => ok();
+          p.src = im.href.baseVal;
+          if (p.complete) ok();
+        }).then(() => im.getBBox()),
+      ),
+    );
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    return i;
+  };
+
+  /* ---------- transport ---------- */
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('play');
+  const big = document.getElementById('bigplay');
+  const scrub = document.getElementById('scrub');
+  const time = document.getElementById('time');
+  const marks = document.getElementById('marks');
+  const nowName = document.getElementById('nowname');
+  const nowText = document.getElementById('nowtext');
+  const fmt = (s) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`;
+  marks.innerHTML = SHOTS.map(
+    (s, i) => `<div class="mark" style="width:${((s.t[1] - s.t[0]) / DUR) * 100}%">${i + 1}</div>`,
+  ).join('');
+
+  let playing = false,
+    t = 0,
+    t0Wall = 0,
+    t0 = 0,
+    useAudio = true,
+    lastShot = -1;
+  function show(tt) {
+    const i = draw(tt);
+    scrub.value = tt;
+    time.textContent = `${fmt(tt)} / ${fmt(DUR).slice(0, -2)}`;
+    if (i !== lastShot) {
+      lastShot = i;
+      const s = SHOTS[i];
+      nowName.innerHTML = `${i + 1}. ${s.name}<small>${fmt(s.t[0])}–${fmt(s.t[1])}</small>`;
+      nowText.textContent = s.what;
+      [...marks.children].forEach((m, j) => m.classList.toggle('on', j === i));
+    }
+  }
+  function clock() {
+    if (useAudio && !audio.paused) return audio.currentTime;
+    return t0 + (performance.now() - t0Wall) / 1000;
+  }
+  function tick() {
+    if (!playing) return;
+    t = clock();
+    if (t >= DUR) {
+      pause();
+      t = DUR;
+      show(DUR - 0.001);
+      return;
+    }
+    show(t);
+    requestAnimationFrame(tick);
+  }
+  function play() {
+    if (t >= DUR - 0.01) t = 0;
+    playing = true;
+    big.hidden = true;
+    playBtn.textContent = '❚❚ Pause';
+    t0 = t;
+    t0Wall = performance.now();
+    try {
+      audio.currentTime = t;
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => (useAudio = false));
+    } catch (e) {
+      useAudio = false;
+    }
+    requestAnimationFrame(tick);
+  }
+  function pause() {
+    playing = false;
+    playBtn.textContent = '▶ Play';
+    try {
+      audio.pause();
+    } catch (e) {}
+  }
+  playBtn.addEventListener('click', () => (playing ? pause() : play()));
+  big.addEventListener('click', play);
+  audio.addEventListener('error', () => (useAudio = false));
+  scrub.addEventListener('input', () => {
+    t = parseFloat(scrub.value);
+    if (playing) {
+      t0 = t;
+      t0Wall = performance.now();
+      try {
+        audio.currentTime = t;
+      } catch (e) {}
+    }
+    show(Math.min(t, DUR - 0.001));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' && e.key !== ' ') return;
+    if (e.key === ' ') {
+      e.preventDefault();
+      playing ? pause() : play();
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      t = clamp(t + (e.key === 'ArrowRight' ? 0.5 : -0.5), 0, DUR - 0.001);
+      if (playing) {
+        t0 = t;
+        t0Wall = performance.now();
+        try {
+          audio.currentTime = t;
+        } catch (e2) {}
+      }
+      show(t);
+    }
+  });
+  if (/[?&]render/.test(location.search)) document.body.classList.add('render');
+  /* open on a frame that shows what this is */
+  t = 0;
+  show(3.5);
+  scrub.value = 0;
+  time.textContent = `${fmt(0)} / ${fmt(DUR).slice(0, -2)}`;
+</script>

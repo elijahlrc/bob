@@ -180,13 +180,20 @@ export function Summary({ c }: { c: Controller }) {
   const last = run.history[run.history.length - 1];
   const kills = run.history.reduce((s, h) => s + h.kills, 0);
   const reason = last?.status === 'timeout' ? ' (timed out)' : '';
+  const slain = !won && last?.status === 'dead';
   return (
     <div class="screen summary">
-      <h2>{won ? 'Victory!' : 'Your run has ended'}</h2>
+      {slain ? (
+        <h1 class="slain">Slain on level {last?.map ?? run.map}</h1>
+      ) : (
+        <h2>{won ? 'Victory!' : 'Your run has ended'}</h2>
+      )}
       <p>
         {classDef(run.classId).name} · Level {run.build.level}
       </p>
-      <p>{won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}</p>
+      {!slain && (
+        <p>{won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}</p>
+      )}
       <p class="muted">
         Maps cleared: {run.history.filter((h) => h.status === 'cleared').length}
         {run.history.some((h) => h.status === 'abandoned') &&

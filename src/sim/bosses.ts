@@ -66,6 +66,7 @@ import {
   TOLL_FLAIL,
   TOLL_RINGS,
   TOLL_RING_DELAY,
+  TOLL_WARN,
   TOLL_RING_MULT,
   TOLL_RING_START,
   TOLL_RING_STEP,
@@ -313,14 +314,19 @@ export function bossAI(w: World, m: Actor, dt: number): boolean {
     case 'courser':
       courserAI(w, m, st, dt);
       return true;
-    case 'tollkeeper':
+    case 'tollkeeper': {
       if (st.due && st.tellT <= 0) {
         st.due = false;
         st.tellT = TOLL_TELL;
         w.events.push({ t: 'window', id: m.id, kind: 'tollTell' });
       }
-      if (st.tellT > 0) m.facing = Math.atan2(p.y - m.y, p.x - m.x);
-      return st.tellT > 0;
+      // It holds still through the tell, and keeps the bell up until the toll's first ring strikes (its blow lands then).
+      const held =
+        st.tellT > 0 ||
+        w.effects.some((e) => e.owner === m.id && e.label === 'Toll' && e.delay === undefined);
+      if (held) m.facing = Math.atan2(p.y - m.y, p.x - m.x);
+      return held;
+    }
     case 'magistrate':
       if (st.due && st.countT <= 0 && p.alive) {
         st.due = false;
@@ -552,8 +558,8 @@ function toll(w: World, m: Actor, st: BossState): void {
       y: m.y,
       radius: r + TOLL_RING_WIDTH / 2,
       inner: Math.max(0, r - TOLL_RING_WIDTH / 2),
-      t: 0.8,
-      total: 0.8,
+      t: TOLL_WARN,
+      total: TOLL_WARN,
       kind: 'slam',
       damage: dmg,
       dtype: 1,

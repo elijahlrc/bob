@@ -1,4 +1,4 @@
-"""Chiptune score for the trailer animatic: 30 s, 120 bpm, D minor, locked to the cut.
+"""Chiptune score for the trailer animatic: 31 s, 120 bpm, D minor, locked to the cut.
 
 Voices in the style of an old sound chip (two pulse channels, a triangle, a noise channel), pushed
 with modern production: kick ducking, a stereo echo on the lead, saturation. Writes a stereo 16-bit WAV.
@@ -7,7 +7,7 @@ import sys, wave
 import numpy as np
 
 SR = 44100
-DUR = 30.0
+DUR = 31.0
 N = int(SR * DUR)
 L = np.zeros(N)
 R = np.zeros(N)
@@ -222,34 +222,37 @@ def motif(t0, g=0.32):
         lead(t0 + off, m, d, g, duty=0.125, vib=0.0)
 
 
-# 0-16 s: the groove, eight bars. In on the first frame, one hit at 1.5 on the opening's biggest burst.
+# 0-16.75 s: the groove, eight bars and most of a ninth, stopped dead by the Tollkeeper's bell on 16.75 (the and of 2). In on
+# the first frame, one hit at 1.5 on the opening's biggest burst.
 for b in range(8):
     bar(b * 2.0)
+bar(16.0, steps=6)
 boom(1.5)
 for t0 in (4.0, 8.0, 12.0):  # the phrase every other bar from bar 3
     motif(t0)
 for st in range(8):  # a short roll into the stop
-    snare(15.0 + st * S16, 0.4 + 0.08 * st)
+    snare(15.75 + st * S16, 0.4 + 0.08 * st)
 
-# 16-19 s: the fall. Silence but for the impact on 16.5 and its low ring; a roll back in.
-boom(16.5, 1.3)
-place('bass', 16.5, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
+# 16.75-20 s: the fall. The groove stops as the toll's rings show on the floor, the bell held up; it comes down as the first
+# ring kills on 17.5, an impact, the bell and a low ring; the end screen held; a roll back in.
+boom(17.5, 1.3)
+place('bass', 17.5, tri(midi(D1), 1.4) * np.exp(-np.arange(int(1.4 * SR)) / SR / 0.45), 0.6)
 for st in range(4):  # a pickup in sixteenths that ends before the downbeat, then the groove lands with a hit
-    snare(18.5 + st * S16, 0.45 + 0.15 * st)
-boom(19.0, 0.9)
+    snare(19.5 + st * S16, 0.45 + 0.15 * st)
+boom(20.0, 0.9)
 
-# 19-25 s: the groove again, three bars; the duel's deciding blow at 22.25 gets a restrained crash, no break.
-bar(19.0)
-bar(21.0)
-bar(23.0, steps=8)
-mute_spans = [(24.875, 25.0)]
+# 20-26 s: the groove again, three bars; the duel's deciding blow at 23.25 gets a restrained crash, no break.
+bar(20.0)
+bar(22.0)
+bar(24.0, steps=8)
+mute_spans = [(25.875, 26.0)]
 
-# 23-25 s: the set-up for the four words, by taking away. The groove runs half a bar, then at 24 it drops out: no kick,
-# no snare, the bass holds one low D, only sixteenth hats tick. At 24.5 a tom fill falls down the kit, then a sixteenth
+# 24-26 s: the set-up for the four words, by taking away. The groove runs half a bar, then at 25 it drops out: no kick,
+# no snare, the bass holds one low D, only sixteenth hats tick. At 25.5 a tom fill falls down the kit, then a sixteenth
 # of silence before the first word.
-place('bass', 24.0, tri(midi(D2 - 12), 0.5) * adsr(int(0.5 * SR), d=0.3, s=0.6, r=0.05), 0.5)
+place('bass', 25.0, tri(midi(D2 - 12), 0.5) * adsr(int(0.5 * SR), d=0.3, s=0.6, r=0.05), 0.5)
 for j in range(4):
-    hat(24.0 + j * S16, 0.5 + 0.1 * j)
+    hat(25.0 + j * S16, 0.5 + 0.1 * j)
 
 
 def tom(at, m, g=1.0):
@@ -259,16 +262,16 @@ def tom(at, m, g=1.0):
 
 
 for j, m in enumerate((57, 57, 52, 52)):  # high and mid toms in thirty-seconds: ta-ka ta-ka
-    tom(24.5 + j * S16 / 2, m, 0.8 + 0.05 * j)
-for at in (24.625, 24.75):  # then two long floor-tom kicks on the sixteenths: dum, dum
+    tom(25.5 + j * S16 / 2, m, 0.8 + 0.05 * j)
+for at in (25.625, 25.75):  # then two long floor-tom kicks on the sixteenths: dum, dum
     d = 0.3
     place('drums', at, tri(midi(40), d, slide=-5) * np.exp(-np.arange(int(d * SR)) / SR / 0.12), 1.0)
     kick(at, 0.9)
-crash(22.25, 0.4, 0.6)  # the deciding blow: a restrained crash on top of the groove, which keeps going
-for t0 in (19.0, 23.0):
+crash(23.25, 0.4, 0.6)  # the deciding blow: a restrained crash on top of the groove, which keeps going
+for t0 in (20.0, 24.0):
     motif(t0)
 
-# 25-27 s: the genres, a hit per word, nothing between. Tight hits with no cymbal wash: a long, deep kick with
+# 26-28 s: the genres, a hit per word, nothing between. Tight hits with no cymbal wash: a long, deep kick with
 # a short bright attack, and a low D under it, each one stopping before the next.
 
 
@@ -284,14 +287,14 @@ def slam(at, g=1.0):
 
 
 for k in range(4):
-    slam(25.0 + k * 0.5, 1.0)
-    bassnote(25.0 + k * 0.5, D2, 0.4, 1.1)
+    slam(26.0 + k * 0.5, 1.0)
+    bassnote(26.0 + k * 0.5, D2, 0.4, 1.1)
 
-# 27-30 s: the title. The last hit, the D rings out.
-boom(27.0, 1.2)
-crash(27.0, 0.6, 2.5)
-bassnote(27.0, D2, 2.2, 0.6)
-lead(27.0, 62, 1.8, 0.3, duty=0.125)
+# 28-31 s: the title. The last hit, the D rings out.
+boom(28.0, 1.2)
+crash(28.0, 0.6, 2.5)
+bassnote(28.0, D2, 2.2, 0.6)
+lead(28.0, 62, 1.8, 0.3, duty=0.125)
 
 # ================= sound effects =================
 # The game has no sound yet, so the trailer's effects are made here: short chip sounds on their own bus, laid over
@@ -315,6 +318,15 @@ def whoosh(at, d=0.2, g=1.0, rise=True):
     place('sfx', at, noise(d, 9000 if rise else 5000) * env_, 0.25 * g)
 
 
+def bell(at, m, g=1.0, d=1.6):
+    """A struck bell in chip voices: a bell's partials (hum, prime, minor third, nominal and a high one), the high ones dying
+    first."""
+    n = int(d * SR)
+    t = np.arange(n) / SR
+    for ratio, amp, tau in ((0.5, 0.6, 0.9), (1.0, 1.0, 0.6), (1.19, 0.55, 0.45), (2.0, 0.45, 0.3), (2.76, 0.3, 0.15)):
+        place('sfx', at, tri(midi(m) * ratio, d) * np.exp(-t / tau), 0.3 * g * amp)
+
+
 def click(at, g=1.0):
     blip(at, 84, 0.02, 0.9 * g, 0.5)
 
@@ -328,32 +340,31 @@ for at in (0.0, 0.5, 1.0):
     zap(at)
 thud(1.5, 1.2)
 whoosh(1.5, 0.4, 0.8)
-# 2-3: a tick per class card, a confirm on the Vanguard
-for k in range(6):
-    tick(2.0 + k * 0.125, 86 + k)
-blip(2.75, 79, 0.08, 0.8, 0.5)
-blip(2.82, 86, 0.12, 0.7, 0.5)
-# 3-6: four node chimes up the tree, the wind-up and the slam
-for k, m in enumerate((74, 77, 81)):  # a chime per node, on the eighth notes; the keystone's is fuller
-    blip(3.25 + k * 0.25, m, 0.14 if k < 2 else 0.3, 0.8 if k < 2 else 1.0, 0.125)
-blip(3.75, 86, 0.3, 0.5, 0.25)
+# 2-5: the tree grows: a chime per eighth note, climbing a pentatonic scale, the last ones fuller
+SCALE = (74, 77, 79, 81, 84, 86, 89, 91, 93, 96, 98)
+for k in range(11):
+    at = 2.25 + k * 0.25
+    blip(at, SCALE[k], 0.14 if k < 9 else 0.3, 0.7 + 0.03 * k, 0.125)
+blip(4.5, 98, 0.4, 0.5, 0.25)
 whoosh(4.6, 0.4, 0.8)
 thud(5.0, 1.5)
 place('sfx', 5.0, noise(0.6, 3000) * np.exp(-np.arange(int(0.6 * SR)) / SR / 0.15), 0.25)  # the floor cracking
-# 6-10.5: the gem drops into its socket, the number climbs, the traps are thrown and spring, the amulet drops, Equip
-blip(6.0, 81, 0.25, 0.4, 0.5, slide=-2)
-click(6.4, 1.3)
+# 6-10.5: the gem is picked up (6.4) and dropped into its socket (7.0), the number climbs, the traps spring, the amulet drops
+# (8.5), the card (9.5) and Swap (10.0)
+blip(6.4, 81, 0.25, 0.4, 0.5, slide=-2)
+click(7.0, 1.3)
 for k in range(8):
-    tick(6.5 + k * 0.05, 76 + k * 2, 0.8)
-for at in (7.0, 7.2, 7.4):
+    tick(7.05 + k * 0.05, 76 + k * 2, 0.8)
+for at in (7.5, 7.7):
     whoosh(at, 0.15, 0.6)
-for at in (7.5, 8.0, 8.5):
+for at in (8.0, 8.25):
     zap(at, 96)
 for k, m in enumerate((81, 86, 89, 93)):
-    blip(9.02 + k * 0.06, m, 0.1, 0.7, 0.5)
-blip(9.26, 98, 0.3, 0.5, 0.25)
-click(10.2, 1.2)
-blip(10.24, 86, 0.08, 0.6, 0.5)
+    blip(8.52 + k * 0.06, m, 0.1, 0.7, 0.5)
+blip(8.76, 98, 0.3, 0.5, 0.25)
+tick(9.7, 88, 0.8)
+click(10.0, 1.2)
+blip(10.04, 86, 0.08, 0.6, 0.5)
 # 10.5-12.5: three panels: arrows loosed, heavy sweeps, a totem's bell
 for n in range(11):
     tick(10.65 + n * 0.18, 95, 0.6)
@@ -363,35 +374,38 @@ for at in (10.85, 11.45, 12.05):
 place('sfx', 10.7, tri(220, 0.12, slide=-4) * adsr(int(0.12 * SR), d=0.1, s=0), 0.4)  # the totem lands
 for n in range(5):
     blip(11.05 + n * 0.33, 93, 0.18, 0.5, 0.125)
-# 12.5-16: an impact on every cut
-for k in range(7):
-    at = 12.5 + k * 0.5
-    [zap, thud, zap, zap, whoosh, thud, zap][k](at + 0.12)
-# 16-19: the boss charges, the void slams down; the duel button
-place('sfx', 16.0, pulse(midi(74), 0.5, 0.5, slide=-3) * np.linspace(0.2, 1, int(0.5 * SR)), 0.16)
-place('sfx', 16.0, noise(0.5, 4000) * np.linspace(0, 1, int(0.5 * SR)) ** 2, 0.15)
-thud(16.5, 1.6)
-place('sfx', 16.5, noise(1.2, 2500) * np.exp(-np.arange(int(1.2 * SR)) / SR / 0.35), 0.35)  # the floor shattering
-click(18.25, 1.2)
-blip(18.3, 74, 0.12, 0.7, 0.5)
-blip(18.45, 69, 0.3, 0.6, 0.5)
-# 19-22.5: the duel: our shots every half beat, the rival's fire, the held frame, the deciding hit
+# 12.5-15: an impact on every cut (the first climb shot is a beat longer), and on the cut to the boss on 15
+for at, fx in ((12.5, zap), (13.5, thud), (14.0, zap), (14.5, zap), (15.0, thud)):
+    fx(at + 0.12)
+# 15-20: the Tollkeeper's bell rises (a slow climb under the fight), the rings of its fourth toll crackle onto the floor, the
+# bell comes down as the first strikes; the duel button
+place('sfx', 15.0, pulse(midi(50), 1.75, 0.25, slide=0.5) * np.linspace(0, 1, int(1.75 * SR)) ** 2, 0.12)
+place('sfx', 16.75, noise(0.25, 16000) * np.exp(-np.arange(int(0.25 * SR)) / SR / 0.05), 0.2)  # the rings of lightning appear
+place('sfx', 17.0, pulse(midi(74), 0.5, 0.5, slide=-3) * np.linspace(0.2, 1, int(0.5 * SR)), 0.16)
+place('sfx', 17.0, noise(0.5, 4000) * np.linspace(0, 1, int(0.5 * SR)) ** 2, 0.15)
+bell(17.5, 62, 1.2)
+thud(17.5, 1.6)
+place('sfx', 17.5, noise(1.2, 2500) * np.exp(-np.arange(int(1.2 * SR)) / SR / 0.35), 0.35)  # the floor shattering
+click(19.25, 1.2)
+blip(19.3, 74, 0.12, 0.7, 0.5)
+blip(19.45, 69, 0.3, 0.6, 0.5)
+# 20-23.5: the duel: our shots every half beat, the rival's fire, the held frame, the deciding hit
 for n in range(5):
-    blip(19.0 + n * 0.5, 88, 0.06, 0.6, 0.25, slide=-3)
-    tick(19.25 + n * 0.5, 72, 0.7)
+    blip(20.0 + n * 0.5, 88, 0.06, 0.6, 0.25, slide=-3)
+    tick(20.25 + n * 0.5, 72, 0.7)
 for n in range(3):
-    whoosh(19.75 + n * 0.75, 0.15, 0.7)
-    thud(19.75 + n * 0.75, 0.5)
-thud(22.25, 0.8)
-zap(22.25, 98, 0.7, 0.1)
-# 22.5-25: the rating counts up, a coin per place gained
+    whoosh(20.75 + n * 0.75, 0.15, 0.7)
+    thud(20.75 + n * 0.75, 0.5)
+thud(23.25, 0.8)
+zap(23.25, 98, 0.7, 0.1)
+# 23.5-26: the rating counts up, a coin per place gained
 for k in range(10):
-    tick(22.65 + k * 0.05, 79 + k, 0.7)
-for at in (23.9, 24.2):
+    tick(23.65 + k * 0.05, 79 + k, 0.7)
+for at in (24.9, 25.2):
     blip(at, 88, 0.05, 0.9, 0.5)
     blip(at + 0.05, 93, 0.12, 0.9, 0.5)
-# 29.5: the torch gutters out
-place('sfx', 29.5, noise(0.5, 9000) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.15), 0.15)
+# 30.5: the torch gutters out
+place('sfx', 30.5, noise(0.5, 9000) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.15), 0.15)
 
 # ================= the mix =================
 
@@ -405,8 +419,39 @@ def degrade(x, rate, bits, drive):
     return np.round(y * q) / q
 
 
-bus['bass'] = degrade(bus['bass'], 6000, 3, 4.5) * 0.6  # a gritty, clipped bass, trimmed back to its old level
-bus['lead'] = degrade(bus['lead'], 7000, 3, 3.5)  # the phrase rougher, the same level
+def lowpass(x, cut):
+    """A steep low-pass through the FFT (the whole score at once): takes the corners off the triangle so the fundamental stands alone."""
+    f = np.fft.rfft(x)
+    fr = np.fft.rfftfreq(len(x), 1 / SR)
+    f *= 1 / (1 + (fr / cut) ** 8)
+    return np.fft.irfft(f, len(x))
+
+
+def fold(x, k):
+    """Wavefold: a signal pushed past full scale folds back on itself, which adds bright inharmonic partials."""
+    return np.sin(np.clip(x, -1, 1) * k)
+
+
+# The bass: the old gritty triangle, a clean low sine under it for weight, and the sine saturated so the note still speaks on
+# a laptop speaker that cannot play 73 Hz. About 9 dB louder than it was.
+_b = bus['bass']
+_sub = lowpass(_b, 110)
+_grit = degrade(_b, 6000, 3, 4.5)
+_harm = np.tanh(_sub * 7.0) * 0.5
+bus['bass'] = (_grit * 0.6 * 1.2 + _sub * 1.5 + _harm * 0.7) * 1.0
+
+# The lead, crushed hard: held to a very low sample rate (aliasing), pushed into a hard clip, wavefolded, cut to 2 and 3 bits and
+# the two blended, then a short metallic comb (a 1.7 ms delay fed back) and a copy that is crushed harder still.
+_l = bus['lead']
+_a = degrade(_l, 3600, 2, 9.0)
+_f = degrade(fold(_l * 6.0, 2.4), 5200, 3, 6.0)
+_mix = 0.55 * _a + 0.45 * _f
+_cd = int(0.0017 * SR)
+_comb = _mix.copy()
+for _k in range(1, 4):
+    _comb[_cd * _k :] += _mix[: -_cd * _k] * (0.45 ** _k)
+_hard = degrade(_l, 2400, 2, 12.0)  # the same line crushed harder still, for the gritty edge
+bus['lead'] = (_comb * 0.8 + _hard * 0.25) * 0.5
 for a_, b_ in mute_spans:  # held silences
     for k_ in bus:
         bus[k_][int(a_ * SR) : int(b_ * SR)] = 0
@@ -419,6 +464,8 @@ for at in duck_points:
     curve = 1 - 0.55 * np.exp(-np.arange(j - i) / SR / 0.06)
     duck[i:j] = np.minimum(duck[i:j], curve)
 
+if len(sys.argv) > 2:  # `chip_score.py out.wav --stems`: how loud each voice is, before the mix
+    print(' '.join(f'{k} {20 * np.log10(np.sqrt(np.mean(v ** 2)) + 1e-9):.1f}' for k, v in bus.items()))
 mono = bus['drums'] + bus['sfx'] * 0.9
 music = (bus['pad'] + bus['bass']) * duck
 L += mono + music
@@ -442,13 +489,16 @@ def finish(x):
 
 
 L, R = finish(L), finish(R)
+# a crushed, clipped signal has hard edges and a lot above the range an encoder keeps; cut it first so the encoder does not ring
+# (which overshoots the peak by several dB and clips) and the sound is the same in the file as here
+L, R = lowpass(L, 14000), lowpass(R, 14000)
 # fade the last half second
 fade = np.ones(N)
 fade[-int(0.4 * SR) :] = np.linspace(1, 0, int(0.4 * SR))
 L *= fade
 R *= fade
 peak = max(np.max(np.abs(L)), np.max(np.abs(R)))
-L, R = L / peak * 0.95, R / peak * 0.95
+L, R = L / peak * 0.7, R / peak * 0.7  # headroom: the lossy encoders overshoot a crushed, clipped signal by about 2 dB
 
 st = np.empty(N * 2)
 st[0::2], st[1::2] = L, R
@@ -459,5 +509,5 @@ with wave.open(sys.argv[1], 'wb') as w:
     w.writeframes((st * 32767).astype(np.int16).tobytes())
 
 # a quick loudness read per second, to catch a section that is far too quiet or loud
-rms = [np.sqrt(np.mean(((L + R) / 2)[int(s * SR) : int((s + 1) * SR)] ** 2)) for s in range(30)]
+rms = [np.sqrt(np.mean(((L + R) / 2)[int(s * SR) : int((s + 1) * SR)] ** 2)) for s in range(int(DUR))]
 print(' '.join(f'{20 * np.log10(max(r, 1e-6)):.0f}' for r in rms))

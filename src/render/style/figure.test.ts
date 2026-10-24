@@ -2,10 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { itemBase } from '../../data/bases';
 import { classDef } from '../../data/classes';
 import { newRun } from '../../run/run';
+import { TOLL_TELL, TOLL_WARN } from '../../data/bosses';
+import { bossState, initBoss } from '../../sim/bosses';
 import { createDuelWorld } from '../../sim/duel';
 import { AnimTrack } from './anim';
-import { buildFigure, heroFigure, poseFor, type AnimName, type FigureKind } from './figure';
-import type { Actor } from '../../sim/types';
+import {
+  buildFigure,
+  heroFigure,
+  poseFor,
+  poseForType,
+  RELEASE_LANDS,
+  type AnimName,
+  type FigureKind,
+} from './figure';
+import type { Actor, World } from '../../sim/types';
 import { figureOf, heroColor, isViewer } from './who';
 
 const KINDS: FigureKind[] = [
@@ -20,7 +30,7 @@ const KINDS: FigureKind[] = [
   'hero_wand',
   'hero_dagger',
 ];
-const ANIMS: AnimName[] = ['idle', 'walk', 'attack', 'stun', 'death'];
+const ANIMS: AnimName[] = ['idle', 'walk', 'attack', 'stun', 'death', 'windup', 'release'];
 
 describe('figure rig (shared by all visual styles)', () => {
   it('builds finite primitives for every kind, animation and time', () => {
@@ -128,6 +138,57 @@ describe('the attack animation of a repeating skill (Echoing Cast)', () => {
     expect(at(0.95)).toBeGreaterThan(0.6);
     a.action = { elapsed: 0.3, duration: 1, profile: { repeats: 0 }, which: 'primary' } as never;
     expect(t.state(a).t).toBeCloseTo(0.3, 6);
+  });
+});
+
+describe("the Tollkeeper's toll (a boss whose body shows its big move)", () => {
+  /** The highest point of the Tollkeeper's figure in a pose (y grows downward). */
+  const top = (anim: AnimName, t: number) =>
+    Math.min(
+      ...buildFigure('tollkeeper', poseForType('tollkeeper', anim, t), 'tollkeeper', t).map((p) =>
+        p.k === 'circ'
+          ? p.y - p.r
+          : p.k === 'cap'
+            ? Math.min(p.y1, p.y2) - p.r
+            : p.k === 'box'
+              ? p.y - p.h / 2
+              : Math.min(p.pts[1], p.pts[3], p.pts[5]),
+      ),
+    );
+
+  it('hoists its bell through the tell, holds it while the rings show, and brings it down as the first strikes', () => {
+    const a = {
+      x: 5,
+      y: 5,
+      alive: true,
+      action: null,
+      stunT: 0,
+      facing: 0,
+      ail: { freezeT: 0 },
+      life: 100,
+      def: { maxLife: 100 },
+      mon: { spec: { type: 'tollkeeper' } },
+    } as unknown as Actor;
+    initBoss({} as World, a);
+    const st = bossState(a)!;
+    const t = new AnimTrack();
+    t.update(a, 1 / 60);
+    expect(t.state(a).anim).toBe('idle');
+    st.tellT = TOLL_TELL / 4;
+    expect(t.state(a)).toEqual({ anim: 'windup', t: 0.75 });
+    // It tolls: the rings show for TOLL_WARN, the bell held up, and it lands (RELEASE_LANDS into the blow) as they strike.
+    st.tellT = 0;
+    st.tolls = 1;
+    t.update(a, 0.35);
+    expect(t.state(a)).toEqual({ anim: 'windup', t: 1 });
+    t.update(a, TOLL_WARN - 0.35);
+    expect(t.state(a).anim).toBe('release');
+    expect(t.state(a).t).toBeCloseTo(RELEASE_LANDS, 6);
+    t.update(a, 0.6);
+    expect(t.state(a).anim).toBe('idle');
+    // High over its head at the top of the tell; down on the floor when it lands.
+    expect(top('windup', 1)).toBeLessThan(top('idle', 0) - 20);
+    expect(top('release', 0.4)).toBeGreaterThan(top('windup', 1) + 20);
   });
 });
 

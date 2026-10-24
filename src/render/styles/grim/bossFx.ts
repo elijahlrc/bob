@@ -533,6 +533,19 @@ export class BossFx {
       this.host.em.dust.explode(18, p.x, p.y);
       return;
     }
+    // The bell lands as a toll's first ring strikes (the later rings have a delay): the floor cracks and the room shakes,
+    // harder with every toll.
+    if (e.t === 'blast' && e.e.label === 'Toll' && e.e.delay === undefined) {
+      const a = this.host.actorById(e.e.owner ?? -1);
+      const st = a && bossState(a);
+      if (!a || !st) return;
+      const p = this.pt(a.x, a.y);
+      this.addCrack(a);
+      this.host.shake(Math.min(8, 2 + st.tolls * 1.5));
+      this.host.flash(p.x, p.y - 20, DTYPE[1], Math.min(3.2, 1.4 + st.tolls * 0.45), 0.5);
+      this.say(a.x, a.y, `Toll ${st.tolls}`, GOLD, st.tolls >= 3);
+      return;
+    }
     if (e.t !== 'window') return;
     const a = this.host.actorById(e.id);
     if (!a) return;
@@ -543,13 +556,7 @@ export class BossFx {
       if (def) this.say(a.x, a.y, BOSSES[def.id].name, 0xffe0b0, true);
       this.pulse(a.x, a.y, 0xffe0b0, 4, 0.9);
     } else if (k === 'tollTell') this.say(a.x, a.y, 'The bell rises', DTYPE[1]);
-    else if (k === 'toll') {
-      this.addCrack(a);
-      this.host.shake(3);
-      this.host.flash(p.x, p.y - 40, DTYPE[1], 1.6, 0.5);
-      const st = bossState(a);
-      this.say(a.x, a.y, `Toll ${st?.tolls ?? ''}`, GOLD);
-    } else if (k === 'tollBroken') {
+    else if (k === 'tollBroken') {
       this.say(a.x, a.y, 'Rung flat', 0xb8b8b8);
       this.pulse(a.x, a.y, 0xb8b8b8, 2.4);
     } else if (k === 'gallop') this.say(a.x, a.y, 'Gallop', DTYPE[3]);

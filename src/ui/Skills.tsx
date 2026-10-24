@@ -300,9 +300,8 @@ export function Skills({
         )}
         {hint && (
           <p class="muted hint">
-            {coarse
-              ? 'Tap a gem, then a socket. Tap a placed gem for its options. ★ sets the primary skill.'
-              : 'Click a gem, then a socket — or drag gems onto sockets (drop on the gem list to remove). Double-click a gem to auto-place or remove it. ★ sets the primary skill.'}
+            ★ is your primary skill. Other skills are used periodically. Use the Strategy tab for
+            more granular control.
           </p>
         )}
         {EQUIP_SLOTS.map((slot) => {
