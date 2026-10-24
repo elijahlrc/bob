@@ -279,3 +279,8 @@ html.leaf .unique {
     font-size: 22px;
   }
 }
+
+/* Inside a dialog nothing is smaller than body text. */
+html.leaf .modal-card :is(p, div, label, span, small, li) {
+  font-size: var(--size);
+}
