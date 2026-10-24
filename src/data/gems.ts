@@ -72,6 +72,8 @@ export type SkillBehaviour =
       falloff?: number;
       /** The projectile turns around at the end of its range and flies back, hitting again on the way. */
       returns?: boolean;
+      /** Chains the projectile makes on its own, as with the chains support (Storm Arrow). */
+      chains?: number;
       /** With a weapon that does not have this tag the skill is a melee strike of this reach instead (Gouge Shot). */
       meleeUnless?: SkillTag;
       meleeRange?: number;

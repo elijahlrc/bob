@@ -496,7 +496,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Pyre Burst',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'area', 'fire', 'duration', 'projectile'],
+    tags: ['spell', 'area', 'fire', 'duration'],
     types: ['orb', 'repeatable', 'trappable', 'totemable', 'mineable', 'triggerable', 'cascadable'],
     behaviour: {
       kind: 'burst',
@@ -1720,10 +1720,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['attack', 'projectile', 'area', 'lightning', 'bow'],
     types: ['totemable', 'trappable', 'mineable', 'volleyable', 'triggerable'],
     behaviour: {
-      kind: 'chain',
+      kind: 'projectile',
+      count: 1,
+      spread: 0,
       range: 9,
       chains: 3,
-      chainRange: 4,
     },
     baseMult: [110, 134],
     cost: [7, 11],
@@ -1740,7 +1741,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: [10, 29],
       },
     ],
-    description: 'An arrow of lightning that arcs from the target to enemies nearby.',
+    description: 'An arrow of lightning that arcs from its target to enemies nearby.',
   },
   {
     kind: 'active',
@@ -2670,9 +2671,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['spell', 'projectile', 'area', 'fire', 'chaining'],
     types: ['totemable', 'trappable', 'mineable', 'repeatable', 'triggerable'],
     behaviour: {
-      kind: 'burst',
-      radius: 1.4,
-      reach: 8,
+      kind: 'projectile',
+      count: 1,
+      spread: 0,
+      range: 8,
+      explodeRadius: 1.4,
     },
     spellDamage: [
       {
@@ -2685,7 +2688,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     crit: 5,
     cost: [8, 22],
     mods: [],
-    description: 'A molten orb that bursts where it lands, and bounces on to burst again.',
+    description:
+      'A molten orb that arcs to where you aim, bursts as it lands, and bounces on to burst again.',
     bounces: {
       spacing: 1.6,
       chains: [1, 2],
@@ -3275,7 +3279,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Hoarfrost Mote',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'cold', 'channelling', 'duration', 'projectile'],
+    tags: ['spell', 'area', 'cold', 'channelling', 'duration'],
     types: ['totemable', 'orb'],
     behaviour: {
       kind: 'burst',

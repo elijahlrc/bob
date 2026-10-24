@@ -551,13 +551,32 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     const { world: w, dummy } = world(['slagLob'], 5, 'wand_3', INT);
     const beyond = neighbour(w, dummy.x + 1.6, dummy.y);
     let bursts = 0;
+    let flights = 0;
     for (let i = 0; i < 60 * 1.6; i++) {
       stepWorld(w);
-      for (const e of w.events) if (e.t === 'explode') bursts++;
+      for (const e of w.events) {
+        if (e.t === 'explode') bursts++;
+        if (e.t === 'projectileSpawned') flights++;
+      }
     }
+    // It flies out as a projectile and hops on as one: a flight for each burst.
+    expect(flights).toBeGreaterThanOrEqual(2);
     expect(bursts).toBeGreaterThanOrEqual(2);
     expect(bursts).toBeLessThanOrEqual(6);
     expect(beyond.life).toBeLessThan(1e9);
+  });
+
+  it('Storm Arrow: a flying arrow that arcs on to the enemies beside its target', () => {
+    const { world: w, dummy } = world(['stormArrow'], 5, 'bow_3', DEX);
+    const beside = neighbour(w, dummy.x + 2.5, dummy.y);
+    const before = beside.life;
+    let flights = 0;
+    for (let i = 0; i < 60 * 2; i++) {
+      stepWorld(w);
+      for (const e of w.events) if (e.t === 'projectileSpawned') flights++;
+    }
+    expect(flights).toBeGreaterThanOrEqual(1);
+    expect(beside.life).toBeLessThan(before);
   });
 
   it('Fuse Arrow: arrows stick, and the first to go off takes the others with it', () => {

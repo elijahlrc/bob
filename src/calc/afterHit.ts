@@ -23,6 +23,8 @@ const BALL_SPREAD = 1.6;
 const BALL_RADIUS = 1.2;
 /** An orb that bounces on bursts in this radius when its skill is not a burst. */
 const BOUNCE_RADIUS = 1.4;
+/** An extra orb of a lob lands this far beside the first (`LOB_SIDE`, src/sim/skillFx.ts). */
+const LOB_SIDE = 0.8;
 
 /**
  * The hits a Whirl Shot lands on one target: the piercing arrow, and then the scatter where it ends (a target at the end of
@@ -83,9 +85,16 @@ function bounceHits(p: SkillProfile): number {
   const spec = p.skill.bounces;
   if (!spec) return 0;
   const b = p.skill.behaviour;
-  const radius = (b.kind === 'burst' ? b.radius : BOUNCE_RADIUS) * p.radiusMult;
+  const own = b.kind === 'burst' ? b.radius : b.kind === 'projectile' ? b.explodeRadius : undefined;
+  const radius = (own ?? BOUNCE_RADIUS) * p.radiusMult;
   const n = Math.round(levelValue(spec.chains, p.skill.level));
   let hits = 0;
-  for (let i = 1; i <= n; i++) if (spec.spacing * i <= radius + TARGET_RADIUS) hits++;
+  // Each projectile is an orb of its own, landing LOB_SIDE beside the first (alternating sides); the first orb's own first burst
+  // is the use's hit, every other burst is counted here.
+  for (let k = 0; k < Math.max(1, p.projectiles); k++) {
+    const side = k === 0 ? 0 : Math.ceil(k / 2) * LOB_SIDE;
+    for (let i = k === 0 ? 1 : 0; i <= n; i++)
+      if (Math.hypot(spec.spacing * i, side) <= radius + TARGET_RADIUS) hits++;
+  }
   return hits;
 }

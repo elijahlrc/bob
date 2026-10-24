@@ -278,6 +278,8 @@ export type Projectile = {
   pulseT?: number;
   kind?: 'nova' | 'tornado' | 'mortar' | 'shield' | 'orb' | 'mirror' | 'creep';
   ring?: number;
+  /** A lobbed orb: hops left, each a burst further on (Slag Lob). */
+  bouncesLeft?: number;
   /** Where it changes form (Frost Lance), and whether it has. */
   formAt?: number;
   formed?: boolean;

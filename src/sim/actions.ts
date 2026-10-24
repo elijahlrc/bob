@@ -18,6 +18,7 @@ import { scaleProfile } from './shots';
 import {
   afterProjectileHit,
   afterStrike,
+  bounceLob,
   changeForm,
   coneBurst,
   fireProjectiles,
@@ -30,7 +31,6 @@ import { areaRadiusOf, repeatSpot } from './spread';
 import { cascadeCast, extraStrikes, repeatTarget, startUse } from './supportFx';
 import {
   addBlade,
-  bounceOrbs,
   fireVolleys,
   leaveCreeping,
   lineWave,
@@ -408,7 +408,6 @@ export function fire(w: World, a: Actor, act: Action): void {
   // The later hits of a spin are only hits: what a use leaves behind (ground, blades, charges spent) is left once.
   if (act.spinN !== undefined && act.spinN > 1) return;
   leaveGround(w, a, act);
-  bounceOrbs(w, a, act);
   cascadeCast(w, a, act);
   if (act.profile.skill.stanceStorm) placeStanceStorm(w, a, act);
   // An aftershock: the ground cracks, and a moment later it erupts, harder and wider.
@@ -881,6 +880,7 @@ export function updateProjectiles(w: World, dt: number): void {
         } else {
           // An arrow fired into the air comes down and bursts.
           if (pr.kind === 'mortar' || pr.kind === 'creep') explode(w, owner, pr, pr.x, pr.y);
+          if (pr.bouncesLeft && owner) bounceLob(w, owner, pr);
           projectileLanded(w, pr, owner);
           endProjectile(w, pr, pr.kind === 'mortar' || pr.kind === 'creep' ? 3 : 1);
           alive = false;

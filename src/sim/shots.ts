@@ -116,6 +116,26 @@ export function launch(
   return pr;
 }
 
+/** An extra orb of a lob lands this far beside the first (and the sheet repeats it, src/calc/afterHit.ts). */
+const LOB_SIDE = 0.8;
+
+/** A lobbed orb has burst where it landed: if it has hops left, it flies on the same way, a spacing further, in `delay` seconds. */
+export function bounceLob(w: World, owner: Actor, pr: Projectile): void {
+  const spec = pr.profile.skill.bounces;
+  if (!spec || !pr.bouncesLeft) return;
+  const speed = Math.hypot(pr.vx, pr.vy) || 1;
+  const next = launch(w, owner, pr.profile, pr.hand, pr.x, pr.y, Math.atan2(pr.vy, pr.vx), {
+    hitIds: [],
+    aimId: pr.aimId,
+    range: spec.spacing,
+    explode: pr.explodeRadius,
+    pierce: 999,
+    kind: 'mortar',
+    speedMult: spec.spacing / spec.delay / speed,
+  });
+  next.bouncesLeft = pr.bouncesLeft - 1;
+}
+
 /** Aim angle of arrow `i` of an `n`-arrow fan (a symmetric fan of an even count is shifted by half a step, alternately). */
 function fan(base: number, i: number, n: number, step: number, tick: number): number {
   const centre = (n - 1) / 2 + (n % 2 === 0 ? (tick % 2 === 0 ? 0.5 : -0.5) : 0);
@@ -195,6 +215,26 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
       kind: 'nova',
       ring: n,
     });
+    return;
+  }
+  if (p.skill.bounces) {
+    // Orbs lobbed to the spot aimed at, one beside the other for each extra projectile; each bursts as it lands and hops on
+    // (`bounceLob`). The sheet repeats `LOB_SIDE` (src/calc/afterHit.ts).
+    const hops = Math.round(levelValue(p.skill.bounces.chains, p.skill.level));
+    for (let k = 0; k < n; k++) {
+      const side = k === 0 ? 0 : (k % 2 === 1 ? 1 : -1) * Math.ceil(k / 2) * LOB_SIDE;
+      const tx = act.aimX - Math.sin(base) * side;
+      const ty = act.aimY + Math.cos(base) * side;
+      const pr = launch(w, a, p, act.hand, a.x, a.y, Math.atan2(ty - a.y, tx - a.x), {
+        hitIds: [],
+        aimId: act.targetId,
+        range: Math.max(1, Math.hypot(tx - a.x, ty - a.y)),
+        explode,
+        pierce: 999,
+        kind: 'mortar',
+      });
+      pr.bouncesLeft = hops;
+    }
     return;
   }
   if (p.skill.mortar) {

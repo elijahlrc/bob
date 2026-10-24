@@ -813,7 +813,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       return base === null ? 1 : Math.max(1, base + db.sum('base', 'projectiles', baseCtx));
     })(),
     pierce: (beh.kind === 'projectile' ? (beh.pierce ?? 0) : 0) + db.sum('base', 'pierce', baseCtx),
-    chains: (beh.kind === 'chain' ? beh.chains : 0) + db.sum('base', 'chains', baseCtx),
+    chains:
+      (beh.kind === 'chain' ? beh.chains : beh.kind === 'projectile' ? (beh.chains ?? 0) : 0) +
+      db.sum('base', 'chains', baseCtx),
     radiusMult: Math.sqrt(aoeMult),
     projSpeedMult: db.mult('projectileSpeed', baseCtx),
     alwaysHit: db.flag('alwaysHit', baseCtx),
