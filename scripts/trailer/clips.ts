@@ -7,6 +7,7 @@ import type { Take, Page } from './capture';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { treeCamera } from './camera';
+import { fitView, zoomAt } from '../../src/ui/treeHit';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type Clip = {
@@ -158,8 +159,7 @@ export const CLIPS: Clip[] = [
   {
     name: 'tree3',
     viewport: UI,
-    css: `.tree-bar, .tree-help, .tree-legend { display: none !important; }
-      .tree-wrap .tooltip, svg.tree g.preview { display: none !important; }
+    css: `.tv-hud, .tv-ledger, .tv-look { display: none !important; }
       * { user-select: none !important; -webkit-user-select: none !important; }
       #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 400 44px/1 'Jacquard 24', Georgia, serif;
         color: #d98a3a; text-shadow: 0 2px 6px #000, 0 0 14px #000; pointer-events: none; }`,
@@ -183,27 +183,40 @@ export const CLIPS: Clip[] = [
       // The camera (scripts/trailer/camera.ts): one smooth zoom out from a part-way close view of the class start to the whole
       // build, the middle following what is lit. The view is driven the way a hand does it (a wheel step about the view's
       // top-left corner, then a drag), so the tree's own text and sizes follow the zoom.
-      const svg = (await t.page.locator('svg.tree').first().boundingBox())!;
-      const W = svg.width;
-      const H = svg.height;
+      // The tree is a canvas now (src/ui/TreeView.tsx): its view is the box's own `fit` and `home`, which are worked out here with the
+      // same pure functions (treeHit.ts), and followed from there, as the wheel and the drag change it.
+      const art = (await t.page.locator('canvas.tv-art').first().boundingBox())!;
+      const [W, H] = await t.page.evaluate(() => {
+        const w = document.querySelector('.tv') as HTMLElement;
+        return [Math.round(w.clientWidth), Math.round(w.clientHeight)];
+      });
       const N = 90;
       const cams = treeCamera(start, pts, W, H, N, {
         first: 0.2,
         around: 8,
         lead: 1,
         pace: 1.5,
+        frac: 0.8,
       });
+      // `home`: the start and the nodes lit so far, fitted with 450 tree units around them, never closer than 0.42.
+      const homeBox = [start, ...pts.slice(0, 3)];
+      const hb = {
+        minX: Math.min(...homeBox.map((q) => q[0])),
+        maxX: Math.max(...homeBox.map((q) => q[0])),
+        minY: Math.min(...homeBox.map((q) => q[1])),
+        maxY: Math.max(...homeBox.map((q) => q[1])),
+      };
+      const fv = fitView(hb, W, H, 450);
+      const hk = Math.min(0.42, Math.max(0.15, fv.k));
+      let cur = {
+        k: hk,
+        x: W / 2 - ((hb.minX + hb.maxX) / 2) * hk,
+        y: H / 2 - ((hb.minY + hb.maxY) / 2) * hk,
+      };
       const setView = async (k: number, cx: number, cy: number) => {
-        const cur = await t.page.evaluate(() => {
-          const g = document.querySelector('svg.tree g[transform^="translate("]')!;
-          const m = /translate\(([-\d.e]+) ([-\d.e]+)\) scale\(([-\d.e]+)\)/.exec(
-            g.getAttribute('transform')!,
-          )!;
-          return { x: +m[1], y: +m[2], k: +m[3] };
-        });
-        if (Math.abs(k / cur.k - 1) > 1e-6)
+        if (Math.abs(k / cur.k - 1) > 1e-6) {
           await t.page.evaluate((f: number) => {
-            const el = document.querySelector('svg.tree') as SVGElement;
+            const el = document.querySelector('canvas.tv-art') as HTMLElement;
             const r = el.getBoundingClientRect();
             el.dispatchEvent(
               new WheelEvent('wheel', {
@@ -215,18 +228,20 @@ export const CLIPS: Clip[] = [
               }),
             );
           }, k / cur.k);
-        // The zoom was about the top-left corner: the view's origin scaled with it.
-        const f = k / cur.k;
-        const dx = W / 2 - cx * k - cur.x * f;
-        const dy = H / 2 - cy * k - cur.y * f;
+          // The zoom is about the view's top-left corner: the view's origin scales with it.
+          cur = zoomAt(cur, k / cur.k, 0, 0);
+        }
+        const dx = W / 2 - cx * cur.k - cur.x;
+        const dy = H / 2 - cy * cur.k - cur.y;
         if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3) return;
-        const ox = svg.x + W / 2;
-        const oy = svg.y + H / 2;
+        const ox = art.x + W / 2;
+        const oy = art.y + H / 2;
         await t.page.mouse.move(ox, oy);
         await t.page.mouse.down();
         await t.page.mouse.move(ox + 20, oy); // past the drag threshold, so that the release is not a click
         await t.page.mouse.move(ox + dx, oy + dy, { steps: 2 });
         await t.page.mouse.up();
+        cur = { ...cur, x: cur.x + dx, y: cur.y + dy };
       };
       for (let i = 0; i < N; i++) {
         const { k, cx, cy, lit } = cams[i];
@@ -263,14 +278,12 @@ export const CLIPS: Clip[] = [
   {
     name: 'skills',
     viewport: UI,
-    // Only the body's row and the gem list, so the gem, its socket and the number that moves are all on screen at once. The gem
-    // and the socket it goes to are lit, and an arrow runs from one to the other, before the gem is placed.
+    // The gem in the bag, the empty socket and the number that moves (the damage medal) are all on screen at once. The gem and the
+    // socket it goes to are lit, and an arrow runs from one to the other, before the gem is placed.
     css: `
-      .socket-row:not([data-slot="body"]), .skill-summary.muted, .skills-help { display: none !important; }
-      .skill-summary { font-size: 1.25em; }
-      .skills .hint { font-size: 0.9em; color: #d9cdb4; }
-      .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; border-color: #d98a3a !important; }
-      .skill-summary.trailer-flash b, .skill-summary.trailer-flash .muted { color: #ffd27a !important; }
+      .sk-hint { display: none !important; }
+      .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; }
+      .sk-medal.trailer-flash b { color: #ffd27a !important; text-shadow: 0 0 14px #d98a3a !important; }
     `,
     async film(t) {
       await t.stage((S, c) => {
@@ -286,48 +299,36 @@ export const CLIPS: Clip[] = [
       });
       await tab(t, 'Skills');
       await t.page.waitForTimeout(200);
+      // Only the body armour's row (the Spire Trap's), so that the gem list under it is on screen too.
+      await t.page.evaluate(() => {
+        const grid = document.querySelector('.sk-grid');
+        if (!grid) return;
+        [...grid.children].forEach((e) => {
+          if (!/Grimsteel/.test(e.textContent ?? '')) (e as HTMLElement).style.display = 'none';
+        });
+      });
+      await t.page.waitForTimeout(100);
       // 2 s: the gem and the empty socket (0.4 s), both lit with the arrow between them (0.6 s), placed, the DPS up (1 s).
       for (let i = 0; i < 60; i++) {
-        if (i === 12)
-          await t.page.evaluate(() => {
-            const chip = document.querySelector('.gem-chip') as HTMLElement;
-            const slot = [...document.querySelectorAll('.socket.empty')].pop() as HTMLElement;
-            chip.classList.add('trailer-lit');
-            slot.classList.add('trailer-lit');
-            const a = chip.getBoundingClientRect();
-            const b = slot.getBoundingClientRect();
-            // In the phone layout the gem list is under the sockets: the arrow rises from the gem's top edge to the socket's
-            // bottom edge. Beside them (the wide layout) it runs from the gem's bottom to the socket's right side.
-            const rises = a.top > b.bottom;
-            const x1 = rises ? a.left + a.width * 0.8 : a.left + a.width * 0.25;
-            const y1 = rises ? a.top - 4 : a.bottom;
-            const x2 = rises ? b.left + b.width * 0.5 : b.right + 4;
-            const y2 = rises ? b.bottom + 6 : b.top + b.height / 2;
-            const ns = 'http://www.w3.org/2000/svg';
-            const svg = document.createElementNS(ns, 'svg');
-            svg.setAttribute('id', 'trailer-arrow');
-            svg.setAttribute(
-              'style',
-              'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:9999',
-            );
-            const path = rises
-              ? `M${x1} ${y1} C ${x1} ${y1 - 90}, ${x2} ${y2 + 90}, ${x2} ${y2 + 12}`
-              : `M${x1} ${y1} C ${x1} ${y2}, ${x2 + 80} ${y2}, ${x2} ${y2}`;
-            // The head is a fixed size in screen pixels (not a multiple of the stroke).
-            svg.innerHTML =
-              '<defs><marker id="ah" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="13" refY="8" orient="auto"><path d="M0 1 L15 8 L0 15 z" fill="#d98a3a"/></marker></defs>' +
-              `<path d="${path}" fill="none" stroke="#d98a3a" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#ah)"/>`;
-            document.body.appendChild(svg);
-          });
-        if (i === 30) {
-          await t.page.evaluate(() => document.getElementById('trailer-arrow')?.remove());
-          await t.page.click('.gem-chip:has-text("Wired Harm")');
-          await t.page.locator('.socket.empty').last().click();
+        if (i === 12) {
+          // The gem is picked up: the empty socket says so (with what the gem would add), and is lit.
+          await t.page.click('.sk-bagrow:has-text("Wired Harm")');
           await t.page.mouse.move(5, 470);
-          // The click scrolls the tab; the skill's line, with its DPS, is at the top.
           await t.page.evaluate(() => {
             document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0));
-            document.querySelector('.skill-summary')?.classList.add('trailer-flash');
+            [...document.querySelectorAll('.sk-name.sk-empty')]
+              .filter((e) => (e as HTMLElement).offsetParent)[0]
+              ?.closest('.sk-sock')
+              ?.classList.add('trailer-lit');
+          });
+        }
+        if (i === 30) {
+          await t.page.click('button:has-text("Socket in the best place")');
+          await t.page.mouse.move(5, 470);
+          // The click scrolls the tab; the damage medal is at the top.
+          await t.page.evaluate(() => {
+            document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0));
+            document.querySelector('.sk-medal')?.classList.add('trailer-flash');
           });
         }
         await t.still(1);
@@ -434,7 +435,7 @@ export const CLIPS: Clip[] = [
         if (i === 21)
           await t.page.evaluate(() => {
             const b = [...document.querySelectorAll('button')].find((x) =>
-              /^(Equip|Swap)/.test(x.textContent ?? ''),
+              /^(Equip|Swap|Wear)/.test(x.textContent ?? ''),
             );
             (b as HTMLElement | undefined)?.classList.add('trailer-press');
           });
@@ -454,9 +455,8 @@ export const CLIPS: Clip[] = [
             await t.page.waitForTimeout(100);
           }
           await t.page.evaluate(() => {
-            const slot = [...document.querySelectorAll('.ix-slot')].find(
-              (s) => s.querySelector('.ix-slot-name')?.textContent === 'Night Locket',
-            ) as HTMLElement | undefined;
+            const slot = document.querySelector('.ix-slot[aria-label$="Night Locket"]') as
+              HTMLElement | undefined;
             slot?.click();
             slot?.classList.add('trailer-lit');
           });
@@ -785,9 +785,8 @@ const VERTICAL = { w: 360, h: 640, phone: true, scale: Number(process.env.TRAILE
 /** CSS that sets the text of a vertical clip lower, clear of the feed apps' own buttons (the top 13 % of the frame; docs/trailer/VERTICAL.md). */
 const VERTICAL_CSS: Record<string, string> = {
   tree3: `#trailer-level { top: 100px !important; }`,
-  skills: `.skill-summary { margin-top: 60px !important; }`,
-  fall: `.boss-bars { top: 92px !important; } .boss-line { top: 27% !important; }`,
-  duel: `.hud-top { top: 90px !important; } .boss-bars { top: 92px !important; }
+  fall: `html.leaf .hud-head { top: 88px !important; }`,
+  duel: `html.leaf .hud-head { top: 88px !important; }
     .screen.summary { padding-top: 100px !important; }`,
 };
 const VERTICAL_ZOOM: Record<string, number> = {
@@ -821,7 +820,9 @@ CLIPS.push(
       viewport: VERTICAL,
       css:
         (c.css ?? '') +
-        (c.name === 'summary' ? `.screen.summary { padding-top: 100px !important; }` : '') +
+        (c.name === 'summary'
+          ? `.screen.summary { padding-top: 100px !important; } .screen.summary .sum-medals, .screen.summary .menu.row { display: none !important; }`
+          : '') +
         (VERTICAL_CSS[c.name] ?? ''),
     }),
   ),

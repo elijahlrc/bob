@@ -24,7 +24,15 @@ export function treeCamera(
   w: number,
   h: number,
   frames: number,
-  opts: { first: number; step?: number; around?: number; lead?: number; pace?: number } = {
+  opts: {
+    first: number;
+    step?: number;
+    around?: number;
+    lead?: number;
+    pace?: number;
+    /** How much of the view the finished build fills (default 0.92). */
+    frac?: number;
+  } = {
     first: 0.28,
   },
 ): Cam[] {
@@ -42,7 +50,7 @@ export function treeCamera(
   /** The zoom at which a box fills `frac` of the view. */
   const fit = (b: ReturnType<typeof box>, frac: number) =>
     frac * Math.min(w / (b.x1 - b.x0 + 2 * PAD), h / (b.y1 - b.y0 + 2 * PAD));
-  const k1 = fit(box(pts.length), 0.92);
+  const k1 = fit(box(pts.length), opts.frac ?? 0.92);
   const k0 = Math.max(opts.first, k1);
   const ks = Array.from({ length: frames }, (_, i) =>
     Math.exp(Math.log(k0) + (Math.log(k1) - Math.log(k0)) * smoothstep(i / (frames - 1))),
