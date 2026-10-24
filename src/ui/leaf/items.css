@@ -4,7 +4,7 @@
    with its housekeeping always at the foot. The doc: docs/mockups/style/STYLE-GUIDE.md sections 8 and 10. */
 
 html.leaf .ix {
-  grid-template-columns: 300px minmax(0, 1fr) 340px;
+  grid-template-columns: 320px minmax(0, 1fr) 340px;
   gap: 20px;
   padding: 16px 20px 28px;
   font-size: var(--size);
@@ -14,10 +14,11 @@ html.leaf .ix {
 html.leaf .ix-gear.ix-reliq {
   position: relative;
   display: block;
-  width: 300px;
+  /* The slots keep clear of the niche's rim and pearls (about 18 px in). */
+  width: 320px;
   height: 560px;
   margin: 0 auto;
-  padding: 84px 8px 0;
+  padding: 84px 18px 0;
   box-sizing: border-box;
 }
 html.leaf .ix-doll {
@@ -389,13 +390,15 @@ html.leaf .ix-hinge i:first-child {
 html.leaf .ix-hinge i:last-child {
   bottom: 50px;
 }
-/* A leaf's caption ("New", "Worn: Main hand") sits on the gold above it, dark, like the camp's headings. */
+/* A leaf's caption ("New", "Worn: Main hand") is a small plaque above it, apart from the card: not a property of the item. */
 html.leaf .ix-cap {
-  padding: 0 4px 6px;
-  font: 400 24px/1 var(--title-font);
+  align-self: flex-start;
+  margin-bottom: 6px;
+  padding: 6px 16px 7px;
+  font: 400 22px/1 var(--title-font);
   font-size-adjust: none;
-  color: var(--ink);
-  text-shadow: 0 2px 0 #e2c68166;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
 }
 /* The sockets and the gems a swap moves */
 html.leaf .ix-sockets {
@@ -811,7 +814,7 @@ html.leaf .clean-group {
     display: none;
   }
   html.leaf .ix {
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
     grid-template-areas:
       'gear detail'
       'list detail';
@@ -820,11 +823,6 @@ html.leaf .clean-group {
 
 /* ---- A phone: the gear folded into one line, the bag, the selection as a sheet above the camp bar ---- */
 @media (max-width: 600px) {
-  /* The sheet is lapis: the leaves' captions are light on it. */
-  html.leaf .ix-cap {
-    color: var(--gold-hi);
-    text-shadow: var(--text-shadow);
-  }
   /* Smaller type on a phone: the cards and the compare need the room. */
   html.leaf .ix {
     --size: 15px;

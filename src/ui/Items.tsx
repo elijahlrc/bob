@@ -138,6 +138,11 @@ export function Items({
     }),
     [run.inventory, run.discarded, rev, infos, unseen, lastDrops, favs],
   );
+  // Opened on the upgrades after a level: with none, the last map's drops (or everything) instead of an empty list.
+  useEffect(() => {
+    if (startView === 'upgrades' && view === 'upgrades' && counts.upgrades === 0)
+      setView(counts.last ? 'last' : 'all');
+  }, []);
   const q = search.trim().toLowerCase();
   const visible = useMemo(() => {
     let pool: InventoryItem[] = view === 'discarded' ? pile : run.inventory;

@@ -162,7 +162,9 @@ function Pair({
     <div class="ix-pair">
       {/* What each leaf is to you sits on the gold above it: not a property of the item. */}
       <div class="ix-side">
-        <div class="ix-cap">{fresh}</div>
+        <div class="ix-cap" data-paint="panel" data-thin>
+          {fresh}
+        </div>
         <div class="ix-leaf" data-paint="panel">
           <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
         </div>
@@ -172,7 +174,9 @@ function Pair({
         <i data-paint="chain" />
       </span>
       <div class="ix-side">
-        <div class="ix-cap">{empty}</div>
+        <div class="ix-cap" data-paint="panel" data-thin>
+          {empty}
+        </div>
         <div class="ix-leaf" data-paint="panel">
           {against ? (
             <ItemCard it={against} marks={lineMarks(against, item, 'old')} />

@@ -202,9 +202,9 @@ export function Camp({ c }: { c: Controller }) {
     if (run.reward || hasDrops) return 'items';
     return nextStep('items', passivePoints(run));
   });
-  // The Items tab shows the last map's drops the first time it is opened after a map (when it dropped anything), then
-  // the player's own view again.
-  const [showDrops, setShowDrops] = useState(hasDrops);
+  // The Items tab shows the upgrades the first time it is opened after a map (the drops when there are none), then the
+  // player's own view again.
+  const [showDrops, setShowDrops] = useState(fromMap);
   // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems"), for that visit only.
   const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
   const setTab = (t: Tab) => {
@@ -498,7 +498,7 @@ export function Camp({ c }: { c: Controller }) {
                 setGemSlot(slot);
                 setTab('skills');
               }}
-              startView={showDrops ? 'last' : undefined}
+              startView={showDrops ? 'upgrades' : undefined}
             />
           )}
           {shown === 'workbench' && CRAFTING_OPEN && (
