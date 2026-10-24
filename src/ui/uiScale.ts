@@ -7,6 +7,9 @@ import { loadPref, savePref } from './prefs';
  * browser scales that up to fill the screen. Everything in the page stays in one coordinate space (window size, pointer
  * positions, media queries, the map canvas), so no other code has to know. Desktop browsers ignore the tag; there the
  * browser's own zoom does this job.
+ *
+ * Inside an iframe (the itch.io page) the tag does nothing, so there the interface layer is zoomed with CSS instead (the
+ * map keeps its own zoom). Code that turns window or pointer positions into interface pixels divides by `uiZoom()`.
  */
 export const UI_SCALES = [0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3] as const;
 
@@ -53,7 +56,28 @@ export function offeredScales(): number[] {
   return scalesFor(deviceWidths().portrait);
 }
 
+/** Whether the game runs inside another page (the itch.io embed), where the viewport tag is ignored. */
+function embedded(): boolean {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+/** The CSS zoom of the interface layer: the scale inside an iframe, 1 everywhere else. */
+export function uiZoom(): number {
+  return typeof window !== 'undefined' && embedded() ? uiScale() : 1;
+}
+
 function apply(): void {
+  if (embedded()) {
+    const ui = document.getElementById('ui');
+    const z = uiZoom();
+    if (ui) ui.style.zoom = z === 1 ? '' : String(z);
+    window.dispatchEvent(new Event('resize'));
+    return;
+  }
   const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
   if (!meta) return;
   const content = viewportContent(deviceWidths().current, uiScale());

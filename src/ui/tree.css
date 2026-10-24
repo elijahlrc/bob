@@ -127,12 +127,32 @@
   display: flex;
   gap: 8px;
 }
-.tv-zoom .btn.small {
+/* `html.leaf` to outweigh the Gold Leaf button padding, which would leave the glyphs no room to centre. */
+html.leaf .tv-zoom .btn.small {
+  display: grid;
+  place-items: center;
   width: 44px;
   height: 44px;
   padding: 0;
   color: var(--gold-hi);
   font-size: 20px;
+}
+/* The Centre button's target, drawn (the fonts have no ◎, and a fallback glyph sits off centre). */
+.tv-home {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.tv-home::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: currentColor;
 }
 .tv-sumbtn {
   left: 12px;

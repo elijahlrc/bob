@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { uiZoom } from './uiScale';
 import { isCoarse } from './device';
 
 /**
@@ -72,9 +73,12 @@ export function InfoLayer() {
     };
   }, []);
   if (!o) return null;
-  const w = Math.min(280, window.innerWidth - 16);
-  const left = Math.max(8, Math.min(window.innerWidth - w - 8, o.x - w / 2));
-  const above = o.y > 120;
+  // Window and element positions in interface pixels (the layer is zoomed inside an iframe, uiScale.ts).
+  const z = uiZoom();
+  const [W, H, x, y] = [window.innerWidth / z, window.innerHeight / z, o.x / z, o.y / z];
+  const w = Math.min(280, W - 16);
+  const left = Math.max(8, Math.min(W - w - 8, x - w / 2));
+  const above = y > 120;
   return (
     <div
       class="info-pop"
@@ -83,7 +87,7 @@ export function InfoLayer() {
       style={{
         left: `${left}px`,
         width: `${w}px`,
-        ...(above ? { bottom: `${window.innerHeight - o.y + 8}px` } : { top: `${o.y + 40}px` }),
+        ...(above ? { bottom: `${H - y + 8}px` } : { top: `${y + 40}px` }),
       }}
     >
       {o.text}

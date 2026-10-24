@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { uiZoom } from './uiScale';
 
 /**
  * How the UI adapts to the screen (docs/MOBILE.md 3.1). Layout follows the width, input follows the pointer: a
@@ -26,8 +27,10 @@ export const isCoarse = (): boolean => matches('(pointer: coarse)');
 
 /** The current viewport. Reads the window once; use `useViewport` in components. */
 export function viewport(): Viewport {
-  const width = typeof window === 'undefined' ? 1280 : window.innerWidth;
-  const height = typeof window === 'undefined' ? 800 : window.innerHeight;
+  // In interface pixels: inside an iframe the interface layer is zoomed (uiScale.ts).
+  const z = uiZoom();
+  const width = typeof window === 'undefined' ? 1280 : window.innerWidth / z;
+  const height = typeof window === 'undefined' ? 800 : window.innerHeight / z;
   return { width, height, layout: layoutFor(width), coarse: isCoarse() };
 }
 

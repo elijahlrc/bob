@@ -688,7 +688,7 @@ export function TreeView({ c }: { c: Controller }) {
             {...infoProps('Centre on your passives')}
             onClick={home}
           >
-            ◎
+            <span class="tv-home" />
           </button>
         </div>
         {phone && (

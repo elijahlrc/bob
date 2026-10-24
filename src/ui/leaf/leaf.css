@@ -103,6 +103,13 @@ html.leaf .camp .tabs {
   box-shadow: 0 2px 0 var(--ink);
   overflow: visible;
 }
+/* Clear of a notch or camera on a touch screen, and far enough from the edge to tap. The safe-area inset reads 0 inside an
+   iframe (the itch.io page), so the room is there regardless. */
+@media (pointer: coarse) {
+  html.leaf .camp .tabs {
+    padding-top: max(26px, calc(8px + var(--safe-top, 0px)));
+  }
+}
 html.leaf .camp .tabs::after {
   content: '';
   position: absolute;
