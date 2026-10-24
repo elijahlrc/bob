@@ -237,12 +237,6 @@ textarea {
     0 0 3px #000,
     0 1px 0 #000;
 }
-.flask-tag {
-  font-size: 10px;
-  line-height: 12px;
-  color: var(--muted);
-  text-shadow: 0 1px 1px #000;
-}
 .flask-fill {
   position: absolute;
   left: 0;
@@ -384,19 +378,6 @@ textarea {
   overflow: auto;
   position: relative;
 }
-.tree-wrap {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-}
-.tree-bar {
-  display: flex;
-  gap: 16px;
-  padding: 6px 10px;
-  font-size: 13px;
-  flex-wrap: wrap;
-}
 svg.tree {
   flex: 1;
   width: 100%;
@@ -415,37 +396,11 @@ svg.tree {
   max-width: 320px;
   font-size: 13px;
 }
-.tt-name {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.tt-name.notable {
-  color: var(--hi);
-}
-.tt-name.keystone {
-  color: #c090ff;
-}
-.tt-mod {
-  color: #9ab8ff;
-}
-.tt-hint {
-  margin-top: 6px;
-  color: var(--muted);
-}
 .skills {
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-.socket-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.socket-item {
-  width: 160px;
 }
 .socket {
   display: flex;
@@ -633,23 +588,6 @@ span.save-name {
   border: 1px solid var(--accent);
   border-radius: var(--radius);
 }
-.reward .inv-item {
-  background: var(--panel);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius);
-  padding: 6px 8px;
-  min-height: var(--tap, 0px);
-  text-align: left;
-  font-size: 13px;
-  cursor: pointer;
-  overflow: hidden;
-}
-.reward .inv-item:hover {
-  background: var(--btn-h);
-}
-.reward .inv-item.sel {
-  outline: 2px solid var(--hi);
-}
 .reward-preview {
   margin-top: 4px;
 }
@@ -664,9 +602,6 @@ span.save-name {
 }
 .items-reward .reward .notice {
   flex-basis: 100%;
-}
-.items-reward .reward .inv-item {
-  flex: 1 1 140px;
 }
 .items-reward .reward .reward-preview {
   flex-basis: 100%;
@@ -703,11 +638,6 @@ span.save-name {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.row-badges {
-  display: flex;
-  gap: 4px;
-  justify-content: flex-end;
-}
 .badge {
   font-size: 11px;
   border-radius: 8px;
@@ -726,15 +656,6 @@ span.save-name {
 .badge.neutral {
   color: #999;
 }
-.new-tag {
-  font-size: 10px;
-  font-weight: bold;
-  background: var(--hi);
-  color: #111;
-  border-radius: 3px;
-  padding: 0 4px;
-  margin-right: 6px;
-}
 .cmp-title {
   font-size: 11px;
   margin-bottom: 2px;
@@ -746,21 +667,6 @@ span.save-name {
 .btn.primary {
   background: var(--accent-d);
   border-color: var(--accent);
-}
-/* Skills / sockets */
-.skills-wrap {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  padding: 16px;
-}
-.skills-wrap .skills {
-  flex: 1 1 420px;
-  padding: 0;
-}
-.skill-summary {
-  font-size: 15px;
 }
 .gem-inv {
   flex: 0 0 280px;
@@ -909,19 +815,6 @@ select option {
     inset 0 0 14px #000,
     0 0 12px #000a;
 }
-.orb-fill {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  transition: height 0.15s;
-}
-.orb.life .orb-fill {
-  background: radial-gradient(circle at 35% 30%, #ff6a5a 0%, #c01820 45%, #5a0810 100%);
-}
-.orb.mana .orb-fill {
-  background: radial-gradient(circle at 35% 30%, #7aa0ff 0%, #2a48c8 45%, #0e1a5a 100%);
-}
 /* Reserved by auras: a locked band across the top of the orb. */
 .orb-reserved {
   position: absolute;
@@ -940,12 +833,6 @@ select option {
   bottom: 0;
   background: rgba(140, 200, 255, 0.35);
   border-top: 1px solid #bfe8ff;
-}
-.orb-gloss {
-  position: absolute;
-  inset: 4px 10px 50% 10px;
-  border-radius: 50%;
-  background: linear-gradient(#ffffff55, #ffffff00);
 }
 .orb-text {
   position: absolute;
@@ -1440,22 +1327,6 @@ select option {
 .look-shape {
   padding: 0.25em 0.5em;
 }
-
-/* ---- Inventory tools: favourites, the New list and Clean up (docs/MOBILE.md 3.8) ---- */
-.row-star {
-  display: inline-block;
-  min-width: 1.2em;
-  margin-right: 4px;
-  text-align: center;
-  color: #6a6a6a;
-  cursor: pointer;
-}
-.row-star.on {
-  color: var(--hi);
-}
-.row-star:hover {
-  color: var(--hi);
-}
 .modal {
   position: fixed;
   inset: 0;
@@ -1588,35 +1459,6 @@ select option {
 .debug-table td:first-child {
   text-align: left;
 }
-/* What an offered map pays: the same cells on every card, to read across, two to a row. */
-.offer-table {
-  width: 100%;
-  margin: 4px 0;
-  border-collapse: collapse;
-  font-size: 12px;
-}
-.offer-table th,
-.offer-table td {
-  padding: 1px 0;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-.offer-table th {
-  color: var(--muted);
-  font-weight: normal;
-  text-align: left;
-  padding-right: 8px;
-}
-.offer-table td {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-.offer-table td + th {
-  padding-left: 10px;
-}
-.offer-table .gain {
-  color: #8fd48a;
-}
 
 /* Who is on an offered map (docs/ENEMIES.md 5.1). */
 .offer-info {
@@ -1654,9 +1496,6 @@ select option {
 .offer-info .mixbar span {
   display: block;
   height: 100%;
-}
-.offer-info .weak {
-  color: #e8d070;
 }
 .offer-info .gate {
   color: #ffb070;
@@ -1844,16 +1683,6 @@ select option {
   letter-spacing: 0.35em;
   text-transform: uppercase;
 }
-.boss-offer-map {
-  letter-spacing: 0.08em;
-  color: #e8b890;
-}
-.boss-offer-body {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  padding: 10px 14px 0;
-}
 .boss-portrait {
   flex: 0 0 auto;
   width: 150px;
@@ -1864,10 +1693,6 @@ select option {
   background: radial-gradient(circle at 50% 80%, rgba(255, 120, 60, 0.25), transparent 65%);
   border-bottom: 2px solid #5a1a10;
 }
-.boss-offer-text {
-  flex: 1 1 auto;
-  min-width: 0;
-}
 .boss-offer-name {
   font-size: 26px;
   line-height: 1.1;
@@ -1875,12 +1700,6 @@ select option {
   text-shadow:
     0 0 10px rgba(255, 90, 40, 0.6),
     0 2px 2px #000;
-}
-.boss-offer-map-info {
-  margin: 10px 14px 0;
-  padding-top: 8px;
-  border-top: 1px solid #4a1a12;
-  font-size: 13px;
 }
 .boss-offer-way {
   margin-bottom: 6px;
@@ -1900,10 +1719,6 @@ select option {
   background: linear-gradient(#d8502a, #8a2414);
 }
 @media (max-width: 640px) {
-  .boss-offer-body {
-    flex-direction: column;
-    align-items: center;
-  }
   .boss-portrait {
     width: 120px;
     height: 120px;
