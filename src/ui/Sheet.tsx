@@ -1,6 +1,7 @@
+import { toChildArray, type ComponentChildren } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
-import { statTotals, type StatTotal } from '../calc/statTotals';
+import { statTotals, type StatTotal, type TotalSection } from '../calc/statTotals';
 import { HEXES, hexText } from '../data/hexes';
 import { modLabel } from '../mods/text';
 
@@ -57,27 +58,42 @@ const titled = (s: string) =>
     )
     .join(' ');
 
-function Totals({ list }: { list: StatTotal[] }) {
-  if (list.length === 0) return null;
+const totalRow = (t: StatTotal) => (
+  <Row key={modLabel(t.mod)} label={titled(modLabel(t.mod))} value={times(t.mult)} />
+);
+
+/** One section of a column: a small heading and its rows; nothing at all when it has no rows. */
+function Section({ title, children }: { title: string; children: ComponentChildren }) {
+  const rows = toChildArray(children);
+  if (rows.length === 0) return null;
   return (
-    <div class="cs-totals">
-      {list.map((t) => (
-        <Row key={modLabel(t.mod)} label={titled(modLabel(t.mod))} value={times(t.mult)} />
-      ))}
-    </div>
+    <section class="cs-section">
+      <h4>{title}</h4>
+      {rows}
+    </section>
   );
 }
 
 /**
  * The Character tab (DESIGN.md Appendix A, 2026-10-23): the character's own numbers across the top, then defence on the left and
- * offence on the right, each as what it is worth (armour as physical damage taken off, evasion as the chance to evade) and the
- * character's modifiers summed per stat. The estimates worked out from all of it come last.
+ * offence on the right in sections, each stat as what it is worth (armour as physical damage taken off, evasion as the chance
+ * to evade) beside the character's modifiers to it, summed per line. The estimates worked out from all of it come last.
  */
 export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   const totals = useMemo(() => statTotals(ch.db, ch.configConds, ch.statValue), [ch]);
   const mit = useMemo(() => ch.mitigation(), [ch]);
-  const of = (g: StatTotal['group']) => totals.filter((t) => t.group === g);
-  const move = totals.find((t) => t.mod.stat === 'moveSpeed' && !t.mod.condition);
+  const of = (id: TotalSection) => totals.filter((t) => t.section === id);
+  /** The plain line of a stat (no tags, no condition), which sits beside what the stat is worth. */
+  const plain = (list: StatTotal[], stat: string) =>
+    list.find((t) => t.mod.stat === stat && !t.mod.tags && !t.mod.condition);
+  const defence = of('armour');
+  const armour = plain(defence, 'armour');
+  const evasion = plain(defence, 'evasion');
+  const recovery = of('recovery');
+  const lifeRate = plain(recovery, 'lifeRegen');
+  const manaRate = plain(recovery, 'manaRegen');
+  const other = of('other');
+  const move = plain(other, 'moveSpeed');
   const sc = s.scenarios;
   const big = (label: string, value: number, of?: number) => (
     <div class="cs-big">
@@ -102,43 +118,68 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
       </div>
       <div class="cs-cols">
         <div class="cs-col">
-          <Row
-            label="Physical Damage Reduction"
-            value={pct(mit.physReduction)}
-            raw={`${f0(s.armour)} armour`}
-          />
-          <Row
-            label="Chance to Evade Attacks"
-            value={pct(mit.evade)}
-            raw={`${f0(s.evasion)} evasion`}
-          />
-          <Row label="Chance to Block Attacks" value={pct(s.blockAttack)} />
-          <Row label="Chance to Block Spells" value={pct(s.blockSpell)} />
-          <div class="cs-res">
-            {RES.map(([i, name, cls]) => (
-              <div key={cls} class={`cs-res-${cls}`}>
-                <span>{name}</span>
-                <b class={s.res[i] < s.maxRes[i] ? 'cs-under' : ''}>{s.res[i]}%</b>
-                <span class="cs-raw">max {s.maxRes[i]}%</span>
-              </div>
-            ))}
-          </div>
-          <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} />
-          <Row label="Mana Regeneration" value={`${f1(s.manaRegen)}/s`} />
-          <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} />
-          <Totals list={of('defence')} />
+          <Section title="Life and Mana">{of('pools').map(totalRow)}</Section>
+          <Section title="Armour and Evasion">
+            <Row
+              label="Physical Damage Reduction"
+              value={pct(mit.physReduction)}
+              raw={`${f0(s.armour)} armour`}
+            />
+            {armour && totalRow(armour)}
+            <Row
+              label="Chance to Evade Attacks"
+              value={pct(mit.evade)}
+              raw={`${f0(s.evasion)} evasion`}
+            />
+            {evasion && totalRow(evasion)}
+            {defence.filter((t) => t !== armour && t !== evasion).map(totalRow)}
+          </Section>
+          <Section title="Block and Stun">
+            <Row label="Chance to Block Attacks" value={pct(s.blockAttack)} />
+            <Row label="Chance to Block Spells" value={pct(s.blockSpell)} />
+            <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} />
+            {of('block').map(totalRow)}
+          </Section>
+          <Section title="Resistances">
+            <div class="cs-res">
+              {RES.map(([i, name, cls]) => (
+                <div key={cls} class={`cs-res-${cls}`}>
+                  <span>{name}</span>
+                  <b class={s.res[i] < s.maxRes[i] ? 'cs-under' : ''}>{s.res[i]}%</b>
+                  <span class="cs-raw">max {s.maxRes[i]}%</span>
+                </div>
+              ))}
+            </div>
+            {of('defenceOther').map(totalRow)}
+          </Section>
+          <Section title="Recovery">
+            <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} />
+            {lifeRate && totalRow(lifeRate)}
+            <Row label="Mana Regeneration" value={`${f1(s.manaRegen)}/s`} />
+            {manaRate && totalRow(manaRate)}
+            {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
+          </Section>
         </div>
         <div class="cs-col">
-          <Totals list={of('offence')} />
-          {s.hexes.map((h) => (
-            <Row key={h.id} label={HEXES[h.id].name} value={hexText(h.id, h.effect)} />
-          ))}
-          <Row
-            label="Movement Speed"
-            value={`${f1(s.moveSpeed)} tiles/s`}
-            raw={times(move?.mult ?? 1)}
-          />
-          <Totals list={of('other').filter((t) => t !== move)} />
+          <Section title="Damage">{of('damage').map(totalRow)}</Section>
+          <Section title="Speed">{of('speed').map(totalRow)}</Section>
+          <Section title="Critical Strikes">{of('crit').map(totalRow)}</Section>
+          <Section title="Area and Projectiles">{of('reach').map(totalRow)}</Section>
+          <Section title="Ailments">{of('ailments').map(totalRow)}</Section>
+          <Section title="Hexes">
+            {s.hexes.map((h) => (
+              <Row key={h.id} label={HEXES[h.id].name} value={hexText(h.id, h.effect)} />
+            ))}
+          </Section>
+          <Section title="Minions, Totems and Effects">{of('offenceOther').map(totalRow)}</Section>
+          <Section title="Movement and More">
+            <Row
+              label="Movement Speed"
+              value={`${f1(s.moveSpeed)} tiles/s`}
+              raw={times(move?.mult ?? 1)}
+            />
+            {other.filter((t) => t !== move).map(totalRow)}
+          </Section>
         </div>
       </div>
       {s.warnings.map((w) => (

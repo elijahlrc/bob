@@ -22,7 +22,7 @@ describe('the modifier totals of the Character tab', () => {
     ]);
     const as = t.find((x) => x.mod.stat === 'attackSpeed')!;
     expect(as.mult).toBeCloseTo(1.5 * 1.1 * 1.1);
-    expect(as.group).toBe('offence');
+    expect(as.section).toBe('speed');
   });
 
   it('shows the fixed lines in their order at ×1 when nothing touches them, and keeps lines apart by type and tags', () => {
@@ -36,7 +36,7 @@ describe('the modifier totals of the Character tab', () => {
       { stat: 'life', kind: 'inc', value: -50 },
     ]);
     expect(t.map((x) => x.mod.stat)).toEqual(none.map((x) => x.mod.stat));
-    const off = t.filter((x) => x.group === 'offence').map((x) => x.mult);
+    const off = t.filter((x) => x.section === 'damage').map((x) => x.mult);
     expect(off.slice(0, 6)).toEqual([1, 1, 1.4, 1.2, 1, 1.8]);
     expect(t.find((x) => x.mod.stat === 'life')!.mult).toBe(0.5);
   });
@@ -47,11 +47,11 @@ describe('the modifier totals of the Character tab', () => {
       { stat: 'attackSpeed', kind: 'inc', value: 10, tags: ['bow'] },
       { stat: 'attackSpeed', kind: 'inc', value: -10, tags: ['bow'] },
     ]);
-    const off = t.filter((x) => x.group === 'offence');
-    const wand = off.findIndex((x) => x.mod.tags?.includes('wand'));
-    expect(off[wand - 1].mod.tags).toEqual(['dot']);
-    expect(off[wand + 1].mod.stat).toBe('attackSpeed');
-    expect(off[wand].mult).toBeCloseTo(1.12);
+    const wand = t.findIndex((x) => x.mod.tags?.includes('wand'));
+    expect(t[wand].section).toBe('damage');
+    expect(t[wand - 1].mod.tags).toEqual(['dot']);
+    expect(t[wand + 1].mod.stat).toBe('attackSpeed');
+    expect(t[wand].mult).toBeCloseTo(1.12);
     expect(t.some((x) => x.mod.tags?.includes('bow'))).toBe(false);
   });
 

@@ -53,6 +53,17 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 0 32px;
 }
+/* A section of a column: a small heading over its rows, the same space above every one. */
+.cs-section + .cs-section {
+  margin-top: 16px;
+}
+.cs-section h4 {
+  margin: 0 0 4px;
+  font-family: var(--title-font);
+  font-weight: normal;
+  font-size: 19px;
+  color: var(--accent);
+}
 .cs-row {
   display: flex;
   justify-content: space-between;
@@ -71,7 +82,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  margin: 10px 0;
+  margin: 4px 0;
 }
 .cs-res > div {
   display: flex;
@@ -132,5 +143,8 @@
   }
   .cs-cols {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .cs-cols > .cs-col + .cs-col {
+    margin-top: 16px;
   }
 }

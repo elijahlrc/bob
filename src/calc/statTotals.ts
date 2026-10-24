@@ -9,62 +9,89 @@ import {
   type StatId,
 } from '../mods/types';
 
-/** Where a total sits on the Character tab. */
-export type TotalGroup = 'offence' | 'defence' | 'other';
+/** The section of the Character tab a total sits in, in the order the tab shows them. */
+export const TOTAL_SECTIONS = [
+  'pools',
+  'armour',
+  'block',
+  'recovery',
+  'defenceOther',
+  'damage',
+  'speed',
+  'crit',
+  'reach',
+  'ailments',
+  'offenceOther',
+  'other',
+] as const;
+export type TotalSection = (typeof TOTAL_SECTIONS)[number];
 
 /**
  * One stat's increases and more multipliers added up over the whole character: `mod` stands for the line (its stat, damage
  * types, tags and condition), `mult` is what they multiply the stat by together (1 for a line nothing touches).
  */
-export type StatTotal = { group: TotalGroup; mod: Mod; mult: number };
+export type StatTotal = { section: TotalSection; mod: Mod; mult: number };
 
 type Line = { stat: StatId; damageTypes?: DamageType[]; tags?: SkillTag[] };
 
 /**
- * The lines every character shows, in the order shown, whether anything touches them or not. Within a group a line the build
- * has that is not here (damage with a weapon kind, a conditional line) follows the last fixed line of its stat.
+ * Each section's stats (a line of any of them that the build has lands there; the first section that matches wins) and its
+ * fixed lines, shown in this order whether anything touches them or not. A line the build has that is not fixed (damage with a
+ * weapon kind, a conditional line) follows the last fixed line of its stat, or ends its section.
  */
-const FIXED: Record<Exclude<TotalGroup, 'other'>, Line[]> = {
-  defence: [
-    { stat: 'life' },
-    { stat: 'es' },
-    { stat: 'mana' },
-    { stat: 'armour' },
-    { stat: 'evasion' },
-    { stat: 'lifeRegen' },
-    { stat: 'manaRegen' },
-    { stat: 'esRechargeRate' },
-  ],
-  offence: [
-    { stat: 'damage' },
-    { stat: 'damage', tags: ['attack'] },
-    { stat: 'damage', tags: ['spell'] },
-    { stat: 'damage', damageTypes: ['physical'] },
-    { stat: 'damage', damageTypes: ['cold', 'fire', 'lightning'] },
-    { stat: 'damage', damageTypes: ['fire'] },
-    { stat: 'damage', damageTypes: ['cold'] },
-    { stat: 'damage', damageTypes: ['lightning'] },
-    { stat: 'damage', damageTypes: ['chaos'] },
-    { stat: 'damage', tags: ['dot'] },
-    { stat: 'attackSpeed' },
-    { stat: 'castSpeed' },
-    { stat: 'critChance' },
-    { stat: 'aoe' },
-    { stat: 'projectileSpeed' },
-    { stat: 'skillDuration' },
-  ],
+const SECTIONS: Record<TotalSection, { stats: RegExp; fixed: Line[] }> = {
+  pools: { stats: /^(life|es|mana)$/, fixed: [{ stat: 'life' }, { stat: 'es' }, { stat: 'mana' }] },
+  armour: {
+    stats: /^(armour|evasion|globalDefences|physReduction|shieldDefences)$/,
+    fixed: [{ stat: 'armour' }, { stat: 'evasion' }],
+  },
+  block: { stats: /^(block|stunThreshold|avoid)/, fixed: [] },
+  recovery: {
+    stats: /^(lifeRegen|manaRegen|esRecharge|leech|recover|lifeOn|manaOn|flask)/,
+    fixed: [{ stat: 'lifeRegen' }, { stat: 'manaRegen' }, { stat: 'esRechargeRate' }],
+  },
+  defenceOther: {
+    stats: /^(resist|maxResist|damageTaken|hitTaken|ailmentThreshold|curseEffectOnSelf|shield)/,
+    fixed: [],
+  },
+  damage: {
+    stats: /^(damage|minDamage|maxDamage|pen)/,
+    fixed: [
+      { stat: 'damage' },
+      { stat: 'damage', tags: ['attack'] },
+      { stat: 'damage', tags: ['spell'] },
+      { stat: 'damage', damageTypes: ['physical'] },
+      { stat: 'damage', damageTypes: ['cold', 'fire', 'lightning'] },
+      { stat: 'damage', damageTypes: ['fire'] },
+      { stat: 'damage', damageTypes: ['cold'] },
+      { stat: 'damage', damageTypes: ['lightning'] },
+      { stat: 'damage', damageTypes: ['chaos'] },
+      { stat: 'damage', tags: ['dot'] },
+    ],
+  },
+  speed: {
+    stats: /^(attackSpeed|castSpeed|actionSpeed|cooldownRecovery)$/,
+    fixed: [{ stat: 'attackSpeed' }, { stat: 'castSpeed' }],
+  },
+  crit: { stats: /^(crit|accuracy)/, fixed: [{ stat: 'critChance' }] },
+  reach: {
+    stats: /^(aoe|projectile|skillDuration|chain|pierce|fork|buffDuration)/,
+    fixed: [{ stat: 'aoe' }, { stat: 'projectileSpeed' }, { stat: 'skillDuration' }],
+  },
+  ailments: {
+    stats:
+      /^(chance|duration|effect|ignite|bleed|poison|ailment|impale|stunDamage|stunDuration|dot)/,
+    fixed: [],
+  },
+  offenceOther: {
+    stats: /^(minion|trap|mine|totem|curseEffect$|warcryEffect|auraEffect)/,
+    fixed: [],
+  },
+  other: { stats: /./, fixed: [] },
 };
 
-const DEFENCE =
-  /^(life|mana|es|armour|evasion|block|resist|maxResist|lifeRegen|manaRegen|esRecharge|leech|recover|damageTaken|hitTaken|stun|avoid|flask|physReduction|ailmentThreshold|lifeOn|manaOn|globalDefences|shield)/;
-const OFFENCE =
-  /^(damage|minDamage|maxDamage|attackSpeed|castSpeed|crit|accuracy|aoe|projectile|pen|ignite|bleed|poison|chance|duration|effect|dot|minion|skillDuration|cooldown|trap|mine|totem|ailment|impale|chain|pierce|fork|curseEffect$|stunDamage|stunDuration)/;
-
-function groupOf(stat: StatId): TotalGroup {
-  if (DEFENCE.test(stat)) return 'defence';
-  if (OFFENCE.test(stat)) return 'offence';
-  return 'other';
-}
+const sectionOf = (stat: StatId): TotalSection =>
+  TOTAL_SECTIONS.find((id) => SECTIONS[id].stats.test(stat)) ?? 'other';
 
 const keyOf = (l: Line, condition?: Condition) =>
   [
@@ -78,8 +105,8 @@ const keyOf = (l: Line, condition?: Condition) =>
  * The character's increased and more modifiers, summed per line (DESIGN.md Appendix A, 2026-10-23): increases add, more
  * multipliers multiply, and the two together give one multiplier per line. A condition the sheet takes to hold (an aura, a buff
  * counted as up) is dropped from the line; one it does not stays on it. Local item mods (already in the item's own numbers) are
- * left out. The fixed lines come in their order, at ×1 when nothing touches them; the build's other lines follow their stat
- * (those of a stat with no fixed line at the end of the group), and are dropped when they come to nothing.
+ * left out. Lines come by section; the fixed lines in their order, at ×1 when nothing touches them; the build's other lines
+ * follow their stat (or end their section), and are dropped when they come to nothing.
  */
 export function statTotals(
   db: ModDB,
@@ -94,7 +121,7 @@ export function statTotals(
       lines.set(key, (got = { mod: { ...l, kind: 'inc', value: 0, condition }, inc: 0, more: 1 }));
     return got;
   };
-  for (const g of Object.values(FIXED)) for (const l of g) lineOf(l);
+  for (const id of TOTAL_SECTIONS) for (const l of SECTIONS[id].fixed) lineOf(l);
   for (const m of db.mods()) {
     if ((m.kind !== 'inc' && m.kind !== 'more') || m.local) continue;
     let condition: Condition | undefined;
@@ -116,23 +143,27 @@ export function statTotals(
     if (m.kind === 'inc') l.inc += value;
     else l.more *= 1 + value / 100;
   }
+  // A line's place: its section, then its fixed line's index, or the last fixed index of its stat, or the section's end.
   const fixedAt = new Map<string, number>();
-  const statAt = new Map<StatId, number>();
-  for (const g of Object.values(FIXED))
-    g.forEach((l, i) => {
-      fixedAt.set(keyOf(l), i);
-      statAt.set(l.stat, i);
-    });
+  const statAt = new Map<string, number>();
+  TOTAL_SECTIONS.forEach((id, si) =>
+    SECTIONS[id].fixed.forEach((l, i) => {
+      fixedAt.set(keyOf(l), si * 1000 + i);
+      statAt.set(`${id}|${l.stat}`, si * 1000 + i);
+    }),
+  );
   const out: (StatTotal & { at: number; fixed: boolean })[] = [];
   for (const [key, { mod, inc, more }] of lines) {
     const mult = Math.max(0, 1 + inc / 100) * more;
     const fixed = fixedAt.has(key);
     if (!fixed && Math.abs(mult - 1) < 0.005) continue;
-    const at = fixedAt.get(key) ?? statAt.get(mod.stat) ?? 1000;
-    out.push({ group: groupOf(mod.stat), mod, mult, at, fixed });
+    const section = sectionOf(mod.stat);
+    const si = TOTAL_SECTIONS.indexOf(section);
+    const at = fixedAt.get(key) ?? statAt.get(`${section}|${mod.stat}`) ?? si * 1000 + 999;
+    out.push({ section, mod, mult, at, fixed });
   }
   out.sort((a, b) => a.at - b.at || Number(b.fixed) - Number(a.fixed) || keyCmp(a.mod, b.mod));
-  return out.map(({ group, mod, mult }) => ({ group, mod, mult }));
+  return out.map(({ section, mod, mult }) => ({ section, mod, mult }));
 }
 
 const keyCmp = (a: Mod, b: Mod) => (keyOf(a, a.condition) < keyOf(b, b.condition) ? -1 : 1);
