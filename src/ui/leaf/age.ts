@@ -3,7 +3,7 @@
  * grimed at its edges, then aged: gold flaked to the red bole, paint worn to plaster, cracks, a few glints, and a
  * dithered pixel shadow below and right of it.
  */
-import { ctx2d, LOSS_TO, nearest, noise, RAMP_NAMES, RGB, RI, type Rand } from './ramps';
+import { ctx2d, LOSS_TO, nearest, noiseGrid, RAMP_NAMES, RGB, RI, type Rand } from './ramps';
 
 export type AgeOpts = {
   /** The share of flaking pixels. */
@@ -27,6 +27,12 @@ export type AgeOpts = {
   /** Boxes kept calm (no flakes, no cracks, less grime): where text sits straight on the surface. */
   calm?: { x: number; y: number; w: number; h: number }[];
 };
+
+/** What each ramp (by index) wears through to, by index; -1 for a ramp that does not flake. */
+const LOSS_I = RAMP_NAMES.map((n) => {
+  const to = LOSS_TO[n];
+  return to ? RI[to] : -1;
+});
 
 const DIRS = [
   [1, 0],
@@ -66,16 +72,21 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
     const p = at(x, y);
     return p >= 0 && ramp[p] >= 0;
   };
-  const len = (ri: number) => RGB[ri].length;
-  const calm = o.calm ?? [];
+  const lens = RGB.map((c) => c.length);
+  const len = (ri: number) => lens[ri];
+  const calmMask = new Uint8Array(N);
+  for (const b of o.calm ?? [])
+    for (let y = Math.max(0, b.y); y < Math.min(H, b.y + b.h); y++)
+      calmMask.fill(1, y * W + Math.max(0, b.x), y * W + Math.min(W, b.x + b.w));
   const inCalm = (x: number, y: number) =>
-    calm.some((b) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
+    x >= 0 && x < W && y >= 0 && y < H && calmMask[y * W + x] === 1;
+  const edge = edgeDistance(ramp, W, H, !!o.wrapX, !!o.wrapY);
   const bc = o.blotch ?? 4;
-  const n1 = noise(r, W, H, 10);
-  const n2 = noise(r, W, H, 3);
-  const n3 = noise(r, W, H, 16);
-  const n4 = noise(r, W, H, bc);
-  const n5 = noise(r, W, H, bc * 5);
+  const n1 = noiseGrid(r, W, H, 10);
+  const n2 = noiseGrid(r, W, H, 3);
+  const n3 = noiseGrid(r, W, H, 16);
+  const n4 = noiseGrid(r, W, H, bc);
+  const n5 = noiseGrid(r, W, H, bc * 5);
   const tex = o.texture ?? 1;
   const grime = o.grime ?? 1;
   // Mottle along the ramp; darken grimy patches and the pixels near an edge.
@@ -83,43 +94,38 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
     for (let x = 0; x < W; x++) {
       const p = y * W + x;
       if (ramp[p] < 0 || ramp[p] === RI.ink) continue;
-      let s = ((n1(x, y) - 0.5) * 2.2 + (n2(x, y) - 0.5) * 1.4 + (r() - 0.5) * 1.1) * tex;
-      if (n3(x, y) > 0.66 && !inCalm(x, y)) s -= grime;
-      let edge = false;
-      for (let k = 1; k <= 2 && !edge; k++)
-        edge = !opaque(x - k, y) || !opaque(x + k, y) || !opaque(x, y - k) || !opaque(x, y + k);
-      if (edge) s -= 0.9 * grime;
+      let s = ((n1[p] - 0.5) * 2.2 + (n2[p] - 0.5) * 1.4 + (r() - 0.5) * 1.1) * tex;
+      if (n3[p] > 0.66 && !inCalm(x, y)) s -= grime;
+      if (edge[p] <= 2) s -= 0.9 * grime;
       idx[p] = Math.max(0, Math.min(len(ramp[p]) - 1, idx[p] + Math.round(s)));
     }
   // Flakes: the most exposed share of each flaking pixel, by blotchy noise, more of it near the edges.
   const loss = o.loss ?? 0.08;
   if (loss > 0) {
     const v = new Float32Array(N).fill(-1);
-    const list: number[] = [];
+    const list = new Float64Array(N);
+    let listed = 0;
     const reach = o.edgeReach ?? 4;
     for (let y = 0; y < H; y++)
       for (let x = 0; x < W; x++) {
         const p = y * W + x;
-        if (ramp[p] < 0 || !LOSS_TO[RAMP_NAMES[ramp[p]]]) continue;
-        let e = 0;
-        for (let k = 1; k <= reach && !e; k++)
-          if (!opaque(x - k, y) || !opaque(x + k, y) || !opaque(x, y - k) || !opaque(x, y + k))
-            e = (reach + 1 - k) / reach;
+        if (ramp[p] < 0 || LOSS_I[ramp[p]] < 0) continue;
+        const k = edge[p];
+        const e = k <= reach ? (reach + 1 - k) / reach : 0;
         v[p] =
-          n4(x, y) * 0.5 +
-          n5(x, y) * 0.5 +
+          n4[p] * 0.5 +
+          n5[p] * 0.5 +
           e * (o.edgeBias ?? 0.12) +
           r() * 0.04 -
           (inCalm(x, y) ? 9 : 0);
-        list.push(v[p]);
+        list[listed++] = v[p];
       }
-    list.sort((a, b) => a - b);
-    const cut = list[Math.floor(list.length * (1 - loss))] ?? 2;
+    const sorted = list.subarray(0, listed).sort();
+    const cut = sorted[Math.floor(listed * (1 - loss))] ?? 2;
     const lost = new Uint8Array(N);
     for (let p = 0; p < N; p++)
       if (v[p] >= cut && !(o.goldLoss !== undefined && ramp[p] === RI.gold && r() >= o.goldLoss)) {
-        const to = LOSS_TO[RAMP_NAMES[ramp[p]]]!;
-        ramp[p] = RI[to];
+        ramp[p] = LOSS_I[ramp[p]];
         idx[p] = 1 + Math.floor(r() * 3);
         lost[p] = 1;
       }
@@ -189,6 +195,47 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
   }
   ctx.putImageData(img, 0, 0);
   return cv;
+}
+
+/**
+ * For every opaque pixel, how far the nearest clear pixel is straight left, right, up or down (the least of the four; the
+ * edge of the canvas counts as clear unless the axis wraps), capped at 255. Clear pixels get 0.
+ */
+function edgeDistance(
+  ramp: Int8Array,
+  W: number,
+  H: number,
+  wrapX: boolean,
+  wrapY: boolean,
+): Uint8Array {
+  const out = new Uint8Array(W * H).fill(255);
+  // One axis at a time: `n` lines of `len` pixels, pixel i of line j at start(j) + i * step.
+  const scan = (
+    n: number,
+    len: number,
+    start: (j: number) => number,
+    step: number,
+    wrap: boolean,
+  ) => {
+    for (let j = 0; j < n; j++) {
+      const o = start(j);
+      for (const dir of [1, -1]) {
+        // A wrapping line runs round twice so that its start knows the pixels at its end.
+        let run = 0;
+        const laps = wrap ? 2 : 1;
+        for (let t = 0; t < len * laps; t++) {
+          const i = dir === 1 ? t % len : len - 1 - (t % len);
+          const p = o + i * step;
+          if (ramp[p] < 0) run = 0;
+          else run = Math.min(255, run + 1);
+          if (t >= len * (laps - 1) && run < out[p]) out[p] = run;
+        }
+      }
+    }
+  };
+  scan(H, W, (y) => y * W, 1, wrapX);
+  scan(W, H, (x) => x, W, wrapY);
+  return out;
 }
 
 /** Hard alpha: anti-aliased edges become whole pixels or nothing. */

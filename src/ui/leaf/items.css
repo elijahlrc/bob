@@ -288,6 +288,11 @@ html.leaf .ix-tab-d .warn {
 html.leaf .ix-tab.on b {
   color: var(--gold-hi);
 }
+/* The chosen flask slot is a gold plaque, its name dark on it. */
+html.leaf .ix-ftab.on b {
+  color: var(--ink);
+  text-shadow: none;
+}
 html.leaf .ix-tab.blocked {
   opacity: 0.6;
 }
@@ -297,6 +302,7 @@ html.leaf .ix-tabs:has(.ix-ftab) {
 html.leaf .ix-ftab {
   flex: 1 1 0;
   align-items: center;
+  justify-content: center;
   padding: 8px 4px 9px;
 }
 /* What it changes: damage and effective HP large on a porphyry plaque, the rest under them. */
@@ -802,6 +808,23 @@ html.leaf .clean-group {
 
 /* ---- A phone: the gear folded into one line, the bag, the selection as a sheet above the camp bar ---- */
 @media (max-width: 600px) {
+  /* Smaller type on a phone: the cards and the compare need the room. */
+  html.leaf .ix {
+    --size: 15px;
+    --head-size: 22px;
+  }
+  html.leaf .ix-tab b {
+    font-size: 19px;
+  }
+  html.leaf .ix-tabs:has(.ix-ftab) {
+    gap: 6px;
+  }
+  html.leaf .ix-ftab {
+    padding: 8px 2px 9px;
+  }
+  html.leaf .ix-ftab b {
+    font: 600 15px/1 var(--font);
+  }
   html.leaf .ix {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:

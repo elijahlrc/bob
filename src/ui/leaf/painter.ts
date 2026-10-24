@@ -328,7 +328,10 @@ export function startPainter() {
   new MutationObserver((records) => {
     // Changes inside a part that redraws itself constantly (the map's HUD, the tree's words) do not need the painter.
     if (records.every((r) => (r.target as Element).closest?.('[data-nopaint]'))) return;
-    schedule();
+    // After a quiet spell (a new tab, a dialog), paint now, before the browser shows the change: the new screen then
+    // appears whole instead of flat for a frame. Changes in quick succession wait for the throttle.
+    if (!queued && performance.now() - last >= 120) run();
+    else schedule();
   }).observe(document.body, {
     subtree: true,
     childList: true,

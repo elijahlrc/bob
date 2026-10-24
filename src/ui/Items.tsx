@@ -24,17 +24,14 @@ import {
   quickEquip,
   searchText,
   type SocketRef,
-  slotName,
   sortItems,
 } from '../run/inventoryOps';
 import { isFavourite, markSeen, toggleFavourite } from '../run/found';
-import { joinNames } from '../run/socketText';
-import { gemDef } from '../data/gems';
 import { ask } from './Confirm';
 import { CleanUp } from './CleanUp';
 import { useViewport } from './device';
 import { Gear, gearSummary, type SlotMark } from './Gear';
-import { ItemDetail, type Sel, type Status } from './ItemDetail';
+import { ItemDetail, type Sel } from './ItemDetail';
 import { ItemList, type ListSort, type View, type What } from './ItemList';
 import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
@@ -85,7 +82,6 @@ export function Items({
   const [sel, setSel] = useState<Sel | null>(null);
   const [peek, setPeek] = useState<number | null>(null);
   const [drag, setDrag] = useState<Drag>(null);
-  const [status, setStatus] = useState<Status>(null);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<ListSort>(() => loadPref<ListSort>('inv.sort', 'newest'));
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
@@ -206,11 +202,8 @@ export function Items({
     setView('all');
   }, [focus?.n]);
 
-  // The line says what the last action did; it is shown only while nothing has been undone or done since.
-  const say = (text: string, undo = true) => setStatus({ text, undo, depth: c.undoDepth });
   const after = (r: { ok: boolean; reason?: string } | void, ok: () => void) => {
     if (r && r.ok) ok();
-    else say(r?.reason ?? 'That did not work.', false);
   };
 
   const equipTo = (uid: number, slot: EquipSlot) => {
@@ -220,26 +213,15 @@ export function Items({
     const r = c.act((rn) => equip(rn, uid, slot));
     after(r, () => {
       const back = dry.toBag;
-      const gems = dry.sockets.out.map((g) => gemDef(g.gemId).name);
-      say(
-        `Wearing ${itemTitle(item)} in ${slotName(slot)}.` +
-          (back.length ? ` ${joinNames(back.map((x) => x.name))} went to the bag.` : '') +
-          (gems.length ? ` ${joinNames(gems)} ${gems.length > 1 ? 'are' : 'is'} in the bag.` : ''),
-      );
       // Next you want to know whether the old one was worth keeping: select it.
       setSel(back.length ? { from: 'inv', uid: back[0].uid } : { from: 'slot', slot });
       setJustOff(back.length ? back[0].uid : null);
     });
   };
   const equipFlaskTo = (uid: number, idx: number) => {
-    const f = run.inventory.find((x) => x.uid === uid);
     const old = run.build.flasks[idx];
     const r = c.act((rn) => equipFlask(rn, uid, idx));
     after(r === undefined ? undefined : { ok: !!r }, () => {
-      say(
-        `Carrying ${f?.kind === 'flask' ? f.name : 'the flask'} as Flask ${idx + 1}.` +
-          (old ? ` ${old.name} went to the bag.` : ''),
-      );
       setSel(old ? { from: 'inv', uid: old.uid } : { from: 'flask', idx });
     });
   };
@@ -248,38 +230,27 @@ export function Items({
     if (!it) return;
     if (it.kind === 'item') {
       const slot = infos.get(uid)?.slot;
-      if (!slot) return say(infos.get(uid)?.reason ?? 'Cannot be worn.', false);
-      return equipTo(uid, slot);
+      return slot && equipTo(uid, slot);
     }
     if (it.kind === 'flask') {
-      if (!infos.get(uid)?.equippable)
-        return say(infos.get(uid)?.reason ?? 'Cannot be worn.', false);
+      if (!infos.get(uid)?.equippable) return;
       return equipFlaskTo(uid, flaskTarget(run, it));
     }
     const r = c.act((rn) => quickEquip(rn, uid));
     after(r, () => {
-      say(`Socketed ${itemTitle(it)}.`);
       setSel(null);
     });
   };
-  /** Put a bag gem in a chosen socket; a gem that was there goes to the bag, and the status line has Undo. */
+  /** Put a bag gem in a chosen socket; a gem that was there goes to the bag. */
   const socketAt = (uid: number, ref: SocketRef) => {
     const gem = run.inventory.find((x) => x.uid === uid);
-    const old = run.build.equipment[ref.slot]?.sockets[ref.socket];
     if (gem?.kind !== 'gem') return;
-    const r = c.act((rn) => socketGem(rn, ref.slot, ref.socket, uid));
-    if (!r) return say('That did not work.', false);
-    say(
-      `Socketed ${itemTitle(gem)} in ${slotName(ref.slot)}.` +
-        (old ? ` ${gemDef(old.gemId).name} is in the bag.` : ''),
-    );
-    setSel(null);
+    if (c.act((rn) => socketGem(rn, ref.slot, ref.socket, uid))) setSel(null);
   };
   const unequipSlot = (slot: EquipSlot) => {
     const it = run.build.equipment[slot];
     c.act((r) => unequip(r, slot));
     if (it) {
-      say(`Took off ${it.name}. It is in the bag.`);
       setSel({ from: 'inv', uid: it.uid });
     }
   };
@@ -287,7 +258,6 @@ export function Items({
     const f = run.build.flasks[idx];
     c.act((r) => unequipFlask(r, idx));
     if (f) {
-      say(`Took off ${f.name}. It is in the bag.`);
       setSel({ from: 'inv', uid: f.uid });
     }
   };
@@ -313,7 +283,6 @@ export function Items({
       return;
     const next = stepAfter(uid);
     c.act((r) => discardToPile(r, uid));
-    say(`Discarded ${itemTitle(it)}.`);
     setSel(next);
   };
   const doPutBack = (uid: number) => {
@@ -322,7 +291,6 @@ export function Items({
     const i = visible.findIndex((x) => x.uid === uid);
     const next = visible[i + 1] ?? visible[i - 1];
     c.act((r) => putBack(r, uid));
-    say(`Put ${itemTitle(it)} back in the bag.`);
     setSel(next ? { from: 'pile', uid: next.uid } : null);
   };
   /** Salvage everything discarded: the one step that cannot be taken back. */
@@ -338,7 +306,6 @@ export function Items({
     });
     if (!ok) return;
     c.craft((r) => salvageDiscarded(r));
-    say(`Salvaged ${pile.length} discarded items for ${dust} Bone Dust.`, false);
     setSel(null);
     if (view === 'discarded') setView('all');
   };
@@ -354,7 +321,6 @@ export function Items({
     });
     if (!ok) return;
     c.craft((r) => junk.forEach((x) => salvage(r, x.uid)));
-    say(`Salvaged ${junk.length} items for ${dust} Bone Dust.`, false);
     setSel(null);
   };
   const step = (dir: -1 | 1) => {
@@ -472,9 +438,6 @@ export function Items({
           selected={selected}
           info={info}
           favourite={selected ? favs.has(selected.uid) : false}
-          status={
-            status && (status.depth === undefined || status.depth === c.undoDepth) ? status : null
-          }
           upgrades={counts.upgrades}
           onBestUpgrade={bestUpgrade}
           aimSlot={aimed?.slot ?? null}
@@ -496,10 +459,6 @@ export function Items({
           onEditGems={onEditGems}
           onClose={() => setSel(null)}
           onStep={step}
-          onUndo={() => {
-            c.undo();
-            setStatus(null);
-          }}
         />
       </section>
       <section class="ix-listcol" aria-label="Bag">

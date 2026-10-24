@@ -79,7 +79,7 @@ export function ItemRow(p: RowProps) {
     <button
       class={`ix-row ${rarityClass(it)}${p.selected ? ' sel' : ''}${info.equippable ? '' : ' unusable'}`}
       data-paint="panel"
-      data-thin={p.selected ? undefined : ''}
+      data-thin
       data-pk={p.selected ? 'sel' : ''}
       draggable={!p.coarse && it.kind !== 'gem'}
       onDragStart={(e) => {

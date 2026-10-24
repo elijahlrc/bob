@@ -120,6 +120,42 @@ export function noise(
   };
 }
 
+/**
+ * The same noise as `noise`, worked out for every pixel at once (the same random draws and arithmetic, so the same
+ * numbers), as a grid read `f[y * W + x]`: far quicker than calling `noise` per pixel.
+ */
+export function noiseGrid(r: Rand, W: number, H: number, cell: number): Float64Array {
+  const gw = Math.max(1, Math.round(W / cell));
+  const gh = Math.max(1, Math.round(H / cell));
+  const g = Float32Array.from({ length: gw * gh }, r);
+  const s = (t: number) => t * t * (3 - 2 * t);
+  const wrap = (i: number, n: number) => ((i % n) + n) % n;
+  const x0 = new Int32Array(W);
+  const x1 = new Int32Array(W);
+  const tx = new Float64Array(W);
+  for (let x = 0; x < W; x++) {
+    const fx = (x / W) * gw;
+    const ix = Math.floor(fx);
+    x0[x] = wrap(ix, gw);
+    x1[x] = wrap(ix + 1, gw);
+    tx[x] = s(fx - ix);
+  }
+  const out = new Float64Array(W * H);
+  for (let y = 0; y < H; y++) {
+    const fy = (y / H) * gh;
+    const iy = Math.floor(fy);
+    const ty = s(fy - iy);
+    const r0 = wrap(iy, gh) * gw;
+    const r1 = wrap(iy + 1, gh) * gw;
+    for (let x = 0; x < W; x++) {
+      const a = g[r0 + x0[x]] + (g[r0 + x1[x]] - g[r0 + x0[x]]) * tx[x];
+      const b = g[r1 + x0[x]] + (g[r1 + x1[x]] - g[r1 + x0[x]]) * tx[x];
+      out[y * W + x] = a + (b - a) * ty;
+    }
+  }
+  return out;
+}
+
 export function canvas(W: number, H: number): HTMLCanvasElement {
   const cv = document.createElement('canvas');
   cv.width = Math.max(1, W);

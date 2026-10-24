@@ -3,6 +3,7 @@ import { useMemo, useState } from 'preact/hooks';
 import type { SheetDiff } from '../calc/character';
 import { CRAFTING_OPEN } from '../data/constants';
 import type { Build, EquipSlot, FlaskItem, GemItem, InventoryItem, Item } from '../data/types';
+import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
 import { joinNames } from '../run/socketText';
 import { salvageValue } from '../run/craft';
@@ -30,7 +31,6 @@ export type Sel =
   | { from: 'flask'; idx: number };
 
 /** What the last action did; `depth` is the undo depth it was said at (the line goes stale when that moves). */
-export type Status = { text: string; undo: boolean; depth?: number } | null;
 
 /** "Needs 40 int, you have 28" from a failed check. */
 export function whyNot(check: EquipCheck): string {
@@ -114,7 +114,6 @@ type Actions = {
   onClose: () => void;
   /** Move the selection to the previous (-1) or next (+1) row of the list. */
   onStep: (dir: -1 | 1) => void;
-  onUndo: () => void;
 };
 
 type Props = Actions & {
@@ -123,7 +122,6 @@ type Props = Actions & {
   selected: InventoryItem | null;
   info: ItemInfo | undefined;
   favourite: boolean;
-  status: Status;
   upgrades: number;
   onBestUpgrade: () => void;
   /** Where the picked item is aimed (lifted to the Items tab, so the reliquary and the tabs agree). */
@@ -436,6 +434,13 @@ function ItemBody({
   );
 }
 
+/** A flask slot's tab: the kind of flask in it ("Life", "Mana", "Hybrid"), a utility flask's first word ("Haste"). */
+function flaskTab(f: FlaskItem | null | undefined): string {
+  if (!f) return 'Empty';
+  const b = flaskBase(f.baseId);
+  return b.kind === 'utility' ? b.name.split(' ')[0] : b.kind[0].toUpperCase() + b.kind.slice(1);
+}
+
 function FlaskBody({
   run,
   flask,
@@ -470,10 +475,12 @@ function FlaskBody({
             aria-selected={s.idx === active.idx}
             class={'ix-tab ix-ftab' + (s.idx === active.idx ? ' on' : '')}
             data-paint="panel"
-            data-thin={s.idx === active.idx ? undefined : ''}
+            data-thin
+            data-field={s.idx === active.idx ? 'gold' : undefined}
+            aria-label={`Flask ${s.idx + 1}`}
             onClick={() => onAim(s.idx)}
           >
-            <b>Flask {s.idx + 1}</b>
+            <b>{flaskTab(s.equipped)}</b>
           </button>
         ))}
       </div>
@@ -583,21 +590,9 @@ export function ItemDetail(p: Props) {
       </button>
     </div>
   );
-  const status = p.status && (
-    <div class="ix-status" role="status" data-paint="panel" data-thin>
-      <span>{p.status.text}</span>
-      {p.status.undo && (
-        <button class="btn small" onClick={a.onUndo}>
-          Undo
-        </button>
-      )}
-    </div>
-  );
-
   if (!sel || !selected) {
     return (
       <div class="ix-detail ix-empty">
-        {status}
         <div class="ix-guide">
           <div class="ix-hint" data-paint="panel" data-thin>
             {p.coarse ? 'Tap' : 'Pick'} something in the bag to see it beside what you wear.
@@ -626,7 +621,6 @@ export function ItemDetail(p: Props) {
     return (
       <div class="ix-detail">
         {head(itemTitle(selected), rarityClass(selected))}
-        {status}
         <div class="ix-body">
           <ItemCard it={selected} build={run.build} />
           <div class="item-actions ix-actions">
@@ -646,7 +640,6 @@ export function ItemDetail(p: Props) {
   return (
     <div class={'ix-detail' + (p.phone ? (full ? ' full' : ' peek') : '')}>
       {head(itemTitle(selected), rarityClass(selected), inBag ? selected.uid : undefined)}
-      {status}
       <div class="ix-body">
         {inBag && selected.kind === 'item' && (
           <ItemBody
