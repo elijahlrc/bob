@@ -2,9 +2,9 @@ import { useEffect, useState } from 'preact/hooks';
 import { isCoarse } from './device';
 
 /**
- * Tooltips for a finger (docs/MOBILE.md 3.2). A `title=` attribute needs a hovering pointer; `infoProps(text)` gives the
- * same text to both: the browser tooltip on a mouse, and on a coarse pointer a tap that opens a small popover (the
- * `InfoLayer` mounted once in App). Spread it on elements that do nothing on a tap (orbs, chips, icons), never on
+ * Tips (docs/MOBILE.md 3.2), one look for every pointer (the Gold Leaf tip: lapis with a gold ring, leaf/leaf.css):
+ * `infoProps(text)` opens the popover of the `InfoLayer` (mounted once in App) on hover and on keyboard focus with a
+ * mouse, and on a tap with a finger. Spread it on elements that do nothing on a tap (orbs, chips, icons), never on
  * buttons: a button's first tap must stay its action.
  */
 type Open = { text: string; x: number; y: number } | null;
@@ -16,20 +16,39 @@ function show(o: Open): void {
   listeners.forEach((l) => l(o));
 }
 
+type Hover = {
+  onMouseEnter?: (e: MouseEvent) => void;
+  onMouseLeave?: () => void;
+  onFocus?: (e: FocusEvent) => void;
+  onBlur?: () => void;
+};
+/** Open the tip over an element while the mouse is on it (or it has the keyboard's focus). */
+const hover = (text: string): Hover => {
+  const open = (e: Event) => {
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    show({ text, x: r.left + r.width / 2, y: r.top });
+  };
+  return {
+    onMouseEnter: open,
+    onMouseLeave: () => show(null),
+    onFocus: open,
+    onBlur: () => show(null),
+  };
+};
+
 /**
- * The text for something inside a button (an offer card): a hover tooltip with a mouse, and on a touch screen nothing, so that a
- * tap on it is still a tap on the button.
+ * The text for something inside a button (an offer card): the tip on hover with a mouse, and on a touch screen nothing,
+ * so that a tap on it is still a tap on the button.
  */
-export function hoverInfo(text: string | undefined): { title?: string } {
-  return text && !isCoarse() ? { title: text } : {};
+export function hoverInfo(text: string | undefined): Hover {
+  return text && !isCoarse() ? hover(text) : {};
 }
 
-export function infoProps(text: string | undefined): {
-  title?: string;
+export function infoProps(text: string | undefined): Hover & {
   onClick?: (e: MouseEvent) => void;
 } {
   if (!text) return {};
-  if (!isCoarse()) return { title: text };
+  if (!isCoarse()) return hover(text);
   return {
     onClick: (e) => {
       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();

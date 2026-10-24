@@ -302,7 +302,7 @@ html.leaf .st .st-sel select:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
   .st-group {
-    padding: 22px 16px 18px;
+    padding: 22px 22px 20px;
   }
   .st-skill {
     grid-template-columns: 44px minmax(0, 1fr) auto;

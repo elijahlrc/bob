@@ -252,3 +252,31 @@ html.leaf .camp-foot .warn {
     padding: 74px 32px 40px;
   }
 }
+
+/* Offers: three equal niches in a row from 900 px; one column below, each as wide as a phone's at most. */
+@media (min-width: 900px) {
+  html.leaf .camp-next .theme-choice {
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+  html.leaf .camp-next .theme-wrap {
+    flex: 1 1 0;
+    max-width: none;
+  }
+}
+@media (max-width: 899px) {
+  html.leaf .camp-next .theme-choice {
+    flex-direction: column;
+    align-items: center;
+  }
+  html.leaf .camp-next .theme-wrap {
+    width: 100%;
+    max-width: 460px;
+  }
+}
+html.leaf .camp-last {
+  align-self: center;
+  padding: 8px 20px 9px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}

@@ -126,8 +126,8 @@ its pattern's periods.
 ## 6. Text and layout rules
 
 - **One body size** (17 px Grenze); secondary lines differ by colour, not size. Headings 28 px Jacquard; big numbers and
-  the screen title 48 px Jacquard. The only smaller text is inside small medallions on a phone (14 px) and the armies line of an offer (15 px), which
-  must stay on one line.
+  the screen title 48 px Jacquard. The only smaller text: a medallion's own label (15 px, 14 px in a small one on a phone, where a ring leaves no
+  room) and the armies line of an offer (15 px), which must stay on one line.
 - **Never shrink words to fit; change the layout:** what a map pays became four short fixed rows of pairs set apart by small gold settings ("Quantity +35% ◆ Rarity +48%"), the same order on every card with what a map lacks dimmed (one column of pairs left gaps, a 2x3 grid of stacked cells took too much height); medallion
   notes moved to plaques; small text on the gold moved onto plaques.
 - **Cut what the player does not need**, in the spirit of "in-game text is concise": on the offer cards the "hard to …

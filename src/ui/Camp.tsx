@@ -218,10 +218,13 @@ export function Camp({ c }: { c: Controller }) {
   };
   // The next map is a tab of its own at every width, with a bar at the bottom.
   const tabsRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     tabsRef.current
       ?.querySelector('.tab.on')
       ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    // A tab opens at its top, not where the last one was scrolled to.
+    if (bodyRef.current) bodyRef.current.scrollTop = 0;
   }, [tab]);
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
@@ -292,7 +295,7 @@ export function Camp({ c }: { c: Controller }) {
       <Satchel c={c} />
       <BossAhead map={run.map} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (
-        <div class="muted">
+        <div class="camp-last" data-paint="panel" data-thin>
           Last map{last.status === 'abandoned' ? ' (abandoned)' : ''}: {last.time.toFixed(0)} s ·{' '}
           {last.kills} kills
           {(last.reprieves ?? []).map(
@@ -471,7 +474,7 @@ export function Camp({ c }: { c: Controller }) {
           </button>
         </div>
         <div class="tabs-trim" aria-hidden="true" />
-        <div class="tab-body">
+        <div class="tab-body" ref={bodyRef}>
           {shown === 'tree' && <TreeView c={c} />}
           {shown === 'sheet' && <Sheet s={sheet} ch={ch} />}
           {shown === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}

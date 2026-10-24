@@ -476,9 +476,9 @@ html.leaf .sk-sheet > .sk-pickrow {
     grid-template-columns: minmax(0, 1fr);
   }
   .sk-item {
-    padding: 18px 16px 16px;
+    padding: 18px 22px 18px;
   }
   .lf-panel.sk-bag {
-    padding: 22px 16px 20px;
+    padding: 22px 22px 20px;
   }
 }

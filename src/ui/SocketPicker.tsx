@@ -17,7 +17,6 @@ export function Badge({
   ];
   const shown = parts.filter(([, v]) => Math.abs(v) >= 0.5);
   if (shown.length === 0) return <span class="badge neutral">{p.idle ?? 'no change'}</span>;
-  const pctText = (v: number) => `${v > 0 ? '+' : '−'}${Math.abs(Math.round(v))}%`;
   return (
     <>
       {shown.map(([l, v]) => (
@@ -26,13 +25,6 @@ export function Badge({
           {Math.abs(Math.round(v))}% {l}
         </span>
       ))}
-      {/* A change that is (partly) the old gem leaving says so, and a gem that would do nothing itself says why. */}
-      {p.fromRemoval !== undefined && p.replaces && Math.abs(p.fromRemoval - p.dpsPct) >= 0.5 && (
-        <span class="muted small">
-          {' '}
-          ({pctText(p.fromRemoval)} from taking out {p.replaces})
-        </span>
-      )}
       {p.idle && <span class="muted small"> · {p.idle}</span>}
     </>
   );

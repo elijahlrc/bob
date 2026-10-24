@@ -248,6 +248,11 @@ export function Skills({
     setPending(null);
     setDrag(null);
     setOver(null);
+    requestAnimationFrame(() =>
+      document
+        .querySelector(`[data-slot="${to.slot}"]`)
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }),
+    );
   };
   const unsocket = (from: Drag) => {
     if (from.from === 'socket') c.act((r) => unsocketGem(r, from.slot, from.socket));
@@ -422,7 +427,7 @@ export function Skills({
             <div class="sk-pick" data-paint="panel" data-thin>
               <div class="sk-pickrow">
                 {pickLine}
-                <span class="sk-acts">{actions}</span>
+                {!confirm && <span class="sk-acts">{actions}</span>}
               </div>
               {confirm}
             </div>

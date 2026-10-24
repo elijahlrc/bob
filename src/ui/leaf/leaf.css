@@ -287,3 +287,8 @@ html.leaf .unique {
 html.leaf .modal-card :is(p, div, label, span, small, li) {
   font-size: var(--size);
 }
+
+/* The footer is taller in Gold Leaf (its tile row): sheets that sit above it are placed by this. */
+html.leaf .camp.tabbed {
+  --camp-bar: 66px;
+}
