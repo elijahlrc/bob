@@ -138,7 +138,7 @@ export const CLIPS: Clip[] = [
     },
   ),
 
-  /* 1b. The same fight pulled back, for the store page's embed background (scripts/trailer/promo.ts): not used in the cut. */
+  /* 1b. The same fight pulled right back (a game pixel is 2 of its pixels), for the store page's embed background (scripts/trailer/promo.ts): not used in the cut. */
   mapClip(
     'promo',
     {
@@ -151,7 +151,7 @@ export const CLIPS: Clip[] = [
     84,
     { theme: 'mix:charnelPits+kilnHall', biome: 'ruins' },
     80,
-    { zoom: 2, pack: 6 },
+    { zoom: 1, pack: 6 },
   ),
 
   /* 2. The tree: a whole build growing, level 5 to 100, zoomed out so that it reads as big, and kept in frame. */
