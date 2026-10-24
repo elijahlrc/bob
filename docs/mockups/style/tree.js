@@ -132,7 +132,6 @@ let points = 3;
 const history = [];
 let sel = null;
 let hover = null;
-let lightTone = '';
 let query = '';
 let showAll = false;
 let view = null;
@@ -183,6 +182,8 @@ function totals(ids) {
     }
   return modsText([...sum.values()]);
 }
+/** What each colour group is called ("Minions and deployables"), so a search for the group finds it all. */
+const GROUP = Object.fromEntries(TONE_LABEL.map(([t, l]) => [t, l.toLowerCase()]));
 const searchHits = () => {
   const q = query.trim().toLowerCase();
   if (q.length < 2) return null;
@@ -190,7 +191,8 @@ const searchHits = () => {
     LIVE.filter(
       (n) =>
         n.name?.toLowerCase().includes(q) ||
-        info.get(n.id).lines.some((l) => l.toLowerCase().includes(q)),
+        info.get(n.id).lines.some((l) => l.toLowerCase().includes(q)) ||
+        GROUP[info.get(n.id).tone]?.includes(q),
     ).map((n) => n.id),
   );
 };
@@ -419,11 +421,7 @@ function nodeState(id, path, hits) {
   if (n.kind === 'start') return id === START ? 'on' : 'off';
   if (alloc.has(id)) return 'on';
   if (path?.has(id)) return 'path';
-  const filtering = hits || lightTone;
-  if (filtering) {
-    const match = (hits && hits.has(id)) || (lightTone && info.get(id).tone === lightTone);
-    return match ? 'lit' : 'dim';
-  }
+  if (hits) return hits.has(id) ? 'lit' : 'dim';
   return linkedToAlloc(id) ? 'can' : 'off';
 }
 function frame() {
@@ -687,7 +685,6 @@ function hud() {
     <div class="tv-find">
       <span class="ix-search" data-paint="panel" data-thin><input class="tv-q" placeholder="Find: mana, fire, spell crit…" value="${query.replace(/"/g, '&quot;')}" /></span>
       ${hits ? `<span class="tv-count" data-paint="panel" data-thin>${hits.size} found</span>` : ''}
-      <span class="sel" data-paint="panel" data-thin><select class="tv-light"><option value="">Light up…</option>${TONE_LABEL.map(([t, l]) => `<option value="${t}"${t === lightTone ? ' selected' : ''}>${l}</option>`).join('')}</select></span>
     </div>
     <div class="tv-zoom"><button class="btn sq" data-paint="panel" data-thin data-tv="in" aria-label="Zoom in">+</button><button class="btn sq" data-paint="panel" data-thin data-tv="out" aria-label="Zoom out">−</button><button class="btn sq" data-paint="panel" data-thin data-tv="home" aria-label="Centre on your passives">◎</button></div>
     <button class="btn small tv-sumbtn" data-paint="panel" data-thin data-tv="sum">${tv?.dataset.sum ? 'Hide totals' : 'Your passives'}</button>`;
@@ -738,10 +735,6 @@ function bindUi() {
         tv.querySelector('.tv-q').focus(),
         tv.querySelector('.tv-q').setSelectionRange(query.length, query.length));
     else if (el) c ? (el.textContent = `${c.size} found`) : refreshUi();
-  };
-  tv.querySelector('.tv-light').onchange = (e) => {
-    lightTone = e.target.value;
-    draw();
   };
 }
 

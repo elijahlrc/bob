@@ -1059,9 +1059,6 @@
   flex: 1 1 220px;
   max-width: 320px;
 }
-[data-style='leaf'] .tv-find .sel {
-  width: 230px;
-}
 [data-style='leaf'] .tv-count {
   padding: 9px 14px 10px;
   text-shadow: 0 2px 0 var(--ink);
@@ -1139,10 +1136,6 @@
   left: 12px;
   right: 12px;
   top: 12px;
-}
-[data-style='leaf'][data-width='phone'] .tv-find .sel {
-  width: auto;
-  flex: 1;
 }
 [data-style='leaf'][data-width='phone'] .tv-points {
   left: 12px;
