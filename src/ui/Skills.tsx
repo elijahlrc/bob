@@ -291,16 +291,11 @@ export function Skills({
             {Math.round(whole.ehp)} effective HP
           </span>
         </div>
-        {(secondary.length > 0 || summary.sustain < 1) && (
+        {secondary.length > 0 && (
           <div class="skill-summary muted">
-            {secondary.length > 0 ? `${summary.name} alone: ${r1(summary.totalDps)} DPS` : ''}
-            {summary.sustain < 1
-              ? `${secondary.length > 0 ? '; m' : 'M'}ana regeneration pays for ${Math.round(summary.sustain * 100)}% of its casts`
-              : ''}
-            {secondary.length > 0 &&
-              ` · also every so often: ${secondary
-                .map((x) => `${x.skill.name} (every ${r1(x.cooldown)} s, ${r1(x.dps)} DPS)`)
-                .join(' · ')}`}
+            {`${summary.name} alone: ${r1(summary.totalDps)} DPS · also every so often: ${secondary
+              .map((x) => `${x.skill.name} (every ${r1(x.cooldown)} s, ${r1(x.dps)} DPS)`)
+              .join(' · ')}`}
           </div>
         )}
         {hint && (
@@ -393,10 +388,7 @@ export function Skills({
                       )}
                       {active && !active.usable && <div class="warn">{active.reason}</div>}
                       {status && (
-                        <div
-                          class={status.ok ? 'muted gem-status' : 'warn gem-status'}
-                          title={status.hint}
-                        >
+                        <div class={status.ok ? 'muted gem-status' : 'warn gem-status'}>
                           {status.text}
                         </div>
                       )}

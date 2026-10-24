@@ -230,8 +230,9 @@ body {
   .sheet table {
     width: 100%;
   }
+  /* The item's name on a line of its own, its sockets always on the lines below. */
   .socket-item {
-    width: calc(50% - 4px);
+    width: 100%;
     min-width: 0;
   }
 }

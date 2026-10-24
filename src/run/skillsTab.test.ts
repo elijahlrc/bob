@@ -73,15 +73,15 @@ describe('a socket badge and the headline agree', () => {
       expect(pct(before, sheetDps(sheetOf(run)))).toBeCloseTo(p.dpsPct, 6);
     });
 
-  it('the mana badge and the summary line give the same figure', () => {
+  it('a skill says what supports it, and nothing about mana or missing links', () => {
     const { run, gem } = mystic();
     put(run, 'body', 0, gem('rimeDrift'));
+    const alone = new Character(run.build, cfgFor(run));
+    expect(gemStatus(alone, alone.primary.gemUid!, gemDef('rimeDrift'))).toBeNull();
     put(run, 'body', 1, gem('witheringBreath'));
     const ch = new Character(run.build, cfgFor(run));
-    const sustain = ch.mainSheet().sustain;
-    const st = gemStatus(ch, ch.primary.gemUid!, gemDef(gemDef('rimeDrift').id));
-    if (sustain < 0.9) expect(st?.text).toContain(`Mana-starved (${Math.round(sustain * 100)}%)`);
-    else expect(st?.text ?? '').not.toContain('Mana-starved');
+    const st = gemStatus(ch, ch.primary.gemUid!, gemDef('rimeDrift'));
+    expect(st?.text ?? '').not.toMatch(/mana|link/i);
   });
 });
 
