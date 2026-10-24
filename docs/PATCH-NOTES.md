@@ -13,6 +13,8 @@ change, and our own names only. Dash bullets under plain headings.
 - Wand attacks shoot a bolt at range instead of stabbing.
 - Pixel art on the map is no longer blurred on scaled-up screens.
 - On phones, the Strategy tab gives each skill's name its own line.
+- Gems now only appear from an area level of their own, between 1 and 38; a gem you already hold below its level works as a level 1 gem.
+- Venom Strike, Rime Mallet, Cinder Blow and Halo Sweep add far less damage at low gem levels and more at high ones.
 
 ## 2026-10-22
 
