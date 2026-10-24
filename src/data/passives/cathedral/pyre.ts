@@ -1,6 +1,6 @@
 /**
  * The Bell Tower (the tip, out toward the Wall past the vestry): the wheel (cold with attacks on its north side since
- * round 3, an aura on its south since 2026-10-20, elemental damage at the ends), the tower junction, and Searing Avatar
+ * round 3, an aura on its south since 2026-10-20, each side's line at one end since G4 fix 1), the tower junction, and Searing Avatar
  * at the tip, the farthest keystone of the region. The id `cathedral.pyre` predates the change and is kept. Round 3
  * (2026-10-20): Kindled Steel (fire strikes) went out to the Ambulatory and Rimed Steel (cold strikes) came here, because
  * Gilded Rod, Kindled Steel and Searing Avatar were one corridor that the fire sceptre walked without a choice.
@@ -10,7 +10,6 @@ import {
   chillEffect,
   eleAttackOne,
   eleDamage,
-  eleDamageAll,
   es,
   int,
   lifeRegen,
@@ -29,16 +28,16 @@ export const pyre: AreaSpec = {
     {
       id: 'wheel',
       name: 'Rimed Steel',
-      why: "The wheel of eight at the tower: cold with attacks on the north side (Rimed Steel), an aura on the south (Benediction, the Zealot's second aura; Choirmaster is the first), elemental damage at the ends. The fire sceptre walks through on its way to Searing Avatar and finds cold strikes here, which the keystone half undoes: its fire strike (Kindled Steel) is out on the Ambulatory, a separate trip. The fire spell is back at the nave.",
+      why: "The wheel of eight at the tower: cold with attacks on the north side (Rimed Steel), an aura on the south (Benediction, the Zealot's second aura; Choirmaster is the first). The ends carry the two sides' lines, cold strikes at the west entrance and aura effect at the east exit (G4 fix 1, audit D8: they were generic elemental damage, which neither side's build wants most), so a walk through the wheel pays one small of the other side. The fire sceptre walks through on its way to Searing Avatar and finds cold strikes here, which the keystone half undoes: its fire strike (Kindled Steel) is out on the Ambulatory, a separate trip. The fire spell is back at the nave.",
       at: P(2250, -550),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'f1',
           kind: 'small',
-          lines: [eleDamageAll(10)],
+          lines: [eleAttackOne('cold', 12)],
           at: P(2150, -550),
-          why: 'The west entrance; the dear road from the Wall also arrives.',
+          why: "The west entrance; the dear road from the Wall also arrives. Cold with attacks, Rimed Steel's line (elemental damage until G4 fix 1, audit D8).",
         },
         {
           id: 'f2',
@@ -58,9 +57,9 @@ export const pyre: AreaSpec = {
         {
           id: 'f4',
           kind: 'small',
-          lines: [eleDamageAll(10)],
+          lines: [auraEffect(6)],
           at: P(2350, -550),
-          why: 'The east exit, to the tower junction.',
+          why: "The east exit, to the tower junction. Aura effect, Benediction's line (elemental damage until G4 fix 1, audit D8).",
         },
         {
           id: 'f5',

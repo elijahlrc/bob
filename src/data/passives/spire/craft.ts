@@ -1,10 +1,10 @@
 /**
  * The Spire's right (the craft road): the wheel off the craft road (spell damage one side, chaos resistance the other since G3), the
  * cost room (swapped in from the west on 2026-10-20), the wand attack chain, the junction, the insight room, the
- * Mana Bastion spur, and the Devotion chain (reservation, energy shield) from the junction east toward the Knife, the
+ * Mana Bastion spur, and the Kept Vows chain (reservation, energy shield) from the junction east toward the Knife, the
  * near Spire-Knife crossing's Spire half. The east road: the curse pocket (Hexwright) and a spell-dodge pocket climbing
- * from the Devotion chain to the east arm's junction along the Knife border, so the craft reaches the arms without the
- * column. Round 3 (2026-10-20): Hexwright and Devotion traded places, so the curse notable is not three steps from the
+ * from the Kept Vows chain to the east arm's junction along the Knife border, so the craft reaches the arms without the
+ * column. Round 3 (2026-10-20): Hexwright and Kept Vows traded places, so the curse notable is not three steps from the
  * Stair's chaos-spell notable and seven from Second Curse. G3 round 1 (2026-10-22): Keen Verse (spell damage with the
  * spell crit multiplier) bridges the road to Wand Volley and the road between Mist Walk and Hexwright. G3 round 2:
  * Hale Scribe (life with mana) bridges the scriptorium stair and Wand Volley, and Sharp Tongue (dagger spells with
@@ -13,7 +13,6 @@
 import {
   castSpeed,
   costReduction,
-  curseArea,
   curseEffect,
   daggerSpellDamage,
   dex,
@@ -30,7 +29,6 @@ import {
   moveSpeed,
   reducedReservation,
   resOne,
-  skillDuration,
   spellCritMulti,
   spellDamage,
   wandAttack,
@@ -47,8 +45,8 @@ export const craft: AreaSpec = {
   clusters: [
     {
       id: 'focus',
-      name: 'Arcane Focus',
-      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Mana at both ends, which every caster uses. Damage and cast speed on the north side (Arcane Focus); chaos resistance and mana on the south (Warded Mind), the defence a caster forgets until a poisoner finds it. Until G3 (2026-10-22, G1/mystic.md MY-r1) the south side was energy shield, so the wheel handed a caster spell damage and energy shield on its two sides seven steps out; the near energy shield is west now (Glass Skin). The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms, Keen Verse on the east road.",
+      name: 'Ready Wit',
+      why: "The wheel: entered from the craft road on the south-west, left to the junction on the east and the column from its north-west small. Each notable's two smalls are its own lines (G4 fix 1, 2026-10-22, audit/growth-1/discipline.md F6: the north-east small was mana, so Ready Wit's side mixed spell damage and mana): Ready Wit, damage and cast speed, on the north side, with a spell damage small and a cast speed small; Warded Mind, chaos resistance and mana, on the south, with a mana small and a chaos resistance small, the defence a caster forgets until a poisoner finds it. Cast speed rather than a second spell damage small, so spell damage near home stays scarce. Until G3 (2026-10-22, G1/mystic.md MY-r1) the south side was energy shield, so the wheel handed a caster spell damage and energy shield on its two sides seven steps out; the near energy shield is west now (Glass Skin). The Spire's spell crit is elsewhere: Sharp Mind at home, Flashpoint and Fever Pitch up the east and middle arms, Keen Verse on the east road.",
       at: [469, -2000],
       shape: { kind: 'ring', r: 80, a0: 150 },
       nodes: [
@@ -57,22 +55,27 @@ export const craft: AreaSpec = {
         {
           id: 'n1',
           kind: 'notable',
-          name: 'Arcane Focus',
+          name: 'Ready Wit',
           lines: [spellDamage(20), castSpeed(6)],
           why: '2.5 + 1.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [mana(8)], why: 'The north-east exit, to the junction.' },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [castSpeed(4)],
+          why: "The north-east exit, to the junction: Ready Wit's cast speed (mana until G4 fix 1).",
+        },
         {
           id: 'd',
           kind: 'small',
-          lines: [resOne('chaos', 8)],
+          lines: [resOne('chaos', 10)],
           why: "Chaos resistance, the south side's stat (energy shield until G3, MY-r1).",
         },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Warded Mind',
-          lines: [resOne('chaos', 16), mana(8), manaRegen(10)],
+          lines: [resOne('chaos', 20), mana(8), manaRegen(10)],
           why: 'The chaos resistance a caster lacks, with mana and a little regeneration: 2 + 1 + 1 units. No energy shield since G3 (MY-r1): the east wheel is spell damage or chaos resistance, not spell damage and energy shield.',
         },
       ],
@@ -179,7 +182,7 @@ export const craft: AreaSpec = {
     },
     {
       id: 'devotion',
-      name: 'Devotion',
+      name: 'Kept Vows',
       why: "Reduced reservation twice, then the notable with reservation and energy shield: the aura caster's chain from the junction east toward the Knife, where it crosses onto the wheel of the Stair. Here since round 3 (2026-10-20), when it traded places with Hexwright; it sat in the west beside the Cathedral's choir until earlier that day. The choir is the other place to buy auras.",
       at: [1150, -2290],
       shape: { kind: 'hand' },
@@ -189,7 +192,7 @@ export const craft: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Devotion',
+          name: 'Kept Vows',
           lines: [reducedReservation(5), es(8)],
           at: [1300, -2400],
           why: 'Room for an aura and the shield it is reserved against: 1.7 + 1.6 units.',
@@ -203,7 +206,7 @@ export const craft: AreaSpec = {
     {
       id: 'hexwright',
       name: 'Hexwright',
-      why: "Curse effect twice, then the notable with curse effect, curse area and skill duration: the curse caster's pocket, the first of the east road, above the Devotion chain. It was the chain toward the Knife until round 3 (2026-10-20), three steps from the Stair's chaos-spell notable and seven from Second Curse, so a chaos hexer was done by point 17; now they are seven and eleven.",
+      why: "Curse effect twice, then the notable with curse effect and mana regeneration: the curse caster's pocket, the hexer who keeps casting its curses (G4 fix 1, 2026-10-22, audit/growth-1/discipline.md F2: its curse area was a dead line, since a cast curse uses its gem's own radius, and its skill duration probably does not reach a cast curse either; cast speed would copy Grim Oath's pairing). It is the first of the east road, above the Kept Vows chain. It was the chain toward the Knife until round 3 (2026-10-20), three steps from the Stair's chaos-spell notable and seven from Second Curse, so a chaos hexer was done by point 17; now they are seven and eleven.",
       at: [1260, -2750],
       shape: { kind: 'ring', r: 80, a0: 90 },
       nodes: [
@@ -211,7 +214,7 @@ export const craft: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [curseEffect(8)],
-          why: 'The entrance, facing the Devotion chain.',
+          why: 'The entrance, facing the Kept Vows chain.',
           at: [1305, -2664],
         },
         { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [1316, -2721] },
@@ -219,8 +222,8 @@ export const craft: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Hexwright',
-          lines: [curseEffect(12), curseArea(15), skillDuration(10)],
-          why: '1.5 + 1.5 + 1 units.',
+          lines: [curseEffect(20), manaRegen(15)],
+          why: '2.5 + 1.5 units.',
         },
       ],
       links: [
@@ -311,7 +314,7 @@ export const craft: AreaSpec = {
     {
       id: 'toFlashpoint',
       name: 'To Flashpoint',
-      why: 'One intelligence node from Mist Walk to Flashpoint: the run from the Gallery stair down to Devotion had no branch for seven nodes.',
+      why: 'One intelligence node from Mist Walk to Flashpoint: the run from the Gallery stair down to Kept Vows had no branch for seven nodes.',
       at: [870, -3294],
       shape: { kind: 'hand' },
       nodes: [{ id: 'r1', kind: 'attribute', lines: [int(7)], at: [870, -3294] }],
@@ -332,7 +335,7 @@ export const craft: AreaSpec = {
     {
       id: 'toDevotion',
       name: 'A road',
-      why: 'Intelligence once between Hexwright and Devotion.',
+      why: 'Intelligence once between Hexwright and Kept Vows.',
       at: [1280, -2535],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [1280, -2535] }],
@@ -359,18 +362,18 @@ export const craft: AreaSpec = {
     {
       id: 'keenVerse',
       name: 'Keen Verse',
-      why: "Spell damage with the spell crit multiplier (G3 round 1, 2026-10-22; G1/mystic.md MY-1): the crit caster's spell damage, on the east, the Mystic's crit side. A bridge across the gap between Wand Volley, Hexwright and Mist Walk, from the road to Wand Volley up to the road between Mist Walk and Hexwright, laid as a V with the notable at its tip and two spell damage smalls on each leg (the ledger's spell section MY-s2 folded in). Spell damage is the flattest stat of every caster; this is its east direction, with crit as the partner, where Arcane Focus (8 steps) sells it with cast speed, the spine's Piercing Word with penetration, and the Eaves (G3, later round) with regeneration. Steps from the Mystic start: 17.",
+      why: "Spell damage with the spell crit multiplier (G3 round 1, 2026-10-22; G1/mystic.md MY-1): the crit caster's spell damage, on the east, the Mystic's crit side. A bridge across the gap between Wand Volley, Hexwright and Mist Walk, from the road to Wand Volley up to the road between Mist Walk and Hexwright, laid as a V with the notable at its tip and two spell crit multiplier smalls on each leg. The smalls were plain spell damage until G4 fix 1 (2026-10-22, audit/growth-1/builds.md finding 1): every caster took the cluster whatever its partner, and spell damage at 120 points doubled; now the smalls are the partner, so the cluster is the crit caster's and the plain spell damage is on the notable only. Spell damage's directions: cast speed (Ready Wit, 8 steps), crit here, penetration (Piercing Word), regeneration (Long Chant), life (Living Verse). Steps from the Mystic start: 17.",
       at: [1000, -2930],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [spellCritMulti(12)],
           at: [957, -2813],
           why: 'The entrance from the road to Wand Volley, on the straight line to the notable.',
         },
-        { id: 'b', kind: 'small', lines: [spellDamage(8)], at: [976, -2864] },
+        { id: 'b', kind: 'small', lines: [spellCritMulti(12)], at: [976, -2864] },
         {
           id: 'n',
           kind: 'notable',
@@ -379,11 +382,11 @@ export const craft: AreaSpec = {
           at: [1000, -2930],
           why: '2.5 + 1.5 units. The tip of the V; the bend is here, at the notable.',
         },
-        { id: 'c', kind: 'small', lines: [spellDamage(8)], at: [1070, -2935] },
+        { id: 'c', kind: 'small', lines: [spellCritMulti(12)], at: [1070, -2935] },
         {
           id: 'd',
           kind: 'small',
-          lines: [spellDamage(8)],
+          lines: [spellCritMulti(12)],
           at: [1125, -2938],
           why: 'The exit, on the straight line to the road node between Mist Walk and Hexwright.',
         },
@@ -511,7 +514,7 @@ export const craft: AreaSpec = {
     {
       from: 'devotion.b',
       to: 'knife.hex.wheel.n',
-      why: "The near crossing to the Knife leaves from the Devotion chain's small, not from the notable, so Devotion is not a step from the notables of the Stair.",
+      why: "The near crossing to the Knife leaves from the Kept Vows chain's small, not from the notable, so Kept Vows is not a step from the notables of the Stair.",
     },
     {
       from: 'spire.craft.hexwright.b',
@@ -526,7 +529,7 @@ export const craft: AreaSpec = {
     {
       from: 'spire.craft.mistWalk.a',
       to: 'spire.craft.toFlashpoint.r1',
-      why: 'One intelligence node from Mist Walk to Flashpoint: the run from the Gallery stair down to Devotion had no branch for seven nodes.',
+      why: 'One intelligence node from Mist Walk to Flashpoint: the run from the Gallery stair down to Kept Vows had no branch for seven nodes.',
     },
     {
       from: 'spire.craft.toFlashpoint.r1',
@@ -563,11 +566,11 @@ export const craft: AreaSpec = {
     {
       from: 'spire.craft.insight.n',
       to: 'spire.craft.devotion.a',
-      why: 'Intelligence once between Flashes of Insight and the Devotion chain.',
+      why: 'Intelligence once between Flashes of Insight and the Kept Vows chain.',
     },
     { from: 'focus.c', to: 'j1.a', why: "The wheel's east side to the junction." },
     { from: 'j1.a', to: 'insight.a', why: 'Junction to the insight room.' },
-    { from: 'j1.a', to: 'devotion.a', why: 'Junction to the Devotion chain.' },
+    { from: 'j1.a', to: 'devotion.a', why: 'Junction to the Kept Vows chain.' },
     { from: 'j1.a', to: 'manaBastion.a', why: 'Junction to the keystone spur.' },
     {
       from: 'spire.column.j1.a',
@@ -578,7 +581,7 @@ export const craft: AreaSpec = {
     {
       from: 'spire.craft.devotion.n',
       to: 'spire.craft.toDevotion.a',
-      why: 'Intelligence once between Devotion and Hexwright.',
+      why: 'Intelligence once between Kept Vows and Hexwright.',
     },
     {
       from: 'spire.craft.toDevotion.a',
@@ -603,7 +606,7 @@ export const craft: AreaSpec = {
     {
       from: 'toStair.a',
       to: 'knife.hex.j4.a',
-      why: "The curse crossing (a near crossing; G1-brief.md §2.1, laid in the G2 border pass): Hexwright through one node to the Stair's junction, so the curser from either start has the other's curses (Hexwright with Second Curse and the Shade's curse cluster). The Stair's west becomes a loop: the junction, Hexwright, Devotion, the hex wheel, the climb.",
+      why: "The curse crossing (a near crossing; G1-brief.md §2.1, laid in the G2 border pass): Hexwright through one node to the Stair's junction, so the curser from either start has the other's curses (Hexwright with Second Curse and the Shade's curse cluster). The Stair's west becomes a loop: the junction, Hexwright, Kept Vows, the hex wheel, the climb.",
     },
     {
       from: 'spire.storm.jArm.a',

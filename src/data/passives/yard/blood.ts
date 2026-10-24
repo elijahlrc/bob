@@ -3,9 +3,9 @@
  * diamond with Crimson Pact beyond the east one, the Festering chain (poison with bleeding; round 3, where Thirsting
  * Blade was) under the keystone spur, the dear crossings west to the Wall's grit and the Bow's dear road landing on the
  * east rim junction. Since G2 (2026-10-22) its roads: the spine (the middle road carried down from the shield wheel
- * between the two diamonds to the Fosse), the rim road (from the west junction to the east one, under the diamonds), the
- * leg from the Pits' west junction down to the Fosse, and Spellsword moved under the rim road, bridging the spine and
- * the Fosse. Since G3 round 2 the leg carries the wheel of the fighter without a shield (Full Swing two-handed with life,
+ * between the two diamonds to the Fosse), the leg from the Pits' west junction down to the Fosse, and Spellsword
+ * moved under the diamonds, bridging the spine and the Fosse (a rim road between the two junctions under the diamonds
+ * was cut back to the spine's one node in G4 fix 2, 2026-10-23: it ran beside the diamonds' own row). Since G3 round 2 the leg carries the wheel of the fighter without a shield (Full Swing two-handed with life,
  * Paired Steel dual wield with leech), and since round 3 the lasting bleed (Lasting Wounds) bridges the spine's end and
  * the Fosse below Wound Dance.
  */
@@ -14,12 +14,14 @@ import {
   bleedDamage,
   bleedDuration,
   castSpeed,
+  critMulti,
   dex,
   dualDamage,
   leechLife,
   life,
   leechRate,
   manaRegen,
+  physAttack,
   poisonChance,
   poisonDamage,
   spellDamage,
@@ -38,7 +40,7 @@ export const blood: AreaSpec = {
     {
       id: 'openVeins',
       name: 'Open Veins',
-      why: 'Bleed: a diamond of damage, chance and the notable, passed through from the junction above to the west rim junction.',
+      why: 'Bleed: a diamond of damage, chance and the notable, passed through from the junction above to the west rim junction. Drawn tight (G4 fix 1: scaled to 0.7 about its centre).',
       at: [-250, 2980],
       shape: { kind: 'hand' },
       nodes: [
@@ -46,7 +48,7 @@ export const blood: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [bleedDamage(12)],
-          at: [-250, 2895],
+          at: [-250, 2920],
           why: 'The entrance, from the junction above.',
         },
         {
@@ -54,17 +56,17 @@ export const blood: AreaSpec = {
           kind: 'notable',
           name: 'Open Veins',
           lines: [bleedChance(15), bleedDamage(30)],
-          at: [-320, 2980],
+          at: [-299, 2980],
           why: '1.5 + 2.5 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [bleedDamage(12)],
-          at: [-250, 3065],
+          at: [-250, 3040],
           why: 'The exit, to the west rim junction.',
         },
-        { id: 'c', kind: 'small', lines: [bleedDamage(12)], at: [-180, 2980] },
+        { id: 'c', kind: 'small', lines: [bleedDamage(12)], at: [-201, 2980] },
       ],
       links: [
         ['a', 'n'],
@@ -76,7 +78,7 @@ export const blood: AreaSpec = {
     {
       id: 'redHarvest',
       name: 'Red Harvest',
-      why: "Leech: a diamond of leech, life on hit and the notable, passed through from the junction above to the east rim junction. The Yard's other leech, Thirsting Blade (leech with attack speed), is on the west road toward Headsman since round 3: Red Harvest, Crimson Pact and Thirsting Blade had hung off one junction.",
+      why: "Leech: a diamond of leech, life on hit and the notable, passed through from the junction above to the east rim junction. The Yard's other leech, Thirsting Blade (leech with attack speed), is on the west road toward Headsman since round 3: Red Harvest, Crimson Pact and Thirsting Blade had hung off one junction. Drawn tight (G4 fix 1: scaled to 0.7 about its centre).",
       at: [250, 2980],
       shape: { kind: 'hand' },
       nodes: [
@@ -84,7 +86,7 @@ export const blood: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [leechLife(0.4, ['attack'])],
-          at: [250, 2895],
+          at: [250, 2920],
           why: 'The entrance, from the junction above.',
         },
         {
@@ -92,17 +94,17 @@ export const blood: AreaSpec = {
           kind: 'notable',
           name: 'Red Harvest',
           lines: [leechLife(1.2, ['attack']), leechRate(10)],
-          at: [320, 2980],
+          at: [299, 2980],
           why: '3 + 1 units.',
         },
         {
           id: 'b',
           kind: 'small',
           lines: [leechLife(0.4, ['attack'])],
-          at: [250, 3065],
+          at: [250, 3040],
           why: 'The exit, to the east rim junction.',
         },
-        { id: 'c', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [180, 2980] },
+        { id: 'c', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [201, 2980] },
       ],
       links: [
         ['a', 'n'],
@@ -137,7 +139,7 @@ export const blood: AreaSpec = {
     {
       id: 'j3',
       name: 'Junction',
-      why: "The west rim junction: the bleed diamond above, the Wound Dance spur below, the rim road east, the Pits' west junction west, and Shield Bash's road.",
+      why: "The west rim junction: the bleed diamond above, the Wound Dance spur below, the Pits' west junction west, and Shield Bash's road.",
       at: [-420, 3100],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [-420, 3100] }],
@@ -162,7 +164,7 @@ export const blood: AreaSpec = {
     {
       id: 'j2',
       name: 'Junction',
-      why: "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the rim road from the west, the Bow's dear road from the east; the Crimson Pact spur and the Fosse leave it (Festering left it for the Fosse's first node in G3 round 3).",
+      why: "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the Bow's dear road from the east; the Crimson Pact spur and the Fosse leave it (Festering left it for the Fosse's first node in G3 round 3).",
       at: [420, 3100],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(6), dex(6)], at: [420, 3100] }],
@@ -171,13 +173,13 @@ export const blood: AreaSpec = {
     {
       id: 'crimsonPact',
       name: 'Crimson Pact',
-      why: 'Two nodes of leech, then the trade: leech is instant, you have no life regeneration. The rim, east from the east junction. A spur of two since G2 (§9.1); it had three.',
-      at: [770, 3220],
+      why: 'Two nodes of leech, then the trade: leech is instant, you have no life regeneration. The rim, east from the east junction. A spur of two since G2 (§9.1); it had three. Pulled 100 units back along its own line toward the junction in G4 fix 1 (2026-10-22), so the Reaver–Strider seam cluster (Clean Break) passes clear of the keystone; still a dead end.',
+      at: [680, 3190],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [789, 3218] },
-        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [844, 3236] },
-        { id: 'k', kind: 'keystone', name: 'Crimson Pact', lines: [], at: [925, 3262] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [694, 3187] },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [749, 3205] },
+        { id: 'k', kind: 'keystone', name: 'Crimson Pact', lines: [], at: [830, 3231] },
       ],
       links: [
         ['a', 'b'],
@@ -185,9 +187,44 @@ export const blood: AreaSpec = {
       ],
     },
     {
+      id: 'cleanBreak',
+      name: 'Clean Break',
+      why: "The Reaver–Strider seam cluster (G4 fix 1, 2026-10-22; seam 1 of the fix brief): crit multiplier, then the notable with physical attack damage and crit multiplier, then crit multiplier, a straight bridge from Festering to the Strider's Pitch Arrows across the far south-east, where the border had no crossing. Wanted from both sides: the Reaver's sword, axe and dual-wield builds and the Strider's physical crit bow all weigh physical attacks and crit multiplier. The pairing is new: physical attack damage sits with life (Deep Pull) and bleed (Deep Cuts), crit multiplier with crit chance (Vital Aim, Crossed Blades), weapon crit (Fencer's Eye) and low life (Killing Eye). Not the rejected Festering–Pitch Arrows link: a notable of a third kind (neither poison nor fire) sits between them, so Festering and Fouled Tips, the two poison notables, stay six steps apart. The notable sits on the straight line between the two ends, its smalls beside it; the border link is the east small to Pitch Arrows.",
+      at: [1014, 3232],
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [critMulti(12)],
+          at: [973, 3289],
+          why: 'From Festering, on the straight line to the notable.',
+        },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Clean Break',
+          lines: [physAttack(20), critMulti(18)],
+          at: [1014, 3232],
+          why: 'A hard blow that lands true and splits the bone: 2 + 1.5 units.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [critMulti(12)],
+          at: [1055, 3175],
+          why: 'To Pitch Arrows, on the straight line from the notable.',
+        },
+      ],
+      links: [
+        ['a', 'n'],
+        ['n', 'b'],
+      ],
+    },
+    {
       id: 'spellsword',
       name: 'Spellsword',
-      why: "Cast speed twice, then the notable with spell damage, cast speed and mana regeneration: a Reaver picks a spell as often as anyone (56 of the 174 skills are spells) and the Yard sold nothing for one. At the rim, as the brief's grid says (spells are far for a Reaver). Since G2 a straight chain under the rim road from the spine to the Fosse's first node, which had nothing coming off it; it joined the two rim junctions before, where the rim road now runs.",
+      why: "Cast speed twice, then the notable with spell damage, cast speed and mana regeneration: a Reaver picks a spell as often as anyone (56 of the 174 skills are spells) and the Yard sold nothing for one. At the rim, as the brief's grid says (spells are far for a Reaver). Since G2 a straight chain under the diamonds from the spine to the Fosse's first node, which had nothing coming off it; it joined the two rim junctions before.",
       at: [181, 3470],
       shape: { kind: 'hand' },
       nodes: [
@@ -222,7 +259,7 @@ export const blood: AreaSpec = {
     {
       id: 'toWall',
       name: 'The Pits junction',
-      why: "A strength junction on the west side of the Pits, where the west road comes down from the Practice Ground and the leg leaves for the Fosse (G2); the Standard Bearer chain and the Wall's road land on it, and the rim road starts one node east. The Yard reaches the Wall by its near crossings.",
+      why: "A strength junction on the west side of the Pits, where the west road comes down from the Practice Ground and the leg leaves for the Fosse (G2); the Standard Bearer chain and the Wall's road land on it, and the west rim junction is one node east. The Yard reaches the Wall by its near crossings.",
       at: [-660, 3140],
       shape: { kind: 'hand' },
       nodes: [{ id: 'a', kind: 'attribute', lines: [str(7)], at: [-660, 3140] }],
@@ -239,30 +276,25 @@ export const blood: AreaSpec = {
     },
     {
       id: 'rim',
-      name: 'The rim road',
-      why: "The road under the bleed and the leech diamonds (G2, 2026-10-22), from the west rim junction to the east one, its middle node shared with the spine: it replaces Spellsword's chain between the two junctions, so the diamonds are a loop from below by road, not through a notable.",
-      at: [0, 3200],
+      name: 'A spine node',
+      why: "One node of the spine between the diamonds' road node and Spellsword's (G2, 2026-10-22). Until G4 fix 2 (2026-10-23) it was the middle of a rim road from the west rim junction to the east one, 90 to 240 units under the diamonds' own row between the same two junctions: a second road beside the first with nothing coming off its two outer nodes, in no build's plan (network audit N2). Those two nodes are gone (ids retired); the diamonds are still a loop by road through the spine's top node.",
+      at: [-24, 3220],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'p1', kind: 'attribute', lines: [str(6), dex(6)], at: [-200, 3190] },
         {
           id: 'p2',
           kind: 'attribute',
           lines: [str(6), dex(6)],
-          at: [0, 3220],
-          why: 'Where the rim road crosses the spine.',
+          at: [-24, 3220],
+          why: "The spine, on the straight line from the diamonds' road node down to Spellsword's.",
         },
-        { id: 'p3', kind: 'attribute', lines: [str(6), dex(6)], at: [210, 3190] },
       ],
-      links: [
-        ['p1', 'p2'],
-        ['p2', 'p3'],
-      ],
+      links: [],
     },
     {
       id: 'spine',
       name: 'The spine',
-      why: "The middle road's last stretch (G2, 2026-10-22): from where the rim road crosses it straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the lasting bleed (Lasting Wounds, RE-8, G3 round 3) leaves west for the Fosse's fifth node.",
+      why: "The middle road's last stretch (G2, 2026-10-22): from Spellsword's node straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the lasting bleed (Lasting Wounds, RE-8, G3 round 3) leaves west for the Fosse's fifth node.",
       at: [-80, 3660],
       shape: { kind: 'hand' },
       nodes: [
@@ -286,7 +318,7 @@ export const blood: AreaSpec = {
     {
       id: 'lasting',
       name: 'Lasting Wounds',
-      why: "Bleed damage twice, then the notable with bleed damage and bleed duration, then bleed damage once more (RE-8, G3 round 3, 2026-10-22): wounds that stay open, below Wound Dance, whose eight stacks are worth more the longer each bleed lasts. A bridge from the spine's last node to the Fosse's fifth node, so the spine, the Fosse and this chain make a loop. Open Veins (bleed with bleed chance, the Pits above) is its twin, 9 steps away by the spine; Hewing (axes with bleed chance) and Executioner (against the bleeding) are farther west, and the Strider's bow bleeds farther east. Laid as an L with the notable at the corner: the straight line from the spine would reach the Fosse's fifth node 29 degrees from the road east to the fourth, so the last small comes down onto it from above.",
+      why: "Bleed damage twice, then the notable with bleed damage and bleed duration, then bleed damage once more (RE-8, G3 round 3, 2026-10-22): wounds that stay open, below Wound Dance, whose eight stacks are worth more the longer each bleed lasts. A bridge from the spine's last node to the Fosse's fifth node, so the spine, the Fosse and this chain make a loop. Open Veins (bleed with bleed chance, the Pits above) is its twin, 9 steps away by the spine; Hewing (axes with bleed chance) and Finishing Cut (against the bleeding) are farther west, and the Strider's bow bleeds farther east. Laid as an L with the notable at the corner: the straight line from the spine would reach the Fosse's fifth node 29 degrees from the road east to the fourth, so the last small comes down onto it from above.",
       at: [-470, 3980],
       shape: { kind: 'hand' },
       nodes: [
@@ -422,14 +454,22 @@ export const blood: AreaSpec = {
     },
     { from: 'j2.a', to: 'crimsonPact.a', why: 'Junction to the keystone spur.' },
     {
+      from: 'festering.n',
+      to: 'cleanBreak.a',
+      why: 'Festering on to the seam cluster (G4 fix 1): Festering stops being a dead end, and the poison Reaver meets a crit notable on its way east.',
+    },
+    {
+      from: 'cleanBreak.b',
+      to: 'bow.steel.pitch.n',
+      why: "Physical attacks with crit multiplier (a dear crossing, seam 1 of the G4 fix brief): the seam cluster lands on the Strider's Pitch Arrows, so the Reaver's melee walks on to the Strider's south and the physical crit bow comes west for it. The border's one link in the far south-east between the Fosse and the Quiver.",
+    },
+    {
       from: 'yard.shield.j1.a',
       to: 'toHarvest.a',
       why: 'The spine goes on down between the two diamonds (G2).',
     },
-    { from: 'toHarvest.a', to: 'rim.p2', why: 'The spine meets the rim road.' },
-    { from: 'j3.a', to: 'rim.p1', why: 'The rim road leaves the west rim junction.' },
-    { from: 'rim.p3', to: 'j2.a', why: 'The rim road reaches the east rim junction.' },
-    { from: 'rim.p2', to: 'spine.s1', why: 'The spine goes on south past the rim road.' },
+    { from: 'toHarvest.a', to: 'rim.p2', why: 'The spine goes on south.' },
+    { from: 'rim.p2', to: 'spine.s1', why: "The spine goes on south to Spellsword's node." },
     {
       from: 'spine.s2',
       to: 'yard.fosse.road.f4',

@@ -1,7 +1,7 @@
 /**
  * The Nave (the home's continuation): the wheel where the three roads meet (a shield on its north side, the
  * fire spell on its south since 2026-10-20), the dear road from the Wall's resistances, Vigil (regeneration and recharge)
- * toward the choir, the nave junction, and Litany, the resist star.
+ * from the transept toward the choir, the nave junction, and Litany, the resist star.
  */
 import {
   armour,
@@ -51,7 +51,7 @@ export const nave: AreaSpec = {
         {
           id: 'n2',
           kind: 'small',
-          lines: [shieldBlock(3)],
+          lines: [shieldBlock(2)],
           at: P(929, -221),
           why: "The block side; the west road and the Wall's crossing arrive.",
         },
@@ -85,7 +85,7 @@ export const nave: AreaSpec = {
           at: P(929, -79),
           why: 'The fire side; the transept arrives.',
         },
-        { id: 'n7', kind: 'small', lines: [shieldBlock(3)], at: P(1071, -221) },
+        { id: 'n7', kind: 'small', lines: [shieldBlock(2)], at: P(1071, -221) },
         { id: 'n8', kind: 'small', lines: [eleDamage('fire', 10)], at: P(1071, -79) },
       ],
       links: [
@@ -148,7 +148,7 @@ export const nave: AreaSpec = {
     {
       id: 'vigil',
       name: 'Vigil',
-      why: "Life regeneration, then the notable with regeneration, shield recharge and shield: the recovery of a class with two pools, as a chain from the shield notable to the aura wheel's north side, so the nave and the choir are joined without the transept. The approach to Living Ward's idea, two areas before the keystone.",
+      why: "Life regeneration, then the notable with regeneration, shield recharge and shield: the recovery of a class with two pools, as a bridge from the transept to the aura wheel's north side. The approach to Living Ward's idea, two areas before the keystone. G4 fix 1 (2026-10-22, audit T7): it hung off Hearthfire, whose four links (its wheel, Vigil, Litany's cold spoke) made every Zealot caster's first fifteen points the same four notables; now it leaves the transept junction beside the aura wheel's entrance, and Hearthfire is only the fire side of its wheel.",
       at: P(1043, 268),
       shape: { kind: 'hand' },
       nodes: [
@@ -156,8 +156,8 @@ export const nave: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [lifeRegen(0.4)],
-          at: P(1034, 199),
-          why: 'The entrance, from Hearthfire.',
+          at: P(978, 293),
+          why: 'The entrance, from the transept, on the line to the notable.',
         },
         {
           id: 'n',
@@ -182,7 +182,7 @@ export const nave: AreaSpec = {
     {
       id: 'star',
       name: 'Litany',
-      why: "The resist star: all resistances and a little shield in the notable, one single-node spoke per element, each landing somewhere else: fire north on the nave junction, cold west on Glass Wall, lightning east on the rods wheel's staff side, chaos south on the aura wheel's north notable. The crossroads between the nave, the rods and the choir.",
+      why: "The resist star: all resistances and a little shield in the notable, one single-node spoke per element, three landing somewhere else: fire on the nave junction, lightning on the road to the Vestry wheel's staff side, chaos on the road to Choirmaster; the cold spoke toward the home is a point of the star only (since G4 fix 1). The crossroads between the nave, the rods and the choir.",
       at: P(1340, 20),
       shape: { kind: 'hand' },
       nodes: [
@@ -206,7 +206,7 @@ export const nave: AreaSpec = {
           kind: 'small',
           lines: [resOne('cold', 10)],
           at: P(1270, 20),
-          why: 'The cold spoke, to Hearthfire.',
+          why: "The cold spoke, the star's one point that lands nowhere: it ran to Hearthfire until G4 fix 1 (audit T7). The road junction the audit named for it already takes the fire spoke, and a second spoke there would close a triangle of the star on one node; the star keeps three ways in (the nave junction, the road to the Vestry, the road to Choirmaster).",
         },
         {
           id: 'e',
@@ -396,7 +396,11 @@ export const nave: AreaSpec = {
       to: 'wall.resists.j.a',
       why: "The armoured sceptre (a near crossing; G1-brief.md §2.3, deferred to G3 by G2/borders.md §4): Verger's far armour node lands on the Wall's Battlements junction, so the cluster is a crossing of its own beside the Nave road. The Vanguard's mace player reaches Verger's armour and sceptre; the Zealot reaches the Battlements. Verger is 7 steps from Hallowed Hammer.",
     },
-    { from: 'wheel.n5', to: 'vigil.a', why: 'Hearthfire onto the recovery chain.' },
+    {
+      from: 'cathedral.home.jT.a',
+      to: 'vigil.a',
+      why: "The transept onto the recovery chain (G4 fix 1, audit T7): Vigil hangs off the road junction, not off Hearthfire, so the fire notable is only its wheel's fire side and the defences are a direction of their own.",
+    },
     {
       from: 'vigil.n',
       to: 'cathedral.choir.wheel.c2',
@@ -405,7 +409,6 @@ export const nave: AreaSpec = {
     { from: 'wheel.n4', to: 'jN.a', why: 'Through the wheel to the nave junction.' },
     { from: 'jN.a', to: 'cathedral.rods.wheel.r1', why: 'The nave junction to the rods wheel.' },
     { from: 'star.f', to: 'jN.a', why: 'The fire spoke lands on the nave junction.' },
-    { from: 'wheel.n5', to: 'star.w', why: 'Hearthfire onto the cold spoke of the resist star.' },
     {
       from: 'cathedral.nave.star.e',
       to: 'cathedral.nave.toRods.a',

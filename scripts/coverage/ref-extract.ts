@@ -56,6 +56,14 @@ export type RefSkill = {
   qualityStats: [string, number][];
   /** Level 1 and 20 (or the top level if it is lower), the anchors of COVERAGE open question 5. */
   levels: { count: number; first: RefLevel; l20: RefLevel };
+  /** The character level each gem level requires, from level 1 up to 25 (gem levels, DESIGN.md Appendix A). */
+  reqs?: number[];
+  /**
+   * How each stat of `stats` scales, from the first level: 1 is a number per level, 3 a share of the base damage of the
+   * character level the gem level requires (`effectiveness` gives that base damage's curve for this skill).
+   */
+  interp?: number[];
+  effectiveness?: { base: number; incremental: number };
   /** From the data's gem list. */
   gem?: { tags: string[]; reqStr: number; reqDex: number; reqInt: number; id: string };
 };
@@ -149,6 +157,19 @@ export function parseSkills(text: string): RefSkill[] {
     const top = Math.max(...keys);
     const lo = Math.min(...keys);
     const at20 = Math.max(...keys.filter((k) => k <= 20), lo);
+    const reqs = keys
+      .filter((k) => k <= 25)
+      .sort((a, b) => a - b)
+      .map((k) => Number(byN.get(k)!.match(/levelRequirement = (\d+)/)?.[1] ?? NaN));
+    const interp = byN
+      .get(lo)!
+      .match(/statInterpolation = \{([^}]*)\}/)?.[1]
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .map(Number);
+    const base = Number(block.match(/\n\tbaseEffectiveness = ([\d.]+)/)?.[1]);
+    const incremental = Number(block.match(/\n\tincrementalEffectiveness = ([\d.]+)/)?.[1]);
     out.push({
       id,
       name,
@@ -163,6 +184,9 @@ export function parseSkills(text: string): RefSkill[] {
       constantStats: pairs(block, 'constantStats'),
       qualityStats: pairs(block, 'qualityStats'),
       levels: { count: top, first: parseLevel(byN.get(lo)!), l20: parseLevel(byN.get(at20)!) },
+      ...(reqs.every(Number.isFinite) ? { reqs } : {}),
+      ...(interp?.length ? { interp } : {}),
+      ...(Number.isFinite(base) ? { effectiveness: { base, incremental: incremental || 0 } } : {}),
     });
   }
   return out;

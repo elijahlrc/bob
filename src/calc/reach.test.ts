@@ -19,6 +19,14 @@ const offered = (sup: string, sk: string): boolean => {
   return typesAllow(d, new Set(s.types)) && supportLive(d, s).live;
 };
 
+describe('a lobbed orb takes the supports that add projectiles', () => {
+  it('Slag Lob counts projectiles, each another orb', () => {
+    expect(projectileBase(skill('slagLob'))).toBe(1);
+    for (const s of ['twinSalvo', 'tripleShot'])
+      expect(offered(s, 'slagLob'), `${s} on slagLob`).toBe(true);
+  });
+});
+
 describe('a rain of arrows takes the supports that add arrows and widen it, not the ones that need a flight', () => {
   for (const rain of ['arrowShower', 'emberDownpour']) {
     it(`${rain} takes projectile counts, area and a second landing`, () => {
@@ -39,8 +47,16 @@ describe('a rain of arrows takes the supports that add arrows and widen it, not 
   }
 
   it('a skill that fires one thing has no count to add to', () => {
-    for (const sk of ['stormArrow', 'driftingStorm', 'rimeDrift', 'mirrorQuiver'])
+    for (const sk of ['driftingStorm', 'rimeDrift', 'mirrorQuiver'])
       expect(offered('twinSalvo', sk), `Twin Salvo on ${sk}`).toBe(false);
+  });
+});
+
+describe('an arrow that chains on its own', () => {
+  it('takes the supports that add arrows and chains', () => {
+    expect(projectileBase(skill('stormArrow'))).toBe(1);
+    for (const s of ['twinSalvo', 'ricochet'])
+      expect(offered(s, 'stormArrow'), `${s} on stormArrow`).toBe(true);
   });
 });
 

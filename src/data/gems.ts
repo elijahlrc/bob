@@ -72,6 +72,8 @@ export type SkillBehaviour =
       falloff?: number;
       /** The projectile turns around at the end of its range and flies back, hitting again on the way. */
       returns?: boolean;
+      /** Chains the projectile makes on its own, as with the chains support (Storm Arrow). */
+      chains?: number;
       /** With a weapon that does not have this tag the skill is a melee strike of this reach instead (Gouge Shot). */
       meleeUnless?: SkillTag;
       meleeRange?: number;
@@ -865,7 +867,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       ramp: 15,
       fork: true,
     },
-    spellDamage: [{ type: 'lightning', min: [2, 70], max: [20, 650] }],
+    spellDamage: [{ type: 'lightning', min: [3, 70], max: [28, 650] }],
     effectiveness: 80,
     castTime: 0.8,
     crit: 5,
@@ -1165,8 +1167,8 @@ export const AURA_GEMS: AuraGemDef[] = [
     attr: 'str',
     reservePct: 50,
     mods: [
-      { stat: 'damage.min', kind: 'base', value: [4, 120], damageTypes: ['fire'] },
-      { stat: 'damage.max', kind: 'base', value: [7, 180], damageTypes: ['fire'] },
+      { stat: 'damage.min', kind: 'base', value: [18, 120], damageTypes: ['fire'] },
+      { stat: 'damage.max', kind: 'base', value: [27, 180], damageTypes: ['fire'] },
     ],
     description: 'Adds fire damage to attacks and spells.',
   },
@@ -1219,7 +1221,7 @@ export const AURA_GEMS: AuraGemDef[] = [
     name: 'Veil of Grace',
     attr: 'dex',
     reservePct: 50,
-    mods: [{ stat: 'evasion', kind: 'base', value: [60, 1700] }],
+    mods: [{ stat: 'evasion', kind: 'base', value: [150, 1700] }],
     description: 'Grants evasion rating.',
   },
   {
@@ -1372,10 +1374,5 @@ export function gemDef(id: string): GemDef {
   if (!g) throw new Error(`unknown gem ${id}`);
   return g;
 }
-
-/** §11.5 level requirement per gem level (index 0 = level 1). */
-export const GEM_LEVEL_REQ = [
-  1, 2, 4, 7, 11, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 67, 70,
-] as const;
 
 export const MAX_GEM_LEVEL = 25;

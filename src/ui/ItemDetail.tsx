@@ -117,11 +117,7 @@ type Props = Actions & {
 /** The one way to get rid of something: put it aside in the discarded pile (it can be put back, or salvaged with the rest). */
 function DiscardButton({ it, a }: { it: InventoryItem; a: Actions }) {
   return (
-    <button
-      class="btn small"
-      title="Put it aside. Nothing is lost: salvage everything discarded at once, or put it back."
-      onClick={() => a.onDiscard(it.uid)}
-    >
+    <button class="btn small" onClick={() => a.onDiscard(it.uid)}>
       Discard
     </button>
   );
@@ -256,13 +252,8 @@ function ActionRow({
       >
         {phone ? (favourite ? '★' : '☆') : favourite ? '★ Favourite' : '☆ Favourite'}
       </button>
-      {craft && (
-        <button
-          class="btn small"
-          onClick={() => a.onCraft(craft.uid)}
-          disabled={!!craft.sealed || !CRAFTING_OPEN}
-          title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
-        >
+      {craft && CRAFTING_OPEN && (
+        <button class="btn small" onClick={() => a.onCraft(craft.uid)} disabled={!!craft.sealed}>
           Craft…
         </button>
       )}
@@ -612,7 +603,6 @@ export function ItemDetail(p: Props) {
           <b>Pick something</b>
           <div class="muted">
             {p.coarse ? 'Tap' : 'Click'} an item in the bag to see how it changes you, slot by slot.
-            Then equip it, swap it, or discard it.
           </div>
           {p.upgrades > 0 && (
             <button class="btn small primary" onClick={p.onBestUpgrade}>
@@ -643,8 +633,7 @@ export function ItemDetail(p: Props) {
             </button>
           </div>
           <div class="ix-note">
-            Discarded: out of the bag, and out of the Workbench. It is broken down for{' '}
-            {salvageValue(selected)} Bone Dust with the rest when you salvage the discarded items.
+            Worth {salvageValue(selected)} Bone Dust when you salvage the pile.
           </div>
         </div>
       </div>
@@ -713,12 +702,11 @@ export function ItemDetail(p: Props) {
               >
                 Take off
               </button>
-              {selected.kind === 'item' && (
+              {selected.kind === 'item' && CRAFTING_OPEN && (
                 <button
                   class="btn small"
                   onClick={() => a.onCraft(selected.uid)}
-                  disabled={!!selected.sealed || !CRAFTING_OPEN}
-                  title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
+                  disabled={!!selected.sealed}
                 >
                   Craft…
                 </button>

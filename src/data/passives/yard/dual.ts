@@ -7,7 +7,9 @@
  */
 import {
   accuracy,
+  meleeRange,
   attackSpeed,
+  avoidAilments,
   bowDamage,
   critMulti,
   dex,
@@ -21,8 +23,8 @@ import {
   fervourDuration,
   fervourOnKill,
   life,
+  lifeOnHit,
   maxFervour,
-  moveSpeed,
   physAttack,
   str,
   swordDamage,
@@ -40,7 +42,7 @@ export const dual: AreaSpec = {
     {
       id: 'twinFangs',
       name: 'Twin Fangs',
-      why: "The wheel off the second-hand road: attack speed at the entrance, then dual wield on the top side (Twin Fangs: damage, speed and the second blade's block) or evasion on the bottom side (Weaving), the Reaver's dexterity defence. Passed through to the gate on the east and the junction below, so the route takes one side.",
+      why: "The wheel off the second-hand road: attack speed at the entrance, then dual wield on the top side (Twin Fangs: damage, speed and the second blade's block) or evasion on the bottom side (Weaving: evasion with avoid elemental ailments since G4 fix 1), the Reaver's dexterity defence. Passed through to the gate on the east and the junction below, so the route takes one side.",
       at: [560, 1800],
       shape: { kind: 'hand' },
       nodes: [
@@ -78,9 +80,9 @@ export const dual: AreaSpec = {
           id: 'n2',
           kind: 'notable',
           name: 'Weaving',
-          lines: [evasion(20), life(5)],
+          lines: [evasion(20), avoidAilments(20)],
           at: [507, 1891],
-          why: 'Evasion and life: 2 + 1 units.',
+          why: "Evasion with avoid elemental ailments: 2 + 2 units. Life out since G4 fix 1 (2026-10-22): evasion with life was the pairing of Hard Target and Wanderer too, three of them about 7 steps from the Strider start in three directions, so the evasion choice there was which copy first (trade-offs audit F2). Slipping the blow and shaking off the burn and the chill is the Reaver's own evasion.",
         },
       ],
       links: [
@@ -179,7 +181,7 @@ export const dual: AreaSpec = {
     {
       id: 'sidestep',
       name: 'Sidestep',
-      why: "Dodge: a node, then the notable with movement and evasion, between the wheel's east side and the east junction. The Reaver who kites, and the Strider who came through the gate for a defence it knows.",
+      why: "Dodge: a node, then the notable with dodge and life on hit, between the wheel's east side and the east junction: the Lists' dodge, the riposte of a fighter who slips the blow and cuts back. It sold dodge, movement and evasion until G4 fix 1 (2026-10-22), the same lines as the Shade home's Soft Step (trade-offs audit F5), then dodge with dual-wield block until G4 fix 2 (2026-10-23), the pairing of Feint and Cut on the Knife's Seawall (dual wield with dodge, trade-offs audit T5). Its partner is now recovery, which no other dodge notable sells.",
       at: [890, 1940],
       shape: { kind: 'hand' },
       nodes: [
@@ -188,9 +190,9 @@ export const dual: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Sidestep',
-          lines: [dodgeAttack(5), moveSpeed(4), evasion(8)],
+          lines: [dodgeAttack(5), lifeOnHit(6, ['attack'])],
           at: [900, 2020],
-          why: '1.7 + 1 + 0.8 units.',
+          why: "Step aside and cut back: dodge with life on attack hit, 1.7 + 1.5 units (G4 fix 2, 2026-10-23). It was dodge with block while dual wielding, the pairing of the Knife's Feint and Cut (dual wield with dodge, trade-offs audit T5); the second blade's block stays on Twin Fangs. Not avoid stun (Footwork's, six steps away), accuracy, evasion (Weaving), dual damage, speed or crit; life on hit is on no other dodge notable, and a blade in each hand hits often.",
         },
       ],
       links: [['a', 'n']],
@@ -270,7 +272,7 @@ export const dual: AreaSpec = {
     {
       id: 'footwork',
       name: 'Footwork',
-      why: "Accuracy twice, then the notable with evasion and accuracy, then accuracy once more (RE-6, G3 round 2, 2026-10-22): feet that slip a blow and land one, the Lists' outer side between the east gate and the Strider's Ford hub (a near crossing). Accuracy leads, not evasion as the brief had it: the gate is 4 steps from the Strider start, so three evasion smalls here would be cheap evasion for the Strider's own builds (whose evasion is near flat at 120 points), and the Reaver's dual-wield evasion already climbs; the evasion is on the notable. Six steps from Weaving, the wheel's evasion, and from Sidestep. Laid as an L with the notable at the corner: the straight line from the gate would reach the hub 18 degrees from the Strider's own link into it.",
+      why: "Accuracy twice, then the notable with accuracy and melee reach, then accuracy once more (RE-6, G3 round 2, 2026-10-22; re-partnered in G4 fix 2, 2026-10-23): the duellist's footing, the Lists' outer side between the east gate and the Strider's Ford hub (a near crossing). No evasion at all since fix 2: the gate is 4 steps from the Strider start, and evasion here made it every dexterity build's first stop; the Reaver's evasion is Weaving's (the wheel) and the Muster's. Reach, not dodge or the second blade: Sidestep (dodge, six steps), Twin Fangs (dual wield) and Crossed Blades (dual crit with accuracy) keep their own partners. Laid as an L with the notable at the corner: the straight line from the gate would reach the hub 18 degrees from the Strider's own link into it.",
       at: [898, 1742],
       shape: { kind: 'hand' },
       nodes: [
@@ -286,9 +288,9 @@ export const dual: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Footwork',
-          lines: [evasion(25), accuracy(15)],
+          lines: [accuracy(20), meleeRange(1)],
           at: [898, 1742],
-          why: 'Slip the blow, land the next: 2.5 + 1.5 units.',
+          why: 'Step in and land the blow: accuracy with melee reach, 2 + 2 units (G4 fix 2, 2026-10-23). It was evasion with accuracy, and every dexterity build from three starts made it a first stop for the evasion (trade-offs audit T1, starts audit F4, the U4 condition). Reach is a melee want the archers do not chase: measured, the dual wielder and the lightning striker take it by 120 and the sword and shield by 160, no bow or Shade build. Not movement and not avoid stun: each trialled, and nobody took it.',
         },
         {
           id: 'c',
@@ -307,7 +309,7 @@ export const dual: AreaSpec = {
     {
       id: 'hotBlood',
       name: 'Hot Blood',
-      why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs).",
+      why: "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs). A square, drawn tight since G4 fix 1 (scaled to 0.7 about its centre).",
       at: [830, 2340],
       shape: { kind: 'hand' },
       nodes: [
@@ -315,7 +317,7 @@ export const dual: AreaSpec = {
           id: 'a',
           kind: 'small',
           lines: [fervourDuration(15)],
-          at: [780, 2290],
+          at: [795, 2305],
           why: 'The entrance, from the east road.',
         },
         {
@@ -323,11 +325,11 @@ export const dual: AreaSpec = {
           kind: 'notable',
           name: 'Hot Blood',
           lines: [maxFervour(1), fervourOnKill(10)],
-          at: [880, 2290],
+          at: [865, 2305],
           why: 'A fourth fervour charge (3 units by the table) and a way to gain them: 4.',
         },
-        { id: 'b', kind: 'small', lines: [fervourDuration(15)], at: [880, 2390] },
-        { id: 'c', kind: 'small', lines: [fervourDuration(15)], at: [780, 2390] },
+        { id: 'b', kind: 'small', lines: [fervourDuration(15)], at: [865, 2375] },
+        { id: 'c', kind: 'small', lines: [fervourDuration(15)], at: [795, 2375] },
       ],
       links: [
         ['a', 'n'],
@@ -389,7 +391,7 @@ export const dual: AreaSpec = {
     {
       from: 'footwork.c',
       to: 'bow.steel.hub.t',
-      why: "Evasion and accuracy (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Footwork lands on the Strider's Ford hub, re-aimed from the gate's old direct link, so the kiting Reaver walks on into the Ford and the Strider comes in for accuracy.",
+      why: "Accuracy and footing (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Footwork lands on the Strider's Ford hub, re-aimed from the gate's old direct link, so the Reaver walks on into the Ford and a Strider who wants accuracy comes in for it.",
     },
     { from: 'twinFangs.d', to: 'j1.a', why: "The wheel's south side to the junction." },
     { from: 'twinFangs.c', to: 'sidestep.a', why: "The wheel's east side onto the dodge chain." },

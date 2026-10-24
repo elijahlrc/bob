@@ -1,7 +1,7 @@
 import { gerp, lerp } from '../core/math';
 import { spellBaseDamage } from '../data/constants';
+import { GEM_LADDERS, GEM_START } from '../data/gemLevels';
 import {
-  GEM_LEVEL_REQ,
   MAX_GEM_LEVEL,
   FX_KEYS,
   type ActiveGemDef,
@@ -36,7 +36,35 @@ export function gemMods(mods: readonly GemMod[], level: number, sourceId: string
   }));
 }
 
-/** Attribute requirement of a gem at a level (§11.5). */
+/** The character level a gem's first level requires (gem levels, DESIGN.md Appendix A): it drops from areas of that level on. */
+export function gemStart(def: { id: string }): number {
+  return GEM_START[def.id] ?? 1;
+}
+
+/** The character level a gem level requires: the reference ladder of the gem's first level. */
+export function gemLevelReq(def: { id: string }, level: number): number {
+  const ladder = GEM_LADDERS[gemStart(def)];
+  return ladder[Math.max(1, Math.min(level, ladder.length)) - 1];
+}
+
+const STANDARD = GEM_LADDERS[1];
+
+/**
+ * Where a gem level stands on the ladder of a gem that starts at level 1: the level whose requirement is the same, between two
+ * steps if it falls between them. What follows the character's level rather than the gem's (the shared curve of spell and
+ * minion damage, the attribute requirement) reads this, so a level 1 gem that needs character level 28 hits like a level 9 one.
+ * It is the gem level itself for a gem that starts at level 1, and for every gem from level 21, where all ladders agree.
+ */
+export function scaleLevel(def: { id: string }, level: number): number {
+  if (gemStart(def) === 1 || level < 1 || level > STANDARD.length) return level;
+  const req = gemLevelReq(def, level);
+  for (let i = 0; i < STANDARD.length - 1; i++)
+    if (req <= STANDARD[i + 1])
+      return i + 1 + (req - STANDARD[i]) / (STANDARD[i + 1] - STANDARD[i]);
+  return STANDARD.length;
+}
+
+/** Attribute requirement of a gem at a level (§11.5), at the level's place on the standard ladder. */
 export function gemAttrReq(attr: GemAttr, level: number): Attrs {
   const full = Math.round(10 + ((98 - 10) * (Math.min(level, 20) - 1)) / 19);
   const hybrid = Math.round(full * 0.6);
@@ -56,12 +84,15 @@ export function gemAttrReq(attr: GemAttr, level: number): Attrs {
   }
 }
 
-/** The highest natural level (≤ 20) allowed by character level and attributes. */
+/**
+ * The highest natural level (≤ 20) allowed by character level and attributes. Never below 1: a gem held below its first level
+ * (one found before gems waited for their level) works as a level 1 gem until the character catches up.
+ */
 export function naturalGemLevel(def: GemDef, charLevel: number, attrs: Attrs): number {
   let best = 1;
   for (let l = 1; l <= 20; l++) {
-    if (GEM_LEVEL_REQ[l - 1] > charLevel) break;
-    const r = gemAttrReq(def.attr, l);
+    if (gemLevelReq(def, l) > charLevel) break;
+    const r = gemAttrReq(def.attr, scaleLevel(def, l));
     if (attrs.str < r.str || attrs.dex < r.dex || attrs.int < r.int) break;
     best = l;
   }
@@ -87,6 +118,11 @@ export type SkillDef = SkillFx & {
   types: SkillType[];
   behaviour: SkillBehaviour;
   level: number;
+  /**
+   * The level on the shared curve of spell and minion damage (`scaleLevel`): the gem level for a gem that starts at level 1,
+   * higher for one that needs a higher character level.
+   */
+  curveLevel: number;
   /** Percent of base damage (attacks). */
   baseMult: number;
   spellDamage: { type: DamageType; min: number; max: number }[];
@@ -245,9 +281,11 @@ export function spellDamageAt(
   d: SpellDamageDef,
   effectiveness: number,
   level: number,
+  /** The level on the shared curve (`scaleLevel`); explicit numbers are the gem level's own. */
+  curveLevel = level,
 ): { type: DamageType; min: number; max: number } {
   if ('spread' in d) {
-    const avg = spellBaseDamage(level) * (effectiveness / 100) * (d.share ?? 1);
+    const avg = spellBaseDamage(curveLevel) * (effectiveness / 100) * (d.share ?? 1);
     return { type: d.type, min: Math.round(avg * d.spread[0]), max: Math.round(avg * d.spread[1]) };
   }
   return {
@@ -303,9 +341,10 @@ function resolveActiveUncached(def: ActiveGemDef, level: number): SkillDef {
     types: [...new Set<SkillType>([...def.tags, ...(def.types ?? defaultTypes(def))])],
     behaviour,
     level,
+    curveLevel: scaleLevel(def, level),
     baseMult: def.baseMult ? levelValue(def.baseMult, level) : 100,
     spellDamage: (def.spellDamage ?? []).map((d) =>
-      spellDamageAt(d, def.effectiveness ?? 100, level),
+      spellDamageAt(d, def.effectiveness ?? 100, level, scaleLevel(def, level)),
     ),
     effectiveness: def.effectiveness ?? 100,
     castTime: def.castTime ?? 1,
@@ -374,6 +413,7 @@ export const DEFAULT_ATTACK: SkillDef = {
   types: ['attack', 'melee'],
   behaviour: { kind: 'melee', range: 1.3 },
   level: 1,
+  curveLevel: 1,
   baseMult: 100,
   spellDamage: [],
   effectiveness: 100,
@@ -390,4 +430,10 @@ export const DEFAULT_BOW_ATTACK: SkillDef = {
   tags: ['attack', 'projectile'],
   types: ['attack', 'projectile'],
   behaviour: { kind: 'projectile', count: 1, spread: 0, range: 9 },
+};
+
+/** Default attack variant for wands: a bolt, shot as a bow shoots an arrow. */
+export const DEFAULT_WAND_ATTACK: SkillDef = {
+  ...DEFAULT_BOW_ATTACK,
+  id: 'defaultWandAttack',
 };

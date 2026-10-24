@@ -5,7 +5,9 @@
  * effect) on the middle road between Stone Ward and the Barrows road. G3 round 2: Hammer Rhythm (the fast mace) between
  * the north road and the barrow stair, Long Watch (totem speed, duration) between the west road and Long Reach; the
  * middle road passes Stone Ward and Iron Voice beside their notables; Tempered took Elemental Ward's armour. G3 round
- * 3: Bellows (fire attacks, melee area) south of the Barrows road, on to Grave Host's chain.
+ * 3: Bellows (fire attacks, melee area) south of the Barrows road, on to Grave Host's chain. G4 fix 1: Iron Voice's
+ * smalls became warcry effect (armour stays on the notable), Greatblade's two-handed damage (the sword stays on the
+ * notable), Heavy Hands' smalls one unit of two-handed speed.
  */
 import {
   accuracy,
@@ -139,12 +141,12 @@ export const grit: AreaSpec = {
     {
       id: 'heavyHands',
       name: 'Heavy Hands',
-      why: "Two-handed attack speed three times, then the notable with speed and accuracy: the fast two-hander, far south beside the warcries and the grit (it was a side of the tower's wheel until 2026-10-20, a step from every other two-hander node). The approach to Blood Rite, whose own spur sells the life it asks for.",
+      why: "Two-handed attack speed three times, then the notable with speed and accuracy: the fast two-hander, far south beside the warcries and the grit (it was a side of the tower's wheel until 2026-10-20, a step from every other two-hander node). The approach to Blood Rite, whose own spur sells the life it asks for. The smalls are one unit each, 5% (7% until G4 fix 1, 2026-10-22).",
       at: [-2496, 3386],
       shape: { kind: 'ring', r: 55, a0: -135 },
       nodes: [
-        { id: 'a', kind: 'small', lines: [attackSpeed(7, ['twoHand'])] },
-        { id: 'b', kind: 'small', lines: [attackSpeed(7, ['twoHand'])] },
+        { id: 'a', kind: 'small', lines: [attackSpeed(5, ['twoHand'])] },
+        { id: 'b', kind: 'small', lines: [attackSpeed(5, ['twoHand'])] },
         {
           id: 'n',
           kind: 'notable',
@@ -152,7 +154,7 @@ export const grit: AreaSpec = {
           lines: [attackSpeed(13, ['twoHand', 'melee']), accuracy(15)],
           why: '2.7 + 1.5 units.',
         },
-        { id: 'c', kind: 'small', lines: [attackSpeed(7, ['twoHand'])] },
+        { id: 'c', kind: 'small', lines: [attackSpeed(5, ['twoHand'])] },
       ],
       links: [
         ['a', 'b'],
@@ -357,12 +359,12 @@ export const grit: AreaSpec = {
     {
       id: 'greatblade',
       name: 'Greatblade',
-      why: 'A pocket south off the Barrows road, where it turns hybrid toward the Yard: sword damage twice, then the two-handed sword. The Yard had no home for it; this one sits on the Wall-Yard road, where its strength and dexterity are both supplied. It hung off the second road node, beside Headsman and Heavy Hands, until round 4 (2026-10-20), which made the three two-hander notables a row on adjacent road nodes.',
+      why: "A pocket south off the Barrows road, where it turns hybrid toward the Yard: two-handed damage twice, then the two-handed sword. The smalls were sword damage until G4 fix 1 (2026-10-22): the sword-and-shield build bought the whole pocket as more sword and the two-handed half never mattered; now a one-handed sword pays two two-handed smalls for the notable's sword, and the two-handed sword finds its home. The Yard had no home for it; this one sits on the Wall-Yard road, where its strength and dexterity are both supplied. It hung off the second road node, beside Headsman and Heavy Hands, until round 4 (2026-10-20), which made the three two-hander notables a row on adjacent road nodes.",
       at: [-1010, 3460],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3482] },
-        { id: 'b', kind: 'small', lines: [swordDamage(10)], at: [-1010, 3540] },
+        { id: 'a', kind: 'small', lines: [twoHandDamage(12)], at: [-1010, 3482] },
+        { id: 'b', kind: 'small', lines: [twoHandDamage(12)], at: [-1010, 3540] },
         {
           id: 'n',
           kind: 'notable',
@@ -417,7 +419,7 @@ export const grit: AreaSpec = {
     {
       id: 'middle',
       name: "The Barrows' middle road",
-      why: "Strength twice on a line across Stone Ward's chain (G2, 2026-10-22): north to Second Wind, south down Iron Voice's armour smalls to the Barrows road. Before it, the only ways between the Quarry and the Barrows road went round by War Drums or the Pits. Since G3 round 2 it crosses Stone Ward at a small and passes Iron Voice beside its notable, so the road buys no notable it does not want.",
+      why: "Strength twice on a line across Stone Ward's chain (G2, 2026-10-22): north to Second Wind, south down Iron Voice's warcry smalls to the Barrows road. Before it, the only ways between the Quarry and the Barrows road went round by War Drums or the Pits. Since G3 round 2 it crosses Stone Ward at a small and passes Iron Voice beside its notable, so the road buys no notable it does not want.",
       at: [-1810, 2400],
       shape: { kind: 'hand' },
       nodes: [
@@ -429,18 +431,18 @@ export const grit: AreaSpec = {
     {
       id: 'ironVoice',
       name: 'Iron Voice',
-      why: "Armour four times on the Barrows' middle road, with the notable of armour and warcry buff effect in a triangle off its middle: the shouting Vanguard in plate, for the warcry and totem build and any strength build passing south (G3, 2026-10-22; the ledger's VA-3, with the armour section VA-s2 folded in). The smalls lie on the straight line from Stone Ward's road node down to the Barrows road, so the road is whole and the Quarry reaches the Barrows through the middle; the notable is a step off it (G3 round 2: it sat in the line, a toll on the road). The strength defence's south-west direction, far from both strength starts; War Drums (warcry duration and effect) is the warcry twin, seven steps west by the junction.",
+      why: "Warcry buff effect four times on the Barrows' middle road, with the notable of armour and warcry buff effect in a triangle off its middle: the shouting Vanguard in plate, for the warcry and totem build (G3, 2026-10-22; the ledger's VA-3). The smalls were armour until G4 fix 1 (2026-10-22): a cluster whose smalls are the generic stat is taken by every build that wants armour, and Iron Voice was in six of the seven armour builds' plans, so the strength builds' armour at 120 points rose by half over G0; the smalls now carry the partner, the armour stays on the notable, and a build passing south pays warcry smalls as road. The smalls lie on the straight line from Stone Ward's road node down to the Barrows road, so the road is whole and the Quarry reaches the Barrows through the middle; the notable is a step off it (G3 round 2: it sat in the line, a toll on the road). The strength defence's south-west direction, far from both strength starts; War Drums (warcry duration and effect) is the warcry twin, seven steps west by the junction.",
       at: [-1928, 2901],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [warcryEffect(10)],
           at: [-1908, 2809],
           why: 'The north end, from the middle road.',
         },
-        { id: 'b', kind: 'small', lines: [armour(12)], at: [-1920, 2864] },
+        { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: [-1920, 2864] },
         {
           id: 'n',
           kind: 'notable',
@@ -449,11 +451,11 @@ export const grit: AreaSpec = {
           at: [-1865, 2915],
           why: "2 + 2 units: 4. Armour and the warcry in even measure (the round-1 allocator showed the strength builds' armour doubling at 120 points with a heavier armour line). The triangle's apex, east of the road.",
         },
-        { id: 'c', kind: 'small', lines: [armour(12)], at: [-1936, 2937] },
+        { id: 'c', kind: 'small', lines: [warcryEffect(10)], at: [-1936, 2937] },
         {
           id: 'd',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [warcryEffect(10)],
           at: [-1948, 2992],
           why: 'The south end, toward the Barrows road.',
         },

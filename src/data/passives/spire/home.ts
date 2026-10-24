@@ -9,7 +9,6 @@
  * Blood bridge (life) joins the two highways across the gate.
  */
 import {
-  critChance,
   es,
   int,
   life,
@@ -42,7 +41,7 @@ export const home: AreaSpec = {
     {
       id: 'sig',
       name: 'First Light',
-      why: 'The loop the start opens onto: energy shield on the west side, spell damage on the east, the signature at the tip. Point one is a side; point two is the signature, a hub, or a road.',
+      why: 'The loop the start opens onto: energy shield on the west side, mana regeneration on the east, the signature at the tip. Point one is a side; point two is the signature, a hub, or a road.',
       at: [0, -1180],
       shape: { kind: 'hand' },
       nodes: [
@@ -64,9 +63,9 @@ export const home: AreaSpec = {
         {
           id: 'b',
           kind: 'small',
-          lines: [critChance(15)],
+          lines: [manaRegen(20)],
           at: [70, -1242],
-          why: 'The east side: offence, for any hit, spell or wand.',
+          why: "The east side: a generous mana regeneration, two units on one small, so a caster's first point keeps its spells going (the user, 2026-10-23; it was 15% crit chance).",
         },
       ],
       links: [

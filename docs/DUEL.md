@@ -277,7 +277,7 @@ not what they watch.
   both reports), a `mapEnd`, and the `'duelResult'` screen, never `endMap`, so the run's map flow (`finishMap`, Crawls, reprieves,
   telemetry, the save) is untouched and `Controller.run` is whatever it was. `againDuel()` fights on the next seed; `leaveDuel()` goes
   back to `from`.
-- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("You won", "You fell", "Won on time: fewer reprieves used", "Lost on
+- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("Victory", "Defeat", "Victory on time: fewer reprieves used", "Defeat on
   time: more reprieves used", "A draw: time ran out", "A draw: nobody landed a blow for 15 s"), the reprieves each side used, the time, each side's damage dealt by skill and taken by source (`MapReportView`, the numbers are what landed), and
   **Again** (the next seed) and **Back**. A fight against a rival (F7, 6.5) adds a line ("Rated" or "Practice") and **Another rival**.
 - **Debug panel** (`src/ui/Debug.tsx`, at camp): a Duel row with a class, a map, a seed, **Mirror** (the character against a copy of
@@ -458,6 +458,16 @@ empty or unreachable pool, is dropped (an empty pool is a line and Back). Diffic
   save version's; a box, "Show high scores from older versions", adds the older versions' list below it under "Older versions
   (outdated)" and a line saying those characters can no longer be fought (2026-10-20, when the new passive tree made every
   earlier snapshot unfightable).
+- **High scores on a run's end screen** (`src/ui/Leaderboard.tsx`, 2026-10-23): at the foot of the summary, the top five of
+  this version's list, then the two rows either side of the run's own character (its newest snapshot, when it is the run's) with a
+  gap between when they do not meet, and "Your rank: #N". A character not yet rated is placed by its rating without a rank
+  ("Unranked until your first rated duel"). It is read again each time the summary opens (so after every duel) and when the post
+  lands.
+- **Paging** (2026-10-23, `docs/rivals.sql` 15c): the screens never read the whole list. `high_scores_page(save_version,
+outdated, start, k)` gives a page (at most 100 rows) with each row's rank, and the High scores screen asks for fifty at a time
+  with Show more; `high_score_standing(snapshot_id, span)` gives the rows within `span` ranks of a snapshot (or of where its rating
+  would stand), which is all the end screen reads besides the top five. Both rank by rating, wins, the older snapshot, then the
+  id; a partial index (`rivals_board_idx`) serves the order. `high_scores` stays for older builds.
 - **Camp** (later, out of this plan): the same screens from a "Spar" button, with the character as it stands.
 
 In-game text: a card says who the rival is and what they reached; the result says what the fight counted for, who won, how, and the

@@ -9,6 +9,7 @@ import {
   postStatus,
   rivalsConfigured,
   rivalsOn,
+  postFailText,
   sendName,
   setRivals,
   watchPost,
@@ -20,6 +21,7 @@ import { themeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
 import type { MapTypeId } from '../data/mapTypes';
 import { MapReportView } from './MapReport';
+import { Leaderboard } from './Leaderboard';
 import { DUEL_TITLE } from './Rivals';
 import { RivalsOptIn } from './RivalsOptIn';
 
@@ -160,9 +162,7 @@ function RivalsBlock({ c, run }: { c: Controller; run: RunState }) {
           }}
         />
       )}
-      {failed?.reason === 'unreachable' && (
-        <p class="warn">Could not reach the rivals. Press the button to try again.</p>
-      )}
+      {failed?.reason === 'unreachable' && <p class="warn">{postFailText(failed.message)}</p>}
       {set && set.fought > 0 && (
         <p class="muted">
           You beat {set.beaten} of {set.fought} rival{set.fought === 1 ? '' : 's'}
@@ -219,6 +219,7 @@ export function Summary({ c }: { c: Controller }) {
           Back to title
         </button>
       </div>
+      {rivalsConfigured() && <Leaderboard run={run} />}
     </div>
   );
 }

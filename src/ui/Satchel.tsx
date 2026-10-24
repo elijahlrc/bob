@@ -60,12 +60,6 @@ export function Satchel({ c }: { c: Controller }) {
       {w.found && <div class="notice">The last map left you {provisionDef(w.found).name}.</div>}
       {held.some((id) => !isReprieveId(id)) && <Tip c={c} id="satchel" />}
       {held.some((id) => isReprieveId(id)) && <Tip c={c} id="reprieve" />}
-      {held.length > 0 && (
-        <div class="muted">
-          Armed provisions are used up when the next map starts, cleared or not, and count in the
-          cards below.
-        </div>
-      )}
       {curses.map((k) => (
         <div key={k.id} class="warn">
           Cursed: {curseDef(k.id).name} — {curseDef(k.id).text}, through level {k.until}.

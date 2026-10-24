@@ -160,9 +160,7 @@ function Arriving({ run }: { run: RunState }) {
     <div
       class="arriving"
       aria-label={`Arriving with life ${pct(v.life)}%, mana ${pct(v.mana)}%`}
-      {...infoProps(
-        'What you carry into the next map. Camp restores what ten seconds of sitting still would. Flasks refill only by killing.',
-      )}
+      {...infoProps('What you carry into the next map. Camp restores a little life and mana.')}
     >
       <div class="arriving-bars">
         {gauge('life', 'Life', v.life)}
@@ -442,14 +440,14 @@ export function Camp({ c }: { c: Controller }) {
           >
             Strategy
           </button>
-          <button
-            class={'tab' + (shown === 'workbench' ? ' on' : '')}
-            onClick={() => setTab('workbench')}
-            disabled={!CRAFTING_OPEN}
-            title={CRAFTING_OPEN ? undefined : 'Crafting is closed for now.'}
-          >
-            Workbench{CRAFTING_OPEN && run.pendingCraft ? ' (pick a result)' : ''}
-          </button>
+          {CRAFTING_OPEN && (
+            <button
+              class={'tab' + (shown === 'workbench' ? ' on' : '')}
+              onClick={() => setTab('workbench')}
+            >
+              Workbench{run.pendingCraft ? ' (pick a result)' : ''}
+            </button>
+          )}
           {last?.report && (
             <button
               class={'tab' + (shown === 'report' ? ' on' : '')}
@@ -465,7 +463,7 @@ export function Camp({ c }: { c: Controller }) {
         </div>
         <div class="tab-body">
           {shown === 'tree' && <TreeView c={c} />}
-          {shown === 'sheet' && <Sheet s={sheet} />}
+          {shown === 'sheet' && <Sheet s={sheet} ch={ch} />}
           {shown === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}
           {shown === 'strategy' && <Strategy c={c} ch={ch} />}
           {shown === 'items' && run.reward && (

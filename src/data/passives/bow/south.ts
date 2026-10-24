@@ -1,12 +1,14 @@
 /**
  * The Water Meadows (G3 round 2, 2026-10-22): the band between the Ford and the Fosse, outside the old edge and along the
  * south half of the outer road. Field Kit and Fouled Tips (round 1, moved here from the Ford's file) bridge the Ford's
- * far pockets (Sentry Post, Pitch Arrows) out to the road; the elemental bow hangs outward from the road's m56a, and
- * lightning attacks with shock from m67 (round 3).
+ * far pockets (Sentry Post, Pitch Arrows) out to the road; the finishing archer's Killing Eye hangs as an arc between
+ * m56a and m56b (G4 fix 1; Bright Shafts was there), and lightning attacks with shock between m67 and j7 (round 3, an arc since
+ * G4 fix 1).
  */
 import {
   bowDamage,
-  eleAttack,
+  critMulti,
+  damageVsLowLife,
   eleAttackOne,
   evasion,
   flaskEffect,
@@ -21,38 +23,42 @@ export const waterMeadows: AreaSpec = {
   id: 'bow.south',
   region: 'strider',
   name: 'The Water Meadows',
-  why: "The band between the Ford and the Fosse, along the outer road's south half: evasion with flasks, the poison bow, the elemental bow and lightning attacks with shock, each a different direction for a bow build that has spent the inside.",
+  why: "The band between the Ford and the Fosse, along the outer road's south half: evasion with flasks, the poison bow, the finishing crit and lightning attacks with shock, each a different direction for a bow build that has spent the inside.",
   at: [2400, 3120], // Where the area's name is drawn (G3 round 2): over the outer road between Field Kit and Bright Shafts, clear of every notable and of the Thicket's and the Ford's names.
   clusters: [
     {
-      id: 'brightShafts',
-      name: 'Bright Shafts',
-      why: "ST-2 (G1/strider.md §1, G3 round 2, 2026-10-22): elemental damage with attacks and bow damage, the elemental bow's own notable, whose elemental attacks were flat (Elemental Fletching, by home, pairs them with penetration; Pitch Arrows is fire alone, with area). On the road's south-middle rather than its end, so it sits about ten steps from Pitch Arrows and Kill Shot and the elemental bow still chooses between the general cluster and its element's (the brief). Three elemental attack smalls, so the elemental archer collects its want here and the crit archer, who wants the bow damage alone, finds only the notable worth it. A pocket straight out from m56a, square to the road: one of the far tips left as dead ends (the brief: ST-2, ST-4 and the ST-6 wheel).",
-      at: P(3000, 1000),
+      id: 'killingEye',
+      name: 'Killing Eye',
+      why: "Crit multiplier with damage against enemies on low life, the finishing archer's notable, hung as an arc between the outer road's m56a and m56b (G4 fix 1, 2026-10-22, the user's answer U3: it traded places with Bright Shafts, which went to the bleed wheel 12 steps out, and the bare m56b got a branch). The crit archer's far direction south, against Kill Shot's bow crit north; crit multiplier is also sold by Vital Aim (with crit chance, by home) and the Shade's Mercy Stroke (with poison since G4 fix 1). Two sections, one small each: crit multiplier on m56a's side, the finishing blow on m56b's. Walked from either end it costs the other line.",
+      at: P(2581, 1060),
       shape: { kind: 'hand' },
       nodes: [
         {
-          id: 's1',
+          id: 'a',
           kind: 'small',
-          lines: [eleAttack(10)],
-          at: P(2827, 954),
-          why: 'The entrance, facing the road.',
+          lines: [critMulti(12)],
+          at: P(2546, 999),
+          why: "m56a's side: crit multiplier, the notable's lead.",
         },
-        { id: 's2', kind: 'small', lines: [eleAttack(10)], at: P(2880, 968) },
-        { id: 's3', kind: 'small', lines: [eleAttack(10)], at: P(2933, 982) },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Bright Shafts',
-          lines: [eleAttack(24), bowDamage(16)],
-          at: P(3000, 1000),
-          why: '2.4 + 1.6 units.',
+          name: 'Killing Eye',
+          lines: [critMulti(24), damageVsLowLife(16)],
+          at: P(2581, 1060),
+          why: '2 + 2 units. Added in the editor (2026-10-19) as a second Vital Aim; round 4 (approved 2026-10-20) gave it the finishing blow instead of crit chance. The apex of the arc, square to the road.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [damageVsLowLife(8)],
+          at: P(2518, 1090),
+          why: "m56b's side: the finishing blow, the notable's second line.",
         },
       ],
       links: [
-        ['s1', 's2'],
-        ['s2', 's3'],
-        ['s3', 'n'],
+        ['a', 'n'],
+        ['n', 'b'],
       ],
     },
     {
@@ -136,40 +142,51 @@ export const waterMeadows: AreaSpec = {
     {
       id: 'liveWire',
       name: 'Live Wire',
-      why: "ST-4 (G1/strider.md §1, G3 round 3, 2026-10-22): lightning damage with attacks and chance to shock, lightning attacks' second home. Stormstruck (the Reaver's Fosse, eight steps away by j8 and the Fosse crossing) pairs them with attack speed; this one with shock. A lightning archer reaches both, each with its own partner. On m67, up the road from the Fosse, not at the junction, where it would sit three or four steps from Stormstruck (the brief). Three lightning attack smalls, so the elemental archer collects its want here; about eleven steps from Bright Shafts (all elements, with the bow) and from Pitch Arrows (fire, with area). A pocket straight out from m67, square to the road: one of the far tips left as dead ends.",
-      at: P(2603, 1982),
+      why: "ST-4 (G1/strider.md §1, G3 round 3, 2026-10-22): lightning damage with attacks and chance to shock, lightning attacks' second home. Stormstruck (the Reaver's Fosse) pairs them with attack speed; this one with shock. A lightning archer reaches both, each with its own partner. G4 fix 1 (2026-10-22, the network audit N1 and N3): an arc between the outer road's m67 and j7, so it is a bridge and the bare j7 has a branch; one small on m67's side, two on j7's, so the notable stays six steps from Stormstruck (j7, m78, j8). Three lightning attack smalls, one section.",
+      at: P(2265, 1948),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 's1',
           kind: 'small',
           lines: [eleAttackOne('lightning', 12)],
-          at: P(2445, 1896),
-          why: 'The entrance, facing the road.',
+          at: P(2234, 1886),
+          why: "m67's side.",
         },
-        { id: 's2', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: P(2493, 1922) },
-        { id: 's3', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: P(2541, 1948) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Live Wire',
           lines: [eleAttackOne('lightning', 24), shockChance(20)],
-          at: P(2603, 1982),
-          why: '2 + 2 units.',
+          at: P(2265, 1948),
+          why: '2 + 2 units. The apex of the arc, square to the road.',
+        },
+        { id: 's2', kind: 'small', lines: [eleAttackOne('lightning', 12)], at: P(2199, 1973) },
+        {
+          id: 's3',
+          kind: 'small',
+          lines: [eleAttackOne('lightning', 12)],
+          at: P(2148, 1992),
+          why: "j7's side, the second small: the rest of the distance is on the link.",
         },
       ],
       links: [
-        ['s1', 's2'],
+        ['s1', 'n'],
+        ['n', 's2'],
         ['s2', 's3'],
-        ['s3', 'n'],
       ],
     },
   ],
   links: [
     {
-      from: 'brightShafts.s1',
+      from: 'killingEye.a',
       to: 'bow.rim.road.m56a',
-      why: 'The elemental bow hangs straight out from the road.',
+      why: "Killing Eye's crit side reaches the road at m56a.",
+    },
+    {
+      from: 'killingEye.b',
+      to: 'bow.rim.road.m56b',
+      why: "Killing Eye's finishing side reaches the road at m56b: the arc is a bridge.",
     },
     {
       from: 'bow.steel.sentryPost.n',
@@ -194,7 +211,12 @@ export const waterMeadows: AreaSpec = {
     {
       from: 'liveWire.s1',
       to: 'bow.rim.road.m67',
-      why: 'Lightning attacks with shock hang straight out from the road (G3 round 3).',
+      why: "Live Wire's m67 side (G3 round 3; an arc since G4 fix 1).",
+    },
+    {
+      from: 'liveWire.s3',
+      to: 'bow.rim.road.j7',
+      why: "Live Wire's j7 side: the arc is a bridge and j7 a junction (G4 fix 1).",
     },
   ],
 };

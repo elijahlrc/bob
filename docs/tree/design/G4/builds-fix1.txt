@@ -1,0 +1,498 @@
+
+== caster-es (mystic): Classic caster: cold spells, all the spell damage and all the energy shield it can find.
+  60 points: choice 2 [100% 97%], tax 32% (19; roads 13), attributes str 0 dex 0 int 134
+  120 points: choice 4 [100% 95% 95% 95%], tax 33% (40; roads 28), attributes str 42 dex 30 int 227
+                              points     60     80    100    120    140    160
+                 spell damage, units   14.8   14.8   21.3   24.8   27.3   35.3
+                         spellDamage     78     78    130    158    178    242
+                     wandSpellDamage     28     28     28     28     28     28
+                     spellAreaDamage     12     12     12     12     12     12
+                  cold damage, units   10.4   10.4   11.4     15   16.6   16.6
+                      eleDamage:cold     58     58     58     74     74     74
+                        eleDamageAll     46     46     56     76     92     92
+                energy shield, units   12.6   23.4     29   41.6     46   47.2
+                                  es     63    117    140    203    225    231
+                              esFlat      0      0     15     15     15     15
+                   cast speed, units    9.8    9.8   11.8    8.8   12.8   12.8
+                       wandCastSpeed      8      8      8      8      8      8
+                           castSpeed     31     31     39     27     43     43
+  gave up at 60 (what 40 more points would add): Hollow Vessel (4), Homily (3.9), Hoarded Breath (3.3), Shroud (2.8), Living Verse (2.5), Kept Vows (1.9), Prism Ward (1.3), Flashes of Insight (1.2)
+  gave up at 120 (what 40 more points would add): Keen Verse (3.1), Shifting Ward (3), Thrown Voice (3), Long Chant (3), Warded Mind (1.1), Frugal (0.9), Still Mind (0.6)
+
+== sword-str (reaver): Strength sword build: all the life, all the armour and all the sword damage.
+  60 points: choice 2 [100% 100%], tax 25% (15; roads 13), attributes str 107 dex 97 int 0
+  120 points: choice 5 [100% 98% 97% 96% 95%], tax 30% (36; roads 31), attributes str 282 dex 127 int 22
+                              points     60     80    100    120    140    160
+                         life, units     11   15.6   17.6   24.2   28.6   37.2
+                                life     55     78     88    121    143    186
+                       armour, units    6.7   14.2   20.2   21.2   26.8   26.8
+                              armour     80    146    218    230    274    274
+                       physReduction      0      2      2      2      4      4
+                 sword damage, units   22.8   24.8   26.8   31.8   31.8   36.8
+                           meleePhys     20     40     60     60     60     60
+                        oneHandMelee     50     50     50     50     50     50
+                         swordDamage    158    158    158    208    208    208
+                          physAttack      0      0      0      0      0     50
+                 attack speed, units    5.6    5.6    5.6    8.2    8.2    8.2
+                         attackSpeed     12     12     12     25     25     25
+                 attackSpeed:oneHand      8      8      8      8      8      8
+                   weaponSpeed:sword      8      8      8      8      8      8
+  gave up at 60 (what 40 more points would add): Mortar and Stone (4.5), Oathbound (2.6), Weak Spot (2.4), Verger (2), Elemental Ward (2), Ringing Blows (1.6), Scar Tissue (1.1)
+  gave up at 120 (what 40 more points would add): Deep Pull (3.6), Barrow Ward (2.8), Long Breath (2.8), Broad Back (2.6), Hard Target (2.1), Ox Hide (2.1), Unbloodied (0.8)
+
+== mace-slam (vanguard): Two-handed mace slams: big hits, area, stun, life and armour.
+  60 points: choice 3 [100% 100% 95%], tax 32% (19; roads 17), attributes str 176 dex 49 int 0
+  120 points: choice 3 [100% 98% 98%], tax 26% (31; roads 22), attributes str 213 dex 37 int 0
+                              points     60     80    100    120    140    160
+                         life, units   14.6   22.6   24.2   28.2   30.2   31.2
+                                life     73    113    121    141    151    156
+                       armour, units   13.8   16.8   18.8   22.2   24.2   29.2
+                              armour    142    178    202    242    242    302
+                       physReduction      2      2      2      2      4      4
+       two-handed mace damage, units     26     26     26     30   37.7   40.1
+                           meleePhys     60     60     60     60     60     60
+                       twoHandDamage     70     70     70     70    162    162
+                           meleeArea     36     36     36     52     52     52
+                   weaponDamage:mace     50     50     50     70     70     70
+                          maceDamage     66     66     66     66     66    100
+  gave up at 60 (what 40 more points would add): Mended Mail (2.8), Second Wind (2.6), Ringing Blows (2), Scarred Hide (2), Drill Call (1.9), Four Winds (1.6), Ground Shaker (1.4), Unbloodied (0.8)
+  gave up at 120 (what 40 more points would add): Full Swing (4), Barrow Ward (2.8), Headsman (2.3), Ringing Blows (2), Verger (2), Elemental Ward (2), Scar Tissue (1.1)
+
+== mace-shield (vanguard): Mace and shield: block, armour and life first, mace damage after.
+  60 points: choice 4 [100% 98% 97% 96%], tax 25% (15; roads 12), attributes str 144 dex 31 int 0
+  120 points: choice 7 [100% 98% 98% 97% 97% 96% 96%], tax 23% (27; roads 23), attributes str 233 dex 70 int 22
+                              points     60     80    100    120    140    160
+                         life, units   15.6     20     21     28   31.2   31.2
+                                life     78    100    105    140    156    156
+                       armour, units   10.5   12.5   16.2   20.2   22.2   24.8
+                              armour    102    126    170    218    242    274
+                       physReduction      2      2      2      2      2      2
+                        block, units   15.5   19.5     24     28     28     32
+                         shieldBlock     31     39     48     56     56     64
+                  mace damage, units    4.7    7.7    8.7   12.1   18.1   21.1
+                          maceDamage     66     66     66    100    114    128
+                        oneHandMelee      0     30     40     50     50     50
+                   weaponDamage:mace      0      0      0      0     50     70
+  gave up at 60 (what 40 more points would add): Shieldwall (4), Mended Mail (2.8), Shield Bash (2.7), Broad Back (2.6), Buckler (2.5), Weak Spot (2.4), Ox Hide (2.3), Light Blades (2), Four Winds (1.6)
+  gave up at 120 (what 40 more points would add): Sledge and Sinew (3.6), Hammer Rhythm (3.4), Second Wind (2.6), Weak Spot (2.4), Stone Ward (2.2), Unbloodied (0.8)
+
+== warcry-totem (vanguard): Totems and warcries: totem damage, warcry effect, life and regeneration.
+  60 points: choice 2 [100% 97%], tax 38% (23; roads 19), attributes str 166 dex 0 int 0
+  120 points: choice 3 [100% 99% 99%], tax 37% (44; roads 31), attributes str 262 dex 24 int 34
+                              points     60     80    100    120    140    160
+                         life, units   13.6   13.6   18.6   23.6   23.6   32.6
+                                life     68     68     93    118    118    163
+                 totem damage, units    5.7    5.7    9.7   16.7   16.7   16.7
+                          totemSpeed     20     20     20     20     20     20
+                         totemDamage      0      0     48    132    132    132
+                     warcries, units    9.8   12.8   12.8   11.8   12.8   17.8
+                        warcryEffect     65     85     85     85     85    135
+                      warcryDuration     50     65     65     50     65     65
+  gave up at 60 (what 40 more points would add): Barrow Ward (3.6), Graven Posts (2.6), Verger (2), Zeal (2), Vigil (1.6), Hearthfire (1.4), Scar Tissue (1.1)
+  gave up at 120 (what 40 more points would add): Barrow Ward (3.6), Mended Mail (3.6), Scarred Hide (2), Four Winds (1.6), Drill Call (1.6)
+
+== spell-totem (zealot): Spell totems from the Zealot: totem damage and speed, spell and elemental damage, a staff, life and energy shield.
+  60 points: choice 6 [100% 98% 98% 98% 97% 96%], tax 33% (20; roads 15), attributes str 79 dex 0 int 114
+  120 points: choice 6 [100% 100% 99% 98% 96% 96%], tax 35% (42; roads 28), attributes str 79 dex 24 int 201
+                              points     60     80    100    120    140    160
+                 totem damage, units      4      4      8      4      8      8
+                         totemDamage     48     48     96     48     96     96
+                 spell damage, units   15.5     19     21   22.5   24.5   31.5
+                        eleDamageAll     50     50     50     80     80    100
+                         spellDamage     84    112    128    116    132    172
+                         life, units   16.6   27.4   27.4   38.8   38.8   39.8
+                                life     83    137    137    189    189    194
+                            lifeFlat      0      0      0     20     20     20
+  gave up at 60 (what 40 more points would add): Warm Blood (3.1), Graven Posts (2.6), Hale Scribe (2.4), Crozier (2.4), Composure (2), Ready Wit (2), Vigil (1.4), Prism Ward (1.3)
+  gave up at 120 (what 40 more points would add): Graven Posts (2.6), Vespers (2.2), Elemental Ward (2), Plainsong (1.6), Vigil (1.4), Warding Staff (1.2), Rood Screen (1.2), Lingering (0.5)
+
+== bow-crit (strider): Physical bow: bow damage, attack speed, crit, evasion and life.
+  60 points: choice 3 [100% 100% 97%], tax 22% (13; roads 13), attributes str 36 dex 157 int 8
+  120 points: choice 4 [100% 99% 97% 97%], tax 25% (30; roads 27), attributes str 28 dex 263 int 37
+                              points     60     80    100    120    140    160
+                         life, units   12.2   12.2   18.2     23     25     32
+                                life     61     61     86    110    120    155
+                            lifeFlat      0      0     20     20     20     20
+                      evasion, units   20.8   24.5   26.5   32.5   33.5     37
+                             evasion    208    245    265    325    335    370
+                   bow damage, units   17.4     27   31.6     32   39.6   39.6
+                    projectileDamage     60    100    100    120    130    130
+                          physAttack     62     62     62     62     62     62
+                           bowDamage     52    108    154    138    204    204
+                         crit, units    5.5    5.5   11.4   11.5   19.4   20.4
+                           critMulti     30     30     30     66     66     78
+                          critChance     45     45     90     90    165    165
+                      weaponCrit:bow      0      0     25      0     25     25
+                 weaponCritMulti:bow      0      0     15      0     15     15
+  gave up at 60 (what 40 more points would add): Kill Shot (3.4), Thick Blood (3), Rapid Fire (2.6), Ricochet (2.1), Close Quarters (2), Quick Hands (1.6), Quick Wrists (1.6), Light Hand (1.3)
+  gave up at 120 (what 40 more points would add): Wiry Frame (3.9), Kill Shot (3.4), Bloodletter (1.6), Light Hand (1.3)
+
+== bow-elemental (strider): Elemental bow: elemental damage with attacks, penetration, attack speed, evasion.
+  60 points: choice 2 [100% 95%], tax 25% (15; roads 14), attributes str 8 dex 167 int 8
+  120 points: choice 2 [100% 97%], tax 27% (32; roads 26), attributes str 81 dex 257 int 43
+                              points     60     80    100    120    140    160
+                         life, units    9.6   15.6     22     31     36     36
+                                life     48     73    105    150    175    175
+                            lifeFlat      0     20     20     20     20     20
+                      evasion, units   17.5   25.5     29   27.5   33.3   37.3
+                             evasion    175    255    290    275    333    373
+      elemental attack damage, units    8.4    8.4   10.4   10.4   14.4   14.4
+                           eleAttack     84     84    104    104    104    104
+                   eleAttackOne:cold      0      0      0      0     48     48
+                   bow damage, units   14.8   15.8   18.4     24     25     30
+                    projectileDamage     70     80     80     70     80     80
+                           bowDamage     78     78    104    170    170    220
+  gave up at 60 (what 40 more points would add): Wiry Frame (3.9), Thick Blood (3), Weaving (2.5), Iron Draw (2.3), Vital Aim (1.8), Quick Wrists (1.6)
+  gave up at 120 (what 40 more points would add): Cold Steel (2.8), Tall Grass (2.8), Telling Shot (2.6), Hot Pursuit (2.2), Weathered (1.2)
+
+== bow-poison (strider): Poison bow, across the map: poison and chaos with bow attacks, evasion and life.
+  60 points: choice 2 [100% 97%], tax 22% (13; roads 13), attributes str 14 dex 159 int 8
+  120 points: choice 5 [100% 98% 97% 97% 95%], tax 27% (32; roads 28), attributes str 24 dex 258 int 99
+                              points     60     80    100    120    140    160
+                         life, units    9.6     18     24     32     32     33
+                                life     48     90    115    155    155    160
+                            lifeFlat      0      0     20     20     20     20
+                       poison, units    7.3      9     14     15   21.2     28
+                         chaosAttack     48     48     48     48     48     48
+                        poisonChance     10     10     20     20     35     45
+                        poisonDamage     28     48     96     96    152    222
+                           dotDamage      0      0      0     10     10     10
+                   bow damage, units    6.6    7.6    7.6   13.2   14.4     17
+                    projectileDamage     50     60     60     80     80     80
+                           bowDamage     16     16     16     52     64     90
+  gave up at 60 (what 40 more points would add): Hare's Pace (3.6), Rat Bite (3.3), Thick Blood (3), Barbed Point (3), Hardy Stock (2.8), Sea Legs (2.4), Quick Wrists (1.6)
+  gave up at 120 (what 40 more points would add): Fouled Tips (3.9), Festering (2.3), Field Kit (2), Iron Draw (2), Weathered (1.2), Hot Blood (1.2)
+
+== caster-life (mystic): Fire and lightning caster on life: spell damage, crit, life, mana.
+  60 points: choice 1 [100%], tax 28% (17; roads 12), attributes str 0 dex 0 int 130
+  120 points: choice 5 [100% 99% 96% 96% 96%], tax 30% (36; roads 23), attributes str 61 dex 0 int 206
+                              points     60     80    100    120    140    160
+                 spell damage, units   14.8   14.8   16.8   24.3   24.3   29.3
+                         spellDamage     78     78     94    154    154    194
+                     spellProjectile     50     50     50     50     50     50
+             elemental damage, units   13.2   16.8   24.4     27   30.6   32.6
+                      eleDamage:fire     44     44     74     84     84     84
+                 eleDamage:lightning     58     94    120     94    130    130
+                        eleDamageAll     30     30     50     92     92    112
+                         life, units   10.8   21.2   26.2   25.4   35.8   36.8
+                                life     54    101    126    127    174    179
+                            lifeFlat      0     20     20      0     20     20
+                   spell crit, units   12.4   12.4   12.4   19.4   19.4   24.4
+                           spellCrit     85     85     85    190    190    265
+                      spellCritMulti     81     81     81     81     81     81
+  gave up at 60 (what 40 more points would add): Hymn (3.6), Hearthfire (3.5), Thick Blood (3), Wiry Frame (2.4), Shelter (1.8), Flashes of Insight (1.2)
+  gave up at 120 (what 40 more points would add): Thick Blood (3), Glint (2.6), Wiry Frame (2.4), Vespers (2), Plainsong (2), Flashes of Insight (1.2), Frugal (0.9)
+
+== summoner (mystic): Summoner: minion damage, minion life and speed, auras, energy shield or life.
+  60 points: choice 3 [100% 96% 95%], tax 40% (24; roads 17), attributes str 60 dex 0 int 142
+  120 points: choice 3 [100% 99% 98%], tax 40% (48; roads 36), attributes str 96 dex 42 int 262
+                              points     60     80    100    120    140    160
+                      minions, units   21.7   21.7   21.7   26.5   26.5   31.5
+                        minionDamage    164    164    164    208    208    268
+                          minionLife     84     84     84     84     84     84
+                         minionSpeed      5      5      5     11     11     11
+                energy shield, units     17   26.2   32.8   44.6     52   53.6
+                                  es     80    126    159    218    255    263
+                              esFlat     15     15     15     15     15     15
+                         life, units    9.4     12     15     19   26.4   28.4
+                                life     47     60     75     90    127    137
+                            lifeFlat      0      0      0     20     20     20
+  gave up at 60 (what 40 more points would add): High Veil (3.6), Benediction (2.8), Rood Screen (2), Prism Ward (1.3), Deep Well (0.6)
+  gave up at 120 (what 40 more points would add): Bad Company (2.6), Shifting Ward (2.4), Wiry Frame (1.4), Snakeskin (1), Deep Well (0.6)
+
+== wand-attack (mystic): Wand attacks: wand damage, attack speed, crit, energy shield.
+  60 points: choice 2 [100% 99%], tax 43% (26; roads 14), attributes str 12 dex 0 int 129
+  120 points: choice 3 [100% 96% 96%], tax 43% (51; roads 27), attributes str 30 dex 40 int 222
+                              points     60     80    100    120    140    160
+                  wand damage, units   12.7   16.3   17.3   17.3   17.3   17.3
+                          wandAttack    152    196    208    208    208    208
+                energy shield, units   22.2   26.2     35   43.6   46.6   46.6
+                                  es    111    131    175    218    233    233
+                 attack speed, units    2.4    4.4    4.4    8.4    8.4   14.4
+                    weaponSpeed:wand     12     12     12     12     12     12
+                         attackSpeed      0     10     10     30     30     60
+  gave up at 60 (what 40 more points would add): Pinpoint (3.3), Hoarded Breath (2.8), Shroud (2.8), Needlework (2.5), Rood Screen (2), Thick Blood (2), Hale Scribe (1.2)
+  gave up at 120 (what 40 more points would add): Grey Cloak (2), Hawk's Eye (1.9), Quick Hands (1.6), Siphon (1.4), Elemental Fletching (1.2), Hard Target (1.1), Long Breath (1)
+
+== axe-bleed (reaver): Axe bleed: bleed chance and damage, axe damage, leech and life.
+  60 points: choice 2 [100% 96%], tax 32% (19; roads 15), attributes str 123 dex 85 int 0
+  120 points: choice 1 [100%], tax 34% (41; roads 31), attributes str 188 dex 202 int 0
+                              points     60     80    100    120    140    160
+                         life, units     13   14.6   17.6   24.2   29.8   35.8
+                                life     65     73     88    121    149    179
+                        bleed, units   18.5   18.5     28     28     28     28
+                         bleedChance     30     30     60     60     60     60
+                         bleedDamage    150    150    228    228    228    228
+                    damageVsBleeding     24     24     24     24     24     24
+                   axe damage, units   10.7   10.7   10.7     14     16     16
+                           meleePhys     20     20     20     40     60     60
+                           axeDamage    104    104    104    120    120    120
+  gave up at 60 (what 40 more points would add): Barbed Arrows (4.8), Deep Cuts (4.3), Crimson Pact (3), Second Wind (2.6), Thirsting Blade (2.3), Hard Target (2.1), Thirsty Quiver (1.3)
+  gave up at 120 (what 40 more points would add): Mortar and Stone (4.5), Oathbound (2.6), Verger (2), Elemental Ward (2)
+
+== dual-wield (reaver): Dual-wielding swords or axes: dual wield damage, speed and crit, life, evasion.
+  60 points: choice 1 [100%], tax 28% (17; roads 15), attributes str 104 dex 179 int 8
+  120 points: choice 4 [100% 99% 98% 98%], tax 25% (30; roads 22), attributes str 98 dex 226 int 33
+                              points     60     80    100    120    140    160
+                         life, units   15.2   19.8   19.8   29.2   34.6   34.6
+                                life     76     99     99    141    168    168
+                            lifeFlat      0      0      0     20     20     20
+                   dual wield, units    8.5   11.5     15     17     17     17
+                          dualDamage     30     30     30     30     30     30
+                           dualSpeed      5      5      5      5      5      5
+                        oneHandMelee     45     75     85     85     85     85
+                            dualCrit      0      0     37     67     67     67
+                      evasion, units   18.1   21.1   25.8   28.5   33.3   38.3
+                             evasion    181    211    258    285    333    383
+  gave up at 60 (what 40 more points would add): Fleet Blade (3), Darting Steel (2.7), Oathbound (2.6), Crossed Blades (2.2), Four Winds (1.6), Sidestep (1.2)
+  gave up at 120 (what 40 more points would add): Wiry Frame (3.9), Darting Steel (2.7), Field Kit (2), Hatchet Work (1.3), Thirsty Quiver (1.3), Bloodletter (1)
+
+== fire-burn (zealot): Burning fire caster: fire damage, burning, ignite, life and energy shield.
+  60 points: choice 2 [100% 96%], tax 37% (22; roads 14), attributes str 55 dex 0 int 111 (short of gear: str 22)
+  120 points: choice 6 [100% 100% 98% 97% 97% 95%], tax 38% (45; roads 23), attributes str 79 dex 18 int 167
+                              points     60     80    100    120    140    160
+                  fire damage, units   12.5   19.5   22.5   30.5   36.5   38.5
+                        eleDamageAll     30     50     70     70     70     90
+                      eleDamage:fire     40     74     84     84    104    104
+                          burnDamage     66     66     66    114    162    162
+                           dotDamage      0     16     16     56     56     56
+                 spell damage, units     13   15.5   20.5   15.5   15.5   20.5
+                         spellDamage    104    124    164    124    124    164
+                         life, units     19   25.4   25.4   34.4   38.8   38.8
+                                life     95    127    127    167    189    189
+                            lifeFlat      0      0      0     20     20     20
+  gave up at 60 (what 40 more points would add): Flashpoint (3), Piercing Word (2.5), Hale Scribe (2.4), Composure (2), Vespers (2), Plainsong (1.8), Lingering (1.6), Litany (1.6), Prism Ward (1.3)
+  gave up at 120 (what 40 more points would add): Warm Blood (3.1), Searing Avatar (3), High Veil (2.4), Brazier (2), Vespers (2), Plainsong (1.8), Vigil (1.4)
+
+== staff-block (zealot): Staff caster who blocks: staff and spell damage, spell block, life and energy shield.
+  60 points: choice 4 [100% 100% 98% 98%], tax 32% (19; roads 16), attributes str 49 dex 0 int 126 (short of gear: str 48)
+  120 points: choice 6 [100% 99% 98% 98% 96% 95%], tax 31% (37; roads 28), attributes str 127 dex 0 int 197
+                              points     60     80    100    120    140    160
+                 spell damage, units   17.6   19.6   25.6   30.1   31.1   32.4
+                        eleDamageAll     46     66     66     86     96     96
+                         spellDamage    104    104    152    172    172    182
+                        block, units      4    5.5   10.5   15.5   15.5   15.5
+                          spellBlock      8      8     18     28     28     28
+                         blockAttack      0      3      3      3      3      3
+                         life, units   22.4   27.4   27.4     25   35.4   40.8
+                                life    112    137    137    125    172    199
+                            lifeFlat      0      0      0      0     20     20
+  gave up at 60 (what 40 more points would add): Crozier (4.3), Warding Staff (4), Quarterstaff (3.5), Sexton (2), Lectern (2), Litany (1.7), Vigil (1.5), Hearthfire (1.4), Consecrated Plate (0.4)
+  gave up at 120 (what 40 more points would add): Thick Blood (3.7), Warm Blood (3.2), Wiry Frame (2.4), Shifting Ward (1.7), Benediction (1.5)
+
+== aura-brand (zealot): Aura and brand support caster: auras, reservation, brands, spell damage, life.
+  60 points: choice 2 [100% 99%], tax 28% (17; roads 13), attributes str 97 dex 0 int 97
+  120 points: choice 4 [100% 100% 98% 98%], tax 32% (38; roads 27), attributes str 103 dex 18 int 191
+                              points     60     80    100    120    140    160
+                        auras, units   14.3   19.3   19.3     23     23     23
+                  reducedReservation     28     28     28     39     39     39
+                          auraEffect     30     60     60     60     60     60
+                 brand damage, units   22.5   22.5   22.5     26     26   27.3
+                         brandDamage    120    120    120    120    120    120
+                         spellDamage    100    100    100    128    128    138
+                         life, units    9.6   14.6   24.6   33.4   37.8   43.4
+                                life     48     73    123    162    184    212
+                            lifeFlat      0      0      0     20     20     20
+  gave up at 60 (what 40 more points would add): Benediction (4), Warm Blood (3.6), Quiet Pulse (3.4), Composure (3.3), Glass Skin (3.2), Sexton (2), Deep Well (1.2)
+  gave up at 120 (what 40 more points would add): Warm Blood (3.6), Hoarded Breath (2.8), Shroud (2.8), Shifting Ward (2.4), Shelter (1.8)
+
+== dagger-crit (shade): Dagger crit attacker: dagger damage, crit, attack speed, evasion and dodge.
+  60 points: choice 1 [100%], tax 17% (10; roads 9), attributes str 6 dex 125 int 31 (short of gear: int 46)
+  120 points: choice 2 [100% 97%], tax 21% (25; roads 18), attributes str 6 dex 179 int 85
+                              points     60     80    100    120    140    160
+                         life, units     12     21   25.4   24.4   29.8   31.4
+                                life     55    100    122    117    144    152
+                            lifeFlat     20     20     20     20     20     20
+                         crit, units    9.5   13.5   17.5   25.3   27.3   32.7
+                          critChance     90    135    195    210    240    307
+                   weaponCrit:dagger     15     15     15     15     15     15
+                           critMulti     30     42     42    123    123    135
+                dagger damage, units      4      4      4    9.6   13.2   13.2
+                        daggerDamage     40     40     40     96    132    132
+                      evasion, units   26.5     28   31.4   36.7   40.2   40.2
+                             evasion    265    280    314    367    402    402
+  gave up at 60 (what 40 more points would add): Sea Legs (4), Wiry Frame (3.9), Tumble (2.1), Bloodletter (2), Cold Steel (2)
+  gave up at 120 (what 40 more points would add): Wiry Frame (3.9), Needlework (3.1), Between Ribs (2.8), Bloodletter (2), Light Hand (1.3)
+
+== claw-poison (shade): Poison claws: claw damage, poison, chaos, attack speed, evasion.
+  60 points: choice 2 [100% 98%], tax 27% (16; roads 14), attributes str 14 dex 144 int 42 (short of gear: int 35)
+  120 points: choice 3 [100% 96% 95%], tax 24% (29; roads 25), attributes str 14 dex 224 int 102
+                              points     60     80    100    120    140    160
+                         life, units   12.6     20     21   29.4   29.4   29.4
+                                life     58     95    100    142    142    142
+                            lifeFlat     20     20     20     20     20     20
+                       poison, units    7.3   12.3   14.7   17.5   18.8     25
+                         chaosAttack     48     48     64     48     64     64
+                        poisonChance     10     20     20     20     20     35
+                        poisonDamage     28     76     76    126    126    182
+                           dotDamage      0      0     10     10     10     10
+                  claw damage, units      7      8   11.6      8   11.6   11.6
+                          clawDamage     70     80    116     80    116    116
+  gave up at 60 (what 40 more points would add): Wiry Frame (3.9), Carrion Claws (3.5), Barbed Point (3), Ill Wish (2), Light Hand (1.3)
+  gave up at 120 (what 40 more points would add): Carrion Claws (3.5), Fouled Tips (3.2), Ill Wish (2), Field Kit (2), Weathered (1.2), Bloodletter (1)
+
+== trap-mine (shade): Traps and mines: trap and mine damage, throwing speed, area, energy shield and evasion.
+  60 points: choice 3 [100% 96% 96%], tax 35% (21; roads 19), attributes str 0 dex 134 int 127
+  120 points: choice 2 [100% 97%], tax 33% (40; roads 31), attributes str 6 dex 260 int 145
+                              points     60     80    100    120    140    160
+         trap and mine damage, units   13.7   21.7   21.7   21.7   24.7   25.7
+                          trapDamage     96    144    144    144    180    192
+                          mineDamage     68    116    116    116    116    116
+                energy shield, units     15     15   21.8   21.8   21.8     32
+                                  es     75     75    109    109    109    160
+                      evasion, units     14     17   20.4   36.8   40.2   40.2
+                             evasion    140    170    204    368    402    402
+  gave up at 60 (what 40 more points would add): Hair Trigger (3.2), Shaped Charge (3.2), Hoarded Breath (2.8), Hare's Pace (2), Hardy Stock (1.8), Sea Legs (1.2), Cold Steel (1)
+  gave up at 120 (what 40 more points would add): Composure (3.3), Glass Skin (3.2), Snare Line (2), Hardy Stock (1.8), Ready Wit (1.5), Weathered (1.2)
+
+== dagger-caster (shade): Dagger caster: spell damage and crit with a dagger, cast speed, energy shield.
+  60 points: choice 3 [100% 97% 95%], tax 38% (23; roads 17), attributes str 0 dex 121 int 121
+  120 points: choice 7 [100% 98% 98% 97% 96% 96% 96%], tax 35% (42; roads 27), attributes str 0 dex 109 int 193
+                              points     60     80    100    120    140    160
+                 spell damage, units     21   28.5   28.5   31.5     39     43
+                   daggerSpellDamage    124    140    140    140    140    140
+                         spellDamage     44     88     88    112    172    204
+                   spell crit, units      7      7      7   12.2   12.2   18.2
+                     daggerSpellCrit     30     30     30     30     30     30
+                           spellCrit     75     75     75    100    100    190
+                      spellCritMulti      0      0      0     42     42     42
+                energy shield, units   18.8   20.8     29   33.2   33.2   38.2
+                                  es     94    104    145    166    166    186
+                              esFlat      0      0      0      0      0     15
+  gave up at 60 (what 40 more points would add): Ready Wit (4), Hedge Magic (3.5), Composure (3.3), Glass Skin (3.2), Thunderhead (2.5), Deep Well (2), Prism Ward (1.3), Flashes of Insight (1.2)
+  gave up at 120 (what 40 more points would add): Homily (3.8), High Veil (3.6), Hedge Magic (3.5), Hymn (3.3), Cold Light (3.3), Living Verse (2.5), Bright Omen (2)
+
+== two-hand-fire (vanguard): Two-handed fire melee: fire damage with attacks, two-handed damage, life, armour.
+  60 points: choice 1 [100%], tax 28% (17; roads 16), attributes str 152 dex 0 int 28
+  120 points: choice 1 [100%], tax 30% (36; roads 34), attributes str 290 dex 66 int 28
+                              points     60     80    100    120    140    160
+                         life, units     16     20     23     27   28.6   35.6
+                                life     80    100    115    135    143    178
+                       armour, units   18.2   22.8   24.8   26.2   29.8   31.8
+                              armour    194    250    274    290    310    334
+                       physReduction      2      2      2      2      4      4
+           fire attack damage, units     12     14   18.4   23.4   23.4   23.4
+                           eleAttack     50     50     94     94     94     94
+                      eleDamage:fire     40     40     40     40     40     40
+                   eleAttackOne:fire     36     60     60    120    120    120
+            two-handed damage, units    3.5    5.8    9.8   13.5   16.8   16.8
+                       twoHandDamage     42     70    118    162    202    202
+  gave up at 60 (what 40 more points would add): Full Swing (4), Mended Mail (2.8), Elemental Edge (2.8), Stout Heart (2.6), Thunderstep (2.2)
+  gave up at 120 (what 40 more points would add): Barrow Ward (2.8), Second Wind (2.6), Iron Voice (2), Scarred Hide (2), Four Winds (1.6)
+
+== block-caster (zealot): Shield caster: spell block and attack block, spell damage, energy shield and life.
+  60 points: choice 4 [100% 99% 97% 96%], tax 25% (15; roads 13), attributes str 49 dex 0 int 105 (short of gear: str 28, int 12)
+  120 points: choice 3 [100% 98% 97%], tax 28% (33; roads 28), attributes str 97 dex 0 int 202
+                              points     60     80    100    120    140    160
+                        block, units      4     11     11     12   13.5   13.5
+                         shieldBlock      8     22     22     24     24     24
+                         blockAttack      0      0      0      0      3      3
+                  spell block, units      6     11     13     14     14     14
+                    shieldSpellBlock      8     12     12     12     12     12
+                          spellBlock      4     10     14     16     16     16
+                 spell damage, units     12   13.3   18.3   19.5   20.8   20.8
+                         spellDamage     96    106    146    156    166    166
+                energy shield, units     11     14   23.6   25.6   29.6     41
+                                  es     50     65    113    123    143    200
+                              esFlat     15     15     15     15     15     15
+  gave up at 60 (what 40 more points would add): High Veil (3.6), Twofold Guard (3.2), Rood Screen (3.2), Warm Blood (2.9), Vespers (2), Warding Staff (1.2)
+  gave up at 120 (what 40 more points would add): Warm Blood (2.9), Hoarded Breath (2.8), Shroud (2.8), Thick Blood (2.4)
+
+== storm-caster (zealot): Lightning and physical spells from the Zealot: spell damage, shock, cast speed, life and energy shield.
+  60 points: choice 3 [100% 98% 97%], tax 33% (20; roads 17), attributes str 37 dex 0 int 135 (short of gear: str 40)
+  120 points: choice 4 [100% 99% 98% 97%], tax 35% (42; roads 30), attributes str 73 dex 24 int 226 (short of gear: str 4)
+                              points     60     80    100    120    140    160
+                 spell damage, units   14.2   19.2   21.7   24.2   26.7   26.7
+                         spellDamage     84    124    144    164    184    184
+                           physSpell     44     44     44     44     44     44
+             lightning damage, units   13.8   15.8   19.3   24.1   24.9   24.9
+                        eleDamageAll     56     76     84     96    104    104
+                 eleDamage:lightning     82     82     94    130    130    130
+               penetration:lightning      0      0      3      3      3      3
+                         life, units   19.4   24.4   24.4   35.8   35.8   41.4
+                                life     97    122    122    174    174    202
+                            lifeFlat      0      0      0     20     20     20
+                   cast speed, units    4.8    7.8   11.8    9.8   12.8   12.8
+                           castSpeed     19     31     47     39     51     51
+  gave up at 60 (what 40 more points would add): Live Current (3.9), Homily (3.8), Long Chant (2.5), Hearthfire (1.4), Vigil (1.4), Prism Ward (1.3), Sharp Mind (1.3), Warded Mind (0.5)
+  gave up at 120 (what 40 more points would add): Stout Heart (2.6), Long Chant (2.5), Shifting Ward (1.4), Vigil (1.4), Sharp Mind (1.3), Rood Screen (1.2)
+
+== channeller (mystic): Channelled spells: channelling damage, spell damage, cast speed, mana and its sustain, energy shield.
+  60 points: choice 3 [100% 98% 96%], tax 27% (16; roads 12), attributes str 6 dex 0 int 129
+  120 points: choice 4 [100% 97% 97% 97%], tax 29% (35; roads 26), attributes str 42 dex 0 int 208
+                              points     60     80    100    120    140    160
+  channelling and spell damage, units   12.3   17.3   24.3   31.3   33.3   33.3
+                         spellDamage     66     98    154    178    194    194
+                       channelDamage     40     50     50     90     90     90
+                 mana sustain, units     23     24     31     25   26.5   27.8
+                                mana     84     84     84     76     88     98
+                       costReduction     16     16     32     22     22     22
+                           manaRegen     45     55     85     60     60     60
+                     manaLeech:spell    1.6    1.6    1.6    1.6    1.6    1.6
+                energy shield, units     14   22.6   22.6   30.2     39     46
+                                  es     70    108    108    146    190    225
+                              esFlat      0     15     15     15     15     15
+  gave up at 60 (what 40 more points would add): Homily (3.8), High Veil (3.6), Hymn (3), Waste Not (2), Vespers (2), Cold Light (1.8), Still Mind (1.2)
+  gave up at 120 (what 40 more points would add): Hoarded Breath (3.7), Hymn (3), Shroud (2.8), Shifting Ward (2.4), Thick Blood (2), Hale Scribe (1.9)
+
+== sceptre-fire (zealot): Fire attacks with a sceptre: sceptre and fire attack damage, burning, attack speed, life and armour.
+  60 points: choice 2 [100% 98%], tax 32% (19; roads 15), attributes str 113 dex 0 int 85
+  120 points: choice 3 [100% 98% 95%], tax 34% (41; roads 30), attributes str 237 dex 0 int 106
+                              points     60     80    100    120    140    160
+                         life, units      9   13.6     17     20   28.6   39.4
+                                life     45     68     85    100    143    197
+           fire attack damage, units     11     15     20     20     20     20
+                           eleAttack     50     50     50     50     50     50
+                      eleDamage:fire     60     60     60     60     60     60
+                   eleAttackOne:fire      0     48    108    108    108    108
+               sceptre damage, units   10.4   10.4   15.1   17.1   17.1   17.1
+                weaponDamage:sceptre     60     60     60     80     80     80
+                          maceDamage     62     62    128    128    128    128
+                       armour, units   17.5   18.5   22.2   24.2   24.2   24.2
+                              armour    186    198    242    266    266    266
+                       physReduction      2      2      2      2      2      2
+  gave up at 60 (what 40 more points would add): Kindled Steel (2.6), Broad Back (2.6), Steady Hands (2.1), Hot Iron (2), Ringing Blows (1.2)
+  gave up at 120 (what 40 more points would add): Quiet Pulse (2.6), Hale Scribe (2.4), Warm Blood (2.4), Prism Ward (1.3), Buttress (1)
+
+== curser (shade): Curses and chaos spells: curse effect, more curses, chaos and damage over time, energy shield.
+  60 points: choice 2 [100% 100%], tax 40% (24; roads 17), attributes str 0 dex 103 int 124
+  120 points: choice 6 [100% 99% 99% 98% 97% 97%], tax 45% (54; roads 38), attributes str 36 dex 166 int 285
+                              points     60     80    100    120    140    160
+                       curses, units   18.5   18.5   18.5   22.5   22.5   22.5
+                            hexLimit      1      1      1      1      1      1
+                         curseEffect     76     76     76    108    108    108
+                      damageVsCursed     32     32     32     32     32     32
+   chaos and damage over time, units    6.7   11.3   12.9   14.7   14.7   16.3
+                          chaosSpell     20     20     20     60     60     60
+                           dotDamage     10     40     56     40     40     56
+                            chaosDot     24     34     34     34     34     34
+                energy shield, units   12.4   23.6   26.2   28.6   42.8   44.6
+                                  es     62    118    131    138    209    218
+                              esFlat      0      0      0     15     15     15
+  gave up at 60 (what 40 more points would add): Withering (3.7), Hedge Magic (3.5), Composure (3.3), Glass Skin (3.2), Shroud (2.8), Lingering (2.4), Deep Well (2), Prism Ward (1.3), Warded Mind (1)
+  gave up at 120 (what 40 more points would add): Glass Skin (3.2), Quickening (3), Lingering (2.4), Deep Well (2), Rood Screen (2), Quiet Pulse (1.8), Prism Ward (1.3), Hale Scribe (1.2), Warded Mind (1)
+
+== dodge-blades (shade): Dodging blades from the Shade: dodge, spell dodge, evasion, crit, dagger or claw damage.
+  60 points: choice 3 [100% 96% 95%], tax 17% (10; roads 10), attributes str 8 dex 148 int 60 (short of gear: int 7)
+  120 points: choice 2 [100% 95%], tax 18% (21; roads 19), attributes str 14 dex 185 int 84
+                              points     60     80    100    120    140    160
+                        dodge, units      4    8.7   17.3   19.3   19.3     26
+                         dodgeAttack     12     20     43     55     55     58
+                          dodgeSpell      0      6      9      3      3     20
+                      evasion, units   21.5     27   35.2   36.7   36.7   40.2
+                             evasion    215    270    352    367    367    402
+                         life, units   13.6     19   22.4     25     26   31.4
+                                life     63     90    107    120    125    152
+                            lifeFlat     20     20     20     20     20     20
+                 blade damage, units     10     10     10     15   24.8   24.8
+                          clawDamage     70     70     70     80    116    116
+                        daggerDamage     30     30     30     70    132    132
+  gave up at 60 (what 40 more points would add): Sea Legs (4.4), Wiry Frame (3.9), Spellslip (3), Tumble (2.9), Weaving (2.5)
+  gave up at 120 (what 40 more points would add): Wiry Frame (3.9), Mist Walk (3.1), Spellslip (3), Long Knives (2.6), Between Ribs (2.2)
+
+== Against the targets (28 archetypes)
+  1. at 120, what 40 more points add to the typical main stat: 23% (target about 30%+); main stats gaining 10% or less: 26% (target about 10%); archetypes whose every main stat gains 20%+: 1 (target about two in three)
+  2. at 60, the typical main stat: 54% (target about 50%); gaining 10% or less: 11%
+  3. at 120, notables worth 2.5+ units that 40 more points add: typically 2, 1 builds with none (target two or more for most)
+  4. at 120, choice: 2 builds with one plan, 22 with three or more (target two or more for all, three for about half)
+  5. at 120, tax: typically 31%, 10 builds above a third (target a third or less for most)

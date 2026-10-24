@@ -110,6 +110,6 @@ describe('a set of deployables that is full', () => {
     const cap = w.sides[0].char.profile(c, w.sides[0].char.configConds).deployCount;
     // Never more totems than the set allows, and the weapon attack is used meanwhile.
     expect(w.sides[0].deployables.filter((d) => d.key === c.key).length).toBeLessThanOrEqual(cap);
-    expect(uses.defaultAttack ?? 0).toBeGreaterThan(0);
+    expect(uses.defaultWandAttack ?? 0).toBeGreaterThan(0);
   });
 });

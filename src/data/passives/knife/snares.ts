@@ -10,7 +10,6 @@ import {
   critChance,
   critMulti,
   daggerDamage,
-  damageVsLowLife,
   dex,
   dodgeAttack,
   dodgeSpell,
@@ -27,6 +26,7 @@ import {
   reducedReservation,
   stunAvoid,
   trapDamage,
+  weaponCrit,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -226,7 +226,7 @@ export const snares: AreaSpec = {
     {
       id: 'smear',
       name: 'Smeared Edge',
-      why: "The poisoned dagger (G3 round 2, 2026-10-22; the ledger's SH-4): a bridge straight across from the Bow's dear road to the road to Ricochet, between Mercy Stroke and the trap wheel: dagger damage once from the dear road, the notable with dagger damage and poison, poison once toward the Ricochet road. The dagger's attack homes, each with its own partner and direction: Fine Point by the start (crit), this one south (poison), Long Knives in the middle (speed and accuracy), Between Ribs far north-east (crit multiplier). The dagger small faces the way in from Fine Point and the poison small the Ricochet road, so a poison bow or claw coming up from the Strider pays a dagger small to reach it; Barbed Point, the Rookery's poison with crit, is the other way out of the trap junction (G1/shade.md §1.2: beside Barbed Point it would hand the poison dagger both for one path).",
+      why: "The poisoned dagger (G3 round 2, 2026-10-22; the ledger's SH-4): a bridge straight across from the Bow's dear road to the road to Ricochet, between Cutpurse's Luck and the trap wheel: dagger damage once from the dear road, the notable with dagger damage and poison, poison once toward the Ricochet road. The dagger's attack homes, each with its own partner and direction: Fine Point by the start (crit), this one south (poison), Long Knives in the middle (speed and accuracy), Between Ribs far north-east (crit multiplier). The dagger small faces the way in from Fine Point and the poison small the Ricochet road, so a poison bow or claw coming up from the Strider pays a dagger small to reach it; Barbed Point, the Rookery's poison with crit, is the other way out of the trap junction (G1/shade.md §1.2: beside Barbed Point it would hand the poison dagger both for one path).",
       at: [2668, -315],
       shape: { kind: 'hand' },
       nodes: [
@@ -297,8 +297,8 @@ export const snares: AreaSpec = {
     },
     {
       id: 'mercy',
-      name: 'Mercy Stroke',
-      why: 'A pocket off the road to the Bow: crit multiplier twice, then the finishing blow, for the crit Shade of any weapon.',
+      name: "Cutpurse's Luck",
+      why: "A pocket off the road to the Bow, a bridge onto the Strider's poison arrows: crit multiplier twice, then crit multiplier with crit chance with daggers and claws, the Shade striker's crit. G4 fix 2 (2026-10-23): it was Wasp Sting, crit multiplier with poison, three steps from the Strider's Venom Fletching across the border, so the poison builds took both (the trade-offs audit's T4); poison's notables here are Barbed Point (crit chance) in the Rookery, Smeared Edge (a dagger) five steps across the barb, Rat Bite (attack speed) on the seawall and Venom Fletching. The knife-hand crit has other partners elsewhere: Fine Point by the start leads with dagger damage (and two-knife crit), the Rooftops' dagger notable with the dagger's crit multiplier; the Reaver's sword-and-axe crit notable is this one's mirror for the strength-and-dexterity blades. Raking Hand (claw speed) is five steps off.",
       at: [2649, -43],
       shape: { kind: 'hand' },
       nodes: [
@@ -307,10 +307,10 @@ export const snares: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Mercy Stroke',
-          lines: [critMulti(25), damageVsLowLife(10)],
+          name: "Cutpurse's Luck",
+          lines: [critMulti(25), weaponCrit('dagger', 15), weaponCrit('claw', 15)],
           at: [2714, 114],
-          why: '2.1 + 1.25 units.',
+          why: '2.1 + 1 + 1 units: crit multiplier, with crit chance for the knife hands, daggers and claws alike.',
         },
       ],
       links: [
@@ -360,7 +360,7 @@ export const snares: AreaSpec = {
     {
       id: 'legs',
       name: 'Sea Legs',
-      why: "Life with the chance to dodge attacks (G3 round 3, 2026-10-22; the ledger's SH-10): the bottom rung of the Docks' east, a bridge from Veiled Herald east to the seawall road's last node, so Veiled Herald stops being a dead end. Attack dodge twice on Veiled Herald's side, the notable, life twice on the seawall side. The dodger's life, and the Shade's third life direction, each with its own partner: Thick Blood by the start (flat life, a little shield), Wiry Frame on the Stair (evasion), this one the far south-east. Tumble (dodge with stun avoidance) is ten steps round, Feint and Cut (dodge with two knives) eight; Soft Step and Nimble Gambit by the start. The dodge smalls face Veiled Herald, the way the Strider's bow builds come in from Ricochet and Hardy Stock (life with resistances): a bow build pays two dodge smalls it does not use for the life, so the two lifes at the border, seven steps apart, are a dear pair, not a cheap one. The notable is the corner: the life side turns up so it lands on the seawall node between the road north and the Strider's road south.",
+      why: "Life with the chance to dodge attacks (G3 round 3, 2026-10-22; the ledger's SH-10): the bottom rung of the Docks' east, a bridge from Veiled Herald east to the seawall road's last node, so Veiled Herald stops being a dead end. Attack dodge twice on Veiled Herald's side, the notable, life twice on the seawall side. The dodger's life, and the Shade's third life direction, each with its own partner: Thick Blood by the start (chaos resistance), Wiry Frame on the Stair (evasion), this one the far south-east. Tumble (dodge with stun avoidance) is ten steps round, Feint and Cut (dodge with two knives) eight; Soft Step and Nimble Gambit by the start. The dodge smalls face Veiled Herald, the way the Strider's bow builds come in from Ricochet and Hardy Stock (life with resistances): a bow build pays two dodge smalls it does not use for the life, so the two lifes at the border, seven steps apart, are a dear pair, not a cheap one. The notable is the corner: the life side turns up so it lands on the seawall node between the road north and the Strider's road south.",
       at: [3750, -264],
       shape: { kind: 'hand' },
       nodes: [
@@ -418,7 +418,7 @@ export const snares: AreaSpec = {
       to: 'knife.rim.wall.s6',
       why: "The rung lands on the seawall road's last node, between the road north and the Strider's outer road.",
     },
-    { from: 'toBow.b', to: 'mercy.a', why: 'The road onto Mercy Stroke.' },
+    { from: 'toBow.b', to: 'mercy.a', why: "The road onto Cutpurse's Luck." },
     {
       from: 'toBow.b',
       to: 'smear.d',
@@ -432,7 +432,7 @@ export const snares: AreaSpec = {
     {
       from: 'mercy.n',
       to: 'bow.flight.venom.a',
-      why: "Crit poison (a near crossing; G1-brief.md §2.6, laid in the G2 border pass): Mercy Stroke onto Venom Fletching's first small, so Mercy Stroke stops being a dead end. The crit poison bow takes Mercy Stroke's crit multiplier beside Venom Fletching, and a Shade with a bow finds the poison arrows; it costs the Strider the pocket's small to pass, and the two notables stay three steps apart, a pairing rather than one cluster.",
+      why: "A near crossing (G1-brief.md §2.6, laid in the G2 border pass): Cutpurse's Luck (Wasp Sting until G4 fix 2, Mercy Stroke before that) onto Venom Fletching's first small, so the pocket stops being a dead end. A crit Shade finds the Strider's poison arrows one way and a poison bow finds the knife hands' crit the other; since fix 2 the two notables share no line, so a build that wants both wants two things, not one thing twice.",
     },
     { from: 'toRicochet.r1', to: 'tumble.a', why: 'The road onto Tumble.' },
     {

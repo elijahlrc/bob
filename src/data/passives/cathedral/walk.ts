@@ -29,7 +29,7 @@ export const lychway: AreaSpec = {
     {
       id: 'road',
       name: 'The north walk',
-      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. Rood Screen (G3 round 1) hangs inward off the third node, Vespers (round 3) off the fourth, and Plainsong (round 3) bridges Shattering Rite to the east end.",
+      why: "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. Rood Screen (G3 round 1) hangs inward between the second and third nodes (an arc since G4 fix 1), Vespers (round 3) off the fourth, and Plainsong (round 3) bridges Shattering Rite to the east end.",
       at: P(3057, 1916),
       shape: { kind: 'hand' },
       nodes: [
@@ -45,14 +45,14 @@ export const lychway: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3396, 1140),
-          why: 'Outside the Sigil Warden keystone.',
+          why: "Outside the Sigil Warden keystone; Rood Screen's arc lands here (G4 fix 1).",
         },
         {
           id: 'n3',
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3244, 1537),
-          why: 'Where Rood Screen (energy shield with spell block) hangs inward.',
+          why: 'Where Rood Screen (energy shield with spell block) leaves inward, as an arc back to the second node.',
         },
         {
           id: 'n4',
@@ -87,32 +87,38 @@ export const lychway: AreaSpec = {
     {
       id: 'rood',
       name: 'Rood Screen',
-      why: "G3 round 1 (2026-10-22; ledger ZE-11): a pocket inward off the north walk's third node, square to the walk: energy shield three times, then the notable with energy shield and spell block. The block caster's shield without a shield (Glass Wall needs one), and the energy shield a Zealot or Mystic caster finds far out on the casters' loop, in a different direction from the Cloister's. A dead-end tip on purpose (§13.5): the walk it hangs from has three ways in.",
-      at: P(2978, 1419),
+      why: "G3 round 1 (2026-10-22; ledger ZE-11): energy shield three times inward of the north walk between its second and third nodes, then the notable with energy shield and spell block. The block caster's shield without a shield (Glass Wall needs one), and the energy shield a Zealot or Mystic caster finds far out on the casters' loop, in a different direction from the Cloister's. G4 fix 1 (2026-10-22, audit N3): it was a dead end off the third node and the run `n1`–`n2` had nothing off it; now it is an arc between `n3` and `n2`, a tent bowed inward (clear of the Sigil Warden keystone below it), two smalls on `n3`'s side and one on `n2`'s, so it is a bridge and `n2` has a branch. Vespers stays the walk's far tip.",
+      at: P(3170, 1281),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [es(5)],
-          at: P(3143, 1492),
-          why: 'The entrance from the walk.',
+          at: P(3205, 1401),
+          why: "The entrance from the walk's third node, on the line to the notable.",
         },
-        { id: 'b', kind: 'small', lines: [es(5)], at: P(3093, 1469) },
-        { id: 'c', kind: 'small', lines: [es(5)], at: P(3042, 1448) },
+        { id: 'b', kind: 'small', lines: [es(5)], at: P(3190, 1348) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Rood Screen',
           lines: [es(10), spellBlock(4)],
-          at: P(2978, 1419),
+          at: P(3170, 1281),
           why: 'Energy shield and spell block: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [es(5)],
+          at: P(3230, 1244),
+          why: "The far node, on the line to the walk's second node.",
         },
       ],
       links: [
         ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'n'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -196,6 +202,11 @@ export const lychway: AreaSpec = {
       why: "Tomb Dust's chain carried on to the north walk's east end: the chaos pocket becomes a bridge, and the walk's second way in.",
     },
     { from: 'road.n3', to: 'rood.a', why: "The north walk's third node onto Rood Screen." },
+    {
+      from: 'rood.c',
+      to: 'road.n2',
+      why: "Rood Screen's far small onto the walk's second node (G4 fix 1, audit N3): the pocket is an arc between the two nodes, a bridge.",
+    },
     {
       from: 'road.n4',
       to: 'vespers.a',

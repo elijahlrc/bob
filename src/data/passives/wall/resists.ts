@@ -119,23 +119,23 @@ export const resists: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [maceDamage(12)],
+          lines: [maceDamage(14)],
           at: [-2527, 104],
           why: "The entrance, from the rampart's junction.",
         },
-        { id: 'b', kind: 'small', lines: [maceDamage(12)], at: [-2533, 50] },
+        { id: 'b', kind: 'small', lines: [maceDamage(14)], at: [-2533, 50] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Hallowed Hammer',
           lines: [maceDamage(20), eleAttack(20)],
           at: [-2540, -20],
-          why: '1.4 + 2 units.',
+          why: '1.4 + 2 units. Its smalls are one unit each, 14% (12% until G4 fix 1, 2026-10-22).',
         },
         {
           id: 'c',
           kind: 'small',
-          lines: [maceDamage(12)],
+          lines: [maceDamage(14)],
           at: [-2547, -90],
           why: "The far small, facing the Cathedral's sceptre road.",
         },
@@ -149,7 +149,7 @@ export const resists: AreaSpec = {
     {
       id: 'posts',
       name: 'Graven Posts',
-      why: "Totem damage twice, then the notable with totem damage and all resistances: a chain west off Hallowed Hammer's middle small, under the battlements, that goes on to Stagger at the tower's top (G3 round 3, 2026-10-22; added beyond the brief because the warcry and totem build held both Vanguard totem clusters by 120 points: the specialization ran out of supply, not of reach). The third direction for the Vanguard's totems: Standing Cairns (damage with area) is south-east by the Quarry, Long Watch (speed and duration) west-south-west by Iron Liturgy, and this is north-west, on the side of the Cathedral's totem keystone across the border, so a totem build that comes here leaves the Barrows' warcries behind. The way from the home passes Iron Lungs or Elemental Ward, notables of other kinds. The partner is the totem player's ward, standing back while the posts fight.",
+      why: "Totem damage twice, then the notable with totem damage and all resistances: a chain west off Hallowed Hammer's middle small, under the battlements, that goes on to Stagger at the tower's top (G3 round 3, 2026-10-22; added beyond the brief because the warcry and totem build held both Vanguard totem clusters by 120 points: the specialization ran out of supply, not of reach). The third direction for the Vanguard's totems: Standing Cairns (damage with area) is south-east by the Quarry, Long Watch (speed and duration) west-south-west by Iron Liturgy, and this is north-west, on the side of the Cathedral's totem keystone across the border, so a totem build that comes here leaves the Barrows' warcries behind. The way from the home passes Iron Lungs or Elemental Ward, notables of other kinds. The partner is the totem player's ward, standing back while the posts fight. Since G4 fix 1 (2026-10-22) the notable also leads east to the Zealot's Twofold Guard (`cathedral.rods.guard.b`, seam 5: block and spell block with a shield), the cross-border end of the chain.",
       at: [-2670, 70],
       shape: { kind: 'hand' },
       nodes: [
@@ -178,12 +178,12 @@ export const resists: AreaSpec = {
     {
       id: 'banner',
       name: "Warlord's Banner",
-      why: "Reduced mana reservation twice, then the notable with reservation, aura effect and mana: the Vanguard's standards, as a chain from the north hub toward the Zealot. The Wall's only reservation lines, and the Cathedral's way in. Its armour went in G3 (2026-10-22): a notable three steps from the Zealot start and five from the Vanguard's sold reservation, armour and mana, three themes, and armour this near two starts is strength by the back door.",
+      why: "Reduced mana reservation twice, then the notable with reservation, aura effect and mana: the Vanguard's standards, as a chain from the north hub toward the Zealot, its two smalls beside the notable on the line toward the hub (G4 fix 1, 2026-10-22: they were strung 180 apart along the seam and read as a road). The Wall's only reservation lines, and the Cathedral's way in. Its armour went in G3 (2026-10-22): a notable three steps from the Zealot start and five from the Vanguard's sold reservation, armour and mana, three themes, and armour this near two starts is strength by the back door.",
       at: [-1170, -60],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [reducedReservation(3)], at: [-1080, 80] },
-        { id: 'b', kind: 'small', lines: [reducedReservation(3)], at: [-1160, -80] },
+        { id: 'a', kind: 'small', lines: [reducedReservation(3)], at: [-1194, -118] },
+        { id: 'b', kind: 'small', lines: [reducedReservation(3)], at: [-1219, -167] },
         {
           id: 'n',
           kind: 'notable',

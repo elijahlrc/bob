@@ -33,9 +33,18 @@ export type Archetype = {
 };
 
 // ---- Bundles most builds share.
-const RES = { resAll: 0.4, 'resOne:*': 0.25, maxResAll: 0.4, 'maxResOne:*': 0.3 };
+// Resistances, and the stun and ailment defences every build counts a little (CONSTRAINTS §4.5 names stun).
+const RES = {
+  resAll: 0.4,
+  'resOne:*': 0.25,
+  maxResAll: 0.4,
+  'maxResOne:*': 0.3,
+  stunAvoid: 0.25,
+  stunRecovery: 0.2,
+  avoidAilments: 0.25,
+};
 const LIFE = { life: 1, lifeFlat: 1, lifeRegen: 0.4 };
-const ES = { es: 1, esFlat: 1, esRecharge: 0.5, esRechargeDelay: 0.5 };
+const ES = { es: 1, esFlat: 1, esRecharge: 0.5, esRechargeDelay: 0.5, esOnHit: 0.4, esLeech: 0.4 };
 const MANA = { mana: 0.3, manaRegen: 0.3, costReduction: 0.3 };
 const ARMOUR = { armour: 1, armourFlat: 1, physReduction: 1, globalDefences: 0.5 };
 const EVASION = { evasion: 1, evasionFlat: 1, globalDefences: 0.5 };
@@ -52,6 +61,8 @@ const SPELL = {
   spellCritMulti: 0.4,
   costReduction: 0.3,
   'manaLeech:spell': 0.3,
+  damageOnFullLife: 0.3,
+  damageVsLowLife: 0.3,
 };
 // Fervour charges grant speed and more damage (src/calc/charges.ts), so attackers want their lines a little.
 const ATTACK = {
@@ -61,8 +72,19 @@ const ATTACK = {
   fervourOnKill: 0.3,
   maxFervour: 0.3,
   fervourDuration: 0.2,
+  doubleDamage: 0.5,
+  damageVsLowLife: 0.3,
+  cullingStrike: 0.3,
+  damageOnFullLife: 0.3,
+  critOnFullLife: 0.2,
 };
-const MELEE = { meleeDamage: 0.8, meleePhys: 1, physAttack: 1, 'critChance:melee': 0.3 };
+const MELEE = {
+  meleeDamage: 0.8,
+  meleePhys: 1,
+  physAttack: 1,
+  'critChance:melee': 0.3,
+  meleeRange: 0.3,
+};
 const SHIELD = {
   shieldBlock: 1,
   blockAttack: 1,
@@ -71,8 +93,23 @@ const SHIELD = {
   blockRecovery: 0.3,
   spellBlock: 0.6,
   shieldSpellBlock: 0.6,
+  shieldStunAvoid: 0.3,
 };
 const FLASK = { flaskEffect: 0.25, flaskRecovery: 0.25, flaskDuration: 0.25 };
+// The strength builds' charges (grit: physical reduction and resistances) and the crit casters' (insight: crit chance),
+// valued a little as fervour is for attackers (src/calc/charges.ts).
+const GRIT = { maxGrit: 0.3, gritOnHitTaken: 0.3, gritDuration: 0.2, lifeRegenPerGrit: 0.3 };
+const INSIGHT = { maxInsight: 0.3, insightOnCrit: 0.3, insightDuration: 0.2 };
+// What every build counts a little, under its own weights (G4 audit round 2, builds F4): movement, flasks and mana were
+// priced at nothing for most archetypes, so the clusters that sell them read as pure loss.
+const UTILITY = {
+  moveSpeed: 0.25,
+  flaskEffect: 0.2,
+  flaskRecovery: 0.2,
+  flaskDuration: 0.2,
+  mana: 0.15,
+  manaRegen: 0.15,
+};
 
 /**
  * A weapon's own lines (`weaponDamage`, `weaponSpeed`, `weaponCrit`... with the weapon as argument), which the older
@@ -94,19 +131,22 @@ const F = {
   evasion: ['evasion', 'evasionFlat'],
   spell: ['spellDamage'],
   block: ['shieldBlock', 'blockAttack', 'dualBlock'],
-  spellBlock: ['spellBlock', 'shieldSpellBlock'],
+  spellBlock: ['spellBlock', 'shieldSpellBlock', 'staffSpellBlock'],
   attackSpeed: ['attackSpeed'],
   castSpeed: ['castSpeed', 'wandCastSpeed'],
   minion: ['minionDamage'],
 };
 
-export const ARCHETYPES: Archetype[] = [
+const LIST: Archetype[] = [
   // The user's two examples (2026-10-22).
   {
     id: 'caster-es',
     want: 'Classic caster: cold spells, all the spell damage and all the energy shield it can find.',
     start: 'mystic',
     weights: {
+      freezeDuration: 0.3,
+      ailmentEffect: 0.3,
+      ...INSIGHT,
       ...SPELL,
       ...ES,
       ...MANA,
@@ -125,7 +165,7 @@ export const ARCHETYPES: Archetype[] = [
       dodgeSpell: 0.3,
       reducedReservation: 0.2,
     },
-    keystones: { 'Hollow Vessel': 4 },
+    keystones: { 'Prismatic Balance': 2, 'Hollow Vessel': 4 },
     main: {
       'spell damage': ['spellDamage', 'wandSpellDamage', 'spellAreaDamage'],
       'cold damage': ['eleDamage:cold', 'eleDamageAll'],
@@ -140,6 +180,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Strength sword build: all the life, all the armour and all the sword damage.',
     start: 'reaver',
     weights: {
+      ...GRIT,
       ...weapon('sword'),
       ...LIFE,
       ...ARMOUR,
@@ -153,7 +194,10 @@ export const ARCHETYPES: Archetype[] = [
       oneHandMelee: 0.9,
       'attackSpeed:oneHand': 0.8,
       stunThreshold: 0.2,
+      critChance: 0.3,
+      critMulti: 0.4,
     },
+    keystones: { 'Crimson Pact': 3 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -170,6 +214,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Two-handed mace slams: big hits, area, stun, life and armour.',
     start: 'vanguard',
     weights: {
+      ...GRIT,
       ...weapon('mace'),
       ...LIFE,
       ...ARMOUR,
@@ -190,7 +235,7 @@ export const ARCHETYPES: Archetype[] = [
       'weaponCritMulti:mace': 0.3,
       warcryEffect: 0.3,
     },
-    keystones: { 'Rooted Stance': 3 },
+    keystones: { 'Unerring Discipline': 3, 'Rooted Stance': 3 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -210,6 +255,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Mace and shield: block, armour and life first, mace damage after.',
     start: 'vanguard',
     weights: {
+      ...GRIT,
       ...weapon('mace'),
       ...LIFE,
       ...ARMOUR,
@@ -238,6 +284,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Totems and warcries: totem damage, warcry effect, life and regeneration.',
     start: 'vanguard',
     weights: {
+      ...GRIT,
       ...LIFE,
       ...ARMOUR,
       ...RES,
@@ -259,6 +306,35 @@ export const ARCHETYPES: Archetype[] = [
     },
     pair: ['totem damage', 'life'],
     gear: { str: 120 },
+  },
+  {
+    // Added after G3 (2026-10-22): no totem build outside the Vanguard was measured, and Idle Hands aims partly at it.
+    id: 'spell-totem',
+    want: 'Spell totems from the Zealot: totem damage and speed, spell and elemental damage, a staff, life and energy shield.',
+    start: 'zealot',
+    weights: {
+      ...LIFE,
+      ...RES,
+      es: 0.6,
+      totemDamage: 1,
+      totemSpeed: 1,
+      totemDuration: 0.5,
+      spellDamage: 0.8,
+      eleDamageAll: 0.8,
+      'eleDamage:fire': 0.6,
+      'eleDamage:lightning': 0.6,
+      // A totem casts the spell, so the staff's attack lines are worth nothing to it; its spell lines are.
+      staffSpellDamage: 0.6,
+      skillDuration: 0.3,
+    },
+    keystones: { 'Idle Hands': 3 },
+    main: {
+      'totem damage': ['totemDamage', 'totemSpeed'],
+      'spell damage': ['spellDamage', 'staffSpellDamage', 'eleDamageAll'],
+      life: F.life,
+    },
+    pair: ['totem damage', 'life'],
+    gear: { str: 100, int: 120 },
   },
 
   // The Strider (dexterity).
@@ -286,7 +362,7 @@ export const ARCHETYPES: Archetype[] = [
       projectileSpeed: 0.3,
       'leechLife:attack': 0.4,
     },
-    keystones: { 'Steady Draw': 4 },
+    keystones: { 'Close Quarters': 2, 'Arrow Weave': 3, 'Steady Draw': 4 },
     main: {
       life: F.life,
       evasion: F.evasion,
@@ -319,6 +395,7 @@ export const ARCHETYPES: Archetype[] = [
       shockEffect: 0.3,
       igniteChance: 0.3,
     },
+    keystones: { 'Arrow Weave': 3 },
     main: {
       life: F.life,
       evasion: F.evasion,
@@ -356,6 +433,7 @@ export const ARCHETYPES: Archetype[] = [
       damageVsPoisoned: 0.6,
       'resOne:chaos': 0.5,
     },
+    keystones: { 'Cruel Agony': 3, 'Arrow Weave': 3 },
     main: {
       life: F.life,
       poison: ['poisonDamage', 'poisonChance', 'chaosAttack', 'dotDamage'],
@@ -371,6 +449,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Fire and lightning caster on life: spell damage, crit, life, mana.',
     start: 'mystic',
     weights: {
+      ...INSIGHT,
       ...SPELL,
       ...LIFE,
       ...MANA,
@@ -387,6 +466,7 @@ export const ARCHETYPES: Archetype[] = [
       shockEffect: 0.4,
       igniteChance: 0.3,
     },
+    keystones: { 'Mind Bulwark': 3, 'Pain Conduit': 3 },
     main: {
       'spell damage': ['spellDamage', 'spellProjectile'],
       'elemental damage': ['eleDamageAll', 'eleDamage:fire', 'eleDamage:lightning'],
@@ -464,6 +544,7 @@ export const ARCHETYPES: Archetype[] = [
       axeDamage: 1,
       'attackSpeed:axe': 1,
       'weaponCrit:axe': 0.3,
+      critMulti: 0.3,
       bleedChance: 1,
       bleedDamage: 1,
       bleedFaster: 0.8,
@@ -473,7 +554,7 @@ export const ARCHETYPES: Archetype[] = [
       physAttack: 0.8,
       twoHandDamage: 0.5,
     },
-    keystones: { 'Wound Dance': 3 },
+    keystones: { 'Crimson Pact': 3, 'Wound Dance': 3 },
     main: {
       life: F.life,
       bleed: ['bleedDamage', 'bleedChance', 'damageVsBleeding'],
@@ -498,6 +579,7 @@ export const ARCHETYPES: Archetype[] = [
       dualDamage: 1,
       dualSpeed: 1,
       dualCrit: 1,
+      critMulti: 0.5,
       dualAccuracy: 0.5,
       dualBlock: 0.6,
       oneHandMelee: 1,
@@ -505,6 +587,7 @@ export const ARCHETYPES: Archetype[] = [
       axeDamage: 0.7,
       attackSpeedOnKill: 0.6,
     },
+    keystones: { Strongarm: 2 },
     main: {
       life: F.life,
       'dual wield': ['dualDamage', 'oneHandMelee', 'dualSpeed', 'dualCrit'],
@@ -534,7 +617,7 @@ export const ARCHETYPES: Archetype[] = [
       'penetration:fire': 0.6,
       'maxResOne:fire': 0.5,
     },
-    keystones: { 'Searing Avatar': 3 },
+    keystones: { 'Fever Pitch': 2, 'Searing Avatar': 3 },
     main: {
       'fire damage': ['eleDamage:fire', 'eleDamageAll', 'burnDamage', 'dotDamage'],
       'spell damage': F.spell,
@@ -554,15 +637,17 @@ export const ARCHETYPES: Archetype[] = [
       ...RES,
       es: 0.7,
       staffDamage: 1,
+      staffSpellDamage: 1,
       spellBlock: 1,
+      staffSpellBlock: 1,
       blockAttack: 1,
       eleDamageAll: 0.8,
       'eleDamage:lightning': 0.6,
       physSpell: 0.6,
     },
     main: {
-      'spell damage': ['spellDamage', 'eleDamageAll'],
-      block: ['spellBlock', 'blockAttack'],
+      'spell damage': ['spellDamage', 'staffSpellDamage', 'eleDamageAll'],
+      block: ['spellBlock', 'staffSpellBlock', 'blockAttack'],
       life: F.life,
     },
     pair: ['block', 'life'],
@@ -573,6 +658,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Aura and brand support caster: auras, reservation, brands, spell damage, life.',
     start: 'zealot',
     weights: {
+      'critChance:brand': 0.6,
       ...LIFE,
       ...RES,
       ...ES,
@@ -600,6 +686,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dagger crit attacker: dagger damage, crit, attack speed, evasion and dodge.',
     start: 'shade',
     weights: {
+      ...INSIGHT,
       ...weapon('dagger'),
       ...LIFE,
       ...EVASION,
@@ -617,7 +704,7 @@ export const ARCHETYPES: Archetype[] = [
       dodgeAttack: 0.8,
       dodgeSpell: 0.5,
     },
-    keystones: { 'Nimble Gambit': 3 },
+    keystones: { 'Shade Leech': 2, 'Nimble Gambit': 3 },
     main: {
       life: F.life,
       crit: ['critChance', 'critMulti', 'weaponCrit:dagger'],
@@ -650,6 +737,7 @@ export const ARCHETYPES: Archetype[] = [
       dodgeAttack: 0.5,
       'resOne:chaos': 0.5,
     },
+    keystones: { 'Cruel Agony': 3 },
     main: {
       life: F.life,
       poison: ['poisonDamage', 'poisonChance', 'chaosAttack', 'dotDamage'],
@@ -663,6 +751,10 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Traps and mines: trap and mine damage, throwing speed, area, energy shield and evasion.',
     start: 'shade',
     weights: {
+      'critChance:trap': 0.6,
+      'critChance:mine': 0.6,
+      'critMulti:trap': 0.6,
+      'critMulti:mine': 0.6,
       ...ES,
       ...EVASION,
       ...RES,
@@ -693,6 +785,7 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Dagger caster: spell damage and crit with a dagger, cast speed, energy shield.',
     start: 'shade',
     weights: {
+      ...INSIGHT,
       ...SPELL,
       ...ES,
       ...RES,
@@ -718,9 +811,13 @@ export const ARCHETYPES: Archetype[] = [
     want: 'Two-handed fire melee: fire damage with attacks, two-handed damage, life, armour.',
     start: 'vanguard',
     weights: {
+      maceDamage: 0.4,
+      axeDamage: 0.4,
+      ...GRIT,
       ...LIFE,
       ...ARMOUR,
       ...ATTACK,
+      ...MELEE,
       ...RES,
       twoHandDamage: 1,
       'attackSpeed:twoHand': 0.8,
@@ -735,7 +832,7 @@ export const ARCHETYPES: Archetype[] = [
       burnDamage: 0.5,
       'maxResOne:fire': 0.5,
     },
-    keystones: { 'Searing Avatar': 4 },
+    keystones: { 'Blood Rite': 2, 'Searing Avatar': 4 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -763,7 +860,7 @@ export const ARCHETYPES: Archetype[] = [
     keystones: { Shieldwall: 3 },
     main: {
       block: ['shieldBlock', 'blockAttack'],
-      'spell block': F.spellBlock,
+      'spell block': ['spellBlock', 'shieldSpellBlock'],
       'spell damage': F.spell,
       'energy shield': F.es,
     },
@@ -820,6 +917,7 @@ export const ARCHETYPES: Archetype[] = [
       'eleDamage:lightning': 0.6,
       life: 0.5,
     },
+    keystones: { 'Mana Bastion': 3, 'Mind Bulwark': 3 },
     main: {
       'channelling and spell damage': ['channelDamage', 'spellDamage'],
       'mana sustain': ['mana', 'manaRegen', 'costReduction', 'manaLeech:spell'],
@@ -919,4 +1017,121 @@ export const ARCHETYPES: Archetype[] = [
     pair: ['dodge', 'evasion'],
     gear: { dex: 150, int: 90 },
   },
+
+  // Added after G4 audit round 2 (builds F3–F4, network finding 1): builds the yardstick lacked, so the clusters they
+  // want read as unused.
+  {
+    id: 'spellblade',
+    want: 'A Reaver who casts: spell damage and cast speed with a one-handed weapon, life and armour.',
+    start: 'reaver',
+    weights: {
+      ...SPELL,
+      ...LIFE,
+      ...ARMOUR,
+      ...MANA,
+      ...RES,
+      ...GRIT,
+      armour: 0.6,
+      armourFlat: 0.6,
+      oneHandMelee: 0.3,
+      'manaLeech:spell': 0.4,
+    },
+    main: {
+      'spell damage': F.spell,
+      'cast speed': F.castSpeed,
+      life: F.life,
+      armour: F.armour,
+    },
+    pair: ['spell damage', 'life'],
+    gear: { str: 100, int: 100 },
+  },
+  {
+    id: 'curse-attacker',
+    want: 'An axe that curses on hit: curse effect, damage against the cursed, axe damage, life and armour.',
+    start: 'reaver',
+    weights: {
+      ...weapon('axe'),
+      ...LIFE,
+      ...ARMOUR,
+      ...ATTACK,
+      ...MELEE,
+      ...RES,
+      axeDamage: 1,
+      'attackSpeed:axe': 0.8,
+      curseEffect: 1,
+      damageVsCursed: 1,
+      hexLimit: 0.6,
+      skillDuration: 0.3,
+    },
+    main: {
+      curses: ['curseEffect', 'hexLimit', 'damageVsCursed'],
+      life: F.life,
+      'axe damage': ['axeDamage', 'weaponDamage:axe', 'meleePhys'],
+    },
+    pair: ['curses', 'life'],
+    gear: { str: 140, dex: 100 },
+  },
+  {
+    id: 'sword-board',
+    want: 'Dexterity sword and shield: block, evasion, life, sword damage and melee crit.',
+    start: 'strider',
+    weights: {
+      ...weapon('sword'),
+      ...LIFE,
+      ...EVASION,
+      ...SHIELD,
+      ...ATTACK,
+      ...MELEE,
+      ...RES,
+      swordDamage: 1,
+      oneHandMelee: 0.8,
+      'attackSpeed:oneHand': 0.8,
+      shieldAttack: 0.5,
+      shieldSpeed: 0.5,
+      critMulti: 0.4,
+    },
+    main: {
+      block: F.block,
+      evasion: F.evasion,
+      life: F.life,
+      'sword damage': ['swordDamage', 'weaponDamage:sword', 'oneHandMelee'],
+    },
+    pair: ['block', 'evasion'],
+    gear: { dex: 150, str: 90 },
+  },
+  {
+    id: 'storm-blade',
+    want: 'Lightning strikes with a one-handed weapon: lightning attack damage, shock, attack speed, life and evasion.',
+    start: 'reaver',
+    weights: {
+      ...weapon('sword', 0.6),
+      ...LIFE,
+      ...EVASION,
+      ...ATTACK,
+      ...MELEE,
+      ...RES,
+      evasion: 0.6,
+      evasionFlat: 0.6,
+      'eleAttackOne:lightning': 1,
+      eleAttack: 1,
+      'eleDamage:lightning': 0.8,
+      eleDamageAll: 0.6,
+      shockChance: 0.6,
+      critChance: 0.4,
+      oneHandMelee: 0.6,
+      'attackSpeed:oneHand': 0.8,
+    },
+    main: {
+      'lightning attack damage': ['eleAttackOne:lightning', 'eleAttack', 'eleDamage:lightning'],
+      'attack speed': ['attackSpeed', 'attackSpeed:oneHand'],
+      life: F.life,
+    },
+    pair: ['lightning attack damage', 'life'],
+    gear: { str: 110, dex: 120 },
+  },
 ];
+
+export const ARCHETYPES: Archetype[] = LIST.map((a) => ({
+  ...a,
+  weights: { ...UTILITY, ...a.weights },
+}));

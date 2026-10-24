@@ -268,7 +268,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Withering Breath',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'chaos', 'channelling', 'duration'],
+    tags: ['spell', 'area', 'chaos', 'channelling', 'duration', 'dot'],
     types: ['totemable', 'damageOverTime'],
     behaviour: {
       kind: 'beam',
@@ -476,7 +476,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [6.9, 401.4],
+      dps: [10.6, 401.4],
       seconds: 5,
       stack: 'refresh',
       hitless: true,
@@ -496,7 +496,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Pyre Burst',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'area', 'fire', 'duration', 'projectile'],
+    tags: ['spell', 'area', 'fire', 'duration'],
     types: ['orb', 'repeatable', 'trappable', 'totemable', 'mineable', 'triggerable', 'cascadable'],
     behaviour: {
       kind: 'burst',
@@ -697,7 +697,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Rime Splinter',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'melee', 'cold'],
+    tags: ['attack', 'projectile', 'melee', 'cold', 'strike'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -1133,7 +1133,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [13.7, 802.9],
+      dps: [33.7, 802.9],
       seconds: 3.8,
       stack: 'refresh',
       scales: ['spell'],
@@ -1299,7 +1299,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 3],
+        value: [2, 75],
         damageTypes: ['cold'],
         condition: {
           id: 'targetChilled',
@@ -1308,7 +1308,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [75, 113],
+        value: [3, 113],
         damageTypes: ['cold'],
         condition: {
           id: 'targetChilled',
@@ -1548,13 +1548,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [5, 8],
+        value: [5, 75],
         damageTypes: ['fire'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [75, 113],
+        value: [8, 113],
         damageTypes: ['fire'],
       },
     ],
@@ -1717,13 +1717,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Storm Arrow',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'area', 'lightning', 'bow'],
+    tags: ['attack', 'projectile', 'lightning', 'bow', 'chaining'],
     types: ['totemable', 'trappable', 'mineable', 'volleyable', 'triggerable'],
     behaviour: {
-      kind: 'chain',
+      kind: 'projectile',
+      count: 1,
+      spread: 0,
       range: 9,
       chains: 3,
-      chainRange: 4,
     },
     baseMult: [110, 134],
     cost: [7, 11],
@@ -1740,7 +1741,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: [10, 29],
       },
     ],
-    description: 'An arrow of lightning that arcs from the target to enemies nearby.',
+    description: 'An arrow of lightning that arcs from its target to enemies nearby.',
   },
   {
     kind: 'active',
@@ -1780,7 +1781,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Crackle Ring',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'lightning', 'channelling'],
+    tags: ['spell', 'area', 'lightning', 'channelling', 'nova'],
     types: ['totemable'],
     behaviour: {
       kind: 'burst',
@@ -1844,7 +1845,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Tempest Mote',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'lightning', 'duration'],
+    tags: ['spell', 'area', 'lightning', 'duration', 'chaining'],
     types: ['orb', 'totemable', 'trappable', 'mineable', 'repeatable', 'triggerable'],
     behaviour: {
       kind: 'burst',
@@ -1933,7 +1934,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Venom Strike',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'strike', 'area', 'chaos', 'duration'],
+    tags: ['attack', 'melee', 'strike', 'chaos', 'duration'],
     types: ['repeatable', 'damageOverTime'],
     behaviour: {
       kind: 'melee',
@@ -1960,13 +1961,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [20, 30],
+        value: [20, 113],
         damageTypes: ['chaos'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [113, 169],
+        value: [30, 169],
         damageTypes: ['chaos'],
       },
       {
@@ -2120,7 +2121,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Searing Lance',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'fire', 'channelling', 'duration'],
+    tags: ['spell', 'fire', 'channelling', 'duration', 'dot'],
     types: ['totemable', 'damageOverTime'],
     behaviour: {
       kind: 'beam',
@@ -2129,7 +2130,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [6.9, 401.4],
+      dps: [16.9, 401.4],
       seconds: 1.5,
       stack: 'stages',
       cap: 8,
@@ -2476,7 +2477,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Snare Shot',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'area', 'bow'],
+    tags: ['attack', 'projectile', 'bow'],
     types: ['totemable', 'trappable', 'mineable', 'volleyable', 'triggerable'],
     behaviour: {
       kind: 'projectile',
@@ -2544,7 +2545,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Iron Rebuke',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'melee'],
+    tags: ['attack', 'melee', 'strike'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -2556,13 +2557,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 56],
+        value: [16, 56],
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 85],
+        value: [25, 85],
         damageTypes: ['physical'],
       },
     ],
@@ -2598,13 +2599,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [5, 8],
+        value: [5, 75],
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [75, 113],
+        value: [8, 113],
         damageTypes: ['physical'],
       },
       {
@@ -2667,12 +2668,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Slag Lob',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'projectile', 'area', 'fire', 'chaining'],
+    tags: ['spell', 'projectile', 'area', 'fire'],
     types: ['totemable', 'trappable', 'mineable', 'repeatable', 'triggerable'],
     behaviour: {
-      kind: 'burst',
-      radius: 1.4,
-      reach: 8,
+      kind: 'projectile',
+      count: 1,
+      spread: 0,
+      range: 8,
+      explodeRadius: 1.4,
     },
     spellDamage: [
       {
@@ -2685,7 +2688,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     crit: 5,
     cost: [8, 22],
     mods: [],
-    description: 'A molten orb that bursts where it lands, and bounces on to burst again.',
+    description:
+      'A molten orb that arcs to where you aim, bursts as it lands, and bounces on to burst again.',
     bounces: {
       spacing: 1.6,
       chains: [1, 2],
@@ -2772,7 +2776,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [17.1, 1003],
+      dps: [95, 1003],
       seconds: 0.6,
       stack: 'refresh',
       carried: 1,
@@ -2908,13 +2912,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 56],
+        value: [16, 56],
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 85],
+        value: [25, 85],
         damageTypes: ['physical'],
       },
     ],
@@ -3020,7 +3024,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [8.2, 480.9],
+      dps: [20.2, 480.9],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -3275,7 +3279,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Hoarfrost Mote',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'cold', 'channelling', 'duration', 'projectile'],
+    tags: ['spell', 'area', 'cold', 'channelling', 'duration'],
     types: ['totemable', 'orb'],
     behaviour: {
       kind: 'burst',
@@ -3487,7 +3491,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [6.9, 401.4],
+      dps: [30.8, 401.4],
       seconds: 2,
       stack: 'refresh',
       hitless: true,
@@ -4357,7 +4361,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Bulwark Rush',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'movement', 'physical'],
+    tags: ['attack', 'melee', 'movement', 'physical', 'area'],
     types: ['repeatable'],
     needsShield: true,
     travel: 6,
@@ -4593,7 +4597,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Blessed Trail',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'movement', 'area', 'fire'],
+    tags: ['attack', 'melee', 'movement', 'area', 'fire', 'slam', 'duration'],
     types: ['repeatable'],
     travel: 7,
     run: {
@@ -4632,7 +4636,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Snag Lash',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'area'],
+    tags: ['attack', 'melee', 'area', 'movement'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -4677,7 +4681,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Thunder Rebuke',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'area', 'lightning', 'duration'],
+    tags: ['attack', 'melee', 'area', 'lightning', 'duration', 'strike'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -4791,7 +4795,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Cinder Bond',
     attr: 'str',
     skillType: 'spell',
-    tags: ['spell', 'totem', 'area', 'fire', 'duration'],
+    tags: ['spell', 'totem', 'area', 'fire', 'duration', 'dot'],
     types: ['totem'],
     behaviour: {
       kind: 'burst',
@@ -4800,7 +4804,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [6.9, 401.4],
+      dps: [16.9, 401.4],
       seconds: 0.5,
       stack: 'refresh',
       hitless: true,
@@ -4830,7 +4834,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Guardian Cairn',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'totem', 'duration'],
+    tags: ['attack', 'melee', 'totem', 'duration', 'strike'],
     types: ['totem'],
     behaviour: {
       kind: 'melee',
@@ -5356,7 +5360,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Drain Trap',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'trap', 'area', 'cold', 'duration'],
+    tags: ['spell', 'trap', 'area', 'cold', 'duration', 'dot'],
     types: ['trap'],
     behaviour: {
       kind: 'burst',
@@ -5380,7 +5384,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cooldown: 4,
     dot: {
       type: 'cold',
-      dps: [6.9, 401.4],
+      dps: [15.4, 401.4],
       seconds: 3,
       stack: 'refresh',
       hitless: true,
@@ -5517,7 +5521,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Smoke Charge',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'mine', 'duration'],
+    tags: ['spell', 'mine', 'duration', 'movement'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
@@ -5645,7 +5649,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [3, 120],
+        value: [17, 120],
         damageTypes: ['fire'],
         per: {
           stat: 'charges.grit',
@@ -5655,7 +5659,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 180],
+        value: [26, 180],
         damageTypes: ['fire'],
         per: {
           stat: 'charges.grit',
@@ -5665,7 +5669,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 100],
+        value: [15, 100],
         damageTypes: ['cold'],
         per: {
           stat: 'charges.fervour',
@@ -5675,7 +5679,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 150],
+        value: [22, 150],
         damageTypes: ['cold'],
         per: {
           stat: 'charges.fervour',
@@ -5685,7 +5689,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 20],
+        value: [3, 20],
         damageTypes: ['lightning'],
         per: {
           stat: 'charges.insight',
@@ -5695,7 +5699,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [8, 330],
+        value: [47, 330],
         damageTypes: ['lightning'],
         per: {
           stat: 'charges.insight',
@@ -6081,7 +6085,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Shadow Quiver',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'minion', 'projectile', 'duration', 'bow'],
+    tags: ['attack', 'minion', 'projectile', 'duration', 'bow', 'movement'],
     types: ['triggerable'],
     requiresWeapon: ['bow'],
     behaviour: {
@@ -6113,7 +6117,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Mirror Quiver',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'minion', 'projectile', 'duration', 'bow', 'movement'],
+    tags: ['attack', 'minion', 'projectile', 'duration', 'bow'],
     requiresWeapon: ['bow'],
     behaviour: {
       kind: 'projectile',
@@ -6322,13 +6326,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 137],
+        value: [14, 137],
         damageTypes: ['chaos'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 205],
+        value: [21, 205],
         damageTypes: ['chaos'],
       },
     ],
@@ -6345,13 +6349,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 150],
+        value: [4, 150],
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 225],
+        value: [5, 225],
         damageTypes: ['cold'],
       },
     ],
@@ -7124,13 +7128,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 40],
+        value: [6, 40],
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [12, 520],
+        value: [60, 520],
         damageTypes: ['lightning'],
       },
       {
@@ -9239,13 +9243,13 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 40],
+        value: [4, 40],
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 60],
+        value: [5, 60],
         damageTypes: ['cold'],
       },
     ],
@@ -9275,13 +9279,13 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 15],
+        value: [2, 15],
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [6, 100],
+        value: [9, 100],
         damageTypes: ['lightning'],
       },
     ],

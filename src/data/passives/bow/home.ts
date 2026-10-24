@@ -11,8 +11,8 @@
  * is a side, not a stat; the second is a real pick from four or five things; the third can be the signature, a pocket's
  * second node, or a road. Nothing in the home is about bows or projectiles: the Strider's skills are bows, dexterity
  * blades, thrown steel, traps and totems, and the home serves them all. The signature is the attacker's notable (attack
- * damage, attack speed, evasion, dexterity) on the loop between the hubs, outward of the start, and the way onto the
- * string. Each hub has one pocket here (crit north, life south), drawn as a tight orbit beside the hub as the reference
+ * damage, attack speed, dexterity) on the loop between the hubs, outward of the start, and the way onto the
+ * string. Each hub has one pocket here (life north, crit south, since the user's editor pass), drawn as a tight orbit beside the hub as the reference
  * draws its pockets; the other pockets of the first ten points hang off the roads, so that a hub is a crossroads and not
  * a bouquet.
  */
@@ -26,10 +26,7 @@ import {
   life,
   lifeRegen,
   mana,
-  manaRegen,
-  oneHandMelee,
-  resOne,
-  shieldBlock,
+  reducedReservation,
 } from '../lines';
 import type { AreaSpec } from '../types';
 import { P } from './frame';
@@ -51,7 +48,7 @@ export const home: AreaSpec = {
     {
       id: 'hubs',
       name: 'The hubs',
-      why: 'The two dexterity hubs the start touches. North leads to the bows, the crit pocket and the ring toward the Shade; south to the physical end, the life pocket and the ring toward the Reaver. Point one is a side.',
+      why: 'The two dexterity hubs the start touches. North leads to the bows, Long Breath and the ring toward the Shade (the link to Hedge Magic went in G4 fix 2: one pocket per hub); south to the physical end, Vital Aim, Wayfarer and the ring toward the Reaver. Point one is a side.',
       at: P(8, 58),
       shape: { kind: 'hand' },
       nodes: [
@@ -60,7 +57,7 @@ export const home: AreaSpec = {
           kind: 'attribute',
           lines: [dex(20)],
           at: P(60, -200),
-          why: 'The north hub: five ways out.',
+          why: 'The north hub: four ways out (the start side, the ring, the bows road, Long Breath).',
         },
         {
           id: 's',
@@ -75,7 +72,7 @@ export const home: AreaSpec = {
     {
       id: 'sig',
       name: "Hawk's Eye",
-      why: "The signature loop between the hubs, outward of the start: attack speed on the north side, evasion on the south, the attacker's notable at the tip. Three steps from the start by either hub, as the reference places every class's first notable, and the only way onto the string without a road.",
+      why: "The signature loop between the hubs, outward of the start: attack speed on the north side, evasion on the south, the attacker's notable (attack damage, attack speed, dexterity) at the tip. Three steps from the start by either hub, as the reference places every class's first notable, and the only way onto the string without a road.",
       at: P(226, 0),
       shape: { kind: 'hand' },
       nodes: [
@@ -90,9 +87,9 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: "Hawk's Eye",
-          lines: [attackDamage(14), attackSpeed(5), evasion(10), dex(20)],
+          lines: [attackDamage(14), attackSpeed(5), dex(20)],
           at: P(280, 0),
-          why: 'The class in one node, and nothing about a weapon: 1.4 + 1 + 1 + 1.3 units. The string leaves from here.',
+          why: "The attacker's notable, and nothing about a weapon: 1.4 + 1 + 1.3 units. G4 fix 2 (2026-10-23, the starts audit F3): its 10% evasion went (4.7 units were the richest notable in the network, and an evasion stop for the neighbours' attackers); the loop's south side still sells evasion. The string leaves from here.",
         },
         {
           id: 'b',
@@ -110,7 +107,7 @@ export const home: AreaSpec = {
     {
       id: 'crit',
       name: 'Vital Aim',
-      why: "The north hub's pocket, a tight orbit beside the hub pointing at the Shade: two crit chance nodes and a multiplier notable. The crit Strider's first three points after the hub; a dead end, as the reference's is.",
+      why: "The south hub's crit pocket: two crit chance smalls up to the multiplier notable, then two more past it (the user's editor nodes, re-homed here in G4 fix 1) on to Weathered's cold spoke, so the pocket is a bridge from the hub to the resist star. The crit Strider's first three points after the hub.",
       at: P(221, 435),
       shape: { kind: 'hand' },
       nodes: [
@@ -130,16 +127,32 @@ export const home: AreaSpec = {
           at: P(328, 480),
           why: '2.5 + 1 units.',
         },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [critChance(15)],
+          at: P(398, 476),
+          why: "Past the notable, on its line toward Weathered's cold spoke (the user's editor node n413; G4 fix 1 re-homed it and laid it on the line).",
+        },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [critChance(15)],
+          at: P(453, 472),
+          why: "The far door, toward the cold spoke (the editor's n414: it hung off c as a one-node dead end until G4 fix 1, the discipline audit F5).",
+        },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
+        ['n', 'c'],
+        ['c', 'd'],
       ],
     },
     {
       id: 'life',
       name: 'Long Breath',
-      why: "The south hub's pocket, a tight orbit beside the hub pointing at the Reaver: two life nodes and a life-and-regeneration notable. The first life a Strider can buy, three points after the hub; a dead end.",
+      why: "Two life smalls and a life-and-regeneration notable, a bridge from the north hub (b) to the string's second node (a), with Elemental Fletching off the notable and Round Shield's chain off a. The first life a Strider can buy, four points out since G4 fix 1 (it hung off the start's own side node, the starts audit F3).",
       at: P(444, -179),
       shape: { kind: 'hand' },
       nodes: [
@@ -150,7 +163,13 @@ export const home: AreaSpec = {
           at: P(486, -154),
           why: 'The entrance, facing the hub.',
         },
-        { id: 'b', kind: 'small', lines: [life(5)], at: P(399, -175) },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [life(5)],
+          at: P(386, -214),
+          why: 'The north hub side, on the line from the hub (G4 fix 1).',
+        },
         {
           id: 'n',
           kind: 'notable',
@@ -166,95 +185,58 @@ export const home: AreaSpec = {
       ],
     },
     {
-      id: 'added',
-      name: 'Added in the editor',
-      why: 'Nodes added by the user in the tree editor (2026-10-19); names and reasons provisional.',
-      at: P(547, 240),
+      id: 'clearHead',
+      name: 'Clear Head',
+      why: "Mana with reduced reservation, the aura carrier's porch: a mana small from the string's second node, the notable, and one more mana small past it. The user's editor nodes (2026-10-19, BigMana), re-homed in G4 fix 1 and re-lined (the Strider sold no reservation line, the starts audit F4). Its link to the start's south side node was cut (F3), so it is six steps out, by the string.",
+      at: P(424, 286),
       shape: { kind: 'hand' },
       nodes: [
         {
-          id: 'n400',
+          id: 'a',
+          kind: 'small',
+          lines: [mana(8)],
+          at: P(459, 226),
+          why: "The door from the string (the editor's n402): 12% mana regeneration → 8% mana, one unit of the notable's lead (G4 fix 1).",
+        },
+        {
+          id: 'n',
           kind: 'notable',
           name: 'Clear Head',
-          lines: [mana(25), manaRegen(15)],
+          lines: [mana(16), reducedReservation(6)],
           at: P(424, 286),
-          why: 'Added in the editor (2026-10-19) as BigMana; named 2026-10-19, lines theirs.',
+          why: '2 + 2 units. Added in the editor (2026-10-19) as BigMana; G4 fix 1 (2026-10-22): 25% mana and 15% regeneration → 16% mana and 6% reduced reservation (4.6 units came down to 4).',
         },
         {
-          id: 'n404',
+          id: 'b',
           kind: 'small',
-          lines: [manaRegen(12)],
-          at: P(380, 232),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n413',
-          kind: 'small',
-          lines: [critChance(15)],
-          at: P(331, 550),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n414',
-          kind: 'small',
-          lines: [critChance(15)],
-          at: P(332, 609),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n424',
-          kind: 'small',
-          lines: [resOne('cold', 10)],
-          at: P(747, 451),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n423',
-          kind: 'small',
-          lines: [resOne('cold', 10)],
-          at: P(803, 437),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n435',
-          kind: 'small',
-          lines: [oneHandMelee(15)],
-          at: P(990, -417),
-          why: 'Added in the editor (2026-10-19).',
-        },
-        {
-          id: 'n437',
-          kind: 'small',
-          lines: [shieldBlock(2)],
-          at: P(856, -162),
-          why: "Added in the editor (2026-10-19). G3 round 2 (2026-10-22, approved after round 1): +4% block and 10% shield defences → +2% block with a shield, one stat at a small's size (CONSTRAINTS §8.1), the same as Round Shield's north small, so the shield chain is one section.",
-        },
-        {
-          id: 'n438',
-          kind: 'small',
-          lines: [shieldBlock(2)],
-          at: P(914, -163),
-          why: 'Added in the editor (2026-10-19). G3 round 2 (2026-10-22): as n437, +2% block with a shield.',
+          lines: [mana(8)],
+          at: P(389, 347),
+          why: "The end small past the notable (the editor's n404, linked to the start's south side until G4 fix 1).",
         },
       ],
       links: [
-        ['n423', 'n424'],
-        ['n400', 'n404'],
-        ['n413', 'n414'],
-        ['n413', 'n424'],
-        ['n437', 'n438'],
+        ['a', 'n'],
+        ['n', 'b'],
       ],
     },
   ],
   links: [
-    { from: 'added.n423', to: 'bow.steel.added.n416', why: 'Added in the editor (2026-10-19).' },
     { from: 'hubs.n', to: 'sig.a', why: "The loop's north side." },
     {
       from: 'hubs.n',
       to: 'centre.ring.road.r7',
       why: 'The north hub joins the ring one node toward the Shade: a Strider going that way, or a Shade coming here, never passes through the start.',
     },
-    { from: 'hubs.n', to: 'bow.bows.road.jb3', why: 'Added in the editor (2026-10-19).' },
+    {
+      from: 'hubs.n',
+      to: 'bow.bows.road.jb3',
+      why: "The north hub's road to the bows: one long link (the user's editor link), shortened in G4 fix 1 by pulling the junction in rather than laying road nodes on it, which would add a step to everything north of it.",
+    },
+    {
+      from: 'hubs.n',
+      to: 'life.b',
+      why: "Long Breath hangs off the north hub (G4 fix 1, 2026-10-22): it hung off the start's own side node, three steps out, and the start fanned straight into two rich pockets (the starts audit, F3). Four steps now, off the hub as the other homes hang their pockets.",
+    },
     { from: 'hubs.s', to: 'sig.b', why: "The loop's south side." },
     {
       from: 'hubs.s',
@@ -262,18 +244,51 @@ export const home: AreaSpec = {
       why: 'The south hub joins the ring one node toward the Reaver, for the same reason.',
     },
     { from: 'hubs.s', to: 'bow.steel.road.jt1', why: "The south hub's road." },
-    { from: 'hubs.s', to: 'crit.a', why: 'Added in the editor (2026-10-19).' },
-    { from: 'hubs.s', to: 'bow.steel.wayfarer.a', why: 'Added in the editor (2026-10-19).' },
-    { from: 'sig.a', to: 'start.strider', why: 'Added in the editor (2026-10-19).' },
-    { from: 'sig.a', to: 'life.b', why: 'Added in the editor (2026-10-19).' },
+    {
+      from: 'hubs.s',
+      to: 'crit.a',
+      why: "The south hub's pocket, Vital Aim (the user's editor link).",
+    },
+    {
+      from: 'hubs.s',
+      to: 'bow.steel.wayfarer.a',
+      why: "The south hub onto Wayfarer, the evasion-and-resistances pocket (the user's editor link).",
+    },
+    {
+      from: 'sig.a',
+      to: 'start.strider',
+      why: "The start touches the loop's north side (the user's editor link).",
+    },
     { from: 'sig.n', to: 'bow.string.road.s1', why: 'The signature opens the string.' },
-    { from: 'sig.b', to: 'start.strider', why: 'Added in the editor (2026-10-19).' },
-    { from: 'sig.b', to: 'added.n404', why: 'Added in the editor (2026-10-19).' },
-    { from: 'crit.n', to: 'added.n413', why: 'Added in the editor (2026-10-19).' },
-    { from: 'life.a', to: 'bow.string.road.s2', why: 'Added in the editor (2026-10-19).' },
-    { from: 'life.a', to: 'added.n435', why: 'Added in the editor (2026-10-19).' },
-    { from: 'life.a', to: 'added.n437', why: 'Added in the editor (2026-10-19).' },
-    { from: 'life.n', to: 'bow.bows.elements.a', why: 'Added in the editor (2026-10-19).' },
-    { from: 'added.n400', to: 'bow.string.added.n402', why: 'Added in the editor (2026-10-19).' },
+    {
+      from: 'sig.b',
+      to: 'start.strider',
+      why: "The start touches the loop's south side (the user's editor link).",
+    },
+    {
+      from: 'life.a',
+      to: 'bow.string.road.s2',
+      why: "Long Breath's other door, from the string's second node: the pocket is a bridge (the user's editor link).",
+    },
+    {
+      from: 'life.a',
+      to: 'bow.flight.roundShield.c',
+      why: "Round Shield's block chain leaves Long Breath's small toward the north-east (the user's editor link); since G4 fix 1 its only spoke there, Light Hand's long spoke having gone to Round Shield's other side (the looks audit, L1 item 4).",
+    },
+    {
+      from: 'life.n',
+      to: 'bow.bows.elements.a',
+      why: "Long Breath's notable onto Elemental Fletching's loop, the elemental bow's first door (the user's editor link).",
+    },
+    {
+      from: 'crit.d',
+      to: 'bow.steel.weathered.k2',
+      why: "Vital Aim's crit run reaches Weathered's cold spoke: the crit pocket is a bridge to the resist star (the user's editor link, through n414 since G4 fix 1).",
+    },
+    {
+      from: 'clearHead.a',
+      to: 'bow.string.road.s2',
+      why: "Clear Head's door, from the string's second node (the user's editor link).",
+    },
   ],
 };

@@ -29,7 +29,7 @@ export const seawall: AreaSpec = {
     {
       id: 'wall',
       name: 'The seawall road',
-      why: "Six attribute nodes: one leg straight out from the rooftop road, then a gentle arc down the east rim. Every node has something off it (G1/shade.md §3.1): Glint (spell crit) at the first, the curse pocket (Long Grudge) at the second, Sleet at the third, Whetted Will and the two-knife dodge rung (Feint and Cut) at the fourth, the cold-and-crit rung and the poison pocket (Rat Bite) at the fifth, the life-and-dodge rung and the Strider's outer road at the sixth (G3 round 3).",
+      why: "Six attribute nodes: one leg straight out from the rooftop road, then a gentle arc down the east rim. Every node has something off it (G1/shade.md §3.1): Glint (spell crit) at the first, bridging back to the rooftop road's fourth node, the curse arc (Long Grudge) between the second and the third, Sleet at the third, Whetted Will and the two-knife dodge rung (Feint and Cut) at the fourth, the cold-and-crit rung and the poison pocket (Rat Bite) at the fifth, the life-and-dodge rung and the Strider's outer road at the sixth (G3 round 3).",
       at: [4100, -1100],
       shape: { kind: 'hand' },
       nodes: [
@@ -38,21 +38,21 @@ export const seawall: AreaSpec = {
           kind: 'attribute',
           lines: [dex(6), int(6)],
           at: [3760, -2148],
-          why: 'The corner: straight out from the rooftop road, then south along the rim. The spell crit pocket (Glint, G3) leaves straight out to the rim here, square to the road.',
+          why: "The corner: straight out from the rooftop road, then south along the rim. The spell crit arc (Glint) leaves here on the road's own line north-west and comes back to the rooftop road's fourth node (G4 fix 1).",
         },
         {
           id: 's2',
           kind: 'attribute',
           lines: [dex(6), int(6)],
           at: [3990, -1830],
-          why: 'The curse pocket (Long Grudge) leaves straight out to the rim, square to the road (G3 round 3).',
+          why: 'The curse arc (Long Grudge) leaves east toward the rim and comes back to the third node (G4 fix 1).',
         },
         {
           id: 's3',
           kind: 'attribute',
           lines: [dex(6), int(6)],
           at: [4150, -1500],
-          why: 'Sleet arrives from the rooftop road.',
+          why: 'Sleet arrives from the rooftop road, and the curse arc (Long Grudge) comes back from the second node.',
         },
         {
           id: 's4',
@@ -87,32 +87,38 @@ export const seawall: AreaSpec = {
     {
       id: 'glint',
       name: 'Glint',
-      why: "Spell crit with insight (G3 round 1, 2026-10-22; the ledger's SH-3): a pocket straight out from the seawall road's corner toward the rim, spell crit three times, then spell crit with insight charges on a crit. Insight comes on crits, so the pair belongs. Insight's second home, seventeen steps from the Spire's Flashes of Insight; the Shade's other spell crit is Athame's, with a dagger, in the Knife's middle. A dead end, square to the road, so the corner becomes a clean junction; the road's second node stays a plain step on the way to Sleet's bridge (the brief had the cluster bridging the first two nodes, which would have left both at 45° to the road).",
-      at: [3812, -2393],
+      why: "Spell crit with insight (G3 round 1, 2026-10-22; the ledger's SH-3): spell crit three times and the notable with spell crit and insight charges on a crit. Insight comes on crits, so the pair belongs. Insight's second home, seventeen steps from the Spire's Flashes of Insight; the Shade's other spell crit is Athame's, with a dagger, in the Knife's middle. G4 fix 1 (2026-10-22, the network audit's comb of rim dead ends): an arc between the seawall road's corner and the rooftop road's fourth node, which had nothing off it, so the corner, Glint and the rooftop road make a loop and the rooftop road's fourth node a junction. Spell crit twice on the corner's side (the chain carries the seawall road's own line on), the notable at the arc's top, spell crit once toward the rooftop road.",
+      at: [3540, -2460],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [spellCrit(15)],
-          at: [3775, -2217],
+          at: [3612, -2358],
           why: 'The entrance, from the corner.',
         },
-        { id: 'b', kind: 'small', lines: [spellCrit(15)], at: [3786, -2271] },
-        { id: 'c', kind: 'small', lines: [spellCrit(15)], at: [3797, -2325] },
+        { id: 'b', kind: 'small', lines: [spellCrit(15)], at: [3580, -2403] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Glint',
           lines: [spellCrit(30), insightOnCrit(20)],
-          at: [3812, -2393],
-          why: '2 + 2 units.',
+          at: [3540, -2460],
+          why: '2 + 2 units. The top of the arc.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [spellCrit(15)],
+          at: [3483, -2419],
+          why: 'The exit, to the rooftop road.',
         },
       ],
       links: [
         ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'n'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -157,30 +163,36 @@ export const seawall: AreaSpec = {
     {
       id: 'grudge',
       name: 'Long Grudge',
-      why: "Curse effect with reduced mana reservation (G3 round 3, 2026-10-22; beyond the brief, for CONSTRAINTS §1.1: with Salt in the Wound in, the curser still took every curse cluster it could reach by point 60 and 40 more points at 120 added nothing to its curses): a pocket straight out from the seawall road's second node to the rim, curse effect twice, then the notable with curse effect and reduced reservation, for the hexer who keeps a curse up as an aura. The curser's far curse supply, in the one direction its curses did not go: Second Curse and the Spire's Hexwright are north, Ill Wish north-east, Salt in the Wound in the middle east, this the east rim, about twenty-four steps out, where a curser gives up the Mystic's shield and spells to come. Its partner is one the curser does not want for itself (reservation is the aura builder's), so it pays half a notable for the curse. It also gives the seawall road's second node, a plain step since G2, something to branch to (§7.3).",
-      at: [4157, -1930],
+      why: "Curse effect with reduced mana reservation (G3 round 3, 2026-10-22; beyond the brief, for CONSTRAINTS §1.1: with Salt in the Wound in, the curser still took every curse cluster it could reach by point 60 and 40 more points at 120 added nothing to its curses): curse effect twice and the notable with curse effect and reduced reservation, for the hexer who keeps a curse up as an aura. The curser's far curse supply, in the one direction its curses did not go: Second Curse and the Spire's Hexwright are north, Ill Wish north-east, Salt in the Wound in the middle east, this the east rim, about twenty-four steps out, where a curser gives up the Mystic's shield and spells to come. Its partner is one the curser does not want for itself (reservation is the aura builder's), so it pays half a notable for the curse. It also gives the seawall road's second node, a plain step since G2, something to branch to (§7.3). G4 fix 1 (2026-10-22, the network audit's comb of rim dead ends): an arc east between the road's second and third nodes rather than a dead end, the notable at its top, one curse small on each side. Ill Wish, the other far curse notable, is ten steps round by the rooftop road.",
+      at: [4268, -1761],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [curseEffect(8)],
-          at: [4050, -1866],
-          why: 'The entrance, from the seawall road.',
+          at: [4200, -1778],
+          why: "The way in from the seawall road's second node.",
         },
-        { id: 'b', kind: 'small', lines: [curseEffect(8)], at: [4097, -1894] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Long Grudge',
           lines: [curseEffect(16), reducedReservation(6)],
-          at: [4157, -1930],
-          why: '2 + 2 units: a curse held for as long as the grudge is.',
+          at: [4268, -1761],
+          why: '2 + 2 units: a curse held for as long as the grudge is. The top of the arc.',
+        },
+        {
+          id: 'b',
+          kind: 'small',
+          lines: [curseEffect(8)],
+          at: [4239, -1697],
+          why: "The way in from the seawall road's third node.",
         },
       ],
       links: [
-        ['a', 'b'],
-        ['b', 'n'],
+        ['a', 'n'],
+        ['n', 'b'],
       ],
     },
     {
@@ -229,7 +241,12 @@ export const seawall: AreaSpec = {
     {
       from: 'wall.s2',
       to: 'grudge.a',
-      why: "The seawall road's second node onto the curse pocket, straight out to the rim (G3 round 3).",
+      why: "The seawall road's second node onto the curse arc (G3 round 3; an arc since G4 fix 1).",
+    },
+    {
+      from: 'grudge.b',
+      to: 'wall.s3',
+      why: "The curse arc comes back to the seawall road's third node (G4 fix 1): Long Grudge is a bridge, not a dead end, and the road's second node a junction.",
     },
     {
       from: 'wall.s5',
@@ -239,7 +256,12 @@ export const seawall: AreaSpec = {
     {
       from: 'wall.s1',
       to: 'glint.a',
-      why: "The seawall road's corner onto the spell crit pocket, outward to the rim (G3).",
+      why: "The seawall road's corner onto the spell crit arc, on the line of the road from the second node (G3; an arc since G4 fix 1).",
+    },
+    {
+      from: 'glint.c',
+      to: 'knife.roofs.walk.r4',
+      why: "The spell crit arc comes back to the rooftop road's fourth node (G4 fix 1, the network audit): the node had nothing off it, and Glint is a bridge between the two roads instead of a dead end.",
     },
     {
       from: 'knife.roofs.walk.r5',

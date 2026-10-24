@@ -6,7 +6,6 @@
  * the cold caster's late one (Hoarfrost and Shatter are in the Spire).
  */
 import {
-  castSpeed,
   chaosAttack,
   chaosDot,
   clawDamage,
@@ -18,6 +17,7 @@ import {
   damageVsCursed,
   damageVsPoisoned,
   dex,
+  dodgeSpell,
   eleDamage,
   es,
   int,
@@ -55,7 +55,13 @@ export const roofs: AreaSpec = {
           at: [2950, -2450],
           why: 'The claw pocket leaves north.',
         },
-        { id: 'r4', kind: 'attribute', lines: [dex(6), int(6)], at: [3230, -2240] },
+        {
+          id: 'r4',
+          kind: 'attribute',
+          lines: [dex(6), int(6)],
+          at: [3230, -2240],
+          why: 'The spell crit arc (Glint) comes back from the seawall road here (G4 fix 1).',
+        },
         {
           id: 'r5',
           kind: 'attribute',
@@ -140,7 +146,7 @@ export const roofs: AreaSpec = {
     {
       id: 'athame',
       name: 'Athame',
-      why: "The dagger's wheel, in the middle of the Knife between the Rookery's two keystone spurs: in from the rooftop road at the top, out to the Rookery's junction at the bottom, so it is a way through the Knife's centre as well as a destination. Crit at the two ends, which every dagger build wants; the caster's side on the west (spells with a dagger, Athame) and the attacker's on the east (dagger attacks with speed and accuracy, Long Knives). The route through takes one side, and a build rarely wants both. The caster's first dagger notable is Quiet Knife by the start (with cast speed), the attacker's Fine Point (with crit); this is where each commits. Round 4 (the user asked for a centre for the dagger-wielding caster, 2026-10-20; a first version put a spell-crit notable on the east side, which every dagger caster would have taken with Athame for one more point).",
+      why: "The dagger's wheel, in the middle of the Knife between the Rookery's two keystone spurs: in from the rooftop road at the top, out to the Rookery's junction at the bottom, so it is a way through the Knife's centre as well as a destination. Crit at the two ends, which every dagger build wants; the caster's side on the west (spells with a dagger, Athame) and the attacker's on the east (dagger attacks with speed and accuracy, Long Knives). The route through takes one side, and a build rarely wants both. The caster's first dagger notable is Quiet Knife by the start (with mana regeneration since G4 fix 1), the attacker's Fine Point (with crit); this is where each commits. Round 4 (the user asked for a centre for the dagger-wielding caster, 2026-10-20; a first version put a spell-crit notable on the east side, which every dagger caster would have taken with Athame for one more point).",
       at: [2950, -2080],
       shape: { kind: 'hand' },
       nodes: [
@@ -257,7 +263,7 @@ export const roofs: AreaSpec = {
           kind: 'attribute',
           lines: [dex(6), int(6)],
           at: [2780, -3020],
-          why: 'The quick caster (Hasty Words, G3) leaves north of here.',
+          why: 'The slippery caster (Thrown Voice, G3; Hasty Words until G4 fix 1) leaves north of here.',
         },
         {
           id: 'c2',
@@ -271,8 +277,8 @@ export const roofs: AreaSpec = {
     },
     {
       id: 'hasty',
-      name: 'Hasty Words',
-      why: "The quick caster (G3 round 1, 2026-10-22; the ledger's SH-11 with the folded spell damage section SH-s5): a pocket straight north off the crossroad's first node, spell damage three times, then spell damage with cast speed. The Shade's plain spell damage had one notable, Quiet Knife by the start; this is its far one, the tip of the north-east, and its partner (speed) is not Quiet Knife's dagger. A dead end on purpose (G1/shade.md §7 item 5): the far tip a caster commits to, rather than a road. Ritual Blade (spells with a dagger) is nine steps west along the ridge, Athame ten; the Spire's Arcane Focus sells this pairing for the Mystic start, far away.",
+      name: 'Thrown Voice',
+      why: "The slippery caster (G3 round 1, 2026-10-22; the ledger's SH-11 with the folded spell damage section SH-s5): a pocket straight north off the crossroad's first node, spell damage three times, then spell damage with the chance to dodge spells, the caster who is never where the answer lands. G4 fix 1 (2026-10-22): it was Hasty Words, spell damage with cast speed, the same notable as the Spire's Ready Wit and the Strider's Hedge Magic; dodge is the Shade's own voice. Shifting Ward (energy shield with spell dodge) is nine steps away and leads with the shield; Glint (spell crit) and Athame (spells with a dagger) are the Shade's other spell notables. The Shade's plain spell damage is here and at Salt in the Wound (with damage against the cursed); Quiet Knife by the start is the dagger caster's. A dead end on purpose (G1/shade.md §7 item 5): the far tip a caster commits to, rather than a road. Ritual Blade (spells with a dagger) is nine steps west along the ridge, Athame ten.",
       at: [2780, -3290],
       shape: { kind: 'hand' },
       nodes: [
@@ -288,10 +294,10 @@ export const roofs: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Hasty Words',
-          lines: [spellDamage(20), castSpeed(6)],
+          name: 'Thrown Voice',
+          lines: [spellDamage(20), dodgeSpell(5)],
           at: [2780, -3290],
-          why: '2.5 + 1.5 units.',
+          why: '2.5 + 1.7 units.',
         },
       ],
       links: [
@@ -303,7 +309,7 @@ export const roofs: AreaSpec = {
     {
       id: 'wish',
       name: 'Ill Wish',
-      why: "Curse effect with the chaos damage-over-time multiplier (G3 round 2, 2026-10-22; the ledger's SH-8): a bridge straight across the Rooftops' empty inside, from the crossroad's first node (which becomes a cross: the ridge west, Carrion Claws east, Hasty Words north, this south) down to the rooftop road's third node. Chaos over time twice on the crossroad side, the notable, curse effect twice on the road side. The curser's far curse cluster: Second Curse (one more curse) is ten steps from the start on the north barb, the Spire's Hexwright (curses with area) across the curse crossing, and this one is the far north-east, about twenty steps out, where the curser gives up the Mystic's shield and spells to come (G1/shade.md §1.2: in the Rookery it was a one-stop with Second Curse, Rotting Word and Hexwright). Hasty Words, the spell damage a curser also wants, is seven steps round the crossroad from here: a pair a far trip buys, not a one-stop near home. A poison claw coming from Carrion Claws reaches the chaos side only through the two curse smalls.",
+      why: "Curse effect with the chaos damage-over-time multiplier (G3 round 2, 2026-10-22; the ledger's SH-8): a bridge straight across the Rooftops' empty inside, from the crossroad's first node (which becomes a cross: the ridge west, Carrion Claws east, Thrown Voice north, this south) down to the rooftop road's third node. Chaos over time twice on the crossroad side, the notable, curse effect twice on the road side. The curser's far curse cluster: Second Curse (one more curse) is ten steps from the start on the north barb, the Spire's Hexwright (curses with area) across the curse crossing, and this one is the far north-east, about twenty steps out, where the curser gives up the Mystic's shield and spells to come (G1/shade.md §1.2: in the Rookery it was a one-stop with Second Curse, Rotting Word and Hexwright). Thrown Voice, the spell damage a curser also wants, is seven steps round the crossroad from here: a pair a far trip buys, not a one-stop near home. A poison claw coming from Carrion Claws reaches the chaos side only through the two curse smalls.",
       at: [2866, -2733],
       shape: { kind: 'hand' },
       nodes: [
@@ -379,7 +385,7 @@ export const roofs: AreaSpec = {
     {
       id: 'ritual',
       name: 'Ritual Blade',
-      why: "A pocket north-east off the ridge road: spell damage with a dagger twice, then spells with a dagger and energy shield, the warded caster. The dagger caster's third cluster: Quiet Knife by the start sells it with cast speed, Athame in the centre with spell crit. Round 4 (the user asked for a third, 2026-10-20).",
+      why: "A pocket north-east off the ridge road: spell damage with a dagger twice, then spells with a dagger and energy shield, the warded caster. The dagger caster's third cluster: Quiet Knife by the start sells it with mana regeneration (G4 fix 1), the Spire's Sharp Tongue with cast speed, Athame in the centre with spell crit. Round 4 (the user asked for a third, 2026-10-20).",
       at: [2490, -3500],
       shape: { kind: 'hand' },
       nodes: [
@@ -402,7 +408,7 @@ export const roofs: AreaSpec = {
     {
       id: 'salt',
       name: 'Salt in the Wound',
-      why: "Spell damage with damage against the cursed (G3 round 3, 2026-10-22; the ledger's SH-2 with one more spell small from the folded section SH-s5): a bridge from the Quiet Shot pocket's small up across the empty ground below the Cruel Agony spur to the rooftop road's sixth node, opposite Sleet. Damage against the cursed twice on the Quiet Shot side, the notable, spell damage twice on the rooftop side. The curser's fourth curse direction and the Shade's spell damage in the Knife's middle east: Second Curse is on the north barb ten steps from the start, the Spire's Hexwright across the curse crossing, Ill Wish and Hasty Words in the far north-east, seven steps or more round the rooftop road from here. The cursed smalls face the point, the way a Shade caster comes in from Hoarded Breath and Quiet Shot, so the dagger caster pays for the curse it does not cast; the spell smalls face the rooftop road and the seawall's casters (Sleet, Whetted Will, Glint). The brief's ends (the rooftop road's south end and the road to Ricochet's first node) are taken by Grey Cloak and Tumble's pocket, and a first try on a rung of the Docks' east (from Tumble) was on no caster's plan even at 160 points: the Shade's casters never walk the Docks. It leaves the Quiet Shot small between the road down to the rooftop road's eighth node and the notable, and lands on the sixth node, which becomes a cross (Sleet east, this west).",
+      why: "Spell damage with damage against the cursed (G3 round 3, 2026-10-22; the ledger's SH-2 with one more spell small from the folded section SH-s5): a bridge from the Quiet Shot pocket's small up across the empty ground below the Cruel Agony spur to the rooftop road's sixth node, opposite Sleet. Damage against the cursed twice on the Quiet Shot side, the notable, spell damage twice on the rooftop side. The curser's fourth curse direction and the Shade's spell damage in the Knife's middle east: Second Curse is on the north barb ten steps from the start, the Spire's Hexwright across the curse crossing, Ill Wish and Thrown Voice in the far north-east, seven steps or more round the rooftop road from here. The cursed smalls face the point, the way a Shade caster comes in from Hoarded Breath and Quiet Shot, so the dagger caster pays for the curse it does not cast; the spell smalls face the rooftop road and the seawall's casters (Sleet, Whetted Will, Glint). The brief's ends (the rooftop road's south end and the road to Ricochet's first node) are taken by Grey Cloak and Tumble's pocket, and a first try on a rung of the Docks' east (from Tumble) was on no caster's plan even at 160 points: the Shade's casters never walk the Docks. It leaves the Quiet Shot small between the road down to the rooftop road's eighth node and the notable, and lands on the sixth node, which becomes a cross (Sleet east, this west).",
       at: [3214, -1475],
       shape: { kind: 'hand' },
       nodes: [
@@ -498,7 +504,7 @@ export const roofs: AreaSpec = {
     {
       from: 'cross.c1',
       to: 'wish.k2',
-      why: "The crossroad's first node south onto the curse bridge (G3 round 2): with Hasty Words north the node is a cross.",
+      why: "The crossroad's first node south onto the curse bridge (G3 round 2): with Thrown Voice north the node is a cross.",
     },
     {
       from: 'wish.u2',

@@ -141,4 +141,13 @@
   .sx-pick select {
     flex: 1 1 auto;
   }
+  /* The skill's name gets the first line (beside its number); kind, DPS and the order buttons go below it. */
+  .sx-head {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .sx-head b {
+    flex: 1 0 calc(100% - 40px);
+    white-space: normal;
+  }
 }

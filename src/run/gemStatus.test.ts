@@ -39,11 +39,13 @@ describe('gem status lines (is this gem doing anything?)', () => {
     expect(skill.text).toContain('Echoing Cast');
   });
 
-  it('a skill the mana cannot pay for says so', () => {
+  it('a skill says nothing about mana (the player sees it in play), and nothing when no support is linked', () => {
     const { ch, body } = chOf(['flameBolt', 'echoingCast'], 'mystic');
     const s = status(ch, body, 0)!;
-    expect(s.ok).toBe(false);
-    expect(s.text).toMatch(/mana/i);
+    expect(s.ok).toBe(true);
+    expect(s.text).not.toMatch(/mana/i);
+    const lone = chOf(['flameBolt'], 'mystic');
+    expect(status(lone.ch, lone.body, 0)).toBeNull();
   });
 
   it('a spell support on an attack is flagged: it does nothing', () => {
@@ -51,9 +53,7 @@ describe('gem status lines (is this gem doing anything?)', () => {
     const s = status(ch, body, 1)!;
     expect(s.ok).toBe(false);
     expect(s.text).toMatch(/spell/);
-    const skill = status(ch, body, 0)!;
-    expect(skill.ok).toBe(true);
-    expect(skill.text).not.toContain('Echoing Cast');
+    expect(status(ch, body, 0)?.text ?? '').not.toContain('Echoing Cast');
   });
 
   it('a melee support barred from a channelled melee skill says why, not that it needs a melee skill', () => {
@@ -76,14 +76,14 @@ describe('gem status lines (is this gem doing anything?)', () => {
     b.primaryGem = body.sockets[0]!.uid;
     const ch = new Character(b, { areaLevel: 30 });
     expect(gemStatus(ch, helm.sockets[0]!.uid, gemDef('echoingCast'))!.ok).toBe(false);
-    expect(gemStatus(ch, body.sockets[0]!.uid, gemDef('flameBolt'))!.text).not.toContain(
+    expect(gemStatus(ch, body.sockets[0]!.uid, gemDef('flameBolt'))?.text ?? '').not.toContain(
       'Echoing Cast',
     );
   });
 
   it('a curse gem is cast by policy, and with Hexing Strikes it is applied on hit instead', () => {
     const lone = chOf(['crushingBlow', 'openWounds']);
-    expect(status(lone.ch, lone.body, 1)!.text).not.toMatch(/hit/i);
+    expect(status(lone.ch, lone.body, 1)?.text ?? '').not.toMatch(/hit/i);
     const both = chOf(['crushingBlow', 'hexingStrikes', 'openWounds']);
     const s = status(both.ch, both.body, 2)!;
     expect(s.ok).toBe(true);

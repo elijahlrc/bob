@@ -5,6 +5,7 @@ import type { MapResult } from './sim/runMap';
 import {
   installRivals,
   pendingPost,
+  postFailText,
   postRun,
   postStatus,
   resetPostKeeper,
@@ -357,6 +358,14 @@ describe('the post of a run, kept', () => {
     expect(await postRun(run, res, deps)).toEqual({ status: 'posted' });
     expect(calls).toHaveLength(4);
     expect(JSON.parse(calls[3].body)[0].name).toBe('Wren2');
+  });
+
+  it('says why a post failed: a cap, the hourly limit, a refusal, or no answer at all', () => {
+    expect(postFailText('too many characters from this address today')).toMatch(/tomorrow/);
+    expect(postFailText('too many characters from this browser today')).toMatch(/tomorrow/);
+    expect(postFailText('the pool is taking a rest; try again later')).toMatch(/busy/);
+    expect(postFailText('this writer is blocked')).toBe('The rivals refused this character.');
+    expect(postFailText(undefined)).toMatch(/Could not reach/);
   });
 
   it('does not retry on its own: a failed post waits for the player', async () => {

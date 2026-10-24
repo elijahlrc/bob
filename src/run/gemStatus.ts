@@ -4,13 +4,14 @@ import { aSkill } from '../data/skillTypes';
 
 /**
  * Whether a socketed gem is doing anything, in a line: which skills a support is on, what supports a skill, whether an aura
- * is active, and why not when it is not (a support needs a matching skill in the same item).
+ * is active, and why not when it is not (a support needs a matching skill in the same item). Nothing for a skill with no
+ * supports, and nothing about mana: the player sees that in play.
  */
 export function gemStatus(
   ch: Character,
   uid: number,
   def: ReturnType<typeof gemDef>,
-): { ok: boolean; text: string; hint?: string } | null {
+): { ok: boolean; text: string } | null {
   if (def.kind === 'support') {
     const on = ch.actives.filter((a) => a.supports.some((x) => x.gem.uid === uid));
     if (on.length)
@@ -29,19 +30,7 @@ export function gemStatus(
     const a = ch.actives.find((x) => x.gemUid === uid);
     if (!a || !a.usable) return null;
     const names = a.supports.map((x) => x.def.name);
-    const linked = names.length ? `Supported by: ${names.join(', ')}` : 'No supports linked';
-    // A skill the mana cannot pay for is mostly replaced by the weapon attack: say so.
-    // The same figure as the Skills tab's summary line: the regeneration left after the other skills' casts.
-    if (ch.primary.gemUid === uid) {
-      const sustain = ch.mainSheet().sustain;
-      if (sustain < 0.9)
-        return {
-          ok: false,
-          text: `${linked} · Mana-starved (${Math.round(sustain * 100)}%)`,
-          hint: `What your mana regeneration has left after your other skills pays for about ${Math.round(sustain * 100)}% of this skill's casts. The rest are weapon attacks. Add mana regeneration, reduce the cost, or use fewer skills or supports.`,
-        };
-    }
-    return { ok: true, text: linked };
+    return names.length ? { ok: true, text: `Supported by: ${names.join(', ')}` } : null;
   }
   if (def.kind === 'aura') {
     const au = ch.auras.find((x) => x.def.id === def.id);
@@ -69,7 +58,7 @@ function supportIdle(
 
 /**
  * Why a worn gem does nothing, structurally: a support with no skill to work on, or a skill the weapons or shield in hand
- * cannot use. Null when it is doing its job. (A skill that is merely short of mana is not idle: `gemStatus` says that.)
+ * cannot use. Null when it is doing its job. (A skill that is merely short of mana is not idle.)
  */
 export function gemIdle(ch: Character, uid: number, def: ReturnType<typeof gemDef>): string | null {
   if (def.kind === 'support') return supportIdle(ch, uid, def)?.why ?? null;

@@ -226,6 +226,7 @@ function monsterBaseSkill(
     types: ['attack', 'melee'],
     behaviour: { kind: 'melee', range: t.range },
     level: spec.level,
+    curveLevel: spec.level,
     baseMult: 100,
     spellDamage: [],
     effectiveness: 100,

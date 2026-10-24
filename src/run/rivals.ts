@@ -72,6 +72,8 @@ export type HighScore = {
   gameVersion: string;
   /** The day it was posted, `YYYY-MM-DD`. */
   postedOn: string;
+  /** Its place on the whole list, from the functions that rank (`high_scores_page`, `high_score_standing`). */
+  rank?: number;
 };
 
 /** The row that is posted: the table's columns, and nothing of the run but `build`. */
@@ -375,6 +377,43 @@ export async function fetchHighScores(
   q: HighScoresQuery = { saveVersion: SAVE_VERSION, outdated: false },
 ): Promise<HighScore[]> {
   return (await fetchHighScoresOrNull(fetchFn, sink, k, q)) ?? [];
+}
+
+/** The most rows a page of the high scores may hold (`high_scores_page`). */
+export const HIGH_SCORES_PAGE_MAX = 100;
+
+/**
+ * A page of the rating list (`high_scores_page`): up to `k` rows (at most 100) from rank `start + 1`, each with its rank on the
+ * whole list. Null when the sink could not be asked.
+ */
+export async function fetchHighScoresPage(
+  fetchFn: FetchAny,
+  sink: Sink,
+  q: HighScoresQuery & { start: number; k: number },
+): Promise<HighScore[] | null> {
+  const rows = await rpc(fetchFn, sink, 'high_scores_page', {
+    save_version: q.saveVersion,
+    outdated: q.outdated,
+    start: Math.max(0, Math.floor(q.start)),
+    k: Math.min(HIGH_SCORES_PAGE_MAX, Math.max(0, Math.floor(q.k))),
+  });
+  return rows ? rankedOf(rows) : null;
+}
+
+/**
+ * The rows within `span` ranks of a snapshot on its version's list (`high_score_standing`), each with its rank: the snapshot and
+ * those either side once it has fought, else those either side of where its rating would stand. Null when the sink could not be asked.
+ */
+export async function fetchStanding(
+  fetchFn: FetchAny,
+  sink: Sink,
+  snapshotId: string,
+  span: number,
+): Promise<HighScore[] | null> {
+  const id = Number(snapshotId);
+  if (!Number.isSafeInteger(id)) return null;
+  const rows = await rpc(fetchFn, sink, 'high_score_standing', { snapshot_id: id, span });
+  return rows ? rankedOf(rows) : null;
 }
 
 /** `fetchHighScores`, but null when the sink could not be asked. */
@@ -764,6 +803,16 @@ function mySnapshotOf(row: unknown): MySnapshot | null {
   };
 }
 
+/** Rows of a ranking function as `HighScore`s, each with its rank; rows of any other shape are skipped. */
+function rankedOf(rows: unknown[]): HighScore[] {
+  const out: HighScore[] = [];
+  for (const row of rows) {
+    const s = highScoreOf(row);
+    if (s && s.rank !== undefined) out.push(s);
+  }
+  return out;
+}
+
 /** A row of `high_scores` as a `HighScore`, or null when it is not the shape the function returns. */
 function highScoreOf(row: unknown): HighScore | null {
   if (!isObj(row)) return null;
@@ -788,5 +837,6 @@ function highScoreOf(row: unknown): HighScore | null {
     wins,
     gameVersion,
     postedOn: posted_on,
+    ...(isInt(row.rank, 1, 1e9) ? { rank: row.rank as number } : {}),
   };
 }

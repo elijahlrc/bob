@@ -12,6 +12,7 @@ import { isWeaponClass, ITEM_BASES, itemBase } from '../data/bases';
 import { FLASK_AFFIXES, FLASK_BASES } from '../data/flasks';
 import { classDef } from '../data/classes';
 import { ALL_GEMS, type GemDef } from '../data/gems';
+import { gemStart } from '../calc/gems';
 import type { MonsterRarity } from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
 import type {
@@ -417,11 +418,12 @@ function isSpecial(g: GemDef): boolean {
 }
 
 /**
- * How likely a gem is to drop: plain damage skills most, supports and auras a little less, the special kinds least, and the
- * character's own attribute twice as much, and four times as much through area level 20. The first four maps hold nothing
- * special at all.
+ * How likely a gem is to drop: never below the level its first level requires (gem levels, DESIGN.md Appendix A), plain damage skills most,
+ * supports and auras a little less, the special kinds least, and the character's own attribute twice as much, and four times
+ * as much through area level 20. The first four maps hold nothing special at all.
  */
 export function gemWeight(g: GemDef, classId?: string, ilvl = 99, hold?: WeaponHold): number {
+  if (gemStart(g) > ilvl) return 0;
   const special = isSpecial(g);
   if (special && ilvl <= EARLY_MAPS) return 0;
   let w = special ? 1 : g.kind === 'active' ? 3 : 2;

@@ -2,10 +2,11 @@
  * The Churchyard (phase G2 of docs/tree/design/G-growth.md, 2026-10-22; G1/zealot.md §3, "the outer walk"): a road of
  * four attribute nodes round the back of the Bell Tower, outside the Searing Avatar spur, from Censer to Thunder Peal.
  * Both pockets become bridges, and the tower gets a loop round its back. It runs in three straight legs that turn at its
- * two junctions, where G3 hangs energy shield with life (Wake, round 2) and burning with the sceptre (Brazier, round 3)
- * inward, and spell block (Buttress, round 3) outward off its middle node; the leg into Thunder Peal is the pocket's own
- * line carried on. Since G3 round 3 the far south-west's bridge
- * from Censer to the Vanguard's Grim Oath (Procession, auras with life) lives here too. The export keeps the name
+ * two junctions. Energy shield with life (Wake, G3 round 2) hangs as an arc inward of the first leg, spell block (Buttress,
+ * round 3) as an arc outward of the second (both arcs since G4 fix 1), and burning with the sceptre (Brazier, round 3)
+ * inward off the far corner as the walk's one far tip; the leg into Thunder Peal is the pocket's own line carried on.
+ * Since G3 round 3 the far south-west's pocket off Censer (Procession, auras with movement since G4 fix 1) lives here
+ * too; it was a bridge to the Vanguard's Grim Oath until G4 fix 2 cut that crossing. The export keeps the name
  * index.ts imports.
  */
 import {
@@ -15,6 +16,7 @@ import {
   igniteChance,
   int,
   life,
+  moveSpeed,
   resAll,
   spellBlock,
   str,
@@ -27,7 +29,7 @@ export const outerWalk: AreaSpec = {
   id: 'cathedral.rim',
   region: 'zealot',
   name: 'The Churchyard',
-  why: "The ground outside the Bell Tower: the outer walk from Censer to Thunder Peal and the clusters that hang inward off it (the fire caster's two pools, the sceptre's burning beside Searing Avatar), spell block out on the rim, and the bridge from Censer to the Vanguard's Grim Oath (auras with life).",
+  why: "The ground outside the Bell Tower: the outer walk from Censer to Thunder Peal and the clusters that hang inward off it (the fire caster's two pools, the sceptre's burning beside Searing Avatar), spell block out on the rim, and the pocket off Censer at the far south-west (auras with movement).",
   at: [-4960, -1290], // Where the area's name is drawn: outside the walk, clear of the Bell Tower's name and every notable.
   clusters: [
     {
@@ -49,14 +51,14 @@ export const outerWalk: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3300, -1250),
-          why: 'The outer corner: Wake (energy shield with life, G3 round 2) hangs inward from here, between Censer and Searing Avatar.',
+          why: 'The outer corner, where two arcs meet: Wake (energy shield with life) inward of the first leg, Buttress (spell block) outward of the second.',
         },
         {
           id: 'o3',
           kind: 'attribute',
           lines: [str(6), int(6)],
           at: P(3382, -858),
-          why: 'The leg along the rim, outside the Searing Avatar keystone (which keeps its one link); Buttress (spell block, G3 round 3) hangs outward from here.',
+          why: 'The leg along the rim, outside the Searing Avatar keystone (which keeps its one link); Buttress (spell block, G3 round 3) leaves outward from here as an arc back to the corner.',
         },
         {
           id: 'o4',
@@ -75,32 +77,38 @@ export const outerWalk: AreaSpec = {
     {
       id: 'wake',
       name: 'Wake',
-      why: "G3 round 2 (2026-10-22; ledger ZE-10, folding ZE-s2): a pocket inward off the outer corner, on the corner's bisector, between Censer and the Searing Avatar spur: energy shield three times, then the notable with energy shield and life. The hybrid caster's defence where the fire caster goes (Censer's burning, Searing Avatar): a fire caster who comes west for its burning finds its two pools here, and gives up the Mystic's east, where its spell damage is. ES-led because the inside's energy shield is spread thin and far (Vigil, Litany, Tomb Dust, Rood Screen); Warm Blood, in the Spire, is the life-led twin. No spell damage here (the convergence rule). A dead-end pocket: the Churchyard it hangs from has two ways in.",
-      at: P(3113, -1042),
+      why: "G3 round 2 (2026-10-22; ledger ZE-10, folding ZE-s2): energy shield three times and the notable with energy shield and life, inward of the walk's first leg, between Censer and the Searing Avatar spur. The hybrid caster's defence where the fire caster goes (Censer's burning, Searing Avatar): a fire caster who comes west for its burning finds its two pools here, and gives up the Mystic's east, where its spell damage is. ES-led because the inside's energy shield is spread thin and far (Vigil, Litany, Tomb Dust, Rood Screen); Warm Blood, in the Spire, is the life-led twin. No spell damage here (the convergence rule). G4 fix 1 (2026-10-22, audit N3): it was a dead end off the outer corner, and `o1` had nothing off it; now it is an arc between `o2` and `o1`, a tent bowed inward, two smalls on the corner's side and one on `o1`'s, so it is a bridge and the first leg has a branch.",
+      at: P(3094, -1112),
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
           lines: [es(5)],
-          at: P(3233, -1176),
-          why: 'The entrance from the outer corner.',
+          at: P(3198, -1182),
+          why: 'The entrance from the outer corner, on the line to the notable.',
         },
-        { id: 'b', kind: 'small', lines: [es(5)], at: P(3196, -1135) },
-        { id: 'c', kind: 'small', lines: [es(5)], at: P(3159, -1094) },
+        { id: 'b', kind: 'small', lines: [es(5)], at: P(3152, -1151) },
         {
           id: 'n',
           kind: 'notable',
           name: 'Wake',
           lines: [es(10), life(10)],
-          at: P(3113, -1042),
+          at: P(3094, -1112),
           why: 'Energy shield and life: 2 + 2 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [es(5)],
+          at: P(3046, -1163),
+          why: "The far node, on the line to the walk's first node.",
         },
       ],
       links: [
         ['a', 'b'],
-        ['b', 'c'],
-        ['c', 'n'],
+        ['b', 'n'],
+        ['n', 'c'],
       ],
     },
     {
@@ -137,8 +145,8 @@ export const outerWalk: AreaSpec = {
     {
       id: 'procession',
       name: 'Procession',
-      why: "G3 round 3 (2026-10-22; ledger ZE-8): the bridge from Censer to the Vanguard's Grim Oath, aura effect twice, the notable with aura effect and life, aura effect once more. The support build's auras on life, at the far south-west where Battle Hymn's shouts and Grim Oath's curses are (the support corner). Aura-led, not life-led as the brief had it: the aura build's auras stood flat from 120 to 160 points (its other aura notables, Choirmaster, Benediction, Lone Vow's spur and the Banner, are all taken by 120), while its life still climbed, and life is spread over every region. Aura twins: Choirmaster (reservation, mana) north-east, Benediction (shield, regeneration) on the tower wheel, Battle Hymn (warcries) seven steps away by the Rampart road. The bridge turns at the notable to clear Battle Hymn, which sits on the straight line from Censer to Grim Oath.",
-      at: P(2641, -1814),
+      why: "G3 round 3 (2026-10-22; ledger ZE-8): a pocket off Censer, aura effect three times, then the notable with aura effect and movement speed. The support build's auras on the move, at the far south-west where Battle Hymn's shouts are (the support corner). Aura-led, not life-led as the brief had it: the aura build's auras stood flat from 120 to 160 points (its other aura notables, Choirmaster, Benediction, Lone Vow's spur and the Banner, are all taken by 120), while its life still climbed, and life is spread over every region. Aura twins: Choirmaster (reservation, mana) north-east, Benediction (shield, regeneration) on the tower wheel, Battle Hymn (warcries) seven steps away by the Rampart road. G4 fix 1 (2026-10-22, audit S4): its life became movement speed, the Zealot's one movement line (a procession walks); life is spread over every region, and the Zealot had no movement at all (§4.6). The Zealot's flasks are the centre's Provisions, six steps from its start by the west hub's ring road. G4 fix 2 (2026-10-23, audit N4): its far node's crossing to the Vanguard's Grim Oath was cut (the corner had two crossings for one combination and no build walked either; Battle Hymn stays the corner's crossing), so Procession is Censer's far tip, laid as a straight pocket with the notable at the end.",
+      at: P(2651, -1868),
       shape: { kind: 'hand' },
       nodes: [
         {
@@ -150,50 +158,19 @@ export const outerWalk: AreaSpec = {
         },
         { id: 'b', kind: 'small', lines: [auraEffect(6)], at: P(2628, -1745) },
         {
-          id: 'n',
-          kind: 'notable',
-          name: 'Procession',
-          lines: [auraEffect(12), life(10)],
-          at: P(2641, -1814),
-          why: 'Aura effect and life: 2 + 2 units.',
-        },
-        {
           id: 'c',
           kind: 'small',
           lines: [auraEffect(6)],
-          at: P(2590, -1862),
-          why: 'The far node, onto Grim Oath.',
+          at: P(2638, -1799),
+          why: 'The last small before the notable (G4 fix 2: it was the far node onto Grim Oath).',
         },
-      ],
-      links: [
-        ['a', 'b'],
-        ['b', 'n'],
-        ['n', 'c'],
-      ],
-    },
-    {
-      id: 'buttress',
-      name: 'Buttress',
-      why: "G3 round 3 (2026-10-22), beyond the brief (CONSTRAINTS §1.1, what more points would still buy; the round's instructions on far supply for flat specializations): a pocket outward off the outer walk's middle node, square to the walk, out on the rim: spell block three times, then the notable with spell block and all resistances. Block without a shield, for the staff blocker, whose block stood flat from 60 points on (Quarterstaff and Warding Staff, both by the Vestry, were all it had). Spell block's third direction from the Zealot start (Warding Staff with a staff south-west, Glass Wall behind a shield and Rood Screen with energy shield north-east and north), with a partner none of them has; Stone Ward, in the Wall, is spell block with life on block. Going here costs the staff blocker the Mystic's east, where its spell damage is. The only node of the walk that had nothing off it; inward is the Searing Avatar spur, so it hangs outward and the region grows by a step at the rim. A dead-end tip: the Churchyard has two ways in.",
-      at: P(3656, -915),
-      shape: { kind: 'hand' },
-      nodes: [
-        {
-          id: 'a',
-          kind: 'small',
-          lines: [spellBlock(2)],
-          at: P(3480, -879),
-          why: 'The entrance from the walk.',
-        },
-        { id: 'b', kind: 'small', lines: [spellBlock(2)], at: P(3534, -889) },
-        { id: 'c', kind: 'small', lines: [spellBlock(2)], at: P(3588, -901) },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Buttress',
-          lines: [spellBlock(4), resAll(10)],
-          at: P(3656, -915),
-          why: 'Spell block and all resistances: 2 + 2.5 units.',
+          name: 'Procession',
+          lines: [auraEffect(12), moveSpeed(8)],
+          at: P(2651, -1868),
+          why: 'Aura effect and movement speed: 2 + 2 units.',
         },
       ],
       links: [
@@ -202,12 +179,54 @@ export const outerWalk: AreaSpec = {
         ['c', 'n'],
       ],
     },
+    {
+      id: 'buttress',
+      name: 'Buttress',
+      why: "G3 round 3 (2026-10-22), beyond the brief (CONSTRAINTS §1.1, what more points would still buy; the round's instructions on far supply for flat specializations): a pocket outward off the outer walk's middle node, square to the walk, out on the rim: spell block three times, then the notable with spell block and all resistances. Block without a shield, for the staff blocker, whose block stood flat from 60 points on (Quarterstaff and Warding Staff, both by the Vestry, were all it had). Spell block's third direction from the Zealot start (Warding Staff with a staff south-west, Glass Wall behind a shield and Rood Screen with energy shield north-east and north), with a partner none of them has; Stone Ward, in the Wall, is spell block with life on block. Going here costs the staff blocker the Mystic's east, where its spell damage is. Inward is the Searing Avatar spur, so it hangs outward and the region grows by a step at the rim. G4 fix 1 (2026-10-22, audit N3): it was a dead end off the walk's middle node; now it is an arc between `o3` and the outer corner `o2`, a tent bowed outward, two smalls on `o3`'s side and one on the corner's, so it is a bridge.",
+      at: P(3498, -1087),
+      shape: { kind: 'hand' },
+      nodes: [
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: P(3441, -975),
+          why: "The entrance from the walk's middle node, on the line to the notable.",
+        },
+        { id: 'b', kind: 'small', lines: [spellBlock(2)], at: P(3466, -1025) },
+        {
+          id: 'n',
+          kind: 'notable',
+          name: 'Buttress',
+          lines: [spellBlock(4), resAll(10)],
+          at: P(3498, -1087),
+          why: 'Spell block and all resistances: 2 + 2.5 units.',
+        },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [spellBlock(2)],
+          at: P(3444, -1132),
+          why: 'The far node, on the line to the outer corner.',
+        },
+      ],
+      links: [
+        ['a', 'b'],
+        ['b', 'n'],
+        ['n', 'c'],
+      ],
+    },
   ],
   links: [
     {
       from: 'walk.o3',
       to: 'buttress.a',
-      why: "The outer walk's middle node onto spell block (G3 round 3), outward, square to the walk.",
+      why: "The outer walk's middle node onto spell block (G3 round 3), outward of the second leg.",
+    },
+    {
+      from: 'buttress.c',
+      to: 'walk.o2',
+      why: "Buttress's far small onto the outer corner (G4 fix 1, audit N3): the pocket is an arc between the second leg's two nodes, a bridge.",
     },
     {
       from: 'cathedral.ambulatory.censer.n',
@@ -217,7 +236,12 @@ export const outerWalk: AreaSpec = {
     {
       from: 'walk.o2',
       to: 'wake.a',
-      why: "The outer corner onto the fire caster's two pools (G3 round 2), on the corner's bisector.",
+      why: "The outer corner onto the fire caster's two pools (G3 round 2), inward of the first leg.",
+    },
+    {
+      from: 'wake.c',
+      to: 'walk.o1',
+      why: "Wake's far small onto the walk's first node (G4 fix 1, audit N3): the pocket is an arc between the leg's two nodes, a bridge, and `o1` has a branch.",
     },
     {
       from: 'walk.o4',
@@ -232,12 +256,7 @@ export const outerWalk: AreaSpec = {
     {
       from: 'cathedral.ambulatory.censer.n',
       to: 'procession.a',
-      why: 'Censer onto the auras with life (G3 round 3): Censer is a junction of three, its links about evenly spread (its own chain east, the outer walk north-west, this south-west).',
-    },
-    {
-      from: 'procession.c',
-      to: 'wall.maces.oath.n',
-      why: "Two-handed fire (a near crossing at the rim; G1-brief.md §2.3, deferred to G3 by G2/borders.md §4): Procession's far node lands on the Vanguard's Grim Oath, so the Zealot's outer walk and the Vanguard's west rim road are one road through the support corner: Censer's burning, Searing Avatar and Brazier for the Vanguard's fire two-hander, Grim Oath's curses for the Zealot's support build.",
+      why: 'Censer onto the auras with movement (G3 round 3): Censer is a junction of three, its links about evenly spread (its own chain east, the outer walk north-west, this south-west).',
     },
   ],
 };

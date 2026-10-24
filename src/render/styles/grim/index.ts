@@ -17,7 +17,7 @@ import type {
   World,
 } from '../../../sim/types';
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
-import { isViewer } from '../../style/who';
+import { holdsWand, isViewer } from '../../style/who';
 import type { Side } from '../../../sim/side';
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
@@ -889,7 +889,10 @@ export class GrimStyle extends StyleBase {
   protected createProjectile(p: Projectile) {
     const s = this.scene;
     const col = DTYPE_COLOR[p.dtype];
-    const state = newProjectileState(p);
+    const state = newProjectileState(
+      p,
+      p.profile.skill.type === 'attack' && holdsWand(this.world, p.owner),
+    );
     // A thrown thing of a monster's sidearm (docs/ENCOUNTERS.md 3) flies as itself, with a halo so it is seen coming.
     const look = p.profile.skill.look;
     if (look) {
@@ -906,9 +909,10 @@ export class GrimStyle extends StyleBase {
       this.owned.push(img, glow);
       return { img, glow, light, acc: 0, spin: projectileSpins(look), state, col };
     }
-    // Everything else is drawn by ProjectileFx: an arrow for an attack, an orb for a spell, and the odd flights as themselves.
+    // Everything else is drawn by ProjectileFx: an arrow for an attack, an orb for a spell or a wand's bolt, and the odd flights
+    // as themselves.
     const light =
-      p.dtype === 0 && p.profile.skill.type === 'attack'
+      p.dtype === 0 && p.profile.skill.type === 'attack' && !state.bolt
         ? null
         : this.addLight(0, 0, 110, col, 1.2);
     return { img: null, glow: null, light, acc: 0, state, col };

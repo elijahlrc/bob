@@ -432,26 +432,6 @@ svg.tree {
   margin-top: 6px;
   color: var(--muted);
 }
-.sheet {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  padding: 16px;
-}
-.sheet table {
-  border-collapse: collapse;
-  font-size: 14px;
-}
-.sheet td {
-  padding: 3px 10px;
-  border-bottom: 1px solid var(--btn);
-}
-.sheet td:first-child {
-  color: var(--muted);
-}
-.auras {
-  width: 100%;
-}
 .skills {
   padding: 16px;
   display: flex;
@@ -872,6 +852,33 @@ select {
 select option {
   background: var(--panel);
   color: var(--text);
+}
+
+/* Scroll bars in the game's colours: a square bronze thumb on the dark panel. Chromium and Safari take the pseudo
+   elements (a set scrollbar-color would switch them off there); Firefox takes the standard properties. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: var(--panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 2px solid var(--panel);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-d);
+}
+::-webkit-scrollbar-thumb:active {
+  background: var(--accent);
+}
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--border) var(--panel);
+    scrollbar-width: thin;
+  }
 }
 
 /* ---- Orb HUD ---- */

@@ -11,6 +11,15 @@ import type { Line } from './types';
 
 const line = (label: string, units: number, ...mods: Mod[]): Line => ({ label, units, mods });
 
+/** A tagged line's tags as the words a node card shows before the stat ("two-handed melee", "brand"). */
+const TAG_WORDS: Partial<Record<SkillTag, string>> = {
+  oneHand: 'one-handed',
+  twoHand: 'two-handed',
+  channelling: 'channelling',
+};
+const tagWords = (tags?: SkillTag[]): string =>
+  tags ? tags.map((t) => TAG_WORDS[t] ?? t).join(' ') + ' ' : '';
+
 /**
  * Names a line function and records, on every line it makes, which function and arguments made it (`Line.spec`), so the
  * tree editor can show and change a node's lines in this vocabulary and a patch can be folded back into an area file.
@@ -42,7 +51,7 @@ export const UNIT = {
   armour: 12,
   evasion: 10,
   resAll: 4,
-  resOne: 8,
+  resOne: 10,
   lifeRegen: 0.4,
   manaRegen: 10,
   stunThreshold: 8,
@@ -119,7 +128,7 @@ export const blockAttack = def('blockAttack', (v: number, cond?: Condition): Lin
 // ---- Offence, generic ----
 export const attackSpeed = def('attackSpeed', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% attack speed${tags ? ' ' + tags.join('+') : ''}`,
+    `${v}% ${tagWords(tags)}attack speed`,
     v / UNIT.attackSpeed,
     mod('attackSpeed', 'inc', v, tags ? { tags } : undefined),
   ),
@@ -135,21 +144,21 @@ export const accuracyFlat = def('accuracyFlat', (v: number): Line =>
 );
 export const critChance = def('critChance', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% crit chance`,
+    `${v}% ${tagWords(tags)}crit chance`,
     v / UNIT.critChance,
     mod('critChance', 'inc', v, tags ? { tags } : undefined),
   ),
 );
 export const critMulti = def('critMulti', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `+${v}% crit multiplier`,
+    `+${v}% ${tagWords(tags)}crit multiplier`,
     v / UNIT.critMulti,
     mod('critMulti', 'base', v, tags ? { tags } : undefined),
   ),
 );
 export const aoe = def('aoe', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% area${tags ? ' ' + tags.join('+') : ''}`,
+    `${v}% ${tagWords(tags)}area`,
     v / UNIT.aoe,
     mod('aoe', 'inc', v, tags ? { tags } : undefined),
   ),
@@ -297,13 +306,17 @@ export const totemDuration = def('totemDuration', (v: number): Line =>
 // ---- Recovery ----
 export const leechLife = def('leechLife', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% life leech`,
+    `${v}% ${tagWords(tags)}life leech`,
     v / UNIT.leechLife,
     mod('leech.life', 'base', v, tags ? { tags } : undefined),
   ),
 );
 export const lifeOnHit = def('lifeOnHit', (v: number, tags?: SkillTag[]): Line =>
-  line(`+${v} life on hit`, v / 4, mod('lifeOnHit', 'base', v, tags ? { tags } : undefined)),
+  line(
+    `+${v} life on ${tagWords(tags)}hit`,
+    v / 4,
+    mod('lifeOnHit', 'base', v, tags ? { tags } : undefined),
+  ),
 );
 export const lifeOnKill = def('lifeOnKill', (v: number): Line =>
   line(`+${v} life on kill`, v / 10, mod('lifeOnKill', 'base', v)),
@@ -471,6 +484,16 @@ export const daggerSpellDamage = def('daggerSpellDamage', (v: number): Line =>
     condition: DAGGER,
     unit: 8,
     label: `${v}% spell damage with a dagger`,
+  }),
+);
+const STAFF: Condition = { id: 'wieldingStaff' };
+/** Spell damage while wielding a staff: the staff caster's line, apart from the staff attacker's `staffDamage`. */
+export const staffSpellDamage = def('staffSpellDamage', (v: number): Line =>
+  damage(v, {
+    tags: ['spell'],
+    condition: STAFF,
+    unit: 8,
+    label: `${v}% spell damage with a staff`,
   }),
 );
 export const daggerSpellCrit = def('daggerSpellCrit', (v: number): Line =>
@@ -744,6 +767,14 @@ export const dualAccuracy = def('dualAccuracy', (v: number): Line =>
 );
 export const spellBlock = def('spellBlock', (v: number): Line =>
   line(`+${v}% spell block`, v / 2, mod('blockSpell', 'base', v)),
+);
+/** Spell block while wielding a staff: the staff's answer to a shield's `shieldSpellBlock`. */
+export const staffSpellBlock = def('staffSpellBlock', (v: number): Line =>
+  line(
+    `+${v}% spell block with a staff`,
+    v / 2,
+    mod('blockSpell', 'base', v, { condition: { id: 'wieldingStaff' } }),
+  ),
 );
 export const blockRecovery = def('blockRecovery', (v: number): Line =>
   line(`${v}% block recovery`, v / 20, mod('blockRecovery', 'inc', v)),

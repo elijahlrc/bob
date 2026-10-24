@@ -9,6 +9,7 @@ import {
   type StopId,
 } from '../data/stops';
 import { EQUIP_SLOTS, type Item } from '../data/types';
+import { gemStart } from '../calc/gems';
 import { gemWeight } from '../gen/loot';
 import { restAtCamp } from './camp';
 import { awlsmithDust, awlsmithSockets, socketCeiling, type CraftResult } from './craft';
@@ -67,14 +68,15 @@ export function hoardKinds(run: RunState, offer: MapOffer): { tag: string; name:
  */
 export function hoardGems(run: RunState, offer: MapOffer, tag: string): string[] {
   const rng = new Rng(run.seed).fork(`hoardgems${offer.id}.${tag}`);
+  // Only gems the level could drop (gem levels, DESIGN.md Appendix A).
   const pool = [
     ...ACTIVE_GEMS.filter((g) => (g.tags as string[]).includes(tag)),
     ...SUPPORT_GEMS.filter((g) => (g.supports as string[]).includes(tag)),
-  ];
+  ].filter((g) => gemStart(g) <= offer.areaLevel);
   const out: string[] = [];
   const left = [...pool];
   while (out.length < HOARD_LAID && left.length) {
-    const g = rng.weighted(left, (x) => Math.max(0.1, gemWeight(x, run.classId, 99)));
+    const g = rng.weighted(left, (x) => Math.max(0.1, gemWeight(x, run.classId, offer.areaLevel)));
     out.push(g.id);
     left.splice(left.indexOf(g), 1);
   }

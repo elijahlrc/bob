@@ -299,9 +299,11 @@ The core of section 1, made concrete.
    inside them. A cluster or a notable may pair two things that belong together in a build, such as "axes and bleed" or
    "staff damage and block". It may not pair two that do not, such as "poison damage and staff damage". The one
    exception is a wheel's two sides (§8 item 3).
-3. **Every line a node carries must be read by the sheet and obeyed by the simulation.** [adopted] Dead lines are never
-   written: `skillDuration` tagged mine, `aoe` tagged minion, `cooldownRecovery` tagged warcry. [adopted, from the
-   engine-stat investigation the user delegated]
+3. **Every line a node carries must be obeyed by the simulation.** [adopted] Dead lines are never written:
+   `skillDuration` tagged mine, `aoe` tagged minion, `cooldownRecovery` tagged warcry. [adopted, from the engine-stat
+   investigation the user delegated] **The character sheet need not count every line**: conditional lines (against
+   bleeding enemies, while on full life, on kill) are fine where the fight uses them. "There is no rule that all stats
+   are on the character sheet. This is a non issue." [user, 10-22]
 4. **Node kinds.** [adopted] The kinds are small, notable, keystone, attribute and start. New nodes may use existing
    stats, and new engine stats are added where a theme clearly needs one. [user, 10-19] Masteries, jewel sockets, ranked
    nodes and points-in-region gates are declined for now. [adopted]
@@ -360,7 +362,7 @@ The core of section 1, made concrete.
 1. **Size falls out of the constraints.** Any agent may add nodes where another constraint needs them, beyond what a
    plan or ledger assigns (the user, 10-22). [user, 10-19] Quality always beats count. If removing nodes improves the tree,
    remove them. If adding nodes improves it, add them. For balance, the network will probably end up around 1,500
-   nodes. [user, 10-20]
+   nodes. [user, 10-20] The growth of 2026-10-22/23 (G-growth.md) took it from 1,009 to 1,396 live nodes.
    - A network too small for that has too few kinds of node, or high-value nodes packed too densely with too few
      trade-offs between them; the user leans to the second. [user, 10-20]
    - The reference's nearest other notable is a median 5 steps away (IQR 3 to 6). [ref]
@@ -441,6 +443,9 @@ Each was tried or proposed and struck by the user. The date is when it was struc
 - **Laying out wheels, loops and other shapes by algorithm alone.** [10-21] Tightening node by node squashed every wheel
   and loop it touched, took a road's smalls for a pocket and put kinks into the roads out of a start. A script places
   the simple cases (a chain off one notable); every cluster is then looked at.
+- **New rules proposed by audits.** [10-22] G4 audit round 1 proposed fifteen additions (G4/fix-1.md §4, C1–C15); the
+  user adopted none: "Literally none of these should be adopted." Audits report findings against the rules as they
+  stand, with fixes; they do not propose new rules.
 - **Section ideas that confused the user, earlier** [10-19]:
   - Delivery categories that are not meaningful to a player (melee, projectile, area, chaining, channelled, triggered,
     slam, strike, nova).
@@ -486,11 +491,15 @@ Each was tried or proposed and struck by the user. The date is when it was struc
 
 ## 16. Open, not yet decided
 
-- **Exact numbers.** Attribute node size, twin distance, and keystone distances from the starts (8 to 18 steps today;
-  the reference's nearest is 6 to 10) are working values, not decisions.
-- **The size of the finished network.** It is about 1,009 nodes now, heading for about 1,500 (§12 item 1).
-- **Attribute values (§7.4).** Roads are +7 and +6/+6 since 2026-10-20, hubs +20 and +15/+15; to be checked against
-  the gear by walks again once the network is near its final size, since more roads per walk means more supply.
+- **Exact numbers.** Attribute node size, twin distance, and keystone distances from the starts are working values, not
+  decisions. After the growth (2026-10-23) the keystones sit 7 (Steady Draw) to 23 (Fever Pitch) steps from their
+  nearest start; the far ones serve as second keystones (§9.3). The reference's nearest is 6 to 10.
+- **The size of the finished network.** 1,396 live nodes after the growth (2026-10-23; §12 item 1).
+- **Attribute values (§7.4).** Roads are +7 and +6/+6 since 2026-10-20, hubs +20 and +15/+15. Checked after the growth
+  (2026-10-23, `G4/builds-final.txt`): at 120 points every archetype meets its weapon's late requirement, its main
+  attribute at 200 to 320 against asks of 120 to 180, about what the pre-growth tree supplied; unchanged. At 60 points
+  seven hybrids are a little short of their late gear (the Shade's attackers 17 to 34 intelligence, Zealot casters 4 to
+  28 strength), a fact for playtesting.
 - **The Knife and the Cathedral were thin.** After the fourth round the Knife has 28 notables and the Cathedral 28,
   against 29 to 40 elsewhere. The Knife gained an outer road (the Rooftops) in round 3 and a centre wheel (Athame) in
   round 4, and a ridge road along its north rim (Ritual Blade).
@@ -498,8 +507,8 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   (the Barrows road, the tower road, the barrow stair) and the Knife have real roads. The Yard's centre is still a
   lattice, joined cluster to cluster with single road nodes; it needs re-laying like the Cathedral's. The Strider is grown
   like the others (§15 item 9).
-- **Roads between regions.** Every border now has 4 to 6 links, against the reference's 10 to 13 per neighbouring
-  pair; more are needed as the regions grow toward their borders.
+- **Roads between regions.** 48 links across the six borders after the growth (7 to 9 a border, with a seam cluster on
+  each; G2/borders.md, G4/fix-1.md), against the reference's 10 to 13 per neighbouring pair.
 - **One-stop shops after round 3.** Fixed in round 3: the mace-and-shield Vanguard (Bracing and Thick Skin traded
   places; Bracing is 14 steps from Weight of Iron), the fire sceptre (Kindled Steel went to the Ambulatory; Gilded Rod,
   Kindled Steel and Searing Avatar are 11 to 13 apart), the Reaver's leech (Thirsting Blade went west, 15 from Red
@@ -520,8 +529,9 @@ Each was tried or proposed and struck by the user. The date is when it was struc
   is still a road, by the user's choice.
 - **In the game.** Since 2026-10-20 the game loads this tree (phase F): change an area file, `lines.ts`, the registry or
   the editor's patch, then run `npm run passives:bake`. Retired ids stay as holes so saved ids keep their meaning.
-- **Labels.** Done in round 4 (`E-round4.md`, "The label pass"): every area name sits over its own area, no two
-  overlap, none covers a notable, keystone or start. Move one when an area grows under another's name.
+- **Labels.** Done in round 4 (`E-round4.md`, "The label pass"): every area name sits over its own area and no two
+  overlap. After the growth (2026-10-23) no two of the 44 overlap; some now cover node names, which is allowed since they
+  fade as the view closes in. Move one when an area grows under another's name.
 - **Weapon placement against attributes (§5 item 4).** Every weapon cluster sits in a region that supplies at least one
   of its attributes. One sits poorly: the Wall's axe cluster (Cleaver) is in the west tower, the side farthest from the
   Yard, so an axe build there gets strength but no dexterity nearby; Headsman (2026-10-20) is the axe on the Wall-Yard

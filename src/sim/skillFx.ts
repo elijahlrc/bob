@@ -506,41 +506,6 @@ export function orbAnswers(w: World, s: Side, p: SkillProfile): void {
   orbBolt(w, s, s.player.x, s.player.y, o);
 }
 
-// ---- Slag Lob: the orb bounces on and bursts again
-
-/** After the first burst, the orb bounces on the same way, bursting again a moment later, whether or not an enemy is there. */
-export function bounceOrbs(w: World, a: Actor, act: Action): void {
-  const p = act.profile;
-  const spec = p.skill.bounces;
-  if (!spec || !a.isPlayer) return;
-  const b = p.skill.behaviour;
-  const n = Math.round(levelValue(spec.chains, p.skill.level));
-  const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x);
-  for (let i = 1; i <= n; i++) {
-    const spot = w.grid.collide(
-      act.aimX + Math.cos(ang) * spec.spacing * i,
-      act.aimY + Math.sin(ang) * spec.spacing * i,
-      0.3,
-    );
-    a.side!.zones.push({
-      id: w.nextId++,
-      owner: a.id,
-      profile: p,
-      hand: act.hand,
-      x: spot.x,
-      y: spot.y,
-      x2: undefined,
-      y2: undefined,
-      radius: (b.kind === 'burst' ? b.radius : 1.4) * p.radiusMult,
-      delayT: spec.delay * i,
-      interval: 1,
-      pulseT: 0,
-      pulsesLeft: 1,
-      dtype: mainTypeOf(p),
-    });
-  }
-}
-
 // ---- Fuse Arrow: arrows that stick, and the first to explode takes the rest with it
 
 /** An arrow has struck an enemy (or a wall, with `target` null): it sticks, and the fuse starts if none is burning there. */

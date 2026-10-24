@@ -20,7 +20,7 @@ import type { SkillDef } from './gems';
 
 /** The ways a projectile skill gets its projectiles into the air (the early returns of `fireProjectiles`). */
 export type ProjectilePath =
-  'pods' | 'creep' | 'mirror' | 'pulse' | 'shield' | 'mortar' | 'tornado' | 'fan';
+  'pods' | 'creep' | 'mirror' | 'pulse' | 'shield' | 'mortar' | 'tornado' | 'lob' | 'fan';
 
 /** Which path a projectile-kind skill takes, in the order the sim checks them; null for other behaviours. */
 export function projectilePath(s: SkillDef): ProjectilePath | null {
@@ -31,6 +31,7 @@ export function projectilePath(s: SkillDef): ProjectilePath | null {
   if (s.pulse) return 'pulse';
   if (s.shield) return 'shield';
   if (s.mods.some((m) => m.stat === 'tornadoShot')) return 'tornado';
+  if (s.bounces) return 'lob';
   if (s.mortar) return 'mortar';
   return 'fan';
 }

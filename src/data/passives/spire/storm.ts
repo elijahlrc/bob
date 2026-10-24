@@ -1,5 +1,5 @@
 /**
- * The east arm of the Spire (north-east, toward the Knife): Flashpoint (fire as the crit hit), Overcharge (lightning as
+ * The east arm of the Spire (north-east, toward the Knife): Flashpoint (fire as the crit hit), Live Current (lightning as
  * shock), and Pain Conduit at the tip (30% more spell damage on low life). Joined to the middle arm by the inter-arm
  * junction. Since 2026-10-20 the arm is a place, not the lightning arm (see `fire.ts`); the id `spire.storm` is kept.
  */
@@ -66,7 +66,7 @@ export const storm: AreaSpec = {
     },
     {
       id: 'overcharge',
-      name: 'Overcharge',
+      name: 'Live Current',
       why: "Lightning damage, the effect of shock and lightning penetration: lightning as the shock that makes every later hit bigger, beside the low-life keystone. The other lightning cluster (Thunderhead, the middle arm) sells speed. The middle arm's ailment bridge arrives at its notable.",
       at: [960, -3900],
       shape: { kind: 'ring', r: 56, a0: 90 },
@@ -80,7 +80,7 @@ export const storm: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Overcharge',
+          name: 'Live Current',
           lines: [eleDamage('lightning', 12), shockEffect(20), penetration('lightning', 3)],
           why: '1.2 + 2 + 1.5 units. The west side, where the ailment bridge arrives.',
         },

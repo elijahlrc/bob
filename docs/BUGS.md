@@ -1,33 +1,5 @@
 # Bugs to return to
 
-Collected during visual-style exploration; to be worked after an aesthetic is chosen.
-Add new entries at the bottom. Remove entries once fixed (git history has the detail).
+Known bugs not yet fixed. Add new entries at the bottom. Remove entries once fixed (git history has the detail).
 
-## 1. Crash after the player tried to shoot an unhittable enemy (open, needs the report)
-
-**Symptom.** A full crash after the character kept shooting an enemy it could not hit. This may have been
-the same situation as the (now fixed) ranged-standoff bug, so it may no longer happen.
-
-**Status.** Error text unknown. Crash logging exists (`src/crashlog.ts`): a crash is stored in
-`localStorage['bob.crashlog']` and shown as a copyable report with a snapshot of the player, its target
-and the actor counts. Paste that report here if it recurs.
-
-## Notes on the fixed ranged-standoff bug (for reference)
-
-Player and ranged enemies stood shooting each other without anyone dying. One or more of these fixed it
-(not isolated): even-count arrow fans now keep one arrow on the aim line (`fanAngle` in
-`src/sim/actions.ts`; the cause found headlessly), enemies notice the player from 10 tiles and wake when
-the player attacks nearby, the player drops a target it cannot damage for 20 s, and it closes in when
-arrows keep hitting walls. A stall report is saved to the crash log with per-arrow diagnostics if a stall
-ever recurs; the `stall-*` scripts in `scripts/` replay bot campaigns looking for them.
-
-## 2. The bow strider can be kept dodging a Spitter rare's caustic pools for a minute (open)
-
-**Symptom.** On a map with a ranged Spitter rare (found with the strider, run seed 7001, map 4, a Packed shrine), the rare keeps its
-distance and spits, and the character spends a minute stepping out of the pools it leaves (the hazard step runs before the
-attack) and never shoots back. The rare's life stays full until the stall breaker drops it; the character ended the map at 4
-life. The stall test (`src/sim/stall.test.ts`, "bow campaign regression") sees this as a stall, so it is run with the usual
-density until this is fixed.
-
-**Where to look.** `avoidHazard` and `kiteStep` in `src/sim/ai.ts` run before the attack is chosen; a hazard that is re-laid every
-1.5 s can hold them for as long as the monster lives. To reproduce: play that campaign without `forceDensity('standard')`.
+None open (2026-10-23: the earlier entries were no longer current and were removed).

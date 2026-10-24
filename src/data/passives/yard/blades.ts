@@ -4,7 +4,7 @@
  * the Pits' west junction) and the west half of the crossroad (the junction east to the Muster's hub). The sword diamond
  * bridges the west road and the crossroad; the armour pocket hangs off the west road's first node toward the Wall; the
  * axes hang off its second; the elements below them; Killing Pace and the one-handed diamond above and below the
- * crossroad; Executioner off the west road's last node, joined to the reservation chain.
+ * crossroad; Finishing Cut off the west road's last node, joined to the reservation chain.
  */
 import {
   accuracy,
@@ -33,7 +33,7 @@ export const blades: AreaSpec = {
   id: 'yard.blades',
   region: 'reaver',
   name: 'The Practice Ground',
-  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Executioner chain, Killing Pace, armour on the Wall side (Guarded) and a second armour chain between the one-handed diamond and the elements (Mended Mail, G3), hung from the west road and the crossroad (G2); past the west road, the sword with a shield (Sword and Board, G3 round 2) on the way to the Wall. The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
+  why: "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Finishing Cut chain, Killing Pace, armour on the Wall side (Guarded) and a second armour notable between the one-handed diamond and the elements (Mended Mail, G3, on regeneration smalls since G4 fix 1), hung from the west road and the crossroad (G2); past the west road, the sword with a shield (Sword and Board, G3 round 2) on the way to the Wall. The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
   at: [-785, 1990], // Where the area's name is drawn: clear of every other area's name; nudged in G2 off Light Blades and the Wall's moved Second Wind.
   clusters: [
     {
@@ -104,7 +104,7 @@ export const blades: AreaSpec = {
           kind: 'attribute',
           lines: [str(6), dex(6)],
           at: [-925, 2940],
-          why: 'The Shieldwall spur leaves west, the block run and Executioner east.',
+          why: 'The Shieldwall spur leaves west, the block run and Finishing Cut east.',
         },
       ],
       links: [['w2', 'w3']],
@@ -154,7 +154,7 @@ export const blades: AreaSpec = {
           kind: 'notable',
           name: 'Guarded',
           lines: [armour(20), evasion(20)],
-          why: "Both of the Reaver's defences, the two-defence notable only a strength-dexterity region sells: 1.7 + 2 units. The Wall's armour-and-stun is Thick Skin, off the tower road.",
+          why: "Both of the Reaver's defences, the two-defence notable only a strength-dexterity region sells: 1.7 + 2 units. The Wall's armour-and-stun is Ox Hide, off the tower road.",
           at: [-775, 1458],
         },
       ],
@@ -202,7 +202,7 @@ export const blades: AreaSpec = {
     {
       id: 'elementalEdge',
       name: 'Elemental Edge',
-      why: "Elemental damage with attacks, below the axes: the Yard's one elemental cluster (C-brief §11), so that a Reaver with a fire or cold sword is near its element without a walk to the Spire. Reached through the axes and from the road to Headsman; no longer joined to the Shieldwall spur (G2: the road from the elements to Executioner ran through the keystone's spur).",
+      why: "Elemental damage with attacks, below the axes: the Yard's one elemental cluster (C-brief §11), so that a Reaver with a fire or cold sword is near its element without a walk to the Spire. Reached through the axes and from the road to Headsman; no longer joined to the Shieldwall spur (G2: the road from the elements to Finishing Cut ran through the keystone's spur).",
       at: [-700, 2560],
       shape: { kind: 'hand' },
       nodes: [
@@ -232,18 +232,18 @@ export const blades: AreaSpec = {
     {
       id: 'mail',
       name: 'Mended Mail',
-      why: "Armour twice, then the notable with armour and life regeneration, then armour once more (RE-4, G3 2026-10-22): the Yard's second armour, a straight chain across the open cell between the one-handed diamond and the elements, so the Practice Ground holds armour in two places with two partners (evasion at Guarded, regeneration here) and a strength build takes one, the other, or walks on to the Wall's Rampart for the rest. Regeneration is recovery, not maximum life, so it is not the life-with-armour pairing the ledger keeps away from the homes. A bridge: from Light Blades' south small down to Elemental Edge, a new loop between the crossroad and the west road.",
+      why: "Life regeneration twice, then the notable with armour and life regeneration, then regeneration once more (RE-4, G3 2026-10-22; the smalls were armour until G4 fix 1, when they went to the notable's partner: with four and three armour smalls, Iron Voice and Mended Mail were in six of the seven armour builds' plans, builds audit B1): the Yard's second armour, a straight chain across the open cell between the one-handed diamond and the elements, so the Practice Ground holds armour in two places with two partners (evasion at Guarded, regeneration here) and a strength build takes one, the other, or walks on to the Wall's Rampart for the rest. Regeneration is recovery, not maximum life, so it is not the life-with-armour pairing the ledger keeps away from the homes. A bridge: from Light Blades' south small down to Elemental Edge, a new loop between the crossroad and the west road.",
       at: [-589, 2430],
       shape: { kind: 'hand' },
       nodes: [
         {
           id: 'a',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [lifeRegen(0.4)],
           at: [-561, 2318],
-          why: 'The entrance from the one-handed diamond.',
+          why: 'Regeneration, the entrance from the one-handed diamond.',
         },
-        { id: 'b', kind: 'small', lines: [armour(12)], at: [-575, 2374] },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-575, 2374] },
         {
           id: 'n',
           kind: 'notable',
@@ -255,9 +255,9 @@ export const blades: AreaSpec = {
         {
           id: 'c',
           kind: 'small',
-          lines: [armour(12)],
+          lines: [lifeRegen(0.4)],
           at: [-603, 2486],
-          why: 'The exit, to Elemental Edge.',
+          why: 'Regeneration, the exit to Elemental Edge.',
         },
       ],
       links: [
@@ -299,7 +299,7 @@ export const blades: AreaSpec = {
           kind: 'small',
           lines: [oneHandMelee(10)],
           at: [-527, 2185],
-          why: "The exits to the resist star's cold spoke and, since G3, down to Mended Mail's armour.",
+          why: "The exits to the resist star's cold spoke and, since G3, down to Mended Mail's chain.",
         },
       ],
       links: [
@@ -311,7 +311,7 @@ export const blades: AreaSpec = {
     },
     {
       id: 'executioner',
-      name: 'Executioner',
+      name: 'Finishing Cut',
       why: "Damage against bleeding enemies, then the notable that finishes them (culling strike, double damage): what an axe Reaver who bleeds wants after Hewing. Since G2 a chain east from the west road's last node to the reservation chain's first small, in the wedge between the block run and the road down to the Pits; it hung off the Shieldwall spur before.",
       at: [-815, 2936],
       shape: { kind: 'hand' },
@@ -319,14 +319,14 @@ export const blades: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [damageVsBleeding(10)],
+          lines: [damageVsBleeding(8)],
           at: [-855, 2938],
           why: 'The entrance, from the west road.',
         },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Executioner',
+          name: 'Finishing Cut',
           lines: [damageVsBleeding(16), cullingStrike()],
           at: [-775, 2935],
           why: '2 + 3 units. The exit, to the reservation chain.',
@@ -337,7 +337,7 @@ export const blades: AreaSpec = {
     {
       id: 'killingPace',
       name: 'Killing Pace',
-      why: "Attack speed after a kill twice, then the notable with speed after a kill, life on kill and movement: the Reaver who clears a pack and runs to the next, which is most of a map. A straight chain from the home road's first node down to the crossroad's second (G2; it ran from the home road's second node to the hub before), so the way from the home to the one-handed diamond stays as short as it was.",
+      why: "Attack speed after a kill once, then the notable with speed after a kill, life on kill and movement: the Reaver who clears a pack and runs to the next, which is most of a map. A straight chain from the home road's first node down to the crossroad's second (G2; it ran from the home road's second node to the hub before), so the way from the home to the one-handed diamond stays as short as it was.",
       at: [-340, 1856],
       shape: { kind: 'hand' },
       nodes: [
@@ -493,12 +493,12 @@ export const blades: AreaSpec = {
     {
       from: 'west.w4',
       to: 'executioner.a',
-      why: "The west road's last node onto Executioner.",
+      why: "The west road's last node onto Finishing Cut.",
     },
     {
       from: 'executioner.n',
       to: 'yard.shield.standard.a',
-      why: 'Executioner on to the reservation chain: a second way in for each, and a way from the west road up to the crit pocket without the hub (G2; it replaced the road node that joined Executioner to Standard Bearer).',
+      why: 'Finishing Cut on to the reservation chain: a second way in for each, and a way from the west road up to the crit pocket without the hub (G2; it replaced the road node that joined Finishing Cut to Standard Bearer).',
     },
     { from: 'j1.a', to: 'crossroad.c1', why: 'The crossroad leaves the junction east.' },
     {
@@ -530,12 +530,12 @@ export const blades: AreaSpec = {
     {
       from: 'lightBlades.c',
       to: 'mail.a',
-      why: "The one-handed diamond's south small onto the armour chain (G3, RE-4): the crossroad reaches the Yard's second armour through a one-handed notable's nodes, a fair price for a sword-and-armour build.",
+      why: "The one-handed diamond's south small onto Mended Mail's chain (G3, RE-4): the crossroad reaches the Yard's second armour through a one-handed notable's nodes, a fair price for a sword-and-armour build.",
     },
     {
       from: 'mail.c',
       to: 'elementalEdge.b',
-      why: 'The armour chain lands on the elements: Mended Mail is a bridge, so the crossroad and the west road meet a second time below the axes.',
+      why: "Mended Mail's chain lands on the elements: it is a bridge, so the crossroad and the west road meet a second time below the axes.",
     },
     {
       from: 'lightBlades.b',
