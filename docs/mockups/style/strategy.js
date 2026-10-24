@@ -16,32 +16,28 @@
       kind: 'damage',
       dps: '1,329',
       role: 'Periodic',
-      every: true,
-      note: 'Every 3.2 s',
+      every: '3.2 s',
     },
     {
       name: 'Guardian Cairn',
       kind: 'damage',
       dps: '1,257',
       role: 'Periodic',
-      every: true,
-      note: 'Every 3 s',
+      every: '3 s',
     },
     {
       name: 'Thunder Rebuke',
       kind: 'damage',
       dps: '2,782',
       role: 'Periodic',
-      every: true,
-      note: 'Every 3 s',
+      every: '3 s',
     },
     {
       name: 'Charged Blow',
       kind: 'damage',
       dps: '1,672',
       role: 'Periodic',
-      every: true,
-      note: 'Every 3 s',
+      every: '3 s',
     },
   ];
   const sel = (label, opts, v) =>
@@ -56,9 +52,9 @@
         <div class="st-ctls">
           ${sel('Role', s.roles ?? ROLES, s.role)}
           ${sel('When', WHEN, 'Any fight')}
-          ${s.every ? sel('Every', EVERY, 'Usual pause') : ''}
+          ${s.every ? sel('Every', [`Usual pause (${s.every})`, ...EVERY.slice(1)], `Usual pause (${s.every})`) : ''}
         </div>
-        <div class="st-note">${s.note}</div>
+        ${s.note ? `<div class="st-note">${s.note}</div>` : ''}
       </div>
       <div class="st-move">
         <button class="btn sq" data-paint="panel" data-thin ${i === 0 ? 'disabled' : ''} aria-label="Move up">▲</button>

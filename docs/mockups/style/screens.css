@@ -1207,8 +1207,15 @@
 [data-style='leaf'] .ix-tidy .btn.small {
   padding: 8px 14px;
 }
-[data-style='leaf'] .ix-tidy .sk-check {
-  margin-top: 4px;
+[data-style='leaf'] .ix-salv {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+[data-style='leaf'] .ix-salv .btn.small {
+  flex: 1 1 0;
+  padding: 8px 6px;
+  white-space: nowrap;
 }
 [data-style='leaf'] .ix-row.gone {
   cursor: default;

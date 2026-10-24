@@ -347,7 +347,6 @@
           dps: -56,
           ehp: -46,
           more: [['−104 life', -1]],
-          warn: 'Two hands: Spidersilk Wall goes to the bag too, with Charged Blow, Pyre Burst and Dune Stance.',
           also: 'off',
         },
       },
@@ -518,12 +517,12 @@
   ];
 
   // ---- State ----
-  let worn, bag, gone, sel, aim, status, history, filter, view, gearOpen, pinFav;
+  let worn, bag, gone, sel, aim, status, history, filter, view, gearOpen, sort;
   function reset() {
     worn = structuredClone(WORN0);
     bag = structuredClone(BAG0);
     gone = [];
-    pinFav = true;
+    sort = 'new';
     sel = null;
     aim = null;
     status = null;
@@ -735,7 +734,12 @@
           (view === 'up' && isUp(it)) ||
           (view === 'fav' && it.fav)),
     );
-    if (pinFav) list.sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
+    if (sort === 'fav') list.sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
+    if (sort === 'up')
+      list.sort(
+        (a, b) => (b.cmp ? score(b.cmp[best(b)]) : -999) - (a.cmp ? score(a.cmp[best(a)]) : -999),
+      );
+    if (sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
     const junk = bag.filter(isJunk);
     const count = (v) =>
       v === 'new'
@@ -748,18 +752,26 @@
               ? gone.length
               : '';
     return `<section class="ix-bag" data-paint="panel">
-      <div class="ix-baghead"><h4>Bag</h4><span class="ix-cap"><i style="width:${(bag.length / 60) * 100}%"></i></span><span class="muted">${bag.length} / 60</span></div>
+      <div class="ix-baghead"><h4>Bag</h4></div>
       <div class="ix-views">${VIEWS.map(([v, t]) => `<button class="ix-view${v === view ? ' on' : ''}" data-view="${v}" ${v === view ? 'data-paint="panel" data-thin data-field="gold" data-pk="on"' : ''}>${t}${count(v) ? ` <span>${count(v)}</span>` : ''}</button>`).join('')}</div>
       <div class="ix-kinds">${FILTERS.map(([f, g, t]) => `<button class="ix-kind${f === filter ? ' on' : ''} tip" data-tip="${t}" data-filter="${f}" ${f === filter ? 'data-paint="panel" data-thin data-field="gold" data-pk="on"' : 'data-paint="panel" data-thin data-pk="off"'}><i data-paint="glyph" data-glyph="${g}" data-pk="${g}${f === filter}"></i></button>`).join('')}</div>
       <div class="ix-tools"><span class="ix-search" data-paint="panel" data-thin data-field="lapis"><input placeholder="Search the bag" /></span>
-        <span class="sel" data-paint="panel" data-thin><select><option>Newest</option><option>Best upgrade</option><option>Slot</option><option>Rarity</option><option>Name</option></select></span></div>
+        <span class="sel" data-paint="panel" data-thin><select data-sort>${[
+          ['new', 'Newest'],
+          ['up', 'Best upgrade'],
+          ['fav', 'Favourites'],
+          ['name', 'Name'],
+        ]
+          .map(([v, t]) => `<option value="${v}"${v === sort ? ' selected' : ''}>${t}</option>`)
+          .join('')}</select></span></div>
       <div class="ix-list">${list.map(view === 'gone' ? goneRow : rowHtml).join('') || '<p class="muted">Nothing here.</p>'}</div>
       <div class="ix-tidy">
         <button class="btn small" data-paint="panel" data-thin data-act="seen" ${bag.some((b) => b.isNew) ? '' : 'disabled'}>Mark all seen</button>
         <button class="btn small" data-paint="panel" data-thin data-act="cleanup">Clean up old items…</button>
-        <button class="btn small" data-paint="panel" data-thin data-field="vermilion" data-act="junk" ${junk.length ? '' : 'disabled'}>Salvage junk (${junk.length})</button>
-        ${gone.length ? `<button class="btn small" data-paint="panel" data-thin data-field="vermilion" data-act="salvage">Salvage ${gone.length} discarded → ${gone.length * DUST} Dust</button>` : ''}
-        <label class="sk-check"><input type="checkbox" data-pinfav ${pinFav ? 'checked' : ''} /> Keep ★ favourites on top</label>
+        <span class="ix-salv">
+          <button class="btn small" data-paint="panel" data-thin data-field="vermilion" data-act="junk" ${junk.length ? '' : 'disabled'}>Salvage junk (${junk.length})</button>
+          <button class="btn small" data-paint="panel" data-thin data-field="vermilion" data-act="salvage" ${gone.length ? '' : 'disabled'}>Salvage discarded (${gone.length})</button>
+        </span>
       </div>
     </section>`;
   }
@@ -863,8 +875,8 @@
           go();
         }),
     );
-    const pf = frame.querySelector('[data-pinfav]');
-    if (pf) pf.onchange = () => ((pinFav = pf.checked), go());
+    const so = frame.querySelector('[data-sort]');
+    if (so) so.onchange = () => ((sort = so.value), go());
     frame
       .querySelectorAll('[data-filter]')
       .forEach((b) => (b.onclick = () => ((filter = b.dataset.filter), go())));

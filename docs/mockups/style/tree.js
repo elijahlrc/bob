@@ -258,16 +258,25 @@ function sprite(kind, tone, state, d) {
       disc(R * 0.75, col('gold', 7));
       if (d >= 4) disc(R * 0.45, col(ramp, from + 1));
     } else {
+      // From medium zoom a small node gets a setting: a ring of dark gold round its enamel, so the colour reads.
+      const set = d >= 4 && !dim;
+      if (set)
+        disc(
+          R + 1,
+          state.s === 'lit' || state.s === 'path'
+            ? col('pearl', 4)
+            : col('gold', state.s === 'can' ? 4 : 3),
+        );
       disc(
         R,
         dim
           ? col('lapis', 3)
           : state.s === 'path'
             ? col('pearl', 4)
-            : col(ramp, from - (state.s === 'lit' ? 0 : 2)),
+            : col(ramp, from - (state.s === 'lit' ? 0 : set ? 1 : 2)),
       );
       if (state.s === 'lit') disc(Math.max(1, R * 0.4), col('pearl', 5));
-      if (state.s === 'can') ring(R + 1.5, d >= 5 ? 2 : 1);
+      if (state.s === 'can') ring(R + (set ? 2.5 : 1.5), d >= 5 ? 2 : 1);
     }
     s = crisp(cv);
   } else {
