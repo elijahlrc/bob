@@ -19,6 +19,9 @@
 --     posted). With a save version, only the snapshots of that version (the ones a game of that version can fight), or with
 --     `outdated` those of older versions; without one, all of them (what builds before 2026-10-20 ask for).
 --
+--   high_scores_page(save_version, outdated, start, k) and high_score_standing(snapshot_id, span)
+--     the same list a page at a time, and the rows around one snapshot, each row with its rank (section 15c).
+--
 --   my_snapshots(token_hash)
 --     the caller's own snapshots, newest first (at most 50), by the token hash that only its browser knows: id, created_at,
 --     name, class_id, level, map, outcome, save_version, rating, fights, wins. The game needs its own snapshot's id to compute
@@ -534,6 +537,99 @@ $$;
 
 revoke all on function public.high_scores(int, int, boolean) from public;
 grant execute on function public.high_scores(int, int, boolean) to anon, authenticated;
+
+-- 15c. The high score list a page at a time, and the rows around one snapshot (2026-10-23), so that a long list is never read
+--      whole. Both rank by rating, then wins, then the older snapshot, then the id, over the snapshots that have fought and are
+--      not bots, and give each row its rank on the whole list. `high_scores` stays for the builds that ask for it.
+--
+--   high_scores_page(save_version, outdated, start, k)
+--     up to k (at most 100) rows from rank start + 1, of that save version or, with `outdated`, of the older ones.
+--
+--   high_score_standing(snapshot_id, span)
+--     the rows within `span` (at most 10) ranks of the snapshot on its save version's list: itself and the rows either side when
+--     it has fought, else the rows either side of where its rating would stand (it is not on the list until it has fought).
+drop function if exists public.high_scores_page(int, boolean, int, int);
+drop function if exists public.high_score_standing(bigint, int);
+drop type if exists public.ranked_score_row;
+
+create type public.ranked_score_row as (
+  id            bigint,
+  name          text,
+  class_id      text,
+  level         int,
+  map           int,
+  outcome       text,
+  rating        int,
+  fights        int,
+  wins          int,
+  game_version  text,
+  posted_on     date,
+  rank          int
+);
+
+create index if not exists rivals_board_idx on public.rivals (save_version, rating desc, wins desc, created_at, id)
+  where fights > 0 and not bot;
+
+create function public.high_scores_page(save_version int, outdated boolean default false, start int default 0,
+                                        k int default 50)
+returns setof public.ranked_score_row
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select b.id, b.name, b.class_id, b.level, b.map, b.outcome, b.rating, b.fights, b.wins, b.game_version, b.posted_on, b.rank
+  from (
+    select r.id, r.name, r.class_id, r.level, r.map, r.outcome, r.rating, r.fights, r.wins, r.game_version,
+           (r.created_at at time zone 'utc')::date as posted_on,
+           (row_number() over (order by r.rating desc, r.wins desc, r.created_at asc, r.id asc))::int as rank
+    from public.rivals r
+    where r.fights > 0 and not r.bot
+      and case when coalesce(high_scores_page.outdated, false)
+               then r.save_version < high_scores_page.save_version
+               else r.save_version = high_scores_page.save_version end
+  ) b
+  where b.rank > greatest(coalesce(high_scores_page.start, 0), 0)
+  order by b.rank
+  limit least(greatest(coalesce(high_scores_page.k, 0), 0), 100);
+$$;
+
+revoke all on function public.high_scores_page(int, boolean, int, int) from public;
+grant execute on function public.high_scores_page(int, boolean, int, int) to anon, authenticated;
+
+create function public.high_score_standing(snapshot_id bigint, span int default 2)
+returns setof public.ranked_score_row
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with me as (
+    select r.id, r.save_version, r.rating, r.wins, r.created_at, (r.fights > 0 and not r.bot) as ranked
+    from public.rivals r
+    where r.id = high_score_standing.snapshot_id
+  ),
+  board as (
+    select r.id, r.name, r.class_id, r.level, r.map, r.outcome, r.rating, r.fights, r.wins, r.game_version,
+           (r.created_at at time zone 'utc')::date as posted_on, r.created_at,
+           (row_number() over (order by r.rating desc, r.wins desc, r.created_at asc, r.id asc))::int as rank
+    from public.rivals r, me
+    where r.fights > 0 and not r.bot and r.save_version = me.save_version
+  ),
+  ahead as (
+    select count(*)::int as n
+    from board b, me
+    where (-b.rating, -b.wins, b.created_at, b.id) < (-me.rating, -me.wins, me.created_at, me.id)
+  ),
+  reach as (select least(greatest(coalesce(high_score_standing.span, 0), 0), 10) as s)
+  select b.id, b.name, b.class_id, b.level, b.map, b.outcome, b.rating, b.fights, b.wins, b.game_version, b.posted_on, b.rank
+  from board b, ahead, reach, me
+  where b.rank between ahead.n + 1 - reach.s and ahead.n + reach.s + (case when me.ranked then 1 else 0 end)
+  order by b.rank;
+$$;
+
+revoke all on function public.high_score_standing(bigint, int) from public;
+grant execute on function public.high_score_standing(bigint, int) to anon, authenticated;
 
 -- 15b. A browser's own snapshots, by the token hash that only it knows (the same proof of ownership as a report's): the ids the
 --      game needs for the seed of a rated fight and for the report, and what it may show the player of their own characters.

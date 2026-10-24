@@ -7,8 +7,6 @@ import { loadStanding, postStatus, watchPost } from '../rivals';
 /** How many rows the top of the board shows, and how many either side of the player's own. */
 const TOP = 5;
 const SPAN = 2;
-/** The longest list the server gives: a character below it has no known rank. */
-const LIST_MAX = 100;
 
 export type BoardRow = {
   id: string;
@@ -16,7 +14,7 @@ export type BoardRow = {
   classId: string;
   level: number;
   rating: number;
-  /** Its place on the board; null for the player's character when it has none (not yet rated, or below the list). */
+  /** Its place on the board; null for the player's character before its first rated duel. */
   rank: number | null;
   me: boolean;
 };
@@ -24,8 +22,8 @@ export type BoardRow = {
 export type Board = {
   /** The rows to show, with null where rows are skipped. */
   rows: (BoardRow | null)[];
-  /** The player's character: its rank, 'unrated' before its first rated duel, 'below' under the list; null when it is not there. */
-  standing: number | 'unrated' | 'below' | null;
+  /** The player's character: its rank, or 'unrated' before its first rated duel; null when it is not there. */
+  standing: number | 'unrated' | null;
 };
 
 const rowOf = (s: HighScore | MySnapshot, rank: number | null, me: boolean): BoardRow => ({
@@ -39,38 +37,35 @@ const rowOf = (s: HighScore | MySnapshot, rank: number | null, me: boolean): Boa
 });
 
 /**
- * The end screen's slice of the high scores: the top few, then the few around the player's character, its rank, and a gap between
- * the two when they do not meet. A character not yet rated is shown where its rating would stand, without a rank.
+ * The end screen's slice of the high scores, from the top rows and the rows around the player's character (each with its rank on
+ * the whole list): the two joined in rank order, a gap wherever ranks are skipped, and the character's rank. A character not yet
+ * on the list is placed where its rating would stand (after those it ties with, being the newest), without a rank.
  */
-export function boardOf(scores: HighScore[], me: MySnapshot | null): Board {
-  const at = me ? scores.findIndex((s) => s.id === me.id) : -1;
-  if (!me || at >= 0) {
-    const rows = scores.map((s, i) => rowOf(s, i + 1, s.id === me?.id));
-    if (at < 0) return { rows: rows.slice(0, TOP), standing: null };
-    return { rows: around(rows, at), standing: at + 1 };
+export function boardOf(top: HighScore[], near: HighScore[], me: MySnapshot | null): Board {
+  const byId = new Map<string, HighScore>();
+  for (const s of [...top, ...near]) if (s.rank !== undefined) byId.set(s.id, s);
+  const ranked = [...byId.values()].sort((a, b) => a.rank! - b.rank!);
+  const rows: (BoardRow | null)[] = [];
+  let last = 0;
+  for (const s of ranked) {
+    if (s.rank! > last + 1) rows.push(null);
+    rows.push(rowOf(s, s.rank!, s.id === me?.id));
+    last = s.rank!;
   }
-  // The list orders by rating, then wins; a newer character comes after those it ties with.
-  let pos = scores.findIndex(
+  if (!me) return { rows, standing: null };
+  const mine = byId.get(me.id);
+  if (mine) return { rows, standing: mine.rank! };
+  // The list orders by rating, then wins, then the older: the newest character comes after those it ties with.
+  const next = ranked.find(
     (s) => s.rating < me.rating || (s.rating === me.rating && s.wins < me.wins),
   );
-  if (pos < 0) pos = scores.length;
-  const rated = me.fights > 0;
-  if (rated && pos >= LIST_MAX) {
-    const top = scores.slice(0, TOP).map((s, i) => rowOf(s, i + 1, false));
-    return { rows: [...top, null, rowOf(me, null, true)], standing: 'below' };
-  }
-  const rows = scores.map((s, i) => rowOf(s, i + 1 + (rated && i >= pos ? 1 : 0), false));
-  rows.splice(pos, 0, rowOf(me, rated ? pos + 1 : null, true));
-  return { rows: around(rows, pos), standing: rated ? pos + 1 : 'unrated' };
+  const at = next ? rows.findIndex((r) => r?.id === next.id) : rows.length;
+  rows.splice(at, 0, rowOf(me, null, true));
+  // A character that has fought but is not in the rows (its rating changed under the read) is shown without a rank.
+  return { rows, standing: me.fights > 0 ? null : 'unrated' };
 }
 
-/** The top rows and the rows around `at`, joined when they meet. */
-function around(rows: BoardRow[], at: number): (BoardRow | null)[] {
-  const from = at - SPAN;
-  const to = Math.min(rows.length, at + SPAN + 1);
-  if (from <= TOP) return rows.slice(0, Math.max(TOP, to));
-  return [...rows.slice(0, TOP), null, ...rows.slice(from, to)];
-}
+type Standing = { top: HighScore[] | null; near: HighScore[]; me: MySnapshot | null };
 
 const className = (id: string): string => {
   try {
@@ -83,19 +78,14 @@ const className = (id: string): string => {
 function standingText(b: Board): string | null {
   if (b.standing === null) return null;
   if (b.standing === 'unrated') return 'Unranked until your first rated duel';
-  if (b.standing === 'below') return `Your rank: below #${LIST_MAX}`;
   return `Your rank: #${b.standing}`;
 }
 
 /** The slice of the high scores for what has been loaded (null while it is asked for). */
-export function LeaderboardView({
-  got,
-}: {
-  got: { scores: HighScore[] | null; me: MySnapshot | null } | null;
-}) {
+export function LeaderboardView({ got }: { got: Standing | null }) {
   if (got === null) return <p class="muted">Looking for rivals…</p>;
-  if (got.scores === null) return <p class="muted">Could not reach the rivals</p>;
-  const b = boardOf(got.scores, got.me);
+  if (got.top === null) return <p class="muted">Could not reach the rivals</p>;
+  const b = boardOf(got.top, got.near, got.me);
   if (b.rows.length === 0) return <p class="muted">No duels yet.</p>;
   const text = standingText(b);
   return (
@@ -138,14 +128,12 @@ export function LeaderboardView({
  * rating is fresh) and again once the character's post lands.
  */
 export function Leaderboard({ run }: { run: RunState }) {
-  const [got, setGot] = useState<{ scores: HighScore[] | null; me: MySnapshot | null } | null>(
-    null,
-  );
+  const [got, setGot] = useState<Standing | null>(null);
   const [posted, setPosted] = useState(postStatus(run).status === 'posted');
   useEffect(() => watchPost(() => setPosted(postStatus(run).status === 'posted')), [run]);
   useEffect(() => {
     let live = true;
-    void loadStanding(run).then((r) => live && setGot(r));
+    void loadStanding(run, TOP, SPAN).then((r) => live && setGot(r));
     return () => {
       live = false;
     };

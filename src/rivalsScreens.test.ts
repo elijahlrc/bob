@@ -3,6 +3,7 @@ import { Controller } from './run/controller';
 import { hashToken, rivalRecord, type Rival } from './run/rivals';
 import { newRun, SAVE_VERSION, type RunState } from './run/run';
 import {
+  HIGH_SCORES_PAGE,
   installRivals,
   loadHighScores,
   loadRivals,
@@ -450,7 +451,7 @@ describe('the report of a rated fight', () => {
 });
 
 describe('the high scores', () => {
-  const row = (id: number, rating: number) => ({
+  const row = (id: number, rating: number, rank = 1) => ({
     id,
     name: `Rival ${id}`,
     class_id: 'strider',
@@ -462,31 +463,63 @@ describe('the high scores', () => {
     wins: 2,
     game_version: 'abc1234',
     posted_on: '2026-10-17',
+    rank,
   });
+  /** `n` ranked rows from rank `from`. */
+  const rows = (from: number, n: number) =>
+    Array.from({ length: n }, (_, i) => row(from + i, 2000 - from - i, from + i));
 
-  it('asks for the top hundred and for the player’s own snapshots, and gives both', async () => {
+  it('asks for the first page and for the player’s own snapshots, and gives both, ranked', async () => {
     browser();
     const net = server({
-      high_scores: () => ok([row(7, 900), row(8, 800)]),
+      high_scores_page: () => ok([row(7, 900, 1), row(8, 800, 2)]),
       my_snapshots: () => ok([snapshotRow(newRun('mystic', 1), { id: 8 })]),
     });
     const got = await loadHighScores(net.deps);
-    expect(got.scores!.map((s) => s.id)).toEqual(['7', '8']);
+    expect(got.scores!.map((s) => [s.id, s.rank])).toEqual([
+      ['7', 1],
+      ['8', 2],
+    ]);
     expect([...got.mine]).toEqual(['8']);
-    expect(net.calls.find((x) => x.path === 'high_scores')!.body).toEqual({
-      k: 100,
+    expect(got.more).toBe(false);
+    expect(net.calls.find((x) => x.path === 'high_scores_page')!.body).toEqual({
       save_version: SAVE_VERSION,
       outdated: false,
+      start: 0,
+      k: HIGH_SCORES_PAGE + 1,
     });
+  });
+
+  it('a page says whether another follows, and the next page is asked for from where it ends, without the snapshots again', async () => {
+    browser();
+    const net = server({
+      high_scores_page: (body) =>
+        ok(
+          rows(
+            (body.start as number) + 1,
+            Math.min(body.k as number, 120 - (body.start as number)),
+          ),
+        ),
+      my_snapshots: () => ok([]),
+    });
+    const first = await loadHighScores(net.deps);
+    expect(first.scores).toHaveLength(HIGH_SCORES_PAGE);
+    expect(first.more).toBe(true);
+    const second = await loadHighScores(net.deps, false, HIGH_SCORES_PAGE);
+    expect(second.scores![0].rank).toBe(HIGH_SCORES_PAGE + 1);
+    expect(second.more).toBe(true);
+    const last = await loadHighScores(net.deps, false, 2 * HIGH_SCORES_PAGE);
+    expect(last.scores).toHaveLength(120 - 2 * HIGH_SCORES_PAGE);
+    expect(last.more).toBe(false);
+    expect(net.calls.filter((x) => x.path === 'my_snapshots')).toHaveLength(1);
   });
 
   it('asks for the older versions’ list when told to', async () => {
     browser();
-    const net = server({ high_scores: () => ok([row(5, 1200)]), my_snapshots: () => ok([]) });
+    const net = server({ high_scores_page: () => ok([row(5, 1200)]), my_snapshots: () => ok([]) });
     const got = await loadHighScores(net.deps, true);
     expect(got.scores!.map((s) => s.id)).toEqual(['5']);
-    expect(net.calls.find((x) => x.path === 'high_scores')!.body).toEqual({
-      k: 100,
+    expect(net.calls.find((x) => x.path === 'high_scores_page')!.body).toMatchObject({
       save_version: SAVE_VERSION,
       outdated: true,
     });
@@ -495,38 +528,45 @@ describe('the high scores', () => {
   it('is an empty list when no one has fought, null when the rivals cannot be reached, and a list without marks when the player’s snapshots cannot be read', async () => {
     browser();
     const empty = await loadHighScores(
-      server({ high_scores: () => ok([]), my_snapshots: () => ok([]) }).deps,
+      server({ high_scores_page: () => ok([]), my_snapshots: () => ok([]) }).deps,
     );
     expect(empty.scores).toEqual([]);
     const offline = await loadHighScores(server({}).deps);
     expect(offline.scores).toBeNull();
     expect(offline.mine.size).toBe(0);
-    const noMine = await loadHighScores(server({ high_scores: () => ok([row(7, 900)]) }).deps);
+    const noMine = await loadHighScores(server({ high_scores_page: () => ok([row(7, 900)]) }).deps);
     expect(noMine.scores).toHaveLength(1);
     expect(noMine.mine.size).toBe(0);
   });
 
-  it('on the end screen, the player’s character is the run’s own newest snapshot, and no other', async () => {
+  it('on the end screen: the top rows, the run’s own newest snapshot and the rows around it, and no other snapshot', async () => {
     browser();
     const { run } = opened();
-    const got = await loadStanding(
-      run,
-      server({
-        high_scores: () => ok([row(7, 900)]),
-        my_snapshots: () => ok([snapshotRow(run, { id: 8 })]),
-      }).deps,
-    );
-    expect(got.scores!.map((s) => s.id)).toEqual(['7']);
-    expect(got.me?.id).toBe('8');
+    const net = server({
+      high_scores_page: () => ok(rows(1, 5)),
+      high_score_standing: () => ok(rows(40, 5)),
+      my_snapshots: () => ok([snapshotRow(run, { id: 42 })]),
+    });
+    const got = await loadStanding(run, 5, 2, net.deps);
+    expect(got.top!.map((s) => s.rank)).toEqual([1, 2, 3, 4, 5]);
+    expect(got.near.map((s) => s.rank)).toEqual([40, 41, 42, 43, 44]);
+    expect(got.me?.id).toBe('42');
+    expect(net.calls.find((x) => x.path === 'high_score_standing')!.body).toEqual({
+      snapshot_id: 42,
+      span: 2,
+    });
     const other = await loadStanding(
       run,
+      5,
+      2,
       server({
-        high_scores: () => ok([]),
+        high_scores_page: () => ok([]),
         my_snapshots: () => ok([snapshotRow(run, { id: 8, level: run.build.level + 1 })]),
       }).deps,
     );
     expect(other.me).toBeNull();
-    const offline = await loadStanding(run, server({}).deps);
-    expect(offline).toEqual({ scores: null, me: null });
+    expect(other.near).toEqual([]);
+    const offline = await loadStanding(run, 5, 2, server({}).deps);
+    expect(offline).toEqual({ top: null, near: [], me: null });
   });
 });

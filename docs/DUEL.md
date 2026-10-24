@@ -461,8 +461,13 @@ empty or unreachable pool, is dropped (an empty pool is a line and Back). Diffic
 - **High scores on a run's end screen** (`src/ui/Leaderboard.tsx`, 2026-10-23): at the foot of the summary, the top five of
   this version's list, then the two rows either side of the run's own character (its newest snapshot, when it is the run's) with a
   gap between when they do not meet, and "Your rank: #N". A character not yet rated is placed by its rating without a rank
-  ("Unranked until your first rated duel"); one below the hundred rows `high_scores` returns reads "below #100". It is read again
-  each time the summary opens (so after every duel) and when the post lands.
+  ("Unranked until your first rated duel"). It is read again each time the summary opens (so after every duel) and when the post
+  lands.
+- **Paging** (2026-10-23, `docs/rivals.sql` 15c): the screens never read the whole list. `high_scores_page(save_version,
+outdated, start, k)` gives a page (at most 100 rows) with each row's rank, and the High scores screen asks for fifty at a time
+  with Show more; `high_score_standing(snapshot_id, span)` gives the rows within `span` ranks of a snapshot (or of where its rating
+  would stand), which is all the end screen reads besides the top five. Both rank by rating, wins, the older snapshot, then the
+  id; a partial index (`rivals_board_idx`) serves the order. `high_scores` stays for older builds.
 - **Camp** (later, out of this plan): the same screens from a "Spar" button, with the character as it stands.
 
 In-game text: a card says who the rival is and what they reached; the result says what the fight counted for, who won, how, and the

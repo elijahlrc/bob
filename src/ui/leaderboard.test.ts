@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import type { HighScore, MySnapshot } from '../run/rivals';
 import { boardOf, type Board } from './Leaderboard';
 
-/** The end screen's slice of the high scores: the top, the rows around the player's character, and its rank. */
+/**
+ * The end screen's slice of the high scores: the top, the rows around the player's character, and its rank. `served` answers as
+ * the two database functions do (docs/rivals.sql 15c): the top five, and the rows within two ranks of the character.
+ */
 
 const score = (id: number, rating: number, wins = 1): HighScore => ({
   id: String(id),
@@ -32,17 +35,33 @@ const mine = (id: number, rating: number, fights = 2, wins = 1): MySnapshot => (
   fights,
   wins,
 });
+
+/** What the server gives for `board` (in rank order, the player's character in it once rated) and the character. */
+function served(board: HighScore[], me: MySnapshot | null, span = 2) {
+  const ranked = board.map((s, i) => ({ ...s, rank: i + 1 }));
+  const top = ranked.slice(0, 5);
+  if (!me) return boardOf(top, [], null);
+  const at = ranked.findIndex((s) => s.id === me.id);
+  const ahead =
+    at >= 0
+      ? at
+      : ranked.filter((s) => s.rating > me.rating || (s.rating === me.rating && s.wins >= me.wins))
+          .length;
+  const hi = ahead + span + (at >= 0 ? 1 : 0);
+  const near = ranked.filter((s) => s.rank >= ahead + 1 - span && s.rank <= hi);
+  return boardOf(top, near, me);
+}
 const shown = (b: Board) => b.rows.map((r) => (r === null ? '…' : `${r.rank ?? '-'}:${r.id}`));
 
 describe('the high scores on the end screen', () => {
   it('shows the top five when the player has no character there', () => {
-    const b = boardOf(list(20), null);
+    const b = served(list(20), null);
     expect(shown(b)).toEqual(['1:1', '2:2', '3:3', '4:4', '5:5']);
     expect(b.standing).toBeNull();
   });
 
   it('shows the top, a gap, and the two either side of the player’s character, with its rank', () => {
-    const b = boardOf(list(30), mine(12, 890));
+    const b = served(list(30), mine(12, 890));
     expect(shown(b)).toEqual([
       '1:1',
       '2:2',
@@ -61,7 +80,7 @@ describe('the high scores on the end screen', () => {
   });
 
   it('joins the two when they meet', () => {
-    expect(shown(boardOf(list(30), mine(6, 950)))).toEqual([
+    expect(shown(served(list(30), mine(6, 950)))).toEqual([
       '1:1',
       '2:2',
       '3:3',
@@ -71,11 +90,24 @@ describe('the high scores on the end screen', () => {
       '7:7',
       '8:8',
     ]);
-    expect(shown(boardOf(list(3), mine(2, 990)))).toEqual(['1:1', '2:2', '3:3']);
+    expect(shown(served(list(3), mine(2, 990)))).toEqual(['1:1', '2:2', '3:3']);
+  });
+
+  it('ranks a character far down a long list, the rows around it read by rank and not by the whole list', () => {
+    const b = served(list(5000), mine(4321, 1000 - 4320 * 10));
+    expect(b.standing).toBe(4321);
+    expect(shown(b).slice(5)).toEqual([
+      '…',
+      '4319:4319',
+      '4320:4320',
+      '4321:4321',
+      '4322:4322',
+      '4323:4323',
+    ]);
   });
 
   it('places a character not yet rated where its rating stands, without a rank, and moves no one', () => {
-    const b = boardOf(list(30), mine(99, 905, 0));
+    const b = served(list(30), mine(99, 905, 0));
     expect(b.standing).toBe('unrated');
     expect(shown(b)).toEqual([
       '1:1',
@@ -92,20 +124,10 @@ describe('the high scores on the end screen', () => {
     ]);
   });
 
-  it('a rated character missing from a short list is ranked where it falls, and those below move down', () => {
-    const b = boardOf(list(10), mine(99, 975));
-    expect(b.standing).toBe(4);
-    expect(shown(b)).toEqual(['1:1', '2:2', '3:3', '4:99', '5:4', '6:5']);
-  });
-
-  it('ties go to the one with more wins, then to the older', () => {
-    expect(boardOf([score(1, 900, 3), score(2, 900, 1)], mine(9, 900, 2, 2)).standing).toBe(2);
-    expect(boardOf([score(1, 900, 2)], mine(9, 900, 2, 2)).standing).toBe(2);
-  });
-
-  it('a character below the full list has no rank and is shown after a gap', () => {
-    const b = boardOf(list(100), mine(999, 1));
-    expect(b.standing).toBe('below');
-    expect(shown(b)).toEqual(['1:1', '2:2', '3:3', '4:4', '5:5', '…', '-:999']);
+  it('a character not yet rated comes after those it ties with, ahead of those with fewer wins', () => {
+    const board = [score(1, 900, 3), score(2, 900, 2), score(3, 900, 1)];
+    expect(shown(served(board, mine(9, 900, 0, 2)))).toEqual(['1:1', '2:2', '-:9', '3:3']);
+    expect(shown(served(list(2), mine(9, 1, 0)))).toEqual(['1:1', '2:2', '-:9']);
+    expect(shown(served([], mine(9, 100, 0)))).toEqual(['-:9']);
   });
 });

@@ -1,8 +1,9 @@
 import type { Controller, DuelMode, DuelOutcome } from './run/controller';
 import {
-  fetchHighScoresOrNull,
+  fetchHighScoresPage,
   fetchMySnapshots,
   fetchRivalsOrNull,
+  fetchStanding,
   hashToken,
   matchesRun,
   nameRefused,
@@ -344,50 +345,76 @@ export async function reportDuel(
 // ---------------------------------------------------------------------------------------------------------------------------
 // The high scores
 
+/** How many rows the High scores screen asks for at a time. */
+export const HIGH_SCORES_PAGE = 50;
+
 /**
- * The top of the list (`high_scores`, at most 100) and the ids of the caller's own snapshots in it (`my_snapshots`), so that a
- * screen can mark the player's rows. The list is of this save version's characters, the ones that can be fought, or with
- * `outdated` of older versions'. `scores` is null when the rivals could not be reached; `mine` is empty when the player's
- * snapshots could not be read (the list is shown without the marks).
+ * A page of the high scores (`high_scores_page`, from rank `start + 1`), whether there are more after it, and with the first page
+ * the ids of the caller's own snapshots (`my_snapshots`), so that a screen can mark the player's rows. The list is of this save
+ * version's characters, the ones that can be fought, or with `outdated` of older versions'. `scores` is null when the rivals could
+ * not be reached; `mine` is empty when the player's snapshots could not be read (the list is shown without the marks) and on
+ * later pages.
  */
 export async function loadHighScores(
   deps: () => RivalDeps = realDeps,
   outdated = false,
-): Promise<{ scores: HighScore[] | null; mine: Set<string> }> {
+  start = 0,
+): Promise<{ scores: HighScore[] | null; mine: Set<string>; more: boolean }> {
   try {
     const d = deps();
-    const tokenHash = await hashToken(rivalToken());
-    const [scores, rows] = await Promise.all([
-      fetchHighScoresOrNull(d.fetch, d.sink, 100, { saveVersion: SAVE_VERSION, outdated }),
-      fetchMySnapshots(d.fetch, d.sink, tokenHash),
-    ]);
-    return { scores, mine: new Set((rows ?? []).map((r) => r.id)) };
+    // One row past the page says whether there is another.
+    const page = fetchHighScoresPage(d.fetch, d.sink, {
+      saveVersion: SAVE_VERSION,
+      outdated,
+      start,
+      k: HIGH_SCORES_PAGE + 1,
+    });
+    const own =
+      start === 0
+        ? hashToken(rivalToken()).then((h) => fetchMySnapshots(d.fetch, d.sink, h))
+        : Promise.resolve(null);
+    const [rows, mine] = await Promise.all([page, own]);
+    return {
+      scores: rows ? rows.slice(0, HIGH_SCORES_PAGE) : null,
+      mine: new Set((mine ?? []).map((r) => r.id)),
+      more: (rows?.length ?? 0) > HIGH_SCORES_PAGE,
+    };
   } catch {
-    return { scores: null, mine: new Set() };
+    return { scores: null, mine: new Set(), more: false };
   }
 }
 
 /**
- * The high scores for a run's end screen: the top of this version's list and the run's own character in it (the newest snapshot of
- * this save version, if it is the run's), once any post still on its way has landed. `scores` is null when the rivals could not be
- * reached; `me` is null when the character was not sent or the player's snapshots could not be read.
+ * The high scores for a run's end screen, once any post still on its way has landed: the top `top` rows of this version's list,
+ * the run's own character (the newest snapshot of this save version, if it is the run's) and the rows within `span` ranks of it.
+ * `top` is null when the rivals could not be reached; `me` is null when the character was not sent or the player's snapshots could
+ * not be read, and `near` is then empty.
  */
 export async function loadStanding(
   run: RunState,
+  top: number,
+  span: number,
   deps: () => RivalDeps = realDeps,
-): Promise<{ scores: HighScore[] | null; me: MySnapshot | null }> {
+): Promise<{ top: HighScore[] | null; near: HighScore[]; me: MySnapshot | null }> {
   try {
     await (pendingPost(run) ?? Promise.resolve());
     const d = deps();
     const tokenHash = await hashToken(rivalToken());
-    const [scores, rows] = await Promise.all([
-      fetchHighScoresOrNull(d.fetch, d.sink, 100, { saveVersion: SAVE_VERSION, outdated: false }),
+    const [first, rows] = await Promise.all([
+      fetchHighScoresPage(d.fetch, d.sink, {
+        saveVersion: SAVE_VERSION,
+        outdated: false,
+        start: 0,
+        k: top,
+      }),
       fetchMySnapshots(d.fetch, d.sink, tokenHash),
     ]);
     const newest = (rows ?? []).find((r) => r.saveVersion === SAVE_VERSION);
-    return { scores, me: newest && matchesRun(newest, run) ? newest : null };
+    const me = newest && matchesRun(newest, run) ? newest : null;
+    const near = me ? ((await fetchStanding(d.fetch, d.sink, me.id, span)) ?? []) : [];
+    return { top: first, near, me };
   } catch {
-    return { scores: null, me: null };
+    return { top: null, near: [], me: null };
   }
 }
 
