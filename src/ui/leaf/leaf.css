@@ -39,6 +39,11 @@ html.leaf {
   --text-shadow: 0 2px 0 var(--ink);
   color-scheme: dark;
 }
+/* The paintings are drawn at half size and doubled: kept as hard pixels everywhere (the camp's screens, the map's HUD,
+   dialogs), never smoothed. */
+html.leaf #ui {
+  image-rendering: pixelated;
+}
 html.leaf .screen {
   background-color: #ad8b40;
   image-rendering: pixelated;
@@ -71,6 +76,7 @@ html.leaf .btn {
   color: var(--pearl);
   font-size: var(--size);
   line-height: 1.2;
+  line-height: round(1.2em, 1px);
   padding: 11px 22px 12px;
   text-shadow: var(--text-shadow);
   cursor: pointer;

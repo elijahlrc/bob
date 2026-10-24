@@ -1,9 +1,15 @@
 /* Gold Leaf: the map's HUD (src/ui/Hud.tsx, SkillBar.tsx; docs/mockups/style/STYLE-GUIDE.md). The map stays in view:
-   no gold wall, only a few painted things that keep their size for the whole map (the orbs' medallions, the dock of
-   flasks and skills, the biome banner, the inspect card, the buttons). What changes while playing is styled here alone,
+   no gold wall and no plates behind the play UI, only a few painted things that keep their size for the whole map (the
+   orbs' medallions, the flasks, the biome banner, the inspect card, the buttons). What changes while playing is styled here alone,
    in the small-bar look (lapis texture, a gold ring, a hard shadow), and sits inside data-nopaint. Overrides the old
    HUD rules of styles.css, fonts.css and mobile.css. */
 
+/* Line heights in whole pixels, so every box of the HUD sits on the pixel grid (a 20.4 px line blurs the paintings
+   under and after it). A rule below that sets its own wins. */
+html.leaf .hud,
+html.leaf .hud * {
+  line-height: round(1.2em, 1px);
+}
 html.leaf .hud {
   color: var(--pearl);
   font-size: var(--size);
@@ -37,12 +43,18 @@ html.leaf .hud-top {
   display: block;
   max-width: calc(100% - 290px);
   box-sizing: border-box;
-  padding: 6px 16px 7px;
+  padding: 0 4px;
   font-size: var(--size);
   line-height: 1.2;
-  background: var(--t-lapis, #172049);
-  box-shadow: var(--ring);
-  text-shadow: var(--text-shadow);
+  line-height: round(1.2em, 1px);
+  /* Straight on the map, no strip behind it (the owner, 2026-10-24): an ink outline keeps it legible. */
+  background: none;
+  box-shadow: none;
+  text-shadow:
+    0 2px 0 var(--ink),
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink),
+    0 -2px 0 var(--ink);
 }
 html.leaf .hud-top-row {
   display: flex;
@@ -103,6 +115,8 @@ html.leaf .hud-reprieve.used {
 /* A duel's reprieves: a gold pip each, a hollow one once used. */
 html.leaf .reprieve-pips {
   gap: 6px;
+  /* Flush like the other items, or the lozenge before it slips out from under the clip at a line's start. */
+  margin-left: 0;
 }
 html.leaf .reprieve-pips .pip {
   width: 10px;
@@ -165,6 +179,7 @@ html.leaf .boss-bar-name {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10px;
   font: 400 var(--head-size) / 1 var(--title-font);
   font-size-adjust: none;
   letter-spacing: 0;
@@ -288,16 +303,20 @@ html.leaf .orb-text {
   text-shadow: var(--text-shadow);
 }
 
-/* The dock: one lapis plate for the flasks and the skills (painted once; its size holds for the map). */
+/* The dock: the flasks and the skills in a row, straight on the map (no plate behind them). */
+/* Room under the last row for a count hung below a slot. */
+html.leaf .hud-dock:has(.skill-badge) {
+  padding-bottom: 18px;
+}
 html.leaf .hud-dock {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 14px 22px;
-  max-width: min(760px, 100%);
+  max-width: 100%;
   box-sizing: border-box;
-  padding: 16px 22px 18px;
+  padding: 0;
   pointer-events: auto;
 }
 
@@ -378,7 +397,7 @@ html.leaf .flask[data-st~='sealed'] {
 /* ---- Skills: each a stone in a gold setting, tinted with its look colour (--c); all CSS, they change every frame ---- */
 html.leaf .skillbar {
   gap: 18px 12px;
-  max-width: 560px;
+  max-width: none;
   padding: 4px;
 }
 html.leaf .skill {
@@ -492,6 +511,7 @@ html.leaf .hexchip {
   border-radius: 0;
   font-size: var(--size);
   line-height: 1.1;
+  line-height: round(1.1em, 1px);
   color: var(--pearl);
   background: #381a2a;
   box-shadow: var(--ring);
@@ -499,9 +519,9 @@ html.leaf .hexchip {
 html.leaf .charge {
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: var(--t-lapis, #172049);
-  box-shadow: var(--ring);
+  padding: 4px 2px;
+  background: none;
+  box-shadow: none;
 }
 html.leaf .charge .pip {
   width: 10px;
@@ -550,6 +570,7 @@ html.leaf .inspect {
   color: var(--pearl);
   font-size: var(--size);
   line-height: 1.3;
+  line-height: round(1.3em, 1px);
   text-shadow: var(--text-shadow);
 }
 html.leaf .inspect-x {
@@ -663,7 +684,15 @@ html.leaf .speeds .btn.small {
   }
   html.leaf .hud-top {
     max-width: 100%;
-    padding: 5px 12px 6px;
+    padding: 0 4px;
+  }
+  /* The boss's or the rival's bar and the boss's words are centred on the screen, not in the head (which keeps clear of
+     the speed column): as far in from the left as the column takes on the right. */
+  html.leaf .boss-bars,
+  html.leaf .boss-line {
+    align-self: stretch;
+    width: auto;
+    margin-left: 52px;
   }
   html.leaf .hud-top-row > span::before {
     margin: 0 9px 0 21px;
@@ -699,12 +728,32 @@ html.leaf .speeds .btn.small {
   html.leaf .orb-text {
     font-size: 24px;
   }
+  html.leaf .hud-bottom {
+    gap: 8px;
+  }
   html.leaf .hud-center {
     flex: 1 1 0;
+    gap: 10px;
   }
+  /* Five skills to a row: a row of ten in two, not four rows of three. */
   html.leaf .hud-dock {
-    gap: 10px 8px;
-    padding: 12px 8px 18px;
+    gap: 10px 6px;
+  }
+  html.leaf .flasks {
+    gap: 6px;
+  }
+  /* Ailments and charges may run wider than the dock, centred on it, so two sit on one line. */
+  html.leaf .charges {
+    align-self: center;
+    justify-content: center;
+    width: calc(100vw - 24px);
+    gap: 6px;
+  }
+  html.leaf .hexchip {
+    padding: 4px 8px 5px;
+  }
+  html.leaf .charge {
+    padding: 6px 8px;
   }
   html.leaf .flask {
     width: 32px;
@@ -720,16 +769,20 @@ html.leaf .speeds .btn.small {
     bottom: 6px;
     height: 20px;
   }
+  /* The row gap leaves room for a count hung below a slot (it would cover the slot under it). */
   html.leaf .skillbar {
-    gap: 16px 8px;
-    padding: 4px 0;
+    gap: 22px 4px;
+    padding: 0;
+  }
+  html.leaf .skillbar:not(:has(.skill-badge)) {
+    row-gap: 8px;
   }
   html.leaf .skill {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
   }
   html.leaf .skill-init {
-    font-size: 22px;
+    font-size: 20px;
   }
   /* Over the abandon and showcase column while it is open; its × closes it. */
   html.leaf .inspect {

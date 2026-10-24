@@ -65,9 +65,10 @@ function makeShared() {
     return age(cv, rng(seed), { wrapX: true, wrapY: true, ...o }).toDataURL();
   };
   const root = document.documentElement.style;
+  // The lapis texture is under text wherever it is used (the status line, tips, bars): mottled, never flaked or cracked.
   root.setProperty(
     '--t-lapis',
-    `url(${tile('lapis', 3, 96, 96, 12, { loss: 0.02, cracks: 2, texture: 0.6 })}) 0 0 / ${96 * P}px ${96 * P}px`,
+    `url(${tile('lapis', 3, 96, 96, 12, { loss: 0, cracks: 0, texture: 0.6 })}) 0 0 / ${96 * P}px ${96 * P}px`,
   );
   root.setProperty(
     '--t-green',
@@ -179,6 +180,15 @@ function draw(
       edgeReach: 6,
       goldLoss: 0.08,
       shadow: true,
+      // A medallion carries a number or a word across its middle: no flakes or cracks under it.
+      calm: [
+        {
+          x: Math.round(S * 0.15),
+          y: Math.round(S * 0.28),
+          w: Math.round(S * 0.7),
+          h: Math.round(S * 0.44),
+        },
+      ],
     }).toDataURL();
   }
   if (kind === 'mix') {

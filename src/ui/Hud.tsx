@@ -64,7 +64,8 @@ function Orb(props: {
       )}
     >
       <div class="orb-glass" data-nopaint>
-        <div class="orb-empty" style={{ height: `${100 - pct}%` }} />
+        {/* Its top edge is the level line: none on a full orb. */}
+        {pct < 100 && <div class="orb-empty" style={{ height: `${100 - pct}%` }} />}
         {esPct > 0 && <div class="orb-es" style={{ height: `${esPct}%` }} />}
         {resPct > 0 && <div class="orb-reserved" style={{ height: `${resPct}%` }} />}
       </div>
@@ -678,7 +679,7 @@ export function Hud({ c }: { c: Controller }) {
         />
         <div class="hud-center">
           <Charges w={w} />
-          <div class="hud-dock" data-paint="panel">
+          <div class="hud-dock">
             {flasks.length > 0 && (
               <div class="flasks">
                 {flasks.map((f, i) => {
