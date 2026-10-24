@@ -24,6 +24,15 @@ import './ui/sheet.css';
 import './ui/report.css';
 import './ui/rivals.css';
 import './ui/wayside.css';
+// Gold Leaf, the interface's look, after everything it restyles (docs/mockups/style/STYLE-GUIDE.md).
+import './ui/leaf/leaf.css';
+import './ui/leaf/camp.css';
+import './ui/leaf/camp-extra.css';
+import './ui/leaf/items.css';
+import './ui/leaf/skills.css';
+import './ui/leaf/screens.css';
+import './ui/leaf/hud.css';
+import { startPainter } from './ui/leaf/painter';
 
 function storage(): Storage | null {
   try {
@@ -42,6 +51,8 @@ installRivals(controller);
 installUpdateCheck(controller);
 const game = createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
+document.documentElement.classList.add('leaf');
+startPainter();
 
 // Dev-only handle for debugging from the browser console.
 if (import.meta.env.DEV) (window as unknown as { __bob: Controller }).__bob = controller;

@@ -10,6 +10,21 @@ const f1 = (v: number) => (Math.round(v * 10) / 10).toLocaleString();
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 const times = (v: number) => `×${v.toFixed(2)}`;
 
+/** The ramp each medallion is painted in (leaf/ramps.ts), by its class. */
+const FIELD: Record<string, string> = {
+  'cs-life': 'vermilion,4',
+  'cs-es': 'sky,4',
+  'cs-mana': 'lapis,4',
+  'cs-str': 'vermilion,3',
+  'cs-dex': 'green,4',
+  'cs-int': 'lapis,5',
+  'cs-res-fire': 'vermilion,5',
+  'cs-res-cold': 'teal,4',
+  'cs-res-lightning': 'straw,4',
+  'cs-res-chaos': 'porphyry,4',
+};
+const POOLS = new Set(['cs-life', 'cs-es', 'cs-mana']);
+
 /** The resistances in the order the tiles show them: index into `res` / `maxRes`, name, and colour class. */
 const RES: [number, string, string][] = [
   [3, 'Fire', 'fire'],
@@ -20,7 +35,7 @@ const RES: [number, string, string][] = [
 
 function Row({ label, value, raw }: { label: string; value: string; raw?: string }) {
   return (
-    <div class="cs-row">
+    <div class={'cs-row' + (value === '×1.00' ? ' def' : '')}>
       <span class="cs-label">{label}</span>
       <span class="cs-value">
         {raw && <span class="cs-raw">{raw}</span>}
@@ -68,7 +83,7 @@ function Section({ title, children }: { title: string; children: ComponentChildr
   if (rows.length === 0) return null;
   return (
     <section class="cs-section">
-      <h4>{title}</h4>
+      <h4 class="lf-h">{title}</h4>
       {rows}
     </section>
   );
@@ -99,16 +114,30 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   const life = plain(pools, 'life');
   const es = plain(pools, 'es');
   const mana = plain(pools, 'mana');
-  /** A tile of a group at the top: name, value, and what is under it (the whole of a pool, a pool's multiplier). */
-  const tile = (label: string, value: string, notes: (string | false)[] = [], cls = '') => (
-    <div key={label} class={`cs-tile ${cls}`}>
-      <span class="cs-label">{label}</span>
-      <b>{value}</b>
-      {notes.filter((n) => n).length > 0 && (
-        <span class="cs-raw">{notes.filter((n) => n).join(' · ')}</span>
-      )}
-    </div>
-  );
+  /**
+   * A medallion of a group at the top: name and value inside, and what is under it (the whole of a pool, a pool's
+   * multiplier, a maximum) on a plaque hung from its foot. The pools are large, in wreaths.
+   */
+  const tile = (label: string, value: string, notes: (string | false)[] = [], cls = '') => {
+    const key = cls.split(' ')[0];
+    return (
+      <div
+        key={label}
+        class={`cs-tile ${cls}`}
+        data-paint="medal"
+        data-field={FIELD[key] ?? 'lapis,4'}
+        data-medal={(POOLS.has(key) ? 'wreath' : '') + (key === 'cs-mana' ? ' stars' : '')}
+      >
+        <span class="cs-label">{label}</span>
+        <b>{value}</b>
+        {notes.filter((n) => n).length > 0 && (
+          <span class="cs-raw" data-paint="panel" data-thin>
+            {notes.filter((n) => n).join(' · ')}
+          </span>
+        )}
+      </div>
+    );
+  };
   return (
     <div class="cs">
       <div class="cs-top">
@@ -144,7 +173,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
         </div>
       </div>
       <div class="cs-cols">
-        <div class="cs-col">
+        <div class="cs-col lf-panel" data-paint="panel">
           <Section title="Life and Mana">
             {pools.filter((t) => t !== life && t !== es && t !== mana).map(totalRow)}
           </Section>
@@ -178,7 +207,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
           </Section>
         </div>
-        <div class="cs-col">
+        <div class="cs-col lf-panel" data-paint="panel">
           <Section title="Damage">{of('damage').map(totalRow)}</Section>
           <Section title="Speed">{of('speed').map(totalRow)}</Section>
           <Section title="Critical Strikes">{of('crit').map(totalRow)}</Section>
@@ -205,7 +234,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           ⚠ {w}
         </div>
       ))}
-      <div class="cs-est">
+      <div class="cs-est" data-paint="panel" data-field="porphyry" data-thin>
         <span>
           Estimated DPS <b>{f0(sc ? sc.pack : scenarioDps(s))}</b>
           {sc && sc.boss !== sc.pack && (

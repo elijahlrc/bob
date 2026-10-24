@@ -1,0 +1,275 @@
+/* Gold Leaf, the shared base (docs/mockups/style/STYLE-GUIDE.md). Loaded after every other stylesheet. The painter
+   (painter.ts) sets each painted element's background; these rules lay out and colour the text, and clear the old
+   borders, gradients and boxes the painting replaces. One body size (17 px Grenze), headings in Jacquard, secondary
+   lines differ by colour, never by size. html.leaf is set by the painter. */
+
+html.leaf {
+  --ink: #0b0805;
+  --gold: #c09d4e;
+  --gold-hi: #e2c681;
+  --pearl: #e6dfca;
+  --muted: #a8adc4;
+  --dim: #7c84a4;
+  --madder: #dca196;
+  --gain: #a3d293;
+  --on-gold: #1a1208;
+  --lapis: #1d2958;
+  --lapis-d: #0c1129;
+  --size: 17px;
+  --head-size: 28px;
+  /* The old theme's names, so what is not restyled yet still reads on lapis and gold. */
+  --text: var(--pearl);
+  --panel: #172049;
+  --panel2: #1d2958;
+  --btn: #1d2958;
+  --btn-h: #24336a;
+  --border: #c09d4e;
+  --border2: #7e622c;
+  --accent: #c09d4e;
+  --accent-d: #7e622c;
+  --hi: #e2c681;
+  --on-accent: #1a1208;
+  --side: #172049;
+  --screen: #ad8b40;
+  --screen-bg: #ad8b40;
+  --radius: 0;
+  --tree-bg: #0c1129;
+  /* A gold ring and a hard offset shadow: what an unpainted box (a bar, a field) wears instead of a border. */
+  --ring: 0 0 0 2px #c09d4e, 4px 5px 0 2px #0b080555;
+  --text-shadow: 0 2px 0 var(--ink);
+  color-scheme: dark;
+}
+html.leaf .screen {
+  background-color: #ad8b40;
+  image-rendering: pixelated;
+  color: var(--pearl);
+  font-size: var(--size);
+}
+html.leaf .muted,
+html.leaf .subtitle {
+  color: var(--muted);
+}
+html.leaf .notice {
+  color: var(--gold-hi);
+}
+html.leaf .warn {
+  color: var(--madder);
+}
+html.leaf ::selection {
+  background: #c09d4e88;
+}
+html.leaf * {
+  scrollbar-color: #c09d4e #0c1129;
+}
+
+/* ---- Buttons: painted plaques; the text sits on them with a hard shadow ---- */
+html.leaf .btn {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--pearl);
+  font-size: var(--size);
+  line-height: 1.2;
+  padding: 11px 22px 12px;
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+html.leaf .btn:hover:not(:disabled) {
+  background-color: transparent;
+  filter: brightness(1.18);
+}
+html.leaf .btn.small {
+  font-size: var(--size);
+  padding: 8px 16px 9px;
+}
+html.leaf .btn.on {
+  color: var(--on-gold);
+  text-shadow: none;
+}
+html.leaf .btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---- The camp: the tab band, the gold wall, the green footer ---- */
+html.leaf .camp .tabs {
+  position: relative;
+  gap: 4px;
+  padding: 8px 12px 0;
+  margin-bottom: 18px;
+  border: 0;
+  background-color: #1d2958;
+  box-shadow: 0 2px 0 var(--ink);
+  overflow: visible;
+}
+html.leaf .camp .tabs::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -16px;
+  height: 14px;
+  background: var(--s-triangles);
+  pointer-events: none;
+}
+html.leaf .camp.tabbed .tabs {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+html.leaf .tab {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 9px 16px 8px;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--muted);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+html.leaf .tab:hover:not(.on) {
+  color: var(--pearl);
+}
+html.leaf .tab.on {
+  color: var(--on-gold);
+  text-shadow: none;
+}
+html.leaf .camp .tab-body {
+  background: transparent;
+}
+html.leaf .camp-bar {
+  position: relative;
+  padding-top: 16px;
+  border-top: 0;
+  background-color: #2f5639;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .camp-bar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  background: var(--s-tiles);
+}
+html.leaf .camp-bar-who {
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+}
+
+/* ---- Fields, menus, checkboxes: lapis wells with a gold ring ---- */
+html.leaf input:not([type='checkbox'], [type='radio'], [type='range']),
+html.leaf select,
+html.leaf textarea {
+  background: var(--lapis-d);
+  color: var(--pearl);
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--ring);
+  font-size: var(--size);
+  padding: 8px 12px;
+  text-shadow: var(--text-shadow);
+}
+html.leaf input::placeholder {
+  color: var(--dim);
+}
+html.leaf select option {
+  background: var(--lapis);
+  color: var(--pearl);
+}
+html.leaf input[type='checkbox'] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin: 0 8px 0 2px;
+  vertical-align: -4px;
+  background: var(--lapis-d);
+  box-shadow: var(--ring);
+  cursor: pointer;
+}
+html.leaf input[type='checkbox']:checked {
+  background: radial-gradient(#e2c681 0 4px, #0c1129 5px);
+}
+html.leaf input:focus-visible,
+html.leaf select:focus-visible,
+html.leaf .btn:focus-visible,
+html.leaf .tab:focus-visible {
+  outline: 2px dashed var(--pearl);
+  outline-offset: 3px;
+}
+
+/* ---- Tooltips, the info layer and dialogs: lapis with a gold ring ---- */
+html.leaf .tooltip,
+html.leaf .info-pop,
+html.leaf .gem-tooltip {
+  background: var(--t-lapis, #172049);
+  color: var(--pearl);
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 0 0 2px #c09d4e,
+    5px 7px 0 2px #0b080566;
+  text-shadow: var(--text-shadow);
+  font-size: var(--size);
+}
+html.leaf .modal {
+  background: #0b0805aa;
+}
+html.leaf .modal-card {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 26px 30px 28px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+
+/* ---- Headings ---- */
+html.leaf h2,
+html.leaf h3 {
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 var(--ink);
+}
+/* A section heading on a lapis panel: Jacquard in gold, over the frieze the panel paints under it. */
+html.leaf .lf-h {
+  margin: 0 0 8px;
+  padding-bottom: 30px;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+  text-align: center;
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+/* ---- Small bars: lapis with a gold ring and a hard shadow ---- */
+html.leaf .bar,
+html.leaf .xp {
+  background: var(--t-lapis, #172049);
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--ring);
+}
+html.leaf .xp-fill {
+  background: #cec6ad;
+  border-radius: 0;
+}
+html.leaf .bar-text {
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+
+/* ---- Rarity in text ---- */
+html.leaf .magic {
+  color: #b9cbe6;
+}
+html.leaf .rare {
+  color: var(--gold-hi);
+}
+html.leaf .unique {
+  color: #e8a07c;
+}

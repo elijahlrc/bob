@@ -281,17 +281,21 @@ export function Camp({ c }: { c: Controller }) {
   const side = (
     <>
       <UpdateNotice />
-      <h2>Camp</h2>
-      <div>
-        {classDef(run.classId).name} · Level {run.build.level}
+      <div class="camp-head">
+        <h2>Camp</h2>
+        <div class="camp-who">
+          {classDef(run.classId).name} · Level {run.build.level}
+        </div>
+        <div class="xp">
+          <div
+            class="xp-fill"
+            style={{ width: `${Math.min(100, (run.xp / xpToNext(run.build.level)) * 100)}%` }}
+          />
+        </div>
+        <div class="nextmap" data-paint="panel" data-thin>
+          Next: map {run.map} of 100
+        </div>
       </div>
-      <div class="xp">
-        <div
-          class="xp-fill"
-          style={{ width: `${Math.min(100, (run.xp / xpToNext(run.build.level)) * 100)}%` }}
-        />
-      </div>
-      <div class="muted">Next: map {run.map} of 100</div>
       <Arriving run={run} />
       {run.offers.some((o) => o.kind === 'stop') && <Tip c={c} id="stop" />}
       <Satchel c={c} />
@@ -308,7 +312,7 @@ export function Camp({ c }: { c: Controller }) {
       )}
       {run.reward && <Reward c={c} />}
       {pts > 0 && (
-        <div class="notice">
+        <div class="notice" data-paint="panel" data-thin>
           You have {pts} unspent passive point{pts > 1 ? 's' : ''}.
         </div>
       )}
@@ -320,7 +324,15 @@ export function Camp({ c }: { c: Controller }) {
             if (o.kind === 'respite')
               return (
                 <div key={o.id} class="theme-wrap">
-                  <button class="btn theme respite" onClick={() => c.startMap(i)}>
+                  <button
+                    class="btn theme respite"
+                    data-paint="panel"
+                    data-field="green"
+                    data-arch
+                    data-pearls
+                    data-foot
+                    onClick={() => c.startMap(i)}
+                  >
                     <div class="theme-name">Respite</div>
                     <div class="muted">Level {o.areaLevel}</div>
                     <div class="affix">Life, mana, shield and flasks refilled.</div>
@@ -331,7 +343,15 @@ export function Camp({ c }: { c: Controller }) {
               const d = stopDef(o.stop!);
               return (
                 <div key={o.id} class="theme-wrap">
-                  <button class="btn theme stop-card" onClick={() => setStopSlot(i)}>
+                  <button
+                    class="btn theme stop-card"
+                    data-paint="panel"
+                    data-field="porphyry"
+                    data-arch
+                    data-pearls
+                    data-foot
+                    onClick={() => setStopSlot(i)}
+                  >
                     <div class="theme-name">{d.name}</div>
                     <div class="muted">Level {o.areaLevel}</div>
                     <div class="affix">{d.text}</div>
@@ -342,15 +362,24 @@ export function Camp({ c }: { c: Controller }) {
             const t = themeDef(o.themeId);
             return (
               <div key={o.id} class="theme-wrap">
-                <button class="btn theme" onClick={() => c.startMap(i)}>
+                <button
+                  class="btn theme"
+                  data-paint="panel"
+                  data-arch
+                  data-pearls
+                  data-foot
+                  onClick={() => c.startMap(i)}
+                >
                   <div class="theme-name">{t.name}</div>
                   <div class="muted">
                     Level {o.areaLevel}
                     {o.offset !== 0 && ` (${o.offset > 0 ? '+' : '−'}${Math.abs(o.offset)})`}
                   </div>
                   {o.type !== 'plain' && (
-                    <div class="affix" title={mapTypeDef(o.type).text}>
-                      <strong>{mapTypeDef(o.type).name}</strong>: {mapTypeDef(o.type).text}
+                    <div class="affix kind">
+                      <strong {...infoProps(mapTypeDef(o.type).text)}>
+                        {mapTypeDef(o.type).name}
+                      </strong>
                     </div>
                   )}
                   <Density d={densityFor(run.seed, o.id, run.map, o.type)} />
@@ -461,6 +490,7 @@ export function Camp({ c }: { c: Controller }) {
             Next map{run.reward ? ' (reward)' : ''}
           </button>
         </div>
+        <div class="tabs-trim" aria-hidden="true" />
         <div class="tab-body">
           {shown === 'tree' && <TreeView c={c} />}
           {shown === 'sheet' && <Sheet s={sheet} ch={ch} />}
@@ -538,8 +568,8 @@ function Density({ d }: { d: DensityId }) {
   if (d === 'standard') return null;
   const def = densityDef(d);
   return (
-    <div class="affix" title={def.text}>
-      <strong>{def.name}</strong>: {def.text}
+    <div class="affix kind">
+      <strong {...infoProps(def.text)}>{def.name}</strong>
     </div>
   );
 }

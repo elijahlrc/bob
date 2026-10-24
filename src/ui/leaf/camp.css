@@ -1,0 +1,249 @@
+/* Gold Leaf: the camp's Next map tab (Camp.tsx, OfferInfo.tsx). Offers are arched niches of equal height; the head is
+   dark Jacquard on the gold with the next map on a plaque; what a map pays is four fixed rows of pairs. */
+
+/* The trim under the tab band (its own element: the band scrolls sideways and would clip it). */
+html.leaf .camp .tabs {
+  margin-bottom: 0;
+}
+html.leaf .camp .tabs::after {
+  content: none;
+}
+html.leaf .tabs-trim {
+  flex: none;
+  height: 14px;
+  margin-bottom: 6px;
+  background: var(--s-triangles);
+  filter: drop-shadow(0 2px 0 #0b080566);
+}
+.tabs-trim {
+  display: none;
+}
+html.leaf .tabs-trim {
+  display: block;
+}
+
+html.leaf .camp-next {
+  padding: 16px 24px 28px;
+  gap: 14px;
+}
+html.leaf .camp-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+html.leaf .camp-next h2,
+html.leaf .camp-head h2 {
+  margin: 0;
+  font-size: 48px;
+  color: var(--on-gold);
+  text-shadow: 0 2px 0 #e2c68166;
+}
+html.leaf .camp-who {
+  color: #2e2010;
+  font-weight: 600;
+  text-shadow: none;
+}
+html.leaf .camp-head .xp {
+  width: min(420px, 90%);
+  height: 10px;
+  margin: 6px 0 10px;
+}
+html.leaf .nextmap {
+  padding: 8px 22px 9px;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .camp-next > .notice {
+  align-self: center;
+  padding: 10px 22px;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .camp-next > .muted {
+  align-self: center;
+  color: #2e2010;
+  font-weight: 600;
+}
+
+/* What the character carries into the next map */
+html.leaf .arriving {
+  align-self: center;
+  align-items: center;
+  gap: 18px;
+  max-width: 460px;
+  width: 100%;
+}
+html.leaf .arriving-bars {
+  gap: 10px;
+}
+html.leaf .arriving-bar {
+  height: 18px;
+}
+html.leaf .arriving-bar .bar-text {
+  font-size: 14px;
+  line-height: 18px;
+  padding-left: 6px;
+}
+html.leaf .arriving-life {
+  background: #8a3020;
+}
+html.leaf .arriving-mana {
+  background: #2f417e;
+}
+html.leaf .arriving-flasks {
+  gap: 10px;
+}
+html.leaf .arriving-flasks .flask-neck {
+  display: none;
+}
+html.leaf .arriving-flasks .flask-body {
+  width: 16px;
+  height: 30px;
+  border: 0;
+  border-radius: 0;
+  background: var(--t-lapis, #172049);
+  box-shadow: var(--ring);
+}
+
+/* The offers: arched niches */
+html.leaf .camp-next .theme-choice {
+  gap: 24px;
+  margin: 12px 0 6px;
+}
+html.leaf .theme-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html.leaf .btn.theme {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  min-height: 340px;
+  padding: 74px 26px 40px;
+  text-align: left;
+  white-space: normal;
+}
+html.leaf .btn.theme:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+html.leaf .theme-name {
+  font-size: 30px;
+  text-align: center;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .theme > .muted {
+  text-align: center;
+  color: var(--muted);
+  margin: 4px 0 12px;
+}
+html.leaf .theme .affix {
+  margin: 6px 0;
+  font-size: var(--size);
+  color: var(--madder);
+  padding-top: 10px;
+  background: var(--s-dots);
+  background-position: left top;
+  background-repeat: repeat-x;
+}
+html.leaf .theme .affix .muted {
+  color: var(--dim);
+}
+html.leaf .theme .affix.kind {
+  padding: 0;
+  background: none;
+  color: var(--pearl);
+}
+html.leaf .theme .affix.kind strong {
+  color: var(--gold-hi);
+  font-weight: 600;
+  border-bottom: 2px dotted #e2c68188;
+  cursor: help;
+}
+html.leaf .stop-card .affix,
+html.leaf .respite .affix {
+  text-align: center;
+  color: var(--pearl);
+  background: none;
+  padding: 0;
+  margin-top: 16px;
+}
+
+/* What a map pays: four short rows, the same on every card */
+html.leaf .offer-pays {
+  margin: 8px 0 12px;
+  line-height: 1.6;
+}
+html.leaf .pays-row {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+html.leaf .pay {
+  color: var(--muted);
+}
+html.leaf .pay.none {
+  color: var(--dim);
+}
+html.leaf .pay b {
+  font-weight: 400;
+  color: var(--gold-hi);
+}
+html.leaf .pay .gain,
+html.leaf .gain {
+  color: var(--gain);
+}
+html.leaf .pay-sep {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin: 0 10px;
+}
+
+/* Who is on the map: the armies on one line (a little smaller than body text, the one exception), the damage bar */
+html.leaf .offer-info {
+  gap: 10px;
+  margin: 8px 0 12px;
+  font-size: var(--size);
+}
+html.leaf .offer-info .chips.armies {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 0 10px;
+}
+html.leaf .offer-info .chip {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 15px;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .offer-info .mixbar {
+  height: 18px;
+  border-radius: 0;
+  background: none;
+}
+html.leaf .offer-info .gate {
+  color: var(--madder);
+}
+
+/* The foot: save and quit, abandon */
+html.leaf .camp-foot {
+  justify-content: center;
+  margin-top: 10px;
+}
+html.leaf .camp-foot .ui-scale {
+  color: #2e2010;
+  font-weight: 600;
+}
+html.leaf .camp-foot .warn {
+  color: var(--madder);
+}

@@ -225,3 +225,22 @@ edits on 2026-10-24: check `git status` and leave them be.)
 bag, `window.__dev.loot(40, 44)` in a run; it is saved into that run, so copy the `bob.save*` keys of localStorage first
 and put them back after. The pane stops running `requestAnimationFrame` while it is hidden, so a canvas may look stale
 in a screenshot taken then; screenshots also come out softer than the real pixels.
+
+### In the game (built 2026-10-24)
+
+- The painter is `src/ui/leaf/` (`ramps.ts`, `age.ts`, `shapes.ts`, `kinds.ts`, `painter.ts`), started from `src/main.ts`,
+  which also puts `leaf` on `<html>`. It repaints on DOM changes (throttled), resizes and font loads; anything inside
+  `[data-nopaint]` is skipped (a part that redraws itself constantly).
+- An element asks for a painting with `data-paint`:
+  - `panel` with `data-field` (a ramp: lapis, porphyry, vermilion, green, gold…), `data-thin` (plaques, buttons),
+    `data-arch`, `data-pearls`, `data-foot`, `data-rim`. A `.lf-h` heading inside a panel gets a frieze under it.
+  - `medal` with `data-field="ramp,step"` and `data-medal` ("wreath", "stars", "plain", "big").
+  - `mix` with `data-mix` (the damage-type bar), `gem` (`data-gem` str/dex/int/empty, `data-shape` skill/support,
+    `data-state` sel/target), `chain` (`data-dir="x"` for across), `glyph` (`data-glyph`), `bottle` (`data-liquid`,
+    `data-fill`), `slot` (`data-rar`, `data-glyph`, `data-sockets`, `data-state`), `soul` (`data-rows`), `sep`, `star`.
+  - `data-pk` adds to the cache key when the same element's look changes with state; `data-paint="none"` opts out.
+- Shared widgets need no markup: `.screen` (the wall), `.tabs`, `.camp-bar`, `.tab.on`, `.btn` (and `.primary`,
+  `.danger`, `.on`), `.modal-card` are matched in `JOBS`.
+- Base rules and variables (`--pearl`, `--gold-hi`, `--muted`, `--dim`, `--madder`, `--gain`, `--on-gold`, `--ring`,
+  `--text-shadow`, `--size`, `--head-size`) are in `src/ui/leaf/leaf.css`; border strips are CSS variables
+  (`--s-wave`, `--s-triangles`, `--s-tiles`, `--s-dots`) and the small-bar texture is `--t-lapis`.

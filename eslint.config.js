@@ -102,4 +102,38 @@ export default defineConfig(
       ],
     },
   },
+  {
+    // The style study (docs/mockups/style): plain scripts for a browser page, with the page's own globals.
+    files: ['docs/mockups/**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        location: 'readonly',
+        requestAnimationFrame: 'readonly',
+        ResizeObserver: 'readonly',
+        PointerEvent: 'readonly',
+        Path2D: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        structuredClone: 'readonly',
+        addEventListener: 'readonly',
+        paintLeaf: 'readonly',
+        LEAF_P: 'readonly',
+      },
+    },
+    // A prototype to look at, not code the game runs: the code-style rules are relaxed there.
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'no-empty': 'off',
+    },
+  },
+  {
+    files: ['docs/mockups/style/tree.js'],
+    languageOptions: { sourceType: 'module' },
+  },
 );
