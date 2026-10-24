@@ -349,7 +349,7 @@
     tree3: 90,
     vanguard: 150,
     skills: 60,
-    shade: 210,
+    shade: 270,
     equip: 45,
     strider: 90,
     reaver: 90,
@@ -358,7 +358,7 @@
     climb2: 45,
     climb4: 45,
     climb5: 45,
-    fall: 150,
+    fall: 170,
     summary: 36,
     duel: 106,
     result: 30,
@@ -367,9 +367,9 @@
   };
   /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame; picked by eye from the events */
   const IN = {
-    endgame: 37,
-    vanguard: 24,
-    shade: 129,
+    endgame: 62,
+    vanguard: 23,
+    shade: 179,
     strider: 0,
     reaver: 0,
     zealot: 16,
@@ -654,7 +654,7 @@
         }
         /* from "Slain on level 63" down to "Killed by the Tollkeeper" */
         /* held on its first frame until the duel button is pressed on 19.25 (the clip's frame 12) */
-        return crop(at('summary', lt - 3.35, -15), [100, 68, 1080, 607.5]);
+        return crop(at('summary', lt - 3.35, -15), [100, 14, 1080, 607.5]);
       },
     },
     {

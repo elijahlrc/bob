@@ -98,6 +98,9 @@ const tab = (t: Take, label: string) => t.page.click(`.tabs .tab:has-text("${lab
 /** The map's zoom of the climb, the fall and the duel, so that the cuts between them keep one scale. */
 const CLOSE = 3.2;
 
+/** A camp screen with more room than `UI` has (1138×640 drawn at 1.125×): the redesigned Skills and High scores screens need it. */
+const ROOMY = { w: 1138, h: 640, scale: 1.125 };
+
 /** Our character's name on the board and in the duel. */
 const ME = 'Morrow';
 
@@ -277,7 +280,7 @@ export const CLIPS: Clip[] = [
   /* 4a. The Shade's skills: Wired Harm into the trap's link, the damage jumps. */
   {
     name: 'skills',
-    viewport: UI,
+    viewport: ROOMY,
     // The gem in the bag, the empty socket and the number that moves (the damage medal) are all on screen at once. The gem and the
     // socket it goes to are lit, and an arrow runs from one to the other, before the gem is placed.
     css: `
@@ -470,7 +473,8 @@ export const CLIPS: Clip[] = [
         await t.still(1);
       }
     },
-    css: `.trailer-press { filter: brightness(1.5); transform: scale(0.96); }
+    css: `.ix-hint { display: none !important; }
+      .trailer-press { filter: brightness(1.5); transform: scale(0.96); }
       .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; border-color: #d98a3a !important; }`,
   },
 
@@ -591,7 +595,8 @@ export const CLIPS: Clip[] = [
   {
     name: 'summary',
     viewport: { w: 854, h: 480, scale: 3 },
-    css: `.duel-cta.trailer-press { filter: brightness(1.5); transform: scale(0.97); }`,
+    css: `.duel-cta.trailer-press { filter: brightness(1.5); transform: scale(0.97); }
+      .screen.summary .sum-medals, .screen.summary .menu.row { display: none !important; }`,
     async film(t) {
       await t.stage((S, c, _game, fallen) => {
         const run = S.stagedRun(fallen, 63);
@@ -709,7 +714,7 @@ export const CLIPS: Clip[] = [
   /* 9. The board: Sin on top; our row climbs past two. */
   {
     name: 'board',
-    viewport: UI,
+    viewport: ROOMY,
     routes: async (page) => {
       await page.route('**/rest/v1/rpc/high_scores_page', (r: any) =>
         r.fulfill({
@@ -730,7 +735,8 @@ export const CLIPS: Clip[] = [
       );
       await page.route('**/rest/v1/rpc/my_snapshots', (r: any) => r.fulfill({ json: [] }));
     },
-    css: `tr.trailer-me td { background: #d98a3a !important; color: #0f1016 !important; font-weight: 700; }`,
+    css: `.lf-back, .hs-older-check { display: none !important; }
+      tr.trailer-me td { background: #d98a3a !important; color: #0f1016 !important; font-weight: 700; }`,
     async film(t) {
       await t.stage((_S, c) => c.goTo('highScores'));
       await t.page.waitForTimeout(800);
