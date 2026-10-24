@@ -11,9 +11,12 @@
     margin: 0;
     background: transparent;
   }
+  /* Every painting is drawn at half size and doubled with hard pixels, inside the wall or not (the embed's alcove sits
+     beside it); a framed shot sets its own scaling back to smooth. */
   #c {
     position: relative;
     overflow: hidden;
+    image-rendering: pixelated;
     box-sizing: border-box;
     font-family: 'Grenze', Georgia, serif;
     color: var(--pearl);
