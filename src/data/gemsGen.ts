@@ -268,7 +268,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Withering Breath',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'chaos', 'channelling', 'duration'],
+    tags: ['spell', 'area', 'chaos', 'channelling', 'duration', 'dot'],
     types: ['totemable', 'damageOverTime'],
     behaviour: {
       kind: 'beam',
@@ -697,7 +697,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Rime Splinter',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'melee', 'cold'],
+    tags: ['attack', 'projectile', 'melee', 'cold', 'strike'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -1717,7 +1717,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Storm Arrow',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'area', 'lightning', 'bow'],
+    tags: ['attack', 'projectile', 'lightning', 'bow', 'chaining'],
     types: ['totemable', 'trappable', 'mineable', 'volleyable', 'triggerable'],
     behaviour: {
       kind: 'projectile',
@@ -1781,7 +1781,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Crackle Ring',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'lightning', 'channelling'],
+    tags: ['spell', 'area', 'lightning', 'channelling', 'nova'],
     types: ['totemable'],
     behaviour: {
       kind: 'burst',
@@ -1845,7 +1845,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Tempest Mote',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'lightning', 'duration'],
+    tags: ['spell', 'area', 'lightning', 'duration', 'chaining'],
     types: ['orb', 'totemable', 'trappable', 'mineable', 'repeatable', 'triggerable'],
     behaviour: {
       kind: 'burst',
@@ -1934,7 +1934,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Venom Strike',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'strike', 'area', 'chaos', 'duration'],
+    tags: ['attack', 'melee', 'strike', 'chaos', 'duration'],
     types: ['repeatable', 'damageOverTime'],
     behaviour: {
       kind: 'melee',
@@ -2121,7 +2121,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Searing Lance',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'fire', 'channelling', 'duration'],
+    tags: ['spell', 'fire', 'channelling', 'duration', 'dot'],
     types: ['totemable', 'damageOverTime'],
     behaviour: {
       kind: 'beam',
@@ -2477,7 +2477,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Snare Shot',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'area', 'bow'],
+    tags: ['attack', 'projectile', 'bow'],
     types: ['totemable', 'trappable', 'mineable', 'volleyable', 'triggerable'],
     behaviour: {
       kind: 'projectile',
@@ -2545,7 +2545,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Iron Rebuke',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'melee'],
+    tags: ['attack', 'melee', 'strike'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -2668,7 +2668,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Slag Lob',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'projectile', 'area', 'fire', 'chaining'],
+    tags: ['spell', 'projectile', 'area', 'fire'],
     types: ['totemable', 'trappable', 'mineable', 'repeatable', 'triggerable'],
     behaviour: {
       kind: 'projectile',
@@ -4361,7 +4361,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Bulwark Rush',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'movement', 'physical'],
+    tags: ['attack', 'melee', 'movement', 'physical', 'area'],
     types: ['repeatable'],
     needsShield: true,
     travel: 6,
@@ -4597,7 +4597,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Blessed Trail',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'movement', 'area', 'fire'],
+    tags: ['attack', 'melee', 'movement', 'area', 'fire', 'slam', 'duration'],
     types: ['repeatable'],
     travel: 7,
     run: {
@@ -4636,7 +4636,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Snag Lash',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'area'],
+    tags: ['attack', 'melee', 'area', 'movement'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -4681,7 +4681,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Thunder Rebuke',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'area', 'lightning', 'duration'],
+    tags: ['attack', 'melee', 'area', 'lightning', 'duration', 'strike'],
     types: ['repeatable'],
     behaviour: {
       kind: 'melee',
@@ -4795,7 +4795,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Cinder Bond',
     attr: 'str',
     skillType: 'spell',
-    tags: ['spell', 'totem', 'area', 'fire', 'duration'],
+    tags: ['spell', 'totem', 'area', 'fire', 'duration', 'dot'],
     types: ['totem'],
     behaviour: {
       kind: 'burst',
@@ -4834,7 +4834,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Guardian Cairn',
     attr: 'str',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'totem', 'duration'],
+    tags: ['attack', 'melee', 'totem', 'duration', 'strike'],
     types: ['totem'],
     behaviour: {
       kind: 'melee',
@@ -5360,7 +5360,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Drain Trap',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'trap', 'area', 'cold', 'duration'],
+    tags: ['spell', 'trap', 'area', 'cold', 'duration', 'dot'],
     types: ['trap'],
     behaviour: {
       kind: 'burst',
@@ -5521,7 +5521,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Smoke Charge',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'mine', 'duration'],
+    tags: ['spell', 'mine', 'duration', 'movement'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
@@ -6085,7 +6085,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Shadow Quiver',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'minion', 'projectile', 'duration', 'bow'],
+    tags: ['attack', 'minion', 'projectile', 'duration', 'bow', 'movement'],
     types: ['triggerable'],
     requiresWeapon: ['bow'],
     behaviour: {
@@ -6117,7 +6117,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Mirror Quiver',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'minion', 'projectile', 'duration', 'bow', 'movement'],
+    tags: ['attack', 'minion', 'projectile', 'duration', 'bow'],
     requiresWeapon: ['bow'],
     behaviour: {
       kind: 'projectile',
