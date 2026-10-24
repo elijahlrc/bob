@@ -99,6 +99,10 @@ export function Items({
   // Where the picked bag item is aimed (a slot, or a flask slot): a lit slot on the reliquary or a tab re-aims it, and
   // Wear puts it there. Unset, it is the best slot.
   const [aim, setAim] = useState<{ uid: number; slot?: EquipSlot; idx?: number } | null>(null);
+  // A new pick starts aimed at the best slot again.
+  useEffect(() => setAim(null), [sel]);
+  // The item a swap just took off, for its caption.
+  const [justOff, setJustOff] = useState<number | null>(null);
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);
   useEffect(() => {
@@ -202,7 +206,8 @@ export function Items({
     setView('all');
   }, [focus?.n]);
 
-  const say = (text: string, undo = true) => setStatus({ text, undo });
+  // The line says what the last action did; it is shown only while nothing has been undone or done since.
+  const say = (text: string, undo = true) => setStatus({ text, undo, depth: c.undoDepth });
   const after = (r: { ok: boolean; reason?: string } | void, ok: () => void) => {
     if (r && r.ok) ok();
     else say(r?.reason ?? 'That did not work.', false);
@@ -223,6 +228,7 @@ export function Items({
       );
       // Next you want to know whether the old one was worth keeping: select it.
       setSel(back.length ? { from: 'inv', uid: back[0].uid } : { from: 'slot', slot });
+      setJustOff(back.length ? back[0].uid : null);
     });
   };
   const equipFlaskTo = (uid: number, idx: number) => {
@@ -466,10 +472,13 @@ export function Items({
           selected={selected}
           info={info}
           favourite={selected ? favs.has(selected.uid) : false}
-          status={status}
+          status={
+            status && (status.depth === undefined || status.depth === c.undoDepth) ? status : null
+          }
           upgrades={counts.upgrades}
           onBestUpgrade={bestUpgrade}
           aimSlot={aimed?.slot ?? null}
+          justOff={justOff}
           aimFlask={aimed?.idx ?? null}
           onAim={(slot, idx) => sel?.from === 'inv' && setAim({ uid: sel.uid, slot, idx })}
           coarse={coarse}

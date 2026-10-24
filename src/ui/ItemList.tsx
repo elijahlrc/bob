@@ -372,7 +372,9 @@ export function ItemList(p: Props) {
             {sortSelect}
             {reverse}
           </div>
-          {filtered && <div class="ix-chips">{clearButton('ix-rm clr')}</div>}
+          {(p.what !== 'all' || p.search.trim() !== '') && (
+            <div class="ix-chips">{clearButton('ix-rm clr')}</div>
+          )}
         </>
       )}
       <div class="ix-list">
@@ -383,7 +385,7 @@ export function ItemList(p: Props) {
               : p.total === 0 && !filtered
                 ? 'The bag is empty.'
                 : 'Nothing matches. '}
-            {filtered && (
+            {(p.what !== 'all' || p.search.trim() !== '') && (
               <button class="link" onClick={clear}>
                 Clear filters
               </button>

@@ -24,6 +24,8 @@ export type AgeOpts = {
   shadow?: boolean;
   wrapX?: boolean;
   wrapY?: boolean;
+  /** Boxes kept calm (no flakes, no cracks, less grime): where text sits straight on the surface. */
+  calm?: { x: number; y: number; w: number; h: number }[];
 };
 
 const DIRS = [
@@ -65,6 +67,9 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
     return p >= 0 && ramp[p] >= 0;
   };
   const len = (ri: number) => RGB[ri].length;
+  const calm = o.calm ?? [];
+  const inCalm = (x: number, y: number) =>
+    calm.some((b) => x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
   const bc = o.blotch ?? 4;
   const n1 = noise(r, W, H, 10);
   const n2 = noise(r, W, H, 3);
@@ -79,7 +84,7 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
       const p = y * W + x;
       if (ramp[p] < 0 || ramp[p] === RI.ink) continue;
       let s = ((n1(x, y) - 0.5) * 2.2 + (n2(x, y) - 0.5) * 1.4 + (r() - 0.5) * 1.1) * tex;
-      if (n3(x, y) > 0.66) s -= grime;
+      if (n3(x, y) > 0.66 && !inCalm(x, y)) s -= grime;
       let edge = false;
       for (let k = 1; k <= 2 && !edge; k++)
         edge = !opaque(x - k, y) || !opaque(x + k, y) || !opaque(x, y - k) || !opaque(x, y + k);
@@ -100,7 +105,12 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
         for (let k = 1; k <= reach && !e; k++)
           if (!opaque(x - k, y) || !opaque(x + k, y) || !opaque(x, y - k) || !opaque(x, y + k))
             e = (reach + 1 - k) / reach;
-        v[p] = n4(x, y) * 0.5 + n5(x, y) * 0.5 + e * (o.edgeBias ?? 0.12) + r() * 0.04;
+        v[p] =
+          n4(x, y) * 0.5 +
+          n5(x, y) * 0.5 +
+          e * (o.edgeBias ?? 0.12) +
+          r() * 0.04 -
+          (inCalm(x, y) ? 9 : 0);
         list.push(v[p]);
       }
     list.sort((a, b) => a - b);
@@ -133,7 +143,8 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
     const steps = 6 + Math.floor(r() * (o.crackLen ?? 26));
     for (let s = 0; s < steps; s++) {
       const p = at(x, y);
-      if (p >= 0 && ramp[p] >= 0 && ramp[p] !== RI.ink) idx[p] = ramp[p] === RI.gold ? 1 : 0;
+      if (p >= 0 && ramp[p] >= 0 && ramp[p] !== RI.ink && !inCalm(x, y))
+        idx[p] = ramp[p] === RI.gold ? 1 : 0;
       if (r() < 0.35) dir = (dir + (r() < 0.5 ? 1 : 7)) % 8;
       x += DIRS[dir][0];
       y += DIRS[dir][1];

@@ -29,12 +29,13 @@ export type Sel =
   | { from: 'slot'; slot: EquipSlot }
   | { from: 'flask'; idx: number };
 
-export type Status = { text: string; undo: boolean } | null;
+/** What the last action did; `depth` is the undo depth it was said at (the line goes stale when that moves). */
+export type Status = { text: string; undo: boolean; depth?: number } | null;
 
 /** "Needs 40 int, you have 28" from a failed check. */
 export function whyNot(check: EquipCheck): string {
   if (check.short)
-    return `Needs ${check.short.need} ${check.short.attr}, you have ${Math.floor(check.short.have)}.`;
+    return `Needs ${check.short.need} ${check.short.attr.charAt(0).toUpperCase()}${check.short.attr.slice(1)}, you have ${Math.floor(check.short.have)}.`;
   return (check.reason ?? 'Cannot be worn.') + (check.reason?.endsWith('.') ? '' : '.');
 }
 
@@ -128,6 +129,8 @@ type Props = Actions & {
   /** Where the picked item is aimed (lifted to the Items tab, so the reliquary and the tabs agree). */
   aimSlot: EquipSlot | null;
   aimFlask: number | null;
+  /** The item just taken off by a swap (its leaf is captioned so). */
+  justOff: number | null;
   onAim: (slot: EquipSlot | undefined, idx: number | undefined) => void;
   coarse: boolean;
   phone: boolean;
@@ -148,16 +151,19 @@ function Pair({
   against,
   empty,
   build,
+  fresh = 'New',
 }: {
   item: Item | FlaskItem;
   against?: Item | FlaskItem;
   empty: string;
   build?: Build;
+  /** The new leaf's caption. */
+  fresh?: string;
 }) {
   return (
     <div class="ix-pair">
       <div class="ix-leaf" data-paint="panel">
-        <div class="muted cmp-title">New</div>
+        <div class="muted cmp-title">{fresh}</div>
         <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
       </div>
       <span class="ix-hinge" aria-hidden="true">
@@ -173,6 +179,18 @@ function Pair({
         )}
       </div>
     </div>
+  );
+}
+
+/** One signed change, the way the bag's rows say it: "▼22% DPS", "▲7% EHP"; nothing when it does not move. */
+function Signed({ v, label }: { v: number; label: string }) {
+  const r = Math.round(v);
+  if (!r) return null;
+  return (
+    <span class={r > 0 ? 'up' : 'down'}>
+      {r > 0 ? '▲' : '▼'}
+      {Math.abs(r)}% {label}
+    </span>
   );
 }
 
@@ -203,30 +221,17 @@ function SlotTabs({
           aria-selected={s.slot === active}
           class={'ix-tab' + (s.slot === active ? ' on' : '') + (s.check.ok ? '' : ' blocked')}
           data-paint="panel"
-          data-thin
-          data-field={s.slot === active ? 'gold' : 'lapis'}
-          data-pk={s.slot === active ? 'on' : 'off'}
+          data-thin={s.slot === active ? undefined : ''}
           onClick={() => pick(s.slot)}
         >
           <b>{s.label}</b>
-          <span class="muted">{s.equipped ? s.equipped.name : 'empty'}</span>
           {s.check.ok ? (
-            <>
-              <span
-                class={'ix-tab-d ' + (s.scorePct > 0.5 ? 'up' : s.scorePct < -0.5 ? 'down' : '')}
-              >
-                {s.scorePct > 0.05 ? '▲' : s.scorePct < -0.05 ? '▼' : '='}{' '}
-                {Math.abs(Math.round(s.dpsPct))}% dmg · {Math.abs(Math.round(s.ehpPct))}% HP
-                {s.best ? ' · best' : ''}
-              </span>
-              <span
-                class={
-                  'ix-tab-d ' + (s.sockets.out.length || s.sockets.idle.length ? 'warn' : 'muted')
-                }
-              >
-                {tabGems(s.sockets)}
-              </span>
-            </>
+            <span class="ix-tab-d">
+              <Signed v={s.dpsPct} label="DPS" /> <Signed v={s.ehpPct} label="EHP" />
+              {(s.sockets.out.length > 0 || s.sockets.idle.length > 0) && (
+                <span class="warn"> {tabGems(s.sockets)}</span>
+              )}
+            </span>
           ) : (
             <span class="ix-tab-d down">can't</span>
           )}
@@ -348,6 +353,7 @@ function ItemBody({
   setFull,
   aim,
   onAim,
+  justOff,
 }: {
   run: RunState;
   item: Item;
@@ -359,6 +365,8 @@ function ItemBody({
   /** The slot the item is aimed at (a lit slot on the reliquary, or a tab); unset, the best one. */
   aim: EquipSlot | null;
   onAim: (slot: EquipSlot) => void;
+  /** The item was just taken off for the one now worn: its leaf says so. */
+  justOff: boolean;
 }) {
   const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
   const best = slots.find((s) => s.best) ?? slots[0];
@@ -377,6 +385,21 @@ function ItemBody({
       names={!phone || full}
     />
   ) : null;
+  const action = (
+    <ActionRow
+      swap={wearLabel(active.label)}
+      title={ok ? `Into ${active.label}` : whyNot(active.check)}
+      disabled={!ok}
+      onSwap={() => a.onEquip(item.uid, active.slot)}
+      a={a}
+      it={item}
+      favourite={favourite}
+      craft={item}
+      phone={phone}
+      full={full}
+      setFull={setFull}
+    />
+  );
   return (
     <>
       <SlotTabs slots={slots} active={active.slot} pick={onAim} />
@@ -398,23 +421,17 @@ function ItemBody({
       ) : (
         <>
           {chips}
-          <Pair item={item} against={active.equipped} empty={`Worn: ${active.label}`} />
+          {action}
           {sockets}
+          <Pair
+            item={item}
+            against={active.equipped}
+            empty={`Worn: ${active.label}`}
+            fresh={justOff ? 'Just taken off' : 'New'}
+          />
         </>
       )}
-      <ActionRow
-        swap={wearLabel(active.label)}
-        title={ok ? `Into ${active.label}` : whyNot(active.check)}
-        disabled={!ok}
-        onSwap={() => a.onEquip(item.uid, active.slot)}
-        a={a}
-        it={item}
-        favourite={favourite}
-        craft={item}
-        phone={phone}
-        full={full}
-        setFull={setFull}
-      />
+      {phone && action}
     </>
   );
 }
@@ -451,16 +468,12 @@ function FlaskBody({
             key={s.idx}
             role="tab"
             aria-selected={s.idx === active.idx}
-            class={'ix-tab' + (s.idx === active.idx ? ' on' : '')}
+            class={'ix-tab ix-ftab' + (s.idx === active.idx ? ' on' : '')}
             data-paint="panel"
-            data-thin
-            data-field={s.idx === active.idx ? 'gold' : 'lapis'}
-            data-pk={s.idx === active.idx ? 'on' : 'off'}
+            data-thin={s.idx === active.idx ? undefined : ''}
             onClick={() => onAim(s.idx)}
           >
             <b>Flask {s.idx + 1}</b>
-            <span class="muted">{s.equipped ? s.equipped.name : 'empty'}</span>
-            {s.chosen && <span class="ix-tab-d">usual pick</span>}
           </button>
         ))}
       </div>
@@ -515,7 +528,7 @@ function WornGems({
   const gems = it.sockets.filter((g): g is GemItem => g !== null);
   const free = it.sockets.length - gems.length;
   return (
-    <div class="ix-worngems">
+    <div class="ix-worngems" data-paint="panel" data-thin>
       <Stones sockets={it.sockets} />
       <span class="ix-note">
         {gems.length
@@ -646,6 +659,7 @@ export function ItemDetail(p: Props) {
             setFull={setFull}
             aim={p.aimSlot}
             onAim={(slot) => p.onAim(slot, undefined)}
+            justOff={p.justOff === selected.uid}
           />
         )}
         {inBag && selected.kind === 'flask' && (

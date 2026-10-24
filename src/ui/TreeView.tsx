@@ -62,7 +62,7 @@ function short(line: string): string {
   for (const [re, to] of SHORT)
     if (re.test(line))
       return typeof to === 'string' ? line.replace(re, to) : line.replace(re, to as never);
-  return line.length > 26 ? line.slice(0, 24) + '…' : line;
+  return line.length > 40 ? line.slice(0, 38) + '…' : line;
 }
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -285,7 +285,7 @@ export function TreeView({ c }: { c: Controller }) {
         });
       else if (n.kind === 'keystone' && k >= 0.1)
         want.push({ v, text: n.name, cls: 'tv-key', font: F_KEY, h: 26, p: pri(v) });
-      else if (n.kind === 'notable' && k >= 0.2)
+      else if (n.kind === 'notable' && k >= 0.16)
         want.push({
           v,
           text: n.name,
@@ -303,7 +303,9 @@ export function TreeView({ c }: { c: Controller }) {
           ? 'on'
           : r.ids.some((id) => path?.has(id))
             ? 'path'
-            : '';
+            : matches && !r.ids.some((id) => matches.has(id))
+              ? 'dim'
+              : '';
         want.push({
           v,
           text: r.text,
@@ -387,10 +389,15 @@ export function TreeView({ c }: { c: Controller }) {
       box.maxX = Math.max(box.maxX, n.x);
       box.maxY = Math.max(box.maxY, n.y);
     }
-    const k = Math.min(0.42, Math.max(FIT_MIN_K, fitView(box, W, H, 450).k));
+    // The panel at the right takes its share of the sky: fit the build into what is left.
+    const panel = phone
+      ? 0
+      : (wrapRef.current?.querySelector<HTMLElement>('.tv-ledger')?.offsetWidth ?? 0) + 16;
+    const room = Math.max(200, W - panel);
+    const k = Math.min(0.42, Math.max(FIT_MIN_K, fitView(box, room, H, 450).k));
     const cx = (box.minX + box.maxX) / 2;
     const cy = (box.minY + box.maxY) / 2;
-    view.current = { k, x: W / 2 - cx * k, y: H / 2 - cy * k };
+    view.current = { k, x: room / 2 - cx * k, y: H / 2 - cy * k };
     draw();
   };
   useEffect(() => {
@@ -483,8 +490,10 @@ export function TreeView({ c }: { c: Controller }) {
       e.pointerType === 'mouse' ? MOUSE_PX : FINGER_PX,
     );
     // Tap to look; tap the same node again to take it (or refund it).
-    if (id === null) setPicked(null);
-    else if (id === picked) {
+    if (id === null) {
+      setPicked(null);
+      setSumOpen(false);
+    } else if (id === picked) {
       if (tree.nodes[id].kind !== 'start') commit(id);
     } else setPicked(id);
   };
@@ -515,6 +524,7 @@ export function TreeView({ c }: { c: Controller }) {
     if (!matchList.length) return;
     const n = tree.nodes[matchList[matchAt % matchList.length]];
     setMatchAt(matchAt + 1);
+    setPicked(n.id);
     const { W, H } = size.current;
     const k = Math.max(view.current.k, 0.4);
     view.current = { k, x: W / 2 - n.x * k, y: H / 2 - n.y * k };
@@ -566,7 +576,13 @@ export function TreeView({ c }: { c: Controller }) {
             <button class="btn primary" disabled={p.length > points} onClick={() => commit(n.id)}>
               Take · {p.length} point{p.length === 1 ? '' : 's'}
             </button>
-            <p class="tv-why">{p.length > points ? `You have ${points}.` : 'Or tap it again.'}</p>
+            <p class="tv-why">
+              {p.length <= points
+                ? 'Or tap it again.'
+                : points > 0
+                  ? `You have ${points}.`
+                  : 'You have none to spend.'}
+            </p>
           </>
         );
       }

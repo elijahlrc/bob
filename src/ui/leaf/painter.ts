@@ -98,6 +98,27 @@ function friezesOf(el: HTMLElement): number[] {
   return out;
 }
 
+/**
+ * Where text sits straight on a wall (a screen's title, the camp's head), in the wall's art pixels: kept calm, so no
+ * crack or flake runs under the words. Only what is on the wall itself counts, not text on a painted panel.
+ */
+function calmOf(el: HTMLElement): { x: number; y: number; w: number; h: number }[] {
+  const er = el.getBoundingClientRect();
+  const sc = el.clientWidth / (er.width || 1);
+  const out: { x: number; y: number; w: number; h: number }[] = [];
+  el.querySelectorAll<HTMLElement>('h1, h2, .lf-calm, .camp-who').forEach((t) => {
+    if (t.closest('[data-paint]') || !t.offsetWidth) return;
+    const r = t.getBoundingClientRect();
+    out.push({
+      x: Math.round(((r.left - er.left) * sc) / P) - 6,
+      y: Math.round(((r.top - er.top + el.scrollTop) * sc) / P) - 4,
+      w: Math.round((r.width * sc) / P) + 12,
+      h: Math.round((r.height * sc) / P) + 8,
+    });
+  });
+  return out;
+}
+
 function draw(
   el: HTMLElement,
   kind: string,
@@ -116,6 +137,7 @@ function draw(
     ctx.fillStyle = col('gold', 4);
     ctx.fillRect(0, 0, W, H);
     return age(cv, r, {
+      calm: calmOf(el),
       loss: 0.045,
       blotch: 7,
       cracks: Math.round((W * H) / 2600),
@@ -204,7 +226,14 @@ function paintEl(el: HTMLElement, kind: string, o: Record<string, unknown>, key:
     W = Math.ceil(el.clientWidth / P);
     H = Math.ceil(el.clientHeight / P);
   }
-  const fz = kind === 'panel' ? friezesOf(el).join(',') : '';
+  const fz =
+    kind === 'panel'
+      ? friezesOf(el).join(',')
+      : kind === 'wall'
+        ? calmOf(el)
+            .map((c) => `${c.x},${c.y},${c.w},${c.h}`)
+            .join(';')
+        : '';
   // Everything the painting reads from the element is in its key (field, thin, arch, mix, state, pk ...); not the HUD's
   // flask state (data-st), which changes during play without changing the painting.
   const pk = Object.entries(el.dataset)

@@ -191,14 +191,17 @@ html.leaf input[type='checkbox'] {
   box-shadow: var(--ring);
   cursor: pointer;
 }
+/* Ticked: a gold square set in the well (a dot would read as a radio button). */
 html.leaf input[type='checkbox']:checked {
-  background: radial-gradient(#e2c681 0 4px, #0c1129 5px);
+  background: #0c1129;
+  box-shadow:
+    var(--ring),
+    inset 0 0 0 4px #0c1129,
+    inset 0 0 0 10px #e2c681;
 }
-html.leaf input:focus-visible,
-html.leaf select:focus-visible,
-html.leaf .btn:focus-visible,
-html.leaf .tab:focus-visible {
-  outline: 2px dashed var(--pearl);
+/* Focus: a gold ring a little outside the thing, never the browser's own outline. */
+html.leaf :is(input, select, textarea, button, a, [tabindex]):focus-visible {
+  outline: 2px solid #e2c681;
   outline-offset: 3px;
 }
 

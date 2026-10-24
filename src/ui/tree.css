@@ -54,9 +54,12 @@
 .tv-note:is(.lit, .path) {
   color: var(--pearl);
 }
-.tv-note.dim,
 .tv-small {
   color: var(--muted);
+}
+/* A search dims what does not match, words and all. */
+.tv-labels .dim {
+  opacity: 0.35;
 }
 .tv-small.on {
   color: #d9c38c;
@@ -144,7 +147,9 @@
   top: 16px;
   width: 360px;
   max-height: calc(100% - 32px);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-sizing: border-box;
   padding: 24px 28px 26px;
   font-size: var(--size, 17px);
@@ -203,9 +208,26 @@
   margin: 0;
   color: var(--muted);
 }
+.tv-look {
+  flex: none;
+}
+/* The panel itself never scrolls (its painting and frieze would slide off their places): the list of totals does. */
+.tv-sum {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
 .tv-sum .tv-lines {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   margin-bottom: 12px;
+  padding-right: 6px;
   color: var(--gold-hi);
+}
+.tv-sum .btn {
+  align-self: flex-start;
 }
 
 /* ---- A phone: the search across the top, the points and zoom below it, the panel at the foot ---- */
@@ -240,6 +262,9 @@
     top: 70px;
     flex-direction: column;
   }
+  .tv-sumbtn {
+    z-index: 3;
+  }
   .tv-ledger {
     left: 8px;
     right: 8px;
@@ -248,5 +273,11 @@
     width: auto;
     max-height: 55%;
     padding: 18px 18px 20px;
+  }
+}
+@media (max-width: 600px) {
+  /* The totals open above their button, so it can close them. */
+  .tv-ledger.sum {
+    bottom: 66px;
   }
 }

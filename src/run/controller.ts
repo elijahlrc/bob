@@ -889,6 +889,10 @@ export class Controller {
   get canUndo(): boolean {
     return this.undoStack.length > 0;
   }
+  /** How many camp changes can be undone: a screen's "what just happened" line is current while this has not moved. */
+  get undoDepth(): number {
+    return this.undoStack.length;
+  }
 
   /** Revert the last camp change (equip, socket, passive point, reward pick ...). */
   undo(): boolean {

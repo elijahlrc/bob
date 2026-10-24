@@ -91,7 +91,7 @@ export function SocketsRow({
   if (!socketsMatter(o)) return null;
   const note = socketNote(o, primary);
   return (
-    <div class="ix-sockets">
+    <div class="ix-sockets" data-paint="panel" data-thin>
       <div class="ix-sk">
         <span class="ix-sk-lab">Sockets</span>
         {was?.sockets.length ? (

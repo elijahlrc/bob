@@ -157,10 +157,17 @@ html.leaf .ix-gear-toggle {
 }
 
 /* ---- The selection ---- */
-html.leaf .ix-detailcol {
-  top: 0;
-  max-height: none;
-  overflow: visible;
+/* On a desktop the selection is a column that grows with the page; on a phone it stays the sheet of items.css. */
+@media (min-width: 601px) {
+  html.leaf .ix-detailcol {
+    top: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  /* The action row has the favourite: the header keeps only its close. */
+  html.leaf .ix-head .ix-star {
+    display: none;
+  }
 }
 html.leaf .ix-detail {
   display: flex;
@@ -223,6 +230,7 @@ html.leaf .ix-keys {
   cursor: help;
 }
 html.leaf .ix-status {
+  font-size: var(--size);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -263,19 +271,33 @@ html.leaf .ix-tab .muted {
   color: var(--muted);
 }
 html.leaf .ix-tab-d {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
   font-size: var(--size);
 }
-html.leaf .ix-tab-d.up {
+html.leaf .ix-tab-d .up {
   color: var(--gain);
 }
+html.leaf .ix-tab-d .down,
 html.leaf .ix-tab-d.down,
-html.leaf .ix-tab-d.warn {
+html.leaf .ix-tab-d .warn {
   color: var(--madder);
 }
-html.leaf .ix-tab.on,
-html.leaf .ix-tab.on :is(.muted, .ix-tab-d) {
-  color: var(--on-gold);
-  text-shadow: none;
+/* The aimed slot: the heavy double rim (the others thin), its name in gold. */
+html.leaf .ix-tab.on b {
+  color: var(--gold-hi);
+}
+html.leaf .ix-tab.blocked {
+  opacity: 0.6;
+}
+html.leaf .ix-tabs:has(.ix-ftab) {
+  flex-wrap: nowrap;
+}
+html.leaf .ix-ftab {
+  flex: 1 1 0;
+  align-items: center;
+  padding: 8px 4px 9px;
 }
 /* What it changes: damage and effective HP large on a porphyry plaque, the rest under them. */
 html.leaf .ix-delta {
@@ -358,15 +380,19 @@ html.leaf .ix-hinge i:last-child {
 }
 html.leaf .ix-leaf .cmp-title {
   margin-bottom: 8px;
+  font-size: var(--size);
   color: var(--muted);
 }
 /* The sockets and the gems a swap moves */
 html.leaf .ix-sockets {
-  padding: 12px 18px;
+  padding: 14px 20px;
   color: var(--pearl);
   text-shadow: var(--text-shadow);
-  background: #172049cc;
-  box-shadow: var(--ring);
+  background-color: transparent;
+  border: 0;
+}
+html.leaf .ix-arrow {
+  font-size: var(--size);
 }
 html.leaf .ix-sk-lab {
   color: var(--muted);
@@ -380,6 +406,11 @@ html.leaf .ix-gc {
 }
 html.leaf .ix-sk-note {
   font-size: var(--size);
+}
+html.leaf .ix-sk-note {
+  background: none;
+  border: 0;
+  padding: 4px 0 0;
 }
 html.leaf .ix-sk-note.warn,
 html.leaf .ix-sk-note.bad {
@@ -404,11 +435,10 @@ html.leaf .ix-worngems {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: 12px 18px;
+  padding: 14px 20px;
   color: var(--pearl);
   text-shadow: var(--text-shadow);
-  background: #172049cc;
-  box-shadow: var(--ring);
+  background-color: transparent;
 }
 html.leaf .ix-worngems .ix-note {
   color: var(--pearl);
@@ -481,6 +511,7 @@ html.leaf .item-card .ic-mod:first-of-type {
 }
 html.leaf .item-card .ic-mod.implicit {
   color: var(--muted);
+  border-bottom: 0;
 }
 html.leaf .item-card .ic-mod.rule {
   color: var(--gold-hi);
@@ -752,8 +783,15 @@ html.leaf .clean-group {
   background-repeat: repeat-x;
 }
 
-/* ---- A tablet: the bag below the reliquary, the selection beside both ---- */
+/* ---- A tablet: the bag below the reliquary, the selection beside both, its two leaves stacked ---- */
 @media (max-width: 1099px) {
+  html.leaf .ix-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  html.leaf .ix-hinge {
+    display: none;
+  }
   html.leaf .ix {
     grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
     grid-template-areas:
