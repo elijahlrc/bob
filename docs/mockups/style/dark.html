@@ -23,11 +23,17 @@
         padding: 24px 16px 48px;
         background: #0b0805;
         color: var(--pearl);
-        font: 17px/1.3 Grenze, Georgia, serif;
+        font:
+          17px/1.3 Grenze,
+          Georgia,
+          serif;
       }
       h1 {
         margin: 0 0 6px;
-        font: 400 40px/1 'Jacquard 24', Georgia, serif;
+        font:
+          400 40px/1 'Jacquard 24',
+          Georgia,
+          serif;
         color: var(--gold-hi);
       }
       .intro {
@@ -39,7 +45,10 @@
       }
       h2 {
         margin: 0 0 4px;
-        font: 400 30px/1 'Jacquard 24', Georgia, serif;
+        font:
+          400 30px/1 'Jacquard 24',
+          Georgia,
+          serif;
         color: var(--gold-hi);
       }
       .why {
@@ -74,7 +83,10 @@
       }
       .card h3 {
         margin: 0 0 8px;
-        font: 400 28px/1 'Jacquard 24', Georgia, serif;
+        font:
+          400 28px/1 'Jacquard 24',
+          Georgia,
+          serif;
         color: var(--gold-hi);
         text-shadow: 0 2px 0 var(--ink);
       }
@@ -110,7 +122,10 @@
         height: 160px;
         display: grid;
         place-items: center;
-        font: 400 28px/1 'Jacquard 24', Georgia, serif;
+        font:
+          400 28px/1 'Jacquard 24',
+          Georgia,
+          serif;
       }
       .ref .screen {
         position: static;
@@ -121,7 +136,8 @@
   <body>
     <h1>A dark material</h1>
     <p class="intro">
-      The bitumen and four ways of bringing red into it, each a field like the gold and the lapis: on its own, framed with text, as a button and as a strip.
+      The bitumen and four ways of bringing red into it, each a field like the gold and the lapis:
+      on its own, framed with text, as a button and as a strip.
     </p>
     <div class="ref">
       <div class="screen">Gold leaf (the wall)</div>
@@ -208,8 +224,10 @@
         const img = ctx.createImageData(W, H);
         const lost = new Uint8Array(W * H);
         const vals = [];
-        for (let p = 0; p < W * H; p++) vals.push(b1(p % W, (p / W) | 0) * 0.5 + b2(p % W, (p / W) | 0) * 0.5);
-        const cut = [...vals].sort((a, b) => a - b)[Math.floor(vals.length * (1 - (o.loss ?? 0)))] ?? 2;
+        for (let p = 0; p < W * H; p++)
+          vals.push(b1(p % W, (p / W) | 0) * 0.5 + b2(p % W, (p / W) | 0) * 0.5);
+        const cut =
+          [...vals].sort((a, b) => a - b)[Math.floor(vals.length * (1 - (o.loss ?? 0)))] ?? 2;
         for (let y = 0; y < H; y++)
           for (let x = 0; x < W; x++) {
             const p = y * W + x;
@@ -224,24 +242,35 @@
               const u = o.under;
               c = !up ? u[0] : u[Math.min(u.length - 1, 1 + Math.floor(r() * (u.length - 1)))];
             } else {
-              let s = ((n1(x, y) - 0.5) * 2.2 + (n2(x, y) - 0.5) * 1.2 + (r() - 0.5) * 1.0) * (o.tex ?? 1);
+              let s =
+                ((n1(x, y) - 0.5) * 2.2 + (n2(x, y) - 0.5) * 1.2 + (r() - 0.5) * 1.0) *
+                (o.tex ?? 1);
               if (st) {
                 // Brush strokes: noise sampled along a slant, stretched long.
                 const a = o.streak;
                 const u = x * Math.cos(a) + y * Math.sin(a);
                 const v = -x * Math.sin(a) + y * Math.cos(a);
-                s += (st(((u / 9) % W + W) % W, ((v * 2) % H + H) % H) - 0.5) * (o.streakAmp ?? 2.2);
+                s +=
+                  (st((((u / 9) % W) + W) % W, (((v * 2) % H) + H) % H) - 0.5) *
+                  (o.streakAmp ?? 2.2);
               }
               // Grime gathers softly (a hard threshold reads as camouflage).
               const gt = o.grimeAt ?? 0.66;
               const gk = Math.max(0, Math.min(1, (g1(x, y) - (gt - 0.12)) / 0.24));
               s -= (o.grime ?? 1) * gk * gk * (3 - 2 * gk);
-              const below = lost[((y + 1) % H) * W + x] === 0 && y > 0 && lost[((y - 1 + H) % H) * W + x];
+              const below =
+                lost[((y + 1) % H) * W + x] === 0 && y > 0 && lost[((y - 1 + H) % H) * W + x];
               if (below) s += 1;
               let i = Math.round(o.base + s);
               if (sm && sm[p] < (o.crackW ?? 0.7)) {
                 if (o.glow) {
-                  c = o.glow[Math.min(o.glow.length - 1, Math.floor(r() * 2 + n1(x, y) * (o.glow.length - 1)))];
+                  c =
+                    o.glow[
+                      Math.min(
+                        o.glow.length - 1,
+                        Math.floor(r() * 2 + n1(x, y) * (o.glow.length - 1)),
+                      )
+                    ];
                 } else i -= o.crackDark ?? 2;
               }
               if (!c) {
@@ -280,8 +309,24 @@
       }
 
       // The bitumen, and four ways of bringing red into it.
-      const UMBER = ramp('#0d0907', '#140e0a', '#1b130d', '#231911', '#2c2016', '#37281b', '#443221');
-      const OXUMBER = ramp('#0e0807', '#170c0a', '#21100d', '#2c1410', '#391813', '#471d16', '#57231a');
+      const UMBER = ramp(
+        '#0d0907',
+        '#140e0a',
+        '#1b130d',
+        '#231911',
+        '#2c2016',
+        '#37281b',
+        '#443221',
+      );
+      const OXUMBER = ramp(
+        '#0e0807',
+        '#170c0a',
+        '#21100d',
+        '#2c1410',
+        '#391813',
+        '#471d16',
+        '#57231a',
+      );
       const PALE = ramp('#0b0805', '#6e604c', '#857561', '#9b8a72');
       const BOLE = ramp('#2e140d', '#5a2414', '#7a2e18', '#93391f');
       const BITUMEN = {
