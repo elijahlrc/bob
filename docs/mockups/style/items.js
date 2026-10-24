@@ -651,7 +651,7 @@
          <button class="btn" data-paint="panel" data-thin data-act="fav">${it.fav ? '★' : '☆'} Favourite</button><button class="btn" data-paint="panel" data-thin data-act="discard">Discard</button></div>
          ${goes || c.gems ? `<p class="ix-goes">${goes}${c.also && worn[c.also] ? ` So does ${worn[c.also].name}.` : ''}${c.gems ? ` ${c.gems}` : ''}</p>` : ''}</div>`;
     const leaves = phone()
-      ? `${card(it, { vs: w, side: 'new', label: it.justOff ? 'Just taken off' : 'New' })}${w ? `<details class="ix-worn-peek"><summary>Worn now: ${w.name}</summary>${card(w, { vs: it, side: 'worn' })}</details>` : ''}`
+      ? `${card(it, { vs: w, side: 'new', label: it.justOff ? 'Just taken off' : 'New' })}${w ? card(w, { vs: it, side: 'worn', label: `Worn: ${SLOTS[s][0]}` }) : ''}`
       : `<div class="ix-diptych">${card(it, { vs: w, side: 'new', label: it.justOff ? 'Just taken off' : 'New' })}<span class="ix-hinge"><i data-paint="chain"></i><i data-paint="chain"></i></span>${card(w, { vs: it, side: 'worn', label: `Worn: ${SLOTS[s][0]}` })}</div>`;
     return `${st}${tabs}${changes}
       ${c.warn ? `<div class="ix-warn" data-paint="panel" data-thin data-field="vermilion">${c.warn}</div>` : ''}

@@ -973,12 +973,6 @@
 [data-style='leaf'][data-width='phone'] .ix-verdict > b {
   font-size: 32px;
 }
-[data-style='leaf'][data-width='phone'] .ix-worn-peek summary {
-  padding: 8px 2px;
-  color: var(--gold-hi);
-  text-shadow: 0 2px 0 var(--ink);
-  cursor: pointer;
-}
 
 /* ---- Passive tree: the starry vault ---- */
 [data-style='leaf'] .tv {
