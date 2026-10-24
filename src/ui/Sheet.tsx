@@ -1,5 +1,5 @@
 import { useMemo } from 'preact/hooks';
-import type { Character, CharacterSheet } from '../calc/character';
+import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
 import { statTotals, type StatTotal } from '../calc/statTotals';
 import { DEFAULT_MAX_RES } from '../data/constants';
 import { HEXES, hexText } from '../data/hexes';
@@ -141,7 +141,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
       </div>
       <div class="cs-est">
         <span>
-          Estimated DPS <b>{f0(sc ? sc.pack : s.skill.totalDps)}</b>
+          Estimated DPS <b>{f0(sc ? sc.pack : scenarioDps(s))}</b>
           {sc && sc.boss !== sc.pack && (
             <>
               {' '}

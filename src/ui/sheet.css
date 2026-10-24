@@ -116,7 +116,7 @@
 
 .cs-foot {
   margin-top: 18px;
-  max-width: 50%;
+  max-width: calc(50% - 16px);
 }
 .cs-foot .cs-totals {
   margin-top: 0;
