@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="en" data-style="now" data-screen="character" data-width="desktop">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bob Style Study</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;600&family=Jacquard+24&display=swap"
+    />
+    <style>
+      /* ================================================================================================================
+     Bob style study: the Character tab and the Next map tab in a few visual directions. Same markup and same data in
+     every direction; a direction is one block of CSS under html[data-style=...]. Flip with the bar at the top or the
+     keys 1-5 (style), C / M (screen), P (phone width).
+     ================================================================================================================ */
+
+      /* ---- The study's own chrome (not part of any direction) ---- */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: #050405;
+        color: #ccc;
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+      }
+      .study {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        align-items: center;
+        padding: 8px 16px;
+        background: #111;
+        border-bottom: 1px solid #333;
+      }
+      .study .grp {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .study .grp > span {
+        color: #777;
+        margin-right: 4px;
+        font-size: 12px;
+      }
+      .study button {
+        font: inherit;
+        font-size: 13px;
+        color: #ccc;
+        background: #222;
+        border: 1px solid #444;
+        padding: 3px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .study button.on {
+        background: #ddd;
+        color: #111;
+        border-color: #ddd;
+      }
+      .note {
+        max-width: 1000px;
+        margin: 12px auto 0;
+        padding: 0 16px;
+        color: #9a9a9a;
+        font-size: 13px;
+      }
+      .note b {
+        color: #ddd;
+        font-weight: 600;
+      }
+      .stage {
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      .frame {
+        width: 1000px;
+        max-width: 100%;
+        min-height: 900px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      [data-width='phone'] .frame {
+        width: 390px;
+      }
+      [data-screen='character'] .scr-camp,
+      [data-screen='camp'] .scr-character {
+        display: none;
+      }
+
+      /* ---- Layout shared by every direction (positions only; looks belong to the directions) ---- */
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .tab {
+        white-space: nowrap;
+      }
+      .tab-body {
+        flex: 1;
+      }
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .foot .right {
+        display: flex;
+        gap: 6px;
+      }
+      .cs-top {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .cs-trio {
+        flex: 1 1 auto;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(max-content, 1fr);
+      }
+      .cs-tile {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .cs-tile .cs-label,
+      .cs-tile .cs-raw {
+        white-space: nowrap;
+      }
+      .cs-cols {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+      .cs-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+      }
+      .cs-value {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .cs-est {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .themes {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: start;
+      }
+      .theme {
+        display: block;
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        color: inherit;
+      }
+      .offer-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .offer-table th {
+        text-align: left;
+        font-weight: normal;
+      }
+      .offer-table td {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .chip {
+        white-space: nowrap;
+      }
+      .mixbar {
+        display: flex;
+        overflow: hidden;
+      }
+      .mixbar span {
+        display: block;
+        height: 100%;
+      }
+      .gauges {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .bars {
+        flex: 0 1 220px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .bar {
+        position: relative;
+        height: 14px;
+      }
+      .bar i {
+        position: absolute;
+        inset: 0;
+      }
+      .bar span {
+        position: relative;
+        padding-left: 6px;
+        font-size: 10px;
+        line-height: 14px;
+      }
+      .flasks {
+        display: flex;
+        gap: 3px;
+      }
+      .flask {
+        width: 14px;
+        height: 26px;
+        position: relative;
+      }
+      .camp-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+      /* The pools, attributes and resistances in their dulled colours (sheet.css), shared by every direction. */
+      .frame .cs-life :is(.cs-label, b) {
+        color: #b86a62;
+      }
+      .frame .cs-es :is(.cs-label, b) {
+        color: #9fb0c8;
+      }
+      .frame .cs-mana :is(.cs-label, b) {
+        color: #6f8fbf;
+      }
+      .frame .cs-str :is(.cs-label, b) {
+        color: #b8705e;
+      }
+      .frame .cs-dex :is(.cs-label, b) {
+        color: #7fa37a;
+      }
+      .frame .cs-int :is(.cs-label, b) {
+        color: #7f90bf;
+      }
+      .frame .cs-res-fire :is(.cs-label, b) {
+        color: #b48068;
+      }
+      .frame .cs-res-cold :is(.cs-label, b) {
+        color: #8497a8;
+      }
+      .frame .cs-res-lightning :is(.cs-label, b) {
+        color: #ae9f72;
+      }
+      .frame .cs-res-chaos :is(.cs-label, b) {
+        color: #97849f;
+      }
+      .frame .cs-four .cs-under .cs-raw {
+        color: #b8695c;
+      }
+      [data-width='phone'] .cs-cols,
+      [data-width='phone'] .themes {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      [data-width='phone'] .tabs {
+        flex-wrap: nowrap;
+        overflow: hidden;
+      }
+
+      /* ================================================================================================================
+     1. NOW: the game as it is today (copied from skins.css, styles.css and sheet.css).
+     ================================================================================================================ */
+      [data-style='now'] {
+        --panel: #17130f;
+        --panel2: #221a13;
+        --btn: #2b2118;
+        --border: #5c4630;
+        --border2: #3a2c20;
+        --accent: #c8742a;
+        --text: #d9cdb4;
+        --muted: #8d7e66;
+        --hi: #ffb347;
+        --font: 'Grenze', Georgia, serif;
+        --title-font: 'Jacquard 24', Georgia, serif;
+      }
+      [data-style='now'] .frame {
+        background: radial-gradient(ellipse at 50% 40%, #1d1510 0%, #0a0708 60%, #040304 100%);
+        color: var(--text);
+        font: 14px/1.35 var(--font);
+        font-feature-settings: 'lnum' 1;
+      }
+      [data-style='now'] .tabs {
+        gap: 2px;
+        padding: 8px 8px 0;
+        border-bottom: 1px solid #333;
+      }
+      [data-style='now'] .tab,
+      [data-style='now'] .btn {
+        color: var(--text);
+        font: inherit;
+        padding: 6px 14px;
+        cursor: pointer;
+        background: linear-gradient(#3a2b1e, #24190f);
+        border: 1px solid #6a5238;
+        box-shadow:
+          inset 0 1px 0 #7a6044,
+          inset 0 0 0 1px #000,
+          0 2px 5px #000a;
+        text-shadow: 0 1px 1px #000;
+      }
+      [data-style='now'] .tab {
+        border-radius: 6px 6px 0 0;
+        border-bottom: none;
+      }
+      [data-style='now'] .tab.on {
+        color: var(--hi);
+      }
+      [data-style='now'] .btn {
+        border-radius: 2px;
+        padding: 8px 18px;
+      }
+      [data-style='now'] .btn.small {
+        padding: 4px 10px;
+        font-size: 13px;
+      }
+      [data-style='now'] .btn.primary {
+        background: linear-gradient(#a8601f, #5e3010);
+        border-color: #d89a50;
+      }
+      [data-style='now'] .foot {
+        padding: 8px 10px;
+        border-top: 1px solid var(--border2);
+        background: #0c0907;
+      }
+      [data-style='now'] .muted,
+      [data-style='now'] .cs-label,
+      [data-style='now'] .cs-raw {
+        color: var(--muted);
+      }
+      [data-style='now'] .cs {
+        padding: 16px;
+        max-width: 920px;
+        font-size: 15px;
+      }
+      [data-style='now'] .cs-raw {
+        font-size: 13px;
+        margin-right: 8px;
+      }
+      [data-style='now'] .cs-top {
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      [data-style='now'] .cs-trio {
+        background: var(--panel2);
+        border: 1px solid var(--border2);
+      }
+      [data-style='now'] .cs-tile {
+        padding: 6px 10px;
+      }
+      [data-style='now'] .cs-tile + .cs-tile {
+        border-left: 1px solid var(--border2);
+      }
+      [data-style='now'] .cs-tile .cs-label {
+        font-size: 13px;
+      }
+      [data-style='now'] .cs-tile b {
+        font-weight: normal;
+        font-size: 24px;
+        line-height: 1.1;
+        color: var(--hi);
+      }
+      [data-style='now'] .cs-tile .cs-raw {
+        margin: 0;
+        font-size: 12px;
+      }
+      [data-style='now'] .cs-section + .cs-section {
+        margin-top: 16px;
+      }
+      [data-style='now'] .cs-section h4 {
+        margin: 0 0 4px;
+        font: 400 19px var(--title-font);
+        color: var(--accent);
+      }
+      [data-style='now'] .cs-cols {
+        gap: 0 32px;
+      }
+      [data-style='now'] .cs-row {
+        padding: 3px 0;
+        border-bottom: 1px solid var(--btn);
+      }
+      [data-style='now'] .cs-est {
+        gap: 4px 24px;
+        margin-top: 18px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border2);
+        color: var(--muted);
+      }
+      [data-style='now'] .cs-est b {
+        font-weight: normal;
+        color: var(--text);
+      }
+      [data-style='now'] .camp {
+        padding: 16px;
+      }
+      [data-style='now'] .camp h2 {
+        font: 400 30px var(--title-font);
+        margin: 0 0 8px;
+      }
+      [data-style='now'] .camp .who {
+        font-weight: 600;
+      }
+      [data-style='now'] .xp {
+        height: 6px;
+        background: #222;
+        margin: 10px 0;
+      }
+      [data-style='now'] .xp i {
+        display: block;
+        height: 100%;
+        width: 38%;
+        background: #8a6a3a;
+      }
+      [data-style='now'] .nextmap {
+        color: var(--muted);
+        margin: 8px 0;
+      }
+      [data-style='now'] .bar {
+        background: #222;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      [data-style='now'] .bar.life i {
+        background: #b8302a;
+      }
+      [data-style='now'] .bar.mana i {
+        background: #2a4ab0;
+      }
+      [data-style='now'] .flask {
+        border: 1px solid #6a5238;
+        border-radius: 0 0 4px 4px;
+        background: #0a0806;
+      }
+      [data-style='now'] .flask i {
+        position: absolute;
+        inset: 2px;
+        border-radius: 0 0 3px 3px;
+      }
+      [data-style='now'] .themes {
+        gap: 12px;
+        margin: 14px 0;
+      }
+      [data-style='now'] .theme {
+        padding: 8px 14px;
+      }
+      [data-style='now'] .theme-name {
+        font: 400 26px/1.05 var(--title-font);
+        text-align: center;
+      }
+      [data-style='now'] .theme .lvl {
+        text-align: center;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      [data-style='now'] .theme .affix {
+        font-size: 12px;
+        color: #e0b070;
+        margin: 2px 0;
+      }
+      [data-style='now'] .offer-table {
+        margin: 4px 0;
+        font-size: 12px;
+      }
+      [data-style='now'] .offer-table th,
+      [data-style='now'] .offer-table td {
+        padding: 1px 0;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      [data-style='now'] .offer-table th {
+        color: var(--muted);
+        padding-right: 8px;
+      }
+      [data-style='now'] .offer-table td + th {
+        padding-left: 10px;
+      }
+      [data-style='now'] .gain {
+        color: #8fd48a;
+      }
+      [data-style='now'] .offer-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin: 4px 0;
+        font-size: 12px;
+      }
+      [data-style='now'] .chips {
+        gap: 3px;
+      }
+      [data-style='now'] .chip {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 6px;
+        background: #1a1922;
+        font-size: 13px;
+      }
+      [data-style='now'] .chip.type {
+        border-style: dotted;
+        font-size: 12px;
+      }
+      [data-style='now'] .leans,
+      [data-style='now'] .rule {
+        color: var(--muted);
+      }
+      [data-style='now'] .mixbar {
+        height: 5px;
+        border-radius: 3px;
+        background: var(--border);
+      }
+      [data-style='now'] .weak {
+        color: #e8d070;
+        text-align: center;
+      }
+      [data-style='now'] .camp-actions {
+        margin-top: 10px;
+      }
+
+      /* ================================================================================================================
+     2. GOLD LEAF: early Christian art as it looks now, fifteen hundred years on. Every surface is painted at half of
+     screen resolution by paint.js (colour ramps, mottling, grime, gold flaked to the red bole, paint worn to plaster,
+     cracks) and scaled up with hard 2 px pixels. Gold is the wall; information sits on lapis panels; pools are
+     medallions in wreaths; offers are arched niches. No small text: one body size, secondary lines in colour, not size.
+     ================================================================================================================ */
+      [data-style='leaf'] {
+        --ink: #0b0805;
+        --gold-hi: #e2c681;
+        --pearl: #e6dfca;
+        --muted: #a8adc4;
+        --dim: #7c84a4;
+        --madder: #dca196;
+        --lapis-d: #11183a;
+        --on-gold: #1a1208;
+        --body: 'Grenze', Georgia, serif;
+        --size: 17px;
+        --lh: 1.45;
+        --small: 15px;
+        --head: 'Jacquard 24', Georgia, serif;
+        --head-size: 28px;
+        --big: 'Jacquard 24', Georgia, serif;
+      }
+      [data-style='leaf'] .frame {
+        background: #ad8b40;
+        image-rendering: pixelated;
+        color: var(--pearl);
+        font: var(--size) / var(--lh) var(--body);
+        font-feature-settings: 'lnum' 1;
+      }
+      [data-style='leaf'] .frame :is(button, .btn) {
+        font-family: inherit;
+      }
+
+      [data-style='leaf'] .tabs {
+        position: relative;
+        gap: 4px;
+        padding: 8px 12px 0;
+        background: #1d2958;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .tabs::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -16px;
+        height: 14px;
+        background: var(--s-triangles);
+      }
+      [data-style='leaf'] .tab {
+        font: 400 var(--head-size) / 1 var(--head);
+        color: var(--muted);
+        background: none;
+        border: 0;
+        padding: 9px 16px 8px;
+        cursor: pointer;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .tab.on {
+        color: var(--on-gold);
+        text-shadow: none;
+      }
+      [data-style='leaf'] .btn {
+        font-size: var(--size);
+        color: var(--pearl);
+        background: none;
+        border: 0;
+        padding: 12px 24px;
+        cursor: pointer;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .btn.small {
+        padding: 9px 20px;
+      }
+      [data-style='leaf'] .btn:hover {
+        filter: brightness(1.18);
+      }
+      [data-style='leaf'] .foot {
+        position: relative;
+        padding: 18px 12px 8px;
+        background: #2f5639;
+        font: 400 var(--head-size) var(--head);
+        color: var(--pearl);
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .foot .btn {
+        font-family: var(--body);
+      }
+      [data-style='leaf'] .foot::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 10px;
+        background: var(--s-tiles);
+      }
+      [data-style='leaf'] .muted,
+      [data-style='leaf'] .cs-raw {
+        color: var(--muted);
+      }
+
+      /* ---- Character: medallions on the gold (their notes as captions under them), then two lapis panels ---- */
+      [data-style='leaf'] .cs {
+        padding: 16px 24px 32px;
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      [data-style='leaf'] .cs-top {
+        justify-content: center;
+        gap: 16px 64px;
+        margin: 0 0 28px;
+      }
+      [data-style='leaf'] .cs-trio {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        background: none;
+        border: 0;
+        padding-bottom: 22px;
+      }
+      [data-style='leaf'] .cs-trio:first-child {
+        flex-basis: 100%;
+        justify-content: center;
+        gap: 20px;
+      }
+      [data-style='leaf'] .cs-tile {
+        position: relative;
+        width: 104px;
+        height: 104px;
+        padding: 0;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: none;
+        border: 0;
+        box-shadow: none;
+      }
+      [data-style='leaf'] .cs-trio:first-child .cs-tile {
+        width: 208px;
+        height: 208px;
+      }
+      [data-style='leaf'] .frame .cs-tile :is(.cs-label, b) {
+        color: var(--pearl);
+        text-shadow: 0 2px 0 #0b0805aa;
+      }
+      [data-style='leaf'] .cs-tile .cs-label {
+        font-size: var(--small);
+        line-height: 1;
+      }
+      [data-style='leaf'] .cs-tile b {
+        font: 400 var(--head-size) / 1 var(--head);
+        margin-top: 2px;
+      }
+      [data-style='leaf'] .cs-trio:first-child .cs-tile .cs-label {
+        font-size: var(--size);
+      }
+      [data-style='leaf'] .cs-trio:first-child .cs-tile b {
+        font: 400 48px / 1 var(--big);
+      }
+      /* The notes of a medallion (a multiplier, a maximum) under it, in dark ink on the gold. */
+      /* The notes of a medallion (a multiplier, a maximum) on a small painted plaque hung from its foot. */
+      [data-style='leaf'] .frame .cs-tile .cs-raw {
+        position: absolute;
+        top: calc(100% - 14px);
+        left: 0;
+        right: 0;
+        width: fit-content;
+        margin: 0 auto;
+        padding: 8px 18px 9px;
+        font-size: var(--size);
+        line-height: 1.1;
+        color: var(--pearl);
+        text-shadow: 0 2px 0 var(--ink);
+        white-space: nowrap;
+      }
+      [data-style='leaf'] .frame .cs-trio:first-child .cs-tile .cs-raw {
+        top: calc(100% - 34px);
+      }
+      [data-style='leaf'] .frame .cs-four .cs-under .cs-raw {
+        color: var(--madder);
+      }
+      [data-style='leaf'] .frame :is(.cs-es, .cs-res-lightning) :is(.cs-label, b) {
+        color: var(--ink);
+        text-shadow: 0 2px 0 #ffffff33;
+      }
+      [data-style='leaf'][data-width='phone'] .cs-trio:first-child {
+        gap: 2px;
+      }
+      [data-style='leaf'][data-width='phone'] .cs-trio:first-child .cs-tile {
+        width: 120px;
+        height: 120px;
+      }
+      [data-style='leaf'][data-width='phone'] .cs-tile .cs-label {
+        white-space: normal;
+        max-width: 64px;
+      }
+      [data-style='leaf'][data-width='phone'] .cs-trio:first-child .cs-tile b {
+        font: 400 var(--head-size) / 1 var(--head);
+      }
+      [data-style='leaf'][data-width='phone'] .cs-trio:first-child .cs-tile .cs-label {
+        font-size: var(--small);
+      }
+      [data-style='leaf'][data-width='phone'] .cs-tile {
+        width: 88px;
+        height: 88px;
+      }
+      [data-style='leaf'][data-width='phone'] .cs-trio {
+        gap: 4px;
+      }
+      [data-style='leaf'][data-width='phone'] .cs-tile .cs-label {
+        font-size: 14px;
+      }
+      [data-style='leaf'][data-width='phone'] :is(.cs, .camp) {
+        padding: 14px 10px;
+      }
+
+      [data-style='leaf'] .cs-cols {
+        gap: 24px;
+        align-items: start;
+      }
+      [data-style='leaf'] .cs-col {
+        padding: 26px 26px 30px;
+      }
+      [data-style='leaf'] .cs-section + .cs-section {
+        margin-top: 28px;
+      }
+      /* A section head, then a band of wave scroll under it. */
+      [data-style='leaf'] .cs-section h4 {
+        margin: 0 0 6px;
+        padding-bottom: 32px;
+        font: 400 var(--head-size) / 1 var(--head);
+        color: var(--gold-hi);
+        text-align: center;
+        text-shadow: 0 2px 0 var(--ink);
+        background: var(--s-wave);
+        background-position: center bottom 4px;
+      }
+      [data-style='leaf'] .cs-row {
+        padding: 3px 0;
+        border-bottom: 2px solid #c09d4e1c;
+      }
+      [data-style='leaf'] .cs-row .cs-label {
+        color: var(--pearl);
+      }
+      [data-style='leaf'] .cs-value {
+        color: var(--gold-hi);
+      }
+      [data-style='leaf'] .cs-row.def .cs-value,
+      [data-style='leaf'] .cs-row.def .cs-label {
+        color: var(--dim);
+      }
+      [data-style='leaf'] .cs-raw {
+        font-size: var(--small);
+        margin-right: 10px;
+      }
+      [data-style='leaf'] .cs-est {
+        justify-content: center;
+        gap: 6px 40px;
+        width: fit-content;
+        margin: 28px auto 0;
+        padding: 14px 32px;
+        color: var(--madder);
+      }
+      [data-style='leaf'] .cs-est b {
+        font: 400 var(--head-size) var(--head);
+        color: var(--pearl);
+        margin-left: 8px;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+
+      /* ---- Next map ---- */
+      [data-style='leaf'] .camp {
+        padding: 16px 24px 24px;
+      }
+      [data-style='leaf'] .camp-head {
+        text-align: center;
+      }
+      [data-style='leaf'] .camp h2 {
+        font: 400 48px/1 var(--big);
+        color: var(--on-gold);
+        margin: 0;
+        text-shadow: 0 2px 0 #e2c68166;
+      }
+      [data-style='leaf'] .camp .who {
+        color: var(--on-gold);
+        font-weight: 600;
+      }
+      [data-style='leaf'] .xp {
+        height: 10px;
+        max-width: 440px;
+        margin: 18px auto 14px;
+        background: var(--t-lapis);
+        box-shadow:
+          0 0 0 2px var(--ink),
+          0 0 0 4px #c09d4e,
+          4px 6px 0 2px #0b080555;
+      }
+      [data-style='leaf'] .xp i {
+        display: block;
+        height: 100%;
+        width: 38%;
+        background: #cec6ad;
+      }
+      [data-style='leaf'] .nextmap {
+        font: 400 var(--head-size) var(--head);
+        color: var(--gold-hi);
+        width: fit-content;
+        margin: 20px auto 16px;
+        padding: 11px 26px 9px;
+        text-align: center;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .gauges {
+        justify-content: center;
+        gap: 20px;
+      }
+      [data-style='leaf'] .bars {
+        gap: 10px;
+        flex-basis: 240px;
+      }
+      [data-style='leaf'] .bar {
+        height: 20px;
+        background: var(--t-lapis);
+        box-shadow:
+          0 0 0 2px var(--ink),
+          0 0 0 4px #c09d4e,
+          4px 6px 0 2px #0b080555;
+      }
+      [data-style='leaf'] .bar.life i {
+        background: #8a3020;
+      }
+      [data-style='leaf'] .bar.mana i {
+        background: #2f417e;
+      }
+      [data-style='leaf'] .bar span {
+        color: var(--pearl);
+        line-height: 20px;
+        font-size: 14px;
+      }
+      [data-style='leaf'] .flask {
+        width: 16px;
+        height: 30px;
+        background: var(--t-lapis);
+        box-shadow:
+          0 0 0 2px var(--ink),
+          0 0 0 4px #c09d4e,
+          4px 6px 0 2px #0b080555;
+        margin: 0 5px;
+      }
+      [data-style='leaf'] .flask i {
+        position: absolute;
+        inset: 6px 0 0;
+        opacity: 0.8;
+      }
+      [data-style='leaf'] .themes {
+        gap: 24px;
+        margin: 28px 0 18px;
+        align-items: stretch;
+      }
+      [data-style='leaf'] .theme {
+        padding: 76px 28px 40px;
+        min-height: 360px;
+        background: none;
+        border: 0;
+        cursor: pointer;
+      }
+      [data-style='leaf'] .theme:hover {
+        filter: brightness(1.12);
+      }
+      [data-style='leaf'] .theme-name {
+        font: 400 var(--head-size) / 1 var(--head);
+        text-align: center;
+        color: var(--gold-hi);
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .theme-name {
+        font-size: 32px;
+      }
+      [data-style='leaf'] .theme .lvl {
+        text-align: center;
+        color: var(--muted);
+        margin: 4px 0 10px;
+      }
+      [data-style='leaf'] .theme .lvl em {
+        font-style: normal;
+        color: var(--gold-hi);
+      }
+      [data-style='leaf'] .theme .affix {
+        color: var(--pearl);
+        margin: 6px 0;
+      }
+      [data-style='leaf'] .theme .affix.kind {
+        display: inline-block;
+        margin: 0 8px 4px 0;
+      }
+      [data-style='leaf'] .theme .affix strong {
+        color: var(--gold-hi);
+        font-weight: 600;
+      }
+      [data-style='leaf'] .theme .affix.mod {
+        color: var(--madder);
+        padding-top: 8px;
+        border-top: 2px solid #c09d4e1c;
+      }
+      /* What is left out here: the explanation of a map type (now a tip), the leans line, the list of monster types. */
+      [data-style='leaf'] :is(.explain, .leans, .chips.types) {
+        display: none;
+      }
+      [data-style='leaf'] .tip {
+        position: relative;
+        cursor: help;
+        border-bottom: 2px dotted #e2c68188;
+        outline: none;
+      }
+      [data-style='leaf'] .tip:is(:hover, :focus)::after {
+        content: attr(data-tip);
+        position: absolute;
+        z-index: 5;
+        left: -10px;
+        top: calc(100% + 8px);
+        width: 250px;
+        padding: 10px 12px;
+        font-weight: 400;
+        color: var(--pearl);
+        background: var(--t-lapis);
+        box-shadow:
+          0 0 0 2px var(--ink),
+          0 0 0 4px #c09d4e,
+          4px 8px 0 2px #0b080555,
+          0 6px 16px #000a;
+      }
+      /* What a map pays: one pair to a line, so the words never have to shrink. */
+      [data-style='leaf'] .offer-table {
+        margin: 8px 0;
+      }
+      [data-style='leaf'] .offer-table tbody {
+        display: grid;
+        grid-template-columns: 1fr auto;
+      }
+      [data-style='leaf'] .offer-table tr {
+        display: contents;
+      }
+      [data-style='leaf'] .offer-table :is(th, td) {
+        padding: 2px 0;
+        border-bottom: 2px solid #c09d4e1c;
+      }
+      [data-style='leaf'] .offer-table th {
+        color: var(--muted);
+      }
+      [data-style='leaf'] .offer-table .muted {
+        color: var(--dim);
+      }
+      [data-style='leaf'] .gain {
+        color: #a3d293;
+      }
+      [data-style='leaf'] .offer-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 12px 0;
+      }
+      [data-style='leaf'] .chips {
+        gap: 6px 14px;
+      }
+      [data-style='leaf'] .chip {
+        padding: 0;
+        background: none;
+        border: 0;
+        font-size: var(--size);
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .mixbar {
+        height: 18px;
+        gap: 0;
+        background: none;
+      }
+      [data-style='leaf'] .mixbar span {
+        display: none;
+      }
+      [data-style='leaf'] .weak {
+        color: var(--pearl);
+        padding: 13px 18px;
+        text-align: center;
+        text-shadow: 0 2px 0 var(--ink);
+      }
+      [data-style='leaf'] .stop-card {
+        text-align: center;
+      }
+      [data-style='leaf'] .stop-card .affix {
+        margin-top: 20px;
+      }
+      [data-style='leaf'] .camp-actions {
+        margin-top: 12px;
+        gap: 12px;
+      }
+
+      /* ---- The border sample sheet under the note (study chrome) ---- */
+      .swatches {
+        display: none;
+        max-width: 1000px;
+        margin: 10px auto 0;
+        padding: 0 16px;
+        gap: 10px 20px;
+        flex-wrap: wrap;
+      }
+      [data-style='leaf'] .swatches {
+        display: flex;
+      }
+      .swatch {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+        color: #999;
+      }
+      .swatch i {
+        display: block;
+        width: 216px;
+        image-rendering: pixelated;
+        outline: 1px solid #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="study">
+      <div class="grp" id="styles"><span>Style</span></div>
+      <div class="grp" id="screens"><span>Screen</span></div>
+      <div class="grp" id="widths"><span>Width</span></div>
+    </div>
+    <p class="note" id="note"></p>
+    <div class="swatches" id="swatches"></div>
+    <div class="stage"><div class="frame" id="frame"></div></div>
+
+    <script src="paint.js"></script>
+    <script>
+      // ---- Directions: name and the bet each one makes (shown above the mockup) ----
+      const STYLES = [
+        [
+          'now',
+          'Now',
+          'The game today, copied from its CSS: the baseline every direction is judged against.',
+        ],
+        [
+          'leaf',
+          'Gold Leaf',
+          '<b>Early Christian art as it looks today.</b> Every surface painted at half screen resolution and aged: grime, gold flaked to the red bole, paint worn to plaster, cracks. Gold is the wall; lapis panels hold the numbers; pools are medallions in wreaths; offers are arched niches. The borders, by name:',
+        ],
+      ];
+
+      // The border sample sheet: the painted strips, by name (paint.js).
+      const swatchHtml = () =>
+        Object.values(window.leafStrips())
+          .map(
+            (s) =>
+              `<div class="swatch"><i style="height:${s.H * LEAF_P}px;background:url(${s.url}) 0 0 / ${s.W * LEAF_P}px ${s.H * LEAF_P}px repeat-x"></i>${s.label}</div>`,
+          )
+          .join('');
+      const SCREENS = [
+        ['character', 'Character'],
+        ['camp', 'Next map'],
+      ];
+      const WIDTHS = [
+        ['desktop', 'Desktop'],
+        ['phone', 'Phone'],
+      ];
+
+      // ---- Character data: the level 42 Mystic as the live Character tab showed it ----
+      const POOLS = [
+        ['Life', '1,145', ['×1.47'], 'cs-life'],
+        ['Energy Shield', '0', ['×1.65'], 'cs-es'],
+        ['Mana', '24', ['of 499', '×1.10'], 'cs-mana'],
+      ];
+      const ATTRS = [
+        ['Strength', '60', [], 'cs-str'],
+        ['Dexterity', '130', [], 'cs-dex'],
+        ['Intelligence', '226', [], 'cs-int'],
+      ];
+      const RES = [
+        ['Fire', 30, '#b48068', 'fire'],
+        ['Cold', 73, '#8497a8', 'cold'],
+        ['Lightning', 59, '#ae9f72', 'lightning'],
+        ['Chaos', 0, '#97849f', 'chaos'],
+      ];
+      const LEFT = [
+        [
+          'Armour and Evasion',
+          [
+            ['Physical Damage Reduction', '90%', '2,278 armour'],
+            ['Armour', '×1.00'],
+            ['Chance to Evade Attacks', '80%', '789 evasion'],
+            ['Evasion Rating', '×1.83'],
+          ],
+        ],
+        [
+          'Block and Stun',
+          [
+            ['Chance to Block Attacks', '41%'],
+            ['Chance to Block Spells', '0%'],
+            ['Chance to Avoid Stuns', '30%'],
+          ],
+        ],
+        [
+          'Recovery',
+          [
+            ['Life Regeneration', '9.2/s'],
+            ['Life Regeneration Rate', '×1.00'],
+            ['Mana Regeneration', '15.7/s'],
+            ['Mana Regeneration Rate', '×1.80'],
+            ['Energy Shield Recharge Rate', '×1.00'],
+          ],
+        ],
+      ];
+      const RIGHT = [
+        [
+          'Damage',
+          [
+            ['Damage', '×1.00'],
+            ['Attack Damage', '×1.00'],
+            ['Spell Damage', '×1.10'],
+            ['Physical Damage', '×1.00'],
+            ['Elemental Damage', '×1.00'],
+            ['Fire Damage', '×1.00'],
+            ['Cold Damage', '×1.00'],
+            ['Lightning Damage', '×1.24'],
+            ['Chaos Damage', '×1.00'],
+            ['Damage over Time', '×1.00'],
+            ['Elemental Damage with Attack Skills', '×1.60'],
+            ['Physical Damage with Melee', '×1.12'],
+            ['Damage from Attack Skills over Time while Wielding a Wand', '×1.12'],
+            ['Damage with Projectiles', '×1.30'],
+            ['Damage with Wands', '×1.12'],
+          ],
+        ],
+        [
+          'Speed',
+          [
+            ['Attack Speed', '×1.38'],
+            ['Cast Speed', '×1.11'],
+          ],
+        ],
+        [
+          'Critical Strikes',
+          [
+            ['Critical Strike Chance', '×1.79'],
+            ['Critical Strike Chance with Spells', '×1.15'],
+          ],
+        ],
+        [
+          'Area and Projectiles',
+          [
+            ['Area of Effect', '×1.00'],
+            ['Projectile Speed', '×1.30'],
+            ['Skill Effect Duration', '×1.00'],
+          ],
+        ],
+        ['Hexes', [['Brittle Doom', '−29% to all elemental resistances']]],
+        ['Movement and More', [['Movement Speed', '4.8 tiles/s', '×1.20']]],
+      ];
+
+      // ---- Next map data: a mid-run set that has every part an offer card can show ----
+      const MIX = ['#eadfc8', '#c89cff', '#9ad8ff', '#ff9a40', '#9ae05a']; // physical, lightning, cold, fire, chaos
+      const OFFERS = [
+        {
+          name: 'Charnel Pits',
+          level: 44,
+          offset: 2,
+          type: [
+            'Quarry',
+            'Three champions and few others. Each drops a rare, sometimes a unique.',
+          ],
+          table: { q: '+35%', r: '+48%', x: '—', n: 9, mrb: '— · — · 3', bonus: '—' },
+          factions: [
+            ['◆', 'Ossuary', '64%', '#e8e0c8'],
+            ['●', 'the Rot', '36%', '#9fd07a'],
+          ],
+          leans: 'Hard to physical. Soft to fire.',
+          mix: [0.55, 0, 0.15, 0, 0.3],
+          types: [
+            ['Skeleton Brute', '34%', '#e8e0c8'],
+            ['Skeleton Mage', '30%', '#e8e0c8'],
+            ['Bloater', '36%', '#9fd07a'],
+          ],
+          affixes: [['Monsters have 40% more life', '+14% item quantity, +8% experience']],
+          weak: 'Your chaos resistance is 0% against 30% chaos damage',
+        },
+        {
+          name: 'Rimed Catacomb',
+          level: 42,
+          offset: 0,
+          density: ['Packed', 'Half as many monsters again in every room.'],
+          table: { q: '+20%', r: '—', x: '+26%', n: 38, mrb: '6 · 2 · —', bonus: '—' },
+          factions: [
+            ['◇', 'the Hollow', '72%', '#8fb8e8'],
+            ['▲', 'the Ashen Choir', '28%', '#e0a070'],
+          ],
+          leans: 'Soft to lightning.',
+          mix: [0.25, 0, 0.6, 0.15, 0],
+          types: [
+            ['Wailer', '31%', '#8fb8e8'],
+            ['Gloomstalker', '41%', '#8fb8e8'],
+            ['Censer-bearer', '16%', '#e0a070'],
+            ['Flagellant', '12%', '#e0a070'],
+          ],
+          affixes: [
+            ['Monsters gain 25% of their damage as extra cold damage', '+9% item quantity'],
+            ['Players have -20% to maximum resistances', '+11% experience'],
+          ],
+        },
+        { stop: true, name: 'The Quartermaster', level: 42, text: 'Eight wares for Bone Dust.' },
+      ];
+
+      // ---- Markup (shared by every direction) ----
+      const tile = (label, value, notes, cls, extra = '') =>
+        `<div class="cs-tile ${cls}"${extra}><span class="cs-label">${label}</span><b>${value}</b>${notes.length ? `<span class="cs-raw">${notes.join(' · ')}</span>` : ''}</div>`;
+      const row = ([label, value, raw]) =>
+        `<div class="cs-row${value === '×1.00' ? ' def' : ''}"><span class="cs-label">${label}</span><span class="cs-value">${raw ? `<span class="cs-raw">${raw}</span>` : ''}${value}</span></div>`;
+      const section = ([title, rows]) =>
+        `<section class="cs-section"><h4>${title}</h4>${rows.map(row).join('')}</section>`;
+      const resColor = { fire: '#b48068', cold: '#8497a8', lightning: '#ae9f72', chaos: '#97849f' };
+
+      const character = `
+    <div class="cs scr-character">
+      <div class="cs-top">
+        <div class="cs-trio">${POOLS.map((p) => tile(...p)).join('')}</div>
+        <div class="cs-trio">${ATTRS.map((p) => tile(...p)).join('')}</div>
+        <div class="cs-trio cs-four">${RES.map(([n, v, c, k]) =>
+          tile(
+            n,
+            v + '%',
+            ['max 75%'],
+            `cs-res-${k}${v < 75 ? ' cs-under' : ''}`,
+            ` style="--c:${c};--f:${(Math.max(0, v) / 75) * 100}%"`,
+          ),
+        ).join('')}</div>
+      </div>
+      <div class="cs-cols">
+        <div class="cs-col">${LEFT.map(section).join('')}</div>
+        <div class="cs-col">${RIGHT.map(section).join('')}</div>
+      </div>
+      <div class="cs-est"><span>Estimated DPS <b>8,095</b></span><span>Effective HP <b>30,788</b></span></div>
+    </div>`;
+
+      const card = (o) => {
+        if (o.stop)
+          return `<div class="theme stop-card" role="button"><div class="theme-name">${o.name}</div><div class="lvl">Level ${o.level}</div><div class="affix">${o.text}</div></div>`;
+        const t = o.table;
+        const cell = (v) =>
+          v === '—'
+            ? '<span class="muted">—</span>'
+            : v.startsWith('+')
+              ? `<span class="gain">${v}</span>`
+              : v;
+        return `<div class="theme" role="button">
+      <div class="theme-name">${o.name}</div>
+      <div class="lvl">Level ${o.level}${o.offset ? ` <em>(+${o.offset})</em>` : ''}</div>
+      ${[o.type, o.density]
+        .filter(Boolean)
+        .map(
+          ([n, t]) =>
+            `<div class="affix kind"><strong class="tip" tabindex="0" data-tip="${t}">${n}</strong><span class="explain">: ${t}</span></div>`,
+        )
+        .join('')}
+      <table class="offer-table"><tbody>
+        <tr><th>Quantity</th><td>${cell(t.q)}</td><th>Rarity</th><td>${cell(t.r)}</td></tr>
+        <tr><th>Experience</th><td>${cell(t.x)}</td><th>Monsters</th><td>${t.n}</td></tr>
+        <tr><th>Magic · Rare · Boss</th><td>${t.mrb}</td><th>Bonus</th><td>${cell(t.bonus)}</td></tr>
+      </tbody></table>
+      <div class="offer-info">
+        <div class="chips">${o.factions.map(([g, n, s, c]) => `<span class="chip faction" style="color:${c};border-color:${c}">${g} ${n} ${s}</span>`).join('')}</div>
+        <div class="leans">${o.leans}</div>
+        <div class="mixbar" data-mix="${o.mix.join(',')}">${o.mix.map((x, i) => (x ? `<span style="width:${x * 100}%;background:${MIX[i]}"></span>` : '')).join('')}</div>
+        <div class="chips types">${o.types.map(([n, s, c]) => `<span class="chip type" style="color:${c}">${n} ${s}</span>`).join('')}</div>
+        ${o.weak ? `<div class="weak">${o.weak}</div>` : ''}
+      </div>
+      ${o.affixes.map(([a, r]) => `<div class="affix mod">${a} <span class="muted">(${r})</span></div>`).join('')}
+    </div>`;
+      };
+
+      const flask = (c) => `<div class="flask"><i style="background:${c}"></i></div>`;
+      const camp = `
+    <div class="camp scr-camp">
+      <div class="camp-head">
+        <h2>Camp</h2>
+        <div class="who">Mystic · Level 42</div>
+        <div class="xp"><i></i></div>
+      </div>
+      <div class="nextmap">Next: map 23 of 100</div>
+      <div class="gauges">
+        <div class="bars"><div class="bar life"><i style="width:82%"></i><span>Life 82%</span></div><div class="bar mana"><i style="width:100%"></i><span>Mana 100%</span></div></div>
+        <div class="flasks">${flask('#b83028')}${flask('#b83028')}${flask('#2a4ab0')}${flask('#c8a040')}${flask('#c8a040')}</div>
+      </div>
+      <div class="themes">${OFFERS.map(card).join('')}</div>
+      <div class="camp-actions"><button class="btn">Save and quit</button><button class="btn">Abandon run</button></div>
+    </div>`;
+
+      const tabs = (on) =>
+        `<div class="tabs">${[
+          'Character',
+          'Passive tree',
+          'Items',
+          'Skills',
+          'Strategy',
+          'Next map',
+        ]
+          .map((t) => `<button class="tab${t === on ? ' on' : ''}">${t}</button>`)
+          .join('')}</div>`;
+
+      function render() {
+        const h = document.documentElement;
+        const screen = h.dataset.screen;
+        document.getElementById('frame').innerHTML =
+          tabs(screen === 'camp' ? 'Next map' : 'Character') +
+          `<div class="tab-body">${character}${camp}</div>` +
+          `<div class="foot"><span>Mystic · Level 42</span><span class="right"><button class="btn small">↶ Undo</button>${screen === 'camp' ? '' : '<button class="btn small primary">Next map ▸</button>'}</span></div>`;
+        document.getElementById('note').innerHTML = STYLES.find((s) => s[0] === h.dataset.style)[2];
+        document.getElementById('swatches').innerHTML =
+          h.dataset.style === 'leaf' ? swatchHtml() : '';
+        if (h.dataset.style === 'leaf')
+          requestAnimationFrame(() => paintLeaf(document.getElementById('frame')));
+        for (const [grp, key] of [
+          ['styles', 'style'],
+          ['screens', 'screen'],
+          ['widths', 'width'],
+        ])
+          for (const b of document.querySelectorAll(`#${grp} button`))
+            b.classList.toggle('on', b.dataset.v === h.dataset[key]);
+      }
+
+      function set(key, v) {
+        document.documentElement.dataset[key] = v;
+        try {
+          localStorage.setItem(
+            'bob.styleStudy',
+            JSON.stringify({ ...document.documentElement.dataset }),
+          );
+        } catch {}
+        render();
+      }
+
+      for (const [grp, key, list] of [
+        ['styles', 'style', STYLES],
+        ['screens', 'screen', SCREENS],
+        ['widths', 'width', WIDTHS],
+      ])
+        for (const [v, label] of list) {
+          const b = document.createElement('button');
+          b.textContent = label;
+          b.dataset.v = v;
+          b.onclick = () => set(key, v);
+          document.getElementById(grp).append(b);
+        }
+
+      // The URL wins (?style=ash&screen=camp&width=phone), then the last view, then the defaults.
+      try {
+        Object.assign(
+          document.documentElement.dataset,
+          JSON.parse(localStorage.getItem('bob.styleStudy') || '{}'),
+        );
+      } catch {}
+      for (const [k, v] of new URLSearchParams(location.search))
+        if (['style', 'screen', 'width'].includes(k)) document.documentElement.dataset[k] = v;
+
+      if (!STYLES.some((s) => s[0] === document.documentElement.dataset.style))
+        document.documentElement.dataset.style = 'now';
+      addEventListener('keydown', (e) => {
+        if (e.key >= '1' && e.key <= String(STYLES.length)) set('style', STYLES[+e.key - 1][0]);
+        if (e.key === 'c') set('screen', 'character');
+        if (e.key === 'm') set('screen', 'camp');
+        if (e.key === 'p')
+          set('width', document.documentElement.dataset.width === 'phone' ? 'desktop' : 'phone');
+      });
+      render();
+      // Repaint once the fonts have set the real sizes, and after the frame changes size.
+      const repaint = () =>
+        document.documentElement.dataset.style === 'leaf' &&
+        paintLeaf(document.getElementById('frame'));
+      document.fonts.ready.then(repaint);
+      document.fonts.addEventListener('loadingdone', () => setTimeout(repaint, 50));
+      let resizeTimer;
+      new ResizeObserver(() => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(repaint, 120);
+      }).observe(document.getElementById('frame'));
+    </script>
+  </body>
+</html>
