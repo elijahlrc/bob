@@ -3,7 +3,6 @@ import { gemDef } from '../data/gems';
 import { EQUIP_SLOTS, type Item } from '../data/types';
 import { placementsFor, slotLabel, type Placement, type SocketRef } from '../run/inventoryOps';
 import type { RunState } from '../run/run';
-import { SocketPips } from './SocketPips';
 
 /** What putting a gem in a socket does to the character, in badges; or why it does nothing (no skill on that item for a support). */
 export function Badge({
@@ -28,7 +27,7 @@ export function Badge({
         </span>
       ))}
       {/* A change that is (partly) the old gem leaving says so, and a gem that would do nothing itself says why. */}
-      {p.fromRemoval !== undefined && p.replaces && (
+      {p.fromRemoval !== undefined && p.replaces && Math.abs(p.fromRemoval - p.dpsPct) >= 0.5 && (
         <span class="muted small">
           {' '}
           ({pctText(p.fromRemoval)} from taking out {p.replaces})
@@ -91,8 +90,8 @@ export function SocketPicker({
     pending && placements.find((p) => p.slot === pending.slot && p.socket === pending.socket);
   const lostPrimary = !!cur && run.build.primaryGem === cur.uid;
   return (
-    <div class="ix-picker">
-      <div class="ix-fsec">Socket it in</div>
+    <div class="ix-picker" data-paint="panel">
+      <h4 class="lf-h">Socket it in</h4>
       {rows.map((r) => {
         const isFree = r.free > 0;
         const on = pending && pending.slot === r.ref.slot && pending.socket === r.ref.socket;
@@ -100,19 +99,21 @@ export function SocketPicker({
           <button
             key={`${r.ref.slot}:${r.ref.socket}`}
             class={'ix-prow' + (r.best ? ' best' : '') + (on ? ' on' : '')}
+            data-paint="panel"
+            data-thin={on ? undefined : ''}
+            data-pk={on ? 'on' : r.best ? 'best' : ''}
             onClick={() =>
               isFree ? onPlace(r.ref) : setTarget(on ? null : { gemUid, ref: r.ref })
             }
           >
-            <SocketPips sockets={r.item.sockets} primary={run.build.primaryGem} size="sm" />
             <span class="m">
-              {r.item.name}
-              <small>
+              <span class="ix-prow-name">{r.item.name}</span>
+              <span class="ix-prow-sub">
                 {slotLabel(r.ref.slot)} ·{' '}
                 {isFree
                   ? `${r.free} free socket${r.free === 1 ? '' : 's'}`
                   : `replaces ${r.p.replaces ?? 'a gem'}`}
-              </small>
+              </span>
             </span>
             <span class="ix-prow-b">
               <Badge p={r.p} />
@@ -121,10 +122,10 @@ export function SocketPicker({
         );
       })}
       {pending && cur && curPlacement && (
-        <div class="ix-confirm" role="status">
+        <div class="ix-confirm" role="status" data-paint="panel" data-field="porphyry" data-thin>
           <div>
             Replace <b>{gemDef(cur.gemId).name}</b>
-            {lostPrimary ? ', your primary skill' : ''}? It goes to the bag.
+            {lostPrimary ? ', your main skill' : ''}? It goes to the bag.
           </div>
           <div class="ix-confirm-b">
             <Badge p={curPlacement} />

@@ -903,3 +903,93 @@ html.leaf .ix-fold {
   font-size: var(--size);
   color: var(--gold-hi);
 }
+
+/* ---- A gem picked in the bag: its card on a leaf, then where it could go (SocketPicker) ---- */
+html.leaf .ix-body > .item-card.gem {
+  padding: 18px 20px 22px;
+  background: var(--t-lapis, #172049);
+  box-shadow:
+    0 0 0 3px #c09d4e,
+    5px 7px 0 2px #0b080566;
+}
+html.leaf .item-card.gem .gem-tags {
+  color: var(--muted);
+  font-size: var(--size);
+}
+html.leaf .ix-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 20px 22px;
+  background-color: transparent;
+  border: 0;
+}
+html.leaf .ix-prow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px 11px;
+  font: inherit;
+  text-align: left;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+html.leaf .ix-prow:hover:not(.on) {
+  filter: brightness(1.15);
+}
+html.leaf .ix-prow .m {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+html.leaf .ix-prow-sub {
+  color: var(--muted);
+}
+html.leaf .ix-prow.best .ix-prow-name {
+  color: var(--gold-hi);
+}
+html.leaf .ix-prow-b {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 8px;
+  max-width: 50%;
+  text-align: right;
+}
+html.leaf .ix-picker .badge,
+html.leaf .ix-confirm .badge {
+  padding: 0;
+  font-size: var(--size);
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+html.leaf .ix-picker .badge.neutral {
+  color: var(--muted);
+}
+html.leaf .ix-picker .muted.small,
+html.leaf .ix-confirm .muted.small {
+  font-size: var(--size);
+  color: var(--muted);
+}
+html.leaf .ix-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 14px 18px 16px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  background-color: transparent;
+  border: 0;
+}
+html.leaf .ix-prow :is(.m, .ix-prow-name, .ix-prow-sub) {
+  font-size: var(--size);
+  line-height: 1.3;
+}
