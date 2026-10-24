@@ -10,8 +10,6 @@ change, and our own names only. Dash bullets under plain headings.
 - The Items tab is rebuilt around your worn gear, with a new item and the one it replaces side by side before you wear it.
 - On the passive tree, the first click or tap on a node shows it and the second takes it; labels no longer pop in and out as you pan.
 - The Character tab is regrouped, with each stat beside its modifiers.
-- The map HUD is sharper and less cluttered, and boss and rival bars stay centred on phones.
-- The interface size buttons now work on the itch.io page.
 - Slag Lob and Storm Arrow count as projectiles and several other skills' tags now match what they do, which changes which supports affect them.
 - The Tollkeeper hoists his bell before each toll and brings it down as the first ring strikes.
 
