@@ -277,20 +277,20 @@
   /* frames filmed of each clip (the last is held past the end) */
   const LEN = {
     'endgame-v': 150,
-    tree3: 90,
+    'tree3-v': 90,
     'vanguard-v': 150,
-    skills: 60,
+    'skills-v': 60,
     'shade-v': 270,
-    equip: 45,
+    'equip-v': 45,
     'climb1-v': 45,
     'climb2-v': 45,
     'climb4-v': 45,
     'climb5-v': 45,
     'fall-v': 170,
-    summary: 36,
+    'summary-v': 36,
     'duel-v': 106,
     result: 30,
-    board: 45,
+    'board-v': 45,
     'auto-v': 60,
   };
   /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame */
@@ -302,19 +302,7 @@
   /* a full-frame vertical clip */
   const img = (href, x = 0, y = 0, w = 180, h = 320, extra = '') =>
     `<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice" ${extra}/>`;
-  /* a landscape frame in a vertical one: the frame itself, `zoom` times the frame's width wide (1 = the width of the stage), centred
-     on `cx` (0 to 1 across the frame) and `y` units from the top, over a dimmed, blurred copy of itself that fills the stage */
-  const fit = (href, { zoom = 1, cx = 0.5, y = null, ar = 16 / 9 } = {}) => {
-    const w = 180 * zoom;
-    const h = w / ar;
-    const top = y ?? (320 - h) / 2;
-    return (
-      `<g filter="url(#blur)">${img(href, -20, -20, 220, 360)}</g>` +
-      `<rect width="180" height="320" fill="#000" opacity=".55"/>` +
-      `<image href="${href}" x="${90 - w * cx}" y="${top}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`
-    );
-  };
-  /* the same, a slice of a frame to fill a box (a cell of the genre grid) */
+  /* a clip's frame in a box (a cell of the genre grid) */
   const cell = (href, x, y, w, h) => img(href, x, y, w, h);
 
   /* two lines of text on a dark band, in the safe zone (not under the app's own buttons, which take the bottom fifth) */
@@ -349,7 +337,7 @@
     {
       t: [2, 5],
       name: 'The tree',
-      draw: (lt) => fit(at('tree3', lt, 0), { zoom: 1, y: 70 }),
+      draw: (lt) => img(at('tree3-v', lt, 0)),
     },
     {
       t: [5, 6],
@@ -364,10 +352,10 @@
       draw(lt) {
         if (lt < 2.5) {
           const sl = lt < 1 ? lt : lt < 1.5 ? 1 : lt - 0.5;
-          return fit(at('skills', sl, 0), { zoom: 2.3, cx: 0.4, y: 110 });
+          return img(at('skills-v', sl, 0));
         }
         if (lt < 4.5) return img(at('shade-v', lt - 2.5));
-        return fit(at('equip', lt - 4.5, 15), { zoom: 1.5, ar: 1280 / 990, cx: 0.5, y: 70 });
+        return img(at('equip-v', lt - 4.5, 15));
       },
     },
     {
@@ -402,7 +390,7 @@
           s += `<rect width="180" height="320" fill="#000" opacity="${clamp((lt - 2.8) / 0.55) * 0.55}"/>`;
           return s + levelTag(72, 'Warren');
         }
-        return fit(at('summary', lt - 3.35, -45), { zoom: 1.7, y: 100 });
+        return img(at('summary-v', lt - 3.35, -45));
       },
     },
     {
@@ -419,17 +407,16 @@
     {
       t: [24.5, 26],
       name: 'The board',
-      draw: (lt) =>
-        fit(at('board', lt, 0), { zoom: 1.8, y: 80 }) + caption(['Take the top spot.'], lt, 0.35),
+      draw: (lt) => img(at('board-v', lt, 0)) + caption(['Take the top spot.'], lt, 0.35, 250),
     },
     {
       t: [26, 28],
       name: 'The genres',
       draw(lt) {
         const cells = [
-          ['Arcade.', () => src('board', LEN.board - 1)],
-          ['ARPG.', () => src('tree3', LEN.tree3 - 1)],
-          ['Roguelike.', () => src('summary', 6)],
+          ['Arcade.', () => src('board-v', LEN['board-v'] - 1)],
+          ['ARPG.', () => src('tree3-v', LEN['tree3-v'] - 1)],
+          ['Roguelike.', () => src('summary-v', 6)],
           ['Autobattler.', (l) => at('auto-v', l)],
         ];
         let s = '';
@@ -515,10 +502,7 @@
       if (k >= 0 && k < 0.15) fl = Math.max(fl, 0.35 * (1 - k / 0.15));
     });
     svg.innerHTML =
-      DEFS.replace(
-        '</defs>',
-        '<filter id="blur" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="6"/></filter></defs>',
-      ) +
+      DEFS +
       `<rect width="180" height="320" fill="#07070b"/>` +
       `<g transform="translate(90 160) scale(${z}) translate(-90 -160)">${body}</g>` +
       hurt(t) +

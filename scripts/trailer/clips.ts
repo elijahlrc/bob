@@ -790,3 +790,10 @@ CLIPS.push(
     zoom: VERTICAL_ZOOM[c.name],
   })),
 );
+
+/** The camp and end screens of the vertical cut: the same scripts in the phone view (their selectors may need the phone layout's). */
+CLIPS.push(
+  ...CLIPS.filter((c) => ['tree3', 'skills', 'equip', 'summary', 'board'].includes(c.name)).map(
+    (c) => ({ ...c, name: `${c.name}-v`, viewport: VERTICAL }),
+  ),
+);
