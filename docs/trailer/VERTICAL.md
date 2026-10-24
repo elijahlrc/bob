@@ -53,11 +53,16 @@ each shot that draws the vertical version (a shot with no override is a bug). Th
 `glow`, `txt`, `pixWord`) stay shared. `render.ts` gets `--vertical`, which sets the page and the screenshot to 1080×1920 and
 writes `cut-vertical.mp4` over `score-vertical.wav`.
 
-**Timing.** The freed 2 s are given in whole beats (0.5 s) to the shots that are short for what they show, after the
-re-framing is seen (V2). A first guess, to be settled by eye: the Endgame, the Vanguard slam, the rating and the board
-each +0.5 s. Each shot is lengthened at its end, so the footage keeps its cut-in and its in-shot sound cues stay at the same
-offset from the shot's start. Half-beat (0.25 s) nudges are possible where a cut needs one, but the cut then falls off the
-beat, so they are the exception.
+**Timing.** The freed 2 s are given in whole beats (0.5 s) to the moments that are short for what they show (the owner,
+2026-10-24): the end screen before the duel button (+1.0 s, the one most in need), the gem going into its socket (+0.5 s)
+and the amulet (+0.5 s). They are inside shots, not whole shots, so each is an insertion point: the picture holds or slows
+there, and everything after it, in the shot and beyond, moves later. The end screen is already held on its first frame until
+the button is pressed on 19.25, so its time is a longer hold before the press. The gem and the amulet are filmed again
+slowed at that moment (the sim's own step, not a frozen frame, so the socket light and the number's climb keep moving),
+or held on the best frame if the footage has no slack. A first guess at the places: the end screen from its first frame to
+the press, the gem from the socket click (7.0) through the number's climb, the amulet from where it lands (8.5) to the
+card. The Endgame, Vanguard, rating and board get nothing unless the re-framed shots turn out to need it. Half-beat (0.25
+s) nudges are possible, but the cut then falls off the beat, so they are the exception.
 
 **Audio.** The score is two kinds of material, and they take a new timeline differently. (a) The _groove_ (`bar()` in
 `chip_score.py`) is a bar repeated, so it can be cut and lengthened freely: it is rebuilt on the new timeline in segments
@@ -65,7 +70,7 @@ between fixed points (the stop for the bell, the drop-out before the genres, the
 and ended with a short bar (`bar(..., steps=n)` already does this at 16.0) and the existing snare roll as the seam, so a
 changed length never leaves a gap or a jump. The one-bar phrase (`motif`) and the bass lift are keyed to bar numbers, so
 they follow the rebuilt bars. (b) The _sound effects_ are placed against shots; each goes through `T(t)`, a function that
-adds the net change of the shots before it, and the in-shot cues keep their offset from the shot's start. The fixed points
+adds the length of every insertion before it (a cue inside a lengthened moment is placed with its moment). The fixed points
 (the bell on the fall, the deciding blow, the four word hits, the title) are cued to the picture the same way, so they stay
 in step. The landscape score is untouched: the script takes `--vertical` and writes a second file, `score-vertical.wav`.
 Dropping the three-phones shot removes its cues (the arrows, sweeps and totem bell, 10.65–12.4) with it and takes exactly
@@ -97,6 +102,5 @@ Nothing here touches `src/` except the dev-only staging module if a clip needs a
 1. **A hook in the first seconds?** Feeds judge a video in about two seconds, and the first caption lands on 12.5 s. Options:
    leave as is (strict recut), or move or repeat a short caption early ("Grind to level 100 in a sitting." over the cold open
    and the tree). It changes no shot timing, only when the text shows.
-2. **Where the freed 2 s go:** the first guess is above; the owner picks the shots, and may also keep the 31 s or let the cut
-   run shorter by 2 s.
+2. **Where the freed 2 s go:** chosen (end screen +1.0, gem +0.5, amulet +0.5); "locket" is read as the amulet. The 31 s stays.
 3. **Length:** the full 31 s (default). A shorter 15–20 s feed cut would be a different pacing, so not part of this plan.
