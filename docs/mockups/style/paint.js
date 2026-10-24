@@ -386,6 +386,23 @@
       ctx.restore();
     }
     if (o.foot) tileRow(ctx, t + 1, W - t - 1, H - t - 6);
+    // A frieze under each heading (o.friezes, the art pixel it starts at): gold bars from rim to rim with a wave scroll
+    // between them, so the band is part of the frame rather than a strip laid on the field.
+    for (const fy of o.friezes ?? []) {
+      const y = fy - (o.thin ? 2 : 3);
+      const rim = o.rim ?? 'gold';
+      ctx.fillStyle = col(rim, 5);
+      ctx.fillRect(0, y, W, 1);
+      ctx.fillStyle = col(rim, 6);
+      ctx.fillRect(0, y + 1, W, 1);
+      wave(ctx, t, W - t, y + 2, 7);
+      ctx.fillStyle = col(rim, 6);
+      ctx.fillRect(0, y + 9, W, 1);
+      ctx.fillStyle = col(rim, 5);
+      ctx.fillRect(0, y + 10, W, 1);
+      ctx.fillStyle = col('ink', 0);
+      ctx.fillRect(t, y + 11, W - 2 * t, 1);
+    }
     if (o.pearls && ar) {
       const ins = t + 3,
         rx = (W - 2 * ins) / 2,
@@ -707,6 +724,18 @@
     if (kind === 'medallion') W = H = Math.min(W, H);
     if (!W || !H) return;
     if (el.dataset.pk) key += `|${el.dataset.pk}`;
+    // Headings that belong to this panel get a frieze painted under them.
+    if (kind === 'panel' || kind === 'dpanel') {
+      const er = el.getBoundingClientRect(),
+        sc = el.offsetHeight / (er.height || 1);
+      const friezes = [...el.querySelectorAll('.lf-h, .cs-section h4')]
+        .filter((h) => h.closest('[data-paint], .cs-col') === el)
+        .map((h) => Math.round(((h.getBoundingClientRect().bottom - er.top) * sc) / P) - 12);
+      if (friezes.length) {
+        o = { ...o, friezes };
+        key += `|f${friezes.join(',')}`;
+      }
+    }
     const ck = `${key}|${W}x${H}`;
     let url = cache.get(ck);
     if (!url) {

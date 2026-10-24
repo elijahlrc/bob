@@ -518,10 +518,12 @@
   ];
 
   // ---- State ----
-  let worn, bag, sel, aim, status, history, filter, view, gearOpen;
+  let worn, bag, gone, sel, aim, status, history, filter, view, gearOpen, pinFav;
   function reset() {
     worn = structuredClone(WORN0);
     bag = structuredClone(BAG0);
+    gone = [];
+    pinFav = true;
     sel = null;
     aim = null;
     status = null;
@@ -644,12 +646,11 @@
       c.dps != null || c.ehp != null
         ? `<div class="ix-verdict" data-paint="panel" data-field="porphyry" data-thin>${big(c.dps, 'damage')}${big(c.ehp, 'effective HP')}${(c.more ?? []).length ? `<div class="ix-more">${c.more.map(([t, v]) => `<span class="${v > 0 ? 'lf-up' : 'lf-down'}">${t}</span>`).join('')}</div>` : ''}</div>`
         : '';
-    const goes = w ? `${w.name} goes to the bag.` : '';
     const action = it.cant
       ? `<div class="ix-warn" data-paint="panel" data-thin data-field="vermilion">${it.cant}</div>`
       : `<div class="ix-actbar" data-paint="panel" data-thin><div class="ix-acts"><button class="btn primary" data-paint="panel" data-thin data-field="vermilion" data-act="wear" data-slot="${s}">Wear ${it.kind === 'jewel' && /ring/.test(s) ? 'as' : 'in'} ${SLOTS[s][0]}</button>
          <button class="btn" data-paint="panel" data-thin data-act="fav">${it.fav ? '★' : '☆'} Favourite</button><button class="btn" data-paint="panel" data-thin data-act="discard">Discard</button></div>
-         ${goes || c.gems ? `<p class="ix-goes">${goes}${c.also && worn[c.also] ? ` So does ${worn[c.also].name}.` : ''}${c.gems ? ` ${c.gems}` : ''}</p>` : ''}</div>`;
+         ${c.gems ? `<p class="ix-goes">${c.gems}</p>` : ''}</div>`;
     const leaves = phone()
       ? `${card(it, { vs: w, side: 'new', label: it.justOff ? 'Just taken off' : 'New' })}${w ? card(w, { vs: it, side: 'worn', label: `Worn: ${SLOTS[s][0]}` }) : ''}`
       : `<div class="ix-diptych">${card(it, { vs: w, side: 'new', label: it.justOff ? 'Just taken off' : 'New' })}<span class="ix-hinge"><i data-paint="chain"></i><i data-paint="chain"></i></span>${card(w, { vs: it, side: 'worn', label: `Worn: ${SLOTS[s][0]}` })}</div>`;
@@ -716,16 +717,26 @@
       <span class="ix-rowsub"><span class="muted">${it.type ?? ''}</span> ${sub}</span>
     </button>`;
   }
+  /** Dust a salvaged item gives (the mockup's flat rate), what counts as junk (an item nobody could wear), and an old item. */
+  const DUST = 7;
+  const isJunk = (it) => !it.fav && (it.cant || it.row?.dps === 'cant');
+  const isOld = (it) => !it.fav && it.listOnly && !isJunk(it);
+  const goneRow = (
+    it,
+  ) => `<div class="ix-row gone"><span class="ix-rowname r-${it.rar}">${it.name}</span>
+      <span class="ix-rowsub"><span class="muted">${it.type ?? ''}</span><button class="btn small" data-paint="panel" data-thin data-putback="${it.id}">Put back</button></span></div>`;
   function bagPanel() {
-    const list = bag.filter(
+    const list = (view === 'gone' ? gone : bag).filter(
       (it) =>
         (filter === 'all' || it.kind === filter) &&
         (view === 'all' ||
+          view === 'gone' ||
           (view === 'new' && it.isNew) ||
           (view === 'up' && isUp(it)) ||
-          (view === 'fav' && it.fav)) &&
-        view !== 'gone',
+          (view === 'fav' && it.fav)),
     );
+    if (pinFav) list.sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0));
+    const junk = bag.filter(isJunk);
     const count = (v) =>
       v === 'new'
         ? bag.filter((b) => b.isNew).length
@@ -733,14 +744,23 @@
           ? bag.filter(isUp).length
           : v === 'fav'
             ? bag.filter((b) => b.fav).length
-            : '';
+            : v === 'gone'
+              ? gone.length
+              : '';
     return `<section class="ix-bag" data-paint="panel">
       <div class="ix-baghead"><h4>Bag</h4><span class="ix-cap"><i style="width:${(bag.length / 60) * 100}%"></i></span><span class="muted">${bag.length} / 60</span></div>
       <div class="ix-views">${VIEWS.map(([v, t]) => `<button class="ix-view${v === view ? ' on' : ''}" data-view="${v}" ${v === view ? 'data-paint="panel" data-thin data-field="gold" data-pk="on"' : ''}>${t}${count(v) ? ` <span>${count(v)}</span>` : ''}</button>`).join('')}</div>
       <div class="ix-kinds">${FILTERS.map(([f, g, t]) => `<button class="ix-kind${f === filter ? ' on' : ''} tip" data-tip="${t}" data-filter="${f}" ${f === filter ? 'data-paint="panel" data-thin data-field="gold" data-pk="on"' : 'data-paint="panel" data-thin data-pk="off"'}><i data-paint="glyph" data-glyph="${g}" data-pk="${g}${f === filter}"></i></button>`).join('')}</div>
       <div class="ix-tools"><span class="ix-search" data-paint="panel" data-thin data-field="lapis"><input placeholder="Search the bag" /></span>
         <span class="sel" data-paint="panel" data-thin><select><option>Newest</option><option>Best upgrade</option><option>Slot</option><option>Rarity</option><option>Name</option></select></span></div>
-      <div class="ix-list">${list.map(rowHtml).join('') || '<p class="muted">Nothing here.</p>'}</div>
+      <div class="ix-list">${list.map(view === 'gone' ? goneRow : rowHtml).join('') || '<p class="muted">Nothing here.</p>'}</div>
+      <div class="ix-tidy">
+        <button class="btn small" data-paint="panel" data-thin data-act="seen" ${bag.some((b) => b.isNew) ? '' : 'disabled'}>Mark all seen</button>
+        <button class="btn small" data-paint="panel" data-thin data-act="cleanup">Clean up old items…</button>
+        <button class="btn small" data-paint="panel" data-thin data-field="vermilion" data-act="junk" ${junk.length ? '' : 'disabled'}>Salvage junk (${junk.length})</button>
+        ${gone.length ? `<button class="btn small" data-paint="panel" data-thin data-field="vermilion" data-act="salvage">Salvage ${gone.length} discarded → ${gone.length * DUST} Dust</button>` : ''}
+        <label class="sk-check"><input type="checkbox" data-pinfav ${pinFav ? 'checked' : ''} /> Keep ★ favourites on top</label>
+      </div>
     </section>`;
   }
 
@@ -758,7 +778,7 @@
   // ---- Acting ----
   function wear(id, s) {
     const it = byId(id);
-    history.push(structuredClone({ worn, bag, sel, aim }));
+    history.push(structuredClone({ worn, bag, gone, sel, aim }));
     const old = worn[s];
     const c = it.cmp[s];
     bag = bag.filter((b) => b.id !== id);
@@ -834,6 +854,17 @@
     frame
       .querySelectorAll('[data-view]')
       .forEach((b) => (b.onclick = () => ((view = b.dataset.view), go())));
+    frame.querySelectorAll('[data-putback]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          const it = gone.find((g) => g.id === b.dataset.putback);
+          gone = gone.filter((g) => g !== it);
+          bag.unshift(it);
+          go();
+        }),
+    );
+    const pf = frame.querySelector('[data-pinfav]');
+    if (pf) pf.onchange = () => ((pinFav = pf.checked), go());
     frame
       .querySelectorAll('[data-filter]')
       .forEach((b) => (b.onclick = () => ((filter = b.dataset.filter), go())));
@@ -843,7 +874,7 @@
           const a = b.dataset.act;
           if (a === 'wear') wear(sel.id, b.dataset.slot);
           if (a === 'undo' && history.length) {
-            ({ worn, bag, sel, aim } = history.pop());
+            ({ worn, bag, gone, sel, aim } = history.pop());
             status = null;
           }
           if (a === 'close') ((sel = null), (status = null));
@@ -853,14 +884,33 @@
             it.fav = !it.fav;
           }
           if (a === 'discard') {
-            history.push(structuredClone({ worn, bag, sel, aim }));
+            history.push(structuredClone({ worn, bag, gone, sel, aim }));
             const it = byId(sel.id);
             bag = bag.filter((x) => x !== it);
+            gone.unshift(it);
             status = `${it.name} is in the discarded pile.`;
             sel = null;
           }
+          if (a === 'seen') bag.forEach((b) => (b.isNew = false));
+          if (a === 'junk' || a === 'cleanup') {
+            history.push(structuredClone({ worn, bag, gone, sel, aim }));
+            const out = bag.filter(a === 'junk' ? isJunk : isOld);
+            bag = bag.filter((b) => !out.includes(b));
+            if (a === 'junk')
+              status = `Salvaged ${out.length} items nobody could wear: ${out.length * DUST} Dust.`;
+            else {
+              gone.unshift(...out);
+              status = `${out.length} old items are in the discarded pile.`;
+            }
+            sel = null;
+          }
+          if (a === 'salvage') {
+            history.push(structuredClone({ worn, bag, gone, sel, aim }));
+            status = `Salvaged ${gone.length} discarded items: ${gone.length * DUST} Dust.`;
+            gone = [];
+          }
           if (a === 'off') {
-            history.push(structuredClone({ worn, bag, sel, aim }));
+            history.push(structuredClone({ worn, bag, gone, sel, aim }));
             const it = worn[sel.slot];
             bag.unshift({
               ...it,

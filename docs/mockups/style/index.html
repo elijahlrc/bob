@@ -770,13 +770,11 @@
       /* A section head, then a band of wave scroll under it. */
       [data-style='leaf'] .cs-section h4 {
         margin: 0 0 6px;
-        padding-bottom: 32px;
+        padding-bottom: 30px;
         font: 400 var(--head-size) / 1 var(--head);
         color: var(--gold-hi);
         text-align: center;
         text-shadow: 0 2px 0 var(--ink);
-        background: var(--s-wave);
-        background-position: center bottom 4px;
       }
       [data-style='leaf'] .cs-row {
         padding: 3px 0 5px;
@@ -902,7 +900,7 @@
         align-items: stretch;
       }
       [data-style='leaf'] .theme {
-        padding: 76px 28px 40px;
+        padding: 76px 26px 40px;
         min-height: 360px;
         background: none;
         border: 0;
@@ -985,31 +983,28 @@
       [data-style='leaf'] .offer-pays {
         display: block;
         margin: 10px 0 12px;
-        overflow: hidden;
+        line-height: 1.6;
       }
-      [data-style='leaf'] .pays-in {
+      [data-style='leaf'] .pays-row {
         display: flex;
-        flex-wrap: wrap;
-        margin-left: -28px;
-        line-height: 1.7;
+        align-items: center;
+        white-space: nowrap;
       }
       [data-style='leaf'] .pay {
-        position: relative;
-        padding-left: 28px;
-        white-space: nowrap;
         color: var(--muted);
+      }
+      [data-style='leaf'] .pay-sep {
+        flex: none;
+        width: 12px;
+        height: 12px;
+        margin: 0 10px;
+      }
+      [data-style='leaf'] .pay.none {
+        color: var(--dim);
       }
       [data-style='leaf'] .pay b {
         font-weight: 400;
         color: var(--gold-hi);
-      }
-      [data-style='leaf'] .pay-sep {
-        position: absolute;
-        left: 8px;
-        top: 50%;
-        width: 12px;
-        height: 12px;
-        margin-top: -7px;
       }
       [data-style='leaf'] .offer-table th {
         color: var(--muted);
@@ -1028,6 +1023,15 @@
       }
       [data-style='leaf'] .chips {
         gap: 6px 14px;
+      }
+      /* The armies stay on one line: a little smaller than body text, the only exception besides small medallions. */
+      [data-style='leaf'] .chips:not(.types) {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 0 10px;
+      }
+      [data-style='leaf'] .frame .chip.faction {
+        font-size: 15px;
       }
       [data-style='leaf'] .chip {
         padding: 0;
@@ -1323,18 +1327,21 @@
       // What a map pays, as one line: the pairs that have a value, set apart by small gold settings (Gold Leaf).
       const pays = (t) => {
         const [m, r, b] = t.mrb.split(' · ');
-        const items = [
-          t.q !== '—' && `Quantity <span class="gain">${t.q}</span>`,
-          t.r !== '—' && `Rarity <span class="gain">${t.r}</span>`,
-          t.x !== '—' && `Experience <span class="gain">${t.x}</span>`,
-          `<b>${t.n}</b> monsters`,
-          m !== '—' && `<b>${m}</b> magic`,
-          r !== '—' && `<b>${r}</b> rare`,
-          b !== '—' && `<b>${b}</b> ${b === '1' ? 'boss' : 'bosses'}`,
-          t.bonus !== '—' && `Bonus <span class="gain">${t.bonus}</span>`,
-        ].filter(Boolean);
-        // Each item carries the setting before it; the ones that start a line are clipped away (CSS).
-        return `<div class="pays-in">${items.map((x) => `<span class="pay"><i class="pay-sep" data-paint="sep" data-pk="sep"></i>${x}</span>`).join('')}</div>`;
+        // Always the same order, so cards compare at a glance; what a map does not give is dimmed.
+        const gain = (label, v) =>
+          v === '—' ? [`${label} —`, true] : [`${label} <span class="gain">${v}</span>`];
+        const count = (v, one, many) =>
+          v === '—' ? [`— ${many}`, true] : [`<b>${v}</b> ${v === '1' ? one : many}`];
+        // Fixed rows, so the same value sits in the same place on every card.
+        const rows = [
+          [gain('Quantity', t.q), gain('Rarity', t.r)],
+          [gain('Experience', t.x), gain('Bonus', t.bonus)],
+          [count(String(t.n), 'monster', 'monsters'), count(b, 'boss', 'bosses')],
+          [count(m, 'magic', 'magic'), count(r, 'rare', 'rare')],
+        ];
+        const pay = ([x, empty], i) =>
+          `${i ? '<i class="pay-sep" data-paint="sep" data-pk="sep"></i>' : ''}<span class="pay${empty ? ' none' : ''}">${x}</span>`;
+        return rows.map((row) => `<div class="pays-row">${row.map(pay).join('')}</div>`).join('');
       };
       const card = (o) => {
         if (o.stop)

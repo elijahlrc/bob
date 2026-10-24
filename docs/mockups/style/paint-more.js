@@ -44,6 +44,7 @@
       pearls: 'pearls' in d,
       foot: 'foot' in d,
       rim: d.rim,
+      friezes: o.friezes,
     };
     return [L.panel(W, H, opt), { ...PANEL_AGE, loss: 0.035, cracks: 2, ...o }];
   });

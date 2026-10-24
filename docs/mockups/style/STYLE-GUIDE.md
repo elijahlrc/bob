@@ -126,9 +126,9 @@ its pattern's periods.
 ## 6. Text and layout rules
 
 - **One body size** (17 px Grenze); secondary lines differ by colour, not size. Headings 28 px Jacquard; big numbers and
-  the screen title 48 px Jacquard. The only smaller text is inside small medallions on a phone (14 px), where nothing
-  larger fits.
-- **Never shrink words to fit; change the layout:** what a map pays became one flowing line of the pairs that have a value ("Quantity +35% ◆ Rarity +48% ◆ 9 monsters ◆ 3 bosses"), set apart by small gold settings (one column of pairs left gaps, a 2x3 grid took too much height); medallion
+  the screen title 48 px Jacquard. The only smaller text is inside small medallions on a phone (14 px) and the armies line of an offer (15 px), which
+  must stay on one line.
+- **Never shrink words to fit; change the layout:** what a map pays became four short fixed rows of pairs set apart by small gold settings ("Quantity +35% ◆ Rarity +48%"), the same order on every card with what a map lacks dimmed (one column of pairs left gaps, a 2x3 grid of stacked cells took too much height); medallion
   notes moved to plaques; small text on the gold moved onto plaques.
 - **Cut what the player does not need**, in the spirit of "in-game text is concise": on the offer cards the "hard to …
   soft to …" line and the list of monster types went (the factions stay), and a map type or density shows only its name,
@@ -136,6 +136,9 @@ its pattern's periods.
 - **No plain rules between rows:** rows inside a panel are divided by a painted line of gold tesserae, every third a pearl
   (`--s-dots`), and items on one line by small gold settings with a stone (`sep`); a separator that would start a line is
   clipped.
+- **Section headings sit over a frieze** the panel paints itself: gold bars running into the rim with a wave scroll
+  between them (the panel finds its headings, `.lf-h` and `.cs-section h4`, and draws one under each). A strip laid on the
+  field looked pasted on.
 - **Hard drop shadows on text** (2 px, ink) on lapis and on painted fields.
 - Everything centred where it is a group (medallion rows, the camp head, plaques); measures in even pixels.
 - Wear never sits under text: panels have low texture and their flakes gather at the edges.

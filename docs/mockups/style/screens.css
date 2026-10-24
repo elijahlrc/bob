@@ -22,13 +22,11 @@
 }
 [data-style='leaf'] .lf-h {
   margin: 0 0 8px;
-  padding-bottom: 32px;
+  padding-bottom: 30px;
   font: 400 var(--head-size) / 1 var(--head);
   color: var(--gold-hi);
   text-align: center;
   text-shadow: 0 2px 0 var(--ink);
-  background: var(--s-wave);
-  background-position: center bottom 4px;
 }
 [data-style='leaf'] .lf-lead {
   margin: 0 0 14px;
@@ -102,6 +100,10 @@
   border: 0;
   cursor: pointer;
 }
+[data-style='leaf'] .st .sel select {
+  padding-top: 7px;
+  padding-bottom: 8px;
+}
 [data-style='leaf'] .sel select option {
   background: #1d2958;
   color: var(--pearl);
@@ -152,7 +154,7 @@
   grid-template-columns: 52px 1fr auto;
   gap: 14px;
   align-items: start;
-  padding: 16px 0 16px;
+  padding: 13px 0 13px;
   background: var(--s-dots);
   background-position: left top;
 }
@@ -184,6 +186,10 @@
 }
 [data-style='leaf'] .st-dps {
   color: var(--gold-hi);
+  white-space: nowrap;
+}
+[data-style='leaf'] .st {
+  line-height: 1.3;
 }
 [data-style='leaf'] .st-ctls {
   display: flex;
@@ -225,7 +231,7 @@
   text-shadow: 0 2px 0 var(--ink);
 }
 [data-style='leaf'] .st-says li + li {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 [data-style='leaf'][data-width='phone'] .st {
   padding: 12px;
@@ -1186,4 +1192,50 @@
 }
 [data-style='leaf'][data-width='phone'] .tv[data-sum] .tv-look {
   display: none;
+}
+
+/* The housekeeping, always at the foot of the bag */
+[data-style='leaf'] .ix-tidy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 14px;
+  background: var(--s-dots);
+  background-position: left top;
+}
+[data-style='leaf'] .ix-tidy .btn.small {
+  padding: 8px 14px;
+}
+[data-style='leaf'] .ix-tidy .sk-check {
+  margin-top: 4px;
+}
+[data-style='leaf'] .ix-row.gone {
+  cursor: default;
+}
+[data-style='leaf'] .ix-row.gone .ix-rowsub {
+  align-items: center;
+  justify-content: space-between;
+}
+[data-style='leaf'] .ix-list {
+  max-height: 470px;
+}
+[data-style='leaf'][data-width='phone'] .ix-list {
+  max-height: none;
+}
+[data-style='leaf'][data-width='phone'] .st-ctls {
+  flex-direction: column;
+  gap: 6px;
+}
+[data-style='leaf'][data-width='phone'] .st-ctl {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+[data-style='leaf'][data-width='phone'] .st-lbl {
+  flex: none;
+  width: 52px;
+}
+[data-style='leaf'][data-width='phone'] .st-ctls.two .st-lbl {
+  width: 120px;
 }
