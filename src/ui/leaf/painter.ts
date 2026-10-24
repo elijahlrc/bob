@@ -244,7 +244,8 @@ export function paintAll(root: ParentNode = document) {
     const kind = el.dataset.paint!;
     if (kind === 'none' || el.closest('[data-nopaint]')) return;
     // Keys follow the element's place among its kind, so a surface keeps its wear while the screen stays the same.
-    const base = `${kind}:${el.className}`;
+    // By its first class only: a state class (sel, drop, on) must not re-roll its wear (data-pk says when it should).
+    const base = `${kind}:${el.classList[0] ?? ''}`;
     const n = seen.get(base) ?? 0;
     seen.set(base, n + 1);
     paintEl(el, kind, {}, `${base}#${n}`);
