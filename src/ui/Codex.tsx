@@ -30,6 +30,18 @@ function gemChip(g: (typeof ALL_GEMS)[number]): string | null {
   return null;
 }
 
+/** The found mark at the head of a row, in a column of its own so the names line up. */
+function Mark({ on }: { on: boolean }) {
+  return (
+    <span
+      class={on ? 'codex-mark found' : 'codex-mark muted'}
+      aria-label={on ? 'found' : 'not found'}
+    >
+      {on ? '✓' : '·'}
+    </span>
+  );
+}
+
 /** Every gem and unique in the game, searchable, with the ones this browser has found marked. */
 export function Codex({ c }: { c: Controller }) {
   const [tab, setTab] = useState<Tab>('gems');
@@ -62,9 +74,19 @@ export function Codex({ c }: { c: Controller }) {
   return (
     <div class="screen codex">
       <h1>Codex</h1>
-      <p class="codex-count">
-        Gems {foundGems} / {ALL_GEMS.length} found · Uniques {foundUniques} /{' '}
-        {UNIQUES.length + UNIQUE_FLASKS.length} found
+      <div class="lf-back">
+        <button class="btn" onClick={() => c.goTo('title')}>
+          Back
+        </button>
+      </div>
+      <p class="codex-count" data-paint="panel" data-thin>
+        <span>
+          Gems {foundGems} / {ALL_GEMS.length} found
+        </span>
+        <i class="pay-sep" data-paint="sep" />
+        <span>
+          Uniques {foundUniques} / {UNIQUES.length + UNIQUE_FLASKS.length} found
+        </span>
       </p>
       <div class="menu row">
         <button
@@ -88,24 +110,25 @@ export function Codex({ c }: { c: Controller }) {
         >
           Skill looks
         </button>
-        <input
-          class="search"
-          type="text"
-          placeholder="Search"
-          value={q}
-          onInput={(e) => setQ((e.target as HTMLInputElement).value)}
-        />
-        <label class="codex-found" data-paint="panel" data-thin>
-          <input
-            type="checkbox"
-            checked={foundOnly}
-            onChange={(e) => setFoundOnly((e.target as HTMLInputElement).checked)}
-          />{' '}
-          found only
-        </label>
-        <button class="btn" onClick={() => c.goTo('title')}>
-          Back
-        </button>
+        {tab !== 'look' && (
+          <>
+            <input
+              class="search"
+              type="text"
+              placeholder="Search"
+              value={q}
+              onInput={(e) => setQ((e.target as HTMLInputElement).value)}
+            />
+            <label class="codex-found" data-paint="panel" data-thin>
+              <input
+                type="checkbox"
+                checked={foundOnly}
+                onChange={(e) => setFoundOnly((e.target as HTMLInputElement).checked)}
+              />{' '}
+              found only
+            </label>
+          </>
+        )}
       </div>
       <div class="codex-panel lf-panel" data-paint="panel">
         {tab === 'look' && (
@@ -153,13 +176,15 @@ export function Codex({ c }: { c: Controller }) {
               gems.map((g) => (
                 <div key={g.id} class="codex-row">
                   <button class="codex-head" onClick={() => setOpen(open === g.id ? null : g.id)}>
-                    <span class={found.has(g.id) ? 'found' : 'muted'}>
-                      {found.has(g.id) ? '✓' : '·'}
-                    </span>{' '}
-                    {gemChip(g) && (
-                      <span class="look-chip" style={{ background: gemChip(g) as string }} />
-                    )}
-                    {g.name} <span class="muted">{gemCardData(g, 20).type}</span>
+                    <Mark on={found.has(g.id)} />
+                    <span class="codex-chip">
+                      {gemChip(g) && (
+                        <span class="look-chip" style={{ background: gemChip(g) as string }} />
+                      )}
+                    </span>
+                    <span class="codex-name">
+                      {g.name} <span class="muted">{gemCardData(g, 20).type}</span>
+                    </span>
                   </button>
                   {open === g.id && <GemCard gemId={g.id} level={20} />}
                 </div>
@@ -170,17 +195,19 @@ export function Codex({ c }: { c: Controller }) {
                 return (
                   <div key={u.id} class="codex-row">
                     <button class="codex-head" onClick={() => setOpen(open === u.id ? null : u.id)}>
-                      <span class={found.has(u.id) ? 'found' : 'muted'}>
-                        {found.has(u.id) ? '✓' : '·'}
-                      </span>{' '}
-                      {u.name}{' '}
-                      <span class="muted">
-                        {isFlask ? 'Flask' : itemBase(u.baseId).name} · level {u.level}
+                      <Mark on={found.has(u.id)} />
+                      <span class="codex-name">
+                        {u.name}{' '}
+                        <span class="muted">
+                          {isFlask ? 'Flask' : itemBase(u.baseId).name}, level {u.level}
+                        </span>
                       </span>
                     </button>
                     {open === u.id && (
-                      <div class="item-card rarity-unique">
-                        <div class="ic-name">{u.name}</div>
+                      <div class="item-card unique">
+                        <div class="ic-name" data-paint="panel" data-thin data-field="vermilion">
+                          {u.name}
+                        </div>
                         {modsText(
                           u.mods.map((m) => ({
                             stat: m.stat,

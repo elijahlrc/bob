@@ -15,7 +15,7 @@ import {
   watchPost,
 } from '../rivals';
 import type { DeathRecap } from '../sim/types';
-import { FACTION_NAMES, MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
+import { FACTION_NAMES, MONSTER_MODS, MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { TYPE_BLURBS } from '../data/monsterInfo';
 import { themeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
@@ -58,7 +58,9 @@ function MixLine({ r, total }: { r: DeathRecap; total: number }) {
 /** Why you died: the killer, the last seconds of damage, and the defences you had (EXPANSION section 9). */
 function Recap({ r }: { r: DeathRecap }) {
   const total = r.lines.reduce((s, l) => s + l.amount, 0);
-  const mods = r.killerMods.length ? `: ${r.killerMods.join(', ')}` : '';
+  // The killer's mods by their names (an id the game no longer knows is left out).
+  const names = r.killerMods.flatMap((id) => MONSTER_MODS.find((m) => m.id === id)?.name ?? []);
+  const mods = names.length ? `: ${names.join(', ')}` : '';
   const resLine = (['fire', 'cold', 'lightning', 'chaos'] as const).map((k) => {
     const below = r.res[k] < r.maxRes[k];
     return (
@@ -208,10 +210,14 @@ export function Summary({ c }: { c: Controller }) {
       ) : (
         <h2>{won ? 'Victory!' : 'Your run has ended'}</h2>
       )}
-      <p class="sum-who">
+      <p class="sum-who" data-paint="panel" data-thin>
         {classDef(run.classId).name}
-        {!slain &&
-          ` · ${won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}`}
+        {!slain && (
+          <>
+            <i class="pay-sep" data-paint="sep" />
+            {won ? 'The Unmaker has fallen.' : `Fell on map ${last?.map ?? run.map}${reason}.`}
+          </>
+        )}
       </p>
       <div class="sum-medals">
         {medal('Level', run.build.level, 'lapis,4')}
@@ -221,14 +227,6 @@ export function Summary({ c }: { c: Controller }) {
         ])}
         {medal('Kills', kills, 'vermilion,4')}
       </div>
-      {!sameDifficulty(run.difficulty, DEFAULT) && (
-        <p class="sum-plaque" data-paint="panel" data-thin>
-          Difficulty: {difficultyText(run.difficulty)}
-        </p>
-      )}
-      <RivalsBlock c={c} run={run} />
-      {!won && run.lastRecap && <Recap r={run.lastRecap} />}
-      {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
       <div class="menu row">
         <button
           class="btn primary"
@@ -240,6 +238,14 @@ export function Summary({ c }: { c: Controller }) {
           Back to title
         </button>
       </div>
+      {!sameDifficulty(run.difficulty, DEFAULT) && (
+        <p class="sum-plaque" data-paint="panel" data-thin>
+          Difficulty: {difficultyText(run.difficulty)}
+        </p>
+      )}
+      <RivalsBlock c={c} run={run} />
+      {!won && run.lastRecap && <Recap r={run.lastRecap} />}
+      {c.lastResult?.report && <MapReportView r={c.lastResult.report} title="The last map" />}
       {rivalsConfigured() && <Leaderboard run={run} />}
     </div>
   );

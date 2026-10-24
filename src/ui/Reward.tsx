@@ -184,7 +184,7 @@ export function Reward({ c }: { c: Controller }) {
             <ProvisionCard id={shown.id} />
           ) : shown.kind === 'currency' ? (
             <div class="item-card flaskitem">
-              <div class="ic-name">
+              <div class="ic-name" data-paint="panel" data-thin data-field="plaster">
                 {shown.count} × {currencyLabel(shown.id)}
               </div>
               <div class="muted">{currencyText(shown.id)}</div>

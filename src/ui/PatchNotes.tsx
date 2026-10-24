@@ -94,7 +94,7 @@ export function PatchNotes({ c }: { c: Controller }) {
   return (
     <div class="screen patchnotes">
       <h1>Patch notes</h1>
-      <div class="menu row">
+      <div class="lf-back">
         <button class="btn" onClick={() => c.goTo('title')}>
           Back
         </button>

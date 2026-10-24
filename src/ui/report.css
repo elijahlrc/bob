@@ -137,6 +137,12 @@ html.leaf .mr-stone {
   height: 14px;
 }
 
+/* Up to about 900 px the bars, hit counts, per second and misses go, so the table fits (the numbers that matter stay). */
+@media (max-width: 900px) {
+  html.leaf .mr-opt {
+    display: none;
+  }
+}
 @media (max-width: 600px) {
   html.leaf .mreport {
     padding: 12px 8px 24px;
@@ -164,10 +170,7 @@ html.leaf .mr-stone {
   html.leaf .mr-panel {
     padding: 22px 20px 24px;
   }
-  /* Phones: the bars, hit counts and misses go, so the table fits (the numbers that matter stay), and names may wrap. */
-  html.leaf .mr-opt {
-    display: none;
-  }
+  /* Phones: names may wrap. */
   html.leaf .mr-table td.mr-name {
     white-space: normal;
   }

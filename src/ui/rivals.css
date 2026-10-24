@@ -223,6 +223,9 @@ html.leaf .rivals-block .duel-cta {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.hs-table td.hs-val {
+  color: var(--gold-hi);
+}
 .hs-table tr.hs-me td {
   color: var(--gold-hi);
 }

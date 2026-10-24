@@ -24,7 +24,7 @@ export function WareCard({ w, run }: { w: Ware; run: NonNullable<Controller['run
   if (w.kind === 'reprieve') return <ReprieveCard id={w.ref!} />;
   return (
     <div class="item-card flaskitem">
-      <div class="ic-name">
+      <div class="ic-name" data-paint="panel" data-thin data-field="plaster">
         {w.count} × {currencyLabel(w.ref!)}
       </div>
       <div class="muted">{currencyText(w.ref!)}</div>

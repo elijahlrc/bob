@@ -15,21 +15,75 @@ html.leaf
   text-align: center;
   text-shadow: 0 2px 0 #e2c68166;
 }
-html.leaf :is(.sum-who, .codex-count) {
-  margin: 0;
-  color: #2e2010;
-  font-weight: 600;
-  text-align: center;
-  text-shadow: none;
-}
 /* A thin plaque round one short line on the gold. */
-html.leaf :is(.sum-plaque, .duel-standing, .rivals-status, .notice.update, .title > .subtitle) {
+html.leaf
+  :is(
+    .sum-plaque,
+    .sum-who,
+    .codex-count,
+    .duel-standing,
+    .rivals-status,
+    .notice.update,
+    .title > .subtitle
+  ) {
   align-self: center;
+  max-width: 100%;
+  box-sizing: border-box;
   margin: 0;
   padding: 9px 22px 10px;
   color: var(--pearl);
   text-align: center;
+  text-wrap: balance;
   text-shadow: var(--text-shadow);
+}
+html.leaf :is(.sum-who, .codex-count) .pay-sep {
+  display: inline-block;
+  vertical-align: -1px;
+}
+html.leaf .codex-count > span {
+  white-space: nowrap;
+}
+/* On a phone the two counts stack, without a stone at a line's end. */
+@media (max-width: 600px) {
+  html.leaf .codex-count > span {
+    display: block;
+  }
+  html.leaf .codex-count > .pay-sep {
+    display: none;
+  }
+}
+
+/* Back, in the same place on every screen that has one: top left, under the screen title, at the column's edge. */
+html.leaf .lf-back {
+  display: flex;
+  align-self: center;
+  justify-content: flex-start;
+  width: min(var(--col, 760px), 100%);
+}
+html.leaf .codex {
+  --col: 780px;
+}
+html.leaf .highscores {
+  --col: 860px;
+}
+html.leaf .rivals {
+  --col: 1180px;
+}
+/* The Rivals screen keeps its buttons in one row (src/ui/Rivals.tsx): moved under the title, Back first. */
+html.leaf .rivals > * {
+  order: 2;
+}
+html.leaf .rivals > :is(h1, h2) {
+  order: 0;
+}
+html.leaf .rivals > .menu.row {
+  order: 1;
+  align-self: center;
+  justify-content: flex-start;
+  width: min(var(--col), 100%);
+}
+html.leaf .rivals > .menu.row > .btn:last-child {
+  order: -1;
 }
 html.leaf :is(.title, .class-select, .summary, .codex, .patchnotes, .highscores, .rivals) .lf-panel,
 html.leaf .confirm-card.lf-panel {
@@ -144,6 +198,10 @@ html.leaf .rivals-opt {
   color: var(--pearl);
   font-size: var(--size);
 }
+/* Both opt-ins read in pearl, like the rest of their panel (RivalsOptIn marks itself muted). */
+html.leaf :is(.title, .summary) .lf-panel .rivals-opt.muted {
+  color: var(--pearl);
+}
 html.leaf .rivals-opt .rival-name {
   gap: 8px;
   margin-top: 10px;
@@ -176,7 +234,7 @@ html.leaf .class-select {
   padding: 24px 24px 32px;
 }
 html.leaf .class-grid {
-  grid-template-columns: repeat(3, minmax(0, 260px));
+  grid-template-columns: repeat(3, minmax(0, 300px));
   gap: 22px;
   max-width: none;
 }
@@ -186,7 +244,7 @@ html.leaf .class-card {
   align-items: center;
   gap: 8px;
   min-height: 300px;
-  padding: 72px 22px 40px;
+  padding: 72px 36px 40px;
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -232,9 +290,17 @@ html.leaf .class-attrs .pay-sep {
   margin: 0 8px;
 }
 html.leaf .class-skill {
+  text-wrap: balance;
   font-size: var(--size);
   color: var(--muted);
   margin: 0;
+}
+
+/* Six niches: three across on a wide screen, two in between (three would squeeze the words into the arches). */
+@media (max-width: 1000px) {
+  html.leaf .class-grid {
+    grid-template-columns: repeat(2, minmax(0, 300px));
+  }
 }
 
 /* ---- The end of a run ---- */
@@ -293,10 +359,26 @@ html.leaf .summary .menu.row {
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
+  margin: 8px 0 6px;
+}
+/* One column for the whole screen: every panel the same width, the same inset on a phone. */
+html.leaf .screen.summary {
+  --col: 860px;
+}
+html.leaf .summary > :is(.rivals-block, .recap, .mreport, .board) {
+  box-sizing: border-box;
+  width: min(var(--col), 100%);
+  max-width: none;
+  margin: 0;
+}
+html.leaf .summary > .mreport {
+  padding: 0;
+}
+html.leaf .summary > .mreport h3.mr-title {
+  margin-top: 10px;
 }
 /* What happened: a lapis panel, its lines divided by tesserae. */
 html.leaf .summary .recap {
-  max-width: 660px;
   margin: 0;
   padding: 26px 36px 28px;
   border: 0;
@@ -383,8 +465,30 @@ html.leaf .codex-head {
 html.leaf .codex-head:hover {
   color: var(--gold-hi);
 }
+html.leaf .codex-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  width: 100%;
+  text-align: left;
+}
+/* The found mark and the colour square each in a column of their own, so the names line up. */
+html.leaf .codex-mark {
+  flex: none;
+  width: 22px;
+  text-align: center;
+}
 html.leaf .codex-head .found {
   color: var(--gain);
+}
+html.leaf .codex-chip {
+  flex: none;
+  width: 26px;
+}
+html.leaf .codex-name {
+  flex: 1;
+  min-width: 0;
+  padding-left: 6px;
 }
 html.leaf .codex-row > :not(.codex-head) {
   margin: 4px 10px 12px;
@@ -532,7 +636,11 @@ html.leaf .confirm-card .item-actions {
   }
   html.leaf .class-card {
     min-height: 0;
-    padding: 64px 18px 36px;
+    padding: 64px 34px 36px;
+  }
+  /* The description sits where the arch still curves in: keep it off the pearls. */
+  html.leaf .class-style {
+    max-width: 230px;
   }
   html.leaf .screen.summary {
     padding-top: 24px;

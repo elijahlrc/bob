@@ -83,11 +83,9 @@ const RARITY_LABEL = {
   boss: 'Boss',
 } as const;
 
-/** The factions of a map's theme that are a quarter or more of its monsters, as a short label. */
-function leadNames(theme: ThemeDef): string {
-  return themeInfo(theme)
-    .asks.map((a) => `${FACTION_GLYPH[a.id]} ${a.name}`)
-    .join(' · ');
+/** The factions of a map's theme that are a quarter or more of its monsters, each a short label with its glyph. */
+function leads(theme: ThemeDef): string[] {
+  return themeInfo(theme).asks.map((a) => `${FACTION_GLYPH[a.id]} ${a.name}`);
 }
 function leadText(theme: ThemeDef): string {
   return themeInfo(theme)
@@ -570,12 +568,16 @@ export function Hud({ c }: { c: Controller }) {
       <div class="hud-head">
         <div class="hud-top" data-nopaint>
           <div class="hud-top-row">
-            <span>
-              {sc ? 'Showcase' : duel ? 'Duel' : `Map ${w.plan.map}`}
-              {!duel && ` · ${w.plan.theme.name}`}
-            </span>
+            <span>{sc ? 'Showcase' : duel ? 'Duel' : `Map ${w.plan.map}`}</span>
+            {!duel && <span>{w.plan.theme.name}</span>}
             {!duel && <span {...infoProps(w.plan.biome.text)}>{w.plan.biome.name}</span>}
-            {!duel && <span {...infoProps(leadText(w.plan.theme))}>{leadNames(w.plan.theme)}</span>}
+            {/* Each leading faction's glyph is its own separator: no stone before it. */}
+            {!duel &&
+              leads(w.plan.theme).map((l) => (
+                <span key={l} class="hud-lead" {...infoProps(leadText(w.plan.theme))}>
+                  {l}
+                </span>
+              ))}
             <span>Level {w.sides[0].build.level}</span>
             {!duel && <span>Kills {w.sides[0].stats.kills}</span>}
             <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>

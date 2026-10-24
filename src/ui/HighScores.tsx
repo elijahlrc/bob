@@ -94,8 +94,8 @@ function ScoreList({ got, onMore }: { got: Loaded | null; onMore?: () => void })
               <td class="num">{s.rank ?? i + 1}</td>
               <td class="hs-name">{s.name}</td>
               <td>{className(s.classId)}</td>
-              <td class="num hs-x">{s.level}</td>
-              <td class="num">{s.rating}</td>
+              <td class="num hs-x hs-val">{s.level}</td>
+              <td class="num hs-val">{s.rating}</td>
               <td class="num hs-x">{s.fights}</td>
               <td class="num hs-x">{s.wins}</td>
               <td class="hs-x">{s.postedOn}</td>
@@ -135,7 +135,13 @@ export function HighScoresView({
   return (
     <div class={`screen highscores${showOlder ? ' hs-both' : ''}`}>
       <h2>High scores</h2>
+      <div class="lf-back">
+        <button class="btn" onClick={onBack}>
+          Back
+        </button>
+      </div>
       <div class="hs-panel lf-panel" data-paint="panel">
+        <h3 class="lf-h">This version</h3>
         <ScoreList got={got} onMore={onMore} />
       </div>
       <label class="hs-older-check" data-paint="panel" data-thin>
@@ -155,11 +161,6 @@ export function HighScoresView({
           </div>
         </>
       )}
-      <div class="menu row">
-        <button class="btn" onClick={onBack}>
-          Back
-        </button>
-      </div>
     </div>
   );
 }

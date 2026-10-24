@@ -112,8 +112,8 @@ export function LeaderboardView({ got }: { got: Standing | null }) {
                 <td class="num">{r.rank ?? '–'}</td>
                 <td class="hs-name">{r.name}</td>
                 <td>{className(r.classId)}</td>
-                <td class="num hs-x">{r.level}</td>
-                <td class="num">{r.rating}</td>
+                <td class="num hs-x hs-val">{r.level}</td>
+                <td class="num hs-val">{r.rating}</td>
               </tr>
             ),
           )}

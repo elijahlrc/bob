@@ -78,7 +78,7 @@ function TelemetryNotice() {
   if (!telemetryConfigured()) return null;
   return (
     <label
-      class="telemetry muted"
+      class="telemetry"
       title="Sent when a run ends: class, level, map, what killed you and the map's modifiers. No personal information is collected."
     >
       <input

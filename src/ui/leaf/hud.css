@@ -68,6 +68,10 @@ html.leaf .hud-top-row > span::before {
     2px 2px 0 2px #0b0805;
   transform: rotate(45deg);
 }
+/* A leading faction's glyph sets it apart: its stone keeps its room (so a line still starts clipped) but is not drawn. */
+html.leaf .hud-top-row > .hud-lead::before {
+  visibility: hidden;
+}
 @media (pointer: coarse) {
   html.leaf .hud-top-row > span {
     pointer-events: auto;
@@ -448,12 +452,13 @@ html.leaf .skill-badge {
 html.leaf .skill.cooling .skill-init {
   opacity: 0.35;
 }
+/* The slot in use: a bright gold ring (--c only tints the stone). */
 html.leaf .skill.active,
 html.leaf .skill.casting {
   box-shadow:
     inset 0 0 0 2px #0b0805,
-    0 0 0 2px #eee8d6,
-    0 0 0 4px var(--c),
+    0 0 0 2px #e2c681,
+    0 0 0 4px #a07f3c,
     3px 4px 0 4px #0b080566;
 }
 html.leaf .skill.casting {
