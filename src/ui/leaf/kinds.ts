@@ -52,7 +52,8 @@ export const RARITY: Record<string, [Ramp, number, boolean]> = {
   normal: ['plaster', 3, true],
   magic: ['sky', 3, true],
   rare: ['gold', 5, true],
-  unique: ['vermilion', 4, false],
+  // Dark brown, so a unique's name keeps the orange players know uniques by.
+  unique: ['bole', 1, false],
   empty: ['lapis', 2, false],
 };
 

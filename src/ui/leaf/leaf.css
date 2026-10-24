@@ -287,7 +287,7 @@ html.leaf .rare {
   color: var(--gold-hi);
 }
 html.leaf .unique {
-  color: #e8a07c;
+  color: #ffa040;
 }
 
 @media (max-width: 600px) {

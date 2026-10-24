@@ -205,7 +205,7 @@ export function Codex({ c }: { c: Controller }) {
                     </button>
                     {open === u.id && (
                       <div class="item-card unique">
-                        <div class="ic-name" data-paint="panel" data-thin data-field="vermilion">
+                        <div class="ic-name" data-paint="panel" data-thin data-field="ink">
                           {u.name}
                         </div>
                         {modsText(

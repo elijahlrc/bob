@@ -487,9 +487,13 @@ html.leaf .item-card .ic-name {
   color: var(--on-gold);
   text-shadow: 0 1px 0 #ffffff33;
 }
-html.leaf .item-card.unique .ic-name,
 html.leaf .item-card.gem .ic-name {
   color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+/* A unique's name is the orange of uniques, on its dark brown plaque. */
+html.leaf .item-card.unique .ic-name {
+  color: #ffa040;
   text-shadow: var(--text-shadow);
 }
 html.leaf .item-card :is(.ic-base, .ic-type, .muted) {
@@ -717,7 +721,7 @@ html.leaf .ix-row.rare .ix-row-name {
   color: var(--gold-hi);
 }
 html.leaf .ix-row.unique .ix-row-name {
-  color: #e8a07c;
+  color: #ffa040;
 }
 html.leaf .ix-row.gem .ix-row-name {
   color: var(--gain);

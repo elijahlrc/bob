@@ -26,8 +26,9 @@ export function rarityClass(it: InventoryItem): string {
 /** The ramp an item's name plaque is painted in, by rarity (leaf/ramps.ts): plaster, sky, gold, vermilion. */
 export function rarityField(it: InventoryItem): string {
   if (it.kind === 'gem') return 'green';
-  if (it.kind === 'flask') return it.uniqueId ? 'vermilion' : it.affixes.length ? 'sky' : 'plaster';
-  return { normal: 'plaster', magic: 'sky', rare: 'gold', unique: 'vermilion' }[it.rarity];
+  // A unique's plaque is near-black brown: its name keeps the orange players know uniques by.
+  if (it.kind === 'flask') return it.uniqueId ? 'ink' : it.affixes.length ? 'sky' : 'plaster';
+  return { normal: 'plaster', magic: 'sky', rare: 'gold', unique: 'ink' }[it.rarity];
 }
 
 /** An item's name on its rarity's plaque, at the head of its card. */
