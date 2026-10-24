@@ -268,7 +268,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Withering Breath',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'chaos', 'channelling', 'duration', 'dot'],
+    tags: ['spell', 'area', 'chaos', 'duration', 'dot'],
     types: ['totemable', 'damageOverTime'],
     behaviour: {
       kind: 'beam',
@@ -293,7 +293,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [2, 5],
     mods: [],
     description:
-      'A withering breath that lays layer upon layer of rot on everything in front of you while you hold it.',
+      'A withering breath that lays layer upon layer of rot on everything in front of you.',
   },
   {
     kind: 'active',
@@ -1781,7 +1781,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Crackle Ring',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'lightning', 'channelling', 'nova'],
+    tags: ['spell', 'area', 'lightning', 'nova'],
     types: ['totemable'],
     behaviour: {
       kind: 'burst',
@@ -1805,7 +1805,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 12,
       },
     ],
-    description: 'Lightning crackles around you in pulses while you channel.',
+    description: 'Lightning crackles around you in pulses.',
   },
   {
     kind: 'active',
@@ -2121,7 +2121,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Searing Lance',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'fire', 'channelling', 'duration', 'dot'],
+    tags: ['spell', 'fire', 'duration', 'dot'],
     types: ['totemable', 'damageOverTime'],
     behaviour: {
       kind: 'beam',
@@ -3327,7 +3327,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Rot Touch',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'chaos', 'channelling', 'duration'],
+    tags: ['spell', 'area', 'chaos', 'duration'],
     types: ['totemable'],
     behaviour: {
       kind: 'burst',
