@@ -574,7 +574,7 @@
       ${it.base ? `<div class="ix-base">${it.base}</div>` : ''}
       ${(it.props ?? []).map((p) => `<div class="ix-prop">${p}</div>`).join('')}
       <div class="ix-req${it.cant ? ' bad' : ''}">${it.req ?? ''}${it.ilvl ? ` · item level ${it.ilvl}` : ''}</div>
-      ${it.sockets ? `<div class="ix-sockrow">${stones(it.sockets)}<span class="muted">${it.sockets.length > 1 ? 'linked' : ''}</span></div>` : ''}
+      ${it.sockets ? `<div class="ix-sockrow">${stones(it.sockets)}</div>` : ''}
       ${it.mods?.length ? `<ul class="ix-mods">${it.mods.map((m) => `<li class="${vs && !other.has(m) ? mark : ''}">${m}</li>`).join('')}</ul>` : ''}
     </div>`;
   }
