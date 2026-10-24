@@ -49,6 +49,8 @@ const H_LINE = 18;
 const H_KEY = 23;
 /** From this zoom on, a run of alike small nodes shows each node's own word instead of one word for the run. */
 const K_SPLIT = 0.8;
+/** The most alike small nodes one word stands for; a longer run gets a word for each chunk of neighbours. */
+const MAX_RUN = 4;
 
 /** A stat line shortened for the words beside small nodes ("+6 Dex"); the panel always has the whole line. */
 const SHORT: [RegExp, string | ((...m: string[]) => string)][] = [
@@ -131,6 +133,15 @@ export function TreeView({ c }: { c: Controller }) {
     const small = (n: TreeNode) => n.kind === 'small' || n.kind === 'travel';
     const seen = new Set<number>();
     const out: { ids: number[]; anchor: number; text: string; one: string }[] = [];
+    // The usual length of a link between small nodes: a chunk keeps within a couple of them of its first node.
+    const lengths: number[] = [];
+    for (const n of live)
+      if (small(n))
+        for (const m of n.links)
+          if (m > n.id && small(tree.nodes[m]))
+            lengths.push(Math.hypot(tree.nodes[m].x - n.x, tree.nodes[m].y - n.y));
+    lengths.sort((a, b) => a - b);
+    const reach = 2.2 * (lengths[Math.floor(lengths.length / 2)] ?? 1);
     for (const n of live) {
       if (seen.has(n.id) || !small(n) || !text(n.id)) continue;
       const t = text(n.id);
@@ -148,14 +159,40 @@ export function TreeView({ c }: { c: Controller }) {
           }
         }
       }
-      const cx = ids.reduce((a, id) => a + tree.nodes[id].x, 0) / ids.length;
-      const cy = ids.reduce((a, id) => a + tree.nodes[id].y, 0) / ids.length;
-      ids.sort(
-        (a, b) =>
-          Math.hypot(tree.nodes[a].x - cx, tree.nodes[a].y - cy) -
-          Math.hypot(tree.nodes[b].x - cx, tree.nodes[b].y - cy),
-      );
-      out.push({ ids, anchor: ids[0], text: ids.length > 1 ? `${t} ×${ids.length}` : t, one: t });
+      // A long run (a road of alike travel nodes) is cut into short chunks of near neighbours, each with its own word
+      // near it: one word with lines to dozens of nodes across the tree reads as a tangle.
+      const left = new Set(ids);
+      for (const first of ids) {
+        if (!left.has(first)) continue;
+        const chunk = [first];
+        left.delete(first);
+        for (let k = 0; k < chunk.length && chunk.length < MAX_RUN; k++)
+          for (const m of tree.nodes[chunk[k]].links)
+            if (
+              left.has(m) &&
+              chunk.length < MAX_RUN &&
+              Math.hypot(
+                tree.nodes[m].x - tree.nodes[first].x,
+                tree.nodes[m].y - tree.nodes[first].y,
+              ) <= reach
+            ) {
+              chunk.push(m);
+              left.delete(m);
+            }
+        const cx = chunk.reduce((a, id) => a + tree.nodes[id].x, 0) / chunk.length;
+        const cy = chunk.reduce((a, id) => a + tree.nodes[id].y, 0) / chunk.length;
+        chunk.sort(
+          (a, b) =>
+            Math.hypot(tree.nodes[a].x - cx, tree.nodes[a].y - cy) -
+            Math.hypot(tree.nodes[b].x - cx, tree.nodes[b].y - cy),
+        );
+        out.push({
+          ids: chunk,
+          anchor: chunk[0],
+          text: chunk.length > 1 ? `${t} ×${chunk.length}` : t,
+          one: t,
+        });
+      }
     }
     return out;
   }, [tree]);
