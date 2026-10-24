@@ -427,7 +427,20 @@
     return [cv, { ...PANEL_AGE, loss: 0.035, cracks: 4 }];
   });
 
+  // ---- A small gold setting with a stone, set between items on one line ----
+  L.kind('sep', (el, W, H) => {
+    const S = Math.min(W, H),
+      cv = canvas(S, S),
+      ctx = cv.getContext('2d'),
+      c = S / 2;
+    diamond(ctx, c, c, c - 0.5, col('gold', 5));
+    diamond(ctx, c, c, c - 1.5, col('gold', 6));
+    diamond(ctx, c, c, c - 2.5, col(el.dataset.stone ?? 'vermilion', 4));
+    return [cv, { loss: 0, cracks: 0, texture: 0.3, grime: 0.3, shadow: true }];
+  });
+
   L.jobs([
+    ['[data-paint=sep]', 'sep'],
     ['[data-paint=soul]', 'soul'],
     ['[data-paint=slot]', 'slot'],
     ['[data-paint=gem]', 'gem'],

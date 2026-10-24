@@ -621,6 +621,23 @@
       },
     ],
     tiles: ['Tile row', 48, 5, (ctx, W) => tileRow(ctx, 0, W, 0)],
+    // A line of gold tesserae, every third a pearl: what divides rows inside a panel.
+    dots: [
+      'Tesserae',
+      24,
+      3,
+      (ctx, W) => {
+        for (let x = 0, i = 0; x < W; x += 4, i++) {
+          const n = i % 3 === 2 ? 'pearl' : 'gold';
+          ctx.fillStyle = col(n, n === 'gold' ? 5 : 3);
+          ctx.fillRect(x + 1, 0, 2, 2);
+          ctx.fillStyle = col(n, n === 'gold' ? 6 : 4);
+          ctx.fillRect(x + 1, 0, 1, 1);
+          ctx.fillStyle = col('ink', 0);
+          ctx.fillRect(x + 2, 2, 1, 1);
+        }
+      },
+    ],
   };
 
   let made = null;

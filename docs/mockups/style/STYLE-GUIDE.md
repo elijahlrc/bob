@@ -128,11 +128,14 @@ its pattern's periods.
 - **One body size** (17 px Grenze); secondary lines differ by colour, not size. Headings 28 px Jacquard; big numbers and
   the screen title 48 px Jacquard. The only smaller text is inside small medallions on a phone (14 px), where nothing
   larger fits.
-- **Never shrink words to fit; change the layout:** the offer table became a grid of two columns and three rows, each value under its label (one column of pairs left too much empty space between label and number); medallion
+- **Never shrink words to fit; change the layout:** what a map pays became one flowing line of the pairs that have a value ("Quantity +35% ◆ Rarity +48% ◆ 9 monsters ◆ 3 bosses"), set apart by small gold settings (one column of pairs left gaps, a 2x3 grid took too much height); medallion
   notes moved to plaques; small text on the gold moved onto plaques.
 - **Cut what the player does not need**, in the spirit of "in-game text is concise": on the offer cards the "hard to …
   soft to …" line and the list of monster types went (the factions stay), and a map type or density shows only its name,
   its explanation in a tip. Scrolling a little more is fine.
+- **No plain rules between rows:** rows inside a panel are divided by a painted line of gold tesserae, every third a pearl
+  (`--s-dots`), and items on one line by small gold settings with a stone (`sep`); a separator that would start a line is
+  clipped.
 - **Hard drop shadows on text** (2 px, ink) on lapis and on painted fields.
 - Everything centred where it is a group (medallion rows, the camp head, plaques); measures in even pixels.
 - Wear never sits under text: panels have low texture and their flakes gather at the edges.

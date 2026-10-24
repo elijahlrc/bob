@@ -779,8 +779,9 @@
         background-position: center bottom 4px;
       }
       [data-style='leaf'] .cs-row {
-        padding: 3px 0;
-        border-bottom: 2px solid #c09d4e1c;
+        padding: 3px 0 5px;
+        background: var(--s-dots);
+        background-position: left bottom;
       }
       [data-style='leaf'] .cs-row .cs-label {
         color: var(--pearl);
@@ -942,8 +943,9 @@
       }
       [data-style='leaf'] .theme .affix.mod {
         color: var(--madder);
-        padding-top: 8px;
-        border-top: 2px solid #c09d4e1c;
+        padding-top: 10px;
+        background: var(--s-dots);
+        background-position: left top;
       }
       /* What is left out here: the explanation of a map type (now a tip), the leans line, the list of monster types. */
       [data-style='leaf'] :is(.explain, .leans, .chips.types) {
@@ -972,62 +974,42 @@
           4px 8px 0 2px #0b080555,
           0 6px 16px #000a;
       }
-      /* What a map pays: a grid of two columns and three rows, each value under its label. */
-      [data-style='leaf'] .offer-table {
-        margin: 8px 0;
+      /* What a map pays: one flowing line of the pairs that have a value (.offer-pays); the table is the Now style's. */
+      [data-style='leaf'] .offer-table,
+      [data-style='leaf'] .weak {
+        display: none;
       }
-      [data-style='leaf'] .offer-table tbody {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: 16px;
+      .offer-pays {
+        display: none;
       }
-      [data-style='leaf'] .offer-table tr {
-        display: contents;
+      [data-style='leaf'] .offer-pays {
+        display: block;
+        margin: 10px 0 12px;
+        overflow: hidden;
       }
-      [data-style='leaf'] .offer-table :is(th, td) {
-        text-align: left;
-        padding: 0;
+      [data-style='leaf'] .pays-in {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -28px;
+        line-height: 1.7;
       }
-      [data-style='leaf'] .offer-table td {
-        padding-bottom: 6px;
-        margin-bottom: 6px;
-        border-bottom: 2px solid #c09d4e1c;
+      [data-style='leaf'] .pay {
+        position: relative;
+        padding-left: 28px;
+        white-space: nowrap;
+        color: var(--muted);
       }
-      [data-style='leaf'] .offer-table tr:nth-child(1) > :nth-child(1) {
-        grid-area: 1 / 1;
+      [data-style='leaf'] .pay b {
+        font-weight: 400;
+        color: var(--gold-hi);
       }
-      [data-style='leaf'] .offer-table tr:nth-child(1) > :nth-child(2) {
-        grid-area: 2 / 1;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(1) > :nth-child(3) {
-        grid-area: 1 / 2;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(1) > :nth-child(4) {
-        grid-area: 2 / 2;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(2) > :nth-child(1) {
-        grid-area: 3 / 1;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(2) > :nth-child(2) {
-        grid-area: 4 / 1;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(2) > :nth-child(3) {
-        grid-area: 3 / 2;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(2) > :nth-child(4) {
-        grid-area: 4 / 2;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(3) > :nth-child(1) {
-        grid-area: 5 / 1;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(3) > :nth-child(2) {
-        grid-area: 6 / 1;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(3) > :nth-child(3) {
-        grid-area: 5 / 2;
-      }
-      [data-style='leaf'] .offer-table tr:nth-child(3) > :nth-child(4) {
-        grid-area: 6 / 2;
+      [data-style='leaf'] .pay-sep {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        margin-top: -7px;
       }
       [data-style='leaf'] .offer-table th {
         color: var(--muted);
@@ -1338,6 +1320,22 @@
       <div class="cs-est"><span>Estimated DPS <b>8,095</b></span><span>Effective HP <b>30,788</b></span></div>
     </div>`;
 
+      // What a map pays, as one line: the pairs that have a value, set apart by small gold settings (Gold Leaf).
+      const pays = (t) => {
+        const [m, r, b] = t.mrb.split(' · ');
+        const items = [
+          t.q !== '—' && `Quantity <span class="gain">${t.q}</span>`,
+          t.r !== '—' && `Rarity <span class="gain">${t.r}</span>`,
+          t.x !== '—' && `Experience <span class="gain">${t.x}</span>`,
+          `<b>${t.n}</b> monsters`,
+          m !== '—' && `<b>${m}</b> magic`,
+          r !== '—' && `<b>${r}</b> rare`,
+          b !== '—' && `<b>${b}</b> ${b === '1' ? 'boss' : 'bosses'}`,
+          t.bonus !== '—' && `Bonus <span class="gain">${t.bonus}</span>`,
+        ].filter(Boolean);
+        // Each item carries the setting before it; the ones that start a line are clipped away (CSS).
+        return `<div class="pays-in">${items.map((x) => `<span class="pay"><i class="pay-sep" data-paint="sep" data-pk="sep"></i>${x}</span>`).join('')}</div>`;
+      };
       const card = (o) => {
         if (o.stop)
           return `<div class="theme stop-card" role="button"><div class="theme-name">${o.name}</div><div class="lvl">Level ${o.level}</div><div class="affix">${o.text}</div></div>`;
@@ -1363,6 +1361,7 @@
         <tr><th>Experience</th><td>${cell(t.x)}</td><th>Monsters</th><td>${t.n}</td></tr>
         <tr><th>Magic · Rare · Boss</th><td>${t.mrb}</td><th>Bonus</th><td>${cell(t.bonus)}</td></tr>
       </tbody></table>
+      <div class="offer-pays">${pays(t)}</div>
       <div class="offer-info">
         <div class="chips">${o.factions.map(([g, n, s, c]) => `<span class="chip faction" style="color:${c};border-color:${c}">${g} ${n} ${s}</span>`).join('')}</div>
         <div class="leans">${o.leans}</div>
