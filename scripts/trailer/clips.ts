@@ -782,6 +782,10 @@ export const CLIPS: Clip[] = [
 
 /** The vertical cut's map clips (docs/trailer/VERTICAL.md): the same staging in a 9:16 phone view, one zoom across the cuts. */
 const VERTICAL = { w: 360, h: 640, phone: true, scale: Number(process.env.TRAILER_VSCALE ?? 3) };
+/** The vertical cut's scenes with text near the top or the bottom: filmed 420 css px tall (1260 of the 1920) so that the cut can set
+ *  them in the middle of the frame, clear of the feed apps' own buttons (docs/trailer/VERTICAL.md). */
+const SAFE = { w: 360, h: 420, phone: true, scale: VERTICAL.scale };
+const SAFE_CLIPS = ['fall', 'duel', 'tree3', 'skills', 'equip', 'summary', 'board'];
 const VERTICAL_ZOOM: Record<string, number> = {
   endgame: 2,
   vanguard: 2,
@@ -798,7 +802,7 @@ CLIPS.push(
   ...CLIPS.filter((c) => c.name in VERTICAL_ZOOM).map((c) => ({
     ...c,
     name: `${c.name}-v`,
-    viewport: VERTICAL,
+    viewport: SAFE_CLIPS.includes(c.name) ? SAFE : VERTICAL,
     zoom: VERTICAL_ZOOM[c.name],
   })),
 );
@@ -806,6 +810,6 @@ CLIPS.push(
 /** The camp and end screens of the vertical cut: the same scripts in the phone view (their selectors may need the phone layout's). */
 CLIPS.push(
   ...CLIPS.filter((c) => ['tree3', 'skills', 'equip', 'summary', 'board'].includes(c.name)).map(
-    (c) => ({ ...c, name: `${c.name}-v`, viewport: VERTICAL }),
+    (c) => ({ ...c, name: `${c.name}-v`, viewport: SAFE }),
   ),
 );
