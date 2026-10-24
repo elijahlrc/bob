@@ -1,5 +1,5 @@
 /*
- * Touch and small-screen rules (docs/MOBILE.md). Loaded after styles.css and skins.css, so a rule here wins over the
+ * Touch and small-screen rules (docs/MOBILE.md). Loaded after styles.css and fonts.css, so a rule here wins over the
  * base rule of the same specificity. The rule of this file: nothing may change the desktop look. Everything is either
  * a no-op on desktop (safe-area insets are 0 there) or scoped by `(pointer: coarse)` or a width query. The width
  * breakpoints repeat PHONE_MAX and TABLET_MAX of device.ts; a test keeps them in step.
@@ -29,7 +29,6 @@ body {
   left: calc(12px + var(--safe-left));
 }
 .hud-bottom {
-  bottom: calc(10px + var(--safe-bottom));
   left: calc(12px + var(--safe-left));
   right: calc(12px + var(--safe-right));
 }
@@ -115,8 +114,6 @@ body {
   }
   .class-grid {
     width: 100%;
-    max-width: 440px;
-    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   }
   .showcase-row,
   .codex .menu.row {
@@ -129,17 +126,10 @@ body {
   position: fixed;
   z-index: 30;
   box-sizing: border-box;
-  padding: 8px 10px;
-  background: #111018f2;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 14px;
-  line-height: 1.35;
   pointer-events: none;
-  box-shadow: 0 4px 16px #000a;
 }
 
-/* A touch screen has no hover: a tapped button must not stay lit until the next tap. These repeat the resting skins. */
+/* A touch screen has no hover: a tapped button must not stay lit until the next tap. These repeat the resting looks. */
 @media (hover: none) {
   :root .btn:hover {
     background: linear-gradient(#3a2b1e, #24190f);
@@ -158,7 +148,6 @@ body {
 /* ---- The camp: tabs, with the next map a tab of its own, and a bar at the bottom (Camp.tsx) ---- */
 .camp.tabbed {
   flex-direction: column;
-  --camp-bar: 52px;
 }
 .camp.tabbed .camp-main {
   flex: 1 1 auto;
@@ -166,7 +155,6 @@ body {
   min-height: 0;
 }
 .camp.tabbed .tabs {
-  overflow-x: auto;
   flex-wrap: nowrap;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
@@ -182,13 +170,8 @@ body {
   scroll-snap-align: start;
 }
 .camp-next {
-  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-.camp-next h2 {
-  margin: 0;
 }
 .camp-next .theme-choice {
   flex-direction: column;
@@ -203,7 +186,6 @@ body {
   padding: 6px calc(12px + var(--safe-right)) calc(6px + var(--safe-bottom))
     calc(12px + var(--safe-left));
   background: var(--side);
-  border-top: 1px solid #333;
 }
 .camp-bar-who {
   flex: 1;
@@ -341,9 +323,6 @@ body {
   }
 }
 @media (max-width: 600px) {
-  .hud {
-    --hud-bottom: 124px;
-  }
   .hud-top {
     right: calc(12px + var(--safe-right));
     font-size: 12px;
@@ -351,8 +330,6 @@ body {
   }
   /* Abandon sits under the status line, the speed buttons under it, both on the right edge. */
   .hud-abandon {
-    top: calc(40px + var(--safe-top));
-    right: calc(8px + var(--safe-right));
     font-size: 12px;
   }
   .hud-bottom {
@@ -360,15 +337,7 @@ body {
     gap: 8px;
     justify-content: space-between;
   }
-  .orb {
-    width: 64px;
-    height: 64px;
-  }
-  .orb-text {
-    font-size: 12px;
-  }
   .hud-center {
-    flex: 1 1 0;
     min-width: 0;
   }
   .skillbar {
@@ -376,26 +345,13 @@ body {
   }
   .speeds {
     position: fixed;
-    top: calc(84px + var(--safe-top));
-    right: calc(8px + var(--safe-right));
     margin: 0;
     flex-direction: column;
-    gap: 4px;
   }
   /* The enemy card is a sheet over the lower map, above the orbs. */
   .inspect {
-    left: 8px;
-    right: 8px;
-    top: auto;
-    bottom: calc(var(--hud-bottom, 124px) + var(--safe-bottom));
-    width: auto;
-    max-height: 42vh;
     overflow: auto;
     box-sizing: border-box;
-  }
-  .hud-showcase {
-    top: calc(84px + var(--safe-top));
-    right: calc(60px + var(--safe-right));
   }
 }
 

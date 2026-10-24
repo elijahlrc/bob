@@ -56,16 +56,8 @@ textarea {
   margin: 0;
   text-align: center;
 }
-.subtitle,
-.muted {
-  color: var(--muted);
-}
 .btn {
   background: var(--btn);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 18px;
-  cursor: pointer;
 }
 .btn:hover {
   background: var(--btn-h);
@@ -74,44 +66,28 @@ textarea {
   background: var(--accent-d);
   border-color: var(--accent);
 }
-.btn.small {
-  padding: 4px 10px;
-  font-size: 13px;
-}
 .btn.on {
   background: var(--accent);
-  color: #111;
 }
 .class-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 220px));
   justify-content: center;
-  gap: 12px;
-  max-width: 720px;
 }
 .class-card {
   background: var(--panel);
-  border: 2px solid;
-  border-radius: 8px;
-  padding: 14px;
-  text-align: left;
   cursor: pointer;
 }
 .class-card:hover {
   background: var(--panel2);
 }
 .class-name {
-  font-size: 20px;
   font-weight: bold;
 }
 .class-style {
-  font-size: 14px;
   margin-top: 4px;
 }
 .class-attrs,
 .class-skill {
-  font-size: 13px;
-  color: #b8b2a6;
   margin-top: 4px;
 }
 .theme-choice {
@@ -132,24 +108,16 @@ textarea {
   pointer-events: none;
 }
 .hud-top {
-  position: absolute;
   top: 8px;
   left: 12px;
-  display: flex;
   flex-wrap: wrap;
   gap: 18px;
-  font-size: 14px;
-  text-shadow: 0 1px 2px #000;
 }
 .hud-bottom {
   position: absolute;
-  bottom: 10px;
   left: 12px;
   right: 12px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 16px;
   pointer-events: auto;
 }
 .bars {
@@ -162,9 +130,6 @@ textarea {
 .bar {
   position: relative;
   height: 16px;
-  background: #000a;
-  border: 1px solid #555;
-  border-radius: 3px;
   overflow: hidden;
 }
 .bar-fill {
@@ -176,17 +141,13 @@ textarea {
   font-size: 11px;
   line-height: 16px;
   padding-left: 6px;
-  text-shadow: 0 1px 2px #000;
 }
 .flasks {
   display: flex;
-  gap: 6px;
   align-items: flex-end;
 }
 .flask {
   position: relative;
-  width: 30px;
-  display: flex;
   flex-direction: column;
   align-items: center;
 }
@@ -225,17 +186,8 @@ textarea {
   }
 }
 .flask-count {
-  position: absolute;
-  inset: 0;
-  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: bold;
-  color: #fff;
-  text-shadow:
-    0 0 3px #000,
-    0 1px 0 #000;
 }
 .flask-fill {
   position: absolute;
@@ -259,7 +211,6 @@ textarea {
 .speeds {
   margin-left: auto;
   display: flex;
-  gap: 4px;
 }
 .camp {
   flex-direction: row;
@@ -274,67 +225,38 @@ textarea {
   flex-direction: column;
   min-width: 0;
 }
-.notice {
-  color: var(--hi);
-}
 /* The nudge to reload a tab left on an older build (src/ui/UpdateNotice.tsx). */
 .notice.update {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
   margin: 8px 0;
   padding: 8px 12px;
-  border: 1px solid var(--hi);
-  border-radius: 6px;
-}
-.warn {
-  color: #ff8a6a;
 }
 .xp {
   height: 6px;
-  background: #222;
-  border-radius: 3px;
   overflow: hidden;
 }
 .xp-fill {
   height: 100%;
-  background: var(--accent);
 }
 /* What the character carries into the next map (Camp): life and mana as bars, flasks as small bottles. */
 .arriving {
   display: flex;
-  align-items: flex-end;
-  gap: 10px;
   margin: 4px 0;
   flex: none;
-  max-width: 360px;
 }
 .arriving-bars {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
   min-width: 0;
 }
 .arriving-bar {
-  height: 14px;
   flex: none;
 }
 .arriving-bar .bar-text {
   display: block;
-  line-height: 14px;
-  font-size: 10px;
-}
-.arriving-life {
-  background: #a82828;
-}
-.arriving-mana {
-  background: #2c46a8;
 }
 .arriving-flasks {
   display: flex;
-  gap: 4px;
   align-items: flex-end;
 }
 .arriving-flasks .flask,
@@ -342,9 +264,7 @@ textarea {
   width: 18px;
 }
 .arriving-flasks .flask-body {
-  height: 28px;
   border-width: 1px;
-  border-radius: 3px 3px 8px 8px;
 }
 .arriving-flasks .flask-neck {
   width: 6px;
@@ -357,16 +277,10 @@ textarea {
   border-bottom: 1px solid #333;
 }
 .tab {
-  background: var(--panel);
-  border: 1px solid #333;
   border-bottom: none;
-  padding: 6px 14px;
-  border-radius: 6px 6px 0 0;
-  cursor: pointer;
 }
 .tab.on {
   background: var(--btn);
-  color: var(--hi);
 }
 .tab:disabled {
   opacity: 0.4;
@@ -389,12 +303,8 @@ svg.tree {
   position: fixed;
   z-index: 10;
   pointer-events: none;
-  background: #111018ee;
-  border: 1px solid #555;
-  border-radius: var(--radius);
   padding: 8px 10px;
   max-width: 320px;
-  font-size: 13px;
 }
 .skills {
   padding: 16px;
@@ -451,28 +361,11 @@ svg.tree {
   border: 1px dashed #555;
   border-radius: var(--radius);
 }
-.magic {
-  color: #8aa8ff;
-}
-.rare {
-  color: #ffe070;
-}
-.unique {
-  color: #ffa040;
-}
 .gem {
   color: #40e0c0;
 }
 .flaskitem {
   color: #ff90b0;
-}
-.item-card {
-  background: #111018;
-  border: 1px solid #444;
-  border-radius: var(--radius);
-  padding: 10px;
-  font-size: 13px;
-  color: #ddd;
 }
 .ic-name {
   font-weight: bold;
@@ -483,9 +376,6 @@ svg.tree {
 }
 .item-card.rare .ic-name {
   color: #ffe070;
-}
-.item-card.unique .ic-name {
-  color: #ffa040;
 }
 .ic-base {
   color: #bbb;
@@ -527,10 +417,6 @@ svg.tree {
 .btn.danger {
   border-color: #803030;
 }
-.btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
 .menu {
   display: flex;
   flex-direction: column;
@@ -542,11 +428,6 @@ svg.tree {
   margin: 4px 0 0;
   text-align: center;
   text-wrap: balance;
-  color: var(--muted);
-}
-.discord a {
-  color: var(--accent);
-  font-weight: bold;
 }
 .discord a:hover {
   text-decoration: underline;
@@ -569,24 +450,12 @@ svg.tree {
 }
 .save-row {
   display: flex;
-  gap: 6px;
   align-items: center;
 }
 .save-row .save-name {
   flex: 1;
   min-width: 0;
   text-align: left;
-}
-span.save-name {
-  padding: 0 4px;
-}
-.reward {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
 }
 .reward-preview {
   margin-top: 4px;
@@ -595,15 +464,7 @@ span.save-name {
 .items-reward {
   margin-bottom: 8px;
 }
-.items-reward .reward {
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-}
 .items-reward .reward .notice {
-  flex-basis: 100%;
-}
-.items-reward .reward .reward-preview {
   flex-basis: 100%;
 }
 .hint {
@@ -646,11 +507,9 @@ span.save-name {
   background: var(--btn);
 }
 .badge.up {
-  color: #60e070;
   background: #17301c;
 }
 .badge.down {
-  color: #ff7070;
   background: #351818;
 }
 .badge.neutral {
@@ -748,17 +607,6 @@ span.save-name {
 .star.on {
   color: var(--hi);
 }
-/* Every dropdown in the game's colours: options on a dark panel need light text, or they show only when hovered. */
-select {
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
-select option {
-  background: var(--panel);
-  color: var(--text);
-}
 
 /* Scroll bars in the game's colours: a square bronze thumb on the dark panel. Chromium and Safari take the pseudo
    elements (a set scrollbar-color would switch them off there); Firefox takes the standard properties. */
@@ -790,30 +638,19 @@ select option {
 /* ---- Orb HUD ---- */
 .hud-bottom {
   justify-content: space-between;
-  align-items: flex-end;
 }
 .hud-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
 }
 .orb {
   position: relative;
-  width: 104px;
-  height: 104px;
   flex: none;
 }
 .orb-glass {
   position: absolute;
-  inset: 0;
-  border-radius: 50%;
   overflow: hidden;
-  background: #0a0508;
-  border: 3px solid #2b2218;
-  box-shadow:
-    inset 0 0 14px #000,
-    0 0 12px #000a;
 }
 /* Reserved by auras: a locked band across the top of the orb. */
 .orb-reserved {
@@ -821,9 +658,7 @@ select option {
   left: 0;
   right: 0;
   top: 0;
-  background: repeating-linear-gradient(135deg, #1a1626 0 4px, #0c0a14 4px 8px);
   border-bottom: 1px solid #8a7ac0;
-  opacity: 0.92;
   z-index: 1;
 }
 .orb-es {
@@ -831,7 +666,6 @@ select option {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(140, 200, 255, 0.35);
   border-top: 1px solid #bfe8ff;
 }
 .orb-text {
@@ -841,62 +675,34 @@ select option {
   place-items: center;
   font-size: 14px;
   font-weight: bold;
-  color: #fff;
   /* Above the reservation band and the fills, and outlined so it reads on any of them. */
   z-index: 3;
-  text-shadow:
-    0 0 3px #000,
-    0 0 3px #000,
-    0 1px 3px #000;
   pointer-events: none;
 }
 .hud-abandon {
   position: absolute;
-  top: 6px;
-  right: 12px;
   display: flex;
-  gap: 8px;
   align-items: center;
-  font-size: 14px;
-  text-shadow: 0 1px 2px #000;
   pointer-events: auto;
 }
 .hud-reprieve {
-  padding: 0 8px;
-  border: 1px solid #e6b84a;
-  border-radius: 10px;
-  background: rgba(20, 17, 26, 0.8);
-  color: #e6c07a;
-  font-size: 13px;
   pointer-events: auto;
 }
 .hud-reprieve.used {
   border-color: #5a5a68;
-  color: #8d8fa8;
   /* The moment a reprieve fires its badge flashes once, so the effect on the map is tied to the item. */
   animation: reprieve-flash 1s ease-out;
 }
 /* A duel's reprieves (docs/DUEL-BALANCE.md 3): a pip for each Bargain Coin, emptied as it fires. */
 .reprieve-pips {
   display: inline-flex;
-  gap: 4px;
   margin-left: 8px;
   vertical-align: middle;
   pointer-events: auto;
 }
-.reprieve-pips .pip {
-  width: 9px;
-  height: 9px;
-  border: 1px solid #e6b84a;
-  border-radius: 50%;
-  background: #e6c07a;
-  box-shadow: 0 0 4px rgba(230, 184, 74, 0.6);
-}
 .reprieve-pips .pip.used {
   border-color: #5a5a68;
-  background: transparent;
   box-shadow: none;
-  animation: pip-flash 1s ease-out;
 }
 @keyframes pip-flash {
   0% {
@@ -924,14 +730,10 @@ select option {
 }
 .hud-showcase {
   position: absolute;
-  top: 40px;
-  right: 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
   align-items: flex-end;
   pointer-events: auto;
-  font-size: 12px;
 }
 .showcase-row {
   display: flex;
@@ -941,27 +743,15 @@ select option {
 
 /* ---- Enemy inspect card ---- */
 .inspect {
-  position: absolute;
   left: 16px;
   top: 56px;
-  width: 270px;
-  padding: 10px 12px;
   background: var(--panel);
-  color: var(--text);
-  border: 2px solid var(--rar, #888);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 14px #000a;
   pointer-events: auto;
-  font-size: 13px;
 }
 .inspect-x {
   position: absolute;
-  right: 6px;
-  top: 4px;
   background: none;
   border: none;
-  color: var(--muted);
-  font-size: 18px;
   cursor: pointer;
 }
 .inspect-name {
@@ -975,49 +765,26 @@ select option {
 }
 .inspect-life {
   position: relative;
-  height: 16px;
-  background: #301010;
-  border: 1px solid #000;
   margin-bottom: 8px;
 }
 .inspect-life > div {
   height: 100%;
-  background: var(--rar, #c03030);
 }
 .inspect-es {
   background: #102838;
-  margin-bottom: 3px;
-}
-.inspect-es > div {
-  background: #4aa8d8;
 }
 .inspect-life > span {
   position: absolute;
   inset: 0;
   text-align: center;
-  font-size: 11px;
-  line-height: 16px;
-  color: #fff;
-  text-shadow:
-    0 0 2px #000,
-    0 1px 0 #000;
 }
 .inspect-mod {
   display: flex;
-  gap: 8px;
   align-items: flex-start;
-  margin-top: 6px;
-}
-.inspect-mod-name {
-  font-weight: bold;
 }
 .mchip {
   flex: none;
-  width: 14px;
-  height: 14px;
-  margin-top: 2px;
   background: var(--c);
-  outline: 2px solid #000;
 }
 .mchip.circle {
   border-radius: 50%;
@@ -1040,9 +807,6 @@ select option {
 }
 .gem-tooltip {
   max-width: 290px;
-  padding: 0;
-  background: none;
-  border: none;
 }
 .gem-tooltip .item-card {
   background: #111018;
@@ -1067,13 +831,6 @@ select option {
 .recap h3 {
   margin: 0 0 6px;
 }
-.recap table td {
-  padding: 1px 10px 1px 0;
-}
-.theme .affix {
-  font-size: 12px;
-  color: #e0b070;
-}
 .theme.respite {
   border-style: dashed;
 }
@@ -1084,27 +841,19 @@ select option {
   background: #1a1922;
   font-size: 13px;
 }
-.theme-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
 .chalk {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
   align-items: center;
 }
 
 .charges {
   display: flex;
-  gap: 10px;
   justify-content: center;
   margin-bottom: 4px;
 }
 .charge {
   display: flex;
-  gap: 2px;
 }
 .pip {
   width: 9px;
@@ -1118,43 +867,17 @@ select option {
   opacity: 1;
   box-shadow: 0 0 5px var(--c);
 }
-.charge.grit {
-  --c: #e0a050;
-}
-.charge.fervour {
-  --c: #e05555;
-}
-.charge.insight {
-  --c: #5aa0ff;
-}
-
-.hexchip {
-  font-size: 11px;
-  padding: 1px 6px;
-  border: 1px solid #c070e0;
-  border-radius: 8px;
-  color: #e0b0f0;
-  background: rgba(80, 30, 100, 0.45);
-}
 /* ---- Skill bar (in-map HUD): one tile per equipped skill, tinted with its look colour in --c ---- */
 .skillbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
   justify-content: center;
-  max-width: 420px;
   /* The HUD ignores the mouse; the tiles take it for their tooltips. */
   pointer-events: auto;
 }
 .skill {
   position: relative;
-  width: 34px;
-  height: 34px;
   box-sizing: border-box;
-  border: 1px solid var(--c);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--c) 22%, #000b);
-  overflow: hidden;
 }
 .skill-init {
   position: absolute;
@@ -1164,20 +887,11 @@ select option {
   justify-content: center;
   font-size: 13px;
   font-weight: bold;
-  color: var(--c);
-  text-shadow:
-    0 0 3px #000,
-    0 1px 0 #000;
 }
 /* The sweep: a dark wedge for the share still to come, clockwise from the top. */
 .skill-sweep {
   position: absolute;
   inset: 0;
-  background: conic-gradient(from 0deg, #000c calc(var(--cd) * 1%), transparent 0);
-}
-.skill.active .skill-sweep,
-.skill.casting .skill-sweep {
-  background: conic-gradient(from 0deg, #fff4 calc(var(--cd) * 1%), transparent 0);
 }
 .skill-time {
   position: absolute;
@@ -1185,43 +899,17 @@ select option {
   right: 0;
   bottom: 1px;
   text-align: center;
-  font-size: 10px;
-  line-height: 11px;
-  color: #fff;
-  text-shadow:
-    0 0 3px #000,
-    0 1px 0 #000;
 }
 .skill-badge {
   position: absolute;
-  top: 0;
-  right: 0;
-  padding: 0 3px;
-  font-size: 9px;
-  line-height: 11px;
-  color: #fff;
-  background: #000c;
   border-bottom-left-radius: 4px;
-}
-.skill.cooling .skill-init {
-  opacity: 0.45;
 }
 .skill.active,
 .skill.casting {
   border-color: #fff;
-  box-shadow:
-    0 0 8px var(--c),
-    inset 0 0 6px #fff8;
-}
-.skill.casting {
-  animation: flask-pulse 0.5s ease-in-out infinite alternate;
 }
 .skill.nopay {
   border-color: #c04040;
-  background: #4a1414cc;
-}
-.skill.nopay .skill-init {
-  color: #e07070;
 }
 .skill.off {
   opacity: 0.4;
@@ -1242,11 +930,7 @@ select option {
 .codex .menu.row {
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 8px;
   align-items: center;
-}
-.codex .search {
-  min-width: 180px;
 }
 .codex-list {
   max-height: 70vh;
@@ -1260,15 +944,8 @@ select option {
 .codex-head {
   background: none;
   border: none;
-  color: inherit;
   cursor: pointer;
   font: inherit;
-  padding: 4px 6px;
-  text-align: left;
-  width: 100%;
-}
-.codex-head .found {
-  color: #8fd18f;
 }
 
 /* Patch notes */
@@ -1277,10 +954,8 @@ select option {
   gap: 8px;
 }
 .patch-list {
-  max-height: 75vh;
   overflow-y: auto;
   text-align: left;
-  width: min(720px, 94vw);
 }
 .patch-list h2 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -1309,12 +984,7 @@ select option {
 /* Skill looks: colour chips in the Codex (see src/calc/skillLook.ts). */
 .look-chip {
   display: inline-block;
-  width: 0.7em;
-  height: 0.7em;
   margin-right: 0.35em;
-  border-radius: 2px;
-  vertical-align: baseline;
-  box-shadow: 0 0 4px currentColor;
 }
 .look-legend h3 {
   margin: 0.8em 0 0.3em;
@@ -1322,10 +992,6 @@ select option {
 .look-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4em 1.2em;
-}
-.look-shape {
-  padding: 0.25em 0.5em;
 }
 .modal {
   position: fixed;
@@ -1336,7 +1002,6 @@ select option {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #000a;
 }
 .modal-card {
   position: relative;
@@ -1347,11 +1012,7 @@ select option {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 16px;
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 10px 40px #000;
 }
 .modal-card h3 {
   margin: 0;
@@ -1412,48 +1073,31 @@ select option {
   justify-content: space-between;
   gap: 8px;
   padding: 2px 6px;
-  background: var(--panel2);
   border-radius: 3px;
 }
 
 /* Debug controls (docs/ENEMIES.md 8.3). */
 .debug-panel {
-  max-width: min(520px, 92vw);
   width: 100%;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 6px 12px;
-  font-size: 13px;
 }
 .debug-panel summary {
   cursor: pointer;
-  color: var(--muted);
 }
 .debug-row {
   display: grid;
-  grid-template-columns: 70px 1fr 70px;
   align-items: center;
-  gap: 8px;
-  margin: 6px 0;
-}
-.debug-row input[type='number'] {
-  width: 70px;
 }
 .debug-buttons {
   display: flex;
-  gap: 8px;
   align-items: center;
   margin: 6px 0;
 }
 .debug-table {
   border-collapse: collapse;
-  margin: 6px 0;
   width: 100%;
 }
 .debug-table th,
 .debug-table td {
-  border: 1px solid var(--border);
-  padding: 2px 6px;
   text-align: right;
 }
 .debug-table td:first-child {
@@ -1464,9 +1108,6 @@ select option {
 .offer-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin: 4px 0;
-  font-size: 12px;
 }
 .offer-info .chips {
   display: flex;
@@ -1474,9 +1115,6 @@ select option {
   gap: 3px;
 }
 .offer-info .chip {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0 6px;
   white-space: nowrap;
 }
 .offer-info .chip.type {
@@ -1488,23 +1126,15 @@ select option {
 }
 .offer-info .mixbar {
   display: flex;
-  height: 5px;
-  border-radius: 3px;
   overflow: hidden;
-  background: var(--border);
 }
 .offer-info .mixbar span {
   display: block;
   height: 100%;
 }
-.offer-info .gate {
-  color: #ffb070;
-}
 .telemetry {
-  display: block;
   max-width: 420px;
   margin: 12px auto 0;
-  font-size: 12px;
   cursor: pointer;
 }
 .telemetry input {
@@ -1525,10 +1155,8 @@ select option {
   margin-right: 4px;
 }
 .rivals-opt {
-  display: block;
   max-width: 420px;
   margin: 8px auto 0;
-  font-size: 12px;
 }
 .rivals-opt label {
   display: block;
@@ -1542,18 +1170,11 @@ select option {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  margin-top: 6px;
 }
 .rivals-opt .rival-name input {
-  width: 14em;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 4px 8px;
   color: var(--text);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
   color-scheme: dark;
 }
 
@@ -1569,7 +1190,6 @@ select option {
   z-index: 45;
   left: 0;
   top: 0;
-  width: min(360px, 92vw);
   margin: 0;
   pointer-events: none;
   box-shadow: 0 6px 24px #000c;
@@ -1577,48 +1197,29 @@ select option {
 
 /* ---- Bosses (docs/BOSSES.md): the bar across the top in a fight, a boss's description at camp ---- */
 .boss-bars {
-  position: absolute;
   top: 34px;
   left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, calc(100% - 32px));
   display: flex;
-  gap: 14px;
   pointer-events: none;
 }
 .boss-bar {
   flex: 1;
   min-width: 0;
   text-align: center;
-  text-shadow: 0 1px 2px #000;
 }
 .boss-bar-name {
   font-size: 16px;
-  letter-spacing: 0.06em;
-  color: #ffd8b0;
 }
 .boss-bar-life {
   position: relative;
-  height: 12px;
-  margin: 3px 0;
-  background: #2a0c0c;
-  border: 1px solid #000;
-  box-shadow: 0 0 0 1px #7a3020;
 }
 .boss-bar-life > div {
   height: 100%;
-  background: linear-gradient(#e04030, #8a1c14);
 }
 .boss-bar-life > .boss-bar-es {
   position: absolute;
   top: 0;
   left: 0;
-  height: 4px;
-  background: #9ad8ff;
-}
-.boss-bar-state {
-  font-size: 12px;
-  color: #e8dcc8;
 }
 .boss-card {
   margin: 6px 0;
@@ -1628,33 +1229,15 @@ select option {
 .flask.sealed {
   filter: grayscale(1) brightness(0.5);
 }
-.boss-ahead {
-  margin: 8px 0;
-  padding: 6px 8px;
-  border: 1px solid #7a3020;
-  border-radius: var(--radius);
-  background: rgba(60, 16, 10, 0.35);
-}
 .boss-ahead-name {
-  color: #ffd8b0;
   font-size: 14px;
 }
 
 /* ---- A boss map's offer (docs/BOSSES.md 10): one level, set apart from all the others ---- */
 .boss-offer {
-  position: relative;
-  margin: 10px 0;
-  padding: 0 0 12px;
-  border: 2px solid #b8401f;
-  border-radius: var(--radius);
   background:
     radial-gradient(ellipse at 20% 0%, rgba(200, 60, 30, 0.28), transparent 60%),
     linear-gradient(#2a0d09, #160807);
-  box-shadow:
-    0 0 0 1px #000,
-    0 0 24px rgba(220, 70, 30, 0.35),
-    inset 0 0 40px rgba(0, 0, 0, 0.6);
-  animation: boss-glow 3s ease-in-out infinite;
 }
 @keyframes boss-glow {
   0%,
@@ -1675,48 +1258,23 @@ select option {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 6px 14px;
   background: linear-gradient(90deg, #7a1c10, #3a0e08);
   border-bottom: 1px solid #000;
-  color: #ffd8b0;
-  font-size: 13px;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
 }
 .boss-portrait {
   flex: 0 0 auto;
-  width: 150px;
-  height: 150px;
-  object-fit: contain;
-  object-position: bottom;
-  image-rendering: pixelated;
-  background: radial-gradient(circle at 50% 80%, rgba(255, 120, 60, 0.25), transparent 65%);
   border-bottom: 2px solid #5a1a10;
 }
 .boss-offer-name {
   font-size: 26px;
   line-height: 1.1;
-  color: #ffe4c4;
-  text-shadow:
-    0 0 10px rgba(255, 90, 40, 0.6),
-    0 2px 2px #000;
 }
 .boss-offer-way {
   margin-bottom: 6px;
-  color: #e8dcc8;
 }
 .btn.boss-go {
-  display: block;
-  margin: 12px auto 0;
-  padding: 10px 28px;
   font-size: 16px;
-  letter-spacing: 0.08em;
-  color: #fff0e0;
-  background: linear-gradient(#b8401f, #7a1c10);
   border-color: #ffb070;
-}
-.btn.boss-go:hover {
-  background: linear-gradient(#d8502a, #8a2414);
 }
 @media (max-width: 640px) {
   .boss-portrait {
@@ -1733,11 +1291,8 @@ select option {
 .biome-banner {
   position: absolute;
   top: 18%;
-  left: 0;
-  right: 0;
   text-align: center;
   pointer-events: none;
-  text-shadow: 0 2px 6px #000;
   animation: biome-fade 5s ease-out forwards;
 }
 .biome-name {
@@ -1746,8 +1301,6 @@ select option {
   text-transform: uppercase;
 }
 .biome-text {
-  font-size: 15px;
-  opacity: 0.8;
   margin-top: 4px;
 }
 @keyframes biome-fade {
@@ -1767,17 +1320,12 @@ select option {
 
 /* What a boss says when its bar first comes up (docs/BOSSES.md), under the bars for a few seconds. */
 .boss-line {
-  position: absolute;
   top: 18%;
   left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, calc(100% - 32px));
   text-align: center;
-  font-size: 18px;
   font-style: italic;
   line-height: 1.5;
   pointer-events: none;
-  text-shadow: 0 2px 6px #000;
   animation: biome-fade 5s ease-out forwards;
 }
 

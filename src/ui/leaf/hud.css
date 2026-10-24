@@ -2,7 +2,7 @@
    no gold wall, only a few painted things that keep their size for the whole map (the orbs' medallions, the dock of
    flasks and skills, the biome banner, the inspect card, the buttons). What changes while playing is styled here alone,
    in the small-bar look (lapis texture, a gold ring, a hard shadow), and sits inside data-nopaint. Overrides the old
-   HUD rules of styles.css, skins.css and mobile.css. */
+   HUD rules of styles.css, fonts.css and mobile.css. */
 
 html.leaf .hud {
   color: var(--pearl);

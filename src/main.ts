@@ -14,7 +14,7 @@ import '@fontsource/grenze/400-italic.css';
 import '@fontsource/grenze/600.css';
 import '@fontsource/jacquard-24/400.css';
 import './ui/styles.css';
-import './ui/skins.css';
+import './ui/fonts.css';
 import './ui/tree.css';
 import './ui/mobile.css';
 import './ui/items.css';
