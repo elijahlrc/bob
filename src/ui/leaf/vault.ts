@@ -368,47 +368,85 @@ export function textWidth(t: string, font: string): number {
 }
 export const clearWidths = () => widths.clear();
 
+/** Boxes kept in a grid of cells, so asking whether a box is free looks only at its neighbours. */
+export class BoxGrid {
+  private cells = new Map<number, Box[]>();
+  private readonly size = 96;
+  private each(b: Box, f: (key: number) => void) {
+    const s = this.size;
+    for (let gx = Math.floor(b.x / s); gx <= Math.floor((b.x + b.w) / s); gx++)
+      for (let gy = Math.floor(b.y / s); gy <= Math.floor((b.y + b.h) / s); gy++)
+        f((gx + 32768) * 65536 + (gy + 32768));
+  }
+  add(b: Box) {
+    this.each(b, (key) => {
+      const c = this.cells.get(key);
+      if (c) c.push(b);
+      else this.cells.set(key, [b]);
+    });
+  }
+  hits(b: Box): boolean {
+    let hit = false;
+    this.each(b, (key) => {
+      if (hit) return;
+      for (const o of this.cells.get(key) ?? [])
+        if (b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y) {
+          hit = true;
+          return;
+        }
+    });
+    return hit;
+  }
+}
+
+/** A word placed: its box, what it was, and the two ends of the thin line from its node to it. */
+export type Placed = Box & { want: Want; line: [number, number, number, number] };
+
 /**
- * Place the words greedily, most wanted first, each beside its node where nothing else is (eight places tried round
- * it), within the view and clear of the boxes given (the panel, the controls, the big nodes).
+ * Place the words greedily, most wanted first, each where nothing else is: beside its node (eight places round it),
+ * then a step and two steps further out, a thin line joining it to its node. Positions are in the view's pixels at
+ * this zoom with the camera at 0, so the whole tree is placed at once and panning only moves the result.
  */
-export function placeLabels(
-  want: Want[],
-  boxes: Box[],
-  W: number,
-  H: number,
-  cap = 170,
-): (Box & { want: Want })[] {
-  const free = (b: Box) =>
-    b.x >= 6 &&
-    b.y >= 6 &&
-    b.x + b.w <= W - 6 &&
-    b.y + b.h <= H - 6 &&
-    !boxes.some((o) => b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y);
-  const out: (Box & { want: Want })[] = [];
+export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
+  const out: Placed[] = [];
   for (const it of [...want].sort((a, b) => a.p - b.p)) {
-    if (out.length > cap) break;
     const tw = textWidth(it.text, it.font) + 4;
     const th = it.h;
     const cx = it.v.x * P;
     const cy = it.v.y * P;
-    const r = (it.v.d / 2 + 1.5) * P;
-    const tries = [
-      { x: cx - tw / 2, y: cy + r },
-      { x: cx - tw / 2, y: cy - r - th },
-      { x: cx + r + 2, y: cy - th / 2 },
-      { x: cx - r - 2 - tw, y: cy - th / 2 },
-      { x: cx + r, y: cy + r - 4 },
-      { x: cx - r - tw, y: cy + r - 4 },
-      { x: cx + r, y: cy - r - th + 4 },
-      { x: cx - r - tw, y: cy - r - th + 4 },
-    ];
-    for (const t of tries) {
-      const b = { x: t.x, y: t.y, w: tw, h: th };
-      if (!free(b)) continue;
-      boxes.push(b);
-      out.push({ ...b, want: it });
-      break;
+    const r0 = (it.v.d / 2 + 1.5) * P;
+    let done = false;
+    for (const gap of [6, 22, 40]) {
+      const r = r0 + gap;
+      const d = r * 0.7;
+      const tries = [
+        { x: cx - tw / 2, y: cy + r },
+        { x: cx - tw / 2, y: cy - r - th },
+        { x: cx + r, y: cy - th / 2 },
+        { x: cx - r - tw, y: cy - th / 2 },
+        { x: cx + d, y: cy + d },
+        { x: cx - d - tw, y: cy + d },
+        { x: cx + d, y: cy - d - th },
+        { x: cx - d - tw, y: cy - d - th },
+      ];
+      for (const t of tries) {
+        const b = { x: t.x, y: t.y, w: tw, h: th };
+        if (taken.hits(b)) continue;
+        taken.add(b);
+        // From the node's rim to the nearest point of the word's box.
+        const nx = Math.max(b.x, Math.min(cx, b.x + b.w));
+        const ny = Math.max(b.y, Math.min(cy, b.y + b.h));
+        const len = Math.hypot(nx - cx, ny - cy) || 1;
+        const rim = r0 - 2;
+        out.push({
+          ...b,
+          want: it,
+          line: [cx + ((nx - cx) / len) * rim, cy + ((ny - cy) / len) * rim, nx, ny],
+        });
+        done = true;
+        break;
+      }
+      if (done) break;
     }
   }
   return out;

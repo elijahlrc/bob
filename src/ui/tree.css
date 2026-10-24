@@ -29,9 +29,30 @@
 .tv-labels span {
   position: absolute;
   white-space: nowrap;
-  font-size: 17px;
-  line-height: 21px;
+  font-size: 15px;
+  line-height: 18px;
   text-shadow: var(--o);
+}
+/* The thin lines from the words to their nodes, under the words. */
+.tv-leaders {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+.tv-leaders line {
+  stroke: #c09d4e;
+  stroke-width: 1;
+  opacity: 0.75;
+}
+.tv-leaders line.tv-small {
+  opacity: 0.5;
+}
+.tv-leaders line.dim {
+  opacity: 0.12;
 }
 .tv-area {
   transform: translate(-50%, -50%);
@@ -40,7 +61,7 @@
   color: var(--gold-hi);
 }
 .tv-key {
-  font: 400 24px/26px var(--title-font) !important;
+  font: 400 21px/23px var(--title-font) !important;
   font-size-adjust: none;
   color: var(--gold-hi);
 }

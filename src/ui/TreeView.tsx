@@ -23,9 +23,10 @@ import { P } from './leaf/ramps';
 import {
   clearWidths,
   drawVault,
+  BoxGrid,
+  diam,
   placeLabels,
   skyUrl,
-  type Box,
   type Drawn,
   type Edge,
   type NodeState,
@@ -40,9 +41,12 @@ const MOUSE_PX = 9;
 /** The view is never fitted to less than this scale, so a late-game tree still opens at a readable size. */
 const FIT_MIN_K = 0.15;
 
-const F_NOTE = "600 17px Grenze, 'Palatino Linotype', Georgia, serif";
-const F_SMALL = "400 17px Grenze, 'Palatino Linotype', Georgia, serif";
-const F_KEY = "400 24px 'Jacquard 24', 'Palatino Linotype', Georgia, serif";
+const F_NOTE = "600 15px Grenze, 'Palatino Linotype', Georgia, serif";
+const F_SMALL = "400 15px Grenze, 'Palatino Linotype', Georgia, serif";
+const F_KEY = "400 21px 'Jacquard 24', 'Palatino Linotype', Georgia, serif";
+/** The line heights of the words (tree.css says the same). */
+const H_LINE = 18;
+const H_KEY = 23;
 
 /** A stat line shortened for the words beside small nodes ("+6 Dex"); the panel always has the whole line. */
 const SHORT: [RegExp, string | ((...m: string[]) => string)][] = [
@@ -214,7 +218,7 @@ export function TreeView({ c }: { c: Controller }) {
     if (!art || !wrap || !linesRef.current) return;
     const ctx = art.getContext('2d')!;
     ctx.imageSmoothingEnabled = false;
-    const drawn = drawVault(ctx, linesRef.current, {
+    drawVault(ctx, linesRef.current, {
       nodes: live,
       edges,
       tone: (id) => tones[id],
@@ -224,7 +228,7 @@ export function TreeView({ c }: { c: Controller }) {
       view: view.current,
       sel: picked,
     });
-    words(drawn, wrap);
+    words();
   };
   const draw = () => {
     if (queued.current) return;
@@ -234,32 +238,39 @@ export function TreeView({ c }: { c: Controller }) {
       latest.current();
     });
   };
-  const words = (drawn: Drawn[], wrap: HTMLDivElement) => {
+  // The words are laid out over the whole tree, in the view's pixels with the camera at 0, whenever the zoom or what
+  // they say changes; panning only moves their layer the way the canvas moves the nodes. A word never comes or goes
+  // because its node crossed the edge of the view.
+  const wordsKey = useRef<unknown[]>([]);
+  const words = () => {
     const el = labelsRef.current;
     if (!el) return;
-    const k = view.current.k;
-    const { W, H } = size.current;
-    const boxes: Box[] = [];
-    // The panel and the controls are in the way of words; so are the big nodes.
-    const wr = wrap.getBoundingClientRect();
-    const sc = wr.width / (W || 1) || 1;
-    wrap.querySelectorAll<HTMLElement>('.tv-ledger, .tv-hud > *').forEach((e) => {
-      const r = e.getBoundingClientRect();
-      if (r.width)
-        boxes.push({
-          x: (r.left - wr.left) / sc - 4,
-          y: (r.top - wr.top) / sc - 4,
-          w: r.width / sc + 8,
-          h: r.height / sc + 8,
-        });
-    });
-    for (const v of drawn)
+    const { k, x, y } = view.current;
+    el.style.transform = `translate(${Math.round(x / P) * P}px, ${Math.round(y / P) * P}px)`;
+    const key = [k, allocSet, path, picked, matches, phone, runs, live];
+    const was = wordsKey.current;
+    if (key.length === was.length && key.every((v, i) => v === was[i])) return;
+    wordsKey.current = key;
+    el.innerHTML = layoutWords(k);
+  };
+  const layoutWords = (k: number): string => {
+    const s = k / P;
+    const all: Drawn[] = live.map((n) => ({
+      n,
+      x: Math.round(n.x * s),
+      y: Math.round(n.y * s),
+      d: diam(n.kind, k),
+      st: state(n.id),
+    }));
+    // The big nodes are in the way of words.
+    const taken = new BoxGrid();
+    for (const v of all)
       if (v.d >= 8) {
         const r = (v.d / 2 + 2) * P;
-        boxes.push({ x: v.x * P - r, y: v.y * P - r, w: 2 * r, h: 2 * r });
+        taken.add({ x: v.x * P - r, y: v.y * P - r, w: 2 * r, h: 2 * r });
       }
     const want: Want[] = [];
-    const byId = new Map(drawn.map((v) => [v.n.id, v]));
+    const byId = new Map(all.map((v) => [v.n.id, v]));
     const pri = (v: Drawn) =>
       v.n.id === picked
         ? 0
@@ -272,7 +283,7 @@ export function TreeView({ c }: { c: Controller }) {
               : v.st === 'can'
                 ? 4
                 : 5;
-    for (const v of drawn) {
+    for (const v of all) {
       const n = v.n;
       if (n.kind === 'start')
         want.push({
@@ -280,18 +291,18 @@ export function TreeView({ c }: { c: Controller }) {
           text: classDef(n.classStart!).name,
           cls: 'tv-key',
           font: F_KEY,
-          h: 26,
+          h: H_KEY,
           p: -1,
         });
       else if (n.kind === 'keystone' && k >= 0.1)
-        want.push({ v, text: n.name, cls: 'tv-key', font: F_KEY, h: 26, p: pri(v) });
+        want.push({ v, text: n.name, cls: 'tv-key', font: F_KEY, h: H_KEY, p: pri(v) });
       else if (n.kind === 'notable' && k >= 0.16)
         want.push({
           v,
           text: n.name,
           cls: `tv-note ${v.st}`,
           font: F_NOTE,
-          h: 21,
+          h: H_LINE,
           p: pri(v) + 0.5,
         });
     }
@@ -311,40 +322,40 @@ export function TreeView({ c }: { c: Controller }) {
           text: r.text,
           cls: `tv-small ${st}`,
           font: F_SMALL,
-          h: 21,
-          p:
-            (st === 'path' ? 1 : st === 'on' ? 3.6 : 6) +
-            0.001 * Math.hypot(v.x * P - W / 2, v.y * P - H / 2),
+          h: H_LINE,
+          // A fixed order among equals (not the distance from the middle of the view, which panning changes).
+          p: (st === 'path' ? 1 : st === 'on' ? 3.6 : 6) + r.anchor * 1e-7,
         });
       }
-    const placed = placeLabels(want, boxes, W, H);
+    const placed = placeLabels(want, taken);
     const out = placed.map(
       (b) =>
         `<span class="${b.want.cls}" style="left:${Math.round(b.x)}px;top:${Math.round(b.y)}px">${esc(b.want.text)}</span>`,
     );
+    // A thin line from each word to its node, when the word is not right against it.
+    const leaders = placed
+      .filter((b) => Math.hypot(b.line[2] - b.line[0], b.line[3] - b.line[1]) > 3)
+      .map(
+        (b) =>
+          `<line x1="${b.line[0].toFixed(1)}" y1="${b.line[1].toFixed(1)}" x2="${b.line[2].toFixed(1)}" y2="${b.line[3].toFixed(1)}" class="${b.want.cls}" />`,
+      );
     // The areas' names, large and faint when zoomed out, wherever the node names left room.
     const alpha = k <= 0.14 ? 1 : k >= 0.3 ? 0 : 1 - (k - 0.14) / 0.16;
     if (alpha > 0) {
       const px = phone ? 32 : 48;
       for (const a of tree.areas ?? []) {
-        const x = Math.round(a.x * view.current.k + view.current.x);
-        const y = Math.round(a.y * view.current.k + view.current.y);
+        const ax = Math.round(a.x * k);
+        const ay = Math.round(a.y * k);
         const tw = placeWidth(a.name, px);
-        const b = { x: x - tw / 2, y: y - px / 2, w: tw, h: px };
-        if (b.x < 6 || b.y < 6 || b.x + b.w > W - 6 || b.y + b.h > H - 6) continue;
-        if (
-          boxes.some(
-            (o) => b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y,
-          )
-        )
-          continue;
-        boxes.push(b);
+        const b = { x: ax - tw / 2, y: ay - px / 2, w: tw, h: px };
+        if (taken.hits(b)) continue;
+        taken.add(b);
         out.push(
-          `<span class="tv-area" style="left:${x}px;top:${y}px;opacity:${(alpha * 0.85).toFixed(2)}">${esc(a.name)}</span>`,
+          `<span class="tv-area" style="left:${ax}px;top:${ay}px;opacity:${(alpha * 0.85).toFixed(2)}">${esc(a.name)}</span>`,
         );
       }
     }
-    el.innerHTML = out.join('');
+    return `<svg class="tv-leaders">${leaders.join('')}</svg>${out.join('')}`;
   };
   const placeWidth = (t: string, px: number) =>
     textWidth(t, `400 ${px}px 'Jacquard 24', Georgia, serif`);
