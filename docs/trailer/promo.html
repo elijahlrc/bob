@@ -62,6 +62,10 @@
     text-shadow: 0 2px 0 var(--ink);
     white-space: nowrap;
   }
+  .plq.two {
+    text-align: center;
+    line-height: 1.15;
+  }
   .plq.gold {
     color: var(--gold-hi);
   }
@@ -136,6 +140,10 @@
       <div style="background-image:url(${src});background-size:${1600 * k}px auto;background-position:${-(cx - cw / 2) * k}px ${-(cy - ch / 2) * k}px"></div></div>`;
   };
   const GENRES = 'Arcade · ARPG · Roguelike · Autobattler';
+  /** The genres on two lines, to be read where the picture is shown small. */
+  const GENRES2 = 'Arcade · ARPG<br>Roguelike · Autobattler';
+  /** The itch.io page's own blue, behind and below the game's frame (sampled from the page, 2026-10-24). */
+  const PAGE_BLUE = '#151d45';
 
   /*
    * Borders built from the interface's strips (src/ui/leaf/shapes.ts), in art pixels: each layer draws a band along a
@@ -194,6 +202,8 @@
     teeth: ['ink', 'gold', 'tiles', 'goldIn', 'wave', 'teeth'],
     // Lighter: the tesserae on lapis between gold, then the tile row.
     tesserae: ['ink', 'gold', 'dots', 'goldIn', 'tiles', 'ink'],
+    // Slim, for a small picture: the tile row between gold.
+    slim: ['ink', 'gold', 'tiles', 'goldIn', 'ink'],
   };
   /** One band of `layers`, `n` long, its outer edge at the top. */
   function band(layers, n) {
@@ -242,8 +252,9 @@
   /**
    * The border of a W × H (art pixels) picture: bands of `layers` down both sides (on out of the top) and along the
    * bottom, a rosette in each bottom corner, aged as the interface is (wear, grime, the pixel shadow on the wall).
+   * `closed` runs a band along the top too, with rosettes in all four corners.
    */
-  function border(W, H, layers) {
+  function border(W, H, layers, closed = false) {
     const side = band(layers, H);
     const t = side.height;
     const cv = document.createElement('canvas');
@@ -259,11 +270,17 @@
       x.restore();
     };
     // The outer edge of a band is its top: turned so it faces out on each side.
-    put(band(layers, H - t), 0, H - t, -Math.PI / 2);
-    put(band(layers, H - t), W, 0, Math.PI / 2);
+    const top = closed ? t : 0;
+    put(band(layers, H - t - top), 0, H - t, -Math.PI / 2);
+    put(band(layers, H - t - top), W, top, Math.PI / 2);
     put(band(layers, W - 2 * t), W - t, H, Math.PI);
     rosette(x, 0, H - t, t);
     rosette(x, W - t, H - t, t);
+    if (closed) {
+      put(band(layers, W - 2 * t), t, 0, 0);
+      rosette(x, 0, 0, t);
+      rosette(x, W - t, 0, t);
+    }
     age(cv, rng(seedOf('banner-border')), {
       loss: 0.03,
       cracks: 4,
@@ -281,20 +298,21 @@
     /* when the page is linked: 1200 × 630. The title and the lines at the left, the tree's build framed at the right. */
     social() {
       box(1200, 630);
-      add(`<div class="col" style="left:20px;top:48px;width:540px;gap:22px">
-        ${title(['Battle', 'of', 'Builds'], 128, 4)}
-        ${plaque(GENRES, 24)}
-        ${plaque('Free in your browser', 24, 'gold', 'vermilion')}
+      // The lines under the title as large as the column allows: the picture is mostly seen small.
+      add(`<div class="col" style="left:16px;top:22px;width:560px;gap:16px">
+        ${title(['Battle', 'of', 'Builds'], 104, 4)}
+        ${plaque(GENRES2, 42, 'two')}
+        ${plaque('Free in your browser', 42, 'gold', 'vermilion')}
       </div>`);
-      add(frame(SHOT.tree, 570, 100, 610, 430, [810, 448, 840], 16));
+      add(frame(SHOT.tree, 590, 100, 590, 430, [810, 448, 812], 16));
     },
     /* home page featuring: 21:9, 2520 × 1080. The same, with a fight framed beside the tree. */
     wide() {
       box(2520, 1080);
-      add(`<div class="col" style="left:70px;top:110px;width:960px;gap:40px">
-        ${title(['Battle', 'of', 'Builds'], 236, 7)}
-        ${plaque(GENRES, 46)}
-        ${plaque('Free in your browser', 46, 'gold', 'vermilion')}
+      add(`<div class="col" style="left:60px;top:44px;width:980px;gap:34px">
+        ${title(['Battle', 'of', 'Builds'], 188, 6)}
+        ${plaque(GENRES2, 80, 'two')}
+        ${plaque('Free in your browser', 80, 'gold', 'vermilion')}
       </div>`);
       add(frame(SHOT.tree, 1080, 70, 1370, 940, [800, 448, 860], 24));
     },
@@ -385,13 +403,23 @@
       c.append(out);
     },
     /*
-     * Behind the game before it is run, 1280 × 720 (a smaller frame crops the middle): the gold wall with an arched lapis
-     * niche in the middle, where the Run button sits. No title: the banner has it.
+     * Behind the game before it is run, 640 × 360: the size of the game's frame on the page, which shows the picture at
+     * its own size. A margin of the page's own blue (PAGE_BLUE), so the picture's edge is the page's; inside it the gold
+     * wall in a slim frame of the interface's strips, and an arched lapis alcove, whole, where the Run button sits. No
+     * title: the banner has it.
      */
     embed() {
-      box(1280, 720);
+      box(640, 360, false);
+      c.style.background = PAGE_BLUE;
+      const m = 8;
       add(
-        `<div data-paint="panel" data-arch data-pearls style="position:absolute;left:430px;top:110px;width:420px;height:500px"></div>`,
+        `<div class="screen" style="position:absolute;left:${m}px;top:${m}px;right:${m}px;bottom:${m}px"></div>`,
+      );
+      const cv = border((640 - 2 * m) / P, (360 - 2 * m) / P, BORDERS.slim, true);
+      cv.style.cssText = `position:absolute;left:${m}px;top:${m}px;width:${640 - 2 * m}px;height:${360 - 2 * m}px;image-rendering:pixelated`;
+      c.append(cv);
+      add(
+        `<div data-paint="panel" data-arch data-pearls style="position:absolute;left:200px;top:48px;width:240px;height:270px"></div>`,
       );
     },
     /*

@@ -8,8 +8,8 @@
  *
  * social.png 1200 × 630 (shown when the page is linked), wide.png 2520 × 1080 (21:9, home page featuring), cover.png
  * 630 × 500 (the cover on itch.io's lists), favicon.png 512 × 512, logo.png (transparent, for light and dark backgrounds);
- * for the page's theme, banner.png 960 × 300, background.png a 560 × 560 tile (repeat both ways) and embed.png 1280 × 720
- * (behind the game before it is run; a smaller frame crops the middle); fire.png, the fire the embed was before.
+ * for the page's theme, banner.png 960 × 300, background.png a 560 × 560 tile (repeat both ways) and embed.png 640 × 360
+ * (behind the game before it is run, at the size of the game's frame on the page); fire.png, the fire the embed was before.
  */
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
