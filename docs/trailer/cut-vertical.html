@@ -327,7 +327,7 @@
     txt(172, 52, place, { size: 10, col: C.bone, anchor: 'end', font: 'display' });
 
   /* ---------- the shots (t: where each falls in this cut; the landscape cut's times are in cut.html) ---------- */
-  const GENRE_SIZE = 11;
+  const GENRE_SIZE = 16;
   const SHOTS = [
     {
       t: [0, 2],
@@ -355,10 +355,10 @@
           return img(at('skills-v', sl, 0));
         }
         if (lt < 4.5) return img(at('shade-v', lt - 2.5));
-        /* the card (1 s), the button pressed (0.3 s: frames 21 to 29), the swap done (0.7 s: frames 30 on, the last held) */
+        /* the card (0.7 s), the button pressed (0.2 s: frames 21 to 30), the swap done (1.1 s: frames 30 on, the last held) */
         const et = lt - 4.5;
         return img(
-          src('equip-v', et < 1 ? 15 : et < 1.3 ? 21 + (et - 1) * FPS : 30 + (et - 1.3) * FPS),
+          src('equip-v', et < 0.7 ? 15 : et < 0.9 ? 21 + (et - 0.7) * 45 : 30 + (et - 0.9) * FPS),
         );
       },
     },
@@ -460,13 +460,14 @@
         let s =
           SHOTS.find((x) => x.name === 'The genres').draw(2 + lt) +
           `<rect width="180" height="320" fill="#07070b" opacity="${lerp(0, 0.8, ease(lt / 0.25)) + 0.2 * out}"/>`;
-        s += glow(90, 140, 100, C.torch, flick * (1 - out));
+        s += glow(90, 150, 110, C.torch, flick * (1 - out));
         s +=
           `<g opacity="${ease(lt / 0.3) * (1 - out)}">` +
-          txt(90, 138, 'Battle of Builds', { size: 22, font: 'display', anchor: 'middle' }) +
+          txt(90, 128, 'Battle', { size: 40, font: 'display', anchor: 'middle' }) +
+          txt(90, 164, 'of Builds', { size: 40, font: 'display', anchor: 'middle' }) +
           '</g>';
-        s += txt(90, 162, 'Free on itch.io', {
-          size: 12,
+        s += txt(90, 200, 'Free on itch.io', {
+          size: 17,
           font: 'display',
           col: C.torch,
           anchor: 'middle',

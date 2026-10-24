@@ -19,7 +19,7 @@ S16 = BEAT / 4
 # exactly, so the groove and everything from 12.5 on are where they are in the landscape cut, until the end screen, which is held
 # 1.0 s longer before the duel button (landscape 19.25), after which all is 1.0 s later.
 #   `T` maps the time of a sound effect, which is placed against the picture: from 7.5 the gem shot is +0.5, the amulet's card
-#   (from 9.5) +1.0 and the Swap click (10.0) +1.8; the three phones' own sounds are dropped (None).
+#   (from 9.5) +1.0 and the Swap click (10.0) +1.4; the three phones' own sounds are dropped (None).
 #   `TM` maps the music, which is not tied to the cuts: it only moves with the end screen.
 import os
 
@@ -41,7 +41,7 @@ def T(t):
     if t < 9.95:
         return t + 1.0
     if t < 10.5:
-        return t + 1.8
+        return t + 1.4
     if t < 12.5:
         return None
     if t < 19.25:
