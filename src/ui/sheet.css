@@ -181,6 +181,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .cs-col {
-    padding: 22px 16px 24px;
+    padding: 22px 24px 24px;
   }
 }

@@ -273,3 +273,9 @@ html.leaf .rare {
 html.leaf .unique {
   color: #e8a07c;
 }
+
+@media (max-width: 600px) {
+  html.leaf .camp-bar-who {
+    font-size: 22px;
+  }
+}

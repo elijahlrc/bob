@@ -247,3 +247,8 @@ html.leaf .camp-foot .ui-scale {
 html.leaf .camp-foot .warn {
   color: var(--madder);
 }
+@media (max-width: 600px) {
+  html.leaf .btn.theme {
+    padding: 74px 32px 40px;
+  }
+}
