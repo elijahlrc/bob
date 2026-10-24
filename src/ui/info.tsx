@@ -79,10 +79,11 @@ export function InfoLayer() {
     <div
       class="info-pop"
       role="tooltip"
+      // In pixels as strings: this Preact adds no "px" to a number.
       style={{
-        left,
-        width: w,
-        ...(above ? { bottom: window.innerHeight - o.y + 8 } : { top: o.y + 40 }),
+        left: `${left}px`,
+        width: `${w}px`,
+        ...(above ? { bottom: `${window.innerHeight - o.y + 8}px` } : { top: `${o.y + 40}px` }),
       }}
     >
       {o.text}

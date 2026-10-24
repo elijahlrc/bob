@@ -292,3 +292,7 @@ html.leaf .modal-card :is(p, div, label, span, small, li) {
 html.leaf .camp.tabbed {
   --camp-bar: 66px;
 }
+html.leaf .info-pop {
+  padding: 10px 14px 11px;
+  line-height: 1.3;
+}
