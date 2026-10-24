@@ -602,19 +602,17 @@ export function ItemDetail(p: Props) {
     return (
       <div class="ix-detail ix-empty">
         <div class="ix-guide">
-          <div class="ix-hint" data-paint="panel" data-thin>
-            {p.coarse ? 'Tap' : 'Pick'} something in the bag to see it beside what you wear.
-            {!p.coarse && (
-              <span
-                class="ix-keys"
-                {...infoProps(
-                  'Keys: ↑/↓ browse · Enter equip · F favourite · Del discard · U take off · Ctrl+Z undo. Drag an item onto a slot to equip it.',
-                )}
-              >
-                ?
-              </span>
-            )}
-          </div>
+          {/* The keys, for a keyboard; the empty column needs no instructions. */}
+          {!p.coarse && (
+            <span
+              class="ix-keys"
+              {...infoProps(
+                'Keys: ↑/↓ browse · Enter equip · F favourite · Del discard · U take off · Ctrl+Z undo. Drag an item onto a slot to equip it.',
+              )}
+            >
+              ?
+            </span>
+          )}
           {p.upgrades > 0 && (
             <button class="btn primary" onClick={p.onBestUpgrade}>
               {p.upgrades} upgrade{p.upgrades > 1 ? 's' : ''} in the bag: show the best

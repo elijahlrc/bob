@@ -43,7 +43,7 @@
   line-height: 18px;
   text-shadow: var(--o);
 }
-/* The thin lines from the words to their nodes, under the words. */
+/* The thin lines from a word for several nodes ("×3") to each of them, under the words. */
 .tv-leaders {
   position: absolute;
   left: 0;
@@ -59,7 +59,7 @@
   opacity: 0.75;
 }
 .tv-leaders line.tv-small {
-  opacity: 0.5;
+  opacity: 0.65;
 }
 .tv-leaders line.dim {
   opacity: 0.12;

@@ -47,6 +47,8 @@ const F_KEY = "400 21px 'Jacquard 24', 'Palatino Linotype', Georgia, serif";
 /** The line heights of the words (tree.css says the same). */
 const H_LINE = 18;
 const H_KEY = 23;
+/** From this zoom on, a run of alike small nodes shows each node's own word instead of one word for the run. */
+const K_SPLIT = 0.8;
 
 /** A stat line shortened for the words beside small nodes ("+6 Dex"); the panel always has the whole line. */
 const SHORT: [RegExp, string | ((...m: string[]) => string)][] = [
@@ -128,7 +130,7 @@ export function TreeView({ c }: { c: Controller }) {
     const text = (id: number) => lines[id].map(short).join(', ');
     const small = (n: TreeNode) => n.kind === 'small' || n.kind === 'travel';
     const seen = new Set<number>();
-    const out: { ids: number[]; anchor: number; text: string }[] = [];
+    const out: { ids: number[]; anchor: number; text: string; one: string }[] = [];
     for (const n of live) {
       if (seen.has(n.id) || !small(n) || !text(n.id)) continue;
       const t = text(n.id);
@@ -153,7 +155,7 @@ export function TreeView({ c }: { c: Controller }) {
           Math.hypot(tree.nodes[a].x - cx, tree.nodes[a].y - cy) -
           Math.hypot(tree.nodes[b].x - cx, tree.nodes[b].y - cy),
       );
-      out.push({ ids, anchor: ids[0], text: ids.length > 1 ? `${t} ×${ids.length}` : t });
+      out.push({ ids, anchor: ids[0], text: ids.length > 1 ? `${t} ×${ids.length}` : t, one: t });
     }
     return out;
   }, [tree]);
@@ -306,8 +308,28 @@ export function TreeView({ c }: { c: Controller }) {
           p: pri(v) + 0.5,
         });
     }
+    // Zoomed far in, every small node says its own lines; further out, a run of alike ones shares one word ("×3").
+    const nodeSt = (id: number) =>
+      allocSet.has(id) ? 'on' : path?.has(id) ? 'path' : matches && !matches.has(id) ? 'dim' : '';
+    const smallP = (st: string) => (st === 'path' ? 1 : st === 'on' ? 3.6 : 6);
     if (k >= 0.26)
       for (const r of runs) {
+        if (k >= K_SPLIT || r.ids.length === 1) {
+          for (const id of r.ids) {
+            const v = byId.get(id);
+            if (!v) continue;
+            const st = nodeSt(id);
+            want.push({
+              v,
+              text: r.one,
+              cls: `tv-small ${st}`,
+              font: F_SMALL,
+              h: H_LINE,
+              p: smallP(st) + id * 1e-7,
+            });
+          }
+          continue;
+        }
         const v = byId.get(r.anchor);
         if (!v) continue;
         const st = r.ids.some((id) => allocSet.has(id))
@@ -324,7 +346,9 @@ export function TreeView({ c }: { c: Controller }) {
           font: F_SMALL,
           h: H_LINE,
           // A fixed order among equals (not the distance from the middle of the view, which panning changes).
-          p: (st === 'path' ? 1 : st === 'on' ? 3.6 : 6) + r.anchor * 1e-7,
+          p: smallP(st) + r.anchor * 1e-7,
+          far: true,
+          ids: r.ids,
         });
       }
     const placed = placeLabels(want, taken);
@@ -332,13 +356,27 @@ export function TreeView({ c }: { c: Controller }) {
       (b) =>
         `<span class="${b.want.cls}" style="left:${Math.round(b.x)}px;top:${Math.round(b.y)}px">${esc(b.want.text)}</span>`,
     );
-    // A thin line from each word to its node, when the word is not right against it.
-    const leaders = placed
-      .filter((b) => Math.hypot(b.line[2] - b.line[0], b.line[3] - b.line[1]) > 3)
-      .map(
-        (b) =>
-          `<line x1="${b.line[0].toFixed(1)}" y1="${b.line[1].toFixed(1)}" x2="${b.line[2].toFixed(1)}" y2="${b.line[3].toFixed(1)}" class="${b.want.cls}" />`,
-      );
+    // A word for several nodes has a thin line to each of them, from its nearest edge to the node's rim.
+    const leaders: string[] = [];
+    for (const b of placed) {
+      if (!b.want.ids || b.want.ids.length < 2) continue;
+      for (const id of b.want.ids) {
+        const v = byId.get(id);
+        if (!v) continue;
+        const cx = v.x * P;
+        const cy = v.y * P;
+        const nx = Math.max(b.x, Math.min(cx, b.x + b.w));
+        const ny = Math.max(b.y, Math.min(cy, b.y + b.h));
+        const len = Math.hypot(nx - cx, ny - cy);
+        const rim = (v.d / 2 + 0.5) * P;
+        if (len <= rim + 2) continue;
+        const sx = cx + ((nx - cx) / len) * rim;
+        const sy = cy + ((ny - cy) / len) * rim;
+        leaders.push(
+          `<line x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" class="${b.want.cls}" />`,
+        );
+      }
+    }
     // The areas' names, large and faint when zoomed out, wherever the node names left room.
     const alpha = k <= 0.14 ? 1 : k >= 0.3 ? 0 : 1 - (k - 0.14) / 0.16;
     if (alpha > 0) {

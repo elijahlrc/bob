@@ -217,16 +217,13 @@ html.leaf .ix-guide {
   gap: 18px;
   padding-top: 40px;
 }
-html.leaf .ix-hint {
-  padding: 12px 22px;
-  text-align: center;
-  text-shadow: var(--text-shadow);
-}
+/* The keys' tip, on the gold of the empty column: dark, like the captions. */
 html.leaf .ix-keys {
   display: inline-block;
-  margin-left: 10px;
-  color: var(--gold-hi);
-  border-bottom: 2px dotted #e2c68188;
+  font: 400 28px/1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--ink);
+  border-bottom: 2px dotted #0b080588;
   cursor: help;
 }
 html.leaf .ix-status {

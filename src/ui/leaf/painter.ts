@@ -260,6 +260,7 @@ function paintEl(el: HTMLElement, kind: string, o: Record<string, unknown>, key:
     if (cache.size > 1500) cache.delete(cache.keys().next().value!);
   }
   el.dataset.painted = ck;
+  sized?.observe(el);
   const s = el.style;
   s.backgroundImage = url ? `url(${url})` : '';
   s.backgroundSize = `${W * P}px ${H * P}px`;
@@ -270,6 +271,7 @@ function paintEl(el: HTMLElement, kind: string, o: Record<string, unknown>, key:
 /** Take a painting off an element that no longer wants one (a tab that is no longer open, a row no longer picked). */
 function unpaint(el: HTMLElement) {
   delete el.dataset.painted;
+  sized?.unobserve(el);
   const s = el.style;
   s.backgroundImage = '';
   s.backgroundSize = '';
@@ -313,6 +315,8 @@ export const leafStrips = () => {
   return strips!;
 };
 
+/** Watches the size of everything painted: a box that grows (its text changed, a font loaded) is painted again. */
+let sized: ResizeObserver | null = null;
 let started = false;
 /** Keep the page painted from now on: after DOM changes (throttled), resizes and font loads. */
 export function startPainter() {
@@ -333,18 +337,27 @@ export function startPainter() {
     if (queued) return;
     queued = true;
     const wait = Math.max(0, 120 - (performance.now() - last));
-    setTimeout(() => requestAnimationFrame(run), wait);
+    setTimeout(run, wait);
   };
-  new MutationObserver((records) => {
-    // Changes inside a part that redraws itself constantly (the map's HUD, the tree's words) do not need the painter.
-    if (records.every((r) => (r.target as Element).closest?.('[data-nopaint]'))) return;
-    // After a quiet spell (a new tab, a dialog), paint now, before the browser shows the change: the new screen then
-    // appears whole instead of flat for a frame. Changes in quick succession wait for the throttle.
+  // Paint at once after a quiet spell, else when the throttle allows (see the observer below).
+  const soon = () => {
     if (!queued && performance.now() - last >= 120) run();
     else schedule();
+  };
+  if (typeof ResizeObserver !== 'undefined') sized = new ResizeObserver(soon);
+  new MutationObserver((records) => {
+    // Changes inside a part that redraws itself constantly (the map's HUD, the tree's words) do not need the painter.
+    // A changed text's target is the text itself: ask its element.
+    const within = (n: Node) => (n.nodeType === 3 ? n.parentElement : (n as Element));
+    if (records.every((r) => within(r.target)?.closest?.('[data-nopaint]'))) return;
+    // After a quiet spell (a new tab, a dialog), paint now, before the browser shows the change: the new screen then
+    // appears whole instead of flat for a frame. Changes in quick succession wait for the throttle.
+    soon();
   }).observe(document.body, {
     subtree: true,
     childList: true,
+    // A text changed in place (a menu's choice described) can make a painted box taller.
+    characterData: true,
     attributes: true,
     attributeFilter: [
       'class',

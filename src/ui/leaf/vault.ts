@@ -350,7 +350,18 @@ export function drawVault(
 }
 
 /** A word to place: what it says, how it looks, how much it is wanted (lower first). */
-export type Want = { v: Drawn; text: string; cls: string; font: string; h: number; p: number };
+export type Want = {
+  v: Drawn;
+  text: string;
+  cls: string;
+  font: string;
+  h: number;
+  p: number;
+  /** May sit a step or two out from its node (a word with lines to its nodes): otherwise only right beside it. */
+  far?: boolean;
+  /** The nodes a word stands for, when it is one word for several (lines are drawn to each). */
+  ids?: number[];
+};
 export type Box = { x: number; y: number; w: number; h: number };
 
 const meas = typeof document !== 'undefined' ? ctx2d(canvas(1, 1)) : null;
@@ -399,12 +410,12 @@ export class BoxGrid {
   }
 }
 
-/** A word placed: its box, what it was, and the two ends of the thin line from its node to it. */
-export type Placed = Box & { want: Want; line: [number, number, number, number] };
+/** A word placed: its box and what it was. */
+export type Placed = Box & { want: Want };
 
 /**
  * Place the words greedily, most wanted first, each where nothing else is: beside its node (eight places round it),
- * then a step and two steps further out, a thin line joining it to its node. Positions are in the view's pixels at
+ * and for a word with lines to its nodes also a step and two steps further out. Positions are in the view's pixels at
  * this zoom with the camera at 0, so the whole tree is placed at once and panning only moves the result.
  */
 export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
@@ -416,7 +427,8 @@ export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
     const cy = it.v.y * P;
     const r0 = (it.v.d / 2 + 1.5) * P;
     let done = false;
-    for (const gap of [6, 22, 40]) {
+    // The first step clears the node's own keep-out box (its radius is 1 px past r0).
+    for (const gap of it.far ? [3, 22, 40] : [3]) {
       const r = r0 + gap;
       const d = r * 0.7;
       const tries = [
@@ -433,16 +445,7 @@ export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
         const b = { x: t.x, y: t.y, w: tw, h: th };
         if (taken.hits(b)) continue;
         taken.add(b);
-        // From the node's rim to the nearest point of the word's box.
-        const nx = Math.max(b.x, Math.min(cx, b.x + b.w));
-        const ny = Math.max(b.y, Math.min(cy, b.y + b.h));
-        const len = Math.hypot(nx - cx, ny - cy) || 1;
-        const rim = r0 - 2;
-        out.push({
-          ...b,
-          want: it,
-          line: [cx + ((nx - cx) / len) * rim, cy + ((ny - cy) / len) * rim, nx, ny],
-        });
+        out.push({ ...b, want: it });
         done = true;
         break;
       }
