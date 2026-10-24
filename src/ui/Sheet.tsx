@@ -1,7 +1,6 @@
 import { useMemo } from 'preact/hooks';
 import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
 import { statTotals, type StatTotal } from '../calc/statTotals';
-import { DEFAULT_MAX_RES } from '../data/constants';
 import { HEXES, hexText } from '../data/hexes';
 import { modLabel } from '../mods/text';
 
@@ -30,12 +29,40 @@ function Row({ label, value, raw }: { label: string; value: string; raw?: string
   );
 }
 
+const SMALL = new Set([
+  'a',
+  'an',
+  'and',
+  'as',
+  'at',
+  'by',
+  'for',
+  'from',
+  'in',
+  'of',
+  'on',
+  'over',
+  'to',
+  'while',
+  'with',
+]);
+/** A modifier's name in the tab's title case ("Life Regeneration Rate"), whatever case its stat text has. */
+const titled = (s: string) =>
+  s
+    .split(' ')
+    .map((w, i) =>
+      i > 0 && SMALL.has(w.toLowerCase())
+        ? w.toLowerCase()
+        : w.charAt(0).toUpperCase() + w.slice(1),
+    )
+    .join(' ');
+
 function Totals({ list }: { list: StatTotal[] }) {
   if (list.length === 0) return null;
   return (
     <div class="cs-totals">
       {list.map((t) => (
-        <Row key={modLabel(t.mod)} label={modLabel(t.mod)} value={times(t.mult)} />
+        <Row key={modLabel(t.mod)} label={titled(modLabel(t.mod))} value={times(t.mult)} />
       ))}
     </div>
   );
@@ -50,42 +77,27 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   const totals = useMemo(() => statTotals(ch.db, ch.configConds, ch.statValue), [ch]);
   const mit = useMemo(() => ch.mitigation(), [ch]);
   const of = (g: StatTotal['group']) => totals.filter((t) => t.group === g);
-  const freeMana = s.mana - s.reservedMana;
+  const move = totals.find((t) => t.mod.stat === 'moveSpeed' && !t.mod.condition);
   const sc = s.scenarios;
+  const big = (label: string, value: number, of?: number) => (
+    <div class="cs-big">
+      <span class="cs-label">{label}</span>
+      <b>{f0(value)}</b>
+      {of !== undefined && <span class="cs-raw">of {f0(of)}</span>}
+    </div>
+  );
   return (
     <div class="cs">
       <div class="cs-top">
         <div class="cs-group">
-          <div class="cs-big">
-            <span class="cs-label">Life</span>
-            <b>{f0(s.life - s.reservedLife)}</b>
-            {s.reservedLife > 0 && <span class="cs-raw">of {f0(s.life)}</span>}
-          </div>
-          {s.es > 0 && (
-            <div class="cs-big">
-              <span class="cs-label">Energy Shield</span>
-              <b>{f0(s.es)}</b>
-            </div>
-          )}
-          <div class="cs-big">
-            <span class="cs-label">Mana</span>
-            <b>{f0(freeMana)}</b>
-            {s.reservedMana > 0 && <span class="cs-raw">of {f0(s.mana)}</span>}
-          </div>
+          {big('Life', s.life - s.reservedLife, s.reservedLife > 0 ? s.life : undefined)}
+          {big('Energy Shield', s.es)}
+          {big('Mana', s.mana - s.reservedMana, s.mana)}
         </div>
         <div class="cs-group">
-          <div class="cs-big">
-            <span class="cs-label">Strength</span>
-            <b>{s.attrs.str}</b>
-          </div>
-          <div class="cs-big">
-            <span class="cs-label">Dexterity</span>
-            <b>{s.attrs.dex}</b>
-          </div>
-          <div class="cs-big">
-            <span class="cs-label">Intelligence</span>
-            <b>{s.attrs.int}</b>
-          </div>
+          {big('Strength', s.attrs.str)}
+          {big('Dexterity', s.attrs.dex)}
+          {big('Intelligence', s.attrs.int)}
         </div>
       </div>
       <div class="cs-cols">
@@ -101,19 +113,19 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             raw={`${f0(s.evasion)} evasion`}
           />
           <Row label="Chance to Block Attacks" value={pct(s.blockAttack)} />
-          {s.blockSpell > 0 && <Row label="Chance to Block Spells" value={pct(s.blockSpell)} />}
+          <Row label="Chance to Block Spells" value={pct(s.blockSpell)} />
           <div class="cs-res">
             {RES.map(([i, name, cls]) => (
               <div key={cls} class={`cs-res-${cls}`}>
                 <span>{name}</span>
                 <b class={s.res[i] < s.maxRes[i] ? 'cs-under' : ''}>{s.res[i]}%</b>
-                {s.maxRes[i] !== DEFAULT_MAX_RES && <span class="cs-raw">max {s.maxRes[i]}%</span>}
+                <span class="cs-raw">max {s.maxRes[i]}%</span>
               </div>
             ))}
           </div>
           <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} />
           <Row label="Mana Regeneration" value={`${f1(s.manaRegen)}/s`} />
-          {s.stunAvoid > 0 && <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} />}
+          <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} />
           <Totals list={of('defence')} />
         </div>
         <div class="cs-col">
@@ -121,24 +133,19 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           {s.hexes.map((h) => (
             <Row key={h.id} label={HEXES[h.id].name} value={hexText(h.id, h.effect)} />
           ))}
+          <Row
+            label="Movement Speed"
+            value={`${f1(s.moveSpeed)} tiles/s`}
+            raw={times(move?.mult ?? 1)}
+          />
+          <Totals list={of('other').filter((t) => t !== move)} />
         </div>
       </div>
-      <div class="cs-foot">
-        <Row label="Movement Speed" value={`${f1(s.moveSpeed)} tiles/s`} />
-        <Totals list={of('other').filter((t) => t.mod.stat !== 'moveSpeed')} />
-        {s.auras.map((a) => (
-          <Row
-            key={a.name}
-            label={a.name}
-            value={a.active ? `reserves ${a.reserved}` : 'inactive: not enough mana'}
-          />
-        ))}
-        {s.warnings.map((w) => (
-          <div key={w} class="warn">
-            ⚠ {w}
-          </div>
-        ))}
-      </div>
+      {s.warnings.map((w) => (
+        <div key={w} class="warn cs-warn">
+          ⚠ {w}
+        </div>
+      ))}
       <div class="cs-est">
         <span>
           Estimated DPS <b>{f0(sc ? sc.pack : scenarioDps(s))}</b>

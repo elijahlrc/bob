@@ -20,20 +20,39 @@ describe('the modifier totals of the Character tab', () => {
       { stat: 'attackSpeed', kind: 'more', value: 10 },
       { stat: 'attackSpeed', kind: 'more', value: 10 },
     ]);
-    expect(t).toHaveLength(1);
-    expect(t[0].mult).toBeCloseTo(1.5 * 1.1 * 1.1);
-    expect(t[0].group).toBe('offence');
+    const as = t.find((x) => x.mod.stat === 'attackSpeed')!;
+    expect(as.mult).toBeCloseTo(1.5 * 1.1 * 1.1);
+    expect(as.group).toBe('offence');
   });
 
-  it('keeps lines apart by damage type and tags, and sorts the biggest effect first', () => {
+  it('shows the fixed lines in their order at ×1 when nothing touches them, and keeps lines apart by type and tags', () => {
+    const none = totalsOf([]);
+    expect(none.length).toBeGreaterThan(10);
+    expect(none.every((x) => x.mult === 1)).toBe(true);
     const t = totalsOf([
       { stat: 'damage', kind: 'inc', value: 20, damageTypes: ['physical'] },
       { stat: 'damage', kind: 'inc', value: 80, damageTypes: ['fire'] },
       { stat: 'damage', kind: 'inc', value: 40, tags: ['spell'] },
       { stat: 'life', kind: 'inc', value: -50 },
     ]);
-    expect(t.map((x) => x.mult)).toEqual([0.5, 1.8, 1.4, 1.2]);
-    expect(t[0].group).toBe('defence');
+    expect(t.map((x) => x.mod.stat)).toEqual(none.map((x) => x.mod.stat));
+    const off = t.filter((x) => x.group === 'offence').map((x) => x.mult);
+    expect(off.slice(0, 6)).toEqual([1, 1, 1.4, 1.2, 1, 1.8]);
+    expect(t.find((x) => x.mod.stat === 'life')!.mult).toBe(0.5);
+  });
+
+  it('puts a line the build has after the last fixed line of its stat, and drops it when it comes to nothing', () => {
+    const t = totalsOf([
+      { stat: 'damage', kind: 'inc', value: 12, tags: ['wand'] },
+      { stat: 'attackSpeed', kind: 'inc', value: 10, tags: ['bow'] },
+      { stat: 'attackSpeed', kind: 'inc', value: -10, tags: ['bow'] },
+    ]);
+    const off = t.filter((x) => x.group === 'offence');
+    const wand = off.findIndex((x) => x.mod.tags?.includes('wand'));
+    expect(off[wand - 1].mod.tags).toEqual(['dot']);
+    expect(off[wand + 1].mod.stat).toBe('attackSpeed');
+    expect(off[wand].mult).toBeCloseTo(1.12);
+    expect(t.some((x) => x.mod.tags?.includes('bow'))).toBe(false);
   });
 
   it('drops a condition the sheet takes to hold, keeps one it does not, and leaves out local mods and nothing lines', () => {
@@ -48,9 +67,11 @@ describe('the modifier totals of the Character tab', () => {
       ],
       ['onFullLife'],
     );
-    expect(t).toHaveLength(2);
-    const plain = t.find((x) => !x.mod.condition)!;
-    expect(plain.mult).toBeCloseTo(1.25);
-    expect(t.find((x) => x.mod.condition)!.mod.condition!.id).toBe('onLowLife');
+    const cast = t.filter((x) => x.mod.stat === 'castSpeed');
+    expect(cast).toHaveLength(2);
+    expect(cast[0].mult).toBeCloseTo(1.25);
+    expect(cast[1].mod.condition!.id).toBe('onLowLife');
+    expect(t.find((x) => x.mod.stat === 'armour')!.mult).toBe(1);
+    expect(t.find((x) => x.mod.stat === 'evasion')!.mult).toBe(1);
   });
 });

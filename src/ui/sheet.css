@@ -65,13 +65,6 @@
   text-align: right;
   white-space: nowrap;
 }
-/* A list of summed modifiers sits apart from the stats above it. */
-.cs-totals {
-  margin-top: 14px;
-}
-.cs-col > .cs-totals:first-child {
-  margin-top: 0;
-}
 
 /* The resistances as four tiles, in dulled element colours; one under its maximum is marked. */
 .cs-res {
@@ -114,12 +107,8 @@
   color: #97849f;
 }
 
-.cs-foot {
-  margin-top: 18px;
-  max-width: calc(50% - 16px);
-}
-.cs-foot .cs-totals {
-  margin-top: 0;
+.cs-warn {
+  margin-top: 12px;
 }
 
 /* The estimates worked out from all of the above, quieter than the stats. */
@@ -143,11 +132,5 @@
   }
   .cs-cols {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .cs-cols > .cs-col + .cs-col {
-    margin-top: 14px;
-  }
-  .cs-foot {
-    max-width: none;
   }
 }
