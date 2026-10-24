@@ -782,6 +782,14 @@ export const CLIPS: Clip[] = [
 
 /** The vertical cut's map clips (docs/trailer/VERTICAL.md): the same staging in a 9:16 phone view, one zoom across the cuts. */
 const VERTICAL = { w: 360, h: 640, phone: true, scale: Number(process.env.TRAILER_VSCALE ?? 3) };
+/** CSS that sets the text of a vertical clip lower, clear of the feed apps' own buttons (the top 13 % of the frame; docs/trailer/VERTICAL.md). */
+const VERTICAL_CSS: Record<string, string> = {
+  tree3: `#trailer-level { top: 100px !important; }`,
+  skills: `.skill-summary { margin-top: 60px !important; }`,
+  fall: `.boss-bars { top: 92px !important; } .boss-line { top: 27% !important; }`,
+  duel: `.hud-top { top: 90px !important; } .boss-bars { top: 92px !important; }
+    .screen.summary { padding-top: 100px !important; }`,
+};
 const VERTICAL_ZOOM: Record<string, number> = {
   endgame: 2,
   vanguard: 2,
@@ -800,12 +808,21 @@ CLIPS.push(
     name: `${c.name}-v`,
     viewport: VERTICAL,
     zoom: VERTICAL_ZOOM[c.name],
+    css: (c.css ?? '') + (VERTICAL_CSS[c.name] ?? ''),
   })),
 );
 
 /** The camp and end screens of the vertical cut: the same scripts in the phone view (their selectors may need the phone layout's). */
 CLIPS.push(
   ...CLIPS.filter((c) => ['tree3', 'skills', 'equip', 'summary', 'board'].includes(c.name)).map(
-    (c) => ({ ...c, name: `${c.name}-v`, viewport: VERTICAL }),
+    (c) => ({
+      ...c,
+      name: `${c.name}-v`,
+      viewport: VERTICAL,
+      css:
+        (c.css ?? '') +
+        (c.name === 'summary' ? `.screen.summary { padding-top: 100px !important; }` : '') +
+        (VERTICAL_CSS[c.name] ?? ''),
+    }),
   ),
 );

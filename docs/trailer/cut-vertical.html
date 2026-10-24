@@ -321,10 +321,10 @@
     );
   };
   /* the level in large type below the top of the screen, and the place under it: the climb's, and the fall's that follows it */
-  const levelTag = (level, place) =>
-    `<rect y="34" width="180" height="40" fill="#000" opacity=".5"/>` +
-    txt(10, 62, `Level ${level}`, { size: 22, col: C.torch, weight: 600, font: 'display' }) +
-    txt(172, 52, place, { size: 10, col: C.bone, anchor: 'end', font: 'display' });
+  const levelTag = (level, place, dy = 0) =>
+    `<rect y="${34 + dy}" width="180" height="40" fill="#000" opacity=".5"/>` +
+    txt(10, 62 + dy, `Level ${level}`, { size: 22, col: C.torch, weight: 600, font: 'display' }) +
+    txt(172, 52 + dy, place, { size: 10, col: C.bone, anchor: 'end', font: 'display' });
 
   /* ---------- the shots (t: where each falls in this cut; the landscape cut's times are in cut.html) ---------- */
   const GENRE_SIZE = 16;
@@ -392,7 +392,7 @@
         if (lt < 3.35) {
           let s = img(at('fall-v', lt));
           s += `<rect width="180" height="320" fill="#000" opacity="${clamp((lt - 2.8) / 0.55) * 0.55}"/>`;
-          return s + levelTag(72, 'Warren');
+          return s + levelTag(72, 'Warren', 160);
         }
         return img(at('summary-v', lt - 3.35, -45));
       },
