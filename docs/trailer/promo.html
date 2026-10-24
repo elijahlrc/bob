@@ -270,6 +270,17 @@
         <h1 class="hf flat" style="font-size:680px;--o:16px;margin-left:42px">B</h1>
       </div>`);
     },
+    /*
+     * The phone screenshot for itch.io's gallery, which shows a tall picture badly: the phone's screen (made by
+     * scripts/trailer/screenshots.ts) in a gold-rimmed frame on the wall, 1440 × 1080 (4:3).
+     */
+    phone() {
+      box(1440, 1080);
+      const h = 1012;
+      const w = Math.round((h * 878) / 1899);
+      add(`<div class="frame" data-paint="panel" style="left:${(1440 - w) / 2 - 14}px;top:20px;width:${w + 28}px;height:${h + 28}px;padding:14px">
+        <div style="background-image:url(promo/screenshots/07-phone.png);background-size:100% 100%"></div></div>`);
+    },
     /* the logo, on nothing: the hellfire title alone */
     logo() {
       box(1500, 210, false);
