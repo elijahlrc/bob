@@ -1,13 +1,12 @@
 import {
   isReprieveId,
   PROVISIONS_PER_MAP,
-  POUCH_LIMIT,
   provisionDef,
   type ProvisionId,
 } from '../data/provisions';
 import { curseDef, reprieveDef } from '../data/reprieves';
 import type { Controller } from '../run/controller';
-import { pouchCount, spare } from '../run/provisions';
+import { spare } from '../run/provisions';
 import { waysideOf } from '../run/wayside';
 import { Tip } from './Tip';
 
@@ -71,9 +70,6 @@ export function Satchel({ c }: { c: Controller }) {
   return (
     <div class="satchel" data-paint="panel">
       <div class="lf-h">Satchel</div>
-      <div class="satchel-count muted">
-        Armed {w.armed.length} · carrying {pouchCount(run)} of {POUCH_LIMIT}
-      </div>
       {w.found && <div class="notice">The last map left you {provisionDef(w.found).name}.</div>}
       {held.some((id) => !isReprieveId(id)) && <Tip c={c} id="satchel" />}
       {held.some((id) => isReprieveId(id)) && <Tip c={c} id="reprieve" />}

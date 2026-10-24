@@ -166,14 +166,19 @@ function Arriving({ run }: { run: RunState }) {
           {flasks.map((f) => {
             const fill = pct(v.flasks[f!.uid] ?? 1);
             return (
-              <div key={f!.uid} class="flask" title={`${f!.name}: ${fill}%`}>
-                <div class="flask-neck" />
-                <div class="flask-body">
-                  <div
-                    class={'flask-fill ' + flaskBase(f!.baseId).kind}
-                    style={{ height: `${fill}%` }}
-                  />
-                </div>
+              // The bottle the map's HUD shows, its glass emptied to the charges carried over.
+              <div key={f!.uid} class="flask" data-st="ready" title={`${f!.name}: ${fill}%`}>
+                <div
+                  class="flask-bottle"
+                  data-paint="bottle"
+                  data-liquid={flaskBase(f!.baseId).kind}
+                  data-fill="1"
+                />
+                {fill < 100 && (
+                  <div class="flask-glass" data-nopaint>
+                    <div class="flask-empty" style={{ height: `${100 - fill}%` }} />
+                  </div>
+                )}
               </div>
             );
           })}

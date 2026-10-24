@@ -317,9 +317,6 @@ html.leaf .satchel {
 html.leaf .satchel .lf-h {
   margin-bottom: 0;
 }
-html.leaf .satchel-count {
-  text-align: center;
-}
 html.leaf .satchel > .notice {
   text-align: center;
   color: var(--gold-hi);

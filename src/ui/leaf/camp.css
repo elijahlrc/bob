@@ -94,19 +94,20 @@ html.leaf .arriving-life {
 html.leaf .arriving-mana {
   background: #2f417e;
 }
+/* The flasks are the HUD's painted bottles (hud.css), a size smaller. */
 html.leaf .arriving-flasks {
-  gap: 10px;
+  gap: 6px;
 }
-html.leaf .arriving-flasks .flask-neck {
-  display: none;
+html.leaf .arriving-flasks .flask {
+  position: relative;
+  width: 32px;
+  height: 48px;
 }
-html.leaf .arriving-flasks .flask-body {
-  width: 16px;
-  height: 30px;
-  border: 0;
-  border-radius: 0;
-  background: var(--t-lapis, #172049);
-  box-shadow: var(--ring);
+html.leaf .arriving-flasks .flask-glass {
+  left: 6px;
+  top: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 /* The offers: arched niches */
@@ -127,7 +128,7 @@ html.leaf .btn.theme {
   justify-content: flex-start;
   min-height: 340px;
   padding: 74px 26px 40px;
-  text-align: left;
+  text-align: center;
   white-space: normal;
 }
 html.leaf .btn.theme:hover:not(:disabled) {
@@ -176,15 +177,26 @@ html.leaf .respite .affix {
   margin-top: 16px;
 }
 
-/* What a map pays: four short rows, the same on every card */
+/* What a map pays: a hard grid of two columns either side of a column of lozenges, the same on every card; each left
+   cell set against the lozenge, each right one starting from it, so the rows line up on the arch's middle. */
 html.leaf .offer-pays {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 6px;
   margin: 8px 0 12px;
+  font-size: 15px;
   line-height: 1.6;
+  line-height: round(1.6em, 1px);
 }
 html.leaf .pays-row {
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
+  display: contents;
+}
+html.leaf .pays-row > .pay:first-child {
+  text-align: right;
+}
+html.leaf .pays-row > .pay:last-child {
+  text-align: left;
 }
 html.leaf .pay {
   color: var(--muted);
@@ -201,10 +213,8 @@ html.leaf .gain {
   color: var(--gain);
 }
 html.leaf .pay-sep {
-  flex: none;
-  width: 12px;
-  height: 12px;
-  margin: 0 10px;
+  width: 10px;
+  height: 10px;
 }
 
 /* Who is on the map: the armies on one line (a little smaller than body text, the one exception), the damage bar */
@@ -215,7 +225,7 @@ html.leaf .offer-info {
 }
 html.leaf .offer-info .chips.armies {
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0 10px;
 }
 html.leaf .offer-info .chip {
