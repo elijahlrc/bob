@@ -14,6 +14,7 @@ change, and our own names only. Dash bullets under plain headings.
 - The Tollkeeper hoists his bell before each toll and brings it down as the first ring strikes.
 - On the passive tree, a long row of alike passives gets a label per stretch, so no label draws lines across the whole tree.
 - On touch screens, tapping a gem on the Skills tab shows its card with what it does.
+- Long labels on the passive tree wrap onto several lines instead of running across the view.
 
 ## 2026-10-23
 
