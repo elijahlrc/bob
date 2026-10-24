@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { sheetDps, type Character } from '../calc/character';
 import { naturalGemLevel, resolveActive } from '../calc/gems';
 import { supportLive } from '../calc/reach';
@@ -282,6 +282,24 @@ export function Skills({
     return g ? { gemId: g.gemId, level: levelOf(g.uid), uid: g.uid } : null;
   })();
   const selDef = selGem ? gemDef(selGem.gemId) : null;
+  // A touch screen has no hover: the gem picked shows its card by the tap that picked it, until the next tap or a
+  // scroll (the card does not take taps, so the sockets under it still do).
+  const lastTap = useRef({ x: 0, y: 0 });
+  useEffect(() => {
+    if (!coarse) return;
+    setTip(selGem ? { gemId: selGem.gemId, level: selGem.level, ...lastTap.current } : null);
+  }, [
+    coarse,
+    sel?.from,
+    sel && 'uid' in sel ? sel.uid : null,
+    sel && 'slot' in sel ? `${sel.slot}:${sel.socket}` : null,
+  ]);
+  useEffect(() => {
+    if (!coarse) return;
+    const close = () => setTip(null);
+    window.addEventListener('scroll', close, true);
+    return () => window.removeEventListener('scroll', close, true);
+  }, [coarse]);
   // What replacing the gem in the picked socket would do, said before it is done.
   const replaced = pending ? run.build.equipment[pending.slot]?.sockets[pending.socket] : null;
   const pendingP = pending ? placements.get(`${pending.slot}:${pending.socket}`) : undefined;
@@ -386,7 +404,14 @@ export function Skills({
       ? ` Every few seconds also ${listOf(secondary.map((x) => x.skill.name))}.`
       : '');
   return (
-    <div class="sk">
+    <div
+      class="sk"
+      onPointerDownCapture={(e) => {
+        // Any tap closes the card; picking a gem opens it again where the tap was.
+        lastTap.current = { x: e.clientX, y: e.clientY };
+        if (coarse) setTip(null);
+      }}
+    >
       <div class="sk-top">
         <div class="sk-medals">
           <div class="sk-medal" data-paint="medal" data-field="vermilion,4">

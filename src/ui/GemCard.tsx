@@ -1,3 +1,4 @@
+import { uiZoom } from './uiScale';
 import { gemDef } from '../data/gems';
 import { gemCardData } from './gemText';
 
@@ -42,11 +43,17 @@ export function GemTip({
   x: number;
   y: number;
 }) {
-  // By the cursor, kept on screen. Preact 11 adds no "px" to a number, so the style says it.
-  const left = Math.max(4, Math.min(x + 16, window.innerWidth - 306));
-  const top = Math.max(4, Math.min(y + 12, window.innerHeight - 300));
+  // By the cursor (or the tap), kept on screen, in interface pixels (uiScale.ts); below it in the upper half of the
+  // window, above it in the lower half. Preact 11 adds no "px" to a number, so the style says it.
+  const z = uiZoom();
+  const [W, H, px, py] = [window.innerWidth / z, window.innerHeight / z, x / z, y / z];
+  const left = Math.max(4, Math.min(px + 16, W - 306));
+  const place =
+    py > H * 0.55
+      ? { bottom: `${Math.max(4, H - py + 12)}px` }
+      : { top: `${Math.max(4, py + 12)}px` };
   return (
-    <div class="tooltip gem-tooltip" style={{ left: `${left}px`, top: `${top}px` }}>
+    <div class="tooltip gem-tooltip" style={{ left: `${left}px`, ...place }}>
       <GemCard gemId={gemId} level={level} tip />
     </div>
   );
