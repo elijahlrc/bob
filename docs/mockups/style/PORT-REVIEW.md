@@ -50,9 +50,11 @@ about 144 px). 14. The duel result's two reports side by side will scroll sidewa
 or "Done"); the Quartermaster's cart line ("In the cart: 1 · 34 of 0 Bone Dust"); Ferry Token's "Does nothing on a
 boss level" is a "does not" line. 16. The large porphyry stop screen shows a lot of mottling; it could be calmer.
 
-**Clean-up for later** 17. The old stylesheets (`styles.css`, `items.css`, `mobile.css`, `skins.css`) are still loaded under the Gold Leaf
-overrides; folding them together would remove a lot of dead rules and specificity fights. `items.css` still holds
-someone else's uncommitted edit, which I left alone. 18. The style study (`docs/mockups/style/`) can stay as the reference or be retired.
+**Clean-up for later** 17. Done in part: the rules for classes no screen uses and every old property a Gold Leaf rule
+overrides are gone (about 1,300 lines), and `skins.css` is now `fonts.css`. The old sheets still load under the
+`html.leaf` ones but hold only what Gold Leaf does not set. Folding the leaf files into them (dropping the `html.leaf`
+prefix) would change which rule wins in places, so it needs a computed-style comparison of every screen first; it
+buys tidiness only, no visible change. `items.css` still holds someone else's uncommitted edit, which I left alone. 18. The style study (`docs/mockups/style/`) can stay as the reference or be retired.
 
 ## Things to know
 
