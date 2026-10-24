@@ -54,7 +54,8 @@ async function main(): Promise<void> {
   const from = arg('--from') ?? 0;
   const to = arg('--to') ?? SECONDS;
   const section = from > 0 || to < SECONDS;
-  const outName = (Q > 1 && !vertical ? `${name}-${720 * Q}p` : name) + (section ? '-section' : '');
+  const outName =
+    (Q > 1 ? `${name}-${(vertical ? 1080 : 720) * Q}p` : name) + (section ? '-section' : '');
   const work = mkdtempSync(path.join(tmpdir(), 'bob-trailer-'));
   const wav = path.join(work, 'score.wav');
   try {
@@ -82,7 +83,7 @@ async function main(): Promise<void> {
     );
     const page = await browser.newPage({
       viewport: vertical ? { width: 1080, height: 1920 } : { width: 1280, height: 720 },
-      deviceScaleFactor: vertical ? 1 : Q,
+      deviceScaleFactor: Q,
     });
     const errors: string[] = [];
     page.on('pageerror', (e: Error) => errors.push(String(e)));

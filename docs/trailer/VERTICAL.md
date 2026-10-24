@@ -113,3 +113,7 @@ replaced by a longer gem (+0.5 s), amulet (+0.5 s) and equip shot (+1.0 s), whic
 screen the cut and the score are the landscape cut's; the end screen is held 1 s longer, and the cut is 32 s. The score maps sound effects
 (`T`) and music (`TM`) separately: the groove runs on unbroken. Open: the equip scene's UX on a phone (waits for the UI work), and the
 `cut-vertical.html` helpers are a copy of `cut.html`'s.
+
+**Resolution:** `TRAILER_VSCALE=6 npm run trailer:capture -- <the -v clips>` then `TRAILER_SCALE=2 npm run trailer:render -- --vertical` writes
+`cut-vertical-2160p.mp4` (2160×3840, about 70 MB, 17 Mb/s), the master for YouTube Shorts; with the default scales it writes the 1080×1920
+`cut-vertical.mp4`, which is what TikTok and Reels take (they scale anything larger down). Neither mp4 is committed.
