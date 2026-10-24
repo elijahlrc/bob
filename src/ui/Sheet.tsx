@@ -113,17 +113,24 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
     <div class="cs">
       <div class="cs-top">
         <div class="cs-trio">
-          {tile('Life', f0(s.life - s.reservedLife), [
-            s.reservedLife > 0 && `of ${f0(s.life)}`,
-            times(life?.mult ?? 1),
-          ])}
-          {tile('Energy Shield', f0(s.es), [times(es?.mult ?? 1)])}
-          {tile('Mana', f0(s.mana - s.reservedMana), [`of ${f0(s.mana)}`, times(mana?.mult ?? 1)])}
+          {tile(
+            'Life',
+            f0(s.life - s.reservedLife),
+            [s.reservedLife > 0 && `of ${f0(s.life)}`, times(life?.mult ?? 1)],
+            'cs-life',
+          )}
+          {tile('Energy Shield', f0(s.es), [times(es?.mult ?? 1)], 'cs-es')}
+          {tile(
+            'Mana',
+            f0(s.mana - s.reservedMana),
+            [`of ${f0(s.mana)}`, times(mana?.mult ?? 1)],
+            'cs-mana',
+          )}
         </div>
         <div class="cs-trio">
-          {tile('Strength', f0(s.attrs.str))}
-          {tile('Dexterity', f0(s.attrs.dex))}
-          {tile('Intelligence', f0(s.attrs.int))}
+          {tile('Strength', f0(s.attrs.str), [], 'cs-str')}
+          {tile('Dexterity', f0(s.attrs.dex), [], 'cs-dex')}
+          {tile('Intelligence', f0(s.attrs.int), [], 'cs-int')}
         </div>
         <div class="cs-trio cs-four">
           {RES.map(([i, name, cls]) =>

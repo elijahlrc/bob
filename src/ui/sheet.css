@@ -56,6 +56,32 @@
   font-size: 12px;
 }
 
+/* The pools and attributes in their own dulled colours, name and value, as the tree draws them. */
+.cs-life .cs-label,
+.cs-life b {
+  color: #b86a62;
+}
+.cs-es .cs-label,
+.cs-es b {
+  color: #9fb0c8;
+}
+.cs-mana .cs-label,
+.cs-mana b {
+  color: #6f8fbf;
+}
+.cs-str .cs-label,
+.cs-str b {
+  color: #b8705e;
+}
+.cs-dex .cs-label,
+.cs-dex b {
+  color: #7fa37a;
+}
+.cs-int .cs-label,
+.cs-int b {
+  color: #7f90bf;
+}
+
 /* The resistances in dulled element colours, name and value; one under its maximum has its maximum marked. */
 .cs-four .cs-tile.cs-under .cs-raw {
   color: #b8695c;
