@@ -18,6 +18,7 @@
     straw: ['#675b35', '#827444', '#9d8f57', '#b6a86e', '#ccbf8a', '#ddd2a8'],
     violet: ['#221930', '#312445', '#433359', '#57456f', '#6d5a87', '#8672a0', '#a08db8'],
     sky: ['#485564', '#617081', '#7c8d9f', '#99a9b9', '#b7c4d1', '#d3dce5'],
+    azure: ['#1d3672', '#264993', '#335fb2', '#4877cb', '#6893dd', '#93b4ec'],
   };
   const NAMES = Object.keys(RAMPS);
   const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -36,6 +37,7 @@
     straw: 'plaster',
     sky: 'plaster',
     violet: 'plaster',
+    azure: 'plaster',
   };
 
   function rng(seed) {
@@ -503,7 +505,7 @@
             ctx.fillStyle = col('gold', 7);
             ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
           }
-    const n = Math.round((2 * Math.PI * (R + 1)) / (o.big ? 4 : 3));
+    const n = o.plain ? 0 : Math.round((2 * Math.PI * (R + 1)) / (o.big ? 4 : 3));
     for (let i = 0; i < n; i++) {
       const a = (i / n) * Math.PI * 2;
       pearl(
@@ -679,23 +681,30 @@
     ],
   ];
   const cache = new Map();
+  /** Painters added by other files: kind -> (el, W, H, rng, options) => [canvas, aging options, or false for none]. */
+  const KINDS = {};
 
   function paintEl(el, kind, o, key) {
     let W = Math.ceil(el.offsetWidth / P),
       H = Math.ceil(el.offsetHeight / P);
     if (kind === 'medallion') W = H = Math.min(W, H);
     if (!W || !H) return;
+    if (el.dataset.pk) key += `|${el.dataset.pk}`;
     const ck = `${key}|${W}x${H}`;
     let url = cache.get(ck);
     if (!url) {
       const r = rng(seedOf(key));
       if (kind === 'medallion') {
         const cls = Object.keys(FIELD).find((c) => el.classList.contains(c));
-        const [field, from, stars] = FIELD[cls] ?? ['lapis', 4];
-        const wreath = !!el.closest('.cs-trio:first-child');
+        const df = el.dataset.field?.split(',');
+        const [field, from, stars] = df
+          ? [df[0], +(df[1] ?? 4), el.dataset.medal === 'stars']
+          : (FIELD[cls] ?? ['lapis', 4]);
+        const wreath = !!el.closest('.cs-trio:first-child') || el.dataset.medal === 'wreath';
         const S = W;
         const R = Math.round(wreath ? S * 0.31 : S * 0.38);
-        url = age(medallion(S, { field, from, stars, wreath, R, big: wreath }, r), r, {
+        const plain = el.dataset.medal === 'plain';
+        url = age(medallion(S, { field, from, stars, wreath, R, big: wreath, plain }, r), r, {
           loss: 0.035,
           cracks: wreath ? 3 : 1,
           crackLen: 10,
@@ -712,7 +721,10 @@
           grime: 0.5,
           goldLoss: 0,
         });
-      else if (kind === 'field')
+      else if (KINDS[kind]) {
+        const [cv, ao] = KINDS[kind](el, W, H, r, o ?? {});
+        url = ao === false ? cv.toDataURL() : age(cv, r, ao);
+      } else if (kind === 'field')
         url = age(flat(W, H, o.field, o.idx), r, { edgeBias: 0, grime: 0.6, ...o });
       else if (kind === 'wall')
         url = age(flat(W, H, 'gold', 4), r, {
@@ -746,9 +758,32 @@
       root.querySelectorAll(sel).forEach((el, i) => {
         if (done.has(el)) return;
         done.add(el);
-        paintEl(el, kind, o, `${sel}#${i}`);
+        try {
+          paintEl(el, kind, o, `${sel}#${i}`);
+        } catch (e) {
+          console.error(sel, e);
+        }
       });
   };
   window.leafStrips = () => make().strips;
+  /** For the other screens' painters (paint-more.js and the screen files). */
+  window.leaf = {
+    P,
+    RAMPS,
+    col,
+    rng,
+    seedOf,
+    canvas,
+    age,
+    lit,
+    pearl,
+    wave,
+    tileRow,
+    panel,
+    medallion,
+    /** Add element jobs, matched before the built-in ones. */
+    jobs: (list) => JOBS.unshift(...list),
+    kind: (name, fn) => (KINDS[name] = fn),
+  };
   window.LEAF_P = P;
 })();

@@ -145,7 +145,30 @@ its pattern's periods.
 4. Check it at desktop and phone width in the browser pane (emulate about 1100 px wide; the pane scales the page, so
    pixels look softer in screenshots than they are).
 
-## 8. Open
+## 8. The other tabs (first pass, 2026-10-24)
+
+Each lives in its own file beside the study ([strategy.js](strategy.js), [skills.js](skills.js), [items.js](items.js),
+[tree.js](tree.js)) and is styled in [screens.css](screens.css); their painters are in [paint-more.js](paint-more.js)
+(`window.leaf` in paint.js lets other files add element kinds and jobs). They are Gold Leaf only, and they work: picks,
+swaps, undo, taking passives.
+
+- **Strategy:** numbered panels, the number in a small gold medallion; menus are plaques (`.sel`); each intro is one line
+  with the rest in a tip.
+- **Skills:** a gem is a stone in a gold setting (round for a skill, a lozenge for a support; `azure` was added for
+  intelligence, lapis on lapis did not read); linked sockets hang on a gold chain; the level sits on the stone. Pick a bag
+  gem and the empty sockets say "Place it here".
+- **Items:** the worn gear sits in an arched niche on the **shadow of a damned soul**, arms hanging, by body position
+  (not a cross: the player is in hell, not Christ). Picking a bag item lights every slot it fits and aims at the best;
+  the new and the worn item open as a **diptych** with the result on a porphyry plaque; the button names the outcome
+  ("Wear in Off hand", "Spidersilk Wall goes to the bag") and a status line with Undo follows. Card headers carry the
+  rarity (plaster, sky, gold, vermilion). On a phone the gear folds into one line and the comparison is a sheet.
+- **Passive tree, the starry vault:** a worn lapis sky with a gold rim; taken passives are gold stars and gold lines,
+  the rest enamel in the colour of what they give (colour is the family, the glyph says exactly what). Drawn each frame
+  on a half-resolution canvas (sprites painted once per kind, colour, state and size; lines one art pixel, alpha snapped)
+  and scaled up 2x; words on top, placed greedily where they fit, most wanted first, runs of identical small nodes
+  sharing one label ("+6 Dex, +6 Int ×6"). Tap to look, tap again to take, on desktop too.
+
+## 9. Open
 
 - The empty stop niche wants an emblem or a figure.
 - Medallion pearls are still all white (the arches alternate).

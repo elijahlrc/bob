@@ -10,11 +10,12 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;600&family=Jacquard+24&display=swap"
     />
+    <link rel="stylesheet" href="screens.css" />
     <style>
       /* ================================================================================================================
      Bob style study: the Character tab and the Next map tab in a few visual directions. Same markup and same data in
      every direction; a direction is one block of CSS under html[data-style=...]. Flip with the bar at the top or the
-     keys 1-5 (style), C / M (screen), P (phone width).
+     keys 1-2 (style), C T I S G M (screen), P (phone width). The screens after the first two are in their own files.
      ================================================================================================================ */
 
       /* ---- The study's own chrome (not part of any direction) ---- */
@@ -1074,6 +1075,11 @@
     <div class="stage"><div class="frame" id="frame"></div></div>
 
     <script src="paint.js"></script>
+    <script src="paint-more.js"></script>
+    <script src="strategy.js"></script>
+    <script src="skills.js"></script>
+    <script src="items.js"></script>
+    <script type="module" src="tree.js"></script>
     <script>
       // ---- Directions: name and the bet each one makes (shown above the mockup) ----
       const STYLES = [
@@ -1099,8 +1105,16 @@
           .join('');
       const SCREENS = [
         ['character', 'Character'],
+        ['tree', 'Passive tree'],
+        ['items', 'Items'],
+        ['skills', 'Skills'],
+        ['strategy', 'Strategy'],
         ['camp', 'Next map'],
       ];
+      // The screens after the first two live in their own files and register here (strategy.js, skills.js, items.js,
+      // tree.js): { html() → markup, mount(frame) → wire it up after it is drawn, next → the footer button }.
+      window.STUDY = window.STUDY || {};
+      const KEYS = { c: 'character', t: 'tree', i: 'items', s: 'skills', g: 'strategy', m: 'camp' };
       const WIDTHS = [
         ['desktop', 'Desktop'],
         ['phone', 'Phone'],
@@ -1336,24 +1350,31 @@
     </div>`;
 
       const tabs = (on) =>
-        `<div class="tabs">${[
-          'Character',
-          'Passive tree',
-          'Items',
-          'Skills',
-          'Strategy',
-          'Next map',
-        ]
-          .map((t) => `<button class="tab${t === on ? ' on' : ''}">${t}</button>`)
-          .join('')}</div>`;
+        `<div class="tabs">${SCREENS.map(
+          ([v, t]) => `<button class="tab${v === on ? ' on' : ''}" data-go="${v}">${t}</button>`,
+        ).join('')}</div>`;
 
       function render() {
         const h = document.documentElement;
         const screen = h.dataset.screen;
-        document.getElementById('frame').innerHTML =
-          tabs(screen === 'camp' ? 'Next map' : 'Character') +
-          `<div class="tab-body">${character}${camp}</div>` +
-          `<div class="foot"><span>Mystic · Level 42</span><span class="right"><button class="btn small">↶ Undo</button>${screen === 'camp' ? '' : '<button class="btn small primary">Next map ▸</button>'}</span></div>`;
+        const extra = !['character', 'camp'].includes(screen) && window.STUDY[screen];
+        const body = ['character', 'camp'].includes(screen)
+          ? character + camp
+          : h.dataset.style !== 'leaf'
+            ? '<p class="only-leaf">This screen is mocked in Gold Leaf only: compare it with the live game.</p>'
+            : extra
+              ? extra.html()
+              : '<p class="only-leaf">Loading…</p>';
+        const next = screen === 'camp' ? '' : (extra?.next ?? 'Next map ▸');
+        const frame = document.getElementById('frame');
+        frame.innerHTML =
+          tabs(screen) +
+          `<div class="tab-body">${body}</div>` +
+          `<div class="foot"><span>Mystic · Level 42</span><span class="right"><button class="btn small">↶ Undo</button>${next ? `<button class="btn small primary">${next}</button>` : ''}</span></div>`;
+        frame
+          .querySelectorAll('[data-go]')
+          .forEach((b) => (b.onclick = () => set('screen', b.dataset.go)));
+        if (extra && h.dataset.style === 'leaf') extra.mount?.(frame);
         document.getElementById('note').innerHTML = STYLES.find((s) => s[0] === h.dataset.style)[2];
         document.getElementById('swatches').innerHTML =
           h.dataset.style === 'leaf' ? swatchHtml() : '';
@@ -1406,11 +1427,15 @@
         document.documentElement.dataset.style = 'now';
       addEventListener('keydown', (e) => {
         if (e.key >= '1' && e.key <= String(STYLES.length)) set('style', STYLES[+e.key - 1][0]);
-        if (e.key === 'c') set('screen', 'character');
-        if (e.key === 'm') set('screen', 'camp');
+        if (e.target.closest('input, select, textarea')) return;
+        if (KEYS[e.key]) set('screen', KEYS[e.key]);
         if (e.key === 'p')
           set('width', document.documentElement.dataset.width === 'phone' ? 'desktop' : 'phone');
       });
+      window.studyRender = render;
+      window.studyPaint = () =>
+        document.documentElement.dataset.style === 'leaf' &&
+        paintLeaf(document.getElementById('frame'));
       render();
       // Repaint once the fonts have set the real sizes, and after the frame changes size.
       const repaint = () =>
