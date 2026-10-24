@@ -138,6 +138,22 @@ export const CLIPS: Clip[] = [
     },
   ),
 
+  /* 1b. The same fight pulled back, for the store page's embed background (scripts/trailer/promo.ts): not used in the cut. */
+  mapClip(
+    'promo',
+    {
+      classId: 'mystic',
+      level: 92,
+      weapon: 'wand_l72',
+      body: ['skyfall', 'echoingCast', 'wiredHarm'],
+      helmet: ['orbitingBlades'],
+    },
+    84,
+    { theme: 'mix:charnelPits+kilnHall', biome: 'ruins' },
+    80,
+    { zoom: 2, pack: 6 },
+  ),
+
   /* 2. The tree: a whole build growing, level 5 to 100, zoomed out so that it reads as big, and kept in frame. */
   {
     name: 'tree3',
