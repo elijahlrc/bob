@@ -1,1 +1,484 @@
-/* Gold Leaf: skills (filled in by the port, docs/mockups/style/STYLE-GUIDE.md section 10). */
+/* Gold Leaf: the Skills tab (src/ui/Skills.tsx; docs/mockups/style/STYLE-GUIDE.md, docs/mockups/style/skills.js). The
+   whole DPS and the effective HP as medallions on the gold, the main skill on a plaque under the DPS one (the rotation in
+   its tip); each socketed item a lapis panel, its gems painted stones in gold settings (round skills, lozenge supports,
+   coloured by attribute) on a gold chain, the level on the stone; the gem bag a lapis panel with its filters. A picked
+   gem's line and buttons sit on a plaque that stays in view (a sheet on a touch screen). The old rules are in styles.css
+   and mobile.css; what they would still do is undone here. Class names start with sk-. */
+.sk {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+  font-size: var(--size, 17px);
+  line-height: 1.2;
+  color: var(--pearl);
+}
+.sk:has(.gem-sheet) {
+  padding-bottom: 54vh;
+}
+
+/* ---- The medallions ---- */
+.sk-top {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.sk-medals {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  padding-bottom: 28px;
+}
+.sk-medal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 148px;
+  height: 148px;
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 #0b0805aa;
+}
+.sk-medal > span {
+  max-width: 72%;
+  line-height: 1.05;
+}
+.sk-medal > b {
+  margin-top: 2px;
+  font: 400 40px / 1 var(--title-font);
+  font-size-adjust: none;
+}
+.sk-plaque {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 22px);
+  transform: translateX(-50%);
+  padding: 7px 18px 8px;
+  font-style: normal;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+  text-decoration: underline dotted var(--gold-hi);
+  text-underline-offset: 4px;
+  cursor: help;
+}
+html.leaf .sk-help {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font: 400 var(--head-size, 28px) / 1 var(--title-font);
+  color: var(--gold-hi);
+}
+.sk-hint,
+.sk-warn {
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 12px 22px 13px;
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-warn {
+  margin-bottom: 20px;
+}
+
+/* ---- The columns: the items (two columns of panels) and the bag ---- */
+.sk-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+}
+.sk-main {
+  min-width: 0;
+}
+.sk-grid {
+  columns: 2;
+  column-gap: 20px;
+}
+.sk-item {
+  break-inside: avoid;
+  margin-bottom: 20px;
+  padding: 20px 20px 18px;
+}
+.sk-item.focus {
+  outline: 2px dashed var(--gold-hi);
+  outline-offset: 4px;
+}
+.sk-head {
+  margin: 0 0 12px;
+  font: 400 24px / 1.05 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-slot {
+  display: block;
+  margin-top: 4px;
+  font: var(--size, 17px) / 1.2 var(--font);
+  color: var(--muted);
+}
+.sk-socks {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- A socket and a bag row: the stone, the name, the lines under it ---- */
+.sk-link {
+  display: flex;
+  flex-direction: column;
+}
+html.leaf :is(.sk-sock, .sk-bagrow) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 2px 6px 2px 0;
+  font: inherit;
+  line-height: 1.2;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+html.leaf :is(.sk-sock, .sk-bagrow)[draggable='true'] {
+  cursor: grab;
+}
+html.leaf :is(.sk-sock, .sk-bagrow):hover .sk-name {
+  color: var(--gold-hi);
+}
+html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
+  outline: 2px dashed var(--pearl);
+  outline-offset: 2px;
+}
+:is(.sk-sock, .sk-bagrow).on .sk-name,
+.sk-sock.aim .sk-empty {
+  color: var(--gold-hi);
+}
+.sk-sock.drop,
+.sk-bag.drop {
+  outline: 2px dashed var(--gold-hi);
+  outline-offset: 2px;
+}
+.sk-gemwrap {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+}
+.sk-stone {
+  position: absolute;
+  inset: 0;
+}
+.sk-lvl {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  min-width: 24px;
+  font: 400 22px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+  text-align: center;
+  text-shadow:
+    0 2px 0 var(--ink),
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink),
+    0 -2px 0 var(--ink);
+}
+.sk-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-name {
+  color: var(--pearl);
+}
+.sk-empty {
+  color: var(--dim);
+}
+.sk-star {
+  color: var(--gold-hi);
+}
+.sk-count {
+  color: var(--muted);
+}
+.sk-new {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  vertical-align: -2px;
+}
+.sk-sub {
+  color: var(--muted);
+}
+.sk-bad {
+  color: var(--madder);
+}
+/* A chain of gold links from one socket's stone to the next (every socket of an item is linked). */
+.sk-chain {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 10px;
+  height: 14px;
+  margin: -6px 0 -6px 21px;
+}
+
+/* ---- What a gem would do: the badges as coloured words, not pills ---- */
+html.leaf :is(.sk, .sk-sheet) .badge {
+  padding: 0;
+  font-size: var(--size, 17px);
+  background: none;
+  border-radius: 0;
+}
+html.leaf :is(.sk, .sk-sheet) .badge.up {
+  color: var(--gain);
+}
+html.leaf :is(.sk, .sk-sheet) .badge.down {
+  color: var(--madder);
+}
+html.leaf :is(.sk, .sk-sheet) .badge.neutral {
+  color: var(--muted);
+}
+html.leaf :is(.sk, .sk-sheet) .badge + .badge {
+  margin-left: 8px;
+}
+html.leaf :is(.sk, .sk-sheet) .sk-badges .small {
+  font-size: var(--size, 17px);
+}
+
+/* ---- The picked gem: its line and buttons, on a plaque that stays in view ---- */
+.sk-pick {
+  position: sticky;
+  top: 8px;
+  z-index: 3;
+  margin-bottom: 20px;
+  padding: 12px 14px 12px 22px;
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-pickrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.sk-pickname b,
+.sk-confirm b {
+  font-weight: 600;
+  color: var(--gold-hi);
+}
+.sk-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sk-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  background: var(--s-dots);
+  background-position: left top;
+}
+.sk-confirm .sk-acts {
+  margin-top: 4px;
+}
+
+/* ---- The bag ---- */
+.sk-bag {
+  min-width: 0;
+  padding: 26px 22px 24px;
+}
+html.leaf .sk-search {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 12px;
+}
+.sk-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.sk-check {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+  cursor: pointer;
+}
+.sk-for {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.sk-lbl {
+  flex: none;
+  color: var(--muted);
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-sel {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sk-sel::after {
+  content: '▾';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-52%);
+  color: var(--gold-hi);
+  pointer-events: none;
+}
+html.leaf .sk-sel select {
+  appearance: none;
+  width: 100%;
+  max-width: 100%;
+  padding: 8px 34px 9px 14px;
+  font: var(--size, 17px) / 1.2 var(--font);
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+  background: none;
+  border: 0;
+  box-shadow: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+.sk-sh {
+  margin: 18px 0 8px;
+  font: 400 24px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 var(--ink);
+}
+html.leaf .sk-bagrow {
+  padding: 5px 0;
+}
+.sk-none {
+  margin: 4px 0;
+  color: var(--muted);
+  text-align: center;
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+/* ---- A gem's card (the hover tip, the sheet on a touch screen) ---- */
+html.leaf .item-card.gem {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  color: var(--pearl);
+  font-size: var(--size, 17px);
+  line-height: 1.25;
+  text-shadow: 0 2px 0 var(--ink);
+}
+html.leaf .gem-tooltip {
+  padding: 14px 16px 16px;
+}
+html.leaf .item-card.gem .ic-name {
+  font: 400 var(--head-size, 28px) / 1.05 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+html.leaf .item-card.gem :is(.muted, .gem-tags, .ic-base) {
+  color: var(--muted);
+  font-size: var(--size, 17px);
+}
+html.leaf .item-card.gem .ic-mod {
+  color: var(--pearl);
+  font-size: var(--size, 17px);
+}
+html.leaf .item-card.gem .ic-mod.explicit {
+  color: #b9cbe6;
+}
+
+/* ---- The sheet of a picked gem on a touch screen ---- */
+html.leaf .gem-sheet.sk-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px calc(26px + var(--safe-right, 0px)) 22px calc(26px + var(--safe-left, 0px));
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+}
+html.leaf .sk-sheet .sheet-x {
+  top: 8px;
+  right: 10px;
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 var(--ink);
+}
+html.leaf .sk-sheet .sk-confirm {
+  margin: 0;
+}
+html.leaf .sk-sheet > .sk-pickrow {
+  padding-right: 40px;
+}
+
+@media (pointer: coarse) {
+  html.leaf :is(.sk-sock, .sk-bagrow) {
+    min-height: var(--tap, 44px);
+  }
+}
+
+@media (max-width: 900px) {
+  .sk-grid {
+    columns: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .sk {
+    padding: 12px 10px 24px;
+  }
+  .sk-top {
+    margin-bottom: 20px;
+  }
+  .sk-medal {
+    width: 136px;
+    height: 136px;
+  }
+  .sk-medal > span {
+    font-size: 15px;
+  }
+  .sk-medal > b {
+    font-size: 36px;
+  }
+  .sk-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sk-item {
+    padding: 18px 16px 16px;
+  }
+  .lf-panel.sk-bag {
+    padding: 22px 16px 20px;
+  }
+}

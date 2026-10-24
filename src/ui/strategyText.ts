@@ -1,4 +1,10 @@
-import { skillRange, type Character, type SkillChoice } from '../calc/character';
+import {
+  SECONDARY_COOLDOWN_USES,
+  SECONDARY_MIN_COOLDOWN,
+  skillRange,
+  type Character,
+  type SkillChoice,
+} from '../calc/character';
 import type { RotationEntry } from '../calc/strategy';
 import type { SkillWhen } from '../data/strategy';
 
@@ -122,4 +128,33 @@ export function mainsWarning(ch: Character): string | null {
     : few
       ? 'With 3 or more enemies near and no main skill for that, the character uses its weapon.'
       : 'Against normal and magic enemies no main skill fits: the character uses its weapon.';
+}
+
+/**
+ * The pause a periodic skill without a cooldown of its own waits when none is set (what `cooldownOf` falls back to), shown
+ * inside the Every menu ("Usual pause (3.2 s)").
+ */
+export function usualPause(ch: Character, c: SkillChoice): string {
+  return secs(
+    Math.max(
+      SECONDARY_MIN_COOLDOWN,
+      SECONDARY_COOLDOWN_USES * ch.profile(c, ch.configConds).useTime,
+    ),
+  );
+}
+
+/**
+ * The line under a skill on the Strategy tab, or null when its menus and its group already say it: a main skill (the
+ * group says when), a skill switched off, and a periodic skill whose pause is in its Every menu (only its short reach,
+ * if any, is left to say).
+ */
+export function entryNote(ch: Character, e: RotationEntry<SkillChoice>): string | null {
+  if (e.role === 'main' || e.role === 'off') return null;
+  if (e.role === 'periodic' && e.choice.skill.cooldown === undefined) {
+    const short =
+      skillRange(ch.profile(e.choice, ch.configConds)) <
+      skillRange(ch.profile(ch.primary, ch.configConds)) - 0.05;
+    return short ? 'Less reach than the main skill: only when an enemy is within it' : null;
+  }
+  return describeEntry(ch, e);
 }
