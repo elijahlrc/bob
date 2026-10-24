@@ -277,7 +277,7 @@ not what they watch.
   both reports), a `mapEnd`, and the `'duelResult'` screen, never `endMap`, so the run's map flow (`finishMap`, Crawls, reprieves,
   telemetry, the save) is untouched and `Controller.run` is whatever it was. `againDuel()` fights on the next seed; `leaveDuel()` goes
   back to `from`.
-- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("You won", "You fell", "Won on time: fewer reprieves used", "Lost on
+- **Result screen** (`src/ui/DuelResult.tsx`): who won and how ("Victory", "Defeat", "Victory on time: fewer reprieves used", "Defeat on
   time: more reprieves used", "A draw: time ran out", "A draw: nobody landed a blow for 15 s"), the reprieves each side used, the time, each side's damage dealt by skill and taken by source (`MapReportView`, the numbers are what landed), and
   **Again** (the next seed) and **Back**. A fight against a rival (F7, 6.5) adds a line ("Rated" or "Practice") and **Another rival**.
 - **Debug panel** (`src/ui/Debug.tsx`, at camp): a Duel row with a class, a map, a seed, **Mirror** (the character against a copy of

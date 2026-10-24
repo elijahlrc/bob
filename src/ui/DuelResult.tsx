@@ -6,8 +6,8 @@ import { MapReportView } from './MapReport';
 /** Who won and how, as a headline (side 0 is the viewer's). */
 function headline(o: DuelOutcome): string {
   const { winner, how } = o.result;
-  if (winner === 0) return how === 'time' ? 'Won on time: fewer reprieves used' : 'You won';
-  if (winner === 1) return how === 'time' ? 'Lost on time: more reprieves used' : 'You fell';
+  if (winner === 0) return how === 'time' ? 'Victory on time: fewer reprieves used' : 'Victory';
+  if (winner === 1) return how === 'time' ? 'Defeat on time: more reprieves used' : 'Defeat';
   if (how === 'time') return 'A draw: time ran out';
   if (how === 'stall') return `A draw: nobody landed a blow for ${DUEL_STALL_TIME} s`;
   return 'A draw: both fell';
