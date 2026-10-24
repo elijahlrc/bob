@@ -2110,14 +2110,14 @@ export class Character {
     const others = rows.reduce((n, r) => (r.u.golem ? n : n + r.count * r.stand), 0);
     let dps = 0;
     for (const { c, u, p, def, count, stand } of rows) {
-      let blow = minionBlow(def, c.skill.level, p, distance);
+      let blow = minionBlow(def, c.skill.curveLevel, p, distance);
       if (u.golem) blow *= 1 + Math.min(u.golem.cap, others * u.golem.perNearby) / 100;
       else if (golem?.u.golem)
         blow += golemAdded(golem.u.golem, golem.c.skill.level, p) * golem.stand;
       let novas = 0;
       if (u.relic && def.nova && distance <= u.relic.radius * p.radiusMult + RELIC_BESIDE)
         novas =
-          relicNova(def, c.skill.level, p) *
+          relicNova(def, c.skill.curveLevel, p) *
           relicNovasPerSec(this.attackUsesPerSec(conds, scenario), u.relic.cooldown);
       dps += (count * blow * def.rate * p.minionSpeed + novas) * stand;
     }

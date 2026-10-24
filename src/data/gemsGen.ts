@@ -476,7 +476,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [6.9, 401.4],
+      dps: [10.6, 401.4],
       seconds: 5,
       stack: 'refresh',
       hitless: true,
@@ -1133,7 +1133,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [13.7, 802.9],
+      dps: [33.7, 802.9],
       seconds: 3.8,
       stack: 'refresh',
       scales: ['spell'],
@@ -1299,7 +1299,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 3],
+        value: [2, 75],
         damageTypes: ['cold'],
         condition: {
           id: 'targetChilled',
@@ -1308,7 +1308,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [75, 113],
+        value: [3, 113],
         damageTypes: ['cold'],
         condition: {
           id: 'targetChilled',
@@ -1548,13 +1548,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [5, 8],
+        value: [5, 75],
         damageTypes: ['fire'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [75, 113],
+        value: [8, 113],
         damageTypes: ['fire'],
       },
     ],
@@ -1960,13 +1960,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [20, 30],
+        value: [20, 113],
         damageTypes: ['chaos'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [113, 169],
+        value: [30, 169],
         damageTypes: ['chaos'],
       },
       {
@@ -2129,7 +2129,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [6.9, 401.4],
+      dps: [16.9, 401.4],
       seconds: 1.5,
       stack: 'stages',
       cap: 8,
@@ -2556,13 +2556,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 56],
+        value: [16, 56],
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 85],
+        value: [25, 85],
         damageTypes: ['physical'],
       },
     ],
@@ -2598,13 +2598,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [5, 8],
+        value: [5, 75],
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [75, 113],
+        value: [8, 113],
         damageTypes: ['physical'],
       },
       {
@@ -2772,7 +2772,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [17.1, 1003],
+      dps: [95, 1003],
       seconds: 0.6,
       stack: 'refresh',
       carried: 1,
@@ -2908,13 +2908,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 56],
+        value: [16, 56],
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 85],
+        value: [25, 85],
         damageTypes: ['physical'],
       },
     ],
@@ -3020,7 +3020,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [8.2, 480.9],
+      dps: [20.2, 480.9],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -3487,7 +3487,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [6.9, 401.4],
+      dps: [30.8, 401.4],
       seconds: 2,
       stack: 'refresh',
       hitless: true,
@@ -4800,7 +4800,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [6.9, 401.4],
+      dps: [16.9, 401.4],
       seconds: 0.5,
       stack: 'refresh',
       hitless: true,
@@ -5380,7 +5380,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cooldown: 4,
     dot: {
       type: 'cold',
-      dps: [6.9, 401.4],
+      dps: [15.4, 401.4],
       seconds: 3,
       stack: 'refresh',
       hitless: true,
@@ -5645,7 +5645,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [3, 120],
+        value: [17, 120],
         damageTypes: ['fire'],
         per: {
           stat: 'charges.grit',
@@ -5655,7 +5655,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 180],
+        value: [26, 180],
         damageTypes: ['fire'],
         per: {
           stat: 'charges.grit',
@@ -5665,7 +5665,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 100],
+        value: [15, 100],
         damageTypes: ['cold'],
         per: {
           stat: 'charges.fervour',
@@ -5675,7 +5675,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 150],
+        value: [22, 150],
         damageTypes: ['cold'],
         per: {
           stat: 'charges.fervour',
@@ -5685,7 +5685,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 20],
+        value: [3, 20],
         damageTypes: ['lightning'],
         per: {
           stat: 'charges.insight',
@@ -5695,7 +5695,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [8, 330],
+        value: [47, 330],
         damageTypes: ['lightning'],
         per: {
           stat: 'charges.insight',
@@ -6322,13 +6322,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 137],
+        value: [14, 137],
         damageTypes: ['chaos'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 205],
+        value: [21, 205],
         damageTypes: ['chaos'],
       },
     ],
@@ -6345,13 +6345,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 150],
+        value: [4, 150],
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 225],
+        value: [5, 225],
         damageTypes: ['cold'],
       },
     ],
@@ -7124,13 +7124,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 40],
+        value: [6, 40],
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [12, 520],
+        value: [60, 520],
         damageTypes: ['lightning'],
       },
       {
@@ -9239,13 +9239,13 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 40],
+        value: [4, 40],
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 60],
+        value: [5, 60],
         damageTypes: ['cold'],
       },
     ],
@@ -9275,13 +9275,13 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 15],
+        value: [2, 15],
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [6, 100],
+        value: [9, 100],
         damageTypes: ['lightning'],
       },
     ],

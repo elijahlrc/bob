@@ -1,11 +1,12 @@
-import { gemAttrReq, gemMods, levelValue, spellDamageAt } from '../calc/gems';
 import {
-  GEM_LEVEL_REQ,
-  type ActiveGemDef,
-  type GemDef,
-  type LevelValue,
-  type SkillBehaviour,
-} from '../data/gems';
+  gemAttrReq,
+  gemLevelReq,
+  gemMods,
+  levelValue,
+  scaleLevel,
+  spellDamageAt,
+} from '../calc/gems';
+import { type ActiveGemDef, type GemDef, type LevelValue, type SkillBehaviour } from '../data/gems';
 import { BUFFS } from '../data/buffs';
 import { HEXES, hexEffect, hexSeconds, hexText } from '../data/hexes';
 import { STATUSES } from '../data/statuses';
@@ -294,7 +295,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     stats.push(`Costs ${Math.round(levelValue(def.cost, level))} mana`);
     if (def.baseMult) stats.push(`Deals ${num(levelValue(def.baseMult, level))}% of base damage`);
     for (const d of def.spellDamage ?? []) {
-      const r = spellDamageAt(d, def.effectiveness ?? 100, level);
+      const r = spellDamageAt(d, def.effectiveness ?? 100, level, scaleLevel(def, level));
       stats.push(`Deals ${r.min} to ${r.max} ${cap(r.type)} damage`);
     }
     if (def.castTime) stats.push(`Cast time ${num(def.castTime)} s`);
@@ -405,8 +406,8 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       }
     }
   }
-  const attrs = gemAttrReq(def.attr, level);
-  const req = [`level ${GEM_LEVEL_REQ[Math.min(level, 20) - 1]}`];
+  const attrs = gemAttrReq(def.attr, scaleLevel(def, level));
+  const req = [`level ${gemLevelReq(def, level)}`];
   if (attrs.str) req.push(`${attrs.str} Str`);
   if (attrs.dex) req.push(`${attrs.dex} Dex`);
   if (attrs.int) req.push(`${attrs.int} Int`);

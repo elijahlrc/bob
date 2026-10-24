@@ -46,6 +46,7 @@
     "coverage:emit-bases": "tsx scripts/coverage/emit-bases.ts",
     "coverage:bases-audit": "tsx scripts/coverage/bases-audit.ts",
     "coverage:emit-gems": "tsx scripts/coverage/emit-gems.ts",
+    "coverage:emit-gem-levels": "tsx scripts/coverage/emit-gem-levels.ts",
     "spirit": "tsx scripts/spirit/report.ts",
     "mapstats": "tsx scripts/mapstats.ts",
     "map:ascii": "tsx scripts/mapascii.ts",

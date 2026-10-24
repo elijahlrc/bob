@@ -149,7 +149,7 @@ export function makeMinion(
   m.mtype = o.mtype;
   m.t = o.seconds === undefined ? Infinity : o.seconds * prof.skillDuration;
   m.atkT = 0;
-  m.level = o.blowLevel ?? c.skill.level;
+  m.level = o.blowLevel ?? c.skill.curveLevel;
   m.dmg = prof.minionDamage;
   m.speed = prof.minionSpeed;
   m.sup = prof.minionSup;

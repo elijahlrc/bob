@@ -19,6 +19,7 @@ import {
   uniqueIdOf,
 } from '../gen/loot';
 import { Character } from '../calc/character';
+import { gemStart } from '../calc/gems';
 import { weaponBar } from '../data/weaponFit';
 import { affixReward, mapAffixDef } from '../data/mapAffixes';
 import { CRESCENDO_LOOT_PER_STEP, mapTypeDef } from '../data/mapTypes';
@@ -441,7 +442,7 @@ export function rollSkillRewards(run: RunState): AnyItem[] {
   const fits = (g: ActiveGemDef) => !held.has(g.id) && !weaponBar(g, hold);
   // A map with nothing usable left (never at the start) falls back to every gem not held.
   let pool = ACTIVE_GEMS.filter((g) => fits(g) && weight(g) > 0);
-  if (pool.length < 3) pool = ACTIVE_GEMS.filter((g) => !held.has(g.id));
+  if (pool.length < 3) pool = ACTIVE_GEMS.filter((g) => !held.has(g.id) && gemStart(g) <= run.map);
   const picks: ActiveGemDef[] = [];
   while (picks.length < 3 && pool.length) {
     const g = rng.weighted(pool, (x) => Math.max(weight(x), 0.01));
