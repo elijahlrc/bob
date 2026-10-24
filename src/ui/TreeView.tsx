@@ -27,6 +27,7 @@ import {
   diam,
   placeLabels,
   skyUrl,
+  wrapTo,
   type Drawn,
   type Edge,
   type NodeState,
@@ -51,6 +52,8 @@ const H_KEY = 23;
 const K_SPLIT = 0.8;
 /** The most alike small nodes one word stands for; a longer run gets a word for each chunk of neighbours. */
 const MAX_RUN = 4;
+/** The widest a word on the tree may be before it wraps, in pixels. */
+const WRAP = 240;
 
 /** A stat line shortened for the words beside small nodes ("+6 Dex"); the panel always has the whole line. */
 const SHORT: [RegExp, string | ((...m: string[]) => string)][] = [
@@ -390,10 +393,12 @@ export function TreeView({ c }: { c: Controller }) {
           }),
         });
       }
+    // Long words wrap: a node with several stats reads as a short paragraph, not a line across the view.
+    for (const w of want) w.lines = wrapTo(w.text, w.font, WRAP);
     const placed = placeLabels(want, taken);
     const out = placed.map(
       (b) =>
-        `<span class="${b.want.cls}" style="left:${Math.round(b.x)}px;top:${Math.round(b.y)}px">${esc(b.want.text)}</span>`,
+        `<span class="${b.want.cls}" style="left:${Math.round(b.x)}px;top:${Math.round(b.y)}px">${(b.want.lines ?? [b.want.text]).map(esc).join('<br>')}</span>`,
     );
     // A word for several nodes has a thin line to each of them, fanned out from the middle of its facing edge.
     const leaders: string[] = [];

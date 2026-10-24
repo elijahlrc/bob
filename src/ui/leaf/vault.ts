@@ -353,6 +353,8 @@ export function drawVault(
 export type Want = {
   v: Drawn;
   text: string;
+  /** The text broken into lines (wrapTo); one line when absent. */
+  lines?: string[];
   cls: string;
   font: string;
   h: number;
@@ -379,6 +381,36 @@ export function textWidth(t: string, font: string): number {
   return w;
 }
 export const clearWidths = () => widths.clear();
+
+/**
+ * A word's text broken into lines no wider than `max`: between its stats first (", "), packing short ones together, and
+ * between words only for a stat too long for a line on its own.
+ */
+export function wrapTo(text: string, font: string, max: number): string[] {
+  if (textWidth(text, font) <= max) return [text];
+  const lines: string[] = [];
+  let cur = '';
+  const push = (piece: string, sep: string) => {
+    const next = cur ? cur + sep + piece : piece;
+    if (!cur || textWidth(next, font) <= max) cur = next;
+    else {
+      lines.push(cur + (sep === ', ' ? ',' : ''));
+      cur = piece;
+    }
+  };
+  for (const stat of text.split(', ')) {
+    if (textWidth(stat, font) <= max) push(stat, ', ');
+    else {
+      if (cur) {
+        lines.push(cur + ',');
+        cur = '';
+      }
+      for (const word of stat.split(' ')) push(word, ' ');
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
 
 /** Boxes kept in a grid of cells, so asking whether a box is free looks only at its neighbours. */
 export class BoxGrid {
@@ -450,8 +482,9 @@ function groupTries(
 export function placeLabels(want: Want[], taken: BoxGrid): Placed[] {
   const out: Placed[] = [];
   for (const it of [...want].sort((a, b) => a.p - b.p)) {
-    const tw = textWidth(it.text, it.font) + 4;
-    const th = it.h;
+    const lines = it.lines ?? [it.text];
+    const tw = Math.max(...lines.map((l) => textWidth(l, it.font))) + 4;
+    const th = it.h * lines.length;
     const cx = it.v.x * P;
     const cy = it.v.y * P;
     const r0 = (it.v.d / 2 + 1.5) * P;
