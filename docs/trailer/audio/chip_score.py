@@ -19,11 +19,40 @@ S16 = BEAT / 4
 bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx')}
 
 
+# TRAILER_VERTICAL=1 scores the vertical cut (docs/trailer/VERTICAL.md): it has no "three more builds" shot, and the gem, the amulet
+# and the end screen are held longer, so every cue is moved to where its picture falls. `T` maps a landscape time to the vertical
+# one, or None when the cue goes with a shot that is cut. Pieces (landscape time): the gem's socket click and the hold under it
+# stay; from 7.5 the rest of the gem shot is +0.5; the amulet's card and Swap (from 9.5) are +1.0; the three phones (10.5 to
+# 12.5) are gone; from 12.5 to the end screen's duel button (19.25) everything is 1.0 earlier.
+import os
+
+VERTICAL = os.environ.get('TRAILER_VERTICAL') == '1'
+
+
+def T(t):
+    if not VERTICAL:
+        return t
+    if t < 7.5:
+        return t
+    if t < 9.5:
+        return t + 0.5
+    if t < 10.5:
+        return t + 1.0
+    if t < 12.5:
+        return None
+    if t < 19.25:
+        return t - 1.0
+    return t
+
+
 def midi(m):
     return 440.0 * 2 ** ((m - 69) / 12)
 
 
 def place(name, at, sig, gain=1.0):
+    at = T(at)
+    if at is None:
+        return
     i = int(round(at * SR))
     if i >= N or i + len(sig) <= 0:
         return
@@ -82,7 +111,8 @@ def kick(at, g=1.0):
     s = tri(150, d, slide=-18) * np.exp(-np.arange(int(d * SR)) / SR / 0.06)
     s[: int(0.004 * SR)] += 0.8  # the click
     place('drums', at, s, 0.75 * g)
-    duck_points.append(at)
+    if T(at) is not None:
+        duck_points.append(T(at))
 
 
 def snare(at, g=1.0):
@@ -283,7 +313,8 @@ def slam(at, g=1.0):
     place('drums', at, body, 1.0 * g)
     place('drums', at, pulse(midi(26), d, 0.5) * np.exp(-np.arange(n) / SR / 0.14), 0.3 * g)
     place('drums', at, noise(0.035, 16000) * np.exp(-np.arange(int(0.035 * SR)) / SR / 0.01), 0.35 * g)
-    duck_points.append(at)
+    if T(at) is not None:
+        duck_points.append(T(at))
 
 
 for k in range(4):

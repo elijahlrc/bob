@@ -354,7 +354,7 @@ export const CLIPS: Clip[] = [
       // so nothing is lit over it; from 135 a trap thrown at it is let be, and the first hit after that throw fells it: the
       // amulet drops where it stood, and the Shade stands still (no more throws, no walk to the loot) while it lies there. The
       // frames of the throw and the fall are printed, for the cut.
-      await t.rec(210, {
+      await t.rec(270, {
         each: (S, c, i) => {
           const win = window as any;
           const w = c.world;
@@ -622,7 +622,7 @@ export const CLIPS: Clip[] = [
     zoom: CLOSE,
     css: `.hud-top .muted, .speeds, .biome-banner { display: none !important; }`,
     async film(t) {
-      const RULES = { damageScale: 5 };
+      const RULES = { damageScale: 2.2 };
       const n = await t.stage(
         (S, c, _g, a) => {
           const mk = (l: any) => S.stagedRun(l, 80).build;
@@ -645,7 +645,7 @@ export const CLIPS: Clip[] = [
             const out = c.lastDuel;
             const left = out ? out.result.sides[0].lifeLeft : 0;
             if (out && out.result.winner === 0 && out.result.how === 'death') {
-              if (f >= 100 && f <= 126 && left > 0.2 && left < 0.5) {
+              if (f >= 100 && f <= 126 && left > 0.2 && left < 0.7) {
                 (window as any).__seed = seed;
                 return f;
               }
@@ -699,10 +699,11 @@ export const CLIPS: Clip[] = [
     name: 'board',
     viewport: UI,
     routes: async (page) => {
-      await page.route('**/rest/v1/rpc/high_scores', (r: any) =>
+      await page.route('**/rest/v1/rpc/high_scores_page', (r: any) =>
         r.fulfill({
           json: BOARD.map(([name, cls, level, outcome, rating, fights, wins], i) => ({
             id: String(100 + i),
+            rank: i + 1,
             name,
             class_id: cls,
             level,
@@ -766,3 +767,26 @@ export const CLIPS: Clip[] = [
     { speed: 8, zoom: 2 },
   ),
 ];
+
+/** The vertical cut's map clips (docs/trailer/VERTICAL.md): the same staging in a 9:16 phone view, one zoom across the cuts. */
+const VERTICAL = { w: 360, h: 640, phone: true, scale: Number(process.env.TRAILER_VSCALE ?? 3) };
+const VERTICAL_ZOOM: Record<string, number> = {
+  endgame: 2,
+  vanguard: 2,
+  shade: 2,
+  climb1: 2,
+  climb2: 2,
+  climb4: 2,
+  climb5: 2,
+  fall: 1.6,
+  duel: 2,
+  auto: 2,
+};
+CLIPS.push(
+  ...CLIPS.filter((c) => c.name in VERTICAL_ZOOM).map((c) => ({
+    ...c,
+    name: `${c.name}-v`,
+    viewport: VERTICAL,
+    zoom: VERTICAL_ZOOM[c.name],
+  })),
+);

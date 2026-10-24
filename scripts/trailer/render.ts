@@ -16,6 +16,9 @@
  * `--cut` renders docs/trailer/cut.html, the cut with the game's footage (film it first: scripts/trailer/capture.ts), to
  * docs/trailer/cut.mp4 over the same score (written afresh, as for the animatic).
  *
+ * `--vertical` renders docs/trailer/cut-vertical.html (1080×1920, docs/trailer/VERTICAL.md) over its own score (the script
+ * is run with TRAILER_VERTICAL=1) to docs/trailer/cut-vertical.mp4; `--frames-only` needs a score written by an earlier run.
+ *
  * `--from <s> --to <s>` renders only that part, to `<name>-section.mp4`, with the score cut to match (to look at one section
  * while it is worked on).
  */
@@ -30,7 +33,7 @@ const FPS = 30;
 const SECONDS = 31;
 /** `TRAILER_SCALE=2` renders 2560×1440 (and reads footage filmed with the same setting): the layout is the same, the pixels twice as many. */
 const Q = Number(process.env.TRAILER_SCALE ?? 1);
-const EXT = Q > 1 ? 'jpg' : 'png';
+const EXT = Q > 1 || process.argv.includes('--vertical') ? 'jpg' : 'png';
 
 function run(cmd: string, args: string[]): void {
   const r = spawnSync(cmd, args, { stdio: 'inherit' });
@@ -39,9 +42,11 @@ function run(cmd: string, args: string[]): void {
 }
 
 async function main(): Promise<void> {
-  const cut = process.argv.includes('--cut');
+  const vertical = process.argv.includes('--vertical');
+  if (vertical) process.env.TRAILER_VERTICAL = '1';
+  const cut = process.argv.includes('--cut') || vertical;
   const framesOnly = process.argv.includes('--frames-only');
-  const name = cut ? 'cut' : 'animatic';
+  const name = vertical ? 'cut-vertical' : cut ? 'cut' : 'animatic';
   const arg = (k: string) => {
     const i = process.argv.indexOf(k);
     return i < 0 ? null : Number(process.argv[i + 1]);
@@ -49,23 +54,24 @@ async function main(): Promise<void> {
   const from = arg('--from') ?? 0;
   const to = arg('--to') ?? SECONDS;
   const section = from > 0 || to < SECONDS;
-  const outName = (Q > 1 ? `${name}-${720 * Q}p` : name) + (section ? '-section' : '');
+  const outName = (Q > 1 && !vertical ? `${name}-${720 * Q}p` : name) + (section ? '-section' : '');
   const work = mkdtempSync(path.join(tmpdir(), 'bob-trailer-'));
   const wav = path.join(work, 'score.wav');
   try {
     if (!framesOnly) {
       const python = process.env.PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
       run(python, [path.join(DIR, 'audio/chip_score.py'), wav]);
-      run('ffmpeg', [
-        '-y',
-        '-loglevel',
-        'error',
-        '-i',
-        wav,
-        '-b:a',
-        '256k',
-        path.join(DIR, 'animatic.mp3'),
-      ]);
+      if (!vertical)
+        run('ffmpeg', [
+          '-y',
+          '-loglevel',
+          'error',
+          '-i',
+          wav,
+          '-b:a',
+          '256k',
+          path.join(DIR, 'animatic.mp3'),
+        ]);
     }
 
     // playwright-core is not a dependency of the game; load it by name so the type-check does not need it
@@ -75,8 +81,8 @@ async function main(): Promise<void> {
       process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {},
     );
     const page = await browser.newPage({
-      viewport: { width: 1280, height: 720 },
-      deviceScaleFactor: Q,
+      viewport: vertical ? { width: 1080, height: 1920 } : { width: 1280, height: 720 },
+      deviceScaleFactor: vertical ? 1 : Q,
     });
     const errors: string[] = [];
     page.on('pageerror', (e: Error) => errors.push(String(e)));
@@ -99,13 +105,13 @@ async function main(): Promise<void> {
     process.stdout.write('\n');
     if (errors.length) throw new Error('page errors: ' + errors.join('; '));
 
-    const audio = framesOnly ? path.join(DIR, 'animatic.mp3') : wav;
+    const audio = framesOnly && !vertical ? path.join(DIR, 'animatic.mp3') : wav;
     if (!existsSync(audio)) throw new Error('no score: run without --frames-only first');
     // prettier-ignore
     run('ffmpeg', [
       '-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(work, `f%04d.${EXT}`),
       ...(section ? ['-ss', String(from), '-t', String(to - from)] : []), '-i', audio,
-      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', Q > 1 ? '18' : '20', '-preset', 'medium',
+      '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', Q > 1 || vertical ? '18' : '20', '-preset', 'medium',
       '-c:a', 'aac', '-b:a', '320k', '-shortest', '-movflags', '+faststart', path.join(DIR, `${outName}.mp4`),
     ]);
     console.log(`wrote docs/trailer/${outName}.mp4`);
