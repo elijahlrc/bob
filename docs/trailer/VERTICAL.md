@@ -5,7 +5,7 @@ a new trailer: the shot list, the timings, the captions and the score stay as in
 changes, and the footage is re-filmed where the landscape frame cannot be cropped. One shot goes ("Three more builds", the
 three phones side by side, which has no place in a vertical frame) and its two seconds are spread over other shots.
 
-Output: `cut-vertical.mp4`, 1080×1920, 30 fps, 31 s, H.264 + AAC 320 kb/s, `+faststart`, well under 100 MB (not committed).
+Output: `cut-vertical.mp4`, 1080×1920, 30 fps, 32 s, H.264 + AAC 320 kb/s, `+faststart`, well under 100 MB (not committed).
 
 ## Principles
 
@@ -104,3 +104,12 @@ Nothing here touches `src/` except the dev-only staging module if a clip needs a
    and the tree). It changes no shot timing, only when the text shows.
 2. **Where the freed 2 s go:** chosen (end screen +1.0, gem +0.5, amulet +0.5); "locket" is read as the amulet. The 31 s stays.
 3. **Length:** the full 31 s (default). A shorter 15–20 s feed cut would be a different pacing, so not part of this plan.
+
+## Built (2026-10-24)
+
+First pass rendered by `npm run trailer:render -- --vertical` (`docs/trailer/cut-vertical.html`, the `-v` clips in `scripts/trailer/clips.ts`,
+`TRAILER_VERTICAL=1` in `audio/chip_score.py`). Every shot is filmed in the phone layout at 360×640 ×3. As built, the three phones are
+replaced by a longer gem (+0.5 s), amulet (+0.5 s) and equip shot (+1.0 s), which fills their 2 s exactly, so from 12.5 s to the end
+screen the cut and the score are the landscape cut's; the end screen is held 1 s longer, and the cut is 32 s. The score maps sound effects
+(`T`) and music (`TM`) separately: the groove runs on unbroken. Open: the equip scene's UX on a phone (waits for the UI work), and the
+`cut-vertical.html` helpers are a copy of `cut.html`'s.

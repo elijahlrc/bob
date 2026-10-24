@@ -7,26 +7,28 @@ import sys, wave
 import numpy as np
 
 SR = 44100
-DUR = 31.0
-N = int(SR * DUR)
-L = np.zeros(N)
-R = np.zeros(N)
 rng = np.random.default_rng(3)
 BEAT = 0.5
 S16 = BEAT / 4
 
-# separate buses so the kick can duck the music and the lead can get its echo
-bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx')}
+# separate buses so the kick can duck the music and the lead can get its echo (made below, once the cut's length is known)
 
 
-# TRAILER_VERTICAL=1 scores the vertical cut (docs/trailer/VERTICAL.md): it has no "three more builds" shot, and the gem, the amulet
-# and the end screen are held longer, so every cue is moved to where its picture falls. `T` maps a landscape time to the vertical
-# one, or None when the cue goes with a shot that is cut. Pieces (landscape time): the gem's socket click and the hold under it
-# stay; from 7.5 the rest of the gem shot is +0.5; the amulet's card and Swap (from 9.5) are +1.0; the three phones (10.5 to
-# 12.5) are gone; from 12.5 to the end screen's duel button (19.25) everything is 1.0 earlier.
+# TRAILER_VERTICAL=1 scores the vertical cut (docs/trailer/VERTICAL.md): 32 s. It has no "three more builds" shot (landscape 10.5 to
+# 12.5); in its place the gem is held 0.5 s, the amulet shown 0.5 s longer and the equip shot 1.0 s longer, which fills those 2 s
+# exactly, so the groove and everything from 12.5 on are where they are in the landscape cut, until the end screen, which is held
+# 1.0 s longer before the duel button (landscape 19.25), after which all is 1.0 s later.
+#   `T` maps the time of a sound effect, which is placed against the picture: from 7.5 the gem shot is +0.5, the amulet's card
+#   (from 9.5) +1.0 and the Swap click (10.0) +1.8; the three phones' own sounds are dropped (None).
+#   `TM` maps the music, which is not tied to the cuts: it only moves with the end screen.
 import os
 
 VERTICAL = os.environ.get('TRAILER_VERTICAL') == '1'
+DUR = 32.0 if VERTICAL else 31.0
+N = int(SR * DUR)
+L = np.zeros(N)
+R = np.zeros(N)
+bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx')}
 
 
 def T(t):
@@ -36,13 +38,19 @@ def T(t):
         return t
     if t < 9.5:
         return t + 0.5
-    if t < 10.5:
+    if t < 9.95:
         return t + 1.0
+    if t < 10.5:
+        return t + 1.8
     if t < 12.5:
         return None
     if t < 19.25:
-        return t - 1.0
-    return t
+        return t
+    return t + 1.0
+
+
+def TM(t):
+    return t + 1.0 if VERTICAL and t >= 19.25 else t
 
 
 def midi(m):
@@ -50,7 +58,7 @@ def midi(m):
 
 
 def place(name, at, sig, gain=1.0):
-    at = T(at)
+    at = T(at) if name == 'sfx' else TM(at)
     if at is None:
         return
     i = int(round(at * SR))
@@ -111,8 +119,7 @@ def kick(at, g=1.0):
     s = tri(150, d, slide=-18) * np.exp(-np.arange(int(d * SR)) / SR / 0.06)
     s[: int(0.004 * SR)] += 0.8  # the click
     place('drums', at, s, 0.75 * g)
-    if T(at) is not None:
-        duck_points.append(T(at))
+    duck_points.append(TM(at))
 
 
 def snare(at, g=1.0):
@@ -275,7 +282,7 @@ boom(20.0, 0.9)
 bar(20.0)
 bar(22.0)
 bar(24.0, steps=8)
-mute_spans = [(25.875, 26.0)]
+mute_spans = [(TM(25.875), TM(26.0))]
 
 # 24-26 s: the set-up for the four words, by taking away. The groove runs half a bar, then at 25 it drops out: no kick,
 # no snare, the bass holds one low D, only sixteenth hats tick. At 25.5 a tom fill falls down the kit, then a sixteenth
@@ -313,8 +320,7 @@ def slam(at, g=1.0):
     place('drums', at, body, 1.0 * g)
     place('drums', at, pulse(midi(26), d, 0.5) * np.exp(-np.arange(n) / SR / 0.14), 0.3 * g)
     place('drums', at, noise(0.035, 16000) * np.exp(-np.arange(int(0.035 * SR)) / SR / 0.01), 0.35 * g)
-    if T(at) is not None:
-        duck_points.append(T(at))
+    duck_points.append(TM(at))
 
 
 for k in range(4):

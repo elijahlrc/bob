@@ -30,7 +30,7 @@ import path from 'node:path';
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const DIR = path.join(ROOT, 'docs/trailer');
 const FPS = 30;
-const SECONDS = 31;
+const SECONDS = process.argv.includes('--vertical') ? 32 : 31;
 /** `TRAILER_SCALE=2` renders 2560×1440 (and reads footage filmed with the same setting): the layout is the same, the pixels twice as many. */
 const Q = Number(process.env.TRAILER_SCALE ?? 1);
 const EXT = Q > 1 || process.argv.includes('--vertical') ? 'jpg' : 'png';
