@@ -296,10 +296,13 @@ export const CLIPS: Clip[] = [
             slot.classList.add('trailer-lit');
             const a = chip.getBoundingClientRect();
             const b = slot.getBoundingClientRect();
-            const x1 = a.left + a.width * 0.25;
-            const y1 = a.bottom;
-            const x2 = b.right + 4;
-            const y2 = b.top + b.height / 2;
+            // In the phone layout the gem list is under the sockets: the arrow rises from the gem's top edge to the socket's
+            // bottom edge. Beside them (the wide layout) it runs from the gem's bottom to the socket's right side.
+            const rises = a.top > b.bottom;
+            const x1 = rises ? a.left + a.width * 0.8 : a.left + a.width * 0.25;
+            const y1 = rises ? a.top - 4 : a.bottom;
+            const x2 = rises ? b.left + b.width * 0.5 : b.right + 4;
+            const y2 = rises ? b.bottom + 6 : b.top + b.height / 2;
             const ns = 'http://www.w3.org/2000/svg';
             const svg = document.createElementNS(ns, 'svg');
             svg.setAttribute('id', 'trailer-arrow');
@@ -307,9 +310,13 @@ export const CLIPS: Clip[] = [
               'style',
               'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:9999',
             );
+            const path = rises
+              ? `M${x1} ${y1} C ${x1} ${y1 - 90}, ${x2} ${y2 + 90}, ${x2} ${y2 + 12}`
+              : `M${x1} ${y1} C ${x1} ${y2}, ${x2 + 80} ${y2}, ${x2} ${y2}`;
+            // The head is a fixed size in screen pixels (not a multiple of the stroke).
             svg.innerHTML =
-              '<defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#d98a3a"/></marker></defs>' +
-              `<path d="M${x1} ${y1} C ${x1} ${y2}, ${x2 + 80} ${y2}, ${x2} ${y2}" fill="none" stroke="#d98a3a" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#ah)"/>`;
+              '<defs><marker id="ah" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="13" refY="8" orient="auto"><path d="M0 1 L15 8 L0 15 z" fill="#d98a3a"/></marker></defs>' +
+              `<path d="${path}" fill="none" stroke="#d98a3a" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#ah)"/>`;
             document.body.appendChild(svg);
           });
         if (i === 30) {
