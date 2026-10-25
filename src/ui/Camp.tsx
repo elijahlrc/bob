@@ -382,9 +382,9 @@ export function Camp({ c }: { c: Controller }) {
       {run.reward && <Reward c={c} onTaken={setTaken} />}
       {!run.reward && <CampGems c={c} ch={ch} taken={taken} onSkills={() => setTab('skills')} />}
       {pts > 0 && (
-        <div class="notice" data-paint="panel" data-thin>
+        <button class="btn notice" data-paint="panel" data-thin onClick={() => setTab('tree')}>
           You have {pts} unspent passive point{pts > 1 ? 's' : ''}.
-        </div>
+        </button>
       )}
       {bossForMap(run.map) && run.offers.length === 1 ? (
         <BossOffer c={c} o={offersFor(run)[0]} />
