@@ -131,3 +131,132 @@ empty slots out.
   (`src/run/offers.ts:75-77`).
 - A map card above the character's level adds "Monsters are 2 levels above you" when life or flasks are low.
 - Text follows the concise-text rule; no line when nothing is wrong.
+
+# Second pass: a player who knows one older action RPG (plan, 2026-10-25)
+
+Two fresh Vanguard runs (desktop, maps 1 to 10) were played as someone who played the popular click-to-move action RPG of
+a decade ago and nothing since. Run 1 took every reward gem and never found the Skills tab: Default Attack all the way,
+dead on map 3 at level 2. Run 2 socketed and equipped what the game suggested: dead to the Tollkeeper after 382 s with
+0% lightning resistance, no support gem, and the Default Attack doing 30% of the boss damage. The owner's notes on the
+title screen and the first map are folded in.
+
+**Left alone by the owner:** life carrying over between maps, mana as a thing to manage (only the orb flash in N12),
+the Gem Hoard offering skills for other weapons.
+
+Order: N7 and N8 first (the gem flow is the priority), then the small fixes (N12), the first-run guidance (N9 to N11)
+and the vocabulary (N13). What a player sees once is remembered per device in prefs (`bob.pref.intro.*`), not per run
+like the existing `Tip` (`src/ui/Tip.tsx`), so a second run starts clean. Decisions go in DESIGN.md Appendix A; text
+follows the concise-text rule and the voice rule (plain rules text, overwrought headings allowed).
+
+## N7. Gem socketing flow (priority)
+
+Today a reward gem goes to the bag. The Next button walks Items → Skills, where the red "No usable active skill" line and
+"Socket in the best place" are, but the Next map tab, a reload (Continue opens on Next map) and the map screen never warn,
+and the skill icon only says "Default Attack · … · Ready".
+
+1. **The first skill gem socketed for you.** The map-1 pick only, and only when no active skill is socketed: taking it
+   puts it in its best place (`bestPlacement`, `src/run/inventoryOps.ts`), inside `takeReward` (`src/run/run.ts`) so the
+   bot and the game agree. The pick's result says where it went ("Thunder Rebuke is in your Dented Plate"). Every
+   later gem pick stays in the bag. Test: map-1 pick socketed; a map-2 pick not; a run that already has a skill
+   socketed not.
+2. **A later gem pick offers to socket it.** Taking a gem leaves a line in its place: "Rime Mallet is in your bag",
+   with **Socket it** (best place, the same action as the Skills tab) and nothing else to read.
+3. **Leaving camp without a skill is guarded.** When no usable active skill is socketed and a usable one is in the bag,
+   the Next map tab shows the vermilion line with a **Socket it** button, and starting a map asks once (`Confirm.tsx`).
+4. **The map says why.** The skill icon's tooltip adds "No skill gem socketed" when that is the reason for the Default
+   Attack.
+5. **The Skills tab explains itself once.** The "?" hint (which names a ★ before any skill has one) becomes a first-open
+   note: skill gems are your character's skills and go in your gear's sockets; a support works on a skill in a socket
+   linked to it. The chain mark between sockets gets hover text saying the same.
+6. **The first support.** A one-time note when the first support gem arrives (what linking means, which of your skills
+   it would work with), and the map-5 pick always holds a support that works with the main skill. Check with
+   `npm run sim` that deaths and pacing by map band stay where they are.
+
+## N8. A swap that drops or idles a skill asks first
+
+The warning exists but is quiet: `SocketOutcome` (`src/run/inventory.ts`) carries `out` and `idle`; the compare tab shows
+"⚠ a gem idles" or "⚠ 2 gems out", the detail has a line, and the bag row shows "⚠ N gems out" (`gemsOut`) but not idle
+gems. Nothing asks before the swap. In run 2, following ▲ swapped a mace for a sceptre and a socketed Rime Splinter
+stopped working.
+
+- **Wear** and **Carry** (and quick-equip, `quickEquip`) ask first (`Confirm.tsx`) when a socketed active skill goes to
+  the bag or stops working, naming it; the primary skill in vermilion. A support that idles gets the line only, so
+  confirms stay rare.
+- The bag row's warning also counts skills that would idle ("⚠ Rime Splinter stops").
+- Test: a sceptre over a mace with a mace-only skill socketed reports the skill as idle; the row shows it.
+
+## N9. The first map
+
+First map of the device's first run:
+
+- A headline: your character fights on its own; between maps you make it stronger.
+- An arrow to the life and mana orbs: "Tap icons for more information" ("Click" with a mouse).
+- An arrow to the pause and speed buttons, labelled.
+- The map starts paused under it; any tap, or **Begin**, dismisses it and starts the map.
+- Make the claim true: the orbs today have only a `title` (invisible on touch). The orbs, flasks and skill icons all
+  answer a tap with their info (`hoverInfo`, `src/ui/info.tsx`).
+
+## N10. After map 1: how a run goes
+
+Once per device, after map 1 clears and before the camp opens (which then opens on Items as now), one screen. A draft,
+to be cut down:
+
+- Your character fights each map on its own. Between maps, you make it stronger.
+- Clear 100 maps to win. If your character dies, the run is over.
+- One line per tab:
+  - **Character:** your life, defences and damage.
+  - **Passive tree:** a point every level, spent on lasting bonuses.
+  - **Items:** the gear you found; ▲ marks an upgrade.
+  - **Skills:** skill gems go in your gear's sockets; they are what your character uses.
+  - **Strategy:** when your character uses each skill and flask.
+  - **Last map:** what you dealt and what hurt you.
+  - **Next map:** where you go next.
+
+A "Show the tips again" button on the title screen clears the `intro.*` prefs (also what testing needs).
+
+## N11. The passive tree, the first time
+
+The first time the tree opens with a point to spend, the nodes linked to the class start pulse, with a label: "Pick one of
+these to start." It goes once a node is taken.
+
+## N12. Small fixes
+
+- **Boss text:** remove "Stun it in the swing to stop the toll." (`src/data/monsterInfo.ts`): the player cannot do it.
+  Check every boss and mini-boss line for counterplay the player has no way to do.
+- **A boss map's damage mix includes the boss.** The card's mix comes from the theme's types and the affixes only
+  (`themeInfo`, `src/run/themeInfo.ts`), so the Tollkeeper's map read "physical 64%, chaos 29%" while the Toll did 85% of
+  the last 5 s. Blend the boss's own mix in by its share of the damage taken on its map, measured with the bot. Test:
+  the Tollkeeper's card shows lightning.
+- **The mana orb flashes** while the main skill cannot be paid (the state that turns its icon red), after about a
+  second, until it can.
+- **Tab bar arrows:** ◂ and ▸ at the ends of the camp tabs when they overflow; a click scrolls; an arrow hides at its end
+  and both hide when the tabs fit.
+- **Title screen:**
+  - New Run is the large primary button.
+  - The saves read as a list of your runs, each with its own **Continue**; Copy and Delete are smaller.
+  - The tagline gets a green field and a plaque outline instead of a button's bezel.
+  - Judged by screenshots at desktop and phone width.
+
+## N13. Words a newcomer does not know
+
+- `src/data/glossary.ts`: one plain line per term, in our own words. The terms:
+  - Armour, evasion, energy shield, block.
+  - Resistances and their 75% cap.
+  - Stun, critical strike, the ailments (ignite, chill, freeze, shock, poison, bleed).
+  - "increased" against "more".
+  - DPS, effective HP.
+  - Attributes and requirements.
+  - Mana cost and reservation, reach, area, projectile.
+  - Magic, rare and unique.
+  - Item level, quantity, rarity.
+  - A faction's share on a map card.
+- **Character tab:** every row and section header answers a hover or tap with its line (none has one today).
+- The same lines on the HUD status pills, the defence lines of item cards and the tag line of gem cards.
+- Test: every Character tab row has a glossary entry.
+
+## Verifying
+
+- Each milestone: `npm run check` and `npm run build`.
+- Then a browser pass on a fresh origin (`http://newplayer.localhost:5173`, its telemetry pref set off first), at desktop
+  and phone width.
+- Patch notes only through `/patch-notes`.
