@@ -88,6 +88,13 @@ lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Thing
 `skillLook.ts`) are drawn coming down and splashing where they land (so are the smaller bursts a mine rains: their `explode` carries `fall`). The balls a
 strike throws (Slag Blow) are real mortar shells, drawn as orbs, that burst where they land.
 
+**Monster attacks that are one event in the sim** (`monsterFlight.ts`, read off the world each frame; nothing the sim decides changes): a **lob**
+(spitter, hag, spinner, pyre priest and the sidearms of the same shape) is a glob or an orb that arcs from the caster to the aim point from the moment the
+aim is fixed to the moment the burst lands; a **mortar** blast has a shell falling onto its spot in the last 0.45 s of its warning; a **loosing call** lane has
+four arrows crossing it from the archer, the last arriving as the lane lands, and standing in the ground until then; the Duellist's **flurry** is ghosts of
+him running down each lane in its last 0.24 s; a **lance** is a crossbow bolt, a lash, an eye-beam or a hook on a chain by what fires it, in the colour of its
+damage (only lightning keeps the jagged bolt); a **leap** lifts the figure over its slide while its shadow stays on the floor. All wear the red rim.
+
 ## Upkeep skills (no damage, no element)
 
 | Skill  | Look                                                                      |

@@ -56,6 +56,7 @@ import {
 } from './isoPaint';
 import { BossFx } from './bossFx';
 import { CURLED_COLOR, DTYPE_COLOR, HitFx, numberKind, WARDED_COLOR, WARDED_WORD } from './hitFx';
+import { MonsterFlightFx } from './monsterFlight';
 import {
   FLIGHT_HEIGHT,
   isLob,
@@ -165,6 +166,7 @@ export class GrimStyle extends StyleBase {
   private enc!: EncounterFx;
   private boss!: BossFx;
   private hitFx!: HitFx;
+  private flight!: MonsterFlightFx;
   private pfx!: ProjectileFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
@@ -303,6 +305,8 @@ export class GrimStyle extends StyleBase {
     this.boss = new BossFx(host);
     this.hitFx?.destroy();
     this.hitFx = new HitFx(host);
+    this.flight = new MonsterFlightFx(host, s);
+    this.owned.push(...this.flight.objects());
     this.pfx = new ProjectileFx(host, s);
     this.owned.push(...this.pfx.objects());
     this.placeProps(world, rng);
@@ -904,6 +908,9 @@ export class GrimStyle extends StyleBase {
     const leap = a.isPlayer ? a.action : null;
     if (leap && !leap.fired && leap.profile.skill.run?.style === 'leap')
       oy -= Math.sin(Math.PI * Math.min(1, leap.elapsed / (HIT_AT * leap.duration))) * 26;
+    // A monster's leap (a hound, a cat) rises and falls over its slide; its shadow stays on the floor.
+    else if (!a.isPlayer && a.alive)
+      oy -= this.flight.leapLift(a, (a.mon?.range ?? 1) + a.r + this.world.sides[0].player.r);
     d.sprite.setPosition(Math.round(px + ox), Math.round(py + oy));
     d.sprite.setFlipX(t.face < 0);
     d.sprite.setDepth(1000 + py);
@@ -1310,6 +1317,8 @@ export class GrimStyle extends StyleBase {
     // The bosses' tells (docs/BOSSES.md).
     this.boss.frame(world, simDt, this.time, g);
     this.hitFx.frame(simDt, this.time, g);
+    // What monsters throw, loose and lunge, above the figures (monsterFlight.ts).
+    this.flight.frame(world, simDt, this.time);
     for (const e of effects) {
       if (e.shape) continue;
       const { x, y } = this.project(e.x, e.y);
@@ -1675,6 +1684,11 @@ export class GrimStyle extends StyleBase {
         const from = this.project(e.x, e.y);
         const to = this.project(e.x2, e.y2);
         const color = [0xd8d0c0, 0xc8a0ff, 0x9ad8ff, 0xff9a40, 0x9be07a][e.dtype] ?? 0xffffff;
+        // A monster's lance is a bolt, a lash, an eye-beam or a hook by what fires it; only lightning keeps the jagged bolt.
+        if (this.flight.onBeam(e, world)) {
+          this.flash(to.x, to.y - 8, color, 1, 0.12);
+          break;
+        }
         // A stream of fire, of frost, of rot or of force is drawn as what it is (skillFx.ts), not as a bolt of lightning.
         if (e.skill && e.width && beamMotifOf(e.skill, e.dtype)) {
           this.flash(to.x, to.y - 8, color, 1, 0.12);
