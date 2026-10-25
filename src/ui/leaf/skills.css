@@ -108,31 +108,40 @@ html.leaf .sk-help {
   columns: 2;
   column-gap: 14px;
 }
+/* The panel's rim is 18 px all round: the padding clears it, and the head and the sockets are packed tighter to keep the
+   panel about its old height. */
 .sk-item {
   break-inside: avoid;
   margin-bottom: 12px;
-  padding: 12px 16px 10px;
+  padding: 21px 24px 19px;
 }
 .sk-item.focus {
   outline: 2px dashed var(--gold-hi);
   outline-offset: 4px;
 }
 .sk-head {
-  margin: 0 0 6px;
-  font: 400 20px / 1.05 var(--title-font);
+  margin: 0 0 2px;
+  font: 400 20px / 0.95 var(--title-font);
   font-size-adjust: none;
   color: var(--pearl);
   text-shadow: 0 2px 0 var(--ink);
 }
 .sk-slot {
   display: block;
-  margin-top: 2px;
-  font: 14px / 1.2 var(--font);
+  margin-top: 0;
+  font: 14px / 1 var(--font);
   color: var(--muted);
 }
 .sk-socks {
   display: flex;
   flex-direction: column;
+}
+html.leaf .sk-item .sk-sock {
+  min-height: 40px;
+}
+.sk-item .sk-gemwrap {
+  width: 40px;
+  height: 40px;
 }
 
 /* ---- A socket and a bag row: the stone, the name, the lines under it ---- */
@@ -467,7 +476,7 @@ html.leaf .item-card.gem .ic-mod.explicit {
     grid-template-columns: minmax(0, 1fr);
   }
   .sk-item {
-    padding: 12px 16px 10px;
+    padding: 21px 24px 19px;
   }
   .lf-panel.sk-bag {
     padding: 18px 18px 16px;
