@@ -21,7 +21,6 @@ import {
   TRAP_RADIUS,
 } from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
-import { BURN_RADIUS } from '../../../sim/minionFx';
 import { vortexRadius } from '../../../sim/skillFx';
 import type { Side } from '../../../sim/side';
 import type { Actor, SimEvent, World } from '../../../sim/types';

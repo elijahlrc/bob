@@ -58,6 +58,7 @@ import { BossFx } from './bossFx';
 import { CURLED_COLOR, DTYPE_COLOR, HitFx, numberKind, WARDED_COLOR, WARDED_WORD } from './hitFx';
 import { MonsterFlightFx } from './monsterFlight';
 import { MoveFx } from './moveFx';
+import { MonsterStateFx, stateSprite } from './monsterStateFx';
 import {
   FLIGHT_HEIGHT,
   isLob,
@@ -169,6 +170,7 @@ export class GrimStyle extends StyleBase {
   private hitFx!: HitFx;
   private flight!: MonsterFlightFx;
   private move!: MoveFx;
+  private states!: MonsterStateFx;
   private pfx!: ProjectileFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
@@ -287,6 +289,7 @@ export class GrimStyle extends StyleBase {
     this.owned.push(this.ward);
     this.fx?.destroy();
     this.move?.destroy();
+    this.states?.destroy();
     const host: FxHost = {
       project: (x, y) => this.project(x, y),
       rpx: (r) => this.rpx(r),
@@ -320,6 +323,7 @@ export class GrimStyle extends StyleBase {
       },
       s,
     );
+    this.states = new MonsterStateFx(host, s);
     this.pfx = new ProjectileFx(host, s);
     this.owned.push(...this.pfx.objects());
     this.placeProps(world, rng);
@@ -941,8 +945,11 @@ export class GrimStyle extends StyleBase {
       else if (a.rhythm.enraged) tint = 0xff9a8a;
       // A monster's modes show on its body: stone, quenched, swollen, molten (docs/ENCOUNTERS.md 6).
       const look = a.enc ? encounterSprite(a) : null;
+      // And a curled beetle or one of a Mirrored pair (monsterStateFx.ts).
+      const state = a.mon ? stateSprite(a) : null;
       if (look?.tint !== undefined && (tint === 0xffffff || look.fill)) tint = look.tint;
-      d.sprite.setScale(look?.scale ?? 1);
+      else if (state?.tint !== undefined && tint === 0xffffff) tint = state.tint;
+      d.sprite.setScale((look?.scale ?? 1) * (state?.scale ?? 1));
       d.sprite
         .setTint(tint)
         .setTintMode(look?.fill ? Phaser.TintModes.FILL : Phaser.TintModes.MULTIPLY);
@@ -1334,6 +1341,8 @@ export class GrimStyle extends StyleBase {
     this.flight.frame(world, simDt, this.time);
     // Hooks, pushes and charges: the move, seen coming and seen happening (moveFx.ts).
     this.move.frame(world, simDt, this.time, g);
+    // Heals, buffs, wards and immunities of the monsters (monsterStateFx.ts).
+    this.states.frame(world, simDt, this.time, g);
     for (const e of effects) {
       if (e.shape) continue;
       const { x, y } = this.project(e.x, e.y);
@@ -1548,6 +1557,7 @@ export class GrimStyle extends StyleBase {
     this.boss.onEvent(e, world);
     this.hitFx.onEvent(e);
     this.move.onEvent(e, world);
+    this.states.onEvent(e);
     switch (e.t) {
       case 'pull':
         // The sim drags the character in one step; the figure slides along the chain instead of jumping.
@@ -1958,6 +1968,7 @@ export class GrimStyle extends StyleBase {
     this.fx?.destroy();
     this.hitFx?.destroy();
     this.move?.destroy();
+    this.states?.destroy();
     this.collapse?.destroy();
     this.collapse = null;
     this.torches = [];

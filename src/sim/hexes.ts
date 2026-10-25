@@ -89,12 +89,22 @@ export function tickCurseAura(w: World, s: Side, dt: number): void {
 }
 
 /** A monster hexes the player: the effect is reduced by "reduced effect of curses on you". */
-export function monsterHexesPlayer(w: World, s: Side, id: HexId, effect: number): void {
+export function monsterHexesPlayer(
+  w: World,
+  s: Side,
+  id: HexId,
+  effect: number,
+  from?: Pick<Actor, 'id'>,
+): void {
   const p = s.player;
   // A flask of Unbinding keeps curses off while it runs (docs/BOSSES.md 11.2).
   if (flaskWards(p.side!, 'curse')) return;
   const mult = Math.max(0, s.char.db.mult('curseEffectOnSelf'));
+  const renew = p.alive && p.hexes.some((h) => h.id === id);
   applyHex(w, p, id, effect * mult, BASE_HEX_LIMIT, 10, HEX_SECONDS);
+  // The caster's tell and the hex's own sign (a renewal too: `applyHex` is silent about one).
+  if (p.alive && !p.modIds.includes('hexWarded'))
+    w.events.push({ t: 'hexCast', from: from?.id ?? -1, to: p.id, hex: id, renew });
 }
 
 /** The player's attack hits an enemy under a hex that gives something back on each hit (Mark of Plenty: life and mana). */

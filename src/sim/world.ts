@@ -17,7 +17,8 @@ import { actorById, tickSkillZones, updateAction, updateProjectiles } from './ac
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, monsterHitOf, rawHit, refreshPlayerDefence, tickActor } from './combat';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
-import { abilitiesOf } from '../data/abilities';
+import { abilitiesOf, RIME_AURA_RANGE } from '../data/abilities';
+import { cue, healed } from './cues';
 import { tickAbilities, tickChargingMod } from './abilities';
 import {
   isZone,
@@ -644,7 +645,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
   const p = hunted(w, m);
   if (
     m.modIds.includes('rimeAura') &&
-    Math.hypot(p.x - m.x, p.y - m.y) <= 3 &&
+    Math.hypot(p.x - m.x, p.y - m.y) <= RIME_AURA_RANGE &&
     !p.def.cannotBeChilled
   ) {
     if (p.ail.chill <= 0.15) {
@@ -701,13 +702,17 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
     twin.state = 'chase';
     twin.mirror.id = m.id;
     m.mirror.id = twin.id;
+    w.events.push({ t: 'twin', id: twin.id, of: m.id });
   }
   if (m.mirror.t > 0) {
     m.mirror.t -= dt;
     // The twin did not follow in time: the survivor is made whole, and the pair is no more.
     if (m.mirror.t <= 0) {
+      const hurt = m.life < m.def.maxLife;
       m.life = m.def.maxLife;
       m.mirror.id = 0;
+      cue(w, 'whole', m, 0);
+      if (hurt) healed(w, m);
     }
   }
   if (m.modIds.includes('raiser')) {

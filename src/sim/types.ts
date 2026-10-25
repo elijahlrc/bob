@@ -421,6 +421,15 @@ export type FlaskState = {
   uses: number;
 };
 
+/**
+ * The moments of a monster's support that the renderer draws (docs/VFX-AUDIT.md): a Choirmaster's heal landing (`mend`) or cut
+ * short (`mendBroken`), a bell or censer taking hold (`aura`), a whistle, a Zealous death spurring allies (`zeal`), a Wight's
+ * ward settling (`ward`), a Carrion Mother's pool opening (`pools`), a Reliquarian changing its immunity (`immune`), a
+ * Mirrored survivor made whole (`whole`).
+ */
+export type CueKind =
+  'mend' | 'mendBroken' | 'aura' | 'whistle' | 'zeal' | 'ward' | 'pools' | 'immune' | 'whole';
+
 export type SimEvent =
   /** A Reprieve fired (docs/WAYSIDE.md 7): the character (`src`) was pulled out of the map, or stood up again. */
   | { t: 'reprieve'; src: number; how: 'retreat' | 'revive'; id: string }
@@ -590,6 +599,16 @@ export type SimEvent =
   | { t: 'spend'; kind: string; n: number }
   /** A shout (a warcry) went out from (x, y) over everything within `r`. */
   | { t: 'cry'; x: number; y: number; r: number }
+  /** A monster was healed, by its own doing or by a channel of another (`src`): the renderer sends green motes up it. */
+  | { t: 'heal'; id: number; src?: number }
+  /** What a monster's support, ward or immunity just did (`CueKind`): at (x, y), reaching `r` tiles; `n` is the element of an immunity. */
+  | { t: 'cue'; kind: CueKind; id: number; x: number; y: number; r: number; n?: number }
+  /** A Mirrored monster's twin appeared (`id`) beside the monster it mirrors (`of`). */
+  | { t: 'twin'; id: number; of: number }
+  /** A monster put a hex on a character (`to`), or renewed one it holds (`renew`); `from` is -1 for a sigil on the ground. */
+  | { t: 'hexCast'; from: number; to: number; hex: string; renew: boolean }
+  /** A thief took charges of a flask (`kind`) from the character `src`. */
+  | { t: 'stolen'; src: number; to: number; kind: string }
   | { t: 'buff'; id: string }
   | { t: 'hex'; id: number; hex: string }
   /** A status was put on an enemy. */

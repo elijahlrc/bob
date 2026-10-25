@@ -7,6 +7,9 @@ import type { Actor, World } from './types';
  * leader falls the rest react by faction. Worked out from the pack's living members, once a tick.
  */
 
+/** Seconds the Choir falters when its leader falls. */
+const RALLY_STUN = 0.7;
+
 /** The factions whose melee members take slots round the character instead of queueing for it. */
 const FLANKERS: ReadonlySet<FactionId> = new Set<FactionId>(['kennel', 'swarm']);
 
@@ -115,7 +118,9 @@ export function rally(w: World, dead: Actor): void {
   if (mates.length < 2) return;
   for (const a of mates) {
     if (def.faction === 'kennel') a.choir.buffT = Math.max(a.choir.buffT, 6);
-    else if (def.faction === 'choir') a.stunT = Math.max(a.stunT, 0.7);
-    else if (def.faction === 'swarm') a.theft.fleeT = Math.max(a.theft.fleeT, 2.5);
+    else if (def.faction === 'choir') {
+      a.stunT = Math.max(a.stunT, RALLY_STUN);
+      w.events.push({ t: 'stun', dst: a.id, dur: RALLY_STUN });
+    } else if (def.faction === 'swarm') a.theft.fleeT = Math.max(a.theft.fleeT, 2.5);
   }
 }

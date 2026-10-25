@@ -8,6 +8,7 @@ import {
   SIGIL_EVERY,
   spawnBeside,
 } from './factions';
+import { cue, healed } from './cues';
 import { markPlayer, noteDevoured, quenched } from './encounters';
 import { awaitsEncircle } from './packPlays';
 import type { Actor, World } from './types';
@@ -40,6 +41,8 @@ const CHARGE_SPEED = 10;
 /** A charge runs on this far past the place it was aimed at. */
 export const CHARGE_OVERSHOOT = 3;
 
+/** Seconds between two rings that show an aura taking hold of someone new. */
+const AURA_CUE_GAP = 2.5;
 /** Seconds between two draws of a Tithe. */
 const TITHE_PULSE = 0.5;
 /** The Bursars whose beam is on the character now (the renderer draws it). */
@@ -182,7 +185,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     w.corpses.splice(w.corpses.indexOf(c), 1);
     m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * ab.amount!);
     m.skillT = ab.interval!;
-    w.events.push({ t: 'summon', id: m.id });
+    healed(w, m);
     // And swells with it (Gorged, docs/ENCOUNTERS.md 6).
     noteDevoured(w, m);
   },
@@ -241,16 +244,25 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
       });
     }
   },
-  aura({ w, m, ab }) {
+  aura({ w, m, dt, ab, i }) {
+    let fresh = false;
     for (const o of w.actors)
-      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!)
+      if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) {
+        if (o.choir.buffT <= 0) fresh = true;
         o.choir.buffT = 0.3;
+      }
+    // The reach shows when the aura takes hold of someone new (a tell only: nothing else reads this timer).
+    m.abT[i] = (m.abT[i] ?? 0) - dt;
+    if (fresh && m.abT[i] <= 0) {
+      m.abT[i] = AURA_CUE_GAP;
+      cue(w, 'aura', m, ab.range!);
+    }
   },
   hex({ w, m, p, dt, d, ab }) {
     m.skillT -= dt;
     if (m.skillT <= 0 && d < 12 && w.grid.los(m.x, m.y, p.x, p.y)) {
       m.skillT = ab.interval!;
-      hexPlayerAtRandom(w, p.side!);
+      hexPlayerAtRandom(w, p.side!, m);
     }
   },
   healChannel({ w, m, dt, ab }) {
@@ -260,11 +272,16 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
       if (m.stunT > 0) {
         m.channelT = 0;
         m.skillT = ab.interval!;
+        cue(w, 'mendBroken', m, ab.range!);
       } else if (m.channelT <= 0) {
         m.skillT = ab.interval!;
+        cue(w, 'mend', m, ab.range!);
         for (const o of w.actors)
-          if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!)
+          if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!) {
+            const before = o.life;
             o.life = Math.min(o.def.maxLife, o.life + o.def.maxLife * ab.amount!);
+            if (o.life > before) healed(w, o, m);
+          }
       }
       return;
     }
@@ -290,6 +307,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     for (const o of w.actors)
       if (!o.isPlayer && o.alive && Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!)
         o.choir.buffT = 4;
+    cue(w, 'whistle', m, ab.range!);
     // And marks the quarry: the pack hits the character harder for a while (docs/ENCOUNTERS.md 7).
     if (d <= 10) markPlayer(w, m);
   },
@@ -322,12 +340,15 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     w.events.push({ t: 'window', id: m.id, kind: 'sigil' });
   },
   shell({ w, m, ab }) {
+    let warded = false;
     for (const o of w.actors) {
       if (o.isPlayer || !o.alive || o === m || o.mon?.spec.type === m.mon?.spec.type) continue;
       if (o.shellBy || Math.hypot(o.x - m.x, o.y - m.y) > ab.range!) continue;
       o.shellBy = m.id;
       o.es = Math.max(o.es, o.def.maxLife * ab.amount!);
+      warded = true;
     }
+    if (warded) cue(w, 'ward', m, ab.range!);
   },
 };
 

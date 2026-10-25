@@ -5,6 +5,7 @@ import { PYLON_RANGE } from '../data/abilities';
 import { MONSTER_TYPES, leavesBody } from '../data/monsters';
 import { ENRAGE_DAMAGE, ENRAGE_SPEED } from '../data/phases';
 import { monsterHitOf, rawHit } from './combat';
+import { cue, healed } from './cues';
 import { rally } from './packs';
 import { monsterHexesPlayer } from './hexes';
 import { encDamageMult, encMoveMult, onEncounterDeath } from './encounters';
@@ -109,13 +110,13 @@ export function monsterHexEffect(w: World, id: HexId): number {
   return hexEffect(id, Math.max(1, Math.min(20, Math.floor(w.plan.areaLevel / 5) + 1)));
 }
 
-/** A monster hexes the player with one of the four hexes. */
-export function hexPlayer(w: World, s: Side, id: HexId): void {
-  monsterHexesPlayer(w, s, id, monsterHexEffect(w, id));
+/** A monster (`from`: none for a sigil on the ground) hexes the player with one of the four hexes. */
+export function hexPlayer(w: World, s: Side, id: HexId, from?: Actor): void {
+  monsterHexesPlayer(w, s, id, monsterHexEffect(w, id), from);
 }
 
-export function hexPlayerAtRandom(w: World, s: Side): void {
-  hexPlayer(w, s, HEX_IDS[w.rngAi.int(0, HEX_IDS.length - 1)]);
+export function hexPlayerAtRandom(w: World, s: Side, from?: Actor): void {
+  hexPlayer(w, s, HEX_IDS[w.rngAi.int(0, HEX_IDS.length - 1)], from);
 }
 
 /** Whether a Warden Pylon within range keeps this monster from taking damage. */
@@ -404,6 +405,7 @@ export function onMonsterDeath(w: World, a: Actor): void {
     }
   }
   // The Choir: a death feeds Flagellants and, with Zealous, spurs the allies around it.
+  let spurred = false;
   for (const o of w.actors) {
     if (!o.alive || o === a || o.isPlayer || !o.mon) continue;
     const d = Math.hypot(o.x - a.x, o.y - a.y);
@@ -411,8 +413,12 @@ export function onMonsterDeath(w: World, a: Actor): void {
       o.choir.fervour = Math.min(FERVOUR_MAX, o.choir.fervour + 1);
       o.choir.fervourT = FERVOUR_SECONDS;
     }
-    if (a.modIds.includes('zealous') && d <= ZEAL_RANGE) o.choir.zealT = ZEAL_SECONDS;
+    if (a.modIds.includes('zealous') && d <= ZEAL_RANGE) {
+      o.choir.zealT = ZEAL_SECONDS;
+      spurred = true;
+    }
   }
+  if (spurred) cue(w, 'zeal', a, ZEAL_RANGE);
   if (type === 'wight')
     for (const o of w.actors)
       if (o.alive && o.shellBy === a.id) {
@@ -547,6 +553,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
       ]) {
         const pos = w.grid.collide(m.x + dx, m.y + dy, 0.4);
         openZone(w, pos.x, pos.y, 2, 6, 'caustic', dps);
+        cue(w, 'pools', { id: m.id, x: pos.x, y: pos.y }, 2);
       }
     }
   }
@@ -600,7 +607,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
       const immune = [false, false, false, false, false];
       immune[element] = true;
       m.def = { ...m.def, immune };
-      w.events.push({ t: 'blink', id: m.id, x: m.x, y: m.y, end: true });
+      cue(w, 'immune', m, 0, element);
     }
   }
   if (m.modIds.includes('huntsmaster')) {
@@ -691,9 +698,12 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     m.raiserT -= dt;
     if (m.raiserT <= 0) {
       m.raiserT = PRECENTOR_HEX_INTERVAL;
-      hexPlayer(w, hunted(w, m).side!, HEX_IDS[m.slamT++ % HEX_IDS.length]);
-      if (Math.floor(m.slamT) % 2 === 0)
+      hexPlayer(w, hunted(w, m).side!, HEX_IDS[m.slamT++ % HEX_IDS.length], m);
+      if (Math.floor(m.slamT) % 2 === 0) {
+        const before = m.life;
         m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * 0.05);
+        if (m.life > before) healed(w, m);
+      }
     }
     if (m.bossPhase === 0 && frac <= 0.5) {
       m.bossPhase = 1;
