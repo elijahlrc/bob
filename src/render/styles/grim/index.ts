@@ -57,6 +57,7 @@ import {
 import { BossFx } from './bossFx';
 import { CURLED_COLOR, DTYPE_COLOR, HitFx, numberKind, WARDED_COLOR, WARDED_WORD } from './hitFx';
 import { MonsterFlightFx } from './monsterFlight';
+import { MoveFx } from './moveFx';
 import {
   FLIGHT_HEIGHT,
   isLob,
@@ -167,6 +168,7 @@ export class GrimStyle extends StyleBase {
   private boss!: BossFx;
   private hitFx!: HitFx;
   private flight!: MonsterFlightFx;
+  private move!: MoveFx;
   private pfx!: ProjectileFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
@@ -284,6 +286,7 @@ export class GrimStyle extends StyleBase {
     this.ward = s.add.graphics().setDepth(95500).setBlendMode(Phaser.BlendModes.ADD);
     this.owned.push(this.ward);
     this.fx?.destroy();
+    this.move?.destroy();
     const host: FxHost = {
       project: (x, y) => this.project(x, y),
       rpx: (r) => this.rpx(r),
@@ -307,6 +310,16 @@ export class GrimStyle extends StyleBase {
     this.hitFx = new HitFx(host);
     this.flight = new MonsterFlightFx(host, s);
     this.owned.push(...this.flight.objects());
+    this.move = new MoveFx(
+      {
+        ...host,
+        renderPos: (id) => {
+          const t = (this.views.get(id) as View | undefined)?.track;
+          return t && !Number.isNaN(t.rx) ? { x: t.rx, y: t.ry } : null;
+        },
+      },
+      s,
+    );
     this.pfx = new ProjectileFx(host, s);
     this.owned.push(...this.pfx.objects());
     this.placeProps(world, rng);
@@ -1319,6 +1332,8 @@ export class GrimStyle extends StyleBase {
     this.hitFx.frame(simDt, this.time, g);
     // What monsters throw, loose and lunge, above the figures (monsterFlight.ts).
     this.flight.frame(world, simDt, this.time);
+    // Hooks, pushes and charges: the move, seen coming and seen happening (moveFx.ts).
+    this.move.frame(world, simDt, this.time, g);
     for (const e of effects) {
       if (e.shape) continue;
       const { x, y } = this.project(e.x, e.y);
@@ -1361,6 +1376,8 @@ export class GrimStyle extends StyleBase {
         );
       }
     }
+    // A pulse that throws the character back: arrows run outward inside its disc, on top of the disc.
+    this.move.warnings(world, g, this.time);
     // Lightning bolts.
     for (let i = this.bolts.length - 1; i >= 0; i--) {
       const b = this.bolts[i];
@@ -1530,7 +1547,15 @@ export class GrimStyle extends StyleBase {
     this.enc.onEvent(e, world);
     this.boss.onEvent(e, world);
     this.hitFx.onEvent(e);
+    this.move.onEvent(e, world);
     switch (e.t) {
+      case 'pull':
+        // The sim drags the character in one step; the figure slides along the chain instead of jumping.
+        (this.views.get(e.dst) as View | undefined)?.track.reel(0.3, 9);
+        break;
+      case 'push':
+        (this.views.get(e.dst) as View | undefined)?.track.reel(0.25, 14);
+        break;
       case 'hit': {
         const dst = this.byId.get(e.dst) ?? world.actors.find((a) => a.id === e.dst);
         if (!dst) break;
@@ -1649,6 +1674,8 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'explode': {
+        // The mark a charge or a leap was aimed at going out: nothing was hit and nothing is thrown.
+        if (e.dud) break;
         const { x, y } = this.project(e.x, e.y);
         if (e.skill) {
           // A skill's own area: what it does there is drawn by its motif (skillFx.ts); the ground keeps its mark.
@@ -1930,6 +1957,7 @@ export class GrimStyle extends StyleBase {
     for (const l of [...this.lightsOwned]) this.dropLight(l);
     this.fx?.destroy();
     this.hitFx?.destroy();
+    this.move?.destroy();
     this.collapse?.destroy();
     this.collapse = null;
     this.torches = [];

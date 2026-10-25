@@ -38,7 +38,7 @@ type Ctx = {
 export const LEAP_SPEED = 15;
 const CHARGE_SPEED = 10;
 /** A charge runs on this far past the place it was aimed at. */
-const CHARGE_OVERSHOOT = 3;
+export const CHARGE_OVERSHOOT = 3;
 
 /** Seconds between two draws of a Tithe. */
 const TITHE_PULSE = 0.5;
@@ -87,6 +87,37 @@ function aimDash(w: World, m: Actor, kind: 'leap' | 'charge', telegraph: number)
   });
   // A charge is not abandoned by a blow it was in the middle of.
   m.action = null;
+  // The renderer marks the lane the charge will run (a leap is drawn by its own cue).
+  if (kind === 'charge') w.events.push({ t: 'rush', id: m.id, seconds: telegraph });
+}
+
+/**
+ * The lane a charge winding up will run, as `beginDash` will work it out from where the monster stands now: from the monster
+ * through the place it was aimed at and `CHARGE_OVERSHOOT` tiles past it, as far as the first wall, `width` wide (its body).
+ * Null when the monster is not winding up. The renderer draws it for the whole warning.
+ */
+export function chargeLane(
+  w: World,
+  m: Actor,
+): { x: number; y: number; x2: number; y2: number; width: number } | null {
+  if (m.dash.windT <= 0) return null;
+  const dx = m.dash.x - m.x;
+  const dy = m.dash.y - m.y;
+  const len = Math.max(0.01, Math.hypot(dx, dy));
+  const ux = dx / len;
+  const uy = dy / len;
+  const dist = len + CHARGE_OVERSHOOT;
+  let x2 = m.x;
+  let y2 = m.y;
+  for (let s = 0.25; ; s += 0.25) {
+    const d = Math.min(s, dist);
+    const c = w.grid.collide(m.x + ux * d, m.y + uy * d, m.r);
+    if (Math.hypot(c.x - (m.x + ux * d), c.y - (m.y + uy * d)) > 0.15) break;
+    x2 = c.x;
+    y2 = c.y;
+    if (d >= dist) break;
+  }
+  return { x: m.x, y: m.y, x2, y2, width: m.r * 2 };
 }
 
 /** A charge on the spot, with a short warning (a Riled Rend-boar, docs/ENCOUNTERS.md 6); the charge ability carries it out. */

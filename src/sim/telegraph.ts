@@ -33,6 +33,9 @@ export type Telegraph =
       width: number;
       progress: number;
       dtype: number;
+      /** A hook: the tiles it drags the character it catches, and the monster that casts it. */
+      pull?: number;
+      src?: number;
     };
 
 /** The damage type of the biggest chunk of a hit (the colour of its warning). */
@@ -105,6 +108,7 @@ function buildTelegraphs(w: World): Telegraph[] {
         width: b.width * scale,
         progress,
         dtype,
+        ...(act.profile.skill.pull ? { pull: act.profile.skill.pull, src: a.id } : {}),
       });
     }
   }

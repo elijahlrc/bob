@@ -86,6 +86,16 @@ export class AnimTrack {
     if (!Number.isNaN(this.rx)) this.slideT = KNOCK_SLIDE;
   }
 
+  /** Seconds left of a slow slide to the sim position (a pull, a push), and how fast it chases (per second). */
+  private reelT = 0;
+  private reelRate = 24;
+
+  /** The figure was moved in one step by the sim and slides to its new place over `seconds` (a rate of about 3 / seconds). */
+  reel(seconds: number, rate: number): void {
+    this.reelT = seconds;
+    this.reelRate = rate;
+  }
+
   update(a: Actor, dt: number): void {
     const big = bigMove(a);
     if (big) {
@@ -113,13 +123,16 @@ export class AnimTrack {
       return;
     }
     // Chase the sim position; snap on teleports. Animation speed/facing derive from the smoothed motion.
-    if (Math.hypot(a.x - this.rx, a.y - this.ry) > 4) {
+    // A pull or a push the sim made in one step is slid over `reelT` seconds, slower, so that the drag can be seen.
+    const reeling = this.reelT > 0;
+    this.reelT = Math.max(0, this.reelT - dt);
+    if (Math.hypot(a.x - this.rx, a.y - this.ry) > (reeling ? 7 : 4)) {
       this.rx = a.x;
       this.ry = a.y;
       this.px = a.x;
       this.py = a.y;
     } else {
-      const k = 1 - Math.exp(-dt * 24);
+      const k = 1 - Math.exp(-dt * (reeling ? this.reelRate : 24));
       this.rx += (a.x - this.rx) * k;
       this.ry += (a.y - this.ry) * k;
     }

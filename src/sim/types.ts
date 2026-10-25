@@ -519,6 +519,8 @@ export type SimEvent =
       skill?: string;
       /** A later pulse of an area that pulses (a zone, a stream): the renderer draws it lighter than the first. */
       pulse?: boolean;
+      /** A mark that hurts nothing and throws nothing (the dot a charge or a leap was aimed at): the renderer draws no blast for it. */
+      dud?: boolean;
     }
   /**
    * Something was thrown from a point `high` pixels over (x, y) to the ground at (x2, y2), landing in `dur` s (a shard of ice from
@@ -550,6 +552,39 @@ export type SimEvent =
       skill?: string;
     }
   | { t: 'blink'; id: number; x: number; y: number; end: boolean; dtype?: number }
+  /**
+   * A monster dragged a character toward itself (a hook, a lance, a pattern's hooked lane): `dst` stood at (x, y) and now stands at
+   * (x2, y2); the hook is at (hx, hy). The renderer draws the chain and the reel-in.
+   */
+  | {
+      t: 'pull';
+      src: number;
+      dst: number;
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      hx: number;
+      hy: number;
+    }
+  /**
+   * A pulse threw a character back (a Warding Pulse): `dst` stood at (x, y) and now stands at (x2, y2); the pulse went off at
+   * (ox, oy) with radius `r`.
+   */
+  | {
+      t: 'push';
+      src: number;
+      dst: number;
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      ox: number;
+      oy: number;
+      r: number;
+    }
+  /** A monster began the warning of a charge: it rushes in a straight line `seconds` from now (the renderer marks the lane). */
+  | { t: 'rush'; id: number; seconds: number }
   | { t: 'charge'; kind: string; count: number }
   /** Charges the character spent on purpose (to skip a cooldown, or to power a skill). */
   | { t: 'spend'; kind: string; n: number }
