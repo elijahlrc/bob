@@ -347,3 +347,26 @@ export function skillSlots(w: World): SkillSlot[] {
   }
   return out;
 }
+
+/** When each world's main skill last became unaffordable (sim seconds), while it still is. */
+const starvedSince = new WeakMap<World, number>();
+/** How long the main skill must have been unaffordable before the mana orb says so. */
+const STARVED_AFTER = 1;
+
+/**
+ * Whether the main skill has wanted more mana than the character has for a second or more (docs/NEWPLAYER.md N12): the mana
+ * orb flashes. A skill paid in life, and the weapon's attack, never count.
+ */
+export function manaStarved(w: World): boolean {
+  const s = w.sides[0];
+  const c = s.char.primary;
+  const short =
+    c.gemUid !== null && !c.costsLife && !canPay(s, false, s.char.profile(c, 0, 0).cost);
+  if (!short) {
+    starvedSince.delete(w);
+    return false;
+  }
+  const since = starvedSince.get(w) ?? w.t;
+  starvedSince.set(w, since);
+  return w.t - since >= STARVED_AFTER;
+}

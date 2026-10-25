@@ -145,12 +145,52 @@ html.leaf .title-board .saves {
   background-position: left bottom;
   background-repeat: repeat-x;
 }
-html.leaf .save-row {
-  gap: 10px;
+html.leaf .saves-head {
+  margin: 0;
+  font: 400 var(--head-size) / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+  text-align: center;
+  text-shadow: var(--text-shadow);
 }
-html.leaf span.save-name {
+/* A saved run: who it is, Continue, and the small Copy and Delete. */
+html.leaf .save-row {
+  gap: 12px;
+}
+html.leaf .save-who {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  min-width: 0;
   padding: 0 4px;
+  text-align: left;
+}
+html.leaf .save-who .save-name {
+  font: 400 var(--head-size) / 1.1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .save-at {
+  color: var(--pearl);
+}
+html.leaf .save-go {
+  min-width: 128px;
+}
+html.leaf .save-tools {
+  display: flex;
+  gap: 6px;
+}
+/* New Run: large, on its own line, in the footer's lettering. */
+html.leaf .title-board .title-new {
+  min-width: min(100%, 280px);
+  padding: 14px 40px 16px;
+  font: 400 34px / 1 var(--title-font);
+  font-size-adjust: none;
+}
+/* The tagline is not a button: a green plaque in a pale rim, where every button has a gold one. */
+html.leaf .title > .subtitle.tagline {
+  padding: 14px 30px 15px;
 }
 html.leaf .title-board .menu {
   flex-direction: row;
@@ -626,10 +666,10 @@ html.leaf .confirm-card .item-actions {
   html.leaf .save-row {
     flex-wrap: wrap;
   }
-  html.leaf .save-row .save-name {
+  html.leaf .save-who {
     flex-basis: 100%;
   }
-  html.leaf .save-row .btn.small {
+  html.leaf .save-go {
     flex: 1;
   }
   html.leaf .class-grid {

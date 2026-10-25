@@ -296,6 +296,23 @@ html.leaf .orb-reserved {
   box-shadow: inset 0 -2px 0 #977835;
   opacity: 1;
 }
+/* The main skill has wanted more mana than there is for a second or more (docs/NEWPLAYER.md N12): the liquid flashes. */
+html.leaf .orb[data-st='starved'] .orb-glass {
+  animation: leaf-mana-starved 0.9s steps(1, end) infinite;
+}
+@keyframes leaf-mana-starved {
+  50% {
+    box-shadow:
+      inset 0 0 0 3px #f2e7c4,
+      0 0 12px 2px #6893dd;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.leaf .orb[data-st='starved'] .orb-glass {
+    animation: none;
+    box-shadow: inset 0 0 0 3px #f2e7c4;
+  }
+}
 html.leaf .orb-text {
   font: 400 40px / 1 var(--title-font);
   font-size-adjust: none;

@@ -36,7 +36,16 @@ export type BossDef = {
   stunMult: number;
   /** How much of a curse's effect it takes (the reference game's bosses take a third less). */
   curseEffect: number;
+  /**
+   * What its fight deals by type (physical, lightning, cold, fire, chaos; hits only, as the card's mix), for the boss
+   * map's card (docs/NEWPLAYER.md N12). Measured: in bot fights by `scripts/boss-gauntlet.ts` where bots reached it four
+   * times or more, alone in an arena by `scripts/boss-mix.ts` for the rest.
+   */
+  fightMix: number[];
 };
+
+/** The share of the damage taken on a boss map that comes in the boss fight (the bots' fights, 2026-10-25: 64% to 85%). */
+export const BOSS_FIGHT_SHARE = 0.7;
 
 export const BOSSES: Record<BossId, BossDef> = {
   tollkeeper: {
@@ -46,12 +55,13 @@ export const BOSSES: Record<BossId, BossDef> = {
     name: 'the Tollkeeper',
     test: 'Single-target damage: it grows stronger with every toll.',
     brief: [
-      'Rings a bell every ten seconds, and each ring is lightning.',
+      'Rings a bell every twelve seconds, and each ring is lightning.',
       'Behind his armour, he is never quite the same after.',
     ],
     says: ["“Every soul pays. You're overdue.”"],
     stunMult: 1.5,
     curseEffect: 0.67,
+    fightMix: [0.71, 0.29, 0, 0, 0],
   },
   siegeMarshal: {
     id: 'siegeMarshal',
@@ -63,6 +73,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Take this shade back to its cell.”'],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [1, 0, 0, 0, 0],
   },
   courser: {
     id: 'courser',
@@ -74,6 +85,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ["“Run, then. It's not like you have anywhere to go.”"],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [0.34, 0, 0, 0.66, 0],
   },
   duellist: {
     id: 'duellist',
@@ -85,6 +97,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Your face will never see the light.”'],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [1, 0, 0, 0, 0],
   },
   magistrate: {
     id: 'magistrate',
@@ -99,6 +112,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Your sentence was passed long ago. There is no appeal.”'],
     stunMult: 4,
     curseEffect: 0,
+    fightMix: [1, 0, 0, 0, 0],
   },
   bulwarkEngine: {
     id: 'bulwarkEngine',
@@ -113,6 +127,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Return to your cell. Return to your cell. Return to your—”'],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [1, 0, 0, 0, 0],
   },
   prismWarden: {
     id: 'prismWarden',
@@ -127,6 +142,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Hot, cold, or quick, spirit?”'],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [0.01, 0.32, 0.32, 0.35, 0],
   },
   twins: {
     id: 'twins',
@@ -139,6 +155,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['The sound of hissing coals...'],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [0.52, 0, 0, 0.48, 0],
   },
   rotwife: {
     id: 'rotwife',
@@ -150,6 +167,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Come here, dear. I can help you.”'],
     stunMult: 4,
     curseEffect: 1,
+    fightMix: [0.96, 0, 0, 0, 0.04],
   },
   unmaker: {
     id: 'unmaker',
@@ -161,6 +179,7 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ["“You made all that for me? You shouldn't have.”"],
     stunMult: 4,
     curseEffect: 0.67,
+    fightMix: [1, 0, 0, 0, 0],
   },
 };
 

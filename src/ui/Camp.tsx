@@ -238,6 +238,31 @@ export function Camp({ c }: { c: Controller }) {
   // The next map is a tab of its own at every width, with a bar at the bottom.
   const tabsRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  // Arrows at the ends of the tab band while tabs are cut off on that side (docs/NEWPLAYER.md N12).
+  const [edges, setEdges] = useState({ left: false, right: false });
+  // The band is not there on the camp's first render, so it is watched from when it appears.
+  const [tabsEl, setTabsEl] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = tabsEl;
+    if (!el) return;
+    const look = () => {
+      const left = el.scrollLeft > 2;
+      const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
+      setEdges((e) => (e.left === left && e.right === right ? e : { left, right }));
+    };
+    look();
+    el.addEventListener('scroll', look, { passive: true });
+    const ro = new ResizeObserver(look);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', look);
+      ro.disconnect();
+    };
+  }, [tabsEl]);
+  const scrollTabs = (dir: -1 | 1) => {
+    const el = tabsRef.current;
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.6, behavior: 'smooth' });
+  };
   useEffect(() => {
     tabsRef.current
       ?.querySelector('.tab.on')
@@ -527,7 +552,23 @@ export function Camp({ c }: { c: Controller }) {
   return (
     <div class="screen camp tabbed">
       <div class="camp-main">
-        <div class="tabs" ref={tabsRef}>
+        <div
+          class="tabs"
+          ref={(el) => {
+            tabsRef.current = el;
+            if (el !== tabsEl) setTabsEl(el);
+          }}
+        >
+          {edges.left && (
+            <button
+              class="tabs-arrow left"
+              aria-label="More tabs to the left"
+              tabIndex={-1}
+              onClick={() => scrollTabs(-1)}
+            >
+              ◂
+            </button>
+          )}
           <button class={'tab' + (shown === 'sheet' ? ' on' : '')} onClick={() => setTab('sheet')}>
             Character
           </button>
@@ -569,6 +610,16 @@ export function Camp({ c }: { c: Controller }) {
           <button class={'tab' + (shown === 'next' ? ' on' : '')} onClick={() => setTab('next')}>
             Next map{run.reward ? ' (reward)' : ''}
           </button>
+          {edges.right && (
+            <button
+              class="tabs-arrow right"
+              aria-label="More tabs to the right"
+              tabIndex={-1}
+              onClick={() => scrollTabs(1)}
+            >
+              ▸
+            </button>
+          )}
         </div>
         <div class="tabs-trim" aria-hidden="true" />
         <div class="tab-body" ref={bodyRef}>

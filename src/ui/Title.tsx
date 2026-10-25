@@ -47,27 +47,41 @@ function SaveRow({ c, slot, first }: { c: Controller; slot: SlotSummary; first: 
   if (res.status === 'incompatible')
     return (
       <div class="save-row">
-        <span class="save-name warn">Save incompatible with this version</span>
-        <CopySave c={c} id={slot.id} />
-        <button class="btn small danger" onClick={() => c.discardSave(slot.id)}>
-          Discard
-        </button>
+        <div class="save-who">
+          <span class="warn">Save incompatible with this version</span>
+        </div>
+        <span class="save-tools">
+          <CopySave c={c} id={slot.id} />
+          <button class="btn small danger" onClick={() => c.discardSave(slot.id)}>
+            Discard
+          </button>
+        </span>
       </div>
     );
   const { run } = res;
-  const name = `${classDef(run.classId).name}, level ${run.build.level}, map ${run.map}`;
+  const cls = classDef(run.classId).name;
+  const name = `${cls}, level ${run.build.level}, map ${run.map}`;
+  // The character first, then the one thing to do with it; copying and deleting are small and last (docs/NEWPLAYER.md N12).
   return (
     <div class="save-row">
+      <div class="save-who">
+        <span class="save-name">{cls}</span>
+        <span class="save-at">
+          Level {run.build.level} · map {run.map} of 100
+        </span>
+      </div>
       <button
-        class={first ? 'btn primary save-name' : 'btn save-name'}
+        class={first ? 'btn primary save-go' : 'btn save-go'}
         onClick={() => c.continueRun(slot.id)}
       >
-        Continue — {name}
+        Continue
       </button>
-      <CopySave c={c} id={slot.id} />
-      <button class="btn small danger" onClick={() => void del(name)}>
-        Delete
-      </button>
+      <span class="save-tools">
+        <CopySave c={c} id={slot.id} />
+        <button class="btn small danger" onClick={() => void del(name)}>
+          Delete
+        </button>
+      </span>
     </div>
   );
 }
@@ -130,22 +144,27 @@ export function Title({ c }: { c: Controller }) {
   return (
     <div class="screen title">
       <h1>Battle of Builds</h1>
-      <p class="subtitle" data-paint="panel" data-thin>
+      <p class="subtitle tagline" data-paint="panel" data-field="green" data-rim="pearl" data-thin>
         Craft your build, test its mettle, climb the ranks.
       </p>
       <UpdateNotice />
       <div class="title-board lf-panel" data-paint="panel">
         {saves.length > 0 && (
           <div class="saves">
+            <h3 class="saves-head">Your runs</h3>
             {saves.map((s, i) => (
               <SaveRow key={s.id} c={c} slot={s} first={i === 0} />
             ))}
           </div>
         )}
+        {/* The way in, on a line of its own: the one button a first-time player needs (docs/NEWPLAYER.md N12). */}
+        <button
+          class={anyOk ? 'btn title-new' : 'btn primary title-new'}
+          onClick={() => c.goTo('classSelect')}
+        >
+          New Run
+        </button>
         <div class="menu">
-          <button class={anyOk ? 'btn' : 'btn primary'} onClick={() => c.goTo('classSelect')}>
-            New Run
-          </button>
           <button class="btn" onClick={() => c.goTo('codex')}>
             Codex
           </button>

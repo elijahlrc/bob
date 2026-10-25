@@ -1,4 +1,5 @@
 import type { Character } from '../calc/character';
+import { BOSSES, BOSS_FIGHT_SHARE, type BossId } from '../data/bosses';
 import { effectiveRes } from '../calc/formulas';
 import { durabilityTable } from '../calc/matrix';
 import { profileOf } from '../data/defence';
@@ -90,6 +91,8 @@ export function themeInfo(
   affixes: string[] = [],
   type: MapTypeId = 'plain',
   level = 1,
+  /** The boss that ends the map, whose fight is most of its damage (docs/NEWPLAYER.md N12). */
+  boss: BossId | null = null,
 ): ThemeInfo {
   // A theme is offered from its first map, so a type of it is never hidden by a level lower than that.
   const shares = typeShares({ ...theme, level: Math.max(level, theme.fromMap ?? 0) });
@@ -126,7 +129,13 @@ export function themeInfo(
   const t = themeThreat(theme);
   const a = affixThreat(type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes, level);
   const g = a.gain.reduce((s, x) => s + x, 0);
-  const mix = g > 0 ? t.mix.map((x, i) => (x + a.gain[i]) / (1 + g)) : t.mix;
+  const monsters = g > 0 ? t.mix.map((x, i) => (x + a.gain[i]) / (1 + g)) : t.mix;
+  // A boss map's damage is mostly the boss fight's: its own mix is blended in by its share.
+  const mix = boss
+    ? monsters.map(
+        (x, i) => x * (1 - BOSS_FIGHT_SHARE) + BOSSES[boss].fightMix[i] * BOSS_FIGHT_SHARE,
+      )
+    : monsters;
   return {
     factions,
     asks: present.map((f) => ({ id: f.id, name: f.name, text: FACTION_ASKS[f.id] })),

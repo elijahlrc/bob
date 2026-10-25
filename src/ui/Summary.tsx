@@ -17,6 +17,7 @@ import {
 import type { DeathRecap } from '../sim/types';
 import { FACTION_NAMES, MONSTER_MODS, MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { TYPE_BLURBS } from '../data/monsterInfo';
+import { BOSSES, type BossId } from '../data/bosses';
 import { themeDef } from '../data/themes';
 import { themeInfo } from '../run/themeInfo';
 import type { MapTypeId } from '../data/mapTypes';
@@ -40,6 +41,7 @@ function MixLine({ r, total }: { r: DeathRecap; total: number }) {
     r.affixes ?? [],
     (r.mapType ?? 'plain') as MapTypeId,
     r.areaLevel ?? 1,
+    r.boss && r.boss in BOSSES ? (r.boss as BossId) : null,
   ).mix;
   const top = taken.indexOf(Math.max(...taken));
   const text = (m: number[]) =>

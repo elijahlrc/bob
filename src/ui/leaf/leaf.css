@@ -130,6 +130,37 @@ html.leaf .camp.tabbed .tabs {
   overflow-x: auto;
   overflow-y: visible;
 }
+/* The ends of a tab band that does not fit (docs/NEWPLAYER.md N12): an arrow over a fade of the band, held at the edge
+   while it scrolls, taking no room of its own (the negative margin). */
+.tabs-arrow {
+  position: sticky;
+  z-index: 2;
+  flex: 0 0 34px;
+  align-self: stretch;
+  margin-bottom: -2px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font: 400 34px / 1 var(--title-font, serif);
+  color: var(--gold-hi, #f2d27a);
+  text-shadow: var(--text-shadow, 0 2px 0 #000);
+  cursor: pointer;
+}
+.tabs-arrow.left {
+  left: 0;
+  margin-right: -34px;
+  text-align: left;
+  background: linear-gradient(90deg, #1d2958 55%, #1d295800);
+  /* A sticky end stops at the band's padding: the shadow covers that strip too. */
+  box-shadow: -16px 0 0 #1d2958;
+}
+.tabs-arrow.right {
+  right: 0;
+  margin-left: -34px;
+  text-align: right;
+  background: linear-gradient(270deg, #1d2958 55%, #1d295800);
+  box-shadow: 16px 0 0 #1d2958;
+}
 html.leaf .tab {
   background: transparent;
   border: 0;

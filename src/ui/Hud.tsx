@@ -31,6 +31,7 @@ import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from 
 import { infoProps } from './info';
 import { reprieveDef } from '../data/reprieves';
 import { SkillBar } from './SkillBar';
+import { manaStarved } from './skillStatus';
 
 /**
  * A resource orb: a painted medallion whose field is the liquid, with the empty part covered from the top down (so the
@@ -45,6 +46,8 @@ function Orb(props: {
   esMax?: number;
   /** The part of `max` held by auras: drawn as a locked band at the top, so the orb keeps its full scale. */
   reserved?: number;
+  /** Flash: the main skill has wanted more than the orb holds for a while (docs/NEWPLAYER.md N12). */
+  flash?: boolean;
 }) {
   const { value, max, kind, label } = props;
   const reserved = Math.max(0, Math.min(max, props.reserved ?? 0));
@@ -54,6 +57,7 @@ function Orb(props: {
   return (
     <div
       class={`orb ${kind}`}
+      data-st={props.flash ? 'starved' : undefined}
       data-paint="medal"
       data-field={kind === 'life' ? 'vermilion,4' : 'lapis,5'}
       data-medal={kind === 'mana' ? 'big stars' : 'big'}
@@ -749,6 +753,7 @@ export function Hud({ c }: { c: Controller }) {
           reserved={w.sides[0].char.reservedMana}
           kind="mana"
           label="Mana"
+          flash={manaStarved(w)}
         />
       </div>
     </div>

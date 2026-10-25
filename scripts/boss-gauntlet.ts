@@ -27,6 +27,9 @@ type Fight = {
   /** What the fight did: tolls rung, Sentences landed and their share of the pool, thefts, and so on. */
   notes: Record<string, number>;
   killer?: string;
+  /** Damage the character took by type (physical, lightning, cold, fire, chaos): during the fight, and on its whole map. */
+  fightTaken: number[];
+  mapTaken: number[];
 };
 
 const arg = (k: string, d: string) => {
@@ -52,6 +55,8 @@ if (mergeAt >= 0) {
       let start = 0;
       let world: World | null = null;
       const seen = new WeakSet<object>();
+      // Hits on the character on the map now (a boss map's whole damage, for its share of it in the fight).
+      let mapTaken = [0, 0, 0, 0, 0];
       const close = (w: World) => {
         if (!cur) return;
         const b = w.actors.find((a) => a.rarity === 'boss' && a.mon?.kind.bossOnly);
@@ -62,6 +67,7 @@ if (mergeAt >= 0) {
           const last = w.sides[0].dmgLog[w.sides[0].dmgLog.length - 1];
           cur.killer = last ? `${last.name} (${last.via ?? last.name})` : 'unknown';
         }
+        cur.mapTaken = [...mapTaken];
         fights.push(cur);
         cur = null;
       };
@@ -70,7 +76,14 @@ if (mergeAt >= 0) {
           if (world !== w) {
             if (world) close(world);
             world = w;
+            mapTaken = [0, 0, 0, 0, 0];
           }
+          const me = w.sides[0].player.id;
+          for (const e of w.events)
+            if (e.t === 'hit' && e.dst === me && e.amount > 0) {
+              mapTaken[e.dtype] += e.amount;
+              if (cur) cur.fightTaken[e.dtype] += e.amount;
+            }
           const b = w.actors.find((a) => a.rarity === 'boss' && a.mon?.kind.bossOnly);
           if (!b) return;
           const st = bossState(b);
@@ -89,6 +102,8 @@ if (mergeAt >= 0) {
               time: 0,
               minPool: 1,
               notes: {},
+              fightTaken: [0, 0, 0, 0, 0],
+              mapTaken: [0, 0, 0, 0, 0],
             };
           }
           if (!cur) return;
@@ -163,4 +178,24 @@ if (deaths.length) {
     console.log(
       `- ${f.classId} (seed ${f.seed}, level ${f.level}) at ${f.boss} after ${f.time.toFixed(0)} s: ${f.killer}`,
     );
+}
+
+// What each boss's fight deals by type, and its share of the damage taken on its map (docs/NEWPLAYER.md N12): the boss
+// map's card blends the boss in by these.
+const TYPES = ['physical', 'lightning', 'cold', 'fire', 'chaos'];
+console.log('');
+console.log('| Boss | Fights | Share of the map in the fight | Fight mix |');
+console.log('| --- | --- | --- | --- |');
+for (const id of BOSS_IDS) {
+  const fs = fights.filter((f) => f.boss === id && f.fightTaken);
+  if (!fs.length) continue;
+  const fight = [0, 0, 0, 0, 0];
+  let map = 0;
+  for (const f of fs) {
+    f.fightTaken.forEach((x, i) => (fight[i] += x));
+    map += f.mapTaken.reduce((a, b) => a + b, 0);
+  }
+  const tot = fight.reduce((a, b) => a + b, 0);
+  const mix = fight.map((x, i) => `${TYPES[i]} ${pct(x / Math.max(1, tot))}`).join(', ');
+  console.log(`| ${BOSSES[id].name} | ${fs.length} | ${pct(tot / Math.max(1, map))} | ${mix} |`);
 }

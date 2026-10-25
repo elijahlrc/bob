@@ -1,4 +1,5 @@
 import { enemiesNear } from './utility';
+import { bossForMap } from '../data/bosses';
 import type { DeathRecap, RecapHit, World } from './types';
 import type { Side } from './side';
 
@@ -59,6 +60,9 @@ export function buildRecap(w: World, s: Side = w.sides[0]): DeathRecap {
     affixes: [...w.plan.affixes],
     areaLevel: w.plan.areaLevel,
     mapType: w.plan.type,
+    ...(w.plan.endKind === 'boss' && bossForMap(w.plan.map)
+      ? { boss: bossForMap(w.plan.map)! }
+      : {}),
     lines: [...byKey.values()].sort((a, b) => b.amount - a.amount),
     res: { fire: cap(3), cold: cap(2), lightning: cap(1), chaos: cap(4) },
     maxRes: {

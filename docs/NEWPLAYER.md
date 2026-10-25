@@ -157,6 +157,11 @@ follows the concise-text rule and the voice rule (plain rules text, overwrought 
   (`src/ui/intro.ts`).
 - N8: `dryEquip` leaves `idle` empty (it needs a `Character`); `swapSockets` adds it for the question before a swap, and
   the bag rows work it out for weapon and off-hand slots only, the ones that change which skills can be used.
+- N12: as planned. The Tollkeeper's camp card also said a toll every ten seconds; it is twelve (`TOLL_EVERY`). The
+  boss fight mixes are measured (DESIGN.md Appendix A, 2026-10-25); the Rotwife reads almost all physical because her
+  ailments are damage over time, which no card counts. The tab arrows are sticky ends inside the scrolling band
+  (`.tabs-arrow`). The title board: New Run on a line of its own, each saved run as its class, level and map with a
+  Continue button and small Copy and Delete, and the tagline on a green plaque with a pale rim (every button's is gold).
 
 ## N7. Gem socketing flow (priority)
 

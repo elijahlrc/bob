@@ -747,6 +747,8 @@ export type DeathRecap = {
   affixes?: string[];
   areaLevel?: number;
   mapType?: string;
+  /** The boss that ends the map, on a boss map (its damage is in what the card said). */
+  boss?: string;
   /** Damage taken in the last 5 seconds, by source and type, largest first. */
   lines: { name: string; dtype: number; amount: number }[];
   /** Resistances (fire, cold, lightning, chaos) and their caps, at the moment of death. */
