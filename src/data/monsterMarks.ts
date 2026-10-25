@@ -191,7 +191,7 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     color: 0xd04040,
     shape: 'ring',
     aura: false,
-    desc: 'Reflects 10% of melee hit damage back as physical damage.',
+    desc: 'Reflects 2% of melee hit damage back as physical damage.',
   },
   festering: {
     color: 0x9ad04a,

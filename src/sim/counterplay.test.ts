@@ -134,7 +134,7 @@ describe('counterplay monster mods (EXPANSION 7.2)', () => {
     expect(melee.skill.behaviour.kind).toBe('melee');
     applyHit(world, player, mon, melee, ok(1000));
     expect(player.life).toBeLessThan(100000);
-    expect(100000 - player.life).toBeGreaterThan(50);
+    expect(100000 - player.life).toBeGreaterThan(10);
     const before = player.life;
     const ranged = {
       ...melee,

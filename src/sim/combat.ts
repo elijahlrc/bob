@@ -98,7 +98,7 @@ const CHAOS = 4;
 /** Seconds of damage kept for the death recap. */
 const DAMAGE_LOG_TIME = 10;
 /** Share of a melee hit that a Thorned monster reflects as physical damage. */
-const THORNS_SHARE = 0.1;
+const THORNS_SHARE = 0.02;
 const OVERLOAD_TIME = 8;
 
 export function lifeCap(a: Actor): number {
@@ -634,7 +634,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
   if (src.isPlayer && wasAlive && p.skill.behaviour.kind === 'melee' && res.total > 0) {
     const share = thornsShare(dst);
-    if (share > 0) rawHit(w, src, res.total * share, 0, null);
+    if (share > 0) rawHit(w, src, res.total * share, 0, null, 'Thorns');
   }
   if (dst.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
   const afterHit = () => {

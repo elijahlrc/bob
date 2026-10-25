@@ -230,7 +230,7 @@ function drainExplosions(w: World, s: Side): void {
         if (o.id === q.from) return;
         if (Math.hypot(o.x - q.x, o.y - q.y) > q.r + o.r) return;
         wake(w, o);
-        rawHit(w, o, q.amount, q.type, s);
+        rawHit(w, o, q.amount, q.type, s, 'Explosion');
       });
     }
   } finally {
