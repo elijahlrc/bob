@@ -15,6 +15,13 @@ change, and our own names only. Dash bullets under plain headings.
 - In duels each life is tougher than the last, and culling strikes and shatter no longer get past a Bargain Coin.
 - Search boxes take commas: every term must match, so "area, attack" finds gems with both.
 - On the Skills tab, a gem found on your last map wears a NEW tag.
+- New players get a few short tips through their first map, camp and passive tree; "Show the tips again" on the title screen brings them back.
+- Your first skill gem goes straight into a socket, later ones offer to, and the game asks before a map with no usable skill or an item swap that would cost you one.
+- The fifth map's reward picks now include a support gem that works with your main skill.
+- The title screen puts New Run front and centre, stats and gem tags explain themselves on hover or tap, and the mana orb flashes when your main skill can't be paid for.
+- Boss maps' cards now count the boss's own damage types, and the Tollkeeper's warning gives the right toll timing and no longer says a stun stops it.
+- Many skills get back what set them apart, among them their own attack speeds, Blaze Trap's burning ground and a channelled Crackle Ring; only one colossus stands at a time.
+- Chilling Shard now loses over half its damage by the end of its range but flies faster with level, and Glacier Dart flies much slower.
 
 ## 2026-10-24
 
