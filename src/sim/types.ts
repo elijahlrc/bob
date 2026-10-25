@@ -422,7 +422,12 @@ export type FlaskState = {
 export type SimEvent =
   /** A Reprieve fired (docs/WAYSIDE.md 7): the character (`src`) was pulled out of the map, or stood up again. */
   | { t: 'reprieve'; src: number; how: 'retreat' | 'revive'; id: string }
-  /** `immune`: it struck a character that cannot be hurt just after a Revive, so it dealt nothing. */
+  /**
+   * `immune`: it struck a character that cannot be hurt just after a Revive, so it dealt nothing. `warded`: a Warden Pylon in range
+   * kept it from dealing anything (`amount` is 0). `curled`: a curled beetle took less physical damage (`amount` is what was left).
+   * `side`: damage with no attacker of its own (an explosion, an aura, a minion's blow) that a side dealt, by that side's id.
+   * `reflect`: it is the reflection of a melee hit, thrown back by the actor with this id.
+   */
   | {
       t: 'hit';
       src: number;
@@ -431,7 +436,15 @@ export type SimEvent =
       crit: boolean;
       dtype: number;
       immune?: boolean;
+      warded?: boolean;
+      curled?: boolean;
+      side?: number;
+      reflect?: number;
     }
+  /** `src` threw back part of a melee hit at `dst` (a Thorned monster, a Gilded Guard, a character's reflection). */
+  | { t: 'reflect'; src: number; dst: number; amount: number; dtype: number }
+  /** An enemy was thrown back by a hit or a pulse: it is drawn sliding to where it landed. */
+  | { t: 'knock'; id: number }
   | { t: 'dot'; dst: number; amount: number }
   | { t: 'miss'; src: number; dst: number }
   | { t: 'block'; src: number; dst: number }

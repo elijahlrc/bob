@@ -105,6 +105,18 @@ lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Thing
 and `skillFx.test.ts` checks that every gem queues an effect when it is used or when its blow lands. A new behaviour kind
 fails to compile until `deliveryOf` handles it.
 
+## Hits: numbers, reflections, protection
+
+- **Whose damage earns a number.** The character's hits and every hit on a character, as before; and now the damage a side deals with no attacker of
+  its own on an enemy (an explosion, a mine's aura, a relic or burning aura, a corpse burst, a minion's blow): the `hit` event carries `side`. These
+  are kept from flooding by `NumberGate` (`hitFx.ts`): the first number on a target shows at once, the rest of a 0.3 s window are summed into one.
+- **A reflection** (a Thorned monster, a Gilded Guard, a character's reflect) is a `reflect` event (`src` threw it, `dst` took it) and the `hit` that
+  comes with it carries `reflect`: a ring of red spikes flashes on the one that threw it and the number lands on the other with the word _Thorns_. A
+  monster that reflects by its kind wears the Thorned pip (`pips.ts`), from the first, even undamaged.
+- **A protected hit shows what it did.** A monster under a Warden Pylon takes nothing: the `hit` has `warded` and `amount` 0 and shows the word
+  _Warded_ and sparks. A curled beetle's `hit` has `curled` and the damage it really took, in grey.
+- **A knockback** is a `knock` event; the figure eases to where it landed over about 0.3 s (`AnimTrack.knocked`) instead of snapping.
+
 ## Sim events the effects use
 
 `use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `beam` (with its

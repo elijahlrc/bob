@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { MOD_MARKS, RARITY_COLOR, type ModShape } from '../../data/monsterMarks';
 import { tone } from '../../data/palette';
 import type { Actor, World } from '../../sim/types';
+import { pipsOf, reflectsUnmarked } from './pips';
 import { isViewer } from './who';
 
 export type MarkTheme = {
@@ -62,8 +63,13 @@ export class MonsterMarks {
       // The viewer's own character has the HUD; the rival of a duel is marked like an enemy.
       if (isViewer(a) || !a.alive) continue;
       const sel = a.id === selectedId;
+      // (A normal monster that reflects wears its pip from the first, so that it is known before the first blow.)
       const interesting =
-        a.rarity !== 'normal' || sel || a.life < a.def.maxLife || a.es < a.def.maxEs;
+        a.rarity !== 'normal' ||
+        sel ||
+        a.life < a.def.maxLife ||
+        a.es < a.def.maxEs ||
+        reflectsUnmarked(a);
       if (!interesting) continue;
       const p = pos(a);
       if (!p) continue;
@@ -137,13 +143,14 @@ export class MonsterMarks {
       }
 
       // Affix pips, one per affix, centred above the bar: stones in gold settings.
-      const n = a.modIds.length;
+      const pips = pipsOf(a);
+      const n = pips.length;
       if (n > 0) {
         const step = Math.round(u * 3.2);
         let x = Math.round(p.x - ((n - 1) * step) / 2);
         by -= Math.round(u * 2.6);
-        for (const id of a.modIds) {
-          this.pip(x, by, u, MOD_MARKS[id].color, MOD_MARKS[id].shape);
+        for (const pip of pips) {
+          this.pip(x, by, u, pip.color, pip.shape);
           x += step;
         }
       }

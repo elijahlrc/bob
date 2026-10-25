@@ -369,6 +369,7 @@ export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void 
     x = c.x;
     y = c.y;
   }
+  if (x !== dst.x || y !== dst.y) w.events.push({ t: 'knock', id: dst.id });
   dst.x = x;
   dst.y = y;
 }
@@ -523,14 +524,19 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   let dtype = 0;
   for (let i = 1; i < 5; i++) if (res.dmg[i] > res.dmg[dtype]) dtype = i;
+  const shown = shelteredAmount(w, dst, res.total, res.dmg[0]);
   w.events.push({
     t: 'hit',
     src: src.id,
     dst: dst.id,
-    amount: res.total,
+    amount: shown.amount,
     crit: res.crit,
     dtype,
     ...(dst.isPlayer && invulnerable(dst.side!) ? { immune: true } : {}),
+    ...(shown.warded ? { warded: true } : {}),
+    ...(shown.curled ? { curled: true } : {}),
+    // A character's minion is not in `world.actors`: its blows name their side, so the renderer knows whose they are.
+    ...(!src.isPlayer && src.side ? { side: src.side.id } : {}),
   });
   if (how) noteHit(w, dst, how, res.total, res.crit);
   if (dst.isPlayer) logDamage(w, dst, src, src.name, dtype, res.total);
@@ -634,7 +640,8 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     dst.mana = Math.max(0, dst.mana - (dst.def.maxMana * p.manaDrain) / 100);
   if (src.isPlayer && wasAlive && p.skill.behaviour.kind === 'melee' && res.total > 0) {
     const share = thornsShare(dst);
-    if (share > 0) rawHit(w, src, res.total * share, 0, null, 'Thorns');
+    if (share > 0)
+      rawHit(w, src, res.total * share, 0, null, 'Thorns', 'player', undefined, dst.id);
   }
   if (dst.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
   const afterHit = () => {
@@ -955,7 +962,8 @@ function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: Hit
     return;
   const d = dst.def;
   for (let t = 0; t < 5; t++)
-    if (d.reflect[t] > 0) rawHit(w, src, d.reflect[t], t, dst.side!, 'Reflect');
+    if (d.reflect[t] > 0)
+      rawHit(w, src, d.reflect[t], t, dst.side!, 'Reflect', 'player', undefined, dst.id);
   // (The share is of the hit as it was before a duel's scale, which the reflection is given when it lands. `res.dmg[0] > 0` says the
   // scale is not 0.)
   if (d.reflectPhysPct > 0 && res.dmg[0] > 0 && src.alive)
@@ -966,6 +974,9 @@ function reflectBack(w: World, src: Actor, dst: Actor, p: SkillProfile, res: Hit
       0,
       dst.side!,
       'Reflect',
+      'player',
+      undefined,
+      dst.id,
     );
 }
 
@@ -1007,6 +1018,7 @@ export function rawHit(
   label = 'Explosion',
   by: 'player' | 'minion' = 'player',
   via?: string,
+  reflector?: number,
 ): void {
   noteCause(dst, 0, by === 'minion', [], owner ?? undefined);
   const dmg = [0, 0, 0, 0, 0];
@@ -1039,14 +1051,22 @@ export function rawHit(
     dmg[i] *= (1 + dst.hex.vulnAll) * (1 + st.vulnType[i]);
   }
   const total = dmg[0] + dmg[1] + dmg[2] + dmg[3] + dmg[4];
+  const shown = shelteredAmount(w, dst, total, dmg[0]);
+  // A reflection is told apart so that the renderer can show where it came from (the reflecting actor) and what was thrown back.
+  if (reflector !== undefined && shown.amount > 0)
+    w.events.push({ t: 'reflect', src: reflector, dst: dst.id, amount: shown.amount, dtype: type });
   w.events.push({
     t: 'hit',
     src: 0,
     dst: dst.id,
-    amount: total,
+    amount: shown.amount,
     crit: false,
     dtype: type,
     ...(dst.isPlayer && invulnerable(dst.side!) ? { immune: true } : {}),
+    ...(shown.warded ? { warded: true } : {}),
+    ...(shown.curled ? { curled: true } : {}),
+    ...(owner ? { side: owner.id } : {}),
+    ...(reflector !== undefined ? { reflect: reflector } : {}),
   });
   if (dst.isPlayer) logDamage(w, dst, null, label, type, total, via);
   // The map report: an effect on the character is its own row (a blast counts as a hit), one on a monster is the skill's or the
@@ -1057,6 +1077,23 @@ export function rawHit(
     : { name: label, kind: by === 'minion' ? 'minion' : 'skill', side };
   if (dst.isPlayer) noteHit(w, dst, how, total, false);
   applyDamage(w, dst, dmg, how);
+}
+
+/**
+ * What a hit on `dst` will really deal, for the event that tells the renderer (`applyDamage` does the work): a monster under a
+ * Warden Pylon takes nothing, and a curled beetle loses most of its physical share. `phys` is the physical part of `total`.
+ */
+export function shelteredAmount(
+  w: World,
+  dst: Actor,
+  total: number,
+  phys: number,
+): { amount: number; warded: boolean; curled: boolean } {
+  if (!dst.mon) return { amount: total, warded: false, curled: false };
+  if (w.hasPylons && shieldedByPylon(w, dst)) return { amount: 0, warded: true, curled: false };
+  if (dst.curlT > 0 && phys > 0)
+    return { amount: total - phys * CURL_LESS, warded: false, curled: true };
+  return { amount: total, warded: false, curled: false };
 }
 
 /** Who a hit is credited to in the map report. */

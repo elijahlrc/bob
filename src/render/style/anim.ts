@@ -41,6 +41,10 @@ function attackTime(act: Action): number {
   return 0.6 + 0.4 * ((u - end) / Math.max(1e-6, 1 - end));
 }
 
+/** How long a knocked-back figure slides, and how fast it closes the distance (per second; the walk's own chase is 24). */
+const KNOCK_SLIDE = 0.3;
+const KNOCK_RATE = 11;
+
 /** Per-actor animation state tracked on the renderer side (never written back to the sim). */
 export class AnimTrack {
   px = NaN;
@@ -74,6 +78,13 @@ export class AnimTrack {
    */
   releaseT = 99;
   private moves = -1;
+  /** Seconds left of the slide after a knockback (see `knocked`). */
+  slideT = 0;
+
+  /** The sim threw this actor back: it moves at once, so the picture eases there over a moment instead of snapping. */
+  knocked(): void {
+    if (!Number.isNaN(this.rx)) this.slideT = KNOCK_SLIDE;
+  }
 
   update(a: Actor, dt: number): void {
     const big = bigMove(a);
@@ -86,6 +97,20 @@ export class AnimTrack {
     if (Number.isNaN(this.px)) {
       this.px = this.rx = a.x;
       this.py = this.ry = a.y;
+    }
+    // Thrown back: an eased slide to where the sim put it, at a stagger rather than a walk (no stride, no turning round).
+    if (this.slideT > 0) {
+      this.slideT -= dt;
+      const k = 1 - Math.exp(-dt * KNOCK_RATE);
+      this.rx += (a.x - this.rx) * k;
+      this.ry += (a.y - this.ry) * k;
+      this.px = this.rx;
+      this.py = this.ry;
+      this.speed = 0;
+      this.hitT += dt;
+      this.idlePhase = (this.idlePhase + dt * 0.5) % 1;
+      if (!a.alive) this.deathT += dt;
+      return;
     }
     // Chase the sim position; snap on teleports. Animation speed/facing derive from the smoothed motion.
     if (Math.hypot(a.x - this.rx, a.y - this.ry) > 4) {

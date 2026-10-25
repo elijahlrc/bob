@@ -55,6 +55,7 @@ import {
   WALL_W,
 } from './isoPaint';
 import { BossFx } from './bossFx';
+import { CURLED_COLOR, DTYPE_COLOR, HitFx, numberKind, WARDED_COLOR, WARDED_WORD } from './hitFx';
 import {
   FLIGHT_HEIGHT,
   isLob,
@@ -99,7 +100,6 @@ const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
   shocking: { fill: 0x4a2a8a, edge: 0xc8a0ff },
   sigil: { fill: 0x3a1050, edge: 0xd070ff },
 };
-const DTYPE_COLOR = [0xeadfc8, 0xc89cff, 0x9ad8ff, 0xff9a40, 0x9ae05a];
 /** The gilded edge of a monster by rarity (docs/WORLD-LEAF.md 3.5); a boss has its ring and light instead. */
 const RIM_COLOR: Record<string, number> = {
   magic: MAP_RARITY.magic,
@@ -162,6 +162,7 @@ export class GrimStyle extends StyleBase {
   private fx!: SkillFx;
   private enc!: EncounterFx;
   private boss!: BossFx;
+  private hitFx!: HitFx;
   private pfx!: ProjectileFx;
   private lastSimT = 0;
   private temps: TempLight[] = [];
@@ -298,6 +299,8 @@ export class GrimStyle extends StyleBase {
     this.fx = new SkillFx(host, s);
     this.enc = new EncounterFx(host);
     this.boss = new BossFx(host);
+    this.hitFx?.destroy();
+    this.hitFx = new HitFx(host);
     this.pfx = new ProjectileFx(host, s);
     this.owned.push(...this.pfx.objects());
     this.placeProps(world, rng);
@@ -1304,6 +1307,7 @@ export class GrimStyle extends StyleBase {
     this.enc.frame(world, simDt, this.time, g);
     // The bosses' tells (docs/BOSSES.md).
     this.boss.frame(world, simDt, this.time, g);
+    this.hitFx.frame(simDt, this.time, g);
     for (const e of effects) {
       if (e.shape) continue;
       const { x, y } = this.project(e.x, e.y);
@@ -1514,6 +1518,7 @@ export class GrimStyle extends StyleBase {
     this.fx.onEvent(e, world);
     this.enc.onEvent(e, world);
     this.boss.onEvent(e, world);
+    this.hitFx.onEvent(e);
     switch (e.t) {
       case 'hit': {
         const dst = this.byId.get(e.dst) ?? world.actors.find((a) => a.id === e.dst);
@@ -1527,6 +1532,12 @@ export class GrimStyle extends StyleBase {
         if (e.immune) {
           em.spark.explode(4, p.x, p.y - 8);
           this.floater(p.x, p.y - 14, 'Immune', 0xfff2c0, false);
+          break;
+        }
+        // A Warden Pylon turned the blow aside: no wound, no bone, only the word.
+        if (e.warded) {
+          em.spark.explode(5, p.x, p.y - 10);
+          this.floater(p.x, p.y - 14, WARDED_WORD, WARDED_COLOR, false);
           break;
         }
         // The viewer's own character: red numbers and the screen shakes; the rival of a duel bleeds without the shake.
@@ -1564,8 +1575,19 @@ export class GrimStyle extends StyleBase {
           em.pop.particleTint = 0xffffff;
           em.pop.explode(1, p.x, p.y - 8);
         }
-        if (amt > 0 && (src?.isPlayer || dst.isPlayer))
-          this.floater(p.x, p.y - 14, String(amt), own ? 0xff5050 : DTYPE_COLOR[e.dtype], e.crit);
+        // A curled beetle: the blow rings off its shell.
+        if (e.curled) em.spark.explode(4, p.x, p.y - 8);
+        const kind = numberKind(e, !!src?.isPlayer, dst.isPlayer);
+        if (kind === 'direct')
+          this.floater(
+            p.x,
+            p.y - 14,
+            String(amt),
+            own ? 0xff5050 : e.curled ? CURLED_COLOR : DTYPE_COLOR[e.dtype],
+            e.crit,
+          );
+        else if (kind === 'effect')
+          this.hitFx.effectNumber(e.dst, amt, e.dtype, p.x, p.y - 14, this.time);
         break;
       }
       case 'miss': {
@@ -1862,6 +1884,7 @@ export class GrimStyle extends StyleBase {
     this.floaters = [];
     for (const l of [...this.lightsOwned]) this.dropLight(l);
     this.fx?.destroy();
+    this.hitFx?.destroy();
     this.collapse?.destroy();
     this.collapse = null;
     this.torches = [];
