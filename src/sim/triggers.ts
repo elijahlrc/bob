@@ -136,10 +136,13 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
     nearestEnemy(w, s) ??
     (ev.on === 'kill' ? ev.target : null);
   if (!target) return false;
+  // A triggered blink would carry the character off at the trigger's whim: only the other utility kinds are cast this way.
+  if (choice.skill.utility?.kind === 'blink') return false;
   const prof = s.char.profile(choice, playerConds(w, s, target), flaskMask(s));
   const act: Action = {
     profile: prof,
-    which: 'triggered',
+    // A buff, curse, shout, summon or offering is carried out as the character's own cast of it is (src/sim/utility.ts).
+    which: choice.skill.utility ? 'utility' : 'triggered',
     hand: 0,
     duration: 0,
     elapsed: 0,

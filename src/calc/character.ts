@@ -651,41 +651,45 @@ export class Character {
     >;
     // A utility skill in a socket is a source of its buff (it casts it).
     const utilBuffs = new Set<BuffId>();
-    for (const slot of EQUIP_SLOTS)
-      for (const g of build.equipment[slot]?.sockets ?? []) {
-        const gd = g ? gemDef(g.gemId) : null;
-        // A stance the character holds, and the buffs of a storm it can make.
-        if (gd?.kind === 'aura' && gd.stance) {
-          utilBuffs.add('bloodStance');
-          utilBuffs.add('sandStance');
-          if (!buffIdsGranted.has('sandStance')) this.briefBuffs.add('sandStance');
-        }
-        if (gd?.kind === 'active' && gd.ancestral) utilBuffs.add(gd.ancestral.buff);
-        if (gd?.kind === 'active' && gd.hitBuff) utilBuffs.add(gd.hitBuff.buff);
-        if (gd?.kind === 'active' && gd.utility?.kind === 'blink' && gd.utility.escape)
-          utilBuffs.add(gd.utility.escape.buff);
-        if (gd?.kind === 'active' && gd.stanceStorm) {
-          for (const id of [gd.stanceStorm.blood, gd.stanceStorm.sand]) {
-            utilBuffs.add(id);
-            if (!buffIdsGranted.has(id)) this.briefBuffs.add(id);
-          }
-        }
-        if (gd?.kind === 'active' && gd.utility?.kind === 'buff') {
-          utilBuffs.add(gd.utility.buff);
-          if (gd.utility.second) utilBuffs.add(gd.utility.second.buff);
-          // What a banner gives when it is put down is brief: the sheet does not count it as always up.
-          const pb = gd.utility.banner?.place.buff;
-          if (pb) {
-            utilBuffs.add(pb);
-            if (!buffIdsGranted.has(pb)) this.briefBuffs.add(pb);
-          }
-        }
-        // Penance: a melee hit on the cursed enemy grants a buff.
-        if (gd?.kind === 'active' && gd.utility?.kind === 'curse') {
-          const mb = HEXES[gd.utility.hex].meleeBuff;
-          if (mb) utilBuffs.add(mb);
+    const noteSource = (gd: ReturnType<typeof gemDef> | null) => {
+      // A stance the character holds, and the buffs of a storm it can make.
+      if (gd?.kind === 'aura' && gd.stance) {
+        utilBuffs.add('bloodStance');
+        utilBuffs.add('sandStance');
+        if (!buffIdsGranted.has('sandStance')) this.briefBuffs.add('sandStance');
+      }
+      if (gd?.kind === 'active' && gd.ancestral) utilBuffs.add(gd.ancestral.buff);
+      if (gd?.kind === 'active' && gd.hitBuff) utilBuffs.add(gd.hitBuff.buff);
+      if (gd?.kind === 'active' && gd.utility?.kind === 'blink' && gd.utility.escape)
+        utilBuffs.add(gd.utility.escape.buff);
+      if (gd?.kind === 'active' && gd.stanceStorm) {
+        for (const id of [gd.stanceStorm.blood, gd.stanceStorm.sand]) {
+          utilBuffs.add(id);
+          if (!buffIdsGranted.has(id)) this.briefBuffs.add(id);
         }
       }
+      if (gd?.kind === 'active' && gd.utility?.kind === 'buff') {
+        utilBuffs.add(gd.utility.buff);
+        if (gd.utility.second) utilBuffs.add(gd.utility.second.buff);
+        // What a banner gives when it is put down is brief: the sheet does not count it as always up.
+        const pb = gd.utility.banner?.place.buff;
+        if (pb) {
+          utilBuffs.add(pb);
+          if (!buffIdsGranted.has(pb)) this.briefBuffs.add(pb);
+        }
+      }
+      // Penance: a melee hit on the cursed enemy grants a buff.
+      if (gd?.kind === 'active' && gd.utility?.kind === 'curse') {
+        const mb = HEXES[gd.utility.hex].meleeBuff;
+        if (mb) utilBuffs.add(mb);
+      }
+    };
+    for (const slot of EQUIP_SLOTS) {
+      for (const g of build.equipment[slot]?.sockets ?? []) noteSource(g ? gemDef(g.gemId) : null);
+      // A skill an item casts on a trigger is a source of its buff too.
+      for (const t of build.equipment[slot]?.uniqueTriggers ?? [])
+        if (t.effect.kind === 'castGranted') noteSource(gemDef(t.effect.skillId));
+    }
     // A flask that holds a buff while it runs (the Onrush Draught) is a source of it too.
     for (const f of build.flasks) {
       const g = f ? flaskBase(f.baseId).grants : undefined;
@@ -1105,6 +1109,46 @@ export class Character {
         })),
       );
       this.cond.bit(bd.cond);
+    }
+    // A buff that only a trigger casts (an item's granted skill, a spell cast on a trigger) acts while its timer runs in the sim. The
+    // sheet leaves it out: it is up when the trigger fires, not always (so it is a brief buff, and has no steady uptime either).
+    const castBuffs = new Set<BuffId>();
+    for (const a of this.utilities) {
+      const u = a.skill.utility;
+      if (u?.kind !== 'buff') continue;
+      castBuffs.add(u.buff);
+      if (u.second) castBuffs.add(u.second.buff);
+    }
+    const trigBuffSkills = new Map<string, SkillChoice>();
+    for (const t of this.triggers)
+      for (const c of t.skills)
+        if (c.skill.utility?.kind === 'buff' && !trigBuffSkills.has(c.skill.id))
+          trigBuffSkills.set(c.skill.id, c);
+    for (const a of trigBuffSkills.values()) {
+      const u = a.skill.utility;
+      if (u?.kind !== 'buff') continue;
+      const src = { kind: 'gem' as const, id: a.skill.id };
+      for (const [id, ms] of [
+        [u.buff, u.mods],
+        ...(u.second ? [[u.second.buff, u.second.mods] as const] : []),
+      ] as const) {
+        const bd = BUFFS[id];
+        // A warcry's buff is scaled by `warcryEffect`, as on a character that casts it (a guard is left alone).
+        const cryEffect =
+          a.skill.tags.includes('warcry') && u.policy !== 'guard'
+            ? db0.mult('warcryEffect', ctx0)
+            : 1;
+        db0.addAll(
+          gemMods(ms, a.skill.level, a.skill.id).map((m) => ({
+            ...m,
+            value: m.kind === 'flag' ? m.value : m.value * cryEffect,
+            condition: { id: bd.cond },
+            source: src,
+          })),
+        );
+        this.cond.bit(bd.cond);
+        if (!castBuffs.has(id) && !buffIdsGranted.has(id)) this.briefBuffs.add(id);
+      }
     }
     // Utility buffs act while their timer runs (the sim) or, for the sheet, as if up; marks give their bonuses.
     for (const a of this.utilities) {

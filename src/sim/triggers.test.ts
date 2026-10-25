@@ -8,6 +8,7 @@ import { newRun, setMap } from '../run/run';
 import { scoreBuild } from '../run/bot';
 import { applyHit, killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
+import { summonCount } from './minions';
 import { MAX_EXPLOSIONS_PER_TICK, tickTriggers } from './triggers';
 import type { Actor, SimEvent, World } from './types';
 import { spawnMonster, stepWorld } from './world';
@@ -369,6 +370,76 @@ describe('calc ↔ sim convergence for triggers (EXPANSION 5.5)', () => {
       `sim ${(dmg / time).toFixed(1)} vs calc ${calc.skill.hitDps.toFixed(1)}`,
     ).toBeGreaterThan(0.95);
     expect(ratio).toBeLessThan(1.05);
+  });
+});
+
+describe('triggers: item-granted utility skills (buffs, curses, summons, blinks)', () => {
+  const granted = (skillId: string, level = 20): TriggerDef => ({
+    on: 'hit',
+    chance: 100,
+    cooldown: 0.5,
+    effect: { kind: 'castGranted', skillId, level },
+  });
+  /** Run the dummy fight until `stop` says so (or 20 s) and return the events seen on the way. */
+  function watch(b: Build, stop: (w: World, dummy: Actor) => boolean, seconds = 20) {
+    const { world, dummy } = createDummyWorld(b, { distance: 1.6, maxTime: seconds, seed: 1 });
+    world.sides[0].opts.freeResources = true;
+    const seen: SimEvent[] = [];
+    while (world.status === 'running') {
+      stepWorld(world);
+      seen.push(...world.events);
+      if (stop(world, dummy)) break;
+    }
+    return { world, dummy, seen };
+  }
+
+  it('a granted guard lands its buff on the caster', () => {
+    const b = buildFor([granted('ironHide')], []);
+    const { world, seen } = watch(b, (w) => w.sides[0].buffT.steelHide > 0);
+    expect(seen.some((e) => e.t === 'trigger' && e.skill === 'ironHide')).toBe(true);
+    expect(world.sides[0].buffT.steelHide).toBeGreaterThan(0);
+    expect(seen.some((e) => e.t === 'buff' && e.id === 'steelHide')).toBe(true);
+  });
+
+  it('a granted guard is a source of its buff, but the sheet does not count it as always up', () => {
+    const c = new Character(buildFor([granted('ironHide')], []), {});
+    expect(c.buffSource.steelHide).toBe(true);
+    expect(c.briefBuffs.has('steelHide')).toBe(true);
+    const plain = new Character(buildFor([], []), {});
+    expect(c.defence().maxLife).toBe(plain.defence().maxLife);
+  });
+
+  it('a granted curse falls on the enemy', () => {
+    const b = buildFor([granted('tinderCurse')], []);
+    const { dummy, seen } = watch(b, (_w, d) => d.hexes.length > 0);
+    expect(dummy.hexes.map((h) => h.id)).toContain('fireSap');
+    expect(seen.some((e) => e.t === 'hex' && e.hex === 'fireSap')).toBe(true);
+  });
+
+  it('a granted summon raises its minions, and a repeat renews them instead of adding more', () => {
+    const b = buildFor([granted('callFuries', 10)], []);
+    const { world, seen } = watch(b, () => false, 8);
+    const mine = world.sides[0].minions.filter((m) => m.alive);
+    expect(mine.length).toBeGreaterThan(0);
+    expect(seen.some((e) => e.t === 'summon')).toBe(true);
+    expect(new Set(mine.map((m) => m.key)).size).toBe(1);
+    const c = new Character(b, {});
+    const skill = c.triggers[0].skills[0]!;
+    expect(mine.length).toBe(summonCount(skill, c.profile(skill)));
+  });
+
+  it('a granted buff that is not a guard lands as well', () => {
+    const b = buildFor([granted('steadfastBellow')], []);
+    const { seen } = watch(b, () => false, 5);
+    expect(seen.some((e) => e.t === 'buff')).toBe(true);
+  });
+
+  it('a spell socketed under a cast-on-trigger item still lands its curse', () => {
+    const b = buildFor([onHit({ cooldown: 0.5 })], ['tinderCurse']);
+    const c = new Character(b, {});
+    expect(c.utilities.map((u) => u.skill.id)).not.toContain('tinderCurse');
+    const { dummy } = watch(b, (_w, d) => d.hexes.length > 0);
+    expect(dummy.hexes.map((h) => h.id)).toContain('fireSap');
   });
 });
 

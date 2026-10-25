@@ -334,7 +334,13 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
 
 /** What a utility cast does when it lands: the buff starts, the curse falls on the target and the pack around it, the player blinks. */
 export function applyUtility(w: World, a: Actor, act: Action): void {
-  const c = a.side!.char.utilities.find((x) => x.skill.id === act.profile.skill.id);
+  const ch = a.side!.char;
+  const id = act.profile.skill.id;
+  // A utility skill that a trigger casts (an item's granted skill, a spell cast on a trigger) is no skill the character casts
+  // itself: it stands among the trigger's skills, not the utilities.
+  const c = act.profile.skill.tags.includes('triggered')
+    ? ch.triggers.flatMap((t) => t.skills).find((x) => x.skill.id === id && x.skill.utility)
+    : ch.utilities.find((x) => x.skill.id === id);
   const u = c?.skill.utility;
   if (!c || !u) return;
   if (c.skill.tags.includes('warcry')) a.side!.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
