@@ -10,6 +10,7 @@ import { makeFlask, makeItem } from '../gen/items';
 import {
   gemWeight,
   mainAttr,
+  inClassAttrs,
   rollChest,
   rollDrop,
   rollFlask,
@@ -425,11 +426,14 @@ export function stash(run: RunState, it: CurrencyItem): void {
 
 /** The early maps that end with a pick of three skill gems (the others follow the every-fifth-map pick). */
 export const SKILL_REWARD_MAPS = 4;
+/** Through this map a pick's gems are all of the class's corner of the attributes (`inClassAttrs`). */
+export const OWN_ATTR_PICK_MAPS = 5;
 
 /**
- * Three different skill gems the run does not hold yet, that the weapons in hand can use (docs/NEWPLAYER.md N3): drawn as
- * the drops are weighted (the class's own attribute first, nothing special on the first maps), and at least one of them a
- * damage skill of the class's own attribute. As many as are left, if fewer.
+ * Three different skill gems the run does not hold yet, that the weapons in hand can use (docs/NEWPLAYER.md N3) and that
+ * need only the class's own attributes (`inClassAttrs`, through `OWN_ATTR_PICK_MAPS`): drawn as the drops are weighted
+ * (nothing special on the first maps), and at least one of them a damage skill of the class's main attribute. As many as
+ * are left, if fewer.
  */
 export function rollSkillRewards(run: RunState): AnyItem[] {
   const rng = new Rng(run.seed).fork(`skillreward${run.map}`);
@@ -439,15 +443,28 @@ export function rollSkillRewards(run: RunState): AnyItem[] {
     for (const g of it?.sockets ?? []) if (g) held.add(g.gemId);
   const hold = new Character(run.build).weaponHold();
   const weight = (g: ActiveGemDef) => gemWeight(g, run.build.classId, run.map);
-  const fits = (g: ActiveGemDef) => !held.has(g.id) && !weaponBar(g, hold);
-  // A map with nothing usable left (never at the start) falls back to every gem not held.
-  let pool = ACTIVE_GEMS.filter((g) => fits(g) && weight(g) > 0);
-  if (pool.length < 3) pool = ACTIVE_GEMS.filter((g) => !held.has(g.id) && gemStart(g) <= run.map);
+  const ownAttrs = (g: ActiveGemDef) =>
+    run.map > OWN_ATTR_PICK_MAPS || inClassAttrs(g, run.build.classId);
+  const open = (g: ActiveGemDef) => !held.has(g.id) && gemStart(g) <= run.map;
+  const fits = (g: ActiveGemDef) => open(g) && !weaponBar(g, hold) && ownAttrs(g);
+  // When the run holds most of what fits (a pure class has few gems of its own early), the three are topped up in turn
+  // from the gems held back early, then those of its attributes its weapon cannot use, and last from every gem not held.
+  const tiers = [
+    (g: ActiveGemDef) => fits(g) && weight(g) > 0,
+    fits,
+    (g: ActiveGemDef) => open(g) && ownAttrs(g),
+    open,
+  ];
   const picks: ActiveGemDef[] = [];
-  while (picks.length < 3 && pool.length) {
-    const g = rng.weighted(pool, (x) => Math.max(weight(x), 0.01));
-    picks.push(g);
-    pool = pool.filter((x) => x !== g);
+  let pool: ActiveGemDef[] = [];
+  for (const tier of tiers) {
+    pool = ACTIVE_GEMS.filter((g) => tier(g) && !picks.includes(g));
+    while (picks.length < 3 && pool.length) {
+      const g = rng.weighted(pool, (x) => Math.max(weight(x), 0.01));
+      picks.push(g);
+      pool = pool.filter((x) => x !== g);
+    }
+    if (picks.length === 3) break;
   }
   const main = mainAttr(run.build.classId);
   const own = (g: ActiveGemDef) => !g.utility && g.attr.includes(main);
@@ -490,6 +507,7 @@ export function rollRewards(run: RunState): RewardCard[] {
           classId: run.build.classId,
           ilvl,
           hold: new Character(run.build).weaponHold(),
+          ownAttrs: run.map <= OWN_ATTR_PICK_MAPS,
         }),
       );
     else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));

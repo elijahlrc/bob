@@ -440,6 +440,25 @@ export function mainAttr(classId: string): 'str' | 'dex' | 'int' {
   return a.str >= a.dex && a.str >= a.int ? 'str' : a.dex >= a.int ? 'dex' : 'int';
 }
 
+/**
+ * The class's corner of the attributes: those it starts above its lowest (one for a pure class, two for a hybrid; all
+ * three for a class with none above the others).
+ */
+export function classAttrs(classId: string): ('str' | 'dex' | 'int')[] {
+  const a = classDef(classId).attrs;
+  const low = Math.min(a.str, a.dex, a.int);
+  const own = (['str', 'dex', 'int'] as const).filter((k) => a[k] > low);
+  return own.length ? own : ['str', 'dex', 'int'];
+}
+
+/** Whether a gem needs only attributes of the class's corner (a strength class: strength gems; a hybrid: either or both). */
+export function inClassAttrs(g: GemDef, classId: string): boolean {
+  const own = classAttrs(classId);
+  return (g.attr.match(/str|dex|int/g) ?? []).every((k) =>
+    own.includes(k as 'str' | 'dex' | 'int'),
+  );
+}
+
 /** How much less often a skill gem drops when the weapons in hand cannot use it. */
 export const OFF_WEAPON_MULT = 0.5;
 
@@ -451,9 +470,15 @@ export const EARLY_ATTR_MULT = 4;
 export function rollGem(
   rng: Rng,
   uid: UidSource,
-  ctx: { classId?: string; ilvl?: number; hold?: WeaponHold } = {},
+  ctx: { classId?: string; ilvl?: number; hold?: WeaponHold; ownAttrs?: boolean } = {},
 ): GemItem {
-  const gem = rng.weighted(ALL_GEMS, (g) => gemWeight(g, ctx.classId, ctx.ilvl, ctx.hold));
+  const w = (g: GemDef) => gemWeight(g, ctx.classId, ctx.ilvl, ctx.hold);
+  // `ownAttrs`: only gems of the class's corner (`inClassAttrs`), while any can drop.
+  const own =
+    ctx.ownAttrs && ctx.classId
+      ? ALL_GEMS.filter((g) => inClassAttrs(g, ctx.classId!) && w(g) > 0)
+      : [];
+  const gem = rng.weighted(own.length ? own : ALL_GEMS, w);
   return { kind: 'gem', uid: uid(), gemId: gem.id };
 }
 
