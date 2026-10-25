@@ -195,11 +195,15 @@ describe('Glacier Wall: what the raising hits', () => {
     p.y = 15.5;
     // The wall stands across the way, east of the character: its line runs north to south through (14.5, 15.5).
     const aim = { x: 14.5, y: 15.5 };
+    const floor = Uint8Array.from(world.grid.tiles);
     const raise = (dx: number, dy: number): boolean => {
       dummy.x = aim.x + dx;
       dummy.y = aim.y + dy;
       world.events.length = 0;
+      // (A wall that ends gives its tiles back, as `endWall` does; this test drops the field instead.)
       world.sides[0].fields.length = 0;
+      world.grid.tiles.set(floor);
+      world.grid.refreshOpen();
       raiseWall(world, p, {
         profile: prof,
         which: 'primary',
@@ -218,8 +222,80 @@ describe('Glacier Wall: what the raising hits', () => {
     expect(raise(0, 0)).toBe(true);
     expect(raise(0, half - 0.2)).toBe(true);
     // Beside the middle of the wall, and past either end: the old circle took these, the band does not.
-    expect(raise(WALL_HALF + 0.9, 0)).toBe(false);
-    expect(raise(0, half + WALL_HALF + 0.5)).toBe(false);
+    expect(raise(WALL_HALF + dummy.r + 0.3, 0)).toBe(false);
+    expect(raise(0, half + WALL_HALF + dummy.r + 0.3)).toBe(false);
+  });
+});
+
+describe('Glacier Wall: the wall has no gaps', () => {
+  /** Raise a wall at `aim` with the character at `from` and the dummy at `at`; the tiles it closed, and the world. */
+  const raiseAt = (from: { x: number; y: number }, aim: { x: number; y: number }, at = aim) => {
+    const { world, dummy } = createDummyWorld(holding('wand_3', ['glacierWall'], 'mystic'), {
+      distance: 3,
+      maxTime: 60,
+    });
+    world.sides[0].opts.freeResources = true;
+    const c = world.sides[0].char.actives.find((x) => x.skill.id === 'glacierWall')!;
+    const prof = world.sides[0].char.profile(c, world.sides[0].char.configConds, 0);
+    const p = world.sides[0].player;
+    p.x = from.x;
+    p.y = from.y;
+    dummy.x = at.x;
+    dummy.y = at.y;
+    const was = Uint8Array.from(world.grid.tiles);
+    raiseWall(world, p, {
+      profile: prof,
+      which: 'primary',
+      hand: 0,
+      duration: 1,
+      elapsed: 1,
+      fired: true,
+      echoes: 0,
+      targetId: dummy.id,
+      aimX: aim.x,
+      aimY: aim.y,
+    });
+    const closed: [number, number][] = [];
+    for (let i = 0; i < was.length; i++)
+      if (was[i] === 1 && world.grid.tiles[i] === 0)
+        closed.push([i % world.grid.w, Math.floor(i / world.grid.w)]);
+    return { world, dummy, p, closed };
+  };
+
+  it('closes the middle even when the target stands in it', () => {
+    const { closed, world, dummy } = raiseAt({ x: 10.5, y: 15.5 }, { x: 14.5, y: 15.5 });
+    const col = closed.filter(([x]) => x === 14).map(([, y]) => y);
+    expect(col.sort((a, b) => a - b)).toEqual([13, 14, 15, 16, 17]);
+    // What stood in it is thrown clear, not left inside the ice.
+    expect(world.grid.isFloor(Math.floor(dummy.x), Math.floor(dummy.y))).toBe(true);
+  });
+
+  it('closes the tile under the character too, and puts the character beside it', () => {
+    const { closed, world, p } = raiseAt({ x: 14.5, y: 15.5 }, { x: 14.5, y: 15.5 });
+    expect(closed.filter(([x]) => x === 14)).toHaveLength(5);
+    expect(world.grid.isFloor(Math.floor(p.x), Math.floor(p.y))).toBe(true);
+  });
+
+  it('joins the tiles of a slanted wall edge to edge, so nothing slips between corners', () => {
+    const { closed } = raiseAt({ x: 10.5, y: 12.5 }, { x: 14.5, y: 15.5 });
+    expect(closed.length).toBeGreaterThan(3);
+    const key = (t: [number, number]) => `${t[0]},${t[1]}`;
+    const left = new Set(closed.map(key));
+    const stack = [closed[0]];
+    left.delete(key(closed[0]));
+    while (stack.length) {
+      const [x, y] = stack.pop()!;
+      for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ] as const) {
+        const k = `${x + dx},${y + dy}`;
+        if (left.delete(k)) stack.push([x + dx, y + dy]);
+      }
+    }
+    expect(left.size).toBe(0);
   });
 });
 

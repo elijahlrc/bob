@@ -782,16 +782,29 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
   const ang = Math.atan2(act.aimY - a.y, act.aimX - a.x) + Math.PI / 2;
   const tiles: number[] = [];
   const steps = Math.max(1, Math.round(len / 0.5));
+  // A fixed training dummy keeps its tile (it cannot be moved, and walled in it could not be seen); every other body is moved clear below.
+  const fixedOn = (tx: number, ty: number) =>
+    w.actors.some(
+      (e) => e.alive && e.dummy && e.stationary && Math.floor(e.x) === tx && Math.floor(e.y) === ty,
+    );
+  const add = (tx: number, ty: number) => {
+    const idx = ty * w.grid.w + tx;
+    if (!tiles.includes(idx) && w.grid.tiles[idx] === 1 && !fixedOn(tx, ty)) tiles.push(idx);
+  };
+  let prevX = NaN;
+  let prevY = NaN;
   for (let i = 0; i <= steps; i++) {
     const off = (i / steps - 0.5) * len;
     const tx = Math.floor(act.aimX + Math.cos(ang) * off);
     const ty = Math.floor(act.aimY + Math.sin(ang) * off);
-    const idx = ty * w.grid.w + tx;
-    if (tiles.includes(idx) || w.grid.tiles[idx] !== 1) continue;
-    // Never wall in the character, or a body.
-    if (Math.floor(a.x) === tx && Math.floor(a.y) === ty) continue;
-    if (w.actors.some((e) => e.alive && Math.floor(e.x) === tx && Math.floor(e.y) === ty)) continue;
-    tiles.push(idx);
+    // A line that steps across a corner would leave a gap between two tiles that only touch there: close it.
+    if (tx !== prevX && ty !== prevY && !Number.isNaN(prevX)) {
+      if (w.grid.tiles[prevY * w.grid.w + tx] === 1) add(tx, prevY);
+      else add(prevX, ty);
+    }
+    add(tx, ty);
+    prevX = tx;
+    prevY = ty;
   }
   if (tiles.length === 0) return;
   for (const idx of tiles) w.grid.tiles[idx] = 0;
@@ -850,6 +863,43 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     );
     e.x = spot.x;
     e.y = spot.y;
+  }
+  // The wall stands whole: whatever still touches its tiles (the character, a minion, an enemy that could not be thrown back) is moved
+  // sideways out of the ice, to the side it stood on, and never left in a gap.
+  const px = Math.cos(ang - Math.PI / 2);
+  const py = Math.sin(ang - Math.PI / 2);
+  const inIce = (e: Actor): boolean => {
+    for (let ty = Math.floor(e.y - e.r); ty <= Math.floor(e.y + e.r); ty++)
+      for (let tx = Math.floor(e.x - e.r); tx <= Math.floor(e.x + e.r); tx++)
+        if (tiles.includes(ty * w.grid.w + tx)) return true;
+    return false;
+  };
+  for (const e of w.actors) {
+    if (!e.alive || (e.dummy && e.stationary) || !inIce(e)) continue;
+    // The side it stands on; on the line itself, the character's side (a body that is behind the wall stays behind it).
+    const across = (e.x - act.aimX) * px + (e.y - act.aimY) * py;
+    const toCaster = (a.x - act.aimX) * px + (a.y - act.aimY) * py;
+    const side = Math.sign(across) || Math.sign(toCaster) || 1;
+    const x0 = e.x;
+    const y0 = e.y;
+    let cleared = false;
+    for (const dir of [side, -side]) {
+      for (let d = 0.6 + e.r; d <= 2.4 + e.r && !cleared; d += 0.3) {
+        const spot = w.grid.collide(
+          x0 + px * dir * (d - dir * across),
+          y0 + py * dir * (d - dir * across),
+          e.r,
+        );
+        e.x = spot.x;
+        e.y = spot.y;
+        cleared = !inIce(e);
+      }
+      if (cleared) break;
+    }
+    if (!cleared) {
+      e.x = x0;
+      e.y = y0;
+    }
   }
 }
 
