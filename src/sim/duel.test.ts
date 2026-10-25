@@ -363,14 +363,59 @@ describe('what a hit does to a character, as it does to a monster', () => {
     expect(sa.player.hexes).toHaveLength(0);
   });
 
-  it('a hit that leaves B at a tenth of its life or less finishes it (culling)', () => {
+  it('a hit that leaves B at a tenth of its life or less finishes it (culling), with no reprieve left', () => {
     const { sb } = strike(
       (_w, _sa, b) => {
+        b.reprieve.held = [];
         b.player.life = b.player.def.maxLife * 0.09 + 10;
       },
       { culling: true },
     );
     expect(sb.player.alive).toBe(false);
+  });
+
+  it('a culling or shattering blow on B spends B’s reprieve first, as damage that would kill does', () => {
+    const coins = { damageScale: 1, reprieves: 1 };
+    const blow = (tweak: Partial<SkillProfile>, frozen: boolean) => {
+      const w = createDuelWorld(vanguard(1), vanguard(2), 1, coins);
+      const [sa, sb] = w.sides;
+      const b = sb.player;
+      b.life = b.def.maxLife * 0.09 + 10;
+      const hit = () => {
+        if (frozen) b.ail.freezeT = 1;
+        applyHit(
+          w,
+          sa.player,
+          b,
+          { ...sa.char.profile(sa.primary, 0), ...tweak },
+          {
+            outcome: 'hit',
+            crit: false,
+            dmg: [10, 0, 0, 0, 0],
+            rawPhys: 10,
+            total: 10,
+            H: [10, 0, 0, 0, 0],
+            ailments: { ignite: 0, bleed: 0, poison: 0, shock: 0, chill: 0, freeze: 0 },
+            stun: 0,
+          },
+        );
+      };
+      hit();
+      const first = { alive: b.alive, fired: [...sb.reprieve.fired] };
+      // The coin spent, the next such blow finishes B.
+      b.life = b.def.maxLife * 0.09 + 10;
+      sb.reprieve.invulnT = 0;
+      hit();
+      return { first, after: b.alive };
+    };
+    for (const [tweak, frozen] of [
+      [{ culling: true }, false],
+      [{ shatter: true }, true],
+    ] as const) {
+      const { first, after } = blow(tweak, frozen);
+      expect(first).toEqual({ alive: true, fired: ['bargainCoin'] });
+      expect(after).toBe(false);
+    }
   });
 
   it('what B has done to A is B’s: A’s hit does not hurt A', () => {

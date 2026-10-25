@@ -332,6 +332,15 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   return total;
 }
 
+/**
+ * Whether a blow that finishes its target outright (a culling strike, a shatter) is turned aside: a character (a duel's opponent)
+ * falls to one only as to damage that would kill, so its reprieve fires first and God mode holds (DESIGN.md Appendix A,
+ * 2026-10-24).
+ */
+function spared(w: World, dst: Actor): boolean {
+  return dst.isPlayer && (!!dst.side!.opts.godMode || reprieveFires(w, dst.side!));
+}
+
 function addLeech(
   src: Actor,
   list: 'life' | 'mana' | 'es',
@@ -610,8 +619,13 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     payImpales(w, dst, src.side ?? undefined);
     recordImpale(w, src.side!, dst, p, res);
     reflectBack(w, src, dst, p, res);
-    // Culling strike: a hit that leaves the target at 10% life or less finishes it.
-    if (p.culling && dst.team !== src.team && dst.life <= dst.def.maxLife * CULLING_SHARE)
+    // Culling strike: a hit that leaves the target at 10% life or less finishes it (a character's reprieve fires first).
+    if (
+      p.culling &&
+      dst.team !== src.team &&
+      dst.life <= dst.def.maxLife * CULLING_SHARE &&
+      !spared(w, dst)
+    )
       killActor(w, dst);
   }
   // A beetle that is hit curls up for a moment (then cannot again for three seconds); fire opens it again.
@@ -670,14 +684,15 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       w.events.push({ t: 'stun', dst: dst.id, dur: p.stunFixed });
     }
     if (p.knockback > 0 && res.outcome === 'hit') knockBack(w, src, dst, p.knockback);
-    // A frozen enemy on less than a third of its life is shattered.
+    // A frozen enemy on less than a third of its life is shattered (a character's reprieve fires first).
     if (
       p.shatter &&
       dst.alive &&
       dst.ail.freezeT > 0 &&
       dst.life < dst.def.maxLife / 3 &&
       dst.rarity !== 'boss' &&
-      dst.rarity !== 'miniboss'
+      dst.rarity !== 'miniboss' &&
+      !spared(w, dst)
     ) {
       w.events.push({ t: 'shatter', id: dst.id });
       killActor(w, dst);
