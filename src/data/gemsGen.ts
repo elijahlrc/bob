@@ -1062,6 +1062,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       count: 1,
       spread: 0,
       range: 5,
+      falloff: 0.4,
     },
     spellDamage: [
       {
@@ -1084,8 +1085,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 20,
       },
+      {
+        stat: 'projectileSpeed',
+        kind: 'inc',
+        value: [0, 19],
+      },
     ],
-    description: 'A shard of ice that passes through its victims and may freeze them.',
+    description:
+      'A fast shard of ice that passes through its victims and may freeze them, hitting hardest up close.',
   },
   {
     kind: 'active',
@@ -1179,7 +1186,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.75,
     crit: 5,
     cost: [6, 25],
-    mods: [],
+    mods: [
+      {
+        stat: 'projectileSpeed',
+        kind: 'more',
+        value: -40,
+      },
+    ],
     description: 'A slow shard of ice that pierces everything in its path.',
   },
   {
