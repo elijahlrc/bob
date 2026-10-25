@@ -485,6 +485,14 @@ svg.tree {
 .items-reward .reward .notice {
   flex-basis: 100%;
 }
+/* Where the gem just taken went, and the no-skill warning (docs/NEWPLAYER.md N7): the line and its one button. */
+.gem-taken {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 12px;
+}
 .hint {
   font-size: 12px;
 }

@@ -262,7 +262,13 @@ function utilitySlot(w: World, c: SkillChoice): SkillSlot {
 export function skillSlots(w: World): SkillSlot[] {
   const ch = w.sides[0].char;
   const out: SkillSlot[] = [];
-  out.push(damageSlot(w, ch.primary, ch.primary.gemUid === null ? 'Basic attack' : 'Primary'));
+  const first = damageSlot(w, ch.primary, ch.primary.gemUid === null ? 'Basic attack' : 'Primary');
+  // Why the weapon's attack stands in (docs/NEWPLAYER.md N7): no skill gem is socketed, or none socketed can be used.
+  if (ch.primary.gemUid === null)
+    first.detail += ch.actives.length
+      ? ' · No socketed skill can be used with this weapon'
+      : ' · No skill gem socketed: put one in a socket at camp';
+  out.push(first);
   // The other main skills (the Strategy tab), then the other damage skills in the order the character considers them.
   for (const e of ch.mains.slice(1)) out.push(damageSlot(w, e.choice, 'Primary'));
   for (const e of ch.rotation)

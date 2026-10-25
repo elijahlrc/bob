@@ -29,6 +29,7 @@ import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
 import { useRehearsal } from './rehearsal';
+import { introSeen, seeIntro } from './intro';
 
 const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Auras'] as const;
 
@@ -115,6 +116,7 @@ export function Skills({
   // A gem from the bag picked, and the socket that holds a gem it would replace: read before committing (docs/EQUIP.md 3.6).
   const [pending, setPending] = useState<SocketRef | null>(null);
   const [hint, setHint] = useState(() => !loadPref<boolean>('skills.hintSeen', false));
+  const [supportSeen, setSupportSeen] = useState(() => introSeen('support'));
   // A copy painted ahead out of sight (rehearsal.ts) has not been seen.
   const rehearsal = useRehearsal();
   useEffect(() => {
@@ -460,7 +462,9 @@ export function Skills({
         </button>
         {hint && (
           <p class="sk-hint" data-paint="panel" data-thin>
-            ★ is your main skill. Other skills are used every so often: the Strategy tab says when.
+            Skill gems are your character's skills: put them in sockets on your gear. A support gem
+            changes the skills in the same item. ★ marks the main skill; the Strategy tab says when
+            the others are used.
           </p>
         )}
       </div>
@@ -470,6 +474,16 @@ export function Skills({
             <div class="sk-warn" data-paint="panel" data-field="vermilion" data-thin>
               No usable active skill: using the default attack.
             </div>
+          )}
+          {!supportSeen && !rehearsal && (
+            <FirstSupport
+              gems={gems}
+              ch={ch}
+              onSeen={() => {
+                seeIntro('support');
+                setSupportSeen(true);
+              }}
+            />
           )}
           {msg && (
             <div class="sk-warn" data-paint="panel" data-field="vermilion" data-thin>
@@ -499,7 +513,13 @@ export function Skills({
                       const isSel = sel?.from === 'socket' && sameSocket(sel, ref);
                       const dropHere = over === key;
                       const chain = i < it.sockets.length - 1 && (
-                        <span class="sk-chain" data-paint="chain" aria-hidden="true" />
+                        <span
+                          class="sk-chain"
+                          data-paint="chain"
+                          {...infoProps(
+                            'Linked: a support gem works on the skills in the same item.',
+                          )}
+                        />
                       );
                       const common = {
                         onDragOver: (e: DragEvent) => {
@@ -748,6 +768,41 @@ export function Skills({
         </section>
       </div>
       {tip && <GemTip {...tip} />}
+    </div>
+  );
+}
+
+/**
+ * The first support gem in the bag, explained once per device (docs/NEWPLAYER.md N7): what a support does, and whether this one
+ * works with the main skill.
+ */
+function FirstSupport({
+  gems,
+  ch,
+  onSeen,
+}: {
+  gems: GemItem[];
+  ch: Character;
+  onSeen: () => void;
+}) {
+  const g = gems.find((x) => gemDef(x.gemId).kind === 'support');
+  if (!g) return null;
+  const sup = gemDef(g.gemId);
+  const main = ch.primary.gemUid !== null ? ch.primary.skill : null;
+  const fits =
+    sup.kind === 'support' &&
+    !!main &&
+    typesAllow(sup, new Set(main.types)) &&
+    supportLive(sup, main).live;
+  return (
+    <div class="tip" data-paint="panel" data-thin>
+      <div class="tip-text">
+        Support gems change the skills in the same item.
+        {fits && ` ${sup.name} works with ${main!.name}: put it in the same item.`}
+      </div>
+      <button class="btn small" onClick={onSeen}>
+        Got it
+      </button>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
 import type { ItemClass } from '../data/types';
 import type { Controller } from '../run/controller';
+import { seatFirstSkill } from '../run/inventoryOps';
 import { takeReward } from '../run/run';
 import { useViewport } from './device';
 import { gemCardData } from './gemText';
@@ -102,7 +103,7 @@ function cardKind(o: RewardCard): string | null {
  * take a reward the player has not been able to read. Each offer is an object on a small plaque with a thin gold rim;
  * the marked one has the heavy rim.
  */
-export function Reward({ c }: { c: Controller }) {
+export function Reward({ c, onTaken }: { c: Controller; onTaken?: (uid: number) => void }) {
   const run = c.run!;
   const { coarse } = useViewport();
   const [hover, setHover] = useState<number | null>(null);
@@ -111,8 +112,14 @@ export function Reward({ c }: { c: Controller }) {
   const shown = offers.find((o) => o.uid === (coarse ? (picked ?? hover) : hover));
   const [note, setNote] = useState<string | null>(null);
   const take = (uid: number | null) => {
-    const ok = c.act((r) => takeReward(r, uid));
+    // The run's first skill gem goes straight into a socket (docs/NEWPLAYER.md N7); the camp then says where it is.
+    const ok = c.act((r) => {
+      const took = takeReward(r, uid);
+      if (took && uid !== null) seatFirstSkill(r, uid);
+      return took;
+    });
     setNote(ok === false ? 'That does not fit now: your pouch is full.' : null);
+    if (ok && uid !== null) onTaken?.(uid);
   };
   // With a mouse the preview floats by the pointer (it would push the page down in the flow), kept inside the window.
   const tip = useRef<HTMLDivElement>(null);

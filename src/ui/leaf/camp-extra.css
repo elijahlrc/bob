@@ -119,6 +119,16 @@ html.leaf .items-reward .reward {
 html.leaf .items-reward .reward .reward-preview {
   flex-basis: auto;
 }
+/* Where the gem just taken went (docs/NEWPLAYER.md N7): a plaque the width of its words, centred, like the camp's notices. */
+html.leaf .notice.gem-taken {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 10px 22px;
+  font-size: var(--size);
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+}
 
 /* ---- The boss's own map: a wide arched niche with a vermilion plaque hung over its arch ---- */
 html.leaf .boss-offer-wrap {

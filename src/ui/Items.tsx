@@ -23,9 +23,13 @@ import {
   junkItems,
   quickEquip,
   searchText,
+  skillsLost,
+  swapSockets,
   type SocketRef,
   sortItems,
 } from '../run/inventoryOps';
+import { Character } from '../calc/character';
+import { gemDef } from '../data/gems';
 import { isFavourite, markSeen, toggleFavourite } from '../run/found';
 import { ask } from './Confirm';
 import { CleanUp } from './CleanUp';
@@ -212,10 +216,29 @@ export function Items({
     if (r && r.ok) ok();
   };
 
-  const equipTo = (uid: number, slot: EquipSlot) => {
+  const equipTo = async (uid: number, slot: EquipSlot) => {
     const item = run.inventory.find((x) => x.uid === uid);
     if (!item) return;
     const dry = dryEquip(run, uid, slot);
+    // A swap that takes a skill away asks first (docs/NEWPLAYER.md N8).
+    const lost = skillsLost(swapSockets(run, uid, slot));
+    if (lost.length) {
+      const primary = new Character(run.build).primary.gemUid;
+      const ok = await ask({
+        title: `Wear ${itemTitle(item)}?`,
+        body:
+          lost.length === 1
+            ? `${gemDef(lost[0].gem.gemId).name} stops working.`
+            : 'These skills stop working.',
+        facts: lost.map(
+          (l) =>
+            `${gemDef(l.gem.gemId).name}${l.gem.uid === primary ? ' (your main skill)' : ''} ${l.why}`,
+        ),
+        confirm: 'Wear it',
+        danger: lost.some((l) => l.gem.uid === primary),
+      });
+      if (!ok || c.run !== run || !run.inventory.some((x) => x.uid === uid)) return;
+    }
     const r = c.act((rn) => equip(rn, uid, slot));
     after(r, () => {
       const back = dry.toBag;

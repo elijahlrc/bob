@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { makeGem, makeItem } from '../gen/items';
 import type { GemItem, Item } from '../data/types';
 import { dryEquip, equip, socketGem } from './inventory';
-import { compareSlots, itemInfos, placementsFor } from './inventoryOps';
+import { compareSlots, itemInfos, placementsFor, skillsLost, swapSockets } from './inventoryOps';
 import { newRun } from './run';
 
 /** A run with no gems anywhere, at level 30 so most bases fit, and helpers to build gear for it. */
@@ -223,5 +223,31 @@ describe('placements say why a support has nowhere to work', () => {
     const onBody = ps.find((p) => p.slot === 'body')!;
     expect(onHelmet.idle).toMatch(/^needs an? .*skill on this item$/);
     expect(onBody.idle).toBeUndefined();
+  });
+});
+
+/** What a swap takes away from the skills, for the bag row and the question before it (docs/NEWPLAYER.md N8). */
+describe('skills a swap takes away', () => {
+  it('a weapon that cannot use a socketed skill: the row names it and the swap reports it lost', () => {
+    const { run, uid, wearBody, carry } = setup('strider');
+    wearBody(1, ['splitVolley']);
+    run.build.equipment.mainHand = makeItem(uid, 'bow_1', 30);
+    delete run.build.equipment.offHand;
+    const sword = carry(0, 'sword_1');
+    const info = itemInfos(run).get(sword.uid)!;
+    if (info.slot === 'mainHand') expect(names(info.skillsIdle)).toEqual(['splitVolley']);
+    const lost = skillsLost(swapSockets(run, sword.uid, 'mainHand'));
+    expect(lost.map((l) => l.gem.gemId)).toEqual(['splitVolley']);
+    expect(lost[0].why).toMatch(/bow/);
+  });
+
+  it('a skill with no socket left goes to the bag; a support alone is not a lost skill', () => {
+    const { run, wearBody, carry } = setup();
+    wearBody(3, ['echoingCast', 'flameBolt', 'kindle']);
+    const one = carry(1);
+    // Echoing Cast keeps the one socket; Flame Bolt is the skill that goes, Kindle a support that is not counted.
+    const lost = skillsLost(swapSockets(run, one.uid, 'body'));
+    expect(lost.map((l) => l.gem.gemId)).toEqual(['flameBolt']);
+    expect(lost[0].why).toMatch(/bag/);
   });
 });

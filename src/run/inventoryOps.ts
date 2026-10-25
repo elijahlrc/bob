@@ -57,6 +57,8 @@ export type ItemInfo = {
   replaces?: Item;
   /** The gems the best-slot swap sends to the bag (a row's warning; no sheet is worked out for it). */
   gemsOut: GemItem[];
+  /** The worn skill gems the best-slot swap leaves unable to work (a weapon they cannot be used with). */
+  skillsIdle: GemItem[];
   /** A flask that would fill an empty flask slot (one of the best few, as many as there are empty slots). */
   fillsFlask?: boolean;
 };
@@ -119,6 +121,7 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
   const base = sheetOf(run);
   const baseScore = score(base);
   const out = new Map<number, ItemInfo>();
+  let now: Character | undefined;
   for (const it of run.inventory) {
     const info: ItemInfo = {
       uid: it.uid,
@@ -131,6 +134,7 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
       ehpPct: 0,
       scorePct: 0,
       gemsOut: [],
+      skillsIdle: [],
     };
     if (it.kind === 'flask') {
       info.equippable = flaskBase(it.baseId).level <= run.build.level;
@@ -157,6 +161,14 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
           info.scorePct = pct(baseScore, sc);
           info.replaces = run.build.equipment[slot];
           info.gemsOut = dry.sockets.out;
+          // Only a weapon or an off hand changes which skills can be used; the check needs a Character, so only for those.
+          info.skillsIdle =
+            slot === 'mainHand' || slot === 'offHand'
+              ? skillsIdled({
+                  ...dry.sockets,
+                  idle: idleAfter(run, (now ??= new Character(run.build, cfgFor(run))), dry.build),
+                })
+              : [];
         }
       }
     }
@@ -460,6 +472,76 @@ export function quickSocket(run: RunState, gemUid: number): boolean {
   return socketGem(run, empties[0].slot, empties[0].socket, gemUid);
 }
 
+/** The skill gems a swap leaves socketed but unable to work (supports that idle are left out: they ask nothing). */
+export function skillsIdled(o: SocketOutcome): GemItem[] {
+  return o.idle.filter((x) => gemDef(x.gem.gemId).kind === 'active').map((x) => x.gem);
+}
+
+/**
+ * What a swap does to the character's skills, when it takes any away (docs/NEWPLAYER.md N8): the skill gems that go to
+ * the bag and those left unable to work, with the reason. Empty when no skill is lost.
+ */
+export function skillsLost(o: SocketOutcome): { gem: GemItem; why: string }[] {
+  const out = o.out
+    .filter((g) => gemDef(g.gemId).kind === 'active')
+    .map((gem) => ({ gem, why: 'goes to the bag: no socket for it' }));
+  const idle = o.idle.filter((x) => gemDef(x.gem.gemId).kind === 'active');
+  return [...out, ...idle];
+}
+
+/** Whether any worn item holds an active skill gem. */
+export function hasSocketedSkill(build: Build): boolean {
+  return EQUIP_SLOTS.some((s) =>
+    (build.equipment[s]?.sockets ?? []).some((g) => g && gemDef(g.gemId).kind === 'active'),
+  );
+}
+
+/**
+ * The run's first skill gem seats itself (docs/NEWPLAYER.md N7): the gem taken from the pick after the first map, when no
+ * skill is socketed yet, goes in its best free socket. Every later gem stays in the bag. Returns whether it was socketed.
+ */
+export function seatFirstSkill(run: RunState, gemUid: number): boolean {
+  if (run.history.length !== 1 || hasSocketedSkill(run.build)) return false;
+  const g = run.inventory.find((x) => x.uid === gemUid);
+  if (g?.kind !== 'gem' || gemDef(g.gemId).kind !== 'active') return false;
+  return quickSocket(run, gemUid);
+}
+
+/** Where a gem is: the worn item holding it, the bag, or neither (salvaged, sold). */
+export function gemWhere(
+  run: RunState,
+  gemUid: number,
+): { at: 'worn'; slot: EquipSlot; item: Item } | { at: 'bag'; gem: GemItem } | null {
+  for (const s of EQUIP_SLOTS) {
+    const it = run.build.equipment[s];
+    if (it?.sockets.some((g) => g?.uid === gemUid)) return { at: 'worn', slot: s, item: it };
+  }
+  const g = run.inventory.find((x) => x.uid === gemUid);
+  return g?.kind === 'gem' ? { at: 'bag', gem: g } : null;
+}
+
+/** Whether a bag gem has a free socket where it would do something (what "Socket it" fills). */
+export function canQuickSocket(run: RunState, gemUid: number): boolean {
+  return placementsFor(run, gemUid, { emptiesFirst: true }).some((p) => !p.replaces && !p.idle);
+}
+
+/**
+ * When the character has no skill it can use, the bag's skill gem that would do most in a free socket (the camp's warning
+ * offers it); null when one is in use or none would work.
+ */
+export function skillToSocket(run: RunState, ch: Character): GemItem | null {
+  if (ch.primary.gemUid !== null) return null;
+  const base = sheetOf(run);
+  let best: { g: GemItem; score: number } | null = null;
+  for (const g of run.inventory) {
+    if (g.kind !== 'gem' || gemDef(g.gemId).kind !== 'active') continue;
+    const p = bestPlacement(run, g.uid, base);
+    if (!p || p.replaces || p.idle) continue;
+    if (!best || p.scorePct > best.score) best = { g, score: p.scorePct };
+  }
+  return best?.g ?? null;
+}
+
 /** Move a socketed gem to another socket (swapping with whatever is there). */
 export function moveGem(run: RunState, from: SocketRef, to: SocketRef): boolean {
   if (from.slot === to.slot && from.socket === to.socket) return false;
@@ -536,6 +618,13 @@ function idleAfter(run: RunState, now: Character, build: Build): SocketOutcome['
       if (why && !gemIdle(now, g.uid, def)) idle.push({ gem: g, why });
     }
   return idle;
+}
+
+/** What equipping a bag item in `slot` does to the gems, the gems left unable to work included (`idle`). */
+export function swapSockets(run: RunState, uid: number, slot: EquipSlot): SocketOutcome {
+  const dry = dryEquip(run, uid, slot);
+  if (!dry.check.ok) return dry.sockets;
+  return { ...dry.sockets, idle: idleAfter(run, new Character(run.build, cfgFor(run)), dry.build) };
 }
 
 /** One entry for every slot the item may go into: rings give two, one-handers two, a two-hander its own. */

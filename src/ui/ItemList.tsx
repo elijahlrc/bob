@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import { gemDef } from '../data/gems';
 import type { EquipSlot, InventoryItem } from '../data/types';
 import { slotsFor } from '../run/inventory';
 import {
@@ -114,6 +115,15 @@ export function ItemRow(p: RowProps) {
             title={`${info.gemsOut.length} gem${info.gemsOut.length > 1 ? 's' : ''} would go to the bag`}
           >
             ⚠ {info.gemsOut.length} gem{info.gemsOut.length > 1 ? 's' : ''} out
+          </span>
+        )}
+        {gear && info.equippable && info.skillsIdle.length > 0 && (
+          <span
+            class="badge warn"
+            title={`${info.skillsIdle.map((g) => gemDef(g.gemId).name).join(', ')} would stop working`}
+          >
+            ⚠ {gemDef(info.skillsIdle[0].gemId).name} stops
+            {info.skillsIdle.length > 1 ? ` (+${info.skillsIdle.length - 1})` : ''}
           </span>
         )}
         {!info.equippable && info.group !== 'gem' && <span class="badge down">can't use</span>}

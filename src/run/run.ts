@@ -1,10 +1,12 @@
-import { ACTIVE_GEMS, type ActiveGemDef } from '../data/gems';
+import { ACTIVE_GEMS, SUPPORT_GEMS, type ActiveGemDef } from '../data/gems';
+import { typesAllow } from '../data/skillTypes';
+import { supportLive } from '../calc/reach';
 import { Rng } from '../core/rng';
 import { DEFAULT, LEGACY, type Difficulty } from '../data/difficulty';
 import { classDef } from '../data/classes';
 import { factionOfSpec } from '../data/monsters';
 import { TABLET_PREFIX } from '../data/currency';
-import type { AnyItem, Build, CurrencyItem, InventoryItem, Item } from '../data/types';
+import type { AnyItem, Build, CurrencyItem, GemItem, InventoryItem, Item } from '../data/types';
 import { rollCurrencyBundle, rollCurrencyDrops } from '../gen/currencyDrops';
 import { makeFlask, makeItem } from '../gen/items';
 import {
@@ -475,6 +477,34 @@ export function rollSkillRewards(run: RunState): AnyItem[] {
   return picks.map((g): AnyItem => ({ kind: 'gem', uid: uid(), gemId: g.id }));
 }
 
+/** The map whose pick always holds a support gem for the main skill (docs/NEWPLAYER.md N7). */
+export const FIRST_SUPPORT_MAP = 5;
+
+/**
+ * A support gem that does something for the main skill with the weapon in hand, drawn as the drops are weighted (from a
+ * stream of its own); null with no skill socketed or none that fits.
+ */
+export function supportForMain(run: RunState, uid: () => number): GemItem | null {
+  const ch = new Character(run.build);
+  if (ch.primary.gemUid === null) return null;
+  const skill = ch.primary.skill;
+  const types = new Set(skill.types);
+  const hold = ch.weaponHold();
+  const weight = (g: (typeof SUPPORT_GEMS)[number]) =>
+    gemWeight(g, run.build.classId, run.map, hold);
+  const pool = SUPPORT_GEMS.filter(
+    (g) =>
+      weight(g) > 0 &&
+      (run.map > OWN_ATTR_PICK_MAPS || inClassAttrs(g, run.build.classId)) &&
+      typesAllow(g, types) &&
+      supportLive(g, skill).live &&
+      (!g.limitWeapon || g.limitWeapon.some((t) => hold.tags.has(t))),
+  );
+  if (!pool.length) return null;
+  const g = new Rng(run.seed).fork(`rewardsupport${run.map}`).weighted(pool, weight);
+  return { kind: 'gem', uid: uid(), gemId: g.id };
+}
+
 /** Three reward offers drawn from the item, gem and flask pools. */
 export function rollRewards(run: RunState): RewardCard[] {
   const rng = new Rng(run.seed).fork(`reward${run.map}`);
@@ -524,6 +554,13 @@ export function rollRewards(run: RunState): RewardCard[] {
       const open = PROVISIONS.filter((p) => p.kind !== 'reprieve' && p.from <= run.map);
       out[1] = { kind: 'pouch', uid: uid(), id: pr.weighted(open, (p) => p.weight).id };
     }
+  }
+  // The first support a run is offered works with its main skill (docs/NEWPLAYER.md N7): it takes the first card that is
+  // not for the Wayside.
+  if (run.map === FIRST_SUPPORT_MAP) {
+    const sup = supportForMain(run, uid);
+    const at = out.findIndex((c) => c.kind !== 'pouch');
+    if (sup && at >= 0) out[at] = sup;
   }
   return out;
 }

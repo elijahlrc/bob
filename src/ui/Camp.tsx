@@ -22,6 +22,7 @@ import { Items } from './Items';
 import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
 import { Rehearsal } from './rehearsal';
+import { CampGems, startGuarded } from './GemFlow';
 import { BossAhead, BossCard } from './BossCard';
 import { BOSSES, bossForMap } from '../data/bosses';
 import type { OfferPreview } from '../run/preview';
@@ -97,7 +98,7 @@ function BossOffer({ c, o }: { c: Controller; o: OfferPreview }) {
             </div>
           );
         })}
-        <button class="btn primary boss-go" onClick={() => c.startMap(0)}>
+        <button class="btn primary boss-go" onClick={() => void startGuarded(c, 0)}>
           Face {boss.name}
         </button>
       </div>
@@ -209,6 +210,8 @@ export function Camp({ c }: { c: Controller }) {
   const [showDrops, setShowDrops] = useState(fromMap);
   // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems"), for that visit only.
   const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
+  // The gem just taken from a pick: the camp says where it went (docs/NEWPLAYER.md N7).
+  const [taken, setTaken] = useState<number | null>(null);
   const setTab = (t: Tab) => {
     if (tab === 'items' && t !== 'items') setShowDrops(false);
     if (tab === 'skills' && t !== 'skills') setGemSlot(null);
@@ -340,7 +343,8 @@ export function Camp({ c }: { c: Controller }) {
           )}
         </div>
       )}
-      {run.reward && <Reward c={c} />}
+      {run.reward && <Reward c={c} onTaken={setTaken} />}
+      {!run.reward && <CampGems c={c} ch={ch} taken={taken} onSkills={() => setTab('skills')} />}
       {pts > 0 && (
         <div class="notice" data-paint="panel" data-thin>
           You have {pts} unspent passive point{pts > 1 ? 's' : ''}.
@@ -399,7 +403,7 @@ export function Camp({ c }: { c: Controller }) {
                   data-arch
                   data-pearls
                   data-foot
-                  onClick={() => c.startMap(i)}
+                  onClick={() => void startGuarded(c, i)}
                 >
                   <div class="theme-name">{t.name}</div>
                   <div class="muted">
@@ -470,8 +474,17 @@ export function Camp({ c }: { c: Controller }) {
       {t === 'strategy' && <Strategy c={c} ch={ch} />}
       {t === 'items' && run.reward && (
         <div class="items-reward">
-          <Reward c={c} />
+          <Reward c={c} onTaken={setTaken} />
         </div>
+      )}
+      {t === 'items' && !run.reward && (
+        <CampGems
+          c={c}
+          ch={ch}
+          taken={taken}
+          onSkills={() => setTab('skills')}
+          box="items-reward"
+        />
       )}
       {t === 'items' && (
         <Items

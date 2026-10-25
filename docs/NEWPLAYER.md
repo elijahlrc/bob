@@ -148,6 +148,16 @@ and the vocabulary (N13). What a player sees once is remembered per device in pr
 like the existing `Tip` (`src/ui/Tip.tsx`), so a second run starts clean. Decisions go in DESIGN.md Appendix A; text
 follows the concise-text rule and the voice rule (plain rules text, overwrought headings allowed).
 
+**Built (2026-10-25):**
+
+- N7: as planned. Every socket of an item is linked in Bob, so the explainer and the chain's hover text say "the same
+  item". The map-5 support follows the rule that pick already has (the class's own attributes) and takes the first card
+  the Wayside left. The bag line and the no-skill warning are one line in camp (`CampGems`, `src/ui/GemFlow.tsx`); the
+  warning takes its place when it applies. The first-support note sits in the Skills tab, once per device
+  (`src/ui/intro.ts`).
+- N8: `dryEquip` leaves `idle` empty (it needs a `Character`); `swapSockets` adds it for the question before a swap, and
+  the bag rows work it out for weapon and off-hand slots only, the ones that change which skills can be used.
+
 ## N7. Gem socketing flow (priority)
 
 Today a reward gem goes to the bag. The Next button walks Items → Skills, where the red "No usable active skill" line and
@@ -193,8 +203,7 @@ First map of the device's first run:
 - An arrow to the life and mana orbs: "Tap icons for more information" ("Click" with a mouse).
 - An arrow to the pause and speed buttons, labelled.
 - The map starts paused under it; any tap, or **Begin**, dismisses it and starts the map.
-- Make the claim true: the orbs today have only a `title` (invisible on touch). The orbs, flasks and skill icons all
-  answer a tap with their info (`hoverInfo`, `src/ui/info.tsx`).
+- The orbs, flasks and skill icons already answer a tap (and a hover) with their info (`infoProps`, `src/ui/info.tsx`).
 
 ## N10. After map 1: how a run goes
 
