@@ -1,7 +1,7 @@
 import { reprieveDef } from '../data/reprieves';
-import { knockBack, lifeCap } from './combat';
+import { knockBack, lifeCap, refreshPlayerDefence } from './combat';
 import type { World } from './types';
-import type { Side } from './side';
+import type { DuelSideOpts, Side } from './side';
 
 /** Monsters within this many tiles of a Revive are thrown back and stunned. */
 export const PULSE_RADIUS = 6;
@@ -19,6 +19,26 @@ export const newReprieveState = (held: readonly string[] | null | undefined): Re
   fired: [],
   invulnT: 0,
 });
+
+/**
+ * A duel side's damage scale and life multiplier on the life it is on, after `fired` reprieves: that life's share of the duel's
+ * modifiers (`DuelSideOpts.stages`), measured from 1, of the life bonus and of what damage is divided by. So at a share of 1.5 a
+ * ×10 life is ×14.5 and a damage scale of 0.3 (÷3.33) is ÷4.5.
+ */
+export function duelStage(
+  d: DuelSideOpts | undefined,
+  fired: number,
+): { damageScale: number; lifeMult: number } {
+  const damageScale = d?.damageScale ?? 1;
+  const lifeMult = d?.lifeMult ?? 1;
+  const stages = d?.stages;
+  if (!stages?.length) return { damageScale, lifeMult };
+  const k = stages[Math.min(fired, stages.length - 1)];
+  return {
+    damageScale: 1 / (1 + k * (1 / damageScale - 1)),
+    lifeMult: 1 + k * (lifeMult - 1),
+  };
+}
 
 /** Whether the character cannot be hurt right now (just after a Revive). */
 export const invulnerable = (s: Side): boolean => s.reprieve.invulnT > 0;
@@ -54,6 +74,11 @@ export function reprieveFires(w: World, s: Side): boolean {
   const def = reprieveDef(id);
   const p = s.player;
   s.reprieve.fired.push(id);
+  // In a duel the next life has its own share of the duel's modifiers, so the pool it rises with is the new one.
+  if (s.opts.duel?.stages) {
+    Object.assign(s, duelStage(s.opts.duel, s.reprieve.fired.length));
+    refreshPlayerDefence(w, s);
+  }
   p.life = Math.max(1, def.life * lifeCap(p));
   p.overkill = 0;
   for (const f of s.flasks) f.charges = f.spec.maxCharges;

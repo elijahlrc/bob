@@ -165,6 +165,22 @@ The curve multiplies today's fight, ×0.3 included, so level 1 duels play as the
 unscaled game, level 100 is 10 / 0.3 ≈ 33× as tough. Whether ×0.3 should then go, or fall with the level, is what the
 measurement (B4) answers (decision 5).
 
+### 4.4 Each life takes a share of the modifiers (the owner, 2026-10-24)
+
+The damage scale and the life curve are not the same on all four lives of a side. Each life has a share of them
+(`DUEL_LIFE_STAGES`): 0.5 on the first, then 5/6, 7/6 and 1.5 after each Bargain Coin, an even spread whose ends are half and
+one and a half times today's. A side is most vulnerable on its first life and least on its last, so a fight swings back and
+forth.
+
+A share is taken of the bonus over 1, of both modifiers (`duelStage`, `src/sim/reprieve.ts`):
+
+- the life multiplier `m` becomes `1 + share × (m − 1)`: ×10 is ×5.5 on the first life and ×14.5 on the last;
+- the damage scale is read as what damage is divided by: ÷3.33 (×0.3) is ÷2.17 (×0.46) on the first life and ÷4.5 (×0.22) on
+  the last. A share of a 70% reduction could not grow by half.
+
+A coin sets the next life's modifiers before it stands the character up, so it rises at half of the new pool. The trailer's
+staged duel keeps the old single life (`stages: null`).
+
 ---
 
 ## 5. The end of a fight

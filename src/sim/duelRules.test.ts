@@ -282,13 +282,13 @@ describe('the order of the sides', () => {
 });
 
 describe('the damage scale', () => {
-  /** A world with the two characters standing still and taking what comes. */
+  /** A world with the two characters standing still and taking what comes (every life at the whole scale). */
   const scaled = (k?: number): World => {
     const w = createDuelWorld(
       vanguard(1),
       vanguard(2),
       1,
-      k === undefined ? {} : { damageScale: k },
+      k === undefined ? { stages: null } : { damageScale: k, stages: null },
     );
     still(w.sides[0]);
     still(w.sides[1]);

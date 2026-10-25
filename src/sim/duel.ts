@@ -3,7 +3,12 @@ import { Rng } from '../core/rng';
 import { biomeDef, biomeFor } from '../data/biomes';
 import { classDef } from '../data/classes';
 import { clamp } from '../core/math';
-import { DUEL_DAMAGE_SCALE, DUEL_LIFE_MULT_TOP, DUEL_REPRIEVES } from '../data/constants';
+import {
+  DUEL_DAMAGE_SCALE,
+  DUEL_LIFE_MULT_TOP,
+  DUEL_LIFE_STAGES,
+  DUEL_REPRIEVES,
+} from '../data/constants';
 import { densityDef } from '../data/density';
 import { LEGACY } from '../data/difficulty';
 import { THEMES } from '../data/themes';
@@ -50,6 +55,11 @@ export type DuelOpts = {
   reprieves?: number;
   /** Multiply each side's life and energy shield by the curve of the other side's level (default true; `duelLifeMult`). */
   lifeCurve?: boolean;
+  /**
+   * The share of the damage scale and the life multiplier a side has on each of its lives (default `DUEL_LIFE_STAGES`); null for
+   * all of them on every life.
+   */
+  stages?: readonly number[] | null;
   /** What the two characters are called on the screen (default: their classes). It changes nothing in the fight. */
   names?: [string, string];
 };
@@ -152,10 +162,13 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
   const maxTime = opts.maxTime ?? DUEL_MAX_TIME;
   const damageScale = opts.damageScale ?? DUEL_DAMAGE_SCALE;
   const curve = opts.lifeCurve ?? true;
-  // Each side's life is multiplied by the curve of the other's level; both carry the same reprieves.
+  // Each side's life is multiplied by the curve of the other's level; both carry the same reprieves, and each life takes its
+  // share of the two modifiers (weakest on the first, strongest on the last).
+  const stages = opts.stages === undefined ? DUEL_LIFE_STAGES : (opts.stages ?? undefined);
   const duelOf = (other: Build) => ({
     damageScale,
     lifeMult: curve ? duelLifeMult(other.level) : 1,
+    stages,
   });
   const reprieves = new Array<string>(opts.reprieves ?? DUEL_REPRIEVES).fill(DUEL_REPRIEVE);
   // The floor is symmetric about the middle of the room's middle tile.

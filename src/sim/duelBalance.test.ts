@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { DUEL_LIFE_MULT_TOP, DUEL_REPRIEVES } from '../data/constants';
+import {
+  DUEL_DAMAGE_SCALE,
+  DUEL_LIFE_MULT_TOP,
+  DUEL_LIFE_STAGES,
+  DUEL_REPRIEVES,
+} from '../data/constants';
 import { reprieveDef } from '../data/reprieves';
 import type { Build } from '../data/types';
 import { newRun } from '../run/run';
@@ -14,6 +19,7 @@ import {
 } from './duel';
 import { activeGem, buildForActive } from './gemKit';
 import { makeMinion } from './minions';
+import { duelStage } from './reprieve';
 import type { Side } from './side';
 import type { World } from './types';
 
@@ -85,6 +91,53 @@ describe('the reprieves of a duel', () => {
   });
 });
 
+describe('the lives of a duel', () => {
+  it('take a share of the duel’s modifiers, from 1: half on a life of 0.5, half again more on one of 1.5', () => {
+    const d = { damageScale: 0.3, lifeMult: 10, stages: [0.5, 1, 1.5] };
+    expect(duelStage(d, 0).lifeMult).toBeCloseTo(5.5, 9);
+    expect(duelStage(d, 1)).toEqual({ damageScale: 0.3, lifeMult: 10 });
+    expect(duelStage(d, 2).lifeMult).toBeCloseTo(14.5, 9);
+    // Damage is divided by 1/0.3: by 1 + 0.5 × 2.33 on the first life and 1 + 1.5 × 2.33 on the last.
+    expect(1 / duelStage(d, 0).damageScale).toBeCloseTo(1 + 0.5 * (1 / 0.3 - 1), 9);
+    expect(1 / duelStage(d, 2).damageScale).toBeCloseTo(1 + 1.5 * (1 / 0.3 - 1), 9);
+    // Past the list the last share holds; with none, all of it on every life; on a map, 1.
+    expect(duelStage(d, 5)).toEqual(duelStage(d, 2));
+    expect(duelStage({ damageScale: 0.3, lifeMult: 10 }, 0)).toEqual({
+      damageScale: 0.3,
+      lifeMult: 10,
+    });
+    expect(duelStage(undefined, 2)).toEqual({ damageScale: 1, lifeMult: 1 });
+  });
+
+  it('grow stronger with each coin: the life rises at half of the new, larger pool, and damage taken shrinks', () => {
+    expect(DUEL_LIFE_STAGES).toHaveLength(DUEL_REPRIEVES + 1);
+    const w = createDuelWorld(vanguard(60), vanguard(60, 2), 1);
+    const [sa] = w.sides;
+    const sheet = sa.char.defence().maxLife;
+    const base = { damageScale: DUEL_DAMAGE_SCALE, lifeMult: duelLifeMult(60) };
+    const seen: { scale: number; mult: number }[] = [];
+    for (let i = 0; i <= DUEL_REPRIEVES; i++) {
+      const want = duelStage({ ...base, stages: DUEL_LIFE_STAGES }, i);
+      expect(sa.damageScale).toBeCloseTo(want.damageScale, 9);
+      expect(sa.lifeMult).toBeCloseTo(want.lifeMult, 9);
+      expect(Math.abs(sa.player.def.maxLife - sheet * sa.lifeMult)).toBeLessThanOrEqual(
+        sa.lifeMult,
+      );
+      if (i > 0) expect(sa.player.life).toBeCloseTo(0.5 * lifeCap(sa.player), 6);
+      seen.push({ scale: sa.damageScale, mult: sa.lifeMult });
+      fell(w, sa);
+      sa.reprieve.invulnT = 0;
+    }
+    expect(sa.player.alive).toBe(false);
+    for (let i = 1; i < seen.length; i++) {
+      expect(seen[i].mult).toBeGreaterThan(seen[i - 1].mult);
+      expect(seen[i].scale).toBeLessThan(seen[i - 1].scale);
+    }
+    // The other side, untouched, stays on its first life.
+    expect(w.sides[1].lifeMult).toBeCloseTo(seen[0].mult, 9);
+  });
+});
+
 describe('the life curve', () => {
   it('runs on a straight line from 1 at level 1 to 10 at level 100', () => {
     expect(DUEL_LIFE_MULT_TOP).toBe(10);
@@ -96,7 +149,7 @@ describe('the life curve', () => {
   });
 
   it('multiplies each side’s life and energy shield by the curve of the other side’s level', () => {
-    const w = createDuelWorld(vanguard(30), vanguard(70, 2), 1);
+    const w = createDuelWorld(vanguard(30), vanguard(70, 2), 1, { stages: null });
     const [sa, sb] = w.sides;
     expect(sa.lifeMult).toBeCloseTo(duelLifeMult(70), 9);
     expect(sb.lifeMult).toBeCloseTo(duelLifeMult(30), 9);
@@ -117,7 +170,7 @@ describe('the life curve', () => {
   });
 
   it('gives equal levels equal factors', () => {
-    const w = createDuelWorld(vanguard(40), vanguard(40, 2), 1);
+    const w = createDuelWorld(vanguard(40), vanguard(40, 2), 1, { stages: null });
     expect(w.sides[0].lifeMult).toBe(w.sides[1].lifeMult);
     expect(w.sides[0].lifeMult).toBeCloseTo(duelLifeMult(40), 9);
   });
@@ -150,7 +203,7 @@ describe('the life curve', () => {
     const a = buildForActive(activeGem('callBonewalkers'));
     const b = vanguard(90, 2);
     const life = (curve: boolean) => {
-      const w = createDuelWorld(a, b, 1, { lifeCurve: curve });
+      const w = createDuelWorld(a, b, 1, { lifeCurve: curve, stages: null });
       const s = w.sides[0];
       const c = s.char.utilities.find((u) => u.skill.id === 'callBonewalkers')!;
       const u = c.skill.utility;
@@ -159,7 +212,7 @@ describe('the life curve', () => {
         .maxLife;
     };
     expect(life(true)).toBe(life(false));
-    expect(createDuelWorld(a, b, 1).sides[0].lifeMult).toBeGreaterThan(8);
+    expect(createDuelWorld(a, b, 1, { stages: null }).sides[0].lifeMult).toBeGreaterThan(8);
   });
 });
 

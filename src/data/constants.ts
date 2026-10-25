@@ -134,6 +134,12 @@ export const DUEL_REPRIEVES = 3;
  * the factor runs on a straight line from 1 at level 1 to this at level 100, and each side's is read from the other side's level.
  */
 export const DUEL_LIFE_MULT_TOP = 10;
+/**
+ * How much of the duel's modifiers (the damage scale and the life multiplier) a character has on each of its lives: the first
+ * life, then after each Bargain Coin (the owner, 2026-10-24). Weakest on the first and strongest on the last, so a fight swings
+ * back and forth; a share is of the bonus over 1 (`duelStage`). Past the end of the list the last share holds.
+ */
+export const DUEL_LIFE_STAGES: readonly number[] = [0.5, 5 / 6, 7 / 6, 1.5];
 
 // §13 AI.
 export const ENGAGE_RANGE = 9;

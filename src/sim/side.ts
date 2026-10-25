@@ -47,6 +47,11 @@ export type DuelSideOpts = {
   damageScale?: number;
   /** What the character's maximum life and energy shield are multiplied by (docs/DUEL-BALANCE.md 4.2; default 1). */
   lifeMult?: number;
+  /**
+   * The share of the two above the character has on each of its lives, the first and then after each reprieve
+   * (`DUEL_LIFE_STAGES`, `duelStage`); absent, all of them on every life.
+   */
+  stages?: readonly number[];
 };
 
 /** What a character brings to a map (what the map decides is `WorldOpts`). */

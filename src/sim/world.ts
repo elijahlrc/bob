@@ -50,7 +50,7 @@ import { Grid } from './grid';
 import { newActor } from './actor';
 import { newLedger } from './ledger';
 import { tickAbandon } from './abandon';
-import { newReprieveState, tickReprieve } from './reprieve';
+import { duelStage, newReprieveState, tickReprieve } from './reprieve';
 import { tickCollapse } from './collapse';
 import { tickHoldout } from './holdout';
 import { tickStranded } from './strand';
@@ -237,8 +237,8 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       reprieves: o?.reprieves,
       duel: o?.duel,
     },
-    damageScale: o?.duel?.damageScale ?? 1,
-    lifeMult: o?.duel?.lifeMult ?? 1,
+    // A duel's first life has its own share of the duel's modifiers (`duelStage`).
+    ...duelStage(o?.duel, 0),
     chargeT: { grit: 0, fervour: 0, insight: 0 },
     buffT: {
       ...Object.fromEntries(BUFF_IDS.map((b) => [b, 0])),

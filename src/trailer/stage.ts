@@ -469,7 +469,8 @@ export function duel(
 ): boolean {
   c.screen = 'title';
   c.world = null;
-  const ok = c.startDuel(a, b, seed, { names, reprieves: 0, ...rules }, 'title');
+  // (The film's rules are its own: no reprieves, and the one life with all of the modifiers.)
+  const ok = c.startDuel(a, b, seed, { names, reprieves: 0, stages: null, ...rules }, 'title');
   if (!ok || !c.duel) return false;
   c.duel.rival = { rivalId: '7', myId: '3', rated: true, home: 'summary' };
   c.onDuelEnd = (_d, out) => {
