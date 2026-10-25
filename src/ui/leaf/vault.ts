@@ -219,7 +219,7 @@ export function sprite(
 }
 
 const skies = new Map<string, string>();
-/** The sky behind the tree at this size (art pixels): worn lapis with a gold rim and a few dim gold specks. */
+/** The sky behind the tree at this size (art pixels): worn lapis with a gold rim and a few faint gold specks, no flakes. */
 export function skyUrl(w: number, h: number): string {
   const key = `${w}x${h}`;
   const had = skies.get(key);
@@ -246,12 +246,12 @@ export function skyUrl(w: number, h: number): string {
   ctx.fillStyle = g;
   ctx.fillRect(4, 4, w - 8, h - 8);
   const r = rng(91);
-  for (let i = 0; i < (w * h) / 900; i++) {
-    ctx.fillStyle = col('gold', 2 + Math.floor(r() * 2));
+  for (let i = 0; i < (w * h) / 1300; i++) {
+    ctx.fillStyle = col('gold', 1 + Math.floor(r() * 2));
     ctx.fillRect(4 + Math.floor(r() * (w - 8)), 4 + Math.floor(r() * (h - 8)), 1, 1);
   }
   const url = age(cv, rng(77), {
-    loss: 0.012,
+    loss: 0,
     blotch: 6,
     cracks: Math.round((w * h) / 5000),
     crackLen: 24,
