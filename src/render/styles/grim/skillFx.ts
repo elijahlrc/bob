@@ -117,7 +117,12 @@ type Flight = {
 };
 
 /** The colour of the ground that skills leave (the element does not say it: consecrated ground is physical but gold). */
-const GROUND_COLOR = { consecrated: 0xffe39a, chilling: 0x9ad8ff, caustic: 0x9ae05a } as const;
+const GROUND_COLOR = {
+  consecrated: 0xffe39a,
+  chilling: 0x9ad8ff,
+  caustic: 0x9ae05a,
+  burning: 0xff8a3a,
+} as const;
 
 const shade = (c: number, f: number): number =>
   (Math.round(((c >> 16) & 255) * f) << 16) |
@@ -1342,9 +1347,11 @@ export class SkillFx {
       switch (f.kind) {
         case 'consecrated':
         case 'chilling':
-        case 'caustic': {
+        case 'caustic':
+        case 'burning': {
           const c = GROUND_COLOR[f.kind];
-          const motif = f.kind === 'consecrated' ? 3 : f.kind === 'chilling' ? 2 : 4;
+          const motif =
+            f.kind === 'consecrated' || f.kind === 'burning' ? 3 : f.kind === 'chilling' ? 2 : 4;
           outlineArea(
             ground,
             this.host,

@@ -132,7 +132,7 @@ export function channelUse(w: World, a: Actor, act: Action): void {
     let q = scaleProfile(p, f);
     q = grown(q, (spec.tickRadiusPerStage ?? 0) * st.stage);
     const b = p.skill.behaviour;
-    const ringed = b.kind === 'burst' && b.origin === 'self';
+    const ringed = b.kind === 'burst' && b.origin === 'self' && !b.arc;
     fireEffect(w, a, { ...act, profile: q, which: 'channelled', ringed });
   }
   // Stages also come from hits: a crowd charges the skill faster (Judgement Tempest).

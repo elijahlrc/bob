@@ -23,6 +23,7 @@ import {
   CHAOS,
   COLD,
   distanceMult,
+  fadeShare,
   FIRE,
   LIGHT,
   PHYS,
@@ -302,6 +303,8 @@ export function ailmentsFromHit(
   crit: boolean,
   t: TargetState,
   roll: (chance: number) => boolean,
+  /** What the chance to freeze is multiplied by: less the farther a fading projectile has flown (Chilling Shard). */
+  freezeShare = 1,
 ): AilmentResult {
   const def = t.def;
   const a = emptyAilments();
@@ -357,7 +360,7 @@ export function ailmentsFromHit(
     }
     const freezeH = from(p.ailmentFrom.freeze);
     const freezeCrit = crit || (p.alwaysFreezeOnCrit && crit);
-    if (freezeH > 0 && !def.cannotBeFrozen && (freezeCrit || roll(p.freeze.chance))) {
+    if (freezeH > 0 && !def.cannotBeFrozen && (freezeCrit || roll(p.freeze.chance * freezeShare))) {
       const d = Math.min(FREEZE_MAX, FREEZE_PER_R * (freezeH / thresh)) * p.freeze.dur;
       if (d >= MIN_FREEZE) a.freeze = d;
     }
@@ -467,6 +470,7 @@ export function resolveHit(
     res.crit,
     t,
     (c) => c > 0 && rng.chance(c),
+    fadeShare(p, dist),
   );
   res.stun = stunFromHit(p, res.dmg, t.def, canStun, rng, (t.es ?? 0) > 0, t.stunBonus).duration;
   return res;

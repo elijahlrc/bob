@@ -208,7 +208,9 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
         ? `Leaves consecrated ground of radius ${num(def.leaves.radius)} for ${num(def.leaves.seconds)} s: you mend there, and hits against what stands on it crit more often`
         : def.leaves.kind === 'chilling'
           ? `Leaves chilling ground of radius ${num(def.leaves.radius)} for ${num(def.leaves.seconds)} s${def.leaves.dps ? ' that burns with cold' : ''}${def.leaves.killCharge ? `; a kill on it may give a ${CHARGE[def.leaves.killCharge.kind]} charge` : ''}`
-          : `Leaves caustic ground of radius ${num(def.leaves.radius)} for ${num(def.leaves.seconds)} s that poisons what stands on it`,
+          : def.leaves.kind === 'burning'
+            ? `Leaves burning ground of radius ${num(def.leaves.radius)} for ${num(def.leaves.seconds)} s that burns what stands on it`
+            : `Leaves caustic ground of radius ${num(def.leaves.radius)} for ${num(def.leaves.seconds)} s that poisons what stands on it`,
     );
   if (def.crystal)
     out.push(
@@ -297,10 +299,18 @@ export function utilityFxLines(u: UtilityDef, level: number): string[] {
     out.push(
       'Landing among a pack, you run on through it without attacking until Elusive is over; the first skill you use ends it; not begun for a lone enemy',
     );
-  if (u.kind === 'buff' && u.shell)
-    out.push(
-      `${u.shell.absorb}% of the damage from hits goes into a pool of ${u.shell.capPct}% of your armour (at most ${u.shell.capMax}); when the buff ends or the pool is spent, ${num(lv(u.shell.reflect, level))}% of what it took goes out as fire around you`,
-    );
+  if (u.kind === 'buff' && u.shell) {
+    const sh = u.shell;
+    const pool =
+      sh.capFlat !== undefined
+        ? `a pool of ${num(Math.round(levelValue(sh.capFlat, level, true)))} damage`
+        : `a pool of ${sh.capPct}% of your armour (at most ${sh.capMax})`;
+    const back =
+      sh.reflect === undefined
+        ? ''
+        : `; when the buff ends or the pool is spent, ${num(lv(sh.reflect, level))}% of what it took goes out as fire around you`;
+    out.push(`${sh.absorb}% of the damage from hits goes into ${pool}${back}`);
+  }
   if (u.kind === 'buff' && u.consume)
     out.push(
       `Spends up to ${u.consume.max} ${CHARGE[u.consume.charge]} charges: each adds ${num(u.consume.durationPct)}% to how long it lasts and takes ${num(u.consume.physLess)}% off the physical damage you take`,

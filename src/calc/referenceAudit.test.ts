@@ -66,7 +66,7 @@ function build(offHand: boolean): Build {
   if (offHand) b.equipment.offHand = makeItem(uid, 'sword_1', 30, 0);
   else delete b.equipment.offHand;
   const body = makeItem(uid, 'body_ar_1', 30, 1);
-  body.sockets = [makeGem(uid, 'reapingArc')];
+  body.sockets = [makeGem(uid, 'crushingBlow')];
   b.equipment.body = body;
   b.primaryGem = body.sockets[0]!.uid;
   b.flasks = [null, null, null, null, null];

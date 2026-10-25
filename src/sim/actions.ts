@@ -681,7 +681,22 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     const cy = b.origin === 'self' ? a.y : act.aimY;
     const radius = b.radius * p.radiusMult;
     const dominant = profileElement(p);
-    if (!act.ringed)
+    // A nova in front only (a half circle toward the target) shows as a sweep.
+    const arc = b.origin === 'self' ? b.arc : undefined;
+    const facing = Math.atan2(act.aimY - a.y, act.aimX - a.x);
+    if (arc)
+      w.events.push({
+        t: 'swing',
+        src: a.id,
+        x: a.x,
+        y: a.y,
+        facing,
+        radius: radius + a.r,
+        arc,
+        dtype: dominant,
+        heavy: false,
+      });
+    else if (!act.ringed)
       w.events.push({
         t: 'explode',
         x: cx,
@@ -691,7 +706,14 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         ...(a.isPlayer ? { skill: p.skill.id } : {}),
         ...(act.fall ? { fall: act.fall } : {}),
       });
-    const inside = enemiesOf(w, a).filter((e) => Math.hypot(e.x - cx, e.y - cy) <= radius + e.r);
+    const half = arc ? ((arc / 2) * Math.PI) / 180 : Math.PI;
+    const inside = enemiesOf(w, a).filter((e) => {
+      const d = Math.hypot(e.x - cx, e.y - cy);
+      if (d > radius + e.r) return false;
+      return (
+        !arc || d <= e.r || Math.abs(angleDiff(facing, Math.atan2(e.y - cy, e.x - cx))) <= half
+      );
+    });
     // A debuff that holds only so many enemies takes the nearest.
     const cap = p.skillDot?.spec.maxTargets;
     if (cap && inside.length > cap)

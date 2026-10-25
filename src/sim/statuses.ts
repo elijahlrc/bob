@@ -111,6 +111,7 @@ export function statusTaken(a: Actor): { res: number[]; vulnType: number[] } {
   }
   if (fx.maim) vulnType[0] += fx.maim.x / 100;
   if (fx.scarred) vulnType[0] += fx.scarred.v / 100;
+  if (fx.rimed) vulnType[2] += fx.rimed.v / 100;
   if (fx.withered) vulnType[4] += (fx.withered.n * fx.withered.v) / 100;
   return { res, vulnType };
 }

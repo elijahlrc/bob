@@ -188,6 +188,12 @@ export const CONDITIONS = [
   'heraldAgony',
   'flickerStep',
   'punisher',
+  // While that colossus stands (its owner bonus holds only then).
+  'golemStone',
+  'golemChaos',
+  'golemFlame',
+  'golemIce',
+  'golemLightning',
   // What waits for a particular curse or mark on the target.
   'cursedDespair',
   'cursedFrost',

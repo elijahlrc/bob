@@ -38,6 +38,7 @@ import {
 import { CRESCENDO_STEP_BONUS } from '../data/mapTypes';
 import { cannotBleed } from '../data/monsters';
 import { BANNER_SHIFT, BUFFS, BUFF_IDS, DYN_SHIFT } from '../data/buffs';
+import { ACTIVE_GEMS } from '../data/gems';
 import { MONSTER_CONDS, scaleOf } from '../calc/monster';
 import { AURA_CONDS, WIELD_CONDS } from '../calc/staticConds';
 import type { ModCtx } from '../mods/modDb';
@@ -144,6 +145,13 @@ for (const [id, gem] of AURA_CONDS)
 for (const id of BUFF_IDS) {
   const cond = BUFFS[id].cond;
   PLAYER_TESTS[cond] = (_w, p) => p.side!.buffT[id] > 0;
+}
+// While a colossus stands: its owner bonus holds only then.
+for (const g of ACTIVE_GEMS) {
+  const u = g.utility;
+  if (u?.kind !== 'summon' || !u.standing) continue;
+  const kind = u.minion;
+  PLAYER_TESTS[u.standing] = (_w, p) => p.side!.minions.some((m) => m.alive && m.kind === kind);
 }
 
 type TargetTest = (t: Actor, from: Actor) => boolean;
@@ -824,6 +832,9 @@ function applyAilments(w: World, src: Actor, dst: Actor, res: HitResult, p: Skil
   if (a.chill > 0 && a.chill >= ail.chill) {
     ail.chill = a.chill;
     ail.chillT = p.chill.dur * d.durOnSelf.chill;
+    // Deep Chill: the strongest chill, if it is the supported skill's, makes the enemy take more cold damage while it lasts.
+    if (p.chillTaken) applyStatus(w, dst, 'rimed', { seconds: ail.chillT, v: a.chill * 100 });
+    else if (dst.fx.rimed) delete dst.fx.rimed;
   }
   // The character is not frozen again while frozen or just after (stun has the same grace).
   const canFreeze = !dst.isPlayer || (ail.freezeT <= 0 && ail.freezeGraceT <= 0);

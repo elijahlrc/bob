@@ -409,6 +409,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: [3, 5],
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 20,
+      },
     ],
     requiresWeapon: ['dagger', 'claw'],
     description: 'A poisonous projectile that flies on from enemy to enemy.',
@@ -602,6 +607,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 25,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -20,
+      },
     ],
     description: 'Two fast strikes in the time of one.',
   },
@@ -642,6 +652,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         condition: {
           id: 'targetFullLife',
         },
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -30,
       },
     ],
     description: 'Strikes with both weapons at once. Needs two weapons.',
@@ -1371,6 +1386,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           id: 'targetNearby',
         },
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -10,
+      },
     ],
     description:
       'Slams the ground and sends out a wave; enemies close in are hit harder and stun more easily.',
@@ -1401,6 +1421,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'damage',
         kind: 'more',
         value: -10,
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -30,
       },
     ],
     description: 'A heavy slam that sends frost out in three waves.',
@@ -1594,7 +1619,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       arc: 150,
       radius: 2.2,
     },
-    baseMult: [100, 100],
+    baseMult: [100, 123],
     cost: [8, 8],
     requiresWeapon: ['sword', 'axe'],
     mods: [
@@ -1630,6 +1655,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           id: 'sandStance',
         },
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -40,
+      },
     ],
     description: 'Two sweeping slashes; bleeding in Blood Stance, a wider sweep in Sand Stance.',
   },
@@ -1655,6 +1685,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'chance.impale',
         kind: 'base',
         value: 100,
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -15,
       },
     ],
     description: 'A thrust that hurls a main blade that impales, with shards flying beside it.',
@@ -1794,12 +1829,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Crackle Ring',
     attr: 'int',
     skillType: 'spell',
-    tags: ['spell', 'area', 'lightning', 'nova'],
+    tags: ['spell', 'area', 'lightning', 'channelling'],
     types: ['totemable'],
     behaviour: {
       kind: 'burst',
       radius: 2.6,
       origin: 'self',
+      arc: 180,
     },
     spellDamage: [
       {
@@ -1818,7 +1854,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 12,
       },
     ],
-    description: 'Lightning crackles around you in pulses.',
+    description: 'Channelled: pulses of lightning crackle in a half circle in front of you.',
+    channel: {
+      cap: 4,
+      tick: true,
+      hold: true,
+    },
   },
   {
     kind: 'active',
@@ -1936,6 +1977,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         condition: {
           id: 'sandStance',
         },
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -20,
       },
     ],
     description:
@@ -2076,6 +2122,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 8,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -30,
+      },
     ],
     description: 'A stab or a shot that always makes the target bleed for a long while.',
   },
@@ -2198,6 +2249,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'flag',
         value: 1,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -15,
+      },
     ],
     description:
       'A spread of steel shards that burst where they land, and hit harder the farther they fly.',
@@ -2294,7 +2350,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     baseMult: [80, 130],
     cost: [7, 9],
     requiresWeapon: ['sword', 'axe', 'mace', 'dagger', 'claw'],
-    mods: [],
+    mods: [
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 10,
+      },
+    ],
     description: 'Throws a phantom copy of your weapon that flies out and comes back.',
   },
   {
@@ -2390,7 +2452,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     baseMult: [175, 220],
     cost: [8, 8],
     requiresWeapon: ['mace', 'sceptre', 'axe', 'staff'],
-    mods: [],
+    mods: [
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -25,
+      },
+    ],
     description:
       'A slam that sends a wave of broken ground ahead, each enemy it strikes setting off a shockwave.',
     wave: {
@@ -2626,6 +2694,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 2,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -30,
+      },
     ],
     description: 'A heavy swing all around you that throws enemies back.',
     needsTwoHand: true,
@@ -2739,6 +2812,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'convertSkill.physical.chaos',
         kind: 'base',
         value: 60,
+      },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: 90,
       },
     ],
     description:
@@ -3858,18 +3936,17 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     utility: {
       kind: 'buff',
       buff: 'steelHide',
-      seconds: 3,
+      seconds: 1.5,
       policy: 'guard',
-      cooldown: 8,
-      mods: [
-        {
-          stat: 'hitTaken',
-          kind: 'more',
-          value: [-35, -50],
-        },
-      ],
+      cooldown: 3,
+      mods: [],
+      shell: {
+        absorb: 70,
+        capFlat: [54, 2209],
+      },
     },
-    description: 'A guard: for a few seconds you take much less damage from hits.',
+    description:
+      'A guard: for a moment a shield of iron takes most of the damage from hits, until it breaks.',
   },
   {
     kind: 'active',
@@ -3917,7 +3994,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Deathless Call',
     attr: 'str',
     skillType: 'spell',
-    tags: ['spell', 'guard', 'duration', 'warcry'],
+    tags: ['spell', 'guard', 'duration'],
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
@@ -4506,7 +4583,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'attackSpeed',
         kind: 'more',
-        value: 100,
+        value: 200,
       },
     ],
     description:
@@ -4709,6 +4786,11 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 50,
       },
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -15,
+      },
     ],
     description:
       'A strike that calls lightning down about its target, and lights you with a crackling aura.',
@@ -4888,7 +4970,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     baseMult: [110, 133],
     cost: [10, 10],
     requiresWeapon: ['mace', 'axe', 'staff', 'sword'],
-    mods: [],
+    mods: [
+      {
+        stat: 'attackSpeed',
+        kind: 'more',
+        value: -10,
+      },
+    ],
     ancestral: {
       buff: 'warchiefCairn',
       range: 8,
@@ -4957,7 +5045,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       range: 11,
       pierce: 9,
     },
-    baseMult: [80, 100],
+    baseMult: [100, 145],
     cost: [6, 11],
     requiresWeapon: ['bow'],
     mods: [
@@ -4968,6 +5056,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'Sets bow totems that shoot long, piercing arrows.',
+    ballista: true,
+    deploySeconds: 8,
   },
   {
     kind: 'active',
@@ -5126,32 +5216,38 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     attr: 'dex',
     skillType: 'spell',
     tags: ['spell', 'trap', 'area', 'fire', 'duration'],
-    types: ['trap'],
+    types: ['trap', 'damageOverTime'],
     behaviour: {
-      kind: 'ground',
+      kind: 'burst',
       radius: 2,
-      duration: 1.75,
-      interval: 0.25,
       reach: 8,
     },
     spellDamage: [
       {
         type: 'fire',
-        spread: [0.7, 1.3],
+        spread: [0.8, 1.2],
+        share: 0.4,
       },
     ],
-    effectiveness: 35,
+    effectiveness: 200,
     castTime: 1,
     crit: 6,
     cost: [8, 20],
-    mods: [
-      {
-        stat: 'chance.ignite',
-        kind: 'base',
-        value: 30,
-      },
-    ],
-    description: 'A trap that sets the ground alight.',
+    mods: [],
+    description: 'A trap that bursts into flame and leaves the ground burning.',
+    dot: {
+      type: 'fire',
+      dps: [55.4, 1316],
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['spell'],
+    },
+    leaves: {
+      kind: 'burning',
+      seconds: 1.75,
+      radius: 2,
+    },
   },
   {
     kind: 'active',
@@ -5253,6 +5349,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'A trap that breathes fire, harder on the burning.',
+    cooldown: 8,
+    cooldownUses: 3,
   },
   {
     kind: 'active',
@@ -5290,6 +5388,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'A trap that raises a spire of lightning.',
+    cooldown: 8,
+    cooldownUses: 3,
   },
   {
     kind: 'active',
@@ -5349,7 +5449,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     behaviour: {
       kind: 'ground',
       radius: 1.8,
-      duration: 4.5,
+      duration: 3.5,
       interval: 0.9,
       line: 6,
       reach: 8,
@@ -5366,6 +5466,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [13, 25],
     mods: [],
     description: 'A trap that makes the ground erupt in a line.',
+    cooldown: 8,
+    cooldownUses: 3,
   },
   {
     kind: 'active',
@@ -5827,6 +5929,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: [33, 105],
         },
       ],
+      group: 'golem',
+      standing: 'golemStone',
     },
     description: 'Raises a colossus of stone that regenerates your life.',
   },
@@ -5857,6 +5961,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: [3, 4],
         },
       ],
+      group: 'golem',
+      standing: 'golemChaos',
     },
     description: 'Raises a colossus of blight that hardens you against blows.',
   },
@@ -5887,6 +5993,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: [15, 20],
         },
       ],
+      group: 'golem',
+      standing: 'golemFlame',
     },
     description: 'Raises a colossus of embers that makes you hit harder.',
   },
@@ -5922,6 +6030,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: [20, 30],
         },
       ],
+      group: 'golem',
+      standing: 'golemIce',
     },
     description: 'Raises a colossus of frost that sharpens your strikes.',
   },
@@ -5957,6 +6067,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: [6, 9],
         },
       ],
+      group: 'golem',
+      standing: 'golemLightning',
     },
     description: 'Raises a colossus of storm that quickens you.',
   },
@@ -5988,6 +6100,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         cap: 80,
         life: [30, 68],
       },
+      group: 'golem',
     },
     description: 'Raises a colossus of carrion that makes your other minions hit harder.',
   },
@@ -6146,6 +6259,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       seconds: 3,
       more: 75,
     },
+    cooldown: 3,
   },
   {
     kind: 'active',
@@ -6454,16 +6568,13 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [25, 44],
       },
       {
-        stat: 'damage',
-        kind: 'more',
-        value: [15, 30],
-        damageTypes: ['cold'],
-        condition: {
-          id: 'targetChilled',
-        },
+        stat: 'chillTaken',
+        kind: 'flag',
+        value: 1,
       },
     ],
-    description: 'Chills hit harder, and chilled enemies take more cold damage.',
+    description:
+      'Stronger chills, and enemies the skill chills take more cold damage from every source, as much as they are slowed.',
   },
   {
     kind: 'support',
@@ -6791,7 +6902,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'surge.threshold',
         kind: 'base',
-        value: [400, 15],
+        value: [15, 400],
       },
       {
         stat: 'buffOn.surge.arcaneSurge',
@@ -7390,8 +7501,8 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     mods: [
       {
         stat: 'projectileSpeed',
-        kind: 'inc',
-        value: [-49, -30],
+        kind: 'more',
+        value: [-30, -49],
       },
       {
         stat: 'damage',
@@ -8399,7 +8510,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'skillDuration',
         kind: 'more',
-        value: [-49, -40],
+        value: [-40, -49],
       },
       {
         stat: 'damage',

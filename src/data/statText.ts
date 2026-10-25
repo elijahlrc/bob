@@ -165,6 +165,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   cannotBeChilled: { flag: 'Cannot be Chilled' },
   cannotBeFrozen: { flag: 'Cannot be Frozen' },
   alwaysFreezeOnCrit: { flag: 'Always Freeze on Critical Strike' },
+  chillTaken: { flag: 'Enemies it Chills take increased Cold Damage equal to the Chill' },
   removeIgnite: { flag: 'Removes Burning on use; Immunity to Ignite during Flask effect' },
   removeFreeze: {
     flag: 'Removes Freeze and Chill on use; Immunity to Freeze and Chill during Flask effect',
@@ -500,6 +501,11 @@ Object.assign(CONDITION_TEXT, {
   onslaught: 'while Quickened',
   unholyMight: 'while you have Dread Might',
   arcaneSurge: 'while you have Arcane Tide',
+  golemStone: 'while your Stone Colossus stands',
+  golemChaos: 'while your Blight Colossus stands',
+  golemFlame: 'while your Ember Colossus stands',
+  golemIce: 'while your Rime Colossus stands',
+  golemLightning: 'while your Storm Colossus stands',
 });
 
 // ---- Added by C3: avoiding ailments, reflect, flat damage taken, dodge ------------------------------

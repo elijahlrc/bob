@@ -211,7 +211,7 @@ export type SkillDef = SkillFx & {
   leaves?: {
     creep?: number;
     max?: number;
-    kind: 'consecrated' | 'chilling' | 'caustic';
+    kind: 'consecrated' | 'chilling' | 'caustic' | 'burning';
     seconds: number;
     radius: number;
     /** How many times larger the ground ends than it began. */

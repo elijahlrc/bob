@@ -53,6 +53,7 @@ export const STATUS_LOOK: Record<StatusId, StatusLook> = {
   overpowered: { glyph: 'hollow', color: 0xe0e4f0 },
   withered: { glyph: 'fork', color: 0xa8a050 },
   scarred: { glyph: 'slash', color: 0xe05050 },
+  rimed: { glyph: 'slash', color: ELEMENT_COLOR[2] },
   // Mends less; goes off when it dies.
   regenLess: { glyph: 'asterisk', color: 0xcfeaff },
   venomed: { glyph: 'drop', color: 0xb8e848 },

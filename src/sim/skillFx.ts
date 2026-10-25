@@ -751,7 +751,10 @@ type ShellSpec = NonNullable<
   Extract<NonNullable<SkillChoice['skill']['utility']>, { kind: 'buff' }>['shell']
 >;
 
-/** The shell goes up: its pool is a share of the armour (the gem's armour counted), and it has not yet taken anything. */
+/**
+ * The shell goes up: its pool is a share of the armour (the gem's armour counted), or a fixed size by level (measured against the
+ * damage the character takes, so scaled in a duel like it), and it has not yet taken anything.
+ */
 export function startShell(
   s: Side,
   buff: BuffId,
@@ -759,13 +762,16 @@ export function startShell(
   level: number,
   profile: SkillProfile,
 ): void {
-  const pool = Math.min(spec.capMax, (s.player.def.armour * spec.capPct) / 100);
+  const pool =
+    spec.capFlat !== undefined
+      ? levelValue(spec.capFlat, level, true) * s.damageScale
+      : Math.min(spec.capMax ?? Infinity, (s.player.def.armour * (spec.capPct ?? 0)) / 100);
   s.shell = {
     left: pool,
     taken: 0,
     absorb: spec.absorb / 100,
-    reflect: levelValue(spec.reflect, level),
-    radius: spec.radius,
+    reflect: spec.reflect === undefined ? 0 : levelValue(spec.reflect, level),
+    radius: spec.radius ?? 0,
     buff,
     profile,
   };

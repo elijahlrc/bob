@@ -104,7 +104,7 @@ describe('triggers: casting a socketed spell (EXPANSION 5.5)', () => {
   });
 
   it('roll their chance', () => {
-    const half = run(buildFor([onHit({ chance: 50, cooldown: 0 })]), 120, 3).t;
+    const half = run(buildFor([onHit({ chance: 50, cooldown: 0 })]), 300, 3).t;
     const ratio = half.triggers / half.hits;
     expect(ratio).toBeGreaterThan(0.4);
     expect(ratio).toBeLessThan(0.6);

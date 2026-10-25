@@ -1,4 +1,4 @@
-import type { DamageType, Mod, SkillTag } from '../mods/types';
+import type { CondId, DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
 import type { BuffId } from './buffs';
 import type { MinionId } from './minions';
@@ -97,6 +97,8 @@ export type SkillBehaviour =
       kind: 'burst';
       radius: number;
       origin?: 'target' | 'self';
+      /** A nova only in front of the caster, toward the target: the angle in degrees (Crackle Ring's half circle). */
+      arc?: number;
       reach?: number;
       /** A monster's burst that also leaves a lasting zone where it lands (a lob), by kind, seconds and damage a second. */
       zone?: {
@@ -181,10 +183,13 @@ export type UtilityDef =
        */
       shell?: {
         absorb: number;
-        capPct: number;
-        capMax: number;
-        reflect: LevelValue;
-        radius: number;
+        capPct?: number;
+        capMax?: number;
+        /** A pool of a fixed size by gem level (on the damage table's curve) instead of a share of the armour (Iron Hide). */
+        capFlat?: LevelValue;
+        /** What goes out as fire when it ends; none without it. */
+        reflect?: LevelValue;
+        radius?: number;
       };
       /**
        * A second buff given with the first for the same time, with its own mods; the first skill used ends the first buff and cuts the
@@ -250,6 +255,10 @@ export type UtilityDef =
       count: LevelValue;
       seconds?: number;
       ownerMods?: GemMod[];
+      /** One summon of the group stands at a time (a single golem): another of the group waits while one stands. */
+      group?: 'golem';
+      /** The condition that holds while its minions stand; `ownerMods` hold only under it. */
+      standing?: CondId;
       /** Enemies within this many tiles of it go for it instead of the character (Lure Totem). */
       taunt?: number;
       /**
@@ -639,7 +648,8 @@ export type ActiveGemDef = SkillFx & {
       };
   /** Ground the skill leaves where it lands (docs/SPIRIT.md S6). */
   leaves?: {
-    kind: 'consecrated' | 'chilling' | 'caustic';
+    /** Caustic and burning ground pulse the skill's own damage over time (`dot.ground`) on what stands in it. */
+    kind: 'consecrated' | 'chilling' | 'caustic' | 'burning';
     seconds: number;
     radius: number;
     /** How many times larger the ground ends than it began. */
@@ -780,6 +790,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       { stat: 'stunDamage', kind: 'inc', value: 25 },
       { stat: 'knockback', kind: 'base', value: 1.2 },
       { stat: 'doubleDamage', kind: 'base', value: 20 },
+      { stat: 'attackSpeed', kind: 'more', value: -15 },
     ],
     description:
       'A single heavy blow that staggers its target, throws it back, and sometimes hits twice as hard.',
@@ -794,7 +805,11 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     behaviour: { kind: 'melee', range: 2.2, arc: 120, radius: 2.2 },
     baseMult: [100, 140],
     cost: [1, 9],
-    mods: [],
+    mods: [
+      { stat: 'attackSpeed', kind: 'more', value: -20 },
+      { stat: 'damage', kind: 'more', value: -40, condition: { id: 'dualWielding' } },
+    ],
+    requiresWeapon: ['sword', 'axe'],
     bothWeapons: true,
     description: 'A wide arc that strikes every enemy in front of you.',
   },

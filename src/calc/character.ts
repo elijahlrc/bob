@@ -430,6 +430,8 @@ export class Character {
   readonly burn: { pct: number; self: number } = { pct: 0, self: 0 };
   /** The utility skills (curses, buffs, warcries, blinks) the character casts by policy, not as damage. */
   readonly utilities: SkillChoice[] = [];
+  /** The conditions of the summons whose minions the sheet assumes standing. */
+  private readonly standingConds: CondId[] = [];
   /** Curse gems that Hexing Strikes applies on hit: they are not cast as well. */
   private readonly hexTouched = new Set<number>();
   /** Whether Hexing Strikes applies this curse gem on hit. */
@@ -1197,13 +1199,21 @@ export class Character {
         );
         this.cond.bit(bd.cond);
       } else if (u.kind === 'summon') {
-        // The minions are assumed standing: what they give their owner is always on.
+        // What the minions give their owner holds while they stand (a colossus); the sheet assumes the first of a group up.
         db0.addAll(
           gemMods(u.ownerMods ?? [], a.skill.level, a.skill.id).map((m) => ({
             ...m,
+            ...(u.standing ? { condition: { id: u.standing } } : {}),
             source: { kind: 'gem' as const, id: a.skill.id },
           })),
         );
+        if (u.standing) {
+          this.cond.bit(u.standing);
+          const first = this.utilities.find(
+            (o) => o.skill.utility?.kind === 'summon' && o.skill.utility.group === u.group,
+          );
+          if (!u.group || first === a) this.standingConds.push(u.standing);
+        }
       } else if (u.kind === 'curse') {
         const hd = HEXES[u.hex];
         const t = Math.max(0, Math.min(1, (a.skill.level - 1) / 19));
@@ -1469,6 +1479,8 @@ export class Character {
     for (const id of BUFF_IDS)
       if (this.buffSource[id] && !this.briefBuffs.has(id))
         m = maskOr(m, this.cond.peek(BUFFS[id].cond));
+    // A summon's minions are assumed standing (the first of a group, the one the character keeps up).
+    for (const c of this.standingConds) m = maskOr(m, this.cond.peek(c));
     if (this.sheetHexes.length) m = maskOr(m, this.cond.peek('targetCursed'));
     for (const h of this.sheetHexes) {
       const c = HEXES[h.id].selfCond;

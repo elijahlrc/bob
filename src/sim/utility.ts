@@ -1,5 +1,6 @@
 import { skillRange, type SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
+import { ACTIVE_GEMS } from '../data/gems';
 import { hexEffect, hexSeconds } from '../data/hexes';
 import { actorById } from './actions';
 import { bannerAction, useBanner } from './banners';
@@ -39,6 +40,31 @@ const GUARDS = '@guard';
 const WARCRIES = '@warcry';
 const WARCRY_SECONDS = 4;
 
+/** The group each summoned minion kind belongs to (the colossi: one golem at a time). */
+const MINION_GROUP = new Map<string, string>();
+for (const g of ACTIVE_GEMS)
+  if (g.utility?.kind === 'summon' && g.utility.group)
+    MINION_GROUP.set(g.utility.minion, g.utility.group);
+
+/** Another summon of the skill's group has a minion standing: this one waits. */
+function groupStands(s: Side, c: SkillChoice): boolean {
+  const u = c.skill.utility;
+  if (u?.kind !== 'summon' || !u.group) return false;
+  return s.minions.some((m) => m.alive && m.key !== c.key && MINION_GROUP.get(m.kind) === u.group);
+}
+
+/** A guard skill (the guard tag): the guards wait on one another, and a guard's cooldown does not run while it lasts. */
+function isGuard(skill: {
+  tags: readonly string[];
+  utility?: { kind: string; policy?: string };
+}): boolean {
+  return (
+    skill.utility?.kind === 'buff' &&
+    skill.utility.policy === 'guard' &&
+    skill.tags.includes('guard')
+  );
+}
+
 export type UtilityPick = { choice: SkillChoice; prof: SkillProfile; cd: number };
 
 export function enemiesNear(w: World, team: number, x: number, y: number, r: number): Actor[] {
@@ -66,7 +92,8 @@ export function utilityPick(
   // The warcries wait on one another (the reference game: a shared four seconds).
   if (c.skill.tags.includes('warcry') && (s.utilityReady[WARCRIES] ?? 0) > w.t) return null;
   // The guard skills wait on one another (as in the reference game).
-  if (u.kind === 'buff' && u.policy === 'guard' && (s.utilityReady[GUARDS] ?? 0) > w.t) return null;
+  // A skill cast by the same low-life rule but not a guard (Mending Totem) keeps its own time.
+  if (isGuard(c.skill) && (s.utilityReady[GUARDS] ?? 0) > w.t) return null;
   const d = Math.hypot(target.x - p.x, target.y - p.y);
   const prof = ch.profile(c, playerConds(w, s, target), flaskMask(s));
   if (!canPay(s, c.costsLife, prof.cost)) return null;
@@ -94,6 +121,7 @@ export function utilityPick(
   }
   if (u.kind === 'summon') {
     if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
+    if (groupStands(s, c)) return null;
     if (d > CAST_RANGE + 6 || minionCount(s, c.key) >= summonCount(c, prof)) return null;
     return { choice: c, prof, cd: summonRespawn(c) };
   }
@@ -201,6 +229,7 @@ function autoPick(
   }
   if (u.kind === 'summon') {
     if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
+    if (groupStands(s, c)) return null;
     // A spectre needs a corpse to raise.
     if ((u.corpse || u.corpseCost) && !corpseNear(w, p.x, p.y, CAST_RANGE)) return null;
     // A decoy goes up when a pack closes in, or life runs low.
@@ -400,7 +429,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     );
     if (u.second) a.side!.buffT[u.second.buff] = Math.max(0, a.side!.buffT[u.buff]);
     // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
-    if (u.policy === 'guard') {
+    if (isGuard(c.skill)) {
       const until = w.t + a.side!.buffT[u.buff] + (u.cooldown ?? 0);
       a.side!.utilityReady[GUARDS] = until;
       a.side!.utilityReady[c.key] = until;

@@ -19,7 +19,8 @@ export type StatusId =
   | 'venomed'
   | 'regenLess'
   | 'scarred'
-  | 'unnerved';
+  | 'unnerved'
+  | 'rimed';
 
 export const STATUS_IDS: StatusId[] = [
   'hinder',
@@ -38,6 +39,7 @@ export const STATUS_IDS: StatusId[] = [
   'regenLess',
   'scarred',
   'unnerved',
+  'rimed',
 ];
 
 export type StatusDef = {
@@ -149,6 +151,15 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     v: 75,
     max: 1,
     text: '{v}% reduced life and energy shield regeneration',
+  },
+  // Deep Chill: an enemy the supported skill chills takes more cold damage, as much as it is slowed; it lasts as the chill does.
+  rimed: {
+    id: 'rimed',
+    name: 'Rimed',
+    seconds: 2,
+    v: 0,
+    max: 1,
+    text: '{v}% increased cold damage taken',
   },
   scarred: {
     id: 'scarred',

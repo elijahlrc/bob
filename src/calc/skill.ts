@@ -231,6 +231,8 @@ export type SkillProfile = {
   /** Damage types (indices) that can inflict each ailment: its own, plus any a rule allows. */
   ailmentFrom: { ignite: number[]; shock: number[]; chill: number[]; freeze: number[] };
   alwaysFreezeOnCrit: boolean;
+  /** An enemy the skill chills takes more cold damage, as much as it is slowed (Deep Chill). */
+  chillTaken: boolean;
   /** Leech from critical strikes is instant. */
   instantLeechOnCrit: boolean;
   /** All leech from this skill's hits is instant. */
@@ -792,6 +794,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       freeze: ailmentSources('Freeze', COLD),
     },
     alwaysFreezeOnCrit: db.flag('alwaysFreezeOnCrit', baseCtx),
+    chillTaken: db.flag('chillTaken', baseCtx),
     instantLeechOnCrit: db.flag('instantLeechOnCrit', baseCtx),
     instantLeechAlways: db.flag('instantLeechAlways', baseCtx),
     gains: [],
@@ -863,6 +866,13 @@ export function distanceMult(p: SkillProfile, d: number): number {
     if (b.falloff !== undefined && b.range) m *= 1 - (1 - b.falloff) * clamp(d / b.range, 0, 1);
   }
   return m;
+}
+
+/** A projectile that fades with distance (falloff): the share of its chance to freeze left after flying this far, none at the end. */
+export function fadeShare(p: SkillProfile, d: number): number {
+  const b = p.skill.behaviour;
+  if (b.kind !== 'projectile' || b.falloff === undefined || !b.range) return 1;
+  return 1 - clamp(d / b.range, 0, 1);
 }
 
 export function typeIndex(t: DamageType): number {

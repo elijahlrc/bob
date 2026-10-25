@@ -27,6 +27,7 @@ export type FieldKind =
   | 'consecrated'
   | 'chilling'
   | 'caustic'
+  | 'burning'
   | 'pod'
   | 'crystal'
   | 'storm'
@@ -113,7 +114,7 @@ export function leaveGround(w: World, a: Actor, act: Action): void {
     profile: p,
     hand: act.hand,
     pulseT: 0,
-    interval: spec.kind === 'caustic' ? 0.25 : 0.5,
+    interval: spec.kind === 'caustic' || spec.kind === 'burning' ? 0.25 : 0.5,
     dps: spec.dps ?? 0,
     killCharge: spec.killCharge,
     dtype: dominantType(p),
@@ -705,8 +706,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
         for (const e of enemiesIn(w, s.team, f.x, f.y, r))
           hit(w, p, e, f.profile, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
       }
-    } else if (f.kind === 'caustic' && pulse && f.profile) {
-      // Caustic ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
+    } else if ((f.kind === 'caustic' || f.kind === 'burning') && pulse && f.profile) {
+      // Caustic (or burning) ground renews the debuff of whoever stands in it, in short spans: patches do not add up.
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
     } else if (f.kind === 'chilling' && pulse && f.dps <= 0) {
@@ -716,6 +717,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
         if (e.def.cannotBeChilled || effect <= 0) continue;
         e.ail.chill = Math.max(e.ail.chill, effect);
         e.ail.chillT = Math.max(e.ail.chillT, f.interval * 2);
+        if (f.profile?.chillTaken)
+          applyStatus(w, e, 'rimed', { seconds: f.interval * 2, v: e.ail.chill * 100 });
       }
     } else if (f.kind === 'chilling' && pulse && f.profile) {
       const q = scaleProfile(f.profile, f.dps * f.interval);
