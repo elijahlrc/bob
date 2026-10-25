@@ -12,6 +12,8 @@ import type { Mod } from '../mods/types';
 import { modsText } from '../mods/text';
 import { slotsFor, withEquipped } from '../run/inventory';
 import { GemCard } from './GemCard';
+import { GLOSSARY } from '../data/glossary';
+import { infoProps } from './info';
 
 export function rarityClass(it: InventoryItem): string {
   return it.kind === 'item'
@@ -121,6 +123,18 @@ export function weaponLine(it: Item): WeaponLine | null {
 
 /** An armour piece's defences after its own mods, each with whether it differs from the base's. */
 export type ArmourPart = { text: string; aug: boolean };
+
+/** What a defence on the card is, in plain words (docs/NEWPLAYER.md N13), by the end of its text. */
+const armourTip = (text: string): string | undefined =>
+  text.endsWith('armour')
+    ? GLOSSARY.armour
+    : text.endsWith('evasion')
+      ? GLOSSARY.evasion
+      : text.endsWith('energy shield')
+        ? GLOSSARY.es
+        : text.endsWith('block')
+          ? GLOSSARY.block
+          : undefined;
 
 export function armourLine(it: Item): ArmourPart[] | null {
   const b = itemBase(it.baseId);
@@ -276,9 +290,17 @@ export function ItemCard({
       {isWeaponClass(b.itemClass) && <div class="ic-type">{WEAPON_TYPE_NAME[b.itemClass]}</div>}
       {wl && (
         <div class="muted">
-          <span class={wl.aug[0] ? 'ic-aug' : ''}>{wl.phys}</span> ·{' '}
-          <span class={wl.aug[1] ? 'ic-aug' : ''}>{wl.speed}</span> ·{' '}
-          <span class={wl.aug[2] ? 'ic-aug' : ''}>{wl.crit}</span>
+          <span class={wl.aug[0] ? 'ic-aug' : ''} {...infoProps(GLOSSARY.hit)}>
+            {wl.phys}
+          </span>{' '}
+          ·{' '}
+          <span class={wl.aug[1] ? 'ic-aug' : ''} {...infoProps(GLOSSARY.aps)}>
+            {wl.speed}
+          </span>{' '}
+          ·{' '}
+          <span class={wl.aug[2] ? 'ic-aug' : ''} {...infoProps(GLOSSARY.crit)}>
+            {wl.crit}
+          </span>
         </div>
       )}
       {wl && wl.extra.length > 0 && <div class="ic-aug">Adds {wl.extra.join(', ')}</div>}
@@ -287,13 +309,15 @@ export function ItemCard({
           {al.map((p, i) => (
             <span key={i}>
               {i > 0 && ' · '}
-              <span class={p.aug ? 'ic-aug' : ''}>{p.text}</span>
+              <span class={p.aug ? 'ic-aug' : ''} {...infoProps(armourTip(p.text))}>
+                {p.text}
+              </span>
             </span>
           ))}
         </div>
       )}
       <div class="muted">
-        Requires {req} · item level {it.ilvl}
+        Requires {req} · <span {...infoProps(GLOSSARY.ilvl)}>item level {it.ilvl}</span>
       </div>
       {it.sockets.length > 0 && (
         <div class="ic-sockets">

@@ -51,6 +51,10 @@
   (`PouchCard`). Provisions, curses and blessings are hidden map affixes (`fixed`, `chalkOnly`), so the world, the threat preview and the rewards read them with no new
   machinery. `RunState.wayside` is optional: read it with `waysideOf(run)`. `npm run sim -- --no-wayside` and `--strategy stopper` are the measuring baselines;
   `scripts/lethal.ts` counts the deaths a reprieve could save.
+- **New-player guidance** (2026-10-25): [docs/NEWPLAYER.md](docs/NEWPLAYER.md) (N1 to N13, built). The first skill gem
+  seats itself and camp guards a map with no skill (`src/ui/GemFlow.tsx`); first-time screens are remembered per device
+  (`src/ui/intro.ts`, "Show the tips again" on the title), unlike the per-run `Tip`; plain words for terms live in
+  `src/data/glossary.ts`. New UI that brings a new word should give it a line there.
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
   spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
   `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet

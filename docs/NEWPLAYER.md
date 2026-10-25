@@ -171,6 +171,10 @@ follows the concise-text rule and the voice rule (plain rules text, overwrought 
   tab's note.
 - N11: the rings are drawn in the tree's word layer, so they pan and zoom with it; the words are a plaque at the foot of
   the view (on the tree they covered one of the nodes).
+- N13: `src/data/glossary.ts` (`GLOSSARY`, `glossFor` by stat id, `TAG_GLOSSARY` for gem tags). Every Character tab
+  row, medallion, the estimates and four section headings explain themselves on hover or tap (a dotted underline marks
+  a row that does), with one line over the columns on what ×1.10 means. Item cards explain their weapon line, defences
+  and item level; gem cards their common tags. The HUD's status pills already had their lines.
 
 ## N7. Gem socketing flow (priority)
 

@@ -3,7 +3,9 @@ import { useMemo } from 'preact/hooks';
 import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
 import { statTotals, type StatTotal, type TotalSection } from '../calc/statTotals';
 import { HEXES, hexText } from '../data/hexes';
+import { GLOSSARY, glossFor } from '../data/glossary';
 import { modLabel } from '../mods/text';
+import { infoProps } from './info';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const f1 = (v: number) => (Math.round(v * 10) / 10).toLocaleString();
@@ -33,9 +35,23 @@ const RES: [number, string, string][] = [
   [4, 'Chaos', 'chaos'],
 ];
 
-function Row({ label, value, raw }: { label: string; value: string; raw?: string }) {
+function Row({
+  label,
+  value,
+  raw,
+  tip,
+}: {
+  label: string;
+  value: string;
+  raw?: string;
+  /** What the line is, in plain words (docs/NEWPLAYER.md N13). */
+  tip?: string;
+}) {
   return (
-    <div class={'cs-row' + (value === '×1.00' ? ' def' : '')}>
+    <div
+      class={'cs-row' + (value === '×1.00' ? ' def' : '') + (tip ? ' tipped' : '')}
+      {...infoProps(tip)}
+    >
       <span class="cs-label">{label}</span>
       <span class="cs-value">
         {raw && <span class="cs-raw">{raw}</span>}
@@ -74,16 +90,31 @@ const titled = (s: string) =>
     .join(' ');
 
 const totalRow = (t: StatTotal) => (
-  <Row key={modLabel(t.mod)} label={titled(modLabel(t.mod))} value={times(t.mult)} />
+  <Row
+    key={modLabel(t.mod)}
+    label={titled(modLabel(t.mod))}
+    value={times(t.mult)}
+    tip={glossFor(t.mod.stat)}
+  />
 );
 
 /** One section of a column: a small heading and its rows; nothing at all when it has no rows. */
-function Section({ title, children }: { title: string; children: ComponentChildren }) {
+function Section({
+  title,
+  tip,
+  children,
+}: {
+  title: string;
+  tip?: string;
+  children: ComponentChildren;
+}) {
   const rows = toChildArray(children);
   if (rows.length === 0) return null;
   return (
     <section class="cs-section">
-      <h4 class="lf-h">{title}</h4>
+      <h4 class={'lf-h' + (tip ? ' tipped' : '')} {...infoProps(tip)}>
+        {title}
+      </h4>
       {rows}
     </section>
   );
@@ -118,12 +149,19 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
    * A medallion of a group at the top: name and value inside, and what is under it (the whole of a pool, a pool's
    * multiplier, a maximum) on a plaque hung from its foot. The pools are large, in wreaths.
    */
-  const tile = (label: string, value: string, notes: (string | false)[] = [], cls = '') => {
+  const tile = (
+    label: string,
+    value: string,
+    notes: (string | false)[] = [],
+    cls = '',
+    tip?: string,
+  ) => {
     const key = cls.split(' ')[0];
     return (
       <div
         key={label}
         class={`cs-tile ${cls}`}
+        {...infoProps(tip)}
         data-paint="medal"
         data-field={FIELD[key] ?? 'lapis,4'}
         data-medal={(POOLS.has(key) ? 'wreath' : '') + (key === 'cs-mana' ? ' stars' : '')}
@@ -147,19 +185,21 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             f0(s.life - s.reservedLife),
             [s.reservedLife > 0 && `of ${f0(s.life)}`, times(life?.mult ?? 1)],
             'cs-life',
+            GLOSSARY.life,
           )}
-          {tile('Energy Shield', f0(s.es), [times(es?.mult ?? 1)], 'cs-es')}
+          {tile('Energy Shield', f0(s.es), [times(es?.mult ?? 1)], 'cs-es', GLOSSARY.es)}
           {tile(
             'Mana',
             f0(s.mana - s.reservedMana),
             [`of ${f0(s.mana)}`, times(mana?.mult ?? 1)],
             'cs-mana',
+            GLOSSARY.mana,
           )}
         </div>
         <div class="cs-trio">
-          {tile('Strength', f0(s.attrs.str), [], 'cs-str')}
-          {tile('Dexterity', f0(s.attrs.dex), [], 'cs-dex')}
-          {tile('Intelligence', f0(s.attrs.int), [], 'cs-int')}
+          {tile('Strength', f0(s.attrs.str), [], 'cs-str', GLOSSARY.str)}
+          {tile('Dexterity', f0(s.attrs.dex), [], 'cs-dex', GLOSSARY.dex)}
+          {tile('Intelligence', f0(s.attrs.int), [], 'cs-int', GLOSSARY.int)}
         </div>
         <div class="cs-trio cs-four">
           {RES.map(([i, name, cls]) =>
@@ -168,10 +208,12 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               `${s.res[i]}%`,
               [`max ${s.maxRes[i]}%`],
               `cs-res-${cls}${s.res[i] < s.maxRes[i] ? ' cs-under' : ''}`,
+              cls === 'chaos' ? GLOSSARY.chaos : GLOSSARY.resist,
             ),
           )}
         </div>
       </div>
+      <p class="cs-key">{GLOSSARY.mult}</p>
       <div class="cs-cols">
         <div class="cs-col lf-panel" data-paint="panel">
           <Section title="Life and Mana">
@@ -182,27 +224,29 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               label="Physical Damage Reduction"
               value={pct(mit.physReduction)}
               raw={`${f0(s.armour)} armour`}
+              tip={GLOSSARY.armour}
             />
             {armour && totalRow(armour)}
             <Row
               label="Chance to Evade Attacks"
               value={pct(mit.evade)}
               raw={`${f0(s.evasion)} evasion`}
+              tip={GLOSSARY.evasion}
             />
             {evasion && totalRow(evasion)}
             {defence.filter((t) => t !== armour && t !== evasion).map(totalRow)}
           </Section>
           <Section title="Block and Stun">
-            <Row label="Chance to Block Attacks" value={pct(s.blockAttack)} />
-            <Row label="Chance to Block Spells" value={pct(s.blockSpell)} />
-            <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} />
+            <Row label="Chance to Block Attacks" value={pct(s.blockAttack)} tip={GLOSSARY.block} />
+            <Row label="Chance to Block Spells" value={pct(s.blockSpell)} tip={GLOSSARY.block} />
+            <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} tip={GLOSSARY.stun} />
             {of('block').map(totalRow)}
           </Section>
           <Section title="Damage Taken">{of('defenceOther').map(totalRow)}</Section>
           <Section title="Recovery">
-            <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} />
+            <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} tip={GLOSSARY.regen} />
             {lifeRate && totalRow(lifeRate)}
-            <Row label="Mana Regeneration" value={`${f1(s.manaRegen)}/s`} />
+            <Row label="Mana Regeneration" value={`${f1(s.manaRegen)}/s`} tip={GLOSSARY.regen} />
             {manaRate && totalRow(manaRate)}
             {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
           </Section>
@@ -212,18 +256,23 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           <Section title="Speed">{of('speed').map(totalRow)}</Section>
           <Section title="Critical Strikes">{of('crit').map(totalRow)}</Section>
           <Section title="Area and Projectiles">{of('reach').map(totalRow)}</Section>
-          <Section title="Ailments">{of('ailments').map(totalRow)}</Section>
-          <Section title="Hexes">
+          <Section title="Ailments" tip={GLOSSARY.ailments}>
+            {of('ailments').map(totalRow)}
+          </Section>
+          <Section title="Hexes" tip={GLOSSARY.hexes}>
             {s.hexes.map((h) => (
               <Row key={h.id} label={HEXES[h.id].name} value={hexText(h.id, h.effect)} />
             ))}
           </Section>
-          <Section title="Minions, Totems and Effects">{of('offenceOther').map(totalRow)}</Section>
+          <Section title="Minions, Totems and Effects" tip={GLOSSARY.minions}>
+            {of('offenceOther').map(totalRow)}
+          </Section>
           <Section title="Movement and More">
             <Row
               label="Movement Speed"
               value={`${f1(s.moveSpeed)} tiles/s`}
               raw={times(move?.mult ?? 1)}
+              tip={GLOSSARY.move}
             />
             {other.filter((t) => t !== move).map(totalRow)}
           </Section>
@@ -235,7 +284,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
         </div>
       ))}
       <div class="cs-est" data-paint="panel" data-field="porphyry" data-thin>
-        <span>
+        <span class="tipped" {...infoProps(GLOSSARY.dps)}>
           Estimated DPS <b>{f0(sc ? sc.pack : scenarioDps(s))}</b>
           {sc && sc.boss !== sc.pack && (
             <>
@@ -244,7 +293,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             </>
           )}
         </span>
-        <span>
+        <span class="tipped" {...infoProps(GLOSSARY.ehp)}>
           Effective HP <b>{f0(s.ehp)}</b>
         </span>
       </div>

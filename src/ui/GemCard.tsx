@@ -1,6 +1,8 @@
 import { uiZoom } from './uiScale';
 import { gemDef } from '../data/gems';
 import { gemCardData } from './gemText';
+import { TAG_GLOSSARY } from '../data/glossary';
+import { infoProps } from './info';
 
 /** What a gem does at a given level: type, tags, stats, effects, requirements. */
 export function GemCard({ gemId, level, tip }: { gemId: string; level: number; tip?: boolean }) {
@@ -14,7 +16,16 @@ export function GemCard({ gemId, level, tip }: { gemId: string; level: number; t
       <div class="muted">
         {d.type} · Level {d.level}
       </div>
-      {d.tags.length > 0 && <div class="gem-tags">{d.tags.join(', ')}</div>}
+      {d.tags.length > 0 && (
+        <div class="gem-tags">
+          {d.tags.map((t, i) => (
+            <span key={t}>
+              {i > 0 && ', '}
+              <span {...infoProps(TAG_GLOSSARY[t.toLowerCase()])}>{t}</span>
+            </span>
+          ))}
+        </div>
+      )}
       {d.stats.map((l, i) => (
         <div key={`s${i}`} class="ic-mod implicit">
           {l}

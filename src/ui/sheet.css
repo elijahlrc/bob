@@ -184,3 +184,18 @@
     padding: 22px 24px 24px;
   }
 }
+
+/* A line that explains itself on hover or tap (docs/NEWPLAYER.md N13): its name dotted underneath. */
+.cs-row.tipped .cs-label,
+.cs-section h4.tipped,
+.cs-est .tipped {
+  text-decoration: underline dotted #c09d4e99;
+  text-underline-offset: 4px;
+  cursor: help;
+}
+.cs-key {
+  margin: 0 0 10px;
+  color: var(--on-gold);
+  font-weight: 600;
+  text-align: center;
+}
