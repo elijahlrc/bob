@@ -6,7 +6,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-10-25
 
-- Slag Blow, Hoarfrost Mote, Pyre Burst and Mortar Charge now visibly throw or drop what they hit with.
+- Slag Blow, Hoarfrost Mote, Pyre Burst and Mortar Charge now visibly throw or drop what they hit with, and Tempest Mote's lightning bolts now show.
 - Glacier Wall is solid along its whole length; there is no longer a gap to walk through.
 - Buffs, curses and summons that an item triggers or a trigger support casts for you now take effect.
 - Debuffs and damage over time now show as small icons over an enemy's life bar, Impale stacks as spears in its body, and frozen enemies shatter into ice.
@@ -23,6 +23,8 @@ change, and our own names only. Dash bullets under plain headings.
 - Many skills get back what set them apart, among them their own attack speeds, Blaze Trap's burning ground and a channelled Crackle Ring; only one colossus stands at a time.
 - Chilling Shard now loses over half its damage by the end of its range but flies faster with level, and Glacier Dart flies much slower.
 - Duels can no longer be left mid-fight.
+- Tempest Mote, Pyre Burst and Orbiting Blades can now be set to Keep up on the Strategy tab.
+- At camp, the unspent passive points notice is now a button to the passive tree.
 
 ## 2026-10-24
 
