@@ -89,9 +89,11 @@ export class CueFx {
   /** The element colour of the character's skill with this id (gold when it is not found). */
   private colorOf(w: World, src: number, skill: string): { color: number; name?: string } {
     const side = w.sides.find((s) => s.player.id === src) ?? w.sides[0];
+    // (A spell a trigger grants is not among the actives: it is in the trigger's own list.)
     const c =
       side?.char?.actives?.find((x) => x.skill.id === skill) ??
-      side?.char?.utilities?.find((x) => x.skill.id === skill);
+      side?.char?.utilities?.find((x) => x.skill.id === skill) ??
+      side?.char?.triggers?.flatMap((t) => t.skills).find((x) => x.skill.id === skill);
     if (!c) return { color: 0xffd070 };
     return {
       color: ELEMENT_COLOR[elementOfTags(c.skill.tags, c.skill.spellDamage)] ?? 0xffd070,

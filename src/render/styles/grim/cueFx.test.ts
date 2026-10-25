@@ -235,6 +235,18 @@ describe('a spell cast by a trigger or an echo is seen at the character', () => 
     expect(pending(fx)).toBe(0);
   });
 
+  it('finds a spell that only a trigger grants, among the trigger’s own skills', () => {
+    const p = actor();
+    const names: string[] = [];
+    const fx = new SkillFx(host([p], names), scene);
+    const w = world(p);
+    (w.sides[0].char as unknown as { triggers: unknown[] }).triggers = [
+      { skills: [choice('graspingVines', skill)] },
+    ];
+    fx.onEvent({ t: 'trigger', skill: 'graspingVines', kind: 'hit', src: 1 }, w);
+    expect(names).toEqual(['graspingVines']);
+  });
+
   it('an echo closes a ring on the character, and many in a moment are one', () => {
     const p = actor();
     const fx = new SkillFx(host([p]), scene);

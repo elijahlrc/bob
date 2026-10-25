@@ -10,10 +10,11 @@ import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { galleryEntries, galleryRun, galleryWorld } from '../run/gallery';
 import { newRun } from '../run/run';
-import { createDummyWorld } from './dummy';
+import { createDummyWorld, dummyDefence } from './dummy';
+import { buildFor as kitBuild, classFor } from './gemKit';
 import { noteRecover, RECOVER_GAP, RECOVER_SHARE, tickRecover } from './recovery';
 import type { Actor, SimEvent, World } from './types';
-import { stepWorld } from './world';
+import { spawnMonster, stepWorld } from './world';
 
 /** The events a skill emits in the training arena over a few seconds. */
 function eventsOf(id: string, seconds = 8): SimEvent[] {
@@ -88,6 +89,45 @@ describe('a totem, a brand or a mirage archer says what fired and where (docs/VI
   });
 });
 
+describe('Echoing Blow gives each extra enemy its own thrust', () => {
+  /** The most thrusts of the character in one tick over some seconds, with `extra` other enemies standing beside the first. */
+  const mostThrusts = (extra: number): number => {
+    const { world: w, dummy } = createDummyWorld(
+      kitBuild(['crushingBlow', 'echoingBlow'], 'sword_3', classFor('str')),
+      { distance: 1.4, maxTime: 60 },
+    );
+    w.sides[0].opts.freeResources = true;
+    w.sides[0].opts.godMode = true;
+    dummy.def = dummyDefence({ maxLife: 1e9 });
+    dummy.life = 1e9;
+    for (let i = 0; i < extra; i++) {
+      const m = spawnMonster(
+        w,
+        { type: 'warrior', variant: 'none', rarity: 'normal', level: 1, mods: [] },
+        dummy.x + 0.5 + i * 0.4,
+        dummy.y + (i % 2 ? 0.9 : -0.9),
+        0,
+        0,
+        'Neighbour',
+      );
+      m.def = dummyDefence({ maxLife: 1e9 });
+      m.life = 1e9;
+    }
+    let most = 0;
+    for (let i = 0; i < 6 * 60; i++) {
+      stepWorld(w);
+      const n = w.events.filter((e) => e.t === 'thrust' && e.src === w.sides[0].player.id).length;
+      most = Math.max(most, n);
+    }
+    return most;
+  };
+
+  it('one thrust for the struck enemy and one for each other it hits; none extra when alone', () => {
+    expect(mostThrusts(0)).toBe(1);
+    expect(mostThrusts(3)).toBeGreaterThanOrEqual(3);
+  });
+});
+
 describe('a mine whose aura helps a hit is named', () => {
   const aura = { double: 30, min: 0, max: 0, cap: 0, radius: 3.5 };
   const mine = (x: number) => ({ kind: 'mine', x, y: 0, aura });
@@ -141,13 +181,21 @@ describe('a blink that waits for a flight says so (Shadow Quiver, Bolt Step)', (
 
 describe('what a trigger does is told', () => {
   it('a triggered spell says whose it is', () => {
-    const { out } = dummyEvents(
+    const { w, out } = dummyEvents(
       buildFor([{ on: 'hit', chance: 100, cooldown: 0.2, effect: { kind: 'castSocketed' } }]),
       12,
     );
     const trig = out.filter((e): e is Extract<SimEvent, { t: 'trigger' }> => e.t === 'trigger');
     expect(trig.length).toBeGreaterThan(0);
-    for (const t of trig) expect(t.src).toBeDefined();
+    const char = w.sides[0].char;
+    for (const t of trig) {
+      expect(t.src).toBe(w.sides[0].player.id);
+      // The renderer finds the spell (for its colour and name) among the character's skills or its triggers' own.
+      const known =
+        char.actives.some((c) => c.skill.id === t.skill) ||
+        char.triggers.some((s) => s.skills.some((c) => c.skill.id === t.skill));
+      expect(known, t.skill).toBe(true);
+    }
   });
 
   it('a trigger that recovers life makes a recover event, and one that sacrifices life a sacrifice', () => {
