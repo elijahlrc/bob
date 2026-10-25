@@ -187,6 +187,8 @@ export function emptyAilBase(): AilBase {
 export type HitResult = {
   outcome: HitOutcome;
   crit: boolean;
+  /** The hit rolled double damage (for the renderer's cue; the damage is already in `dmg`). */
+  doubled?: boolean;
   /** Post-mitigation damage per type (before routing to ES/life). */
   dmg: number[];
   /** Physical damage after crit, before mitigation: what an impale records. */
@@ -449,7 +451,10 @@ export function resolveHit(
       (isSpellHit || rng.chance(attackHitChance(p, hand, t.def, t.hitChanceMult, t.evasionLess))));
   let cm = (res.crit ? hand.critMulti * (p.cruelAgony ? 0.7 : 1) : 1) * hand.hitMult;
   // Double damage doubles the hit before it is mitigated (and rolls only when something gives the chance).
-  if (p.doubleChance > 0 && rng.chance(p.doubleChance)) cm *= 2;
+  if (p.doubleChance > 0 && rng.chance(p.doubleChance)) {
+    cm *= 2;
+    res.doubled = true;
+  }
   for (let i = 0; i < NT; i++) res.dmg[i] = res.H[i] * cm;
   res.rawPhys = res.dmg[PHYS];
   mitigate(p, t, res.dmg);

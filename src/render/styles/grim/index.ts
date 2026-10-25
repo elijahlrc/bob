@@ -34,6 +34,7 @@ import {
 import { CollapseFx } from './collapseFx';
 import { MOTIF_DECAL } from './areaMotifs';
 import { SkillFx, type FxHost } from './skillFx';
+import { flaskLook } from './flaskFx';
 import {
   EncounterFx,
   encounterSprite,
@@ -1825,10 +1826,9 @@ export class GrimStyle extends StyleBase {
         const side = this.sideOf(world, e.src);
         const f = side.flasks[e.idx];
         const p = this.project(side.player.x, side.player.y);
-        const col =
-          f?.spec.kind === 'mana' ? 0x4a78ff : f?.spec.kind === 'utility' ? 0xffd070 : 0xd03030;
-        this.flash(p.x, p.y - 8, col, 1.4, 0.3);
-        em.mote.explode(10, p.x, p.y - 10);
+        // The light and the motes are the flask's own colour; what it is drawn as (drops, a ward, a rush, an edge) is flaskFx.ts.
+        this.flash(p.x, p.y - 8, flaskLook(f?.spec).color, 1.4, 0.3);
+        em.mote.explode(f?.spec.kind === 'utility' ? 6 : 10, p.x, p.y - 10);
         break;
       }
       case 'blink': {

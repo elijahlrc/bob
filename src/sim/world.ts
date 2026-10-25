@@ -47,6 +47,7 @@ import { tickMinions } from './minions';
 import { tickAuraBurn } from './utility';
 import { rebuildCharacter, seedCharacters, tickCharges } from './charges';
 import { tickTriggers } from './triggers';
+import { noteRecover, tickRecover } from './recovery';
 import { Grid } from './grid';
 import { newActor } from './actor';
 import { newLedger } from './ledger';
@@ -441,7 +442,9 @@ function useFlask(w: World, side: Side, i: number): void {
       if (f.queued) return;
       f.queued = true;
     } else if (s.instant) {
+      const l0 = p.life;
       p.life = Math.min(lifeCap(p), p.life + s.life);
+      noteRecover(p, 'life', p.life - l0);
     } else {
       f.activeT = s.duration;
       f.lifeRate = s.life / s.duration;
@@ -488,6 +491,14 @@ function useFlask(w: World, side: Side, i: number): void {
   f.charges -= s.perUse;
   f.uses++;
   p.since.flask = 0;
+  // What the flask takes off (for the renderer): only the ailments that were there.
+  const cleansed: string[] = [];
+  if (s.removeIgnite && p.ail.ignites.length > 0) cleansed.push('ignite');
+  if (s.removeBleed && p.ail.bleeds.length > 0) cleansed.push('bleed');
+  if (s.removeFreeze && (p.ail.freezeT > 0 || p.ail.chill > 0)) cleansed.push('freeze');
+  if (s.removePoison && p.ail.poisons.length > 0) cleansed.push('poison');
+  if (s.removeShock && p.ail.shock > 0) cleansed.push('shock');
+  if (s.removeCurse && p.hexes.length > 0) cleansed.push('curse');
   if (s.removeIgnite) p.ail.ignites.length = 0;
   if (s.removeBleed) p.ail.bleeds.length = 0;
   if (s.removeFreeze) {
@@ -503,7 +514,12 @@ function useFlask(w: World, side: Side, i: number): void {
     p.hexes.length = 0;
     recompute(p);
   }
-  w.events.push({ t: 'flaskUsed', src: p.id, idx: i });
+  w.events.push({
+    t: 'flaskUsed',
+    src: p.id,
+    idx: i,
+    ...(cleansed.length > 0 ? { cleansed } : {}),
+  });
   rollGains(w, side, 'flask');
 }
 
@@ -512,7 +528,9 @@ function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
   for (const i of policy(w, s)) useFlask(w, s, i);
   for (const f of s.flasks) {
     if (f.esT > 0) {
+      const e0 = p.es;
       p.es = Math.min(p.def.maxEs, p.es + f.esRate * Math.min(dt, f.esT));
+      noteRecover(p, 'es', p.es - e0);
       f.esT -= dt;
       if (f.esT <= 0) {
         f.esT = 0;
@@ -522,8 +540,12 @@ function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
     if (f.activeT <= 0) continue;
     const step = Math.min(dt, f.activeT);
     f.activeT -= dt;
+    const l0 = p.life;
+    const m0 = p.mana;
     if (f.lifeRate) p.life = Math.min(lifeCap(p), p.life + f.lifeRate * step);
     if (f.manaRate) p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + f.manaRate * step);
+    noteRecover(p, 'life', p.life - l0);
+    noteRecover(p, 'mana', p.mana - m0);
     if (f.activeT <= 0) {
       f.activeT = 0;
       if (f.queued) {
@@ -873,6 +895,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   for (const s of w.order)
     if (s.id === 0 && !s.player.alive && w.status === 'running') w.status = 'dead';
   for (const s of w.order) tickCollapse(w, s);
+  for (const s of w.order) tickRecover(w, s.player, dt);
   for (const s of w.order) tickReprieve(s, dt);
   tickAbandon(w, dt);
   if (w.t >= (w.opts.maxTime ?? 900) && w.status === 'running') w.status = 'timeout';

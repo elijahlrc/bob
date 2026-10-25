@@ -179,5 +179,17 @@ fails to compile until `deliveryOf` handles it.
 
 ## Sim events the effects use
 
-`use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `hurl` (a shard thrown from a point over the ground to a spot on it: a frost orb's ice, a geyser's fire; its `explode` follows as it lands), `beam` (with its
-width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off), `impale`, `shatter`, `spread`, `kindle` (above), `minionBlow` (one blow of a minion, once however its damage splits), `botSpark` (a mote sets off a trap or a mine from where it stands), `heal`, `cue` (`mend`, `mendBroken`, `aura`, `whistle`, `zeal`, `ward`, `pools`, `immune`, `whole`), `twin`, `hexCast`, `stolen` (a monster's support, see above); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+`use` (a skill starts; with `via: 'deployed'` and `dep`, a totem, brand or mirage archer fired: what, where, at which spot, whether it flies as a projectile), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `hurl` (a shard thrown from a point over the ground to a spot on it: a frost orb's ice, a geyser's fire; its `explode` follows as it lands), `beam` (with its
+width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink` (with `skill` for the character's own), `warp` (a blink that waits for an arrow or a run), `mineBonus`, `recover`, `sacrifice`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off), `impale`, `shatter`, `spread`, `kindle` (above), `minionBlow` (one blow of a minion, once however its damage splits), `botSpark` (a mote sets off a trap or a mine from where it stands), `heal`, `cue` (`mend`, `mendBroken`, `aura`, `whistle`, `zeal`, `ward`, `pools`, `immune`, `whole`), `twin`, `hexCast`, `stolen` (a monster's support, see above); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+
+## Cues (totems, mines, triggers, flasks, blinks, recovery)
+
+Thin, short and rate-limited, because a build repeats them; none flashes a light (`cueFx.ts`, `deployFx.ts`, `flaskFx.ts`, `warpFx.ts`).
+
+- **A totem, brand or mirage archer fires:** a ring and a bright heart pulse on it, and a spark runs from it to the spot an area spell was fired at (a projectile is its own link; a trap and a mine have `sprung`).
+- **A war-cry totem** draws its reach: faint when idle, brighter with ticks turning and a lit mark over the totem while it is active.
+- **A mine's aura** is a faint ring of chevrons pointing in (fire, gold for double damage, violet for more damage taken); a hit it helped sends a spark from the mine to the enemy.
+- **A trigger** turns a rune at the character's feet and names the spell; **an echo** closes a ring on the feet. Each at most once in half a second for a skill.
+- **Shadow Quiver** looses an arrow along the path with an after-image following it; **Bolt Step** runs a jagged bolt; **Smoke Charge** throws a mine to where the character lands; **Rotting Stride** keeps a faint ring of its withering round the character.
+- **A flask** is drunk with drops (life red, mana blue, both for a hybrid) or, for a utility flask, a ward (resistances, armour), a rush (speed, evasion) or an edge (damage, critical strikes) in the colour of what it gives. A running utility flask leaves a pip under the feet that drains with it. An ailment it takes off sends motes of its colour away.
+- **Recovery:** green (life), pale (energy shield) or blue (mana) motes rise from the character when a pool gets back at least 1.5% of itself, at most once in a third of a second per pool (a steady leech is a faint stream); a sacrifice runs red drops down the character.

@@ -1,5 +1,6 @@
 import type { SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
+import { profileElement } from '../calc/skillLook';
 import { CHARGE_KINDS } from '../calc/charges';
 import { fireEffect } from './actions';
 import { gainBuff, rollGains } from './buffs';
@@ -240,8 +241,21 @@ export function extraStrikes(w: World, a: Actor, act: Action, target: Actor): vo
     .filter((e) => e !== target && e.phaseT <= 0 && Math.hypot(e.x - a.x, e.y - a.y) <= reach + e.r)
     .sort((x, y) => Math.hypot(x.x - a.x, x.y - a.y) - Math.hypot(y.x - a.x, y.y - a.y));
   a.side!.critLock = a.side!.critSeen;
-  for (const e of others.slice(0, p.extraTargets))
+  const dtype = profileElement(p, act.hand);
+  for (const e of others.slice(0, p.extraTargets)) {
+    // Each extra enemy gets its own thrust for the renderer, as the first does.
+    w.events.push({
+      t: 'thrust',
+      src: a.id,
+      x: a.x,
+      y: a.y,
+      x2: e.x,
+      y2: e.y,
+      dtype,
+      heavy: false,
+    });
     hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+  }
   a.side!.critLock = null;
 }
 

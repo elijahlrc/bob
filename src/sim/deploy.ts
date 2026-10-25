@@ -9,6 +9,7 @@ import {
 } from '../calc/deploy';
 import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
+import { profileLook } from '../calc/skillLook';
 import { standIn } from './actor';
 import { actorById, fire, segmentDist } from './actions';
 import { missileOf } from '../calc/skillLook';
@@ -330,7 +331,24 @@ function shoot(
     aimX: ax,
     aimY: ay,
   };
-  w.events.push({ t: 'use', src: s.player.id, skill: prof.skill.id, via: 'deployed' });
+  // (What fired it, from where, and at which spot, for the renderer: a totem's pulse and the line to the target.)
+  const look = profileLook(prof);
+  w.events.push({
+    t: 'use',
+    src: s.player.id,
+    skill: prof.skill.id,
+    via: 'deployed',
+    dep: {
+      id: d.id,
+      kind: d.id === 0 ? 'mirage' : d.kind,
+      x: d.x,
+      y: d.y,
+      tx: ax,
+      ty: ay,
+      shot: look.delivery === 'arrow' || look.delivery === 'orb',
+      dtype: Math.max(0, look.element),
+    },
+  });
   fire(w, from, act);
 }
 
@@ -505,8 +523,25 @@ export function mineAuraAt(
 /** The extra damage the aura of a mine adds to a hit that landed (fire, from Pyroclast). */
 export function mineAuraHit(w: World, s: Side, dst: Actor): void {
   const a = mineAuraAt(s, dst.x, dst.y);
-  if (a && a.max > 0)
+  if (a && a.max > 0) {
     rawHit(w, dst, a.min + w.rngCombat.float(0, 1) * (a.max - a.min), 3, s, 'Mine');
+    mineBonus(w, s, dst, 'fire');
+  }
+}
+
+/** Tell the renderer that a mine's aura added to a hit: the mine nearest the enemy among those whose aura reaches it. */
+export function mineBonus(w: World, s: Side, dst: Actor, kind: 'double' | 'fire'): void {
+  let best: Deployable | null = null;
+  let bd = Infinity;
+  for (const d of s.deployables) {
+    if (!d.aura || d.kind !== 'mine') continue;
+    const dist = Math.hypot(d.x - dst.x, d.y - dst.y);
+    if (dist <= d.aura.radius && dist < bd) {
+      best = d;
+      bd = dist;
+    }
+  }
+  if (best) w.events.push({ t: 'mineBonus', kind, x: dst.x, y: dst.y, mx: best.x, my: best.y });
 }
 
 /** The beams of a skill's totems: from each to the character and to the other totems, when in range and in sight. */

@@ -481,13 +481,32 @@ export type SimEvent =
   | { t: 'drop'; id: number }
   | { t: 'pickup'; id: number }
   | { t: 'chest'; id: number }
-  /** A character drank flask `idx` of its own: `src` is the character. */
-  | { t: 'flaskUsed'; src: number; idx: number }
+  /** A character drank flask `idx` of its own: `src` is the character. `cleansed` names the ailments it took off (ignite, bleed, freeze, poison, shock, curse). */
+  | { t: 'flaskUsed'; src: number; idx: number; cleansed?: string[] }
   | { t: 'projectileSpawned'; id: number }
-  /** A skill use began. `via` marks a shot fired by something the character put down (a totem, a trap), not by the character. */
-  | { t: 'use'; src: number; skill: string; via?: 'deployed' }
+  /**
+   * A skill use began. `via` marks a shot fired by something the character put down (a totem, a trap), not by the character; `dep` then
+   * says what fired it (`kind` is a deployable's, or 'mirage'), from where, at which spot, and whether the skill flies as a projectile.
+   */
+  | {
+      t: 'use';
+      src: number;
+      skill: string;
+      via?: 'deployed';
+      dep?: {
+        id: number;
+        kind: string;
+        x: number;
+        y: number;
+        tx: number;
+        ty: number;
+        shot: boolean;
+        dtype: number;
+      };
+    }
   | { t: 'echo'; src: number; skill: string }
-  | { t: 'trigger'; skill: string; kind: string }
+  /** A trigger cast a spell by itself (`src` is the character it belongs to). */
+  | { t: 'trigger'; skill: string; kind: string; src?: number }
   | { t: 'chain'; from: number; to: number; dtype?: number }
   /** A melee sweep (the arc, in degrees, centred on `facing`) and a melee thrust at one target; `heavy` is a slam or a boss blow. */
   | {
@@ -560,7 +579,8 @@ export type SimEvent =
       width?: number;
       skill?: string;
     }
-  | { t: 'blink'; id: number; x: number; y: number; end: boolean; dtype?: number }
+  /** `skill` names the character's own blink skill that made it (absent for a monster's travel). */
+  | { t: 'blink'; id: number; x: number; y: number; end: boolean; dtype?: number; skill?: string }
   /**
    * A monster dragged a character toward itself (a hook, a lance, a pattern's hooked lane): `dst` stood at (x, y) and now stands at
    * (x2, y2); the hook is at (hx, hy). The renderer draws the chain and the reel-in.
@@ -594,6 +614,23 @@ export type SimEvent =
     }
   /** A monster began the warning of a charge: it rushes in a straight line `seconds` from now (the renderer marks the lane). */
   | { t: 'rush'; id: number; seconds: number }
+  /** A blink that waits for something to cross the ground first (an arrow, a run): from (x, y) to (x2, y2) in `seconds`, then the blink ends. */
+  | {
+      t: 'warp';
+      id: number;
+      skill: string;
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      seconds: number;
+    }
+  /** The aura of a mine did something to a hit: `double` the hit dealt double damage, `fire` it added fire damage. (mx, my) is the mine, (x, y) the enemy. */
+  | { t: 'mineBonus'; kind: 'double' | 'fire'; x: number; y: number; mx: number; my: number }
+  /** A character got back life, energy shield or mana, as a share (0 to 1) of that pool: summed over a moment, and only a share worth showing. */
+  | { t: 'recover'; src: number; pool: 'life' | 'es' | 'mana'; pct: number }
+  /** A character gave up life for something else (a trigger's sacrifice). */
+  | { t: 'sacrifice'; src: number; amount: number }
   | { t: 'charge'; kind: string; count: number }
   /** Charges the character spent on purpose (to skip a cooldown, or to power a skill). */
   | { t: 'spend'; kind: string; n: number }
