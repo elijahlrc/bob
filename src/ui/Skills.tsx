@@ -27,6 +27,7 @@ import { infoProps } from './info';
 import { Badge } from './SocketPicker';
 import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
+import { matchesTerms, searchTerms } from './search';
 import { useRehearsal } from './rehearsal';
 
 const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Auras'] as const;
@@ -151,7 +152,7 @@ export function Skills({
         }),
     [gemKey],
   );
-  const needle = q.trim().toLowerCase();
+  const terms = searchTerms(q);
   // The list's filters (kept between visits): one of each gem, only what the weapons in hand can use, and the supports that
   // would act on one chosen skill.
   const [oneEach, setOneEach] = useState(() => loadPref('gemOneEach', false));
@@ -192,11 +193,12 @@ export function Skills({
       if (!typesAllow(def, new Set(forResolved.types)) || !supportLive(def, forResolved).live)
         return false;
     }
-    if (!needle) return true;
+    if (!terms.length) return true;
     const d = gemCardData(def, 20);
-    return `${d.name} ${d.type} ${d.tags.join(' ')} ${d.description}`
-      .toLowerCase()
-      .includes(needle);
+    return matchesTerms(
+      `${d.name} ${d.type} ${d.tags.join(' ')} ${d.description}`.toLowerCase(),
+      terms,
+    );
   });
   const levelOf = (uid: number) => ch.gems.find((g) => g.gem.uid === uid)?.level ?? 1;
   const bagLevel = (d: GemDef) => naturalGemLevel(d, run.build.level, ch.attrs);
@@ -621,6 +623,7 @@ export function Skills({
               class="sk-search"
               type="text"
               placeholder="Search by name, tag or type"
+              title="Commas join terms: area, attack"
               value={q}
               onInput={(e) => {
                 const v = (e.target as HTMLInputElement).value;

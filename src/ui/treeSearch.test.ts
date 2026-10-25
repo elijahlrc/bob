@@ -11,6 +11,7 @@ describe('the tree search', () => {
   it('splits a query into words and ignores the rest', () => {
     expect(searchWords('  Spell   CRIT ')).toEqual(['spell', 'crit']);
     expect(searchWords('   ')).toEqual([]);
+    expect(searchWords('spell, crit')).toEqual(['spell', 'crit']);
   });
 
   it('finds nothing for an empty query', () => {

@@ -20,6 +20,7 @@ import { ask } from './Confirm';
 import { useViewport } from './device';
 import { rarityClass } from './ItemCard';
 import { loadPref, savePref } from './prefs';
+import { matchesTerms, searchTerms } from './search';
 import { Actions } from './WbActions';
 import { Guide, Pouch, type GroupId } from './WbPouch';
 import { ResultPanel } from './WbResult';
@@ -53,14 +54,14 @@ function Picker({
 }) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  const q = query.trim().toLowerCase();
+  const terms = searchTerms(query);
   const shown = rows.filter(
     (r) =>
       (filter === 'all' || (filter === 'worn') === r.worn) &&
-      (!q ||
-        r.item.name.toLowerCase().includes(q) ||
-        r.where.toLowerCase().includes(q) ||
-        itemBase(r.item.baseId).name.toLowerCase().includes(q)),
+      matchesTerms(
+        `${r.item.name} ${r.where} ${itemBase(r.item.baseId).name}`.toLowerCase(),
+        terms,
+      ),
   );
   return (
     <div class="wx-picker">

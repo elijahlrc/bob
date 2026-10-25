@@ -18,6 +18,7 @@ import {
   UTILITY_COLOR,
 } from '../calc/skillLook';
 import { gemCardData } from './gemText';
+import { matchesTerms, searchTerms } from './search';
 
 type Tab = 'gems' | 'uniques' | 'look';
 
@@ -49,22 +50,22 @@ export function Codex({ c }: { c: Controller }) {
   const [foundOnly, setFoundOnly] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const found = c.found();
-  const needle = q.trim().toLowerCase();
+  const terms = searchTerms(q);
 
   const gems = ALL_GEMS.filter((g) => {
     if (foundOnly && !found.has(g.id)) return false;
-    if (!needle) return true;
+    if (!terms.length) return true;
     const d = gemCardData(g, 20);
-    return `${g.name} ${d.type} ${d.tags.join(' ')} ${d.description}`
-      .toLowerCase()
-      .includes(needle);
+    return matchesTerms(
+      `${g.name} ${d.type} ${d.tags.join(' ')} ${d.description}`.toLowerCase(),
+      terms,
+    );
   }).sort((a, b) => a.name.localeCompare(b.name));
 
   const uniques = [...UNIQUES, ...UNIQUE_FLASKS]
     .filter((u) => {
       if (foundOnly && !found.has(u.id)) return false;
-      if (!needle) return true;
-      return `${u.name} ${u.flavour}`.toLowerCase().includes(needle);
+      return matchesTerms(`${u.name} ${u.flavour}`.toLowerCase(), terms);
     })
     .sort((a, b) => a.name.localeCompare(b.name));
 

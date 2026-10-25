@@ -22,6 +22,7 @@ import { waysideOf } from '../run/wayside';
 import { ReprieveCard } from './Satchel';
 import { WareCard } from './WareCard';
 import { itemTitle, rarityClass } from './ItemCard';
+import { matchesTerms, searchTerms } from './search';
 
 /**
  * A stop's emblem: a few of the painted objects it deals in, standing in its niche (the empty middle of a stop card,
@@ -229,11 +230,11 @@ function Awlsmith({
   const dust = run.dust;
   if (!items.length)
     return <div class="muted">None of your items has room for another socket.</div>;
-  const q = search.trim().toLowerCase();
+  const terms = searchTerms(search);
   const shown = items.filter(
     (i) =>
       (show === 'all' || worn.has(i.uid) === (show === 'worn')) &&
-      (!q || searchText(i).includes(q)),
+      matchesTerms(searchText(i), terms),
   );
   const chips: [typeof show, string, number][] = [
     ['worn', 'Worn', nWorn],

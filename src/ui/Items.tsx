@@ -35,6 +35,7 @@ import { ItemDetail, type Sel } from './ItemDetail';
 import { ItemList, type ListSort, type View, type What } from './ItemList';
 import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
+import { matchesTerms, searchTerms } from './search';
 
 type Drag = { kind: 'inv'; uid: number } | { kind: 'slot'; slot: EquipSlot } | null;
 
@@ -143,7 +144,7 @@ export function Items({
     if (startView === 'upgrades' && view === 'upgrades' && counts.upgrades === 0)
       setView(counts.last ? 'last' : 'all');
   }, []);
-  const q = search.trim().toLowerCase();
+  const terms = searchTerms(search);
   const visible = useMemo(() => {
     let pool: InventoryItem[] = view === 'discarded' ? pile : run.inventory;
     if (view === 'new') pool = pool.filter((x) => unseen.has(x.uid));
@@ -151,7 +152,7 @@ export function Items({
     else if (view === 'fav') pool = pool.filter((x) => favs.has(x.uid));
     else if (view === 'upgrades') pool = filterItems(pool, infos, 'upgrades');
     if (what !== 'all') pool = filterItems(pool, listInfos, what);
-    if (q) pool = pool.filter((x) => searchText(x).includes(q));
+    if (terms.length) pool = pool.filter((x) => matchesTerms(searchText(x), terms));
     const sorted = sortItems(pool, listInfos, sort === 'fav' ? 'newest' : sort, desc);
     // Sorted by favourites: the starred ones first, newest first inside both groups.
     return sort === 'fav'
@@ -166,7 +167,7 @@ export function Items({
     desc,
     what,
     view,
-    q,
+    search,
     lastDrops,
     unseen,
     favs,
