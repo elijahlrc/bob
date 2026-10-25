@@ -454,6 +454,7 @@ function orbBolt(
   fromX: number,
   fromY: number,
   orb: NonNullable<Side['stormOrb']>,
+  from?: Actor,
 ): void {
   const p = orb.profile;
   const spec = p.skill.stormOrb!;
@@ -472,10 +473,12 @@ function orbBolt(
     .filter((n) => n.d <= spec.reach)
     .sort((a, b) => a.d - b.d)
     .slice(0, splits);
-  for (const n of [first, ...rest]) {
-    w.events.push({ t: 'chain', from: 0, to: n.e.id, dtype: 1 });
+  // The bolt leaves the orb (or the character) for the first enemy and splits from there to the others.
+  const src = from ? { from: from.id } : { from: 0, at: { x: fromX, y: fromY } };
+  w.events.push({ t: 'chain', ...src, to: first.e.id, dtype: 1 });
+  for (const n of rest) w.events.push({ t: 'chain', from: first.e.id, to: n.e.id, dtype: 1 });
+  for (const n of [first, ...rest])
     hit(w, s.player, n.e, p, orb.hand, Math.hypot(n.e.x - s.player.x, n.e.y - s.player.y));
-  }
 }
 
 function tickOrb(w: World, s: Side, dt: number): void {
@@ -504,7 +507,7 @@ export function orbAnswers(w: World, s: Side, p: SkillProfile): void {
   if (!o || p.skill.id === o.profile.skill.id || !p.skill.tags.includes('lightning')) return;
   const r = o.profile.skill.stormOrb!.radius * o.profile.radiusMult;
   if (Math.hypot(s.player.x - o.x, s.player.y - o.y) > r) return;
-  orbBolt(w, s, s.player.x, s.player.y, o);
+  orbBolt(w, s, s.player.x, s.player.y, o, s.player);
 }
 
 // ---- Fuse Arrow: arrows that stick, and the first to explode takes the rest with it

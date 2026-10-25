@@ -507,7 +507,8 @@ export type SimEvent =
   | { t: 'echo'; src: number; skill: string }
   /** A trigger cast a spell by itself (`src` is the character it belongs to). */
   | { t: 'trigger'; skill: string; kind: string; src?: number }
-  | { t: 'chain'; from: number; to: number; dtype?: number }
+  /** A bolt from actor `from` to actor `to`, or from the point `at` (a Tempest Mote's orb) when `from` is 0. */
+  | { t: 'chain'; from: number; to: number; dtype?: number; at?: { x: number; y: number } }
   /** A melee sweep (the arc, in degrees, centred on `facing`) and a melee thrust at one target; `heavy` is a slam or a boss blow. */
   | {
       t: 'swing';

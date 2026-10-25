@@ -1749,15 +1749,17 @@ export class GrimStyle extends StyleBase {
         break;
       }
       case 'chain': {
-        const a = this.pxOf(e.from);
+        // From an actor, its chest; from a point (a Tempest Mote's orb), the orb as it is drawn, 14 px up.
+        const p0 = e.at ? this.project(e.at.x, e.at.y) : this.pxOf(e.from);
+        const a = p0 && { x: p0.x, y: p0.y - (e.at ? 14 : 8) };
         const b = this.pxOf(e.to);
         if (a && b) {
-          const pts: { x: number; y: number }[] = [{ x: a.x, y: a.y - 8 }];
+          const pts: { x: number; y: number }[] = [{ x: a.x, y: a.y }];
           const n = 7;
           for (let i = 1; i < n; i++)
             pts.push({
               x: a.x + ((b.x - a.x) * i) / n + (Math.random() - 0.5) * 9,
-              y: a.y - 8 + ((b.y - a.y) * i) / n + (Math.random() - 0.5) * 9,
+              y: a.y + ((b.y - 8 - a.y) * i) / n + (Math.random() - 0.5) * 9,
             });
           pts.push({ x: b.x, y: b.y - 8 });
           const col = DTYPE_COLOR[e.dtype ?? 1] ?? 0xb890ff;
