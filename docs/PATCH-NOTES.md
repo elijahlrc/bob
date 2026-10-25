@@ -18,6 +18,9 @@ change, and our own names only. Dash bullets under plain headings.
 - After a level, the Items tab opens on your upgrades.
 - The map is repainted in the menus' gold leaf, from gilded health bars to worn stone floors, walls and monster colours.
 - Thorned monsters and Gilded Guards reflect far less of your melee damage, and the death recap now names it Thorns.
+- Menus and tabs open faster.
+- In a large window the interface scales up to fill it, and the Interface size buttons are now on desktop too.
+- The skill gem picks in the first five maps offer only gems that suit your class's attributes.
 
 ## 2026-10-23
 
