@@ -16,6 +16,8 @@ change, and our own names only. Dash bullets under plain headings.
 - On touch screens, tapping a gem on the Skills tab shows its card with what it does.
 - Long labels on the passive tree wrap onto several lines instead of running across the view.
 - After a level, the Items tab opens on your upgrades.
+- The map is repainted in the menus' gold leaf, from gilded health bars to worn stone floors, walls and monster colours.
+- Thorned monsters and Gilded Guards reflect far less of your melee damage, and the death recap now names it Thorns.
 
 ## 2026-10-23
 
