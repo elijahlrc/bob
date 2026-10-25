@@ -251,9 +251,14 @@ export function Camp({ c }: { c: Controller }) {
   useEffect(() => {
     const el = tabsEl;
     if (!el) return;
+    // An arrow while the first or last tab is cut off at that end. Not the scroll position: on a phone the tabs snap
+    // into place with the first one at the edge, which leaves the band scrolled by its own padding.
     const look = () => {
-      const left = el.scrollLeft > 2;
-      const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
+      const tabs = el.querySelectorAll<HTMLElement>('.tab');
+      if (!tabs.length) return;
+      const box = el.getBoundingClientRect();
+      const left = tabs[0].getBoundingClientRect().left < box.left - 1;
+      const right = tabs[tabs.length - 1].getBoundingClientRect().right > box.right + 1;
       setEdges((e) => (e.left === left && e.right === right ? e : { left, right }));
     };
     look();
