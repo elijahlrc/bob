@@ -39,7 +39,7 @@ import { tickSkillFx } from './skillFx';
 import { recompute, tickCurseAura } from './hexes';
 import { tickBerserk, tickDegen, tickStance } from './stances';
 import { tickProliferation } from './proliferate';
-import { tickFields } from './fields';
+import { tickFields, tickLobbed } from './fields';
 import { tickShots } from './shots';
 import { tickDeployables } from './deploy';
 import { tickMinions } from './minions';
@@ -309,6 +309,7 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
     stacks: null,
     hitsLanded: 0,
     shots: [],
+    lobbed: [],
     lastOutcome: null,
     player,
     char,
@@ -805,6 +806,7 @@ export function stepWorld(w: World, policy: FlaskPolicy = autoFlaskPolicy): void
   }
   for (const s of w.order) tickPackPlays(w, s, dt);
   for (const s of w.order) tickShots(w, s);
+  for (const s of w.order) tickLobbed(w, s);
   for (const s of w.order) tickChannel(w, s);
   for (const s of w.order) tickFields(w, s, dt);
   for (const s of w.order) tickBanner(w, s, dt);

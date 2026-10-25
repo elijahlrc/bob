@@ -689,6 +689,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         r: radius,
         dtype: dominant,
         ...(a.isPlayer ? { skill: p.skill.id } : {}),
+        ...(act.fall ? { fall: act.fall } : {}),
       });
     const inside = enemiesOf(w, a).filter((e) => Math.hypot(e.x - cx, e.y - cy) <= radius + e.r);
     // A debuff that holds only so many enemies takes the nearest.
@@ -878,8 +879,14 @@ export function updateProjectiles(w: World, dt: number): void {
           const rm = pr.profile.skill.returnMore;
           if (rm) pr.profile = scaleProfile(pr.profile, 1 + rm / 100);
         } else {
-          // An arrow fired into the air comes down and bursts.
-          if (pr.kind === 'mortar' || pr.kind === 'creep') explode(w, owner, pr, pr.x, pr.y);
+          // An arrow fired into the air comes down and bursts, on the spot it was thrown to (not a step past it).
+          if (pr.kind === 'mortar' || pr.kind === 'creep') {
+            const sp = Math.hypot(pr.vx, pr.vy) || 1;
+            const over = Math.min(pr.travelled - pr.maxRange, (sp * dt) / steps);
+            pr.x -= (pr.vx / sp) * over;
+            pr.y -= (pr.vy / sp) * over;
+            explode(w, owner, pr, pr.x, pr.y);
+          }
           if (pr.bouncesLeft && owner) bounceLob(w, owner, pr);
           projectileLanded(w, pr, owner);
           endProjectile(w, pr, pr.kind === 'mortar' || pr.kind === 'creep' ? 3 : 1);

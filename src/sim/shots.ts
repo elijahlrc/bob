@@ -40,6 +40,8 @@ const BARRAGE_GAP = 0.07;
 const MORTAR_APART = 0.45;
 /** Molten balls thrown together land at least this far apart, in tiles. */
 const BALL_APART = 0.7;
+/** A ball is thrown at least this far, in tiles (a spot at the thrower's feet still has a way to fly). */
+const BALL_MIN_THROW = 0.3;
 /** Lane spacing of parallel projectiles, in tiles. */
 const LANE = 0.6;
 /** The randomised spread of a barrage, in radians (about twenty degrees across). */
@@ -593,21 +595,18 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
         if (landed.every((l) => Math.hypot(l.x - spot.x, l.y - spot.y) >= BALL_APART)) break;
       }
       landed.push(spot);
-      a.side!.zones.push({
-        id: w.nextId++,
-        owner: a.id,
-        profile: p,
-        hand: act.hand,
-        x: spot.x,
-        y: spot.y,
-        x2: undefined,
-        y2: undefined,
-        radius: (spec.explodeRadius ?? 1.2) * p.radiusMult,
-        delayT: 0.3 + w.rngCombat.float(0, 0.3),
-        interval: 1,
-        pulseT: 0,
-        pulsesLeft: 1,
-        dtype: dominantType(p, act.hand),
+      // Each ball is lobbed from the hand to its spot and bursts there, 0.3 to 0.6 s after the blow (the same draw as the
+      // delay the ground burst had); the speed follows the distance, and a faster projectile brings it sooner.
+      const dist = Math.max(BALL_MIN_THROW, Math.hypot(spot.x - a.x, spot.y - a.y));
+      const flight = 0.3 + w.rngCombat.float(0, 0.3);
+      launch(w, a, p, act.hand, a.x, a.y, Math.atan2(spot.y - a.y, spot.x - a.x), {
+        hitIds: [],
+        aimId: struck.id,
+        range: dist,
+        explode: (spec.explodeRadius ?? 1.2) * p.radiusMult,
+        pierce: 999,
+        kind: 'mortar',
+        speedMult: dist / flight / PROJECTILE_SPEED,
       });
     }
   }

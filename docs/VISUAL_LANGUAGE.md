@@ -85,7 +85,8 @@ Every projectile is drawn by `projectileFx.ts`: an **attack flies as an arrow** 
 **tornado**, a **skull**, a mirrored pair of arrows. Each rides a hand's height over the floor with a **shadow where it truly is** and leaves a tapered
 **trail** (not a spray of particles). A flight the description calls a lob (a mortar shell, the arrow of a nova) **rises and falls**; only the picture
 lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Things that fall (a rain of arrows, a hail of embers: `FALLING_SKILLS` in
-`skillLook.ts`) are drawn coming down and splashing where they land.
+`skillLook.ts`) are drawn coming down and splashing where they land (so are the smaller bursts a mine rains: their `explode` carries `fall`). The balls a
+strike throws (Slag Blow) are real mortar shells, drawn as orbs, that burst where they land.
 
 ## Upkeep skills (no damage, no element)
 
@@ -107,5 +108,5 @@ fails to compile until `deliveryOf` handles it.
 
 ## Sim events the effects use
 
-`use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `beam` (with its
+`use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `hurl` (a shard thrown from a point over the ground to a spot on it: a frost orb's ice, a geyser's fire; its `explode` follows as it lands), `beam` (with its
 width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
