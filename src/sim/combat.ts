@@ -47,7 +47,8 @@ import { invulnerable, reprieveFires } from './reprieve';
 import { rollGains } from './buffs';
 import { gainTrophy, rollCharges } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
-import { mineAuraAt, mineAuraHit } from './deploy';
+import { mineAuraAt, mineAuraHit, mineBonus } from './deploy';
+import { noteRecover } from './recovery';
 import { refreshOnKill, stanceFarLess } from './stances';
 import { afterPlayerHit } from './supportFx';
 import { applyHex, applyPlayerHexes, hexHit, hexKill, tickHexes } from './hexes';
@@ -348,6 +349,7 @@ function addLeech(
     if (list === 'life') src.life += amount;
     else if (list === 'es') src.es = Math.min(src.def.maxEs, src.es + amount);
     else src.mana += amount;
+    noteRecover(src, list, amount);
     return;
   }
   const arr = src.leech[list];
@@ -577,21 +579,35 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       ll += res.dmg[i] * p.leechLife[i];
       lm += res.dmg[i] * p.leechMana[i];
     }
-  if (src.def.leechToEs && instant) src.es = Math.min(src.def.maxEs, src.es + ll);
-  else addLeech(src, 'life', ll, instant);
+  if (src.def.leechToEs && instant) {
+    const es0 = src.es;
+    src.es = Math.min(src.def.maxEs, src.es + ll);
+    noteRecover(src, 'es', src.es - es0);
+  } else addLeech(src, 'life', ll, instant);
   addLeech(src, 'mana', lm, instant);
   // Energy shield leeched from the damage (Ward Siphon).
   let le = 0;
   if (!dst.def.cannotBeLeechedFrom)
     for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
   if (le > 0) addLeech(src, 'es', le, instant);
-  if (p.lifeOnHit > 0) src.life = Math.min(lifeCap(src), src.life + p.lifeOnHit);
-  if (p.esOnHit > 0 && src.isPlayer) src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
-  if (p.manaOnHit > 0 && src.isPlayer)
+  if (p.lifeOnHit > 0) {
+    const l0 = src.life;
+    src.life = Math.min(lifeCap(src), src.life + p.lifeOnHit);
+    noteRecover(src, 'life', src.life - l0);
+  }
+  if (p.esOnHit > 0 && src.isPlayer) {
+    const e0 = src.es;
+    src.es = Math.min(src.def.maxEs, src.es + p.esOnHit);
+    noteRecover(src, 'es', src.es - e0);
+  }
+  if (p.manaOnHit > 0 && src.isPlayer) {
+    const m0 = src.mana;
     src.mana = Math.min(
       Math.max(0, src.def.maxMana - reservedMana(src.side!)),
       src.mana + p.manaOnHit,
     );
+    noteRecover(src, 'mana', src.mana - m0);
+  }
 
   const wasAlive = dst.alive;
   if (src.isPlayer) applyPlayerHexes(w, src.side!, dst);
@@ -877,6 +893,7 @@ export function hit(
   if (p.stunFull > 0 && wasFull && canStun && res.outcome === 'hit' && res.stun < p.stunFull)
     res.stun = p.stunFull;
   applyHit(w, src, dst, p, res);
+  if (aura && aura.double > 0 && res.doubled) mineBonus(w, src.side!, dst, 'double');
   if (aura && aura.max > 0 && dst.alive) mineAuraHit(w, src.side!, dst);
 }
 
@@ -1136,9 +1153,17 @@ function killGains(
   const lok =
     fs.char.db.sum('base', 'lifeOnKill', kctx) +
     (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
-  if (lok > 0) p.life = Math.min(lifeCap(p), p.life + lok);
+  if (lok > 0) {
+    const l0 = p.life;
+    p.life = Math.min(lifeCap(p), p.life + lok);
+    noteRecover(p, 'life', p.life - l0);
+  }
   const mok = fs.char.db.sum('base', 'manaOnKill', kctx);
-  if (mok > 0) p.mana = Math.min(p.def.maxMana - reservedMana(fs), p.mana + mok);
+  if (mok > 0) {
+    const m0 = p.mana;
+    p.mana = Math.min(p.def.maxMana - reservedMana(fs), p.mana + mok);
+    noteRecover(p, 'mana', p.mana - m0);
+  }
 }
 
 /**
@@ -1476,6 +1501,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   if (a.isPlayer && !suppressed) {
     const manaCap = Math.max(0, def.maxMana - reservedMana(a.side!));
     a.mana = Math.min(manaCap, a.mana + def.manaRegen * dt);
+    const m0 = a.mana;
     leechTick(
       a.leech.mana,
       (x) => (a.mana = Math.min(manaCap, a.mana + x)),
@@ -1484,8 +1510,11 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       a.mana >= manaCap,
       def.leechRate,
     );
+    noteRecover(a, 'mana', a.mana - m0);
   }
   if (suppressed) return;
+  const life0 = a.life;
+  const es0 = a.es;
   if (def.leechToEs)
     leechTick(
       a.leech.life,
@@ -1513,6 +1542,8 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       a.es >= def.maxEs,
       def.leechRate,
     );
+  noteRecover(a, 'life', a.life - life0);
+  noteRecover(a, 'es', a.es - es0);
   if (def.esRegen > 0 && a.es < def.maxEs) a.es = Math.min(def.maxEs, a.es + def.esRegen * dt);
   // ES recharge.
   if (def.maxEs > 0 && a.es < def.maxEs && a.since.damaged >= def.esDelay)

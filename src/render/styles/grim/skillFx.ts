@@ -28,6 +28,10 @@ import { isViewer } from '../../style/who';
 import { playMotif, tongue } from './areaMotifs';
 import { drawBuffs, type BuffMark } from './buffFx';
 import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
+import { CueFx } from './cueFx';
+import { drawDeployZones } from './deployFx';
+import { drawFlaskPips, FlaskFx } from './flaskFx';
+import { WarpFx } from './warpFx';
 
 /**
  * Skill effects for the grim style, drawn from sim events and sim state. The language (see src/calc/skillLook.ts):
@@ -74,6 +78,9 @@ const KIND_COLOR = { totem: 0xc8a060, brand: 0xb070ff, trap: 0xe0c040, mine: 0xf
 /** Seconds a trap or a mine takes to fly from the hand to the ground, and a totem or a brand to drop onto it. */
 const LOB_SECONDS = 0.3;
 const DROP_SECONDS = 0.18;
+/** The mine that an escape skill throws flies a little faster, and is the grey of its smoke. */
+const SMOKE_THROW = 0.25;
+const SMOKE_COLOR = 0xb0b0b8;
 
 /** What a deployable still in the air needs to be drawn, and to land. */
 type Flight = {
@@ -114,11 +121,20 @@ export class SkillFx {
   private lastBuff = new Map<string, number>();
   private lastHex = new Map<number, number>();
   private now = 0;
+  /** Ids of the mines thrown by a blink (negative, so none is a deployable's). */
+  private thrown = 0;
 
   private host: FxHost;
+  /** Cues of things that fire, trigger, echo and recover; flasks; blinks that wait for a flight. */
+  private cues: CueFx;
+  private flask: FlaskFx;
+  private warps: WarpFx;
 
   constructor(host: FxHost, scene: Phaser.Scene) {
     this.host = host;
+    this.cues = new CueFx(host, (t, air, draw) => this.add(t, air, draw));
+    this.flask = new FlaskFx(host, (t, air, draw) => this.add(t, air, draw));
+    this.warps = new WarpFx(host);
     // Light adds up: effects glow against the dark map.
     this.air = scene.add.graphics().setDepth(94500).setBlendMode(1);
   }
@@ -245,8 +261,12 @@ export class SkillFx {
   onEvent(e: SimEvent, w: World): void {
     switch (e.t) {
       case 'use': {
-        // A trap that goes off or a totem that shoots is not the character casting: no cue round the character.
-        if (e.via) break;
+        // A trap that goes off or a totem that shoots is not the character casting: no cue round the character (the
+        // thing that fired has its own).
+        if (e.via) {
+          this.cues.onEvent(e, w, this.now);
+          break;
+        }
         const a = this.host.actorById(e.src);
         if (a) this.cast(a, w);
         break;
@@ -336,6 +356,7 @@ export class SkillFx {
         break;
       }
       case 'blink': {
+        this.warps.onEvent(e, w);
         if (!e.end) {
           this.blinkFrom.set(e.id, { x: e.x, y: e.y });
           break;
@@ -347,8 +368,22 @@ export class SkillFx {
         const b = this.lifted(e.x, e.y);
         this.add(0.24, true, (g, k) => this.streak(g, [a, b], UTILITY_COLOR.blink, 1 - k, 1.4));
         this.wave(e.x, e.y, 0.2, 1.0, UTILITY_COLOR.blink, 0.3, 1.5);
+        if (this.isEscape(e, w)) this.throwMine(from, e);
         break;
       }
+      case 'warp':
+        this.warps.onEvent(e, w);
+        break;
+      case 'mineBonus':
+      case 'trigger':
+      case 'echo':
+      case 'recover':
+      case 'sacrifice':
+        this.cues.onEvent(e, w, this.now);
+        break;
+      case 'flaskUsed':
+        this.flask.onEvent(e, w);
+        break;
       case 'deploy':
         if (e.end) {
           // It ended while still in the air (a trap sprang the moment it was thrown): it is gone, not landing.
@@ -394,6 +429,28 @@ export class SkillFx {
       fromX: from.x,
       fromY: from.y,
       glow: this.glowOf(w, e.id),
+    });
+  }
+
+  /** Whether a blink was made by an escape skill (Smoke Charge), which throws a mine and goes to it. */
+  private isEscape(e: Extract<SimEvent, { t: 'blink' }>, w: World): boolean {
+    if (!e.skill) return false;
+    const side = w.sides.find((s) => s.player.id === e.id) ?? w.sides[0];
+    const u = side?.char?.utilities?.find((x) => x.skill.id === e.skill)?.skill.utility;
+    return u?.kind === 'blink' && !!u.escape;
+  }
+
+  /** The mine of an escape skill flies from where the character stood to where it lands, as a thrown mine does. */
+  private throwMine(from: Pt, e: Extract<SimEvent, { t: 'blink' }>): void {
+    this.flights.set(--this.thrown, {
+      t: SMOKE_THROW,
+      total: SMOKE_THROW,
+      kind: 'mine',
+      x: e.x,
+      y: e.y,
+      fromX: from.x,
+      fromY: from.y,
+      glow: SMOKE_COLOR,
     });
   }
 
@@ -768,6 +825,7 @@ export class SkillFx {
     const air = this.air;
     air.clear();
     this.flying(ground, air, dt, time);
+    this.warps.frame(w, dt, time, ground, air);
     for (const s of w.sides) this.fieldMarks(ground, air, s, time);
     this.curseMarks(air, w, time);
     for (const s of w.sides) this.siphons(air, w, s, time);
@@ -951,6 +1009,7 @@ export class SkillFx {
       const fade = Math.min(1, d.t);
       const armed = d.fireT <= 0.05;
       const going = d.goAt !== undefined;
+      drawDeployZones(g, this.host, d, choice, fade, time);
       this.deployable(g, d.kind, x, y, glow, fade, armed, going, time, d.id, 0);
       if (d.kind !== 'trap' && d.kind !== 'mine') continue;
       if (going) {
@@ -1421,6 +1480,7 @@ export class SkillFx {
       marks.push({ id, alpha: left < 1.5 ? 0.4 + 0.6 * Math.abs(Math.sin(time * 8)) : 1 });
     }
     drawBuffs(air, ground, this.host, p, marks, time);
+    drawFlaskPips(ground, this.host, side, time);
   }
 
   /** A curse is a violet sigil turning over the head of each enemy that carries one. */

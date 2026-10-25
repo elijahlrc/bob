@@ -167,6 +167,17 @@ export function blinkCast(
         ? run / (PROJECTILE_SPEED * u.warp.speed * p.projSpeedMult)
         : (run / Math.max(0.5, a.def.moveSpeed)) *
           (1 - levelValue(u.warp.lessDuration, c.skill.level) / 100);
+    // (For the renderer: the arrow or the run that crosses the ground meanwhile.)
+    w.events.push({
+      t: 'warp',
+      id: a.id,
+      skill: c.skill.id,
+      x: a.x,
+      y: a.y,
+      x2: spot.x,
+      y2: spot.y,
+      seconds: a.side!.warp ? a.side!.warp.t + t : t,
+    });
     if (a.side!.warp) a.side!.warp.t += t;
     else a.side!.warp = { key: c.key, toX: spot.x, toY: spot.y, t, profile: p };
     if (a.side!.warp.key === c.key) {
@@ -232,10 +243,10 @@ function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: Blin
       dtype: 0,
     });
   }
-  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false, skill: c.skill.id });
   a.x = best.x;
   a.y = best.y;
-  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true, skill: c.skill.id });
   gainBuff(w, a.side!, esc.buff);
 }
 
@@ -254,10 +265,10 @@ function arrive(
   if (u.burst === 'depart' || u.burst === 'both' || u.warp) burstAt(w, a, p, fx, fy, u);
   if (u.chill) a.side!.fields.push(chillGround(w, a, p, fx, fy, u.chill));
   if (u.trail) a.side!.fields.push(trailGround(w, a, p, fx, fy, x, y, u.trail));
-  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false });
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: false, skill: c.skill.id });
   a.x = x;
   a.y = y;
-  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true });
+  w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true, skill: c.skill.id });
   if (u.burst === 'arrive' || u.burst === 'both' || u.warp) burstAt(w, a, p, x, y, u);
   if (u.clone)
     cloneOfPlayer(summonAt(w, a.side!, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);

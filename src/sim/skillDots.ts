@@ -1,5 +1,6 @@
 import type { SkillDotProfile, SkillProfile } from '../calc/skill';
 import { effectiveRes } from '../calc/formulas';
+import { noteRecover } from './recovery';
 import { statusTaken } from './statuses';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
@@ -201,8 +202,11 @@ export function sumSkillDots(w: World, a: Actor, out: number[], dt: number): voi
     if (d.regen <= 0) continue;
     // It mends the character whose skill inflicted it (with no owner named, the one that fights the enemy).
     const p = d.by?.player ?? hunted(w, a);
-    if (p.alive && p.team !== a.team)
+    if (p.alive && p.team !== a.team) {
+      const l0 = p.life;
       p.life = Math.min(p.def.maxLife, p.life + (d.raw * d.regen * dt) / 100);
+      noteRecover(p, 'life', p.life - l0);
+    }
   }
 }
 

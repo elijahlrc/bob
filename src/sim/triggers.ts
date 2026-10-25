@@ -6,6 +6,7 @@ import { applyFlatDot } from './skillDots';
 import { fire } from './actions';
 import { registerBlast } from './factions';
 import { startStorm } from './fields';
+import { noteRecover } from './recovery';
 import { flaskMask, lifeCap, playerConds, playerCtx, pushDot, rawHit, wake } from './combat';
 import type { Actor, Action, World } from './types';
 import { eachEnemy, livingEnemiesOf } from './side';
@@ -111,7 +112,7 @@ function perform(
     case 'recover':
       return recover(s, e);
     case 'sacrifice':
-      return sacrifice(s, e);
+      return sacrifice(w, s, e);
   }
 }
 
@@ -149,7 +150,7 @@ function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent)
     aimX: target.x,
     aimY: target.y,
   };
-  w.events.push({ t: 'trigger', skill: prof.skill.id, kind: ev.on });
+  w.events.push({ t: 'trigger', skill: prof.skill.id, kind: ev.on, src: s.player.id });
   s.trig.busy = true;
   try {
     fire(w, s.player, act);
@@ -261,13 +262,17 @@ function spread(w: World, e: Extract<TriggerEffect, { kind: 'spread' }>, dead: A
   return any;
 }
 
-function sacrifice(s: Side, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
+function sacrifice(w: World, s: Side, e: Extract<TriggerEffect, { kind: 'sacrifice' }>): boolean {
   const p = s.player;
   const amount = Math.min(Math.max(0, p.life - 1), (e.pctOfLife / 100) * p.def.maxLife);
   if (amount <= 0) return false;
   p.life -= amount;
+  w.events.push({ t: 'sacrifice', src: p.id, amount });
+  const pool = e.pool === 'es' ? 'es' : 'mana';
+  const before = p[pool];
   if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
   else p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + amount);
+  noteRecover(p, pool, p[pool] - before);
   return true;
 }
 
@@ -275,9 +280,11 @@ function recover(s: Side, e: Extract<TriggerEffect, { kind: 'recover' }>): boole
   const p = s.player;
   const amount = (e.value / 100) * (e.pctOf === 'armour' ? p.def.armour : p.def.maxLife);
   if (amount <= 0) return false;
+  const before = p[e.pool];
   if (e.pool === 'life') p.life = Math.min(lifeCap(p), p.life + amount);
   else if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
   else p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + amount);
+  noteRecover(p, e.pool, p[e.pool] - before);
   return true;
 }
 

@@ -10,6 +10,7 @@ import { applyStatus } from './statuses';
 import { gainCharge } from './charges';
 import { hit, lifeCap, rawHit } from './combat';
 import { creepToward } from './skillFx';
+import { noteRecover } from './recovery';
 import { scaleProfile } from './shots';
 import type { Action, Actor, World } from './types';
 import { enemiesWithin, hunted, livingEnemiesOf } from './side';
@@ -594,8 +595,11 @@ export function tickFields(w: World, s: Side, dt: number): void {
     const pulse = f.pulseT <= 0;
     if (pulse) f.pulseT += f.interval;
     if (f.kind === 'consecrated') {
-      if (p.alive && Math.hypot(p.x - f.x, p.y - f.y) <= f.radius + p.r)
+      if (p.alive && Math.hypot(p.x - f.x, p.y - f.y) <= f.radius + p.r) {
+        const l0 = p.life;
         p.life = Math.min(lifeCap(p), p.life + p.def.maxLife * REGEN_CONSECRATED * dt);
+        noteRecover(p, 'life', p.life - l0);
+      }
     } else if (f.kind === 'pod' && f.profile) {
       const spec = f.profile.skill.pods!;
       if (pulse)

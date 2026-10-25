@@ -13,6 +13,7 @@ import { reservedMana } from './reserve';
 import { gainBuff } from './buffs';
 import { gainCharge } from './charges';
 import { lifeCap } from './combat';
+import { noteRecover } from './recovery';
 import { bossOfType } from '../data/bosses';
 import { flaskWards } from './afflict';
 import type { Actor, World } from './types';
@@ -101,6 +102,8 @@ export function monsterHexesPlayer(w: World, s: Side, id: HexId, effect: number)
 export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
   if (dst.hexes.length === 0 || dst.team === s.team) return;
   const p = s.player;
+  const l0 = p.life;
+  const m0 = p.mana;
   for (const h of dst.hexes) {
     const def = HEXES[h.id];
     if (melee && def.meleeBuff) gainBuff(w, s, def.meleeBuff);
@@ -113,6 +116,8 @@ export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
         p.mana + atLevel(give.mana, h.level),
       );
   }
+  noteRecover(p, 'life', p.life - l0);
+  noteRecover(p, 'mana', p.mana - m0);
 }
 
 /**
@@ -122,6 +127,8 @@ export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
 export function hexKill(w: World, dead: Actor): number {
   let flasks = 0;
   const p = hunted(w, dead);
+  const l0 = p.life;
+  const m0 = p.mana;
   for (const h of dead.hexes) {
     const give = HEXES[h.id].onKill;
     if (!give) continue;
@@ -135,6 +142,8 @@ export function hexKill(w: World, dead: Actor): number {
       gainCharge(w, hunted(w, dead).side!, give.charge.kind);
     if (give.flasks) flasks += give.flasks;
   }
+  noteRecover(p, 'life', p.life - l0);
+  noteRecover(p, 'mana', p.mana - m0);
   return flasks;
 }
 

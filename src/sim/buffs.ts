@@ -15,6 +15,7 @@ import { reservedMana } from './reserve';
 import type { Mod } from '../mods/types';
 import { sumOf } from './charges';
 import { lifeCap } from './combat';
+import { noteRecover } from './recovery';
 import type { World } from './types';
 import type { Side } from './side';
 
@@ -68,10 +69,12 @@ export function rollGains(w: World, s: Side, event: BuffEvent, extra: readonly M
     const p = s.player;
     const max = pool === 'life' ? p.def.maxLife : pool === 'mana' ? p.def.maxMana : p.def.maxEs;
     const amount = flat + (pct / 100) * max;
+    const before = p[pool];
     if (pool === 'life') p.life = Math.min(lifeCap(p), p.life + amount);
     else if (pool === 'mana')
       p.mana = Math.min(Math.max(0, p.def.maxMana - reservedMana(s)), p.mana + amount);
     else p.es = Math.min(p.def.maxEs, p.es + amount);
+    noteRecover(p, pool, p[pool] - before);
   }
   // Being hit holds the rage you have, as gaining it does.
   if (event === 'hitTaken') s.rageT = 0;
