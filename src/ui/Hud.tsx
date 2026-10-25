@@ -618,15 +618,6 @@ export function Hud({ c }: { c: Controller }) {
         {sel && sel.alive && (!sel.isPlayer || isRival(sel)) && <Inspect a={sel} c={c} />}
       </div>
       {!sc && !c.gallery && !duel && <AbandonButton c={c} w={w} />}
-      {duel && (
-        <div class="hud-showcase">
-          <div class="showcase-row">
-            <button class="btn small" onClick={() => c.leaveDuel()}>
-              Leave
-            </button>
-          </div>
-        </div>
-      )}
       {c.gallery && (
         <div class="hud-showcase hud-gallery">
           <div class="hud-note" data-nopaint>
