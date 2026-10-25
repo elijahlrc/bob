@@ -1,5 +1,7 @@
 # Preload: make every map start and menu feel instant
 
+**Parked (the owner, 2026-10-24):** the menus come first; their plan is [MENU-SPEED.md](MENU-SPEED.md).
+
 A plan (asked for 2026-10-24) to paint the map in a background thread, and to prepare as much as possible ahead of time
 while the player is in the menus, so that starting a map, switching tabs and returning to camp feel instant. Nothing
 here is built yet. It follows [WORLD-LEAF.md](WORLD-LEAF.md), whose world-space floor doubled the cost of a map start,
