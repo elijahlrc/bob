@@ -35,7 +35,7 @@ type Ctx = {
 };
 
 /** Tiles a second of a leap and of a charge. */
-const LEAP_SPEED = 15;
+export const LEAP_SPEED = 15;
 const CHARGE_SPEED = 10;
 /** A charge runs on this far past the place it was aimed at. */
 const CHARGE_OVERSHOOT = 3;
