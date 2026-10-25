@@ -797,8 +797,8 @@ function FirstSupport({
   return (
     <div class="tip" data-paint="panel" data-thin>
       <div class="tip-text">
-        Support gems change the skills in the same item.
-        {fits && ` ${sup.name} works with ${main!.name}: put it in the same item.`}
+        Support gems modify the skills socketed in the same item.
+        {fits && ` Try placing ${main!.name} with ${sup.name} in the same item.`}
       </div>
       <button class="btn small" onClick={onSeen}>
         Got it
