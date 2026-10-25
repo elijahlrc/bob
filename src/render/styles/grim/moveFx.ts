@@ -31,6 +31,8 @@ const SHOCK = 0xf0e8d0;
 /** Seconds the hook takes to reach the character, and the whole life of a pull's chain. */
 const HOOK_FLIGHT = 0.12;
 const CHAIN_LIFE = 0.5;
+/** Seconds the figure takes to slide in along the chain (`AnimTrack.reel`, set by the style on the event). */
+const REEL_SECONDS = 0.28;
 
 const lighten = (c: number, f: number): number => {
   const m = (v: number) => Math.round(v + (255 - v) * f);
@@ -383,8 +385,16 @@ export class MoveFx {
   /** A hook flies out to the character, then the chain draws taut and reels it in; the figure slides along it. */
   private pulled(e: Extract<SimEvent, { t: 'pull' }>): void {
     const from = this.lifted(e.x, e.y, 8);
+    let landed = false;
     this.add(CHAIN_LIFE, (_g, air, k) => {
       const t = k * CHAIN_LIFE;
+      // The figure arrives: a puff where it comes to rest.
+      if (!landed && t >= REEL_SECONDS) {
+        landed = true;
+        const l = this.pt(e.x2, e.y2);
+        this.host.em.dust.explode(5, l.x, l.y);
+        this.host.flash(l.x, l.y - 6, HOOK, 1, 0.15);
+      }
       const m = this.host.actorById(e.src);
       const hand = this.lifted(m ? m.x : e.hx, m ? m.y : e.hy, 10);
       const fly = Math.min(1, t / HOOK_FLIGHT);

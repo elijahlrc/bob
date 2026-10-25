@@ -78,6 +78,8 @@ describe('a pull is told to the renderer (docs/VFX-AUDIT.md)', () => {
         expect(dist({ x: e.x2, y: e.y2 }, tc)).toBeLessThan(dist({ x: e.x, y: e.y }, tc) - 1);
         expect(e.x2).toBe(p.x);
         expect(e.y2).toBe(p.y);
+        // The pull is told by its own event: no blink's flash goes off at the landing before the figure gets there.
+        expect(w.events.some((x) => x.t === 'blink' && x.id === p.id)).toBe(false);
         expect(e.hx).toBe(tc.x);
         expect(e.hy).toBe(tc.y);
       }

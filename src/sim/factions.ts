@@ -186,7 +186,7 @@ export function pullPlayer(w: World, s: Side, from: Actor, tiles: number): void 
   p.x = to.x;
   p.y = to.y;
   p.stunT = Math.max(p.stunT, 0.3);
-  w.events.push({ t: 'blink', id: p.id, x: p.x, y: p.y, end: true });
+  // The renderer draws the chain and the reel-in from this (a blink's flash at the landing would come before the figure does).
   w.events.push({
     t: 'pull',
     src: from.id,
