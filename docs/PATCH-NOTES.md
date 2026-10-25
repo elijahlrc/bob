@@ -4,6 +4,18 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-25
+
+- Slag Blow, Hoarfrost Mote, Pyre Burst and Mortar Charge now visibly throw or drop what they hit with.
+- Glacier Wall is solid along its whole length; there is no longer a gap to walk through.
+- Buffs, curses and summons that an item triggers or a trigger support casts for you now take effect.
+- Debuffs and damage over time now show as small icons over an enemy's life bar, Impale stacks as spears in its body, and frozen enemies shatter into ice.
+- Damage from minions, mines and kill explosions now shows numbers.
+- Minions, totems, traps, flasks, triggered spells and monsters now show their shots, blows and effects as they happen.
+- In duels each life is tougher than the last, and culling strikes and shatter no longer get past a Bargain Coin.
+- Search boxes take commas: every term must match, so "area, attack" finds gems with both.
+- On the Skills tab, a gem found on your last map wears a NEW tag.
+
 ## 2026-10-24
 
 - A new look across the whole game: worn gold leaf and lapis in crisp pixels, under a hellfire title.
