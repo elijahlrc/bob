@@ -39,7 +39,7 @@ function useCampGemLine(c: Controller, ch: Character, taken: number | null, onSk
   if (missing)
     return (
       <div class="sk-warn gem-taken" data-paint="panel" data-field="vermilion" data-thin>
-        <span>No skill socketed: your character will only use its weapon's attack.</span>
+        <span>No usable skill socketed: your character will only use its weapon's attack.</span>
         <button class="btn small primary" onClick={() => c.act((r) => quickSocket(r, missing.uid))}>
           Socket {gemDef(missing.gemId).name}
         </button>
@@ -81,8 +81,10 @@ export async function startGuarded(c: Controller, i: number): Promise<void> {
   if (g) {
     const ok = await ask({
       title: 'Start without a skill?',
-      body: `No skill is socketed: your character will only use its weapon's attack. ${gemDef(g.gemId).name} is in your bag.`,
+      body: `No usable skill is socketed: your character will only use its weapon's attack. ${gemDef(g.gemId).name} is in your bag.`,
       confirm: 'Start anyway',
+      // Cancel has the focus: starting this way is the choice to make on purpose.
+      danger: true,
     });
     if (!ok || c.run !== run) return;
   }
