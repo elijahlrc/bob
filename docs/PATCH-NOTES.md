@@ -22,7 +22,6 @@ change, and our own names only. Dash bullets under plain headings.
 - Boss maps' cards now count the boss's own damage types, and the Tollkeeper's warning gives the right toll timing and no longer says a stun stops it.
 - Many skills get back what set them apart, among them their own attack speeds, Blaze Trap's burning ground and a channelled Crackle Ring; only one colossus stands at a time.
 - Chilling Shard now loses over half its damage by the end of its range but flies faster with level, and Glacier Dart flies much slower.
-- The Begin button on the first map now responds, and the camp tabs' scroll arrow goes away once you reach the end.
 
 ## 2026-10-24
 
