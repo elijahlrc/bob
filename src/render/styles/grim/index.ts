@@ -100,6 +100,12 @@ const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
   sigil: { fill: 0x3a1050, edge: 0xd070ff },
 };
 const DTYPE_COLOR = [0xeadfc8, 0xc89cff, 0x9ad8ff, 0xff9a40, 0x9ae05a];
+/** The gilded edge of a monster by rarity (docs/WORLD-LEAF.md 3.5); a boss has its ring and light instead. */
+const RIM_COLOR: Record<string, number> = {
+  magic: MAP_RARITY.magic,
+  rare: MAP_RARITY.rare,
+  miniboss: MAP_RARITY.miniboss,
+};
 /** The ring under a monster, by rarity: the map's rarity colours, a boss's an oxblood glow (docs/WORLD-LEAF.md 3.2). */
 const RARITY_RING: Record<string, number> = {
   magic: MAP_RARITY.magic,
@@ -114,6 +120,8 @@ type View = ActorView & {
     sprite: Phaser.GameObjects.Image;
     shadow: Phaser.GameObjects.Image;
     ring: Phaser.GameObjects.Image | null;
+    /** A magic or rare monster's gilded edge: its silhouette in the rarity colour, a pixel up and left, behind it. */
+    rim: Phaser.GameObjects.Image | null;
     light: Phaser.GameObjects.Light | null;
     gone: boolean;
     last: string;
@@ -821,6 +829,17 @@ export class GrimStyle extends StyleBase {
         .setAlpha(0.85);
       ring.setScale((a.rarity === 'boss' ? 2.6 : a.r * 2.4) * 0.8);
     }
+    // Magic, rare and minibosses catch the light on their upper-left edge in their rarity's colour (docs/WORLD-LEAF.md 3.5).
+    const rimColor = a.isPlayer ? undefined : RIM_COLOR[a.rarity];
+    const rim =
+      rimColor === undefined
+        ? null
+        : s.add
+            .image(0, 0, sprite.texture.key)
+            .setOrigin(0.5, 0.84)
+            .setTint(rimColor)
+            .setTintMode(Phaser.TintModes.FILL)
+            .setAlpha(0.75);
     let light: Phaser.GameObjects.Light | null = null;
     if (a.rarity === 'boss') light = this.addLight(0, 0, 260, 0xff4a28, 1.3);
     else if (a.rarity === 'miniboss') light = this.addLight(0, 0, 170, 0xff8a30, 1.1);
@@ -828,6 +847,7 @@ export class GrimStyle extends StyleBase {
     else if (a.rarity === 'rare') light = this.addLight(0, 0, 100, 0xffd860, 0.8);
     this.owned.push(sprite, shadow);
     if (ring) this.owned.push(ring);
+    if (rim) this.owned.push(rim);
     return {
       id: a.id,
       track: new AnimTrack(),
@@ -836,6 +856,7 @@ export class GrimStyle extends StyleBase {
         sprite,
         shadow,
         ring,
+        rim,
         light,
         gone: false,
         last: '',
@@ -919,6 +940,15 @@ export class GrimStyle extends StyleBase {
       .setDepth(500)
       .setAlpha(a.alive ? 0.85 : Math.max(0, 0.6 - t.deathT * 0.2))
       .setScale(Math.max(0.6, a.r * 2.1) * 0.8);
+    if (d.rim) {
+      if (d.rim.texture.key !== d.sprite.texture.key) d.rim.setTexture(d.sprite.texture.key);
+      d.rim
+        .setPosition(d.sprite.x - 1, d.sprite.y - 1)
+        .setFlipX(d.sprite.flipX)
+        .setScale(d.sprite.scaleX, d.sprite.scaleY)
+        .setDepth(d.sprite.depth - 0.01)
+        .setVisible(a.alive && d.sprite.alpha >= 0.8);
+    }
     if (d.ring)
       d.ring
         .setPosition(px, py + 1)
@@ -940,6 +970,7 @@ export class GrimStyle extends StyleBase {
         d.sprite.destroy();
         d.shadow.destroy();
         d.ring?.destroy();
+        d.rim?.destroy();
         this.dropLight(d.light);
         d.gone = true;
       }
@@ -952,6 +983,7 @@ export class GrimStyle extends StyleBase {
     v.data.sprite.destroy();
     v.data.shadow.destroy();
     v.data.ring?.destroy();
+    v.data.rim?.destroy();
     this.dropLight(v.data.light);
   }
 

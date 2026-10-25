@@ -145,4 +145,9 @@ they go in DESIGN.md Appendix A, and `docs/VISUAL_STYLES.md` gets a pointer here
   (`BIOME_LOOKS`) lean to umber, the torchless ones less and 10% brighter; the vignette and the camera's ground are
   bitumen-black; the player's light and the torches lean to gold (`PLAYER_LIGHT`, `TORCH_LIGHT` in the grim style).
 - **L6 built (2026-10-24):** the floor and walls of 3.6.
-- Next: L5, enemy colours.
+- **L5 built (2026-10-24):** 47 body colours of the faction palettes (bone, cloth, metal, wood, skin) moved onto the
+  nearest ramp step where the faction stays distinct (`step()` in `paint.ts`): the Ossuary in pearl, plaster and
+  vermilion, the Hollow's robes lapis, the Choir's and the Emberborn's robes bitumen, the Drowned teal and sky, the
+  Gilded gold and straw, the Reliquary sky with a gold trim. Rot's greens, the bone of the Swarm and the Kennel, eyes
+  and glows keep their colours. Magic, rare and minibosses have a gilded edge: their silhouette in the rarity colour a
+  pixel up and left, behind the body (`RIM_COLOR`, the `rim` sprite).
