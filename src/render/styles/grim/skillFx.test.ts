@@ -390,3 +390,182 @@ describe('skill effects with two sides (a duel)', () => {
     expect(hexed.filter((x) => x === 5).length).toBe(base.filter((x) => x === 5).length);
   });
 });
+
+describe('what minions do and wear (docs/VISUAL_LANGUAGE.md, "Minions")', () => {
+  /** A graphics object that counts the calls of each method. */
+  const counting = (): { g: unknown; n: Record<string, number> } => {
+    const n: Record<string, number> = {};
+    const g: unknown = new Proxy(() => g, {
+      get: (_t, k) =>
+        k === 'destroy'
+          ? () => undefined
+          : () => {
+              n[String(k)] = (n[String(k)] ?? 0) + 1;
+              return g;
+            },
+    });
+    return { g, n };
+  };
+
+  const setup = () => {
+    const a = actor();
+    const w = world(a);
+    const fx = new SkillFx(host([a]), scene);
+    return { a, w, fx };
+  };
+
+  /** Run the effects out; they must all expire. */
+  const runOut = (fx: SkillFx, w: World, seconds = 1): void => {
+    for (let i = 0; i < seconds * 20; i++) fx.frame(w, 0.05, 1 + i * 0.05, gfx() as never);
+    expect(pending(fx)).toBe(0);
+  };
+
+  const blow = (over: Partial<Extract<SimEvent, { t: 'minionBlow' }>> = {}): SimEvent => ({
+    t: 'minionBlow',
+    src: 10,
+    dst: 2,
+    minion: 'skeleton',
+    x: 5,
+    y: 5,
+    x2: 8,
+    y2: 5,
+    dtype: 0,
+    splash: 0,
+    caught: 0,
+    ...over,
+  });
+
+  it('a ranged blow flies as its body and lands, each in a moment', () => {
+    for (const shot of ['arrow', 'orb', 'bolt'] as const) {
+      // The flight is drawn on the effects' own layer (`air`), which the scene stub hands out: it is the one that counts.
+      const c = counting();
+      const a = actor();
+      const w = world(a);
+      const fx = new SkillFx(host([a]), {
+        add: { graphics: () => ({ setDepth: () => c.g }) },
+      } as never);
+      fx.onEvent(blow({ shot, minion: 'flameGolem', dtype: shot === 'bolt' ? 1 : 3 }), w);
+      expect(pending(fx), shot).toBe(1);
+      // Mid-flight it draws; the body is the shot's own.
+      fx.frame(w, 0.05, 1, gfx() as never);
+      if (shot === 'arrow') expect(c.n.fillTriangle, shot).toBeGreaterThan(0);
+      if (shot === 'orb') expect(c.n.fillCircle, shot).toBeGreaterThan(0);
+      if (shot === 'bolt') expect(c.n.strokePath, shot).toBeGreaterThan(0);
+      runOut(fx, w, 0.5);
+    }
+  });
+
+  it('a melee blow is one slash, and a splash outlines the ground it covers', () => {
+    const { w, fx } = setup();
+    fx.onEvent(blow(), w);
+    expect(pending(fx)).toBe(1);
+    fx.onEvent(blow({ splash: 1, caught: 2 }), w);
+    expect(pending(fx)).toBe(3);
+    runOut(fx, w, 0.5);
+  });
+
+  it('a melee minion leans into the blow it strikes, then settles', () => {
+    const { a, w, fx } = setup();
+    const m = minionStub(10, 5, 'skeleton');
+    w.sides[0].minions = [m] as never;
+    void a;
+    const bodyX = (t: number): number => {
+      const xs: number[] = [];
+      const g: unknown = new Proxy(() => g, {
+        get: (_t, k) =>
+          k === 'fillCircle'
+            ? (x: number) => {
+                xs.push(x);
+                return g;
+              }
+            : () => g,
+      });
+      fx.frame(w, 0.001, t, g as never);
+      return xs[0];
+    };
+    const still = bodyX(1);
+    fx.onEvent(blow(), w);
+    // The lean is toward the target (east here) and gone after a moment.
+    expect(bodyX(1.06)).toBeGreaterThan(still);
+    expect(bodyX(1.3)).toBe(still);
+  });
+
+  it('a mote that sets off a trap runs a spark to it', () => {
+    const { w, fx } = setup();
+    fx.onEvent({ t: 'botSpark', src: 10, device: 7, x: 5, y: 5, tx: 9, ty: 6, aura: 'shock' }, w);
+    expect(pending(fx)).toBeGreaterThan(0);
+    runOut(fx, w);
+  });
+
+  function minionStub(id: number, x: number, kind: string, over: Record<string, unknown> = {}) {
+    return {
+      id,
+      alive: true,
+      x,
+      y: 5,
+      life: 10,
+      def: { maxLife: 10 },
+      kind,
+      sup: { burn: 0 },
+      ...over,
+    };
+  }
+
+  it('the offering that stands marks every minion; a golem marks the ones it boosts', () => {
+    const { w, fx } = setup();
+    w.sides[0].minions = [minionStub(10, 6, 'skeleton'), minionStub(11, 7, 'skeleton')] as never;
+    const plain = counting();
+    fx.frame(w, 0.05, 1, plain.g as never);
+    (w.sides[0].buffT as Record<string, number>).offeringSpirit = 5;
+    const marked = counting();
+    fx.frame(w, 0.05, 1.05, marked.g as never);
+    // A mote circling each of the two (two circles each, two layers of each).
+    expect(marked.n.fillCircle - plain.n.fillCircle).toBe(8);
+    w.sides[0].minions.push(
+      minionStub(12, 8, 'stoneGolem', {
+        golem: { min: 1, max: 2, perNearby: 5, cap: 50 },
+      }) as never,
+    );
+    const withGolem = counting();
+    fx.frame(w, 0.05, 1.1, withGolem.g as never);
+    // The pip over each of the two boosted minions is two triangles; the golem's own body is none.
+    expect(withGolem.n.fillTriangle).toBe(4);
+  });
+
+  it('the kinds with a body of their own draw it, and a mote shows the ground its aura covers', () => {
+    const { w, fx } = setup();
+    for (const [kind, over] of [
+      ['relic', {}],
+      ['bot', { bot: { kind: 'chill', v: 20, radius: 3 }, botCd: 0 }],
+      ['bot', { bot: { kind: 'shock', v: 20, radius: 3 }, botCd: 2 }],
+      ['stoneGolem', { golem: { min: 1, max: 2, perNearby: 5, cap: 50 } }],
+      ['skeleton', { sup: { burn: 10 } }],
+    ] as const) {
+      w.sides[0].minions = [minionStub(10, 6, kind, over)] as never;
+      const c = counting();
+      fx.frame(w, 0.05, 1, c.g as never);
+      expect(c.n.fillCircle ?? c.n.fillRect, kind).toBeGreaterThan(0);
+    }
+    const plain = counting();
+    w.sides[0].minions = [minionStub(10, 6, 'skeleton')] as never;
+    fx.frame(w, 0.05, 1, plain.g as never);
+    const mote = counting();
+    w.sides[0].minions = [
+      minionStub(10, 6, 'bot', { bot: { kind: 'chill', v: 20, radius: 3 }, botCd: 0 }),
+    ] as never;
+    fx.frame(w, 0.05, 1, mote.g as never);
+    // The aura's ring is stroked on the ground under it, beside the minion's own ring.
+    expect(mote.n.strokeEllipse - plain.n.strokeEllipse).toBe(1);
+  });
+
+  it('an offering going up rings every minion it reaches, in its colour, and a buff that is not running does not', () => {
+    const { w, fx } = setup();
+    w.sides[0].minions = [minionStub(10, 6, 'skeleton'), minionStub(11, 7, 'skeleton')] as never;
+    fx.onEvent({ t: 'buff', id: 'offeringBone' }, w);
+    expect(pending(fx)).toBe(0);
+    (w.sides[0].buffT as Record<string, number>).offeringBone = 5;
+    fx.onEvent({ t: 'buff', id: 'offeringBone' }, w);
+    expect(pending(fx)).toBe(2);
+    runOut(fx, w);
+  });
+});

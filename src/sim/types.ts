@@ -522,6 +522,36 @@ export type SimEvent =
   | { t: 'deploy'; id: number; kind: string; x: number; y: number; end: boolean }
   /** A trap or a mine went off at (x, y), at an enemy standing at (tx, ty). */
   | { t: 'sprung'; id: number; kind: string; x: number; y: number; tx: number; ty: number }
+  /**
+   * One blow of a minion (one event however many damage types it splits into), from (x, y) to the target at (x2, y2). The damage
+   * is instant; the event is for the picture. `shot` is the body a ranged blow flies as (absent: a melee blow). `splash` is the
+   * radius of the half-damage hit on the neighbours (0: none) and `caught` how many it found.
+   */
+  | {
+      t: 'minionBlow';
+      src: number;
+      dst: number;
+      minion: string;
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      dtype: number;
+      shot?: 'arrow' | 'orb' | 'bolt';
+      splash: number;
+      caught: number;
+    }
+  /** A mote (a minion with an aura) set off the trap or mine `device` from where it stands: from (x, y) to (tx, ty). */
+  | {
+      t: 'botSpark';
+      src: number;
+      device: number;
+      x: number;
+      y: number;
+      tx: number;
+      ty: number;
+      aura: 'chill' | 'shock';
+    }
   /** A character that could not move was put at its next waypoint: `src` is the character. */
   | { t: 'stuck'; src: number }
   | { t: 'stall'; id: number }

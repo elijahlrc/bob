@@ -10,7 +10,8 @@ import {
   type Delivery,
 } from '../../../calc/skillLook';
 import { HIT_AT, SCATTER_RADIUS } from '../../../data/constants';
-import { MINIONS } from '../../../data/minions';
+import { MINIONS, type MinionId } from '../../../data/minions';
+import { BURN_RADIUS } from '../../../sim/minionFx';
 import {
   bondLinks,
   choiceByKey,
@@ -26,7 +27,19 @@ import type { Actor, SimEvent, World } from '../../../sim/types';
 import { beamMotifOf, fallbackMotif, motifOf } from '../../../calc/areaLook';
 import { isViewer } from '../../style/who';
 import { playMotif, tongue } from './areaMotifs';
-import { drawBuffs, type BuffMark } from './buffFx';
+import { BUFF_LOOK, drawBuffs, type BuffMark } from './buffFx';
+import {
+  drawBoostPip,
+  drawGolemBody,
+  drawMend,
+  drawMoteBody,
+  drawOfferingMark,
+  drawRelicBody,
+  drawShot,
+  SHOT_FLIGHT,
+  SHOT_LAND,
+  zigzag,
+} from './minionMarks';
 import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
@@ -113,6 +126,8 @@ export class SkillFx {
   private blinkFrom = new Map<number, Pt>();
   private lastBuff = new Map<string, number>();
   private lastHex = new Map<number, number>();
+  /** A minion's melee blow in the last moments: when, and which way it leaned (the body lunges at what it strikes). */
+  private lunge = new Map<number, { at: number; ux: number; uy: number }>();
   private now = 0;
 
   private host: FxHost;
@@ -127,6 +142,7 @@ export class SkillFx {
     this.air.destroy();
     this.list = [];
     this.flights.clear();
+    this.lunge.clear();
   }
 
   // ---- Primitives -----------------------------------------------------------------------------
@@ -358,6 +374,12 @@ export class SkillFx {
         break;
       case 'sprung':
         this.sprung(e, w);
+        break;
+      case 'minionBlow':
+        this.minionBlow(e);
+        break;
+      case 'botSpark':
+        this.botSpark(e);
         break;
       default:
         break;
@@ -703,13 +725,99 @@ export class SkillFx {
   }
 
   /**
+   * One blow of a minion. A ranged one flies from the minion to its target as an arrow, an orb or a bolt and lands in a small ring
+   * (the damage is the sim's, instant); a melee one is a short slash with the body leaning into it. A blow that splashes outlines
+   * the splash ground at the target, fainter when it caught nothing.
+   */
+  private minionBlow(e: Extract<SimEvent, { t: 'minionBlow' }>): void {
+    const element = ELEMENT_COLOR[e.dtype] ?? 0xffffff;
+    const own = MINIONS[e.minion as MinionId]?.color ?? element;
+    const dx = e.x2 - e.x;
+    const dy = e.y2 - e.y;
+    const d = Math.hypot(dx, dy) || 1;
+    const ux = dx / d;
+    const uy = dy / d;
+    if (e.shot) {
+      const shot = e.shot;
+      const a = this.lifted(e.x + ux * 0.3, e.y + uy * 0.3);
+      const b = this.lifted(e.x2 - ux * 0.2, e.y2 - uy * 0.2);
+      const total = SHOT_FLIGHT + SHOT_LAND;
+      this.add(total, true, (g, k) => {
+        const t = k * total;
+        if (t <= SHOT_FLIGHT) drawShot(g, a, b, t / SHOT_FLIGHT, shot, element, e.src);
+        else {
+          const v = (t - SHOT_FLIGHT) / SHOT_LAND;
+          this.ring(g, e.x2, e.y2, 0.1 + 0.25 * v, lighten(element, 0.4), 0.9 * (1 - v), 1.2);
+        }
+      });
+    } else {
+      this.lunge.set(e.src, { at: this.now, ux, uy });
+      // The slash: a short arc across the front of the body, in the element (a physical blow wears the minion's own colour).
+      const color = e.dtype === 0 ? lighten(own, 0.35) : element;
+      const face = Math.atan2(uy, ux);
+      const cx = e.x + ux * 0.45;
+      const cy = e.y + uy * 0.45;
+      this.add(0.13, true, (g, k) => {
+        const head = -0.9 + 1.8 * Math.min(1, k * 2.2);
+        const pts: Pt[] = [];
+        for (let i = 0; i <= 5; i++) {
+          const a = face - 0.9 + ((head + 0.9) * i) / 5;
+          pts.push(this.lifted(cx + Math.cos(a) * 0.4, cy + Math.sin(a) * 0.4));
+        }
+        this.streak(g, pts, color, 1 - k * k, 0.32);
+      });
+    }
+    if (e.splash > 0) {
+      const strength = e.caught > 0 ? 0.7 : 0.3;
+      this.add(0.26, false, (g, k) =>
+        outlineArea(
+          g,
+          this.host,
+          { kind: 'circle', x: e.x2, y: e.y2, r: e.splash },
+          element,
+          strength * (1 - k),
+          2,
+        ),
+      );
+    }
+  }
+
+  /** A mote sets off a trap or a mine from where it stands: a spark runs from the mote to the device, and both ring. */
+  private botSpark(e: Extract<SimEvent, { t: 'botSpark' }>): void {
+    const color = ELEMENT_COLOR[e.aura === 'chill' ? 2 : 1];
+    const a = this.lifted(e.x, e.y, 6);
+    const b = this.lifted(e.tx, e.ty, 3);
+    this.add(0.3, true, (g, k) => {
+      const pts = zigzag(a, b, e.device + Math.floor(k * 5), 3 * (1 - k), 8);
+      this.streak(g, pts, color, 1 - k, 0.5);
+    });
+    this.wave(e.x, e.y, 0.1, 0.6, color, 0.25, 1.2);
+    this.wave(e.tx, e.ty, 0.1, 0.7, color, 0.3, 1.5);
+  }
+
+  /**
    * A buff or warcry begins: a pulse around the character, in the colour of its kind. The event names the buff and not whose it
    * is, so with several sides it is every side that has the skill and has the buff running (a mirror's two pulse together).
    */
   private buffPulse(id: string, w: World): void {
+    if (id.startsWith('offering')) {
+      this.offeringPulse(id, w);
+      return;
+    }
     for (const side of w.sides) {
       if (w.sides.length > 1 && !(side.buffT[id as keyof Side['buffT']] > 0)) continue;
       this.buffPulseOf(id, side);
+    }
+  }
+
+  /** An offering goes up: a ring in its colour about each minion it reaches (the character's own mark is the buff's, buffFx.ts). */
+  private offeringPulse(id: string, w: World): void {
+    const look = BUFF_LOOK[id as keyof typeof BUFF_LOOK];
+    if (!look) return;
+    for (const side of w.sides) {
+      if (!(side.buffT[id as keyof Side['buffT']] > 0)) continue;
+      for (const m of side.minions)
+        if (m.alive) this.wave(m.x, m.y, 0.15, 0.7, look.color, 0.4, 1.5);
     }
   }
 
@@ -1351,12 +1459,63 @@ export class SkillFx {
     }
   }
 
-  /** Minions: a teal ring at their feet, their body, and what is left of their life. */
+  /**
+   * Minions: a teal ring at their feet, their body, and what is left of their life. A kind of minion has its own body (a relic, a
+   * mote, a golem), and what acts on it is a mark on it: the offering that stands (a mote circling, plates, sparks rising), the
+   * golem's field and the pip on those it boosts, the burning aura, the mote's aura, the relic's mending, and a ring about the
+   * character for minions that guard it.
+   */
   private minions(g: Gfx, side: Side, time: number): void {
-    for (const m of side.minions) {
-      if (!m.alive) continue;
-      const { x, y } = this.host.project(m.x, m.y);
-      const col = MINIONS[m.kind].color;
+    if (side.minions.length === 0) return;
+    const alive = side.minions.filter((m) => m.alive);
+    const offering = (['offeringSpirit', 'offeringBone', 'offeringFlesh'] as const).find(
+      (id) => (side.buffT[id] ?? 0) > 0,
+    );
+    const offeringLook = offering ? BUFF_LOOK[offering] : null;
+    const golem = alive.find((m) => m.golem);
+    const mending = (side.relicRegen?.t ?? 0) > 0;
+    // Minions that stay by the character and hit what is near it harder: that ground, lightly.
+    if (alive.some((m) => m.defensive && m.nearMore))
+      this.ring(
+        g,
+        side.player.x,
+        side.player.y,
+        3.5,
+        UTILITY_COLOR.guard,
+        0.16 + 0.04 * Math.sin(time * 2),
+        1,
+      );
+    for (const m of alive) {
+      const kind = MINIONS[m.kind];
+      const col = kind.color;
+      // The ground under it: the aura of a mote, the field of a golem, the burning aura.
+      if (m.bot)
+        this.auraGround(
+          g,
+          m.x,
+          m.y,
+          m.bot.radius,
+          ELEMENT_COLOR[m.bot.kind === 'chill' ? 2 : 1],
+          time + m.id,
+        );
+      if (m.golem) this.ticks(g, m.x, m.y, 5, 28, time * 0.1, col, 0.2, 1.5);
+      if (m.sup && m.sup.burn > 0)
+        this.auraGround(g, m.x, m.y, BURN_RADIUS, 0xff7a30, time * 1.3 + m.id);
+      // Where it stands on the screen, leaning into a melee blow it just struck.
+      let { x, y } = this.host.project(m.x, m.y);
+      const lg = this.lunge.get(m.id);
+      if (lg) {
+        const u = (this.now - lg.at) / 0.12;
+        if (u >= 1) this.lunge.delete(m.id);
+        else if (u >= 0) {
+          const o = this.host.project(m.x, m.y);
+          const t = this.host.project(m.x + lg.ux, m.y + lg.uy);
+          const d = Math.hypot(t.x - o.x, t.y - o.y) || 1;
+          const lean = 3 * Math.sin(Math.PI * u);
+          x += ((t.x - o.x) / d) * lean;
+          y += ((t.y - o.y) / d) * lean;
+        }
+      }
       g.fillStyle(0x000000, 0.35).fillEllipse(x, y + 1, 9, 4);
       g.lineStyle(1, UTILITY_COLOR.summon, 0.55 + 0.15 * Math.sin(time * 3 + m.id)).strokeEllipse(
         x,
@@ -1364,14 +1523,33 @@ export class SkillFx {
         12,
         5,
       );
-      g.fillStyle(col, 0.95).fillCircle(x, y - 5, 4);
-      g.lineStyle(1, 0xffffff, 0.6).strokeCircle(x, y - 5, 4);
+      if (m.kind === 'relic') drawRelicBody(g, x, y, col, time);
+      else if (m.kind === 'bot') drawMoteBody(g, x, y, col, time, (m.botCd ?? 0) > 0, m.id);
+      else if (m.golem) drawGolemBody(g, x, y, col);
+      else {
+        g.fillStyle(col, 0.95).fillCircle(x, y - 5, 4);
+        g.lineStyle(1, 0xffffff, 0.6).strokeCircle(x, y - 5, 4);
+      }
+      if (offeringLook && offering)
+        drawOfferingMark(g, offeringLook.motif, x, y, offeringLook.color, time, m.id);
+      if (golem && !m.golem) drawBoostPip(g, x, y, MINIONS[golem.kind].color);
+      if (mending) drawMend(g, x, y, time, m.id);
       if (m.life < m.def.maxLife) {
         const frac = Math.max(0, m.life / m.def.maxLife);
         g.fillStyle(0x000000, 0.6).fillRect(x - 6, y - 13, 12, 2);
         g.fillStyle(0x6ad07a, 0.95).fillRect(x - 6, y - 13, 12 * frac, 2);
       }
     }
+    if (mending && side.player.alive) {
+      const p = this.host.project(side.player.x, side.player.y);
+      drawMend(g, p.x, p.y - 6, time, 99);
+    }
+  }
+
+  /** The ground a minion's aura covers, lightly: a faint ring that breathes and a few ticks turning on it. */
+  private auraGround(g: Gfx, x: number, y: number, r: number, color: number, t: number): void {
+    this.ring(g, x, y, r, color, 0.14 + 0.05 * Math.sin(t * 2), 1);
+    this.ticks(g, x, y, r, 8, t * 0.5, color, 0.3, 1.5);
   }
 
   /** Auras are slow rings at the player's feet (heralds are spiked), and each buff running is a mote circling the body. */

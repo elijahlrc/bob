@@ -99,6 +99,18 @@ lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Thing
 | Summon | teal circle; each minion in a teal ring, with a life bar when hurt        |
 | Aura   | slow gold ring at your feet; a herald's ring is spiked, in its element    |
 
+## Minions
+
+A minion's blow is told by one `minionBlow` event (the damage is instant; the picture is not). A **ranged** blow flies from the minion to its
+target in about 0.14 s as the body of its element (an arrow for physical, an orb, a jagged bolt for lightning) and lands in a small ring; a
+**melee** blow is a short slash in the element (the minion's own colour when physical) with the body leaning into it for a moment; a blow that
+**splashes** outlines the splash ground at the target, fainter when it caught nothing. What acts on a minion is a mark on it: an offering
+that stands (a mote circling, plates about it, sparks rising: the buff's own colour, and a ring on each minion as it goes up), a golem
+(a heavy block body, a dotted ring at the range it counts minions in, a gold pip over each minion it boosts), a burning aura (a faint fire
+ring of its radius), a guarding minion (a faint ring about the character), the relic (an obelisk in a halo, and small crosses rising off the
+character and minions while it mends), and a mote (a rotor, slower while it waits; a faint ring of its aura's radius in the ice or storm
+colour, and a spark to a trap or a mine it sets off from afar).
+
 ## Keeping it complete
 
 `skillLook.test.ts` checks that every gem lands on a delivery and a colour, that every delivery and every element is used,
@@ -108,4 +120,4 @@ fails to compile until `deliveryOf` handles it.
 ## Sim events the effects use
 
 `use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `beam` (with its
-width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off), `minionBlow` (one blow of a minion, once however its damage splits), `botSpark` (a mote sets off a trap or a mine from where it stands); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
