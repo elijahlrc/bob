@@ -1,6 +1,6 @@
 # Bob — Audit of the readability of the ability effects
 
-Status: **pass 1 done 2026-10-12** (areas and projectiles, renderer-first; one small set of new sim events). Pass 2 is the list at the end:
+Status: **pass 1 done 2026-10-12** (areas and projectiles, renderer-first; one small set of new sim events), **pass 5 done 2026-10-24** (effects with no picture; the end of this file). Pass 2 is the list at the end:
 each item changes how a skill _behaves_ or needs the user's eye, so none of them was done silently.
 
 ## Why
@@ -195,3 +195,60 @@ the white-cored bolts themselves) and a mine's spike burst (below).
 4. **Measure the rest:** the monsters' own areas and the bosses stacked (a pack of casters), particle counts, and the minion and totem hits.
 
 Nothing here changes the sim.
+
+## Pass 5: things that happen and are not seen (2026-10-24)
+
+Why: the user saw Slag Blow and asked whether it threw anything. It does not: its four "balls" were four delayed ground zones placed at once
+(`afterStrike`, `src/sim/shots.ts`), so a skill that says "splatters molten metal" and carries the projectile tag had no body in flight. The question was
+whether anything else is like that, and whether other effects are done by the sim with no picture.
+
+### Method
+
+1. **Every skill played** (203, as in pass 1): the events, projectiles, zones, deployables and minions each emits in eight seconds in the training arena,
+   read against its tags and description (`scripts/vfx/inventory.ts`).
+2. **Two readings of the code**, one for monsters (abilities, marks, encounters, bosses, factions, packs) and one for the character's side beyond the
+   skills (supports, triggers, item effects, minions, deployables, ailments, flasks, recovery): for each effect, where the sim does it and where, if
+   anywhere, the renderer draws it. These were leads, not proof: each package confirmed its leads in the code before changing anything, and they held,
+   with one exception (damage over time has no tick numbers for ignite, poison or bleed either, so the new marks have none).
+3. **Nine work packages**, each in its own worktree, merged into one branch and checked together: `npm run check` (3,558 tests), the build, and a replay of
+   the bot's runs (six classes, two seeds, ten maps, the outcome and not the events) on the starting commit and on every package alone. Only WP1 moves any
+   outcome, five of the twelve runs, as intended.
+
+### Findings and what was done
+
+Kind 1 is a thing that should fly and does not, kind 2 is an effect with no picture.
+
+| Package | Finding                                                                                                                                                                                                                                                                                        | Done                                                                                                                                                                                                                                                                                                                                                                     |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| WP1     | **Kind 1.** Slag Blow's balls were instant zones. Hoarfrost Mote's ice and Pyre Burst's fire ("pelts", "sends down") were instant blasts. Mortar Charge's extra bursts "rain" and nothing fell.                                                                                                | Slag Blow throws real `mortar` shells from the hand, bursting where they land (a mortar now bursts on its exact spot, not up to a step past it). Hoarfrost and Pyre Burst keep their blast and add a thrown streak (`hurl` event) with the blast 0.15 to 0.25 s later. Mortar Charge's rain bursts carry `fall`.                                                         |
+| WP2     | **A sim bug, not a picture:** item-granted and trigger-cast utility skills (Iron Hide, Slag Carapace, Aspect of Prey, Penance, Tinder Curse and the Sigils) did nothing: they fell through to an empty burst ring and applied no buff or curse.                                                | They are cast as a manual cast is (a granted buff counts as a buff source on the sheet; a granted blink is not cast). Six tests.                                                                                                                                                                                                                                         |
+| WP3     | **Kind 2.** Damage from `rawHit` (kill explosions, Impale, minion blows, mine aura, thorns) had no number. Thorns showed nothing on the monster and the Gilded Guard had no mark. A Pylon-covered monster or a curled beetle showed a number for damage not dealt. A knockback read as a snap. | Numbers for the side's own effect damage (merged per target over 0.3 s). A `reflect` event: a ring of spikes on the reflector, "N Thorns" on the attacker, the Thorned pip on the Guard. "Warded" and a grey curled number. A `knock` event eases the figure over 0.3 s.                                                                                                 |
+| WP4     | **Kind 2.** Sixteen statuses, a skill's damage over time, Impale stacks, a frozen shatter, ailment spread, Cinder Herald's burn and Burning Pack had no mark on the enemy.                                                                                                                     | One row of tiny pips over the life bar, spears stuck in the body, an ice burst with no bones, an arc for spread (`spread` event), a flame ring for the Herald (`kindle`), flames on burning minions.                                                                                                                                                                     |
+| WP5     | **Kind 1.** Ranged minions (the Colossi, Shadow Archer, Bound Shade, Wisp) hit with no event and no body. **Kind 2.** Melee blows, splash, the golem, the offering, the relic and the mote's trap triggering had no picture.                                                                   | One `minionBlow` event: an arrow, orb or bolt in about 0.14 s, a slash for melee, the splash outlined. Marks for offerings, golems, the relic and the mote, and a spark from a mote to the trap it sets off (`botSpark`).                                                                                                                                                |
+| WP6     | **Kind 2.** A totem or brand firing, an Ancestral totem in range, a mine's aura, Echoing Blow's extra strikes, trigger and echo, flasks and recovery had no cue. **Kind 1.** Shadow Quiver ("fire an arrow") and Smoke Charge ("throws a mine") were plain blinks.                             | A pulse and a spark on a firing totem, a reach ring on the war-cry totem, the mine's aura ring and a spark on its bonus (`mineBonus`), a thrust per echoed strike, a rune and the spell's name for a trigger, a look for each kind of flask, recovery motes at 1.5% of a pool (`recover`, gathered in `src/sim/recovery.ts`), a flying arrow and a thrown mine (`warp`). |
+| WP7     | **Kind 1.** Monster lobs, the mortar pattern, the Loosing Call, crossbow and lance bolts (drawn as lightning), the Duellist's Flurry and a monster's leap.                                                                                                                                     | All drawn in the renderer during the existing warning, so nothing lands earlier or later (`monsterFlight.ts`).                                                                                                                                                                                                                                                           |
+| WP8     | **Kind 2.** Hooks and pulls, Warding Pulse and charges moved the player with no cue.                                                                                                                                                                                                           | `pull`, `push` and `rush` events: a hook and chain, a shock ring and arrows, the true rush lane. The Tidewarden's hook has a telegraph read from its existing timer (`moveFx.ts`).                                                                                                                                                                                       |
+| WP9     | **Kind 2.** Mend, ally buffs, Pylon and Curl, Mirrored, ward shells, Rime Aura, Reliquarian, hexes, Bursar and Treasurer and the Carrion Mother's pools had no cue.                                                                                                                            | Pips, rings, threads and glyphs for each, and the events `heal`, `cue`, `twin`, `hexCast` and `stolen` (`monsterStateFx.ts`). Hexes and the Reliquarian carry their caster and kind.                                                                                                                                                                                     |
+
+The events the effects use are listed at the end of [VISUAL_LANGUAGE.md](VISUAL_LANGUAGE.md), with a section for each family of cue.
+
+### Decisions taken
+
+- Damage and hit timing did not move, with these exceptions: Slag Blow's balls, Hoarfrost Mote's ice and Pyre Burst's geyser land after a short flight
+  (about 0.15 to 0.25 s, as Slag Blow's did already), and a mortar bursts on its exact landing spot (Mortar Bow 437 to 439 in the sim). Item-granted buffs
+  and curses now work (WP2).
+- A cue that would delay damage to give a warning was not built. The Carrion Mother's pools open with a burst and a ring and still hurt from their first pulse.
+- Cosmetic events are hashed like the rest, so the local replay fence (`npm run fence`) had to be re-recorded.
+
+### What is left
+
+1. **Nothing here has been looked at in the game.** Every cue is checked by tests and sim runs. First to look at: the pip row on a pack of afflicted enemies,
+   many minions or totems firing at once, the Slag Blow shell and the Hoarfrost streaks, the monster arcs and the crossbow bolt, the ward shell on every
+   monster with natural energy shield, and the monsters' reach rings on a pale floor.
+2. **Known rough edges.** Rime Aura draws two rings and a new hex a doubled rune. The Tidewarden's "ready" ring stays on one more than 14 tiles away, and
+   its hook is cold blue though it deals no damage.
+3. **Still instant:** the monster "March" and "Closing ring" patterns, the Tollkeeper's rings of lightning, a twin's echo, Thunder Spiral's and Tempest
+   Mote's beads (which "jump"), and there is no warning before minions burst under the life-threshold support.
+4. **Mismatches found, not changed:** the Charge ability's text says it staggers what it hits and the code does not; the beetle's Curl is a 90% cut under a
+   comment that says 80%; Skitterbots set off traps from where they stand and do not walk to them.
+5. The measurements of pass 4 (many at once) were not repeated for the new cues; each is rate-limited and none flashes a light.
