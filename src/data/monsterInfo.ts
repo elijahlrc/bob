@@ -108,8 +108,7 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
     'A molten brute that slams the ground, gathers speed and leaves burning ground behind it.',
   pyrepriest: 'Keeps its distance and sets fire to the ground where you stand.',
   slagworm: 'Sinks out of sight and comes up under you in a ring of fire.',
-  tollkeeper:
-    'Tolls its bell every twelve seconds, and every toll makes it stronger.',
+  tollkeeper: 'Tolls its bell every twelve seconds, and every toll makes it stronger.',
   siegeMarshal:
     'Commands from where he stands while his regiments fight; the more of them stand, the less he takes.',
   duellist:
