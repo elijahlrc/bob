@@ -92,15 +92,24 @@ The owner kept the drops as they are (section 4): labels, beams and glows do not
 
 ### 3.6 Level sprites
 
-- Run the menus' wear pass over the baked chunks: ramp-snap the stone, then mottle, a few cracks and grime at the
-  wall foot. It runs at low strength and on stone ramps (plaster, ink and bitumen), not gold. The chunks are baked once,
-  so the cost falls at load.
-- This needs the canvas-only part of the painter (`ramps`, `age`, the noise) in a folder both sides may import, for
-  example `src/art/`. It has no Phaser and no Preact; the menus' `src/ui/leaf` imports it from there.
-- **A few gilded elements in the "holy" biomes only** (shrine, crypt): worn gold-leaf inlays in some floor slabs, a
-  lapis-and-gold frieze on the top course of some walls, and a gilded icon niche as a rare prop. They are flaked and
-  dim, lit only by the torches: the menus' gold, fallen into the dark.
-- The other biomes (cavern, marsh, warren, forge) get only the wear and the palette snap.
+The owner added (2026-10-24): more variety in the ground and the walls, so the map looks less like flat boxes on a
+grid. As built:
+
+- **The floor is painted in world space** (`paintFloorChunk`, `isoPaint.ts`): each 8×8-tile chunk is painted pixel by
+  pixel from tile space, so flagstones and cobbles are one field of stones across tiles (a jittered grid, measured in
+  the view's pixels) and no tile outline shows. Over every kind: wear at two scales, damp patches, speckle; flagstones
+  have a lit and a shadowed lip, a few are missing (earth) or cracked; slabs are staggered rows of one- and
+  two-tile slabs; plates are staggered two-tile plates; rock has fissures; earth has pebbles and green tufts. A dark lip
+  only where the floor meets the void.
+- **Walls** (`isoWallCube`): courses measured from the foot and repeating every 16 px, so they run on from cube to
+  cube; a cube is chosen by which of its four neighbours are walls, and has an outline and a lit lip only on the edges
+  no neighbour covers (a faint joint between capstones); three heights each of tall and low cubes; grime towards the
+  foot and streaks from the cap; natural rock has a ragged top where it is open. All 192 cubes are one texture.
+- **The menus' wear pass is not reused:** its ramp snap would recolour every biome. The method (mottle at two
+  scales, grime near edges, cracks) is redone in the biome's own colours.
+- **Gold where it fits** (decision C): in the crypt and the shrine a few floor stones are worn gilded inlay (gold
+  flaked to the red bole), and stretches of tall wall carry a gold and lapis frieze (`BIOME_LOOKS.gilt`).
+- Cost: building a showcase map went from about 110 ms to about 230 ms (the floor's per-pixel stones).
 
 ## 4. Decisions (the owner, 2026-10-24)
 
@@ -135,4 +144,5 @@ they go in DESIGN.md Appendix A, and `docs/VISUAL_STYLES.md` gets a pointer here
   lozenges and the selection ring are in `src/render/style/marks.ts`, in whole world pixels. The ambients
   (`BIOME_LOOKS`) lean to umber, the torchless ones less and 10% brighter; the vignette and the camera's ground are
   bitumen-black; the player's light and the torches lean to gold (`PLAYER_LIGHT`, `TORCH_LIGHT` in the grim style).
-- Next: the owner's look at L2 and L4, then L5 and L6.
+- **L6 built (2026-10-24):** the floor and walls of 3.6.
+- Next: L5, enemy colours.

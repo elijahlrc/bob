@@ -56,7 +56,7 @@ The Grimdark look from a 2:1 diagonal camera. It is the same class as Grimdark (
 so lights, particles, decals, flasks, enemy marks and animation are shared. What differs:
 
 - 32×16 px diamond tiles (vs 24 px squares) and 0.6× figure rasterisation, shown at 2× zoom (1.5× on windows under 1100 px): smaller pixels and roughly twice the map area in view.
-- Pixel-art floor slabs (Voronoi flagstones) baked into 8×8 chunks; wall cubes with brick courses, a lit top, a mid-tone left face and a dark right face. Walls on the near side are cut low so they never hide the action.
+- The floor is painted in world space into 8×8-tile chunks (stones laid across tiles, no tile outlines, wear and damp at a larger scale; since 2026-10-24); wall cubes have a lit top, a mid-tone left face and a dark right face, courses measured from the foot so they run on from cube to cube, an outline only on edges no neighbouring wall covers, and three heights each. Walls on the near side are cut low so they never hide the action.
 - Everything sorts by screen y; lights are scaled to 80% of the top-down radii; ground effects become ellipses.
 
 Since 2026-10-24 the map borrows a few elements of the Gold Leaf menus (palette, marks, light): see [WORLD-LEAF.md](WORLD-LEAF.md).

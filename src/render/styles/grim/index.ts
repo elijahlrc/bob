@@ -42,7 +42,18 @@ import {
   sidearmStance,
 } from './encounterFx';
 import { BIOME_LOOKS, biomeColors, type PropSpec } from './biomeLook';
-import { isoFloors, isoWalls, ISO_H, ISO_W, WALL_LOW, WALL_TALL } from './isoPaint';
+import {
+  isoWallCube,
+  ISO_H,
+  ISO_W,
+  LOW_HEIGHTS,
+  paintFloorChunk,
+  TALL_HEIGHTS,
+  WALL_E,
+  WALL_N,
+  WALL_S,
+  WALL_W,
+} from './isoPaint';
 import { BossFx } from './bossFx';
 import {
   FLIGHT_HEIGHT,
@@ -114,6 +125,12 @@ type View = ActorView & {
 
 type Bolt = { pts: { x: number; y: number }[]; t: number; color: number };
 type TempLight = { light: Phaser.GameObjects.Light; t: number; total: number; base: number };
+/** A tile's hash in [0, 1), for choices that must not move when the random sequence does. */
+function hashTile(x: number, y: number, salt: number): number {
+  let h = (x * 374761393 + y * 668265263 + salt * 2246822519) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
 /** The player's lamp and the torches: warm, leaning to the menus' gold rather than orange (docs/WORLD-LEAF.md 3.4). */
 const PLAYER_LIGHT = 0xf6bc6c;
 const TORCH_LIGHT = 0xf4943e;
@@ -322,24 +339,44 @@ export class GrimStyle extends StyleBase {
     const th = world.plan.theme;
     const look = BIOME_LOOKS[world.plan.biome.id];
     const col = biomeColors(look, th);
-    const floors = isoFloors(col.floor, look.floorKind);
-    // One texture holds every wall variant: a lit sprite batch cannot span textures (Phaser 4 draws one texture per batch
-    // when lighting is on), and walls of random variants side by side in depth order would be a draw call each.
+    const gilt = look.gilt;
+    // One texture holds every wall cube: a lit sprite batch cannot span textures (Phaser 4 draws one texture per batch
+    // when lighting is on), and walls of random variants side by side in depth order would be a draw call each. A cube
+    // for each neighbour mask (16), height (3), variant (2), tall and low, in a grid of 16 columns.
     const wallAtlas = `gwa_${tid}_${world.plan.biome.id}`;
     if (!s.textures.exists(wallAtlas)) {
-      const cubes = [
-        ...isoWalls(col.wall, WALL_TALL, look.wallKind).map((c, i) => ({ name: `gwt_${i}`, c })),
-        ...isoWalls(col.wall, WALL_LOW, look.wallKind).map((c, i) => ({ name: `gwl_${i}`, c })),
-      ];
-      const cell = ISO_W + 2;
+      const cubes: { name: string; c: HTMLCanvasElement }[] = [];
+      for (const [tag, hs] of [
+        ['t', TALL_HEIGHTS],
+        ['l', LOW_HEIGHTS],
+      ] as const)
+        hs.forEach((height, hi) => {
+          for (let variant = 0; variant < 2; variant++)
+            for (let mask = 0; mask < 16; mask++)
+              cubes.push({
+                name: `gw${tag}${hi}_${variant}_${mask}`,
+                c: isoWallCube({
+                  wall: col.wall,
+                  kind: look.wallKind,
+                  height,
+                  mask,
+                  variant,
+                  frieze: tag === 't' && !!gilt,
+                }),
+              });
+        });
+      const cw = ISO_W + 2;
+      const ch = ISO_H + TALL_HEIGHTS[2] + 2;
       const cv = document.createElement('canvas');
-      cv.width = cell * cubes.length;
-      cv.height = ISO_H + WALL_TALL + 2;
+      cv.width = cw * 16;
+      cv.height = ch * Math.ceil(cubes.length / 16);
       const ctx = cv.getContext('2d')!;
-      cubes.forEach(({ c }, i) => ctx.drawImage(c, i * cell + 1, 1));
+      cubes.forEach(({ c }, i) => ctx.drawImage(c, (i % 16) * cw + 1, Math.floor(i / 16) * ch + 1));
       this.addTex(wallAtlas, cv);
       const tex = s.textures.get(wallAtlas);
-      cubes.forEach(({ name, c }, i) => tex.add(name, 0, i * cell + 1, 1, c.width, c.height));
+      cubes.forEach(({ name, c }, i) =>
+        tex.add(name, 0, (i % 16) * cw + 1, Math.floor(i / 16) * ch + 1, c.width, c.height),
+      );
     }
     const isFloor = (x: number, y: number) =>
       x >= 0 && y >= 0 && x < lab.w && y < lab.h && lab.tiles[y * lab.w + x] === 1;
@@ -352,14 +389,25 @@ export class GrimStyle extends StyleBase {
         cnv.width = CH * ISO_W + ISO_W;
         cnv.height = CH * ISO_H + ISO_H;
         const c = cnv.getContext('2d')!;
-        let any = false;
+        const pix = c.createImageData(cnv.width, cnv.height);
+        const any = paintFloorChunk(
+          pix,
+          minX,
+          minY,
+          (x, y) => isFloor(x, y) && Math.floor(x / CH) === cx && Math.floor(y / CH) === cy,
+          isFloor,
+          {
+            floor: col.floor,
+            kind: look.floorKind,
+            gilt: gilt?.stones ?? 0,
+            seed: world.plan.seed,
+          },
+        );
+        c.putImageData(pix, 0, 0);
         for (let y = cy * CH; y < Math.min(lab.h, cy * CH + CH); y++)
           for (let x = cx * CH; x < Math.min(lab.w, cx * CH + CH); x++) {
             if (!isFloor(x, y)) continue;
-            any = true;
             const p = this.project(x, y);
-            const v = (x * 7 + y * 13 + ((x + y) % 2) * 5) % 4;
-            c.drawImage(floors[v], p.x - ISO_W / 2 - minX, p.y - minY);
             // Contact shadow in the corner under walls to the north-west.
             if (!isFloor(x - 1, y) || !isFloor(x, y - 1)) {
               c.save();
@@ -381,17 +429,34 @@ export class GrimStyle extends StyleBase {
         const img = s.add.image(minX, minY, key).setOrigin(0, 0).setDepth(0).setLighting(true);
         this.owned.push(img);
       }
+    // The walls drawn: every non-floor tile next to a floor tile.
+    const isWall = (x: number, y: number) => {
+      if (x < 0 || y < 0 || x >= lab.w || y >= lab.h || isFloor(x, y)) return false;
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) if (isFloor(x + dx, y + dy)) return true;
+      return false;
+    };
+    const salt = world.plan.seed | 0;
     for (let y = 0; y < lab.h; y++)
       for (let x = 0; x < lab.w; x++) {
-        if (isFloor(x, y)) continue;
-        let near = false;
-        for (let dy = -1; dy <= 1 && !near; dy++)
-          for (let dx = -1; dx <= 1; dx++) if (isFloor(x + dx, y + dy)) near = true;
-        if (!near) continue;
+        if (!isWall(x, y)) continue;
         const front = isFloor(x - 1, y) || isFloor(x, y - 1) || isFloor(x - 1, y - 1);
+        const mask =
+          (isWall(x, y - 1) ? WALL_N : 0) |
+          (isWall(x - 1, y) ? WALL_W : 0) |
+          (isWall(x + 1, y) ? WALL_E : 0) |
+          (isWall(x, y + 1) ? WALL_S : 0);
+        const hr = hashTile(x, y, salt);
+        const hi = hr < 0.25 ? 0 : hr > 0.75 ? 2 : 1;
+        // The frieze comes in stretches (four tiles square share a draw), the plain variants at random.
+        const variant = gilt
+          ? hashTile(x >> 2, y >> 2, salt + 1) < gilt.frieze
+            ? 1
+            : 0
+          : rng.int(0, 1);
         const p = this.project(x + 1, y + 1);
         const img = s.add
-          .image(p.x, p.y, wallAtlas, `${front ? 'gwl' : 'gwt'}_${rng.int(0, 2)}`)
+          .image(p.x, p.y, wallAtlas, `gw${front ? 'l' : 't'}${hi}_${variant}_${mask}`)
           .setOrigin(0.5, 1)
           // Sorted by the middle of the footprint, like actors by their feet: a wall behind an actor must never draw over it
           // (the bottom corner, half a tile lower, did that to anyone in the half of a tile nearest a wall).

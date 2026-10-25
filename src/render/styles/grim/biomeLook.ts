@@ -33,6 +33,11 @@ export type BiomeLook = {
    * biomes without torches keep more of their own cool cast and a little more light.
    */
   ambient: number;
+  /**
+   * Gold where it fits (the owner, 2026-10-24; docs/WORLD-LEAF.md 3.6): the share of floor stones that are worn gilded
+   * inlay, and of wall runs that carry a gold frieze. Only the holy biomes have any.
+   */
+  gilt?: { stones: number; frieze: number };
   /** Chance that each of a room's two north-wall torches is lit. */
   torches: number;
   /** Chance of a brazier in a main room (always in the end room). */
@@ -54,6 +59,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     floorKind: 'flag',
     wallKind: 'brick',
     ambient: 0x65595a,
+    gilt: { stones: 0.02, frieze: 0.2 },
     torches: 1,
     brazier: 0.5,
     perRoom: [3, 4],
@@ -162,6 +168,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     floorKind: 'slab',
     wallKind: 'ashlar',
     ambient: 0x7d6c6b,
+    gilt: { stones: 0.04, frieze: 0.35 },
     torches: 1,
     brazier: 0.6,
     perRoom: [2, 4],
