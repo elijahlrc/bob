@@ -292,6 +292,24 @@ textarea {
   overflow: auto;
   position: relative;
 }
+/* A tab's content, marked for the painter (docs/MENU-SPEED.md); it lays out as if it were not there. */
+.tab-scope {
+  display: contents;
+}
+/* A hidden copy of another tab, painted ahead: the tab body's own size and padding, unseen, untouchable, clipped so it
+   adds nothing to the scrolling. */
+.lf-rehearse {
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+  contain: layout paint;
+}
+.lf-rehearse-in {
+  height: 100%;
+}
 svg.tree {
   flex: 1;
   width: 100%;

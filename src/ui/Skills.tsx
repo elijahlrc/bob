@@ -27,6 +27,7 @@ import { infoProps } from './info';
 import { Badge } from './SocketPicker';
 import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
+import { useRehearsal } from './rehearsal';
 
 const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Auras'] as const;
 
@@ -113,7 +114,11 @@ export function Skills({
   // A gem from the bag picked, and the socket that holds a gem it would replace: read before committing (docs/EQUIP.md 3.6).
   const [pending, setPending] = useState<SocketRef | null>(null);
   const [hint, setHint] = useState(() => !loadPref<boolean>('skills.hintSeen', false));
-  useEffect(() => savePref('skills.hintSeen', true), []);
+  // A copy painted ahead out of sight (rehearsal.ts) has not been seen.
+  const rehearsal = useRehearsal();
+  useEffect(() => {
+    if (!rehearsal) savePref('skills.hintSeen', true);
+  }, []);
   useEffect(() => setPending(null), [sel]);
   useEffect(() => {
     if (focusSlot)
@@ -208,6 +213,8 @@ export function Skills({
   // worked out a little at a time after the screen has been drawn, and the badges already shown stay until their gem is redone.
   const [best, setBest] = useState<Map<number, Placement | null>>(() => new Map());
   useEffect(() => {
+    // Not for a copy painted ahead: nobody reads its badges, and the open tab works them out again.
+    if (rehearsal) return;
     let stopped = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const uids = gems.map((g) => g.uid);

@@ -1,5 +1,6 @@
 import { DebugPanel } from './Debug';
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import type { ComponentChildren, RefObject } from 'preact';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Character } from '../calc/character';
 import { classDef } from '../data/classes';
 import type { EquipSlot } from '../data/types';
@@ -20,6 +21,7 @@ import { infoProps } from './info';
 import { Items } from './Items';
 import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
+import { Rehearsal } from './rehearsal';
 import { BossAhead, BossCard } from './BossCard';
 import { BOSSES, bossForMap } from '../data/bosses';
 import type { OfferPreview } from '../run/preview';
@@ -210,8 +212,17 @@ export function Camp({ c }: { c: Controller }) {
   const setTab = (t: Tab) => {
     if (tab === 'items' && t !== 'items') setShowDrops(false);
     if (tab === 'skills' && t !== 'skills') setGemSlot(null);
+    if (t === ahead) {
+      aheadDone.current.add(t);
+      setAhead(null);
+    }
     setTabState(t);
   };
+  // The tabs not open yet are painted ahead, one at a time, out of sight in idle moments (docs/MENU-SPEED.md 3.3): a
+  // hidden copy is rendered, the painter makes its paintings a few milliseconds at a time and says when it is done
+  // ('leaf-rehearsed'), and the copy goes. The passive tree is left out (it draws itself).
+  const [ahead, setAhead] = useState<Tab | null>(null);
+  const aheadDone = useRef(new Set<Tab>());
   // An item the Items tab sends to the Workbench ("Craft…") and back ("Show in Items"); `n` makes a repeat count.
   const [focus, setFocus] = useState<{ uid: number; n: number; to: 'items' | 'workbench' } | null>(
     null,
@@ -233,6 +244,26 @@ export function Camp({ c }: { c: Controller }) {
   }, [tab]);
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
+  useEffect(() => {
+    if (ahead) return;
+    const order: Tab[] = ['items', 'skills', 'sheet', 'strategy', 'next', 'report'];
+    const timer = setTimeout(() => {
+      const t = order.find(
+        (x) => x !== tab && !aheadDone.current.has(x) && (x !== 'report' || !!c.lastResult?.report),
+      );
+      if (t) setAhead(t);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [tab, ahead]);
+  useEffect(() => {
+    if (!ahead) return;
+    const done = () => {
+      aheadDone.current.add(ahead);
+      setAhead(null);
+    };
+    window.addEventListener('leaf-rehearsed', done);
+    return () => window.removeEventListener('leaf-rehearsed', done);
+  }, [ahead]);
   // Ctrl+Z undoes the last camp change (equip, socket, passive point, reward pick ...).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -430,6 +461,54 @@ export function Camp({ c }: { c: Controller }) {
       </div>
     </>
   );
+  /** What tab `t` shows (the open tab, or a hidden copy of another painted ahead). */
+  const body = (t: Tab) => (
+    <>
+      {t === 'tree' && <TreeView c={c} />}
+      {t === 'sheet' && <Sheet s={sheet} ch={ch} />}
+      {t === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}
+      {t === 'strategy' && <Strategy c={c} ch={ch} />}
+      {t === 'items' && run.reward && (
+        <div class="items-reward">
+          <Reward c={c} />
+        </div>
+      )}
+      {t === 'items' && (
+        <Items
+          c={c}
+          focus={focus?.to === 'items' ? focus : null}
+          onCraft={(uid) => goTo('workbench', uid)}
+          onEditGems={(slot) => {
+            setGemSlot(slot);
+            setTab('skills');
+          }}
+          startView={showDrops ? 'upgrades' : undefined}
+        />
+      )}
+      {t === 'workbench' && CRAFTING_OPEN && (
+        <Workbench
+          c={c}
+          focus={focus?.to === 'workbench' ? focus : null}
+          onShowInItems={(uid) => goTo('items', uid)}
+        />
+      )}
+      {t === 'report' && last?.report && (
+        <MapReportView
+          r={last.report}
+          title={`Map ${run.history[run.history.length - 1]?.map ?? ''} · ${last.status}`}
+        />
+      )}
+      {t === 'next' && (
+        <div class="camp-next camp-side-body">
+          {stopSlot !== null && run.offers[stopSlot]?.kind === 'stop' ? (
+            <StopScreen c={c} slot={stopSlot} onBack={() => setStopSlot(null)} />
+          ) : (
+            side
+          )}
+        </div>
+      )}
+    </>
+  );
   const shown: Tab = tab;
   const after = nextStep(shown, pts);
   return (
@@ -480,48 +559,17 @@ export function Camp({ c }: { c: Controller }) {
         </div>
         <div class="tabs-trim" aria-hidden="true" />
         <div class="tab-body" ref={bodyRef}>
-          {shown === 'tree' && <TreeView c={c} />}
-          {shown === 'sheet' && <Sheet s={sheet} ch={ch} />}
-          {shown === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}
-          {shown === 'strategy' && <Strategy c={c} ch={ch} />}
-          {shown === 'items' && run.reward && (
-            <div class="items-reward">
-              <Reward c={c} />
-            </div>
-          )}
-          {shown === 'items' && (
-            <Items
-              c={c}
-              focus={focus?.to === 'items' ? focus : null}
-              onCraft={(uid) => goTo('workbench', uid)}
-              onEditGems={(slot) => {
-                setGemSlot(slot);
-                setTab('skills');
-              }}
-              startView={showDrops ? 'upgrades' : undefined}
-            />
-          )}
-          {shown === 'workbench' && CRAFTING_OPEN && (
-            <Workbench
-              c={c}
-              focus={focus?.to === 'workbench' ? focus : null}
-              onShowInItems={(uid) => goTo('items', uid)}
-            />
-          )}
-          {shown === 'report' && last?.report && (
-            <MapReportView
-              r={last.report}
-              title={`Map ${run.history[run.history.length - 1]?.map ?? ''} · ${last.status}`}
-            />
-          )}
-          {shown === 'next' && (
-            <div class="camp-next camp-side-body">
-              {stopSlot !== null && run.offers[stopSlot]?.kind === 'stop' ? (
-                <StopScreen c={c} slot={stopSlot} onBack={() => setStopSlot(null)} />
-              ) : (
-                side
-              )}
-            </div>
+          <div class="tab-scope" data-paint-scope={shown}>
+            {body(shown)}
+          </div>
+          {ahead && ahead !== shown && (
+            <Ahead key={ahead} body={bodyRef}>
+              <Rehearsal.Provider value={true}>
+                <div class="tab-scope" data-paint-scope={ahead}>
+                  {body(ahead)}
+                </div>
+              </Rehearsal.Provider>
+            </Ahead>
           )}
         </div>
         <div class="camp-bar">
@@ -558,6 +606,64 @@ function Density({ d }: { d: DensityId }) {
   return (
     <div class="affix kind">
       <strong {...infoProps(def.text)}>{def.name}</strong>
+    </div>
+  );
+}
+
+let scrollbar: number | null = null;
+/** The width of a classic scrollbar on this device (0 where scrollbars overlay the content, as on phones). */
+function scrollbarWidth(): number {
+  if (scrollbar === null) {
+    const d = document.createElement('div');
+    d.style.cssText = 'position:absolute;top:-999px;width:100px;height:100px;overflow:scroll';
+    document.body.appendChild(d);
+    scrollbar = d.offsetWidth - d.clientWidth;
+    d.remove();
+  }
+  return scrollbar;
+}
+
+/**
+ * A hidden copy of a tab, painted ahead (docs/MENU-SPEED.md 3.3): out of sight and out of reach (`inert`), clipped to
+ * the tab body so it adds nothing to its scrolling, and as wide as the tab will be when it is opened: a tab that will
+ * scroll is a scrollbar narrower than one that will not, whatever the open tab does now. The painter waits until that
+ * width is set (`data-rehearse-wait`).
+ */
+function Ahead({
+  body,
+  children,
+}: {
+  body: RefObject<HTMLDivElement | null>;
+  children: ComponentChildren;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const b = body.current;
+    const el = box.current;
+    const inn = inner.current;
+    if (!b || !el || !inn) return;
+    const sb = scrollbarWidth();
+    if (sb > 0) {
+      const cs = getComputedStyle(b);
+      const has =
+        b.offsetWidth -
+          b.clientWidth -
+          parseFloat(cs.borderLeftWidth) -
+          parseFloat(cs.borderRightWidth) >
+        0;
+      const will =
+        inn.scrollHeight >
+        el.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      if (has !== will) inn.style.width = `calc(100% + ${has ? sb : -sb}px)`;
+    }
+    el.removeAttribute('data-rehearse-wait');
+  }, []);
+  return (
+    <div ref={box} class="lf-rehearse" data-rehearse data-rehearse-wait="" inert aria-hidden="true">
+      <div ref={inner} class="lf-rehearse-in">
+        {children}
+      </div>
     </div>
   );
 }

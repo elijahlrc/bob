@@ -1,5 +1,6 @@
 import preact from '@preact/preset-vite';
-import { writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vitest/config';
 
@@ -47,6 +48,21 @@ function treeEditSave(): Plugin {
 const BUILD_ID = process.env.GITHUB_SHA?.slice(0, 7) ?? 'local';
 
 /**
+ * The Gold Leaf painter's version: a hash of its source and the ramps. The paintings players keep between sessions
+ * (src/ui/leaf/store.ts) are dropped when it changes, and kept across deploys that do not touch the painter.
+ */
+const LEAF_VERSION = (() => {
+  const h = createHash('sha1');
+  const dir = resolve(import.meta.dirname, 'src/ui/leaf');
+  for (const f of readdirSync(dir)
+    .filter((f) => f.endsWith('.ts'))
+    .sort())
+    h.update(f).update(readFileSync(resolve(dir, f)));
+  h.update(readFileSync(resolve(import.meta.dirname, 'src/data/palette.ts')));
+  return h.digest('hex').slice(0, 10);
+})();
+
+/**
  * `version.json` beside the game: `{"build":"<id>"}`, which a tab open on an older build fetches to learn that a newer one is out
  * (`src/update.ts`). Written into `dist/` by the build; the dev server answers `local`, so the check is a no-op there.
  */
@@ -75,7 +91,10 @@ export default defineConfig({
   // Relative asset paths so `dist/` works when hosted under a sub-path (e.g. GitHub Pages).
   base: './',
   // The commit a build was made from (set by the deploy workflow), so run statistics can be told apart by balance version.
-  define: { __BUILD_ID__: JSON.stringify(BUILD_ID) },
+  define: {
+    __BUILD_ID__: JSON.stringify(BUILD_ID),
+    __LEAF_VERSION__: JSON.stringify(LEAF_VERSION),
+  },
   server: {
     port: 5173,
     strictPort: true,

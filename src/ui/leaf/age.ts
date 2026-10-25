@@ -28,6 +28,17 @@ export type AgeOpts = {
   dark?: boolean;
   /** Boxes kept calm (no flakes, no cracks, less grime): where text sits straight on the surface. */
   calm?: { x: number; y: number; w: number; h: number }[];
+  /**
+   * The whole surface calm: the same mottle as the aged painting with the same seed (the random draws up to it are the
+   * same), without its grime patches, flakes or cracks. Cut into boxes and laid over the aged painting, it stands in for
+   * `calm` without painting the whole surface again (the wall, painter.ts).
+   */
+  cleanOnly?: boolean;
+  /**
+   * Also make the clean twin of this painting in the same pass (as `cleanOnly` would, at the cost of one extra
+   * canvas): it is handed to this.
+   */
+  twin?: (clean: HTMLCanvasElement) => void;
 };
 
 /** What each ramp (by index) wears through to, by index; -1 for a ramp that does not flake. */
@@ -80,8 +91,9 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
   for (const b of o.calm ?? [])
     for (let y = Math.max(0, b.y); y < Math.min(H, b.y + b.h); y++)
       calmMask.fill(1, y * W + Math.max(0, b.x), y * W + Math.min(W, b.x + b.w));
+  const allCalm = !!o.cleanOnly;
   const inCalm = (x: number, y: number) =>
-    x >= 0 && x < W && y >= 0 && y < H && calmMask[y * W + x] === 1;
+    allCalm || (x >= 0 && x < W && y >= 0 && y < H && calmMask[y * W + x] === 1);
   const edge = edgeDistance(ramp, W, H, !!o.wrapX, !!o.wrapY);
   const bc = o.blotch ?? 4;
   const n1 = noiseGrid(r, W, H, 10);
@@ -91,18 +103,25 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
   const n5 = noiseGrid(r, W, H, bc * 5);
   const tex = o.texture ?? 1;
   const grime = o.grime ?? 1;
+  // The clean twin's steps: the same mottle without the grime patches, and none of the wear that follows.
+  const twinIdx = o.twin ? new Int8Array(N) : null;
   // Mottle along the ramp; darken grimy patches and the pixels near an edge.
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
       const p = y * W + x;
-      if (ramp[p] < 0 || ramp[p] === RI.ink) continue;
+      if (ramp[p] < 0 || ramp[p] === RI.ink) {
+        if (twinIdx) twinIdx[p] = idx[p];
+        continue;
+      }
       let s = ((n1[p] - 0.5) * 2.2 + (n2[p] - 0.5) * 1.4 + (r() - 0.5) * 1.1) * tex;
-      if (n3[p] > 0.66 && !inCalm(x, y)) s -= grime;
       if (edge[p] <= 2) s -= 0.9 * grime;
+      if (twinIdx) twinIdx[p] = Math.max(0, Math.min(len(ramp[p]) - 1, idx[p] + Math.round(s)));
+      if (n3[p] > 0.66 && !inCalm(x, y)) s -= grime;
       idx[p] = Math.max(0, Math.min(len(ramp[p]) - 1, idx[p] + Math.round(s)));
     }
+  const twinRamp = o.twin ? ramp.slice() : null;
   // Flakes: the most exposed share of each flaking pixel, by blotchy noise, more of it near the edges.
-  const loss = o.loss ?? 0.08;
+  const loss = allCalm ? 0 : (o.loss ?? 0.08);
   if (loss > 0) {
     const v = new Float32Array(N).fill(-1);
     const list = new Float64Array(N);
@@ -144,7 +163,7 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
       }
   }
   // Cracks: short wandering walks to the darkest step of whatever they cross.
-  for (let c = 0; c < (o.cracks ?? 0); c++) {
+  for (let c = 0; c < (allCalm ? 0 : (o.cracks ?? 0)); c++) {
     let x = Math.floor(r() * W);
     let y = Math.floor(r() * H);
     let dir = Math.floor(r() * 8);
@@ -165,9 +184,30 @@ export function age(cv: HTMLCanvasElement, r: Rand, o: AgeOpts = {}): HTMLCanvas
       }
     }
   }
-  // A few glints where the leaf still catches the light.
+  // A few glints where the leaf still catches the light (on the twin too, where its leaf is whole).
   for (let p = 0; p < N; p++)
-    if (ramp[p] === RI.gold && r() < (o.glint ?? 0.006)) idx[p] = len(RI.gold) - 1;
+    if (ramp[p] === RI.gold && r() < (o.glint ?? 0.006)) {
+      idx[p] = len(RI.gold) - 1;
+      if (twinIdx) twinIdx[p] = idx[p];
+    }
+  if (o.twin && twinIdx && twinRamp) {
+    const tw = document.createElement('canvas');
+    tw.width = W;
+    tw.height = H;
+    const tctx = ctx2d(tw);
+    const timg = tctx.createImageData(W, H);
+    const t = timg.data;
+    for (let p = 0; p < N; p++) {
+      if (twinRamp[p] < 0) continue;
+      const c = RGB[twinRamp[p]][twinIdx[p]];
+      t[p * 4] = c[0];
+      t[p * 4 + 1] = c[1];
+      t[p * 4 + 2] = c[2];
+      t[p * 4 + 3] = 255;
+    }
+    tctx.putImageData(timg, 0, 0);
+    o.twin(tw);
+  }
   const shade = new Uint8Array(N);
   if (o.shadow)
     for (let y = 0; y < H; y++)

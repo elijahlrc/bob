@@ -124,3 +124,20 @@ the cache. Only if M0 on a phone shows the need.
   Items tab's first-visit view); M3 needs a check of every tab's mount effects.
 - The wall's calm overlays must line up with the wall to the pixel at every size and scroll position.
 - IndexedDB can be unavailable (private windows, blocked storage): the cache then lives in memory as it does today.
+
+## 7. Progress
+
+- **3.1, 3.2 and 3.3 built (2026-10-24; the owner chose these three, with no measuring harness).**
+  - The wall (`paintWall`, `painter.ts`) is painted once per size; its calm boxes are cut from a clean twin made in the
+    same pass (`age`'s `twin`, same mottle pixel for pixel) and laid over it as extra background layers of the same
+    element. When a screen has a scrollbar, the wall for the width without one is made in the next idle moment (the
+    title screen prepares the camp's).
+  - Paintings are kept in IndexedDB (`store.ts`) under a painter version hashed from `src/ui/leaf/*.ts` and the ramps
+    at build time (`__LEAF_VERSION__`, `vite.config.ts`), capped at 20 MB; in the dev server only with `?leafcache`.
+  - Camp paints the tabs not open yet ahead (`Ahead`, `Camp.tsx`): a hidden, inert copy in the tab body, as wide as the
+    tab will be (a scrollbar narrower when it will scroll), its paintings made in idle moments within the time the
+    browser offers; the painter's keys count within each tab (`data-paint-scope`), so the copy and the real tab share
+    paintings. A hidden copy changes nothing (`rehearsal.ts`: the Skills tab skips its hint flag and its badge work).
+  - Checked in the browser on the level 42 save: a second session opened the camp and every tab with no task over
+    50 ms and 5 new paintings in all; the first ever camp entry went from 254 to 205 ms; every tab looked as before at
+    desktop and phone width. The wear of panels inside tabs was re-rolled once by the new keys.
