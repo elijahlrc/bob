@@ -21,6 +21,8 @@ change, and our own names only. Dash bullets under plain headings.
 - Menus and tabs open faster.
 - In a large window the interface scales up to fill it, and the Interface size buttons are now on desktop too.
 - The skill gem picks in the first five maps offer only gems that suit your class's attributes.
+- On desktop the Next map button at the foot of the camp is twice the size.
+- The passive tree's background is calmer: no bare patches, and fewer, fainter gold specks.
 
 ## 2026-10-23
 
