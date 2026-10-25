@@ -1,4 +1,5 @@
 import { currencyLabel } from '../data/currency';
+import { MAP_RARITY } from '../data/palette';
 import { gemDef } from '../data/gems';
 import type { AnyItem } from '../data/types';
 
@@ -21,13 +22,5 @@ export function dropLabel(item: AnyItem): string {
   }
 }
 
-/** Colours for ground labels and beams, by drop rarity. */
-export const DROP_COLOR: Record<string, number> = {
-  normal: 0xdddddd,
-  magic: 0x6a8cff,
-  rare: 0xffd84a,
-  unique: 0xff9a2a,
-  gem: 0x40e0c0,
-  flask: 0xff6090,
-  currency: 0xe8d8a0,
-};
+/** Colours for ground labels and beams, by drop rarity: the map's rarity colours (data/palette.ts). */
+export const DROP_COLOR: Record<string, number> = MAP_RARITY;

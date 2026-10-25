@@ -22,6 +22,7 @@ import type { Side } from '../../../sim/side';
 import type { MarkTheme } from '../../style/marks';
 import { isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
+import { MAP_RARITY, tone } from '../../../data/palette';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
 import {
   ensurePixelFonts,
@@ -88,11 +89,12 @@ const ZONE_LOOK: Record<string, { fill: number; edge: number }> = {
   sigil: { fill: 0x3a1050, edge: 0xd070ff },
 };
 const DTYPE_COLOR = [0xeadfc8, 0xc89cff, 0x9ad8ff, 0xff9a40, 0x9ae05a];
+/** The ring under a monster, by rarity: the map's rarity colours, a boss's an oxblood glow (docs/WORLD-LEAF.md 3.2). */
 const RARITY_RING: Record<string, number> = {
-  magic: 0x5a7cff,
-  rare: 0xffd040,
-  miniboss: 0xff8a20,
-  boss: 0xff3a20,
+  magic: MAP_RARITY.magic,
+  rare: MAP_RARITY.rare,
+  miniboss: MAP_RARITY.miniboss,
+  boss: 0xb02a18,
 };
 
 type Emitter = Phaser.GameObjects.Particles.ParticleEmitter;
@@ -112,6 +114,9 @@ type View = ActorView & {
 
 type Bolt = { pts: { x: number; y: number }[]; t: number; color: number };
 type TempLight = { light: Phaser.GameObjects.Light; t: number; total: number; base: number };
+/** The player's lamp and the torches: warm, leaning to the menus' gold rather than orange (docs/WORLD-LEAF.md 3.4). */
+const PLAYER_LIGHT = 0xf6bc6c;
+const TORCH_LIGHT = 0xf4943e;
 /** Lights a map's glowing props may use between them (the torches and braziers have theirs). */
 const MAX_PROP_LIGHTS = 10;
 /** Flash lights alive at once: past this a flash is only its particle (see `flash`). */
@@ -240,7 +245,7 @@ export class GrimStyle extends StyleBase {
       ((lab.w + lab.h) * ISO_H) / 2 + 600,
     );
     cam.roundPixels = true;
-    cam.setBackgroundColor(0x050408);
+    cam.setBackgroundColor(tone('bitumen', 0));
     this.setupFilters(cam);
 
     this.makeEmitters();
@@ -280,7 +285,7 @@ export class GrimStyle extends StyleBase {
     // Each character has a light of its own: the rival's is redder.
     this.playerLights = world.sides.map((side, i) => {
       const at = this.project(side.player.x, side.player.y);
-      return this.addLight(at.x, at.y, 320, i === 0 ? 0xffb060 : 0xff8060, 1.5);
+      return this.addLight(at.x, at.y, 320, i === 0 ? PLAYER_LIGHT : 0xff8060, 1.5);
     });
     // A duel's arena has no exit to show (its portal would stand there, faint, with the exit shut).
     this.portal = null;
@@ -398,7 +403,7 @@ export class GrimStyle extends StyleBase {
 
   private setupFilters(cam: Phaser.Cameras.Scene2D.Camera): void {
     try {
-      cam.filters.external.addVignette(0.5, 0.5, 0.82, 0.55, 0x000000);
+      cam.filters.external.addVignette(0.5, 0.5, 0.82, 0.55, tone('bitumen', 0));
     } catch {
       /* filters are optional */
     }
@@ -581,7 +586,7 @@ export class GrimStyle extends StyleBase {
         const td = 1000 + tb.y + 1;
         const img = s.add.image(wx, wy, 'g_torch').setDepth(td);
         this.owned.push(img);
-        const light = this.addLight(wx, wy + 8, 190, 0xff8a38, 1.5);
+        const light = this.addLight(wx, wy + 8, 190, TORCH_LIGHT, 1.5);
         this.torches.push({ light, seed: rng.next() * 100, base: 1.5, x: wx, y: wy });
         const fl = s.add.particles(wx, wy - 2, 'g_flame', {
           frequency: 85,
@@ -779,7 +784,7 @@ export class GrimStyle extends StyleBase {
   }
 
   protected markTheme(): MarkTheme {
-    return { unit: 2.6, outline: 0x08060a, squash: 0.5 };
+    return { unit: 2.6, outline: tone('ink', 0), squash: 0.5 };
   }
 
   protected updateView(v: View, a: Actor, dt: number): void {

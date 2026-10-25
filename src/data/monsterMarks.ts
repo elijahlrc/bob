@@ -1,4 +1,5 @@
 import type { MonsterModId, MonsterRarity } from './monsters';
+import { MAP_RARITY } from './palette';
 
 /** How an enemy affix is shown: a coloured shape (map pips, inspect chips) and a plain-language effect. */
 export type ModShape = 'circle' | 'diamond' | 'square' | 'triUp' | 'triDown' | 'ring';
@@ -332,12 +333,13 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
   },
 };
 
+/** A monster's colour by rarity (its life bar, the inspect card): the map's rarity colours (palette.ts). */
 export const RARITY_COLOR: Record<MonsterRarity, number> = {
-  normal: 0xcfcfcf,
-  magic: 0x8888ff,
-  rare: 0xffd860,
-  miniboss: 0xff9040,
-  boss: 0xff4a40,
+  normal: MAP_RARITY.normal,
+  magic: MAP_RARITY.magic,
+  rare: MAP_RARITY.rare,
+  miniboss: MAP_RARITY.miniboss,
+  boss: MAP_RARITY.boss,
 };
 
 export function hex(c: number): string {

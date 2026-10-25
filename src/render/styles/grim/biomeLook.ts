@@ -28,7 +28,10 @@ export type BiomeLook = {
   themeTint: number;
   floorKind: FloorKind;
   wallKind: WallKind;
-  /** Ambient light colour. */
+  /**
+   * Ambient light colour: leaning to umber, so the gold of the lights reads as gilding (docs/WORLD-LEAF.md 3.4); the
+   * biomes without torches keep more of their own cool cast and a little more light.
+   */
   ambient: number;
   /** Chance that each of a room's two north-wall torches is lit. */
   torches: number;
@@ -50,7 +53,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 1,
     floorKind: 'flag',
     wallKind: 'brick',
-    ambient: 0x625c7a,
+    ambient: 0x65595a,
     torches: 1,
     brazier: 0.5,
     perRoom: [3, 4],
@@ -69,7 +72,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.4,
     floorKind: 'rock',
     wallKind: 'rough',
-    ambient: 0x4a5878,
+    ambient: 0x596076,
     torches: 0,
     brazier: 0.1,
     perRoom: [4, 6],
@@ -87,7 +90,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.5,
     floorKind: 'cobble',
     wallKind: 'ashlar',
-    ambient: 0x6c667c,
+    ambient: 0x6f615e,
     torches: 0.5,
     brazier: 0.3,
     perRoom: [4, 6],
@@ -105,7 +108,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.4,
     floorKind: 'earth',
     wallKind: 'rough',
-    ambient: 0x58786c,
+    ambient: 0x6b8070,
     torches: 0,
     brazier: 0,
     perRoom: [5, 7],
@@ -123,7 +126,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.4,
     floorKind: 'plate',
     wallKind: 'ashlar',
-    ambient: 0x7a5a58,
+    ambient: 0x70594e,
     torches: 0.5,
     brazier: 1,
     perRoom: [3, 5],
@@ -140,7 +143,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.4,
     floorKind: 'earth',
     wallKind: 'rough',
-    ambient: 0x6a6c86,
+    ambient: 0x7b7786,
     torches: 0,
     brazier: 0.2,
     perRoom: [5, 8],
@@ -158,7 +161,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.4,
     floorKind: 'slab',
     wallKind: 'ashlar',
-    ambient: 0x7a7090,
+    ambient: 0x7d6c6b,
     torches: 1,
     brazier: 0.6,
     perRoom: [2, 4],
@@ -175,7 +178,7 @@ export const BIOME_LOOKS: Record<BiomeId, BiomeLook> = {
     themeTint: 0.4,
     floorKind: 'earth',
     wallKind: 'rough',
-    ambient: 0x5a5068,
+    ambient: 0x665968,
     torches: 0,
     brazier: 0.1,
     perRoom: [3, 5],
