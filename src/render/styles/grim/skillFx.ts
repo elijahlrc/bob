@@ -258,6 +258,8 @@ export class SkillFx {
         this.thrust(e);
         break;
       case 'explode': {
+        // The mark a charge or a leap was aimed at going out: nothing to outline.
+        if (e.dud) break;
         const c = ELEMENT_COLOR[e.dtype] ?? 0xffffff;
         // A spark or a ping (a fraction of a tile) is not an area to read: it only rings.
         if (e.r < COSMETIC_R) this.wave(e.x, e.y, e.r * 0.2, Math.max(0.5, e.r), c, 0.34);

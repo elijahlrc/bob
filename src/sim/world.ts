@@ -588,7 +588,16 @@ function tickEffects(w: World, dt: number): void {
       if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
       continue;
     }
-    w.events.push({ t: 'explode', x: e.x, y: e.y, r: e.radius, dtype: e.dtype });
+    // A mark that hurts nothing and throws nothing (the dot a charge or a leap was aimed at) goes off as a dud.
+    const dud = e.damage <= 0 && !e.push;
+    w.events.push({
+      t: 'explode',
+      x: e.x,
+      y: e.y,
+      r: e.radius,
+      dtype: e.dtype,
+      ...(dud ? { dud: true } : {}),
+    });
     const label = e.label ?? (e.kind === 'slam' ? 'Crushing slam' : 'Volatile explosion');
     for (const s of w.sides) {
       if (s.team === e.team) continue;
@@ -597,8 +606,23 @@ function tickEffects(w: World, dt: number): void {
       if (e.push && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r) {
         const ang = Math.atan2(p.y - e.y, p.x - e.x);
         const to = w.grid.collide(p.x + Math.cos(ang) * e.push, p.y + Math.sin(ang) * e.push, p.r);
+        const x0 = p.x;
+        const y0 = p.y;
         p.x = to.x;
         p.y = to.y;
+        if (Math.hypot(p.x - x0, p.y - y0) > 0.05)
+          w.events.push({
+            t: 'push',
+            src: e.owner ?? 0,
+            dst: p.id,
+            x: x0,
+            y: y0,
+            x2: p.x,
+            y2: p.y,
+            ox: e.x,
+            oy: e.y,
+            r: e.radius,
+          });
       }
       if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
         rawHit(w, p, e.damage, e.dtype, null, label, 'player', viaOf(w, e));

@@ -179,14 +179,76 @@ export const SIGIL_EVERY = 1.5;
 export function pullPlayer(w: World, s: Side, from: Actor, tiles: number): void {
   const p = s.player;
   if (!p.alive) return;
-  const d = Math.hypot(from.x - p.x, from.y - p.y);
-  const k = Math.min(tiles, Math.max(0, d - (from.r + p.r + 0.6)));
-  if (k <= 0.05) return;
-  const to = w.grid.collide(p.x + ((from.x - p.x) / d) * k, p.y + ((from.y - p.y) / d) * k, p.r);
+  const to = pullLanding(w, p, from, tiles);
+  if (!to) return;
+  const x0 = p.x;
+  const y0 = p.y;
   p.x = to.x;
   p.y = to.y;
   p.stunT = Math.max(p.stunT, 0.3);
   w.events.push({ t: 'blink', id: p.id, x: p.x, y: p.y, end: true });
+  w.events.push({
+    t: 'pull',
+    src: from.id,
+    dst: p.id,
+    x: x0,
+    y: y0,
+    x2: p.x,
+    y2: p.y,
+    hx: from.x,
+    hy: from.y,
+  });
+}
+
+/** Where a pull of `tiles` toward `from` would leave `p` (null when it would not move it): the drag and its warning agree. */
+export function pullLanding(
+  w: World,
+  p: Actor,
+  from: Actor,
+  tiles: number,
+): { x: number; y: number } | null {
+  const d = Math.hypot(from.x - p.x, from.y - p.y);
+  const k = Math.min(tiles, Math.max(0, d - (from.r + p.r + 0.6)));
+  if (k <= 0.05) return null;
+  return w.grid.collide(p.x + ((from.x - p.x) / d) * k, p.y + ((from.y - p.y) / d) * k, p.r);
+}
+
+/** Tiles a Tidewarden's hook drags the character, how often it is thrown, and the warning the renderer shows before it. */
+export const TIDEWARDEN_PULL = 4;
+export const HOOK_TELL = 0.8;
+
+/**
+ * The warning of a Tidewarden's hook (it is thrown when its timer runs out and the character is 3 to 14 tiles away, so the
+ * warning is read off the timer and changes nothing): how far the timer has run (`progress`, 1 when the hook is ready and waits for
+ * the character to come into range), whether the character is in range, and where the drag would leave it. Null when no hook is coming.
+ */
+export function hookTell(
+  w: World,
+  m: Actor,
+): {
+  progress: number;
+  ready: boolean;
+  inRange: boolean;
+  land: { x: number; y: number } | null;
+} | null {
+  if (
+    !m.alive ||
+    m.state !== 'chase' ||
+    m.rarity !== 'miniboss' ||
+    !m.modIds.includes('tidewarden')
+  )
+    return null;
+  if (m.raiserT > HOOK_TELL) return null;
+  const p = hunted(w, m);
+  if (!p.alive) return null;
+  const d = Math.hypot(p.x - m.x, p.y - m.y);
+  const inRange = d > 3 && d < 14;
+  return {
+    progress: m.raiserT <= 0 ? 1 : 1 - m.raiserT / HOOK_TELL,
+    ready: m.raiserT <= 0,
+    inRange,
+    land: inRange ? pullLanding(w, p, m, TIDEWARDEN_PULL) : null,
+  };
 }
 
 /** Whether a ground effect is a lasting zone (as opposed to a telegraphed blast). */
@@ -578,7 +640,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
     m.raiserT -= dt;
     if (m.raiserT <= 0 && d > 3 && d < 14) {
       m.raiserT = 10;
-      pullPlayer(w, hunted(w, m).side!, m, 4);
+      pullPlayer(w, hunted(w, m).side!, m, TIDEWARDEN_PULL);
     }
     if (m.bossPhase === 0 && frac <= 0.5) {
       m.bossPhase = 1;
