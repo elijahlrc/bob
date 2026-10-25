@@ -30,8 +30,9 @@ export function rolesFor(skill: SkillDef): SkillRole[] {
   const u = skill.utility;
   if (!u) {
     const roles: SkillRole[] = ['main', 'periodic', 'opener', 'emergency'];
-    // A debuff kept on the target, or an orb kept beside the character (Tempest Mote).
-    if (skill.dot || skill.stormOrb) roles.push('keepUp');
+    // A debuff kept on the target, or what the skill leaves standing: an orb (Tempest Mote), geysers (Pyre Burst), blades
+    // (Orbiting Blades).
+    if (skill.dot || skill.stormOrb || skill.geyser || skill.vortex) roles.push('keepUp');
     return [...roles, 'off'];
   }
   switch (u.kind) {

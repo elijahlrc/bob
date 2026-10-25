@@ -2105,14 +2105,16 @@ export class Character {
           rotation.push({ ...this.planSkill(c, conds, this.cooldownOf(c, conds)), utility: false });
           continue;
         }
-        // A skill kept up is cast again as what it keeps runs low: its orb (src/sim/ai.ts), or a debuff renewed as it ends
-        // (planSkill); one with neither is not counted.
+        // A skill kept up is cast again as what it keeps runs low: what it leaves standing (src/sim/ai.ts), or a debuff renewed
+        // as it ends (planSkill); one with neither is not counted.
         const st = this.planSkill(c, conds, 0);
         const p = this.profile(c, conds);
-        const orb = p.skill.stormOrb;
-        if (orb) {
-          // The sim casts it again with its use time and 0.3 s left on the orb, so the new orb is up 0.3 s before the old ends.
-          const gap = Math.max(p.useTime, orb.seconds * p.skillDuration - 0.3);
+        const keep = p.skill.stormOrb ?? p.skill.geyser ?? p.skill.vortex;
+        if (keep) {
+          // The sim casts it again with its use time and 0.3 s left on the one that ends first, so each of the `max` it holds
+          // (one orb) is renewed 0.3 s before it ends.
+          const n = 'max' in keep ? keep.max : 1;
+          const gap = Math.max(p.useTime, (keep.seconds * p.skillDuration - 0.3) / n);
           rotation.push({ ...st, cooldown: { seconds: gap, uses: 1 }, utility: false });
         } else if (st.cooldown) rotation.push({ ...st, utility: false });
       }

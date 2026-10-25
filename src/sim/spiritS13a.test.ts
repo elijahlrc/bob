@@ -584,6 +584,32 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     expect(casts('periodic').n).toBeGreaterThan(kept.n);
   });
 
+  it('Orbiting Blades kept up: cast again only as a blade runs low once all ten circle the character', () => {
+    const casts = (keepUp: boolean) => {
+      const b = buildFor(['orbitingBlades'], 'wand_3', INT);
+      if (keepUp)
+        b.strategy = { skills: { [b.equipment.body!.sockets[0]!.uid]: { role: 'keepUp' } } };
+      const run = createDummyWorld(b, { distance: 1.5, maxTime: 120 });
+      const w = run.world;
+      w.sides[0].opts.freeResources = true;
+      w.sides[0].opts.godMode = true;
+      run.dummy.def = dummyDefence({ maxLife: 1e9 });
+      run.dummy.life = 1e9;
+      let n = 0;
+      let full = 0;
+      for (let i = 0; i < 60 * 15; i++) {
+        stepWorld(w);
+        for (const e of w.events) if (e.t === 'use' && e.skill === 'orbitingBlades') n++;
+        if (i >= 60 * 8 && (w.sides[0].vortex?.blades.length ?? 0) >= 10) full++;
+      }
+      return { n, full: full / (60 * 7) };
+    };
+    const kept = casts(true);
+    const main = casts(false);
+    expect(kept.full).toBeGreaterThan(0.9);
+    expect(kept.n).toBeLessThan(main.n);
+  });
+
   it('Slag Lob: bursts where it lands, then bounces on and bursts again', () => {
     const { world: w, dummy } = world(['slagLob'], 5, 'wand_3', INT);
     const beyond = neighbour(w, dummy.x + 1.6, dummy.y);

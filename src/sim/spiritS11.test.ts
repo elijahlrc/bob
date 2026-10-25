@@ -186,4 +186,30 @@ describe('Pyre Burst (pyreBurst)', () => {
     expect(most).toBeLessThanOrEqual(3);
     expect(most).toBeGreaterThanOrEqual(1);
   });
+
+  it('kept up, it waits while three geysers stand with time to run, and so spends fewer corpses', () => {
+    const spent = (keepUp: boolean) => {
+      const b = buildFor(['pyreBurst'], 'wand_3', DEX);
+      if (keepUp)
+        b.strategy = { skills: { [b.equipment.body!.sockets[0]!.uid]: { role: 'keepUp' } } };
+      const run = createDummyWorld(b, { distance: 4, maxTime: 120 });
+      const w = run.world;
+      w.sides[0].opts.freeResources = true;
+      w.sides[0].opts.godMode = true;
+      for (let i = 0; i < 12; i++)
+        corpseAt(w, run.dummy.x + (i % 4) * 0.3, run.dummy.y + (i >> 2) * 0.3);
+      let most = 0;
+      for (let i = 0; i < 7 * 60; i++) {
+        stepWorld(w);
+        most = Math.max(most, w.sides[0].fields.filter((f) => f.kind === 'geyser').length);
+      }
+      return { corpses: 12 - w.corpses.length, most };
+    };
+    const kept = spent(true);
+    const main = spent(false);
+    // Three geysers, then nothing until the first runs low (eight seconds each).
+    expect(kept.most).toBe(3);
+    expect(kept.corpses).toBe(3);
+    expect(main.corpses).toBeGreaterThan(6);
+  });
 });

@@ -53,10 +53,13 @@ function autoText(c: SkillChoice): string {
 /** What keeping a skill up means for its kind. */
 function keepUpText(c: SkillChoice): string {
   const u = c.skill.utility;
-  if (!u)
-    return c.skill.stormOrb
-      ? 'Cast again when its orb runs low or the target is out of its reach'
-      : 'Cast again when its debuff on the target runs low';
+  if (!u) {
+    const s = c.skill;
+    if (s.stormOrb) return 'Cast again when its orb runs low or the target is out of its reach';
+    if (s.geyser) return 'Cast again when a geyser runs low or none reaches the target';
+    if (s.vortex) return 'Cast again when a blade runs low';
+    return 'Cast again when its debuff on the target runs low';
+  }
   switch (u.kind) {
     case 'buff':
       return 'Kept up whenever an enemy is near';

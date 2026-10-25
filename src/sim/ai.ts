@@ -263,12 +263,37 @@ function debuffHolds(prof: SkillProfile, target: Actor): boolean {
   return target.sdots.some((d) => d.src === prof.skill.id && d.t > prof.useTime + 0.3);
 }
 
-/** A Tempest Mote kept up is not cast again while its orb has a while to run and the target is in its reach. */
-function orbHolds(s: Side, prof: SkillProfile, target: Actor): boolean {
-  const o = s.stormOrb;
-  if (!o || o.profile.skill.id !== prof.skill.id || o.t <= prof.useTime + 0.3) return false;
-  const reach = o.profile.skill.stormOrb!.radius * o.profile.radiusMult;
-  return Math.hypot(target.x - o.x, target.y - o.y) <= reach + target.r;
+/**
+ * A skill kept up that leaves something standing is not cast again while what it left holds: Tempest Mote's orb has a while to run
+ * and the target is in its reach; Pyre Burst's geysers stand at their cap, each with a while to run, and one reaches the target;
+ * Orbiting Blades has every blade it can hold, the shortest with a while to run.
+ */
+function standingHolds(s: Side, prof: SkillProfile, target: Actor): boolean {
+  const left = prof.useTime + 0.3;
+  const sk = prof.skill;
+  const near = (x: number, y: number, r: number) =>
+    Math.hypot(target.x - x, target.y - y) <= r + target.r;
+  if (sk.stormOrb) {
+    const o = s.stormOrb;
+    if (!o || o.profile.skill.id !== sk.id || o.t <= left) return false;
+    return near(o.x, o.y, sk.stormOrb.radius * o.profile.radiusMult);
+  }
+  if (sk.geyser) {
+    // Counted as the cap is (placeGeyser, src/sim/fields.ts): every geyser of the side.
+    const mine = s.fields.filter((f) => f.kind === 'geyser');
+    return (
+      mine.length >= sk.geyser.max &&
+      mine.every((f) => f.t > left) &&
+      mine.some((f) => near(f.x, f.y, f.radius))
+    );
+  }
+  if (sk.vortex) {
+    const v = s.vortex;
+    return (
+      !!v && v.key === sk.id && v.blades.length >= sk.vortex.max && Math.min(...v.blades) > left
+    );
+  }
+  return false;
 }
 
 /**
@@ -310,7 +335,8 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
     if (e.role === 'opener' && !openerDue(s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
     const prof = s.char.profile(c, conds, flaskMask(s));
-    if (e.role === 'keepUp' && (debuffHolds(prof, target) || orbHolds(s, prof, target))) continue;
+    if (e.role === 'keepUp' && (debuffHolds(prof, target) || standingHolds(s, prof, target)))
+      continue;
     if (!usable(c, prof) || !inReach(w, s, prof, target)) continue;
     return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
   }
