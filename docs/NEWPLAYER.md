@@ -154,7 +154,9 @@ follows the concise-text rule and the voice rule (plain rules text, overwrought 
   item". The map-5 support follows the rule that pick already has (the class's own attributes) and takes the first card
   the Wayside left. The bag line and the no-skill warning are one line in camp (`CampGems`, `src/ui/GemFlow.tsx`); the
   warning takes its place when it applies. The first-support note sits in the Skills tab, once per device
-  (`src/ui/intro.ts`).
+  (`src/ui/intro.ts`). The map-5 support measured with `npm run sim -- --runs 12 --class all --maps 1-20 --seed 7`
+  against the same code without it: deaths before map 20 14 (16 without), deaths on the map-20 boss 40 (36, the runs
+  that got further), the same pacing; within the noise of 12 runs a class.
 - N8: `dryEquip` leaves `idle` empty (it needs a `Character`); `swapSockets` adds it for the question before a swap, and
   the bag rows work it out for weapon and off-hand slots only, the ones that change which skills can be used.
 - N12: as planned. The Tollkeeper's camp card also said a toll every ten seconds; it is twelve (`TOLL_EVERY`). The
