@@ -99,6 +99,29 @@ lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Thing
 | Summon | teal circle; each minion in a teal ring, with a life bar when hurt        |
 | Aura   | slow gold ring at your feet; a herald's ring is spiked, in its element    |
 
+## What monsters do for each other (`monsterStateFx.ts`, `style/stateMarks.ts`)
+
+A **pip** over the head is a state a monster is in now (above its affix pips): amber up-triangle buffed (an aura, a whistle, a rally),
+red up-triangle spurred, red diamond in a fervour, pale-blue ring warded, cyan diamond one of a Mirrored pair, tan square curled, gold
+square kept from harm by a pylon, a circle in the element of a Reliquarian's immunity. The body shows it too: amber or red chevrons
+climb off a buffed monster, a thin shell surrounds anything with energy shield, a curled beetle is smaller with a ring tight about it,
+a Mirrored pair is pale with a thread between them, and a survivor of the pair has a ring that empties over its three seconds.
+
+- **Green is life given back.** A Choirmaster's channel draws its reach, a ring closing in and motes drawn to it; when it lands a ring
+  runs out to the reach and a green thread and motes reach each ally it helped (`cue mend`, `heal`). A stun that cuts it says
+  "Interrupted" (`mendBroken`). A meal, a Precentor's rite and a Mirrored survivor made whole are motes too.
+- **A reach is a ring on the ground, drawn only while it matters**: dashes while the character is within nine tiles of its edge, firmer
+  with the character inside, only while the monster hunts. Rime Aura (3 tiles, `RIME_AURA_RANGE`), Bursar (5) and Treasurer (7) are
+  where nothing recovers (a struck-through plus sign by the character's head); a censer or bell is where allies are buffed (5, 6); a pylon
+  draws a line to each monster it keeps from harm. The body ring of the `aura` affixes is a sign, not a radius (only Rime Aura has one).
+- **A cast shows its reach once**: a ring runs out when an aura takes hold of someone new, a whistle goes (`cue aura`, `whistle`), a
+  Zealous monster spurs its allies as it dies (`zeal`), a Wight's ward settles (`ward`).
+- **A hex has a caster and a kind.** `hexCast` flares a rune on the caster, runs a line to the character and raises the hex's own glyph
+  over it (cracked ring, weights, open grip, slashes, each in its own colour); a renewal is a smaller glyph and a ring closing in.
+- **Appearances are marked where they happen**: a Mirrored twin steps out of a column of pale light (`twin`), a Carrion Mother's four
+  pools open in a burst on the spot they will hurt (`pools`), a Reliquarian's change of immunity rings in the new element (`immune`),
+  and a thief's flask flies from the character to it (`stolen`).
+
 ## Keeping it complete
 
 `skillLook.test.ts` checks that every gem lands on a delivery and a colour, that every delivery and every element is used,
@@ -108,4 +131,4 @@ fails to compile until `deliveryOf` handles it.
 ## Sim events the effects use
 
 `use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `beam` (with its
-width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off), `heal`, `cue` (`mend`, `mendBroken`, `aura`, `whistle`, `zeal`, `ward`, `pools`, `immune`, `whole`), `twin`, `hexCast`, `stolen` (a monster's support, see above); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.

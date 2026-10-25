@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { MOD_MARKS, RARITY_COLOR, type ModShape } from '../../data/monsterMarks';
 import { tone } from '../../data/palette';
 import type { Actor, World } from '../../sim/types';
+import { shownMaxEs, statePips } from './stateMarks';
 import { isViewer } from './who';
 
 export type MarkTheme = {
@@ -62,8 +63,13 @@ export class MonsterMarks {
       // The viewer's own character has the HUD; the rival of a duel is marked like an enemy.
       if (isViewer(a) || !a.alive) continue;
       const sel = a.id === selectedId;
+      const states = statePips(world, a);
       const interesting =
-        a.rarity !== 'normal' || sel || a.life < a.def.maxLife || a.es < a.def.maxEs;
+        a.rarity !== 'normal' ||
+        sel ||
+        a.life < a.def.maxLife ||
+        a.es < a.def.maxEs ||
+        states.length > 0;
       if (!interesting) continue;
       const p = pos(a);
       if (!p) continue;
@@ -106,7 +112,8 @@ export class MonsterMarks {
       const w = Math.round(u * (a.rarity === 'boss' ? 16 : 11));
       const h = big ? 5 : 4;
       // Energy shield: a thinner strip stacked on top of the life bar, so a shielded monster reads as two layers.
-      const maxEs = a.def.maxEs;
+      // A ward gives energy shield past the monster's own, so the strip is there for it too.
+      const maxEs = shownMaxEs(a);
       const esFrac = maxEs > 0 ? Math.max(0, Math.min(1, a.es / maxEs)) : 0;
       const eh = maxEs > 0 ? 2 : 0;
       const bx = Math.round(p.x - w / 2);
@@ -144,6 +151,16 @@ export class MonsterMarks {
         by -= Math.round(u * 2.6);
         for (const id of a.modIds) {
           this.pip(x, by, u, MOD_MARKS[id].color, MOD_MARKS[id].shape);
+          x += step;
+        }
+      }
+      // Then the states it is in now, in a row of their own above the affixes.
+      if (states.length > 0) {
+        const step = Math.round(u * 3.2);
+        let x = Math.round(p.x - ((states.length - 1) * step) / 2);
+        by -= Math.round(u * 2.6);
+        for (const s of states) {
+          this.pip(x, by, u, s.color, s.shape);
           x += step;
         }
       }

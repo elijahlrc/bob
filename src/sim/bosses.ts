@@ -818,6 +818,7 @@ function tickCourt(w: World, m: Actor, st: BossState, dt: number): void {
           hunted(w, m).side!,
           id,
           monsterHexEffect(w, id) * (1 + WITNESS_HEX_STEP * (alive - 1)),
+          st.witnesses[i],
         );
       st.hexNext = i + 1;
       break;

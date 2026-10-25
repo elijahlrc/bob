@@ -280,6 +280,8 @@ export const NEST_MAX_ALIVE = 8;
 export const SENTINEL_SLAM_INTERVAL = 4;
 export const SENTINEL_SLAM_RADIUS = 2;
 export const PYLON_RANGE = 5;
+/** Tiles within which a monster with the Rime Aura mod chills the character. */
+export const RIME_AURA_RANGE = 3;
 
 /** The abilities of each type (docs/ENEMIES.md 7.3): the single list the sim runs and the cards read. */
 export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {

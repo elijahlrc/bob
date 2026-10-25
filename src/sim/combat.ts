@@ -471,7 +471,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     src.hex.cd <= 0
   ) {
     src.hex.cd = 4;
-    hexPlayerAtRandom(w, dst.side!);
+    hexPlayerAtRandom(w, dst.side!, src);
   }
   // A monster's modes change what the hit does to it: exposed, quenched, swollen, fed by fire (docs/ENCOUNTERS.md 6).
   if (dst.enc && res.outcome !== 'block') {
@@ -911,6 +911,10 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   const steal = abilitiesOf(src.mon!.spec.type).find((a) => a.id === 'steal');
   if (steal || src.modIds.includes('flaskTaker') || src.modIds.includes('treasurer')) {
     const got = takeFlaskCharges(dst.side!, src, steal?.amount ?? 0.2);
+    if (got > 0) {
+      const kind = dst.side!.flasks.find((f) => f.spec.uid === src.theft.stolenFlask)?.spec.kind;
+      w.events.push({ t: 'stolen', src: dst.id, to: src.id, kind: kind ?? 'life' });
+    }
     // A thief runs with what it took.
     if (steal && got > 0) src.theft.fleeT = 5;
   }
