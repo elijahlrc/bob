@@ -731,9 +731,7 @@ export function Skills({
                           {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
                             <span class="sk-count"> ×{counts.get(g.gemId)}</span>
                           )}
-                          {fresh && (
-                            <span class="sk-new" data-paint="star" title="New" aria-label="New" />
-                          )}
+                          {fresh && <span class="sk-new">New</span>}
                         </span>
                         {b && (
                           <span class="sk-sub sk-badges">

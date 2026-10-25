@@ -228,12 +228,23 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
 .sk-count {
   color: var(--muted);
 }
+/* A gem found on the last map: a small vermilion tag, read at a glance down the list. */
 .sk-new {
   display: inline-block;
-  width: 16px;
-  height: 16px;
   margin-left: 8px;
-  vertical-align: -2px;
+  padding: 0 5px 1px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+  color: var(--gold-hi);
+  background: #a3361f;
+  box-shadow:
+    0 0 0 1px var(--ink),
+    0 0 0 2px var(--gold);
+  text-shadow: 0 1px 0 var(--ink);
 }
 .sk-sub {
   color: var(--muted);
