@@ -62,6 +62,8 @@ each hash the same before and after; 18 bot runs reach the same maps and levels)
 
 ## 4. Open
 
+- Map starts and menus are planned in [PRELOAD.md](PRELOAD.md) (2026-10-24): the floor in a background thread, and
+  the next map, its textures and the tabs' calculations prepared ahead in the menus.
 - A sheet is about 1 ms: a `Character` is 0.5 ms (its mods, compiled, are the largest part) and the sheet 0.5. The rest of the cost
   is spread thin (`ModDB.sum`, building each skill's profile, `steadyMask`); a character that shares its compiled static mods with
   the hypothetical ones that differ from it in one item would be the next large step.
