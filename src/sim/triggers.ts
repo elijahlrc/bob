@@ -190,10 +190,14 @@ function overkillBurn(
     1 << DAMAGE_TYPES.indexOf('fire'),
   );
   const dps = (over * e.pct * s.char.db.mult('damage', ctx)) / 100;
+  let lit = 0;
   for (const o of livingEnemiesOf(w, s.team)) {
     if (Math.hypot(o.x - dead.x, o.y - dead.y) > e.radius + o.r) continue;
     applyFlatDot(w, o, '@herald', 3, dps, e.seconds, s);
+    lit++;
   }
+  // The burn goes out from the corpse: the renderer rings the ground it reaches.
+  w.events.push({ t: 'kindle', x: dead.x, y: dead.y, r: e.radius, n: lit });
   return true;
 }
 
@@ -251,6 +255,7 @@ function spread(w: World, e: Extract<TriggerEffect, { kind: 'spread' }>, dead: A
         o.ail.shock = dead.ail.shock;
         o.ail.shockT = Math.max(o.ail.shockT, dead.ail.shockT);
         w.events.push({ t: 'ailment', dst: o.id, kind: 'shock' });
+        w.events.push({ t: 'spread', from: dead.id, to: o.id, kind: 'shock', dtype: 1 });
       }
       any = true;
     } else if (e.ailment === 'ignite' && dead.ail.ignites.length > 0) {
@@ -258,6 +263,7 @@ function spread(w: World, e: Extract<TriggerEffect, { kind: 'spread' }>, dead: A
       for (const d of dead.ail.ignites) if (d.dps > best.dps) best = d;
       pushDot(o.ail.ignites, { dps: best.dps, t: best.t });
       w.events.push({ t: 'ailment', dst: o.id, kind: 'ignite' });
+      w.events.push({ t: 'spread', from: dead.id, to: o.id, kind: 'ignite', dtype: 3 });
       any = true;
     }
   }

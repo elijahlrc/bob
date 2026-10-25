@@ -158,6 +158,8 @@ export class GrimStyle extends StyleBase {
   private gfx!: Phaser.GameObjects.Graphics;
   /** The ward of a character that cannot be hurt just after a Revive, drawn over the figures every frame. */
   private ward!: Phaser.GameObjects.Graphics;
+  /** Enemies that a shatter just broke (the death that follows leaves no bones: the body is ice shards). */
+  private shattered = new Set<number>();
   private bolts: Bolt[] = [];
   private fx!: SkillFx;
   private enc!: EncounterFx;
@@ -1616,6 +1618,16 @@ export class GrimStyle extends StyleBase {
         }
         const p = this.project(a.x, a.y);
         if (a.isPlayer) break;
+        // A frozen body that was shattered is ice shards (SkillFx draws them): no bones, no bone pile, and the figure is gone at once.
+        if (this.shattered.delete(a.id)) {
+          const v = this.views.get(a.id) as View | undefined;
+          if (v) {
+            v.data.noCorpse = true;
+            v.data.sprite.setVisible(false);
+          }
+          em.dust.explode(2, p.x, p.y - 2);
+          break;
+        }
         const big = a.rarity === 'boss' || a.rarity === 'miniboss' || a.rarity === 'rare';
         em.bone.explode(big ? 22 : 10, p.x, p.y - 8);
         em.dust.explode(big ? 6 : 3, p.x, p.y - 2);
@@ -1793,6 +1805,10 @@ export class GrimStyle extends StyleBase {
         if (p && e.kind === 'freeze') em.ice.explode(14, p.x, p.y - 8);
         break;
       }
+      case 'shatter':
+        // The `death` that follows in the same step reads this.
+        this.shattered.add(e.id);
+        break;
     }
   }
 
@@ -1859,6 +1875,21 @@ export class GrimStyle extends StyleBase {
       if (a.ail.poisons.length)
         this.em.poison.emitParticleAt(x + (Math.random() - 0.5) * 8, y - 6, 1);
       if (a.ail.bleeds.length && Math.random() < 0.5) this.em.blood.emitParticleAt(x, y - 6, 1);
+      // A skill's damage over time (a rot, a burn): the particles of its element, a little thinner than an ailment's (its pip is in the marks).
+      if (a.sdots.length > 0 && Math.random() < 0.6) {
+        const d = a.sdots[(a.id + Math.floor(this.time * 3)) % a.sdots.length];
+        const em =
+          d.type === 3
+            ? this.em.flame
+            : d.type === 2
+              ? this.em.ice
+              : d.type === 1
+                ? this.em.bolt
+                : d.type === 4
+                  ? this.em.poison
+                  : this.em.spark;
+        em.emitParticleAt(x + (Math.random() - 0.5) * 9, y - 5 - Math.random() * 10, 1);
+      }
       if (a.stunT > 0) {
         const ang = this.time * 8;
         this.em.spark.emitParticleAt(x + Math.cos(ang) * 7, y - 24 + Math.sin(ang) * 2, 1);
@@ -1890,6 +1921,7 @@ export class GrimStyle extends StyleBase {
     this.torches = [];
     this.temps = [];
     this.bolts = [];
+    this.shattered.clear();
     this.portal = null;
     this.playerLights = [];
     this.scene.lights.disable();

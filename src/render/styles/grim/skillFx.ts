@@ -20,6 +20,7 @@ import {
   TRAP_RADIUS,
 } from '../../../sim/deploy';
 import type { Field } from '../../../sim/fields';
+import { BURN_RADIUS } from '../../../sim/minionFx';
 import { vortexRadius } from '../../../sim/skillFx';
 import type { Side } from '../../../sim/side';
 import type { Actor, SimEvent, World } from '../../../sim/types';
@@ -27,6 +28,14 @@ import { beamMotifOf, fallbackMotif, motifOf } from '../../../calc/areaLook';
 import { isViewer } from '../../style/who';
 import { playMotif, tongue } from './areaMotifs';
 import { drawBuffs, type BuffMark } from './buffFx';
+import {
+  burningMinion,
+  impalePaid,
+  impaleStuck,
+  kindleRim,
+  shatterBurst,
+  spreadLink,
+} from './afflictFx';
 import { drawLanded, outlineArea, shapeOfExplode, type AreaShape } from './areaFx';
 
 /**
@@ -362,7 +371,48 @@ export class SkillFx {
       case 'sprung':
         this.sprung(e, w);
         break;
+      case 'impale':
+      case 'shatter':
+      case 'spread':
+      case 'kindle':
+        this.afflicted(e);
+        break;
       default:
+        break;
+    }
+  }
+
+  /** What was done to an enemy, at the moment it happens (afflictFx.ts). */
+  private afflicted(e: Extract<SimEvent, { t: 'impale' | 'shatter' | 'spread' | 'kindle' }>): void {
+    const m = {
+      host: this.host,
+      add: (t: number, air: boolean, draw: (g: Gfx, k: number) => void) => this.add(t, air, draw),
+    };
+    switch (e.t) {
+      case 'impale': {
+        const a = this.host.actorById(e.dst);
+        if (!a) break;
+        if (e.kind === 'stuck') impaleStuck(m, a.x, a.y, a.id * 7 + e.n);
+        else impalePaid(m, a.x, a.y, e.n, a.id);
+        break;
+      }
+      case 'shatter': {
+        const a = this.host.actorById(e.id);
+        if (a) shatterBurst(m, a.x, a.y, a.rarity === 'rare' || a.r > 0.6);
+        break;
+      }
+      case 'spread': {
+        const from = this.host.actorById(e.from);
+        const to = this.host.actorById(e.to);
+        if (from && to) spreadLink(m, from, to, e.dtype);
+        break;
+      }
+      case 'kindle':
+        // Only when the burn caught something: the ground it reaches, outlined, with flames standing up inside.
+        if (e.n > 0) {
+          this.landed({ kind: 'circle', x: e.x, y: e.y, r: e.r }, ELEMENT_COLOR[3], 0.5);
+          kindleRim(m, e.x, e.y, e.r, e.n);
+        }
         break;
     }
   }
@@ -791,6 +841,11 @@ export class SkillFx {
     const air = this.air;
     air.clear();
     this.flying(ground, air, dt, time);
+    // A burning pack: flames on each minion that burns, and the reach of its burn.
+    for (const s of w.sides)
+      for (const m of s.minions)
+        if (m.alive && (m.sup?.burn ?? 0) > 0)
+          burningMinion(air, ground, this.host, m, BURN_RADIUS, time);
     for (const s of w.sides) this.fieldMarks(ground, air, s, time);
     this.curseMarks(air, w, time);
     for (const s of w.sides) this.siphons(air, w, s, time);

@@ -100,6 +100,23 @@ strike throws (Slag Blow) are real mortar shells, drawn as orbs, that burst wher
 | Summon | teal circle; each minion in a teal ring, with a life bar when hurt        |
 | Aura   | slow gold ring at your feet; a herald's ring is spiked, in its element    |
 
+## On the enemy: what has been done to it
+
+What a skill leaves on an enemy is drawn on the enemy, in the marks module (`render/style/marks.ts`, `statusMarks.ts`), from state, so it lasts as long as the
+thing does. Curses are the violet sigils over the head; ailments tint the body and shed their particles; the rest is a **row of tiny pips over the life bar**
+(smaller than an affix stone, no gold setting, an ink rim, blinking in the last half second):
+
+- **Statuses**, one pip each: slowed or held (hinder and maim a blue and a red down-arrow, immobilised a stone block, shackled a fading ring, ensnared a cross), blinded
+  (an eye), unnerved (a bang), exposed (a cracked ring in the element), overpowered (a hollow plate), withered (a sprig), scarred (a slash), frostbitten (a frost star),
+  venomed (a drop), doomed (a skull). Stacks are dots under the glyph.
+- **A skill's damage over time** (a rot, a burn, Decay), one pip for each damage type in its element's colour (a slash, a bolt, a shard, a flame, a drop), the layers as dots, with a
+  thin spray of that element's particles on the body.
+- **Impales** (Skewer): a short spear stuck in the body for each one held (five at most); a spear driven in stabs, and a payout flings bone-pale spikes from the body.
+
+Short effects from events: `impale` (`stuck` or `paid`), `shatter` (a frozen body bursts into ice shards and leaves no bones), `spread` (an arc in the element's colour from the
+enemy that carried an ailment or a debuff to the one that caught it), `kindle` (a kill set the enemies about it burning: the ground it reaches, outlined, flames standing
+up inside). Minions of a burning pack carry flames and a thin ring at the reach of their burn.
+
 ## Keeping it complete
 
 `skillLook.test.ts` checks that every gem lands on a delivery and a colour, that every delivery and every element is used,
@@ -121,4 +138,4 @@ fails to compile until `deliveryOf` handles it.
 ## Sim events the effects use
 
 `use` (a skill starts), `swing` and `thrust` (a melee blow lands), `explode` (a circle, or a strip; maybe with things falling), `hurl` (a shard thrown from a point over the ground to a spot on it: a frost orb's ice, a geyser's fire; its `explode` follows as it lands), `beam` (with its
-width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.
+width), `cry` (a shout's radius), `chain`, `buff`, `hex`, `summon`, `blink`, `deploy` (put down, or ended), `sprung` (a trap or a mine goes off), `impale`, `shatter`, `spread`, `kindle` (above); zones, lasting fields, deployables, minions, auras, buffs and curses are drawn from world state every frame.

@@ -23,20 +23,24 @@ export function spreadAilments(w: World, from: Actor): void {
     if (ignite && !e.ail.ignites.some((d) => d.dps >= ignite!.dps * 0.99)) {
       pushDot(e.ail.ignites, { dps: ignite.dps, t: ignite.t });
       w.events.push({ t: 'ailment', dst: e.id, kind: 'ignite' });
+      w.events.push({ t: 'spread', from: from.id, to: e.id, kind: 'ignite', dtype: 3 });
     }
     if (!ele) continue;
     if (ail.shockT > 0 && ail.shock > e.ail.shock) {
       e.ail.shock = ail.shock;
       e.ail.shockT = Math.max(e.ail.shockT, ail.shockT);
       w.events.push({ t: 'ailment', dst: e.id, kind: 'shock' });
+      w.events.push({ t: 'spread', from: from.id, to: e.id, kind: 'shock', dtype: 1 });
     }
     if (ail.chillT > 0 && ail.chill > e.ail.chill && !e.def.cannotBeChilled) {
       e.ail.chill = ail.chill;
       e.ail.chillT = Math.max(e.ail.chillT, ail.chillT);
+      w.events.push({ t: 'spread', from: from.id, to: e.id, kind: 'chill', dtype: 2 });
     }
     if (ail.freezeT > 0 && e.ail.freezeT < ail.freezeT * 0.99) {
       e.ail.freezeT = ail.freezeT;
       w.events.push({ t: 'ailment', dst: e.id, kind: 'freeze' });
+      w.events.push({ t: 'spread', from: from.id, to: e.id, kind: 'freeze', dtype: 2 });
     }
   }
 }
