@@ -65,6 +65,7 @@ const NONE: Aura = {
   addedMax: 0,
 };
 
+/** How far the burning aura of a minion reaches (tiles); the renderer draws it. */
 export const BURN_RADIUS = 1.8;
 
 /** The aura now: the standing offering's effects, and the added damage of the golem that stands. */
@@ -210,6 +211,26 @@ export function minionStrike(
     parts[0] -= moved;
     parts[4] += moved;
   }
+  // For the picture: one event for the blow, not one for each damage type it splits into.
+  let caught = 0;
+  if (st.splash > 0)
+    for (const e of foes)
+      if (e !== target && e.alive && Math.hypot(e.x - target.x, e.y - target.y) <= st.splash + e.r)
+        caught++;
+  w.events.push({
+    t: 'minionBlow',
+    src: m.id,
+    dst: target.id,
+    minion: m.kind,
+    x: m.x,
+    y: m.y,
+    x2: target.x,
+    y2: target.y,
+    dtype,
+    shot: st.ranged ? (dtype === 1 ? 'bolt' : dtype === 0 ? 'arrow' : 'orb') : undefined,
+    splash: st.splash,
+    caught,
+  });
   for (let t = 0; t < 5; t++) {
     if (parts[t] <= 0) continue;
     rawHit(w, target, parts[t], t, m.side!, 'Minion', 'minion');

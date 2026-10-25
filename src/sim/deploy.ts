@@ -395,6 +395,20 @@ function freeBot(s: Side): Minion | null {
   return null;
 }
 
+/** A mote sets off a device from where it stands (for the renderer: a spark runs from the mote to the device). */
+function botSpark(w: World, bot: Minion, d: Deployable): void {
+  w.events.push({
+    t: 'botSpark',
+    src: bot.id,
+    device: d.id,
+    x: bot.x,
+    y: bot.y,
+    tx: d.x,
+    ty: d.y,
+    aura: bot.bot?.kind ?? 'chill',
+  });
+}
+
 /** A trap or a mine goes off at an enemy (for the renderer: the trap springs, a line runs to what it fires at). */
 function sprung(w: World, d: Deployable, target: Actor): void {
   w.events.push({
@@ -612,6 +626,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
           const bot = far ? freeBot(s) : null;
           if (far && bot) {
             bot.botCd = 3;
+            botSpark(w, bot, d);
             setOffMines(w, s, d.key, c, far, true);
           } else d.fireT = 0.05;
         }
@@ -650,6 +665,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
           const bot = far ? freeBot(s) : null;
           if (far && bot) {
             bot.botCd = 3;
+            botSpark(w, bot, d);
             sprung(w, d, far);
             shoot(w, s, d, c, far, 1, crowd);
             keep = false;
