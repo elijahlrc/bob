@@ -111,6 +111,7 @@ import {
 } from '../mods/types';
 import {
   expectedAilments,
+  ailmentsFromHit,
   expectedHit,
   NO_SHIFT,
   shockTaken,
@@ -1652,7 +1653,7 @@ export class Character {
         ? formedProfile(p0)
         : p0;
     const hexed = this.hexTarget();
-    const t: TargetState = target ?? {
+    let t: TargetState = target ?? {
       def: referenceMonster(this.config.areaLevel, this.config.difficulty).defence,
       shock: 0,
       resShift: hexed.resShift,
@@ -1660,6 +1661,12 @@ export class Character {
       vulnAll: hexed.vulnAll,
     };
     const d = this.config.targetDistance;
+    // Deep Chill: the reference monster the skill keeps chilled takes more cold damage, as much as an average hit chills it.
+    if (!target && p.chillTaken) {
+      const ex = expectedHit(p, p.hands[0], t, d ?? 3);
+      const chill = ailmentsFromHit(p, p.hands[0], ex.avgH, ex.avgHA, false, t, () => true).chill;
+      if (chill > 0) t = { ...t, vulnType: [0, 0, chill, 0, 0] };
+    }
     // A charge's bonus is for the run it makes; the sheet's fight is at the target, in reach, where nothing is left to run.
     if (p.distMore?.travel) p = { ...p, distMore: null };
     // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.

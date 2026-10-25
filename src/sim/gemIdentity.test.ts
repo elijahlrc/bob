@@ -6,6 +6,7 @@ import { gemDef, type ActiveGemDef } from '../data/gems';
 import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
+import { playerConds } from './combat';
 import { createDummyWorld } from './dummy';
 import { statusTaken } from './statuses';
 import type { World } from './types';
@@ -49,6 +50,21 @@ describe('the colossi', () => {
       most = Math.max(most, golems);
     });
     expect(most).toBe(1);
+  });
+
+  it('hold their owner bonus in the sim while the colossus stands, and lose it when it falls', () => {
+    const { world } = createDummyWorld(holding('sword_3', ['crushingBlow', 'stoneColossus']), {
+      distance: 1.2,
+    });
+    const s = world.sides[0];
+    s.opts.freeResources = true;
+    steps(world, 3);
+    const bit = s.char.cond.peek('golemStone');
+    const golem = s.minions.find((m) => m.alive && m.kind === 'stoneGolem');
+    expect(golem).toBeDefined();
+    expect(playerConds(world, s, null) & bit).toBe(bit);
+    golem!.alive = false;
+    expect(playerConds(world, s, null) & bit).toBe(0);
   });
 
   it('give their owner bonus only while they stand, and the sheet counts only the first', () => {

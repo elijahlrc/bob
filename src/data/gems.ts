@@ -809,7 +809,6 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       { stat: 'attackSpeed', kind: 'more', value: -20 },
       { stat: 'damage', kind: 'more', value: -40, condition: { id: 'dualWielding' } },
     ],
-    requiresWeapon: ['sword', 'axe'],
     bothWeapons: true,
     description: 'A wide arc that strikes every enemy in front of you.',
   },
