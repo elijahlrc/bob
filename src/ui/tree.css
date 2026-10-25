@@ -332,3 +332,39 @@ html.leaf .tv-zoom .btn.small {
     bottom: 66px;
   }
 }
+
+/* The first tree a player opens (docs/NEWPLAYER.md N11): a pulsing ring round each node that can be taken, and a word. */
+.tv-cue-ring {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border: 3px solid #f2d27a;
+  border-radius: 50%;
+  box-shadow: 0 0 10px 2px #f2d27a99;
+  pointer-events: none;
+  animation: tv-cue-pulse 1.1s ease-in-out infinite;
+}
+@keyframes tv-cue-pulse {
+  50% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tv-cue-ring {
+    animation: none;
+  }
+}
+.tv-cue {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  max-width: calc(100% - 140px);
+  padding: 8px 18px 9px;
+  color: #f2d27a;
+  font-size: var(--size, 17px);
+  text-align: center;
+  text-shadow: var(--text-shadow, 0 2px 0 #000);
+  pointer-events: none;
+}

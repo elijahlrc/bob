@@ -23,6 +23,8 @@ import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
 import { Rehearsal } from './rehearsal';
 import { CampGems, startGuarded } from './GemFlow';
+import { introSeen } from './intro';
+import { RunIntro } from './RunIntro';
 import { BossAhead, BossCard } from './BossCard';
 import { BOSSES, bossForMap } from '../data/bosses';
 import type { OfferPreview } from '../run/preview';
@@ -210,6 +212,10 @@ export function Camp({ c }: { c: Controller }) {
   const [showDrops, setShowDrops] = useState(fromMap);
   // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems"), for that visit only.
   const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
+  // Back from a player's very first map: how a run goes, before the camp (docs/NEWPLAYER.md N10).
+  const [runIntro, setRunIntro] = useState(
+    () => fromMap && run!.history.length === 1 && !introSeen('run'),
+  );
   // The gem just taken from a pick: the camp says where it went (docs/NEWPLAYER.md N7).
   const [taken, setTaken] = useState<number | null>(null);
   const setTab = (t: Tab) => {
@@ -659,6 +665,7 @@ export function Camp({ c }: { c: Controller }) {
           )}
         </div>
       </div>
+      {runIntro && <RunIntro onDone={() => setRunIntro(false)} />}
     </div>
   );
 }

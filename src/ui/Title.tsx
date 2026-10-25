@@ -10,6 +10,7 @@ import { DebugPanel } from './Debug';
 import { RivalsOptIn } from './RivalsOptIn';
 import { UiScalePicker } from './UiScalePicker';
 import { UpdateNotice } from './UpdateNotice';
+import { anyIntroSeen, resetIntros } from './intro';
 
 /** Copies the saved run so it can be attached to a bug report, and says whether that worked. */
 function CopySave({ c, id }: { c: Controller; id: SlotId }) {
@@ -109,6 +110,31 @@ function TelemetryNotice() {
   );
 }
 
+/** Brings back the first-time explanations (docs/NEWPLAYER.md N10), for a new player on a shared device or a curious one. */
+function ShowTips() {
+  const [shown, setShown] = useState(() => anyIntroSeen());
+  const [done, setDone] = useState(false);
+  if (!shown && !done) return null;
+  return (
+    <p class="show-tips">
+      {done ? (
+        <span class="muted">The tips will show again.</span>
+      ) : (
+        <button
+          class="btn small"
+          onClick={() => {
+            resetIntros();
+            setShown(false);
+            setDone(true);
+          }}
+        >
+          Show the tips again
+        </button>
+      )}
+    </p>
+  );
+}
+
 /** The invite to the game's Discord server (a permanent one). Empty hides the invitation. */
 export const DISCORD_URL = 'https://discord.gg/JJJgK9Prj3';
 
@@ -183,6 +209,7 @@ export function Title({ c }: { c: Controller }) {
         <TelemetryNotice />
         <RivalsOptIn />
         <UiScalePicker />
+        <ShowTips />
       </div>
       <DebugPanel c={c} />
     </div>

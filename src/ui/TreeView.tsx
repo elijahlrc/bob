@@ -8,6 +8,7 @@ import { passivePoints } from '../run/run';
 import { allocate, canRemove, pathTo, refund } from '../run/tree';
 import { useViewport } from './device';
 import { infoProps } from './info';
+import { introSeen, seeIntro } from './intro';
 import { searchMatches } from './treeSearch';
 import {
   fitView,
@@ -234,6 +235,15 @@ export function TreeView({ c }: { c: Controller }) {
         if (!allocSet.has(m) && tree.nodes[m].kind !== 'start') s.add(m);
     return s;
   }, [alloc, run.classId]);
+  // The first tree a player opens with a point to spend rings the nodes it can take (docs/NEWPLAYER.md N11), until one is.
+  const [cueSeen, setCueSeen] = useState(() => introSeen('tree'));
+  const cue = !cueSeen && points > 0 && alloc.length === 0;
+  useEffect(() => {
+    if (!cueSeen && alloc.length > 0) {
+      seeIntro('tree');
+      setCueSeen(true);
+    }
+  }, [alloc.length]);
   const looking = hover ?? picked;
   const path = useMemo(
     () =>
@@ -289,7 +299,7 @@ export function TreeView({ c }: { c: Controller }) {
     if (!el) return;
     const { k, x, y } = view.current;
     el.style.transform = `translate(${Math.round(x / P) * P}px, ${Math.round(y / P) * P}px)`;
-    const key = [k, allocSet, path, picked, matches, phone, runs, live];
+    const key = [k, allocSet, path, picked, matches, phone, runs, live, cue];
     const was = wordsKey.current;
     if (key.length === was.length && key.every((v, i) => v === was[i])) return;
     wordsKey.current = key;
@@ -428,6 +438,16 @@ export function TreeView({ c }: { c: Controller }) {
         taken.add(b);
         out.push(
           `<span class="tv-area" style="left:${ax}px;top:${ay}px;opacity:${(alpha * 0.85).toFixed(2)}">${esc(a.name)}</span>`,
+        );
+      }
+    }
+    if (cue) {
+      for (const id of reachable) {
+        const v = byId.get(id);
+        if (!v) continue;
+        const d = Math.round((v.d + 8) * P);
+        out.push(
+          `<i class="tv-cue-ring" style="left:${v.x * P}px;top:${v.y * P}px;width:${d}px;height:${d}px"></i>`,
         );
       }
     }
@@ -715,6 +735,11 @@ export function TreeView({ c }: { c: Controller }) {
       <div class="tv-labels" data-nopaint aria-hidden="true">
         <div class="tv-words" ref={labelsRef} />
       </div>
+      {cue && (
+        <div class="tv-cue" data-paint="panel" data-thin>
+          Take one of the ringed nodes to start
+        </div>
+      )}
       <div class="tv-hud">
         {/* The points to spend; more taken than earned (a changed tree) reads as how many to refund. */}
         <div

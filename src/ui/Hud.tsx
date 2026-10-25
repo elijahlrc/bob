@@ -32,6 +32,8 @@ import { infoProps } from './info';
 import { reprieveDef } from '../data/reprieves';
 import { SkillBar } from './SkillBar';
 import { manaStarved } from './skillStatus';
+import { FirstMap } from './FirstMap';
+import { introSeen } from './intro';
 
 /**
  * A resource orb: a painted medallion whose field is the liquid, with the empty part covered from the top down (so the
@@ -550,8 +552,11 @@ function formatLevelTime(t: number): string {
  */
 export function Hud({ c }: { c: Controller }) {
   useTicks(c);
+  // The first map a player sees waits under a few words on the screen (docs/NEWPLAYER.md N9), once per device.
+  const [introDone, setIntroDone] = useState(() => introSeen('map'));
   const w = c.world;
   if (!w) return null;
+  const intro = !introDone && w.plan.map === 1 && !c.showcase && !c.duel && !c.gallery && w.t < 1;
   const p = w.sides[0].player;
   const lifeMax = Math.max(1, p.def.maxLife);
   const manaMax = Math.max(1, p.def.maxMana);
@@ -563,7 +568,8 @@ export function Hud({ c }: { c: Controller }) {
   const sealed = flasksSealed(w);
   return (
     <div class="hud">
-      {!sc && w.t < 5 && (
+      {intro && <FirstMap c={c} onDone={() => setIntroDone(true)} />}
+      {!sc && !intro && w.t < 5 && (
         <div class="biome-banner" key={w.plan.seed} data-paint="panel">
           {/* A duel names its place, not the biome the arena borrowed: the banner's text describes a layout the arena has not. */}
           <div class="biome-name lf-h">{duel ? 'Duelling arena' : w.plan.biome.name}</div>

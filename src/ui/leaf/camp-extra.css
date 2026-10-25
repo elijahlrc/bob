@@ -369,3 +369,78 @@ html.leaf .stop-card .stop-emblem {
     width: 72px;
   }
 }
+
+/* ---- After a player's first map (docs/NEWPLAYER.md N10): how a run goes, over the camp ---- */
+.run-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: #0b0805b8;
+  overflow-y: auto;
+}
+.run-intro-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 580px);
+  box-sizing: border-box;
+  margin: auto;
+  padding: 28px 34px 30px;
+  color: var(--pearl);
+  text-align: center;
+  text-shadow: var(--text-shadow);
+}
+.run-intro-card h2 {
+  margin: 0 0 4px;
+  font: 400 38px / 1.05 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+.run-intro-card p {
+  margin: 0;
+}
+.run-intro-tabs {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  margin: 8px 0 12px;
+  padding: 12px 0 0;
+  text-align: left;
+  background: var(--s-dots) left top repeat-x;
+}
+.run-intro-tabs > div {
+  display: grid;
+  grid-template-columns: 9.5em 1fr;
+  gap: 12px;
+}
+.run-intro-tabs dt {
+  font: 400 var(--head-size) / 1.2 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+}
+.run-intro-tabs dd {
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .run-intro-card {
+    padding: 22px 22px 24px;
+  }
+  .run-intro-card h2 {
+    font-size: 30px;
+  }
+  .run-intro-tabs > div {
+    display: block;
+  }
+  .run-intro-tabs dt,
+  .run-intro-tabs dd {
+    display: inline;
+  }
+  .run-intro-tabs dt::after {
+    content: ': ';
+  }
+}

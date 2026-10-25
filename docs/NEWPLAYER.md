@@ -162,6 +162,15 @@ follows the concise-text rule and the voice rule (plain rules text, overwrought 
   ailments are damage over time, which no card counts. The tab arrows are sticky ends inside the scrolling band
   (`.tabs-arrow`). The title board: New Run on a line of its own, each saved run as its class, level and map with a
   Continue button and small Copy and Delete, and the tagline on a green plaque with a pale rim (every button's is gold).
+- N9: as planned (`src/ui/FirstMap.tsx`). The tags are measured against the orbs and the speed buttons, so they hold at
+  every layout: above each orb, the speed tag beside a row of speed buttons when there is room and to the left of the
+  phone's column of them (the card then sits below the column). The biome banner waits until it is gone. On a mouse
+  the words are "Hover over icons", on a touch screen "Tap icons".
+- N10: as planned (`src/ui/RunIntro.tsx`), headed "The road through the hundred maps". On a phone a tab's name and its
+  line run on one line. "Show the tips again" on the title brings back N9 to N11, the first-support note and the Skills
+  tab's note.
+- N11: the rings are drawn in the tree's word layer, so they pan and zoom with it; the words are a plaque at the foot of
+  the view (on the tree they covered one of the nodes).
 
 ## N7. Gem socketing flow (priority)
 
