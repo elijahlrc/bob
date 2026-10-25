@@ -760,7 +760,7 @@ html.leaf .speeds .btn.small {
   html.leaf .charges {
     align-self: center;
     justify-content: center;
-    width: calc(100vw - 24px);
+    width: calc(100 * var(--vw, 1vw) - 24px);
     gap: 6px;
   }
   html.leaf .hexchip {
@@ -808,7 +808,7 @@ html.leaf .speeds .btn.small {
     top: auto;
     width: auto;
     min-height: 0;
-    max-height: 42vh;
+    max-height: calc(42 * var(--vh, 1vh));
     padding: 18px 18px 20px;
   }
   html.leaf .biome-banner {

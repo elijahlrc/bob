@@ -12,6 +12,7 @@ import { ItemCard, itemTitle, rarityClass } from './ItemCard';
 import { ProvisionCard } from './Satchel';
 import { provisionDef } from '../data/provisions';
 import type { RewardCard } from '../run/run';
+import { uiZoom } from './uiScale';
 
 /** What a card of the pick is called on its button. */
 function cardTitle(o: RewardCard): string {
@@ -119,12 +120,14 @@ export function Reward({ c }: { c: Controller }) {
   const place = () => {
     const el = tip.current;
     if (!el) return;
-    const { x, y } = mouse.current;
+    // In interface pixels (the layer may be zoomed, uiScale.ts).
+    const z = uiZoom();
+    const [x, y] = [mouse.current.x / z, mouse.current.y / z];
     const w = el.offsetWidth;
     const h = el.offsetHeight;
     let left = x + 18;
-    if (left + w > window.innerWidth - 8) left = Math.max(8, x - 18 - w);
-    const top = Math.max(8, Math.min(y + 18, window.innerHeight - 8 - h));
+    if (left + w > window.innerWidth / z - 8) left = Math.max(8, x - 18 - w);
+    const top = Math.max(8, Math.min(y + 18, window.innerHeight / z - 8 - h));
     el.style.left = `${left}px`;
     el.style.top = `${top}px`;
   };

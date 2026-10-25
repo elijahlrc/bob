@@ -125,7 +125,7 @@ textarea {
   flex-direction: column;
   gap: 4px;
   width: 260px;
-  max-width: 60vw;
+  max-width: calc(60 * var(--vw, 1vw));
 }
 .bar {
   position: relative;
@@ -443,7 +443,7 @@ svg.tree {
   flex-direction: column;
   gap: 6px;
   width: min(100%, 640px);
-  max-height: 40vh;
+  max-height: calc(40 * var(--vh, 1vh));
   overflow-y: auto;
   /* A scrolling flex child may shrink to nothing: on a short screen the saves were squeezed to 0 px and vanished. */
   flex-shrink: 0;
@@ -933,10 +933,10 @@ svg.tree {
   align-items: center;
 }
 .codex-list {
-  max-height: 70vh;
+  max-height: calc(70 * var(--vh, 1vh));
   overflow-y: auto;
   text-align: left;
-  width: min(720px, 94vw);
+  width: min(720px, calc(94 * var(--vw, 1vw)));
 }
 .codex-row {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -1006,8 +1006,8 @@ svg.tree {
 .modal-card {
   position: relative;
   box-sizing: border-box;
-  width: min(520px, 94vw);
-  max-height: 88vh;
+  width: min(520px, calc(94 * var(--vw, 1vw)));
+  max-height: calc(88 * var(--vh, 1vh));
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -1063,7 +1063,7 @@ svg.tree {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 30vh;
+  max-height: calc(30 * var(--vh, 1vh));
   min-height: 60px;
   overflow: auto;
   font-size: 13px;

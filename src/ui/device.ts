@@ -27,7 +27,7 @@ export const isCoarse = (): boolean => matches('(pointer: coarse)');
 
 /** The current viewport. Reads the window once; use `useViewport` in components. */
 export function viewport(): Viewport {
-  // In interface pixels: inside an iframe the interface layer is zoomed (uiScale.ts).
+  // In interface pixels: the interface layer may be zoomed (uiScale.ts).
   const z = uiZoom();
   const width = typeof window === 'undefined' ? 1280 : window.innerWidth / z;
   const height = typeof window === 'undefined' ? 800 : window.innerHeight / z;

@@ -73,7 +73,7 @@ export function InfoLayer() {
     };
   }, []);
   if (!o) return null;
-  // Window and element positions in interface pixels (the layer is zoomed inside an iframe, uiScale.ts).
+  // Window and element positions in interface pixels (the layer may be zoomed, uiScale.ts).
   const z = uiZoom();
   const [W, H, x, y] = [window.innerWidth / z, window.innerHeight / z, o.x / z, o.y / z];
   const w = Math.min(280, W - 16);

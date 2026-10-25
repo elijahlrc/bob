@@ -68,7 +68,7 @@
 .wx-resultcol {
   position: sticky;
   top: 8px;
-  max-height: calc(100vh - 170px);
+  max-height: calc(100 * var(--vh, 1vh) - 170px);
   overflow: auto;
   min-width: 0;
 }
@@ -420,7 +420,7 @@ label.wx-affix input {
 
 /* ---- The currency guide ---- */
 .wx-guide {
-  width: min(640px, 94vw);
+  width: min(640px, calc(94 * var(--vw, 1vw)));
 }
 .wx-guide-list {
   display: flex;
@@ -482,7 +482,7 @@ label.wx-affix input {
     grid-template-columns: minmax(0, 1fr);
   }
   .wx-body.has-result {
-    padding-bottom: 60vh;
+    padding-bottom: calc(60 * var(--vh, 1vh));
   }
   .wx-resultcol {
     display: none;
@@ -495,7 +495,7 @@ label.wx-affix input {
     right: 0;
     bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom, 0px));
     top: auto;
-    max-height: 58vh;
+    max-height: calc(58 * var(--vh, 1vh));
     overflow: auto;
     background: var(--panel);
     border-top: 2px solid var(--hi);

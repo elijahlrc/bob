@@ -449,7 +449,7 @@ html.leaf .codex-panel {
 }
 html.leaf .codex-panel .codex-list {
   width: 100%;
-  max-height: 62vh;
+  max-height: calc(62 * var(--vh, 1vh));
 }
 html.leaf .codex-row {
   border: 0;

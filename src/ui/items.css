@@ -18,7 +18,7 @@
   min-width: 0;
   position: sticky;
   top: 8px;
-  max-height: calc(100vh - 150px);
+  max-height: calc(100 * var(--vh, 1vh) - 150px);
   overflow: auto;
 }
 .ix-listcol {
@@ -512,7 +512,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-height: 80vh;
+  max-height: calc(80 * var(--vh, 1vh));
   overflow: auto;
   padding: 10px calc(12px + var(--safe-right, 0px)) 0 calc(12px + var(--safe-left, 0px));
   background: var(--panel);
@@ -561,7 +561,7 @@
 /* ---- A phone: gear folded, the bag, and the selection as a sheet above the camp bar ---- */
 @media (max-width: 600px) {
   .ix:has(.ix-detailcol.has-sel) {
-    padding-bottom: 54vh;
+    padding-bottom: calc(54 * var(--vh, 1vh));
   }
   .ix-detailcol {
     display: none;
@@ -575,11 +575,11 @@
     right: 0;
     bottom: calc(var(--camp-bar, 52px) + var(--safe-bottom, 0px));
     top: auto;
-    max-height: 52vh;
+    max-height: calc(52 * var(--vh, 1vh));
     overflow: auto;
   }
   .ix-detailcol.has-sel:has(.ix-detail.full) {
-    max-height: 85vh;
+    max-height: calc(85 * var(--vh, 1vh));
   }
   .ix-head {
     position: relative;
@@ -625,7 +625,7 @@
     padding: 8px calc(12px + var(--safe-right, 0px)) 8px calc(12px + var(--safe-left, 0px));
   }
   .ix-row {
-    scroll-margin-bottom: 54vh;
+    scroll-margin-bottom: calc(54 * var(--vh, 1vh));
     scroll-margin-top: 8px;
   }
   .ix-chips.kinds {

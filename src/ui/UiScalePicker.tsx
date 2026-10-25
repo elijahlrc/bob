@@ -1,11 +1,12 @@
 import { useState } from 'preact/hooks';
-import { isCoarse } from './device';
+import { useViewport } from './device';
 import { offeredScales, setUiScale, uiScale } from './uiScale';
 
-/** The interface size, on a touch screen only (a desktop browser ignores it and has its own zoom). */
+/** The interface size (uiScale.ts). */
 export function UiScalePicker() {
   const [scale, setScale] = useState(uiScale);
-  if (!isCoarse()) return null;
+  // Re-rendered on a resize: the sizes offered follow the window.
+  useViewport();
   return (
     <div class="ui-scale" role="group" aria-label="Interface size">
       <span class="muted">Interface size</span>

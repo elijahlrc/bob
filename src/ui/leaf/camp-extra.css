@@ -101,7 +101,7 @@ html.leaf .reward-preview {
   text-shadow: var(--text-shadow);
 }
 html.leaf .reward-preview.float {
-  width: min(380px, 92vw);
+  width: min(380px, calc(92 * var(--vw, 1vw)));
 }
 html.leaf .reward-preview .provision .muted {
   color: var(--muted);
