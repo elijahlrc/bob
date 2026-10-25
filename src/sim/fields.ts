@@ -414,7 +414,15 @@ export function placeGeyser(w: World, a: Actor, act: Action): void {
 }
 
 /** Blasts at a spot: the enemies in its radius are hit. */
-function blast(w: World, s: Side, f: Field, x: number, y: number, r: number, pulse = false): void {
+function blast(
+  w: World,
+  s: Side,
+  f: Pick<Field, 'dtype' | 'profile' | 'hand'>,
+  x: number,
+  y: number,
+  r: number,
+  pulse = false,
+): void {
   const p = s.player;
   w.events.push({
     t: 'explode',
@@ -429,7 +437,75 @@ function blast(w: World, s: Side, f: Field, x: number, y: number, r: number, pul
     hit(w, p, e, f.profile!, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
 }
 
-/** One run of a frost orb: a volley of explosions on the ground near the character, where the enemies are. */
+/** A blast thrown from above that has not landed yet (a shard of a frost orb): it goes off where it lands, `at` seconds in. */
+export type PendingBlast = {
+  at: number;
+  x: number;
+  y: number;
+  r: number;
+  profile: SkillProfile;
+  hand: number;
+  dtype: number;
+};
+
+/** A shard of ice flies from the orb to its spot in this long, in seconds: further spots take longer. */
+const SHARD_FLIGHT = { min: 0.15, max: 0.25, perTile: 0.03 };
+/** How high over the character the orb hangs, in pixels on the screen (the renderer draws it there). */
+const ORB_HEIGHT = 26;
+/** How high a geyser throws its fire from, in the same pixels. */
+const GEYSER_HEIGHT = 40;
+
+/**
+ * Throw a blast from a point `high` pixels up to a spot on the ground. The shard flies (the renderer draws it, from the event) and
+ * the blast goes off where it lands, a moment later. The spot is fixed at the throw.
+ */
+function throwBlast(
+  w: World,
+  s: Side,
+  f: Field,
+  from: { x: number; y: number },
+  high: number,
+  x: number,
+  y: number,
+  r: number,
+): void {
+  const dur = Math.max(
+    SHARD_FLIGHT.min,
+    Math.min(
+      SHARD_FLIGHT.max,
+      SHARD_FLIGHT.min + SHARD_FLIGHT.perTile * Math.hypot(x - from.x, y - from.y),
+    ),
+  );
+  w.events.push({
+    t: 'hurl',
+    x: from.x,
+    y: from.y,
+    x2: x,
+    y2: y,
+    dur,
+    high,
+    dtype: f.dtype,
+  });
+  s.lobbed.push({ at: w.t + dur, x, y, r, profile: f.profile!, hand: f.hand, dtype: f.dtype });
+}
+
+/** The shards in the air whose time has come land and burst. */
+export function tickLobbed(w: World, s: Side): void {
+  if (s.lobbed.length === 0) return;
+  let j = 0;
+  for (const b of s.lobbed) {
+    if (b.at > w.t) {
+      s.lobbed[j++] = b;
+      continue;
+    }
+    // The orb may have gone since the throw: the shard lands all the same.
+    if (!s.player.alive) continue;
+    blast(w, s, b, b.x, b.y, b.r, true);
+  }
+  s.lobbed.length = j;
+}
+
+/** One run of a frost orb: a volley of ice thrown from the orb onto the ground near the character, where the enemies are. */
 function volley(w: World, s: Side, f: Field): void {
   const spec = f.profile!.skill.orb;
   if (spec?.kind !== 'frost') return;
@@ -448,7 +524,7 @@ function volley(w: World, s: Side, f: Field): void {
       x = p.x + Math.cos(ang) * d;
       y = p.y + Math.sin(ang) * d;
     }
-    blast(w, s, f, x, y, f.radius, true);
+    throwBlast(w, s, f, p, ORB_HEIGHT, x, y, f.radius);
   }
 }
 
@@ -543,14 +619,16 @@ export function tickFields(w: World, s: Side, dt: number): void {
         f.pulseT += f.interval;
         const ang = w.rngTrig.float(0, Math.PI * 2);
         const d = f.radius * Math.sqrt(w.rngTrig.float(0, 1));
-        blast(
+        // Fire is thrown up out of the geyser and comes down on the spot.
+        throwBlast(
           w,
           s,
           f,
+          f,
+          GEYSER_HEIGHT,
           f.x + Math.cos(ang) * d,
           f.y + Math.sin(ang) * d,
           spec.blast * f.profile!.radiusMult,
-          true,
         );
       }
       if (f.t > 0) s.fields[j++] = f;

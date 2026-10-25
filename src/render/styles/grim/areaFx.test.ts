@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Projectile } from '../../../sim/types';
 import { outlinePoints, shapeOfExplode, type AreaHost } from './areaFx';
-import { isLob, lobHeight } from './projectileFx';
+import { bodyOf, isLob, lobHeight } from './projectileFx';
 
 const host: AreaHost = { project: (x, y) => ({ x, y }), rpx: (r) => r * 10, squash: () => 0.5 };
 
@@ -67,5 +67,14 @@ describe('what a projectile looks like', () => {
     expect(at(1)).toBe(0);
     expect(at(0.5)).toBeGreaterThan(at(0.2));
     expect(at(0.5)).toBeGreaterThan(at(0.8));
+  });
+
+  it('the lumps a strike throws fly as orbs, an attack otherwise as an arrow', () => {
+    const lump = {
+      kind: 'mortar',
+      profile: { skill: { type: 'attack', afterHit: { kind: 'balls' } } },
+    } as Partial<Projectile>;
+    expect(bodyOf(proj(lump))).toBe('orb');
+    expect(bodyOf(proj({ kind: 'mortar' }))).toBe('arrow');
   });
 });

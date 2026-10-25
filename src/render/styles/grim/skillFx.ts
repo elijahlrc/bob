@@ -285,6 +285,9 @@ export class SkillFx {
         }
         break;
       }
+      case 'hurl':
+        this.hurl(e, ELEMENT_COLOR[e.dtype] ?? 0xffffff);
+        break;
       case 'cry':
         // A warcry reaches everything within its radius: that ground, outlined, and a shake.
         this.landed({ kind: 'circle', x: e.x, y: e.y, r: e.r }, UTILITY_COLOR.warcry, 0.6);
@@ -605,6 +608,26 @@ export class SkillFx {
         }
       });
     }
+  }
+
+  /**
+   * A shard thrown from a point over the ground to a spot on it (the ice of a frost orb): a bright head on a short streak that
+   * dips from the height it was thrown at to the ground, where the sim's burst follows as it lands.
+   */
+  private hurl(e: Extract<SimEvent, { t: 'hurl' }>, color: number): void {
+    const at = (u: number): Pt => {
+      const x = e.x + (e.x2 - e.x) * u;
+      const y = e.y + (e.y2 - e.y) * u;
+      return this.lifted(x, y, e.high * (1 - u) + HAND * u + 4 * u * (1 - u) * 6);
+    };
+    this.add(e.dur + 0.02, true, (g, k) => {
+      const u = Math.min(1, (k * (e.dur + 0.02)) / e.dur);
+      const pts = [0.3, 0.2, 0.1, 0].map((back) => at(Math.max(0, u - back)));
+      this.streak(g, pts, color, 0.8, 0.5);
+      const head = pts[pts.length - 1];
+      g.fillStyle(color, 0.35).fillCircle(head.x, head.y, 4);
+      g.fillStyle(0xffffff, 0.95).fillCircle(head.x, head.y, 1.8);
+    });
   }
 
   private cracks(x: number, y: number, r: number): void {

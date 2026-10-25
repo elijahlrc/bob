@@ -5,7 +5,7 @@ import type { Mirage } from './supportFx';
 import type { CaughtState, WarpState, WitherState } from './blinks';
 import type { OfferingState } from './minionFx';
 import type { BannerState } from './banners';
-import type { Field } from './fields';
+import type { Field, PendingBlast } from './fields';
 import type { Minion } from './minions';
 import type { Deployable } from './deploy';
 import type { Character, SkillChoice } from '../calc/character';
@@ -222,6 +222,8 @@ export type Side = {
   hitsLanded: number;
   /** The projectiles of a barrage still to be fired, one after another. */
   shots: PendingShot[];
+  /** The shards a frost orb has thrown that have not landed. */
+  lobbed: PendingBlast[];
   /** How the last hit of the player's resolved (a strike that sends more out waits to see it land). */
   lastOutcome: 'hit' | 'miss' | 'block' | null;
   // G5: the character

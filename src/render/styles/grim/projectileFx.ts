@@ -54,6 +54,8 @@ export function bodyOf(p: Projectile, bolt = false): Body {
     default:
       break;
   }
+  // The lumps a strike throws (an attack, but not a shaft) fly as orbs.
+  if (p.profile.skill.afterHit?.kind === 'balls') return 'orb';
   if (p.profile.skill.type === 'attack' && !bolt) return 'arrow';
   return 'orb';
 }

@@ -24,20 +24,33 @@ function run(gems: string[], seconds: number, distance = 2.5) {
   const bursts: Burst[] = [];
   const sprung: { t: number; x: number; y: number }[] = [];
   const zones: { t: number; x: number; y: number; r: number }[] = [];
+  // Where each lobbed shell is thrown to, by the moment it is thrown.
+  const thrown: { t: number; x: number; y: number }[] = [];
   const seen = new Set<number>();
+  const seenShells = new Set<number>();
   for (let i = 0; i < seconds * 60; i++) {
     stepWorld(world);
     for (const e of world.events) {
       if (e.t === 'explode') bursts.push({ t: world.t, x: e.x, y: e.y, r: e.r });
       if (e.t === 'sprung') sprung.push({ t: world.t, x: e.x, y: e.y });
     }
+    for (const pr of world.projectiles)
+      if (pr.kind === 'mortar' && !seenShells.has(pr.id)) {
+        seenShells.add(pr.id);
+        const sp = Math.hypot(pr.vx, pr.vy) || 1;
+        thrown.push({
+          t: world.t,
+          x: pr.startX + (pr.vx / sp) * pr.maxRange,
+          y: pr.startY + (pr.vy / sp) * pr.maxRange,
+        });
+      }
     for (const z of (world as World).sides[0].zones)
       if (!seen.has(z.id)) {
         seen.add(z.id);
         zones.push({ t: world.t, x: z.x, y: z.y, r: z.radius });
       }
   }
-  return { c, world, dummy, bursts, sprung, zones };
+  return { c, world, dummy, bursts, sprung, zones, thrown };
 }
 
 /** The moments at which several things went off at once, with what each did. */
@@ -114,11 +127,15 @@ describe('what one use of a skill does with its supports', () => {
   });
 
   it('Slag Blow: the balls thrown round the enemy keep their distance', () => {
-    const { zones } = run(['slagBlow'], 8, 1.6);
-    const groups = together(zones);
+    const { thrown, bursts } = run(['slagBlow'], 8, 1.6);
+    const groups = together(thrown);
     expect(groups.length).toBeGreaterThan(0);
     for (const g of groups)
       for (let i = 0; i < g.length; i++)
         for (let j = i + 1; j < g.length; j++) expect(apart(g[i], g[j])).toBeGreaterThan(0.3);
+    // Each ball bursts where it was thrown to.
+    for (const b of bursts) {
+      expect(thrown.some((s) => apart(s, b) < 0.4)).toBe(true);
+    }
   });
 });

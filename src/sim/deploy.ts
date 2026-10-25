@@ -11,6 +11,7 @@ import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { standIn } from './actor';
 import { actorById, fire, segmentDist } from './actions';
+import { missileOf } from '../calc/skillLook';
 import { SCATTER_RADIUS } from '../data/constants';
 import { flaskMask, playerConds, rawHit } from './combat';
 import type { Minion } from './minions';
@@ -447,6 +448,8 @@ function detonate(
         targetId: target.id,
         aimX: spot.x,
         aimY: spot.y,
+        // Each comes down from above (the renderer draws the missiles falling; the hit lands at once, as a rain's does).
+        fall: missileOf(c.skill.type),
       };
       fire(w, from, act);
     }

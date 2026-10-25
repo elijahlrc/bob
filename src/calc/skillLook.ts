@@ -30,9 +30,12 @@ export const FALLING_SKILLS: ReadonlySet<string> = new Set([
   'venomShower',
 ]);
 
-/** What falls for a skill of this type: arrows from an attack, bolts from a spell. */
+/** What falls from a skill of this type: arrows from an attack, bolts from a spell. */
+export const missileOf = (type: string): 'arrow' | 'bolt' => (type === 'attack' ? 'arrow' : 'bolt');
+
+/** What falls for a skill that is rain from the sky. */
 export const fallOf = (skillId: string, type: string): 'arrow' | 'bolt' | undefined =>
-  FALLING_SKILLS.has(skillId) ? (type === 'attack' ? 'arrow' : 'bolt') : undefined;
+  FALLING_SKILLS.has(skillId) ? missileOf(type) : undefined;
 
 export const ELEMENT_NAME = ['Physical', 'Lightning', 'Cold', 'Fire', 'Chaos'] as const;
 

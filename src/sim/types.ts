@@ -76,6 +76,8 @@ export type Action = {
   hitIds?: number[];
   /** The area of this use is shown by a ring that stays on the character (a channelled spin), not by a burst each time. */
   ringed?: boolean;
+  /** The burst of this use is one of a rain (a mine's smaller bursts): what comes down on it, for the renderer. */
+  fall?: 'arrow' | 'bolt';
 };
 
 export type MonsterState = 'idle' | 'chase' | 'leash';
@@ -492,6 +494,20 @@ export type SimEvent =
       skill?: string;
       /** A later pulse of an area that pulses (a zone, a stream): the renderer draws it lighter than the first. */
       pulse?: boolean;
+    }
+  /**
+   * Something was thrown from a point `high` pixels over (x, y) to the ground at (x2, y2), landing in `dur` s (a shard of ice from
+   * a frost orb): the renderer draws it in flight; the area it bursts into follows as an `explode` when it lands.
+   */
+  | {
+      t: 'hurl';
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      dur: number;
+      high: number;
+      dtype: number;
     }
   /** A shaped blast of a pattern landed (docs/ENCOUNTERS.md 4); the effect carries its shape. */
   | { t: 'blast'; e: GroundEffect }
