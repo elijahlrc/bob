@@ -91,7 +91,10 @@ export abstract class StyleBase implements MapStyle {
 
   onEvents(events: SimEvent[], world: World): void {
     for (const e of events) {
-      if (e.t === 'hit') {
+      // An enemy thrown back slides to where it landed (the sim moved it at once).
+      if (e.t === 'knock') this.views.get(e.id)?.track.knocked();
+      // (A hit a Warden Pylon turned aside does not stagger the monster.)
+      if (e.t === 'hit' && !e.warded) {
         const tr = this.views.get(e.dst)?.track;
         if (tr) {
           tr.hitT = 0;
