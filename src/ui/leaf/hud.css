@@ -844,6 +844,8 @@ html.leaf .speeds .btn.small {
   inset: 0;
   z-index: 40;
   cursor: pointer;
+  /* The HUD lets taps through to the map (pointer-events: none); this layer must catch them. */
+  pointer-events: auto;
 }
 .intro-card {
   position: absolute;
