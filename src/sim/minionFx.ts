@@ -65,7 +65,7 @@ const NONE: Aura = {
   addedMax: 0,
 };
 
-const BURN_RADIUS = 1.8;
+export const BURN_RADIUS = 1.8;
 
 /** The aura now: the standing offering's effects, and the added damage of the golem that stands. */
 export function auraNow(s: Side): Aura {

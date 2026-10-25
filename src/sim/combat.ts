@@ -974,11 +974,14 @@ function payImpales(w: World, dst: Actor, by?: Side): void {
   if (dst.impales.length === 0) return;
   let stored = 0;
   let j = 0;
+  const held = dst.impales.length;
   for (const imp of dst.impales) {
     stored += imp.dmg;
     if (--imp.hits > 0) dst.impales[j++] = imp;
   }
   dst.impales.length = j;
+  // The renderer cannot tell this payout from the state alone (a hit pays and records in one step), so it is said.
+  w.events.push({ t: 'impale', dst: dst.id, kind: 'paid', n: held - j });
   rawHit(w, dst, stored, 0, by ?? null, 'Impale');
 }
 
@@ -990,6 +993,7 @@ function recordImpale(w: World, s: Side, dst: Actor, p: SkillProfile, res: HitRe
   dst.impales.push({ dmg: (res.rawPhys ?? 0) * imp.share, hits: imp.hits });
   bannerStage(w, s, 'impale');
   while (dst.impales.length > imp.max) dst.impales.shift();
+  w.events.push({ t: 'impale', dst: dst.id, kind: 'stuck', n: dst.impales.length });
 }
 
 /**

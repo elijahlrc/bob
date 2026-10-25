@@ -440,6 +440,18 @@ export type SimEvent =
   | { t: 'dot'; dst: number; id: string }
   | { t: 'death'; id: number }
   | { t: 'shatter'; id: number }
+  /**
+   * Skewer's impales: a spear was driven into `dst` (`stuck`, `n` now held), or a hit made the held ones pay out (`paid`, `n`
+   * of them used up; the ones with hits left stay in).
+   */
+  | { t: 'impale'; dst: number; kind: 'stuck' | 'paid'; n: number }
+  /**
+   * An ailment or a damage-over-time debuff was passed on from `from` to `to` (Wildfire Spread, a kill that spreads, a
+   * spreading debuff). `kind` is the ailment ('ignite', 'shock', 'chill', 'freeze') or 'dot', and `dtype` the damage type of it.
+   */
+  | { t: 'spread'; from: number; to: number; kind: string; dtype: number }
+  /** A kill set the enemies about (x, y) burning, within `r` tiles (Cinder Herald): `n` of them. */
+  | { t: 'kindle'; x: number; y: number; r: number; n: number }
   /** A character gained a level: `src` is the character (a duel has two). */
   | { t: 'levelUp'; src: number; level: number }
   | { t: 'drop'; id: number }

@@ -238,6 +238,7 @@ export function spreadSkillDots(w: World, dead: Actor): void {
         spreadR: d.spreadR,
       });
       w.events.push({ t: 'dot', dst: e.id, id: d.src });
+      w.events.push({ t: 'spread', from: dead.id, to: e.id, kind: 'dot', dtype: d.type });
     }
   }
 }

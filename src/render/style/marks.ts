@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { MOD_MARKS, RARITY_COLOR, type ModShape } from '../../data/monsterMarks';
 import { tone } from '../../data/palette';
 import type { Actor, World } from '../../sim/types';
+import { drawSpears, drawStatusRow, hasAfflictions, statusPips } from './statusMarks';
 import { isViewer } from './who';
 
 export type MarkTheme = {
@@ -63,7 +64,11 @@ export class MonsterMarks {
       if (isViewer(a) || !a.alive) continue;
       const sel = a.id === selectedId;
       const interesting =
-        a.rarity !== 'normal' || sel || a.life < a.def.maxLife || a.es < a.def.maxEs;
+        a.rarity !== 'normal' ||
+        sel ||
+        a.life < a.def.maxLife ||
+        a.es < a.def.maxEs ||
+        hasAfflictions(a);
       if (!interesting) continue;
       const p = pos(a);
       if (!p) continue;
@@ -98,6 +103,18 @@ export class MonsterMarks {
         g.lineStyle(u * 0.6, tone('gold', 7), 0.95);
         g.strokeEllipse(p.x, p.y, rx * 2, rx * 2 * this.theme.squash);
       }
+
+      // Skewer's impales: a spear stuck in the body for each one it holds.
+      if (a.impales.length > 0)
+        drawSpears(
+          g,
+          p.x,
+          p.y - p.headUp * 0.45,
+          Math.max(p.r * 0.6, p.headUp * 0.22),
+          a.impales.length,
+          a.id,
+          this.theme.outline,
+        );
 
       // Life bar, in whole world pixels from the inside out: the fill, a 1 px ring, a 1 px ink outline, a hard shadow.
       const big = a.rarity === 'boss' || a.rarity === 'miniboss';
@@ -146,6 +163,20 @@ export class MonsterMarks {
           this.pip(x, by, u, MOD_MARKS[id].color, MOD_MARKS[id].shape);
           x += step;
         }
+      }
+
+      // What has been done to it (statuses, a skill's damage over time): smaller pips in a row above the affix stones.
+      if (hasAfflictions(a)) {
+        const pips = statusPips(a);
+        if (pips.length > 0)
+          drawStatusRow(
+            g,
+            p.x,
+            by - (n > 0 ? Math.round(u * 3.2) : Math.round(u * 1.6)),
+            pips,
+            this.theme.outline,
+            time,
+          );
       }
     }
   }
