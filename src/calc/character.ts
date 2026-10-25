@@ -2099,8 +2099,23 @@ export class Character {
         // A utility skill is cast at its own interval (a blink's cooldown is shorter than the pause the character keeps).
         if (every !== undefined)
           rotation.push({ ...this.planSkill(c, conds, every), cooldown: undefined, utility: true });
-      } else if (e.role === 'periodic' && skillRange(this.profile(c, conds)) >= reach - 0.05)
-        rotation.push({ ...this.planSkill(c, conds, this.cooldownOf(c, conds)), utility: false });
+      } else if (e.role === 'periodic' || e.role === 'keepUp') {
+        if (skillRange(this.profile(c, conds)) < reach - 0.05) continue;
+        if (e.role === 'periodic') {
+          rotation.push({ ...this.planSkill(c, conds, this.cooldownOf(c, conds)), utility: false });
+          continue;
+        }
+        // A skill kept up is cast again as what it keeps runs low: its orb (src/sim/ai.ts), or a debuff renewed as it ends
+        // (planSkill); one with neither is not counted.
+        const st = this.planSkill(c, conds, 0);
+        const p = this.profile(c, conds);
+        const orb = p.skill.stormOrb;
+        if (orb) {
+          // The sim casts it again with its use time and 0.3 s left on the orb, so the new orb is up 0.3 s before the old ends.
+          const gap = Math.max(p.useTime, orb.seconds * p.skillDuration - 0.3);
+          rotation.push({ ...st, cooldown: { seconds: gap, uses: 1 }, utility: false });
+        } else if (st.cooldown) rotation.push({ ...st, utility: false });
+      }
     }
     const mains = this.mains
       .filter((e) => whenFits(e.when, scenario))
@@ -2126,7 +2141,7 @@ export class Character {
     if (this.unused.some((e) => e.choice.gemUid === gemUid))
       return 'set to Off on the Strategy tab';
     const e = this.rotation.find((x) => x.choice.gemUid === gemUid);
-    if (e?.role !== 'periodic') return null;
+    if (e?.role !== 'periodic' && e?.role !== 'keepUp') return null;
     const main = this.mainFor('pack');
     const reach = Math.min(
       skillRange(this.profile(main, this.configConds)),

@@ -263,6 +263,14 @@ function debuffHolds(prof: SkillProfile, target: Actor): boolean {
   return target.sdots.some((d) => d.src === prof.skill.id && d.t > prof.useTime + 0.3);
 }
 
+/** A Tempest Mote kept up is not cast again while its orb has a while to run and the target is in its reach. */
+function orbHolds(s: Side, prof: SkillProfile, target: Actor): boolean {
+  const o = s.stormOrb;
+  if (!o || o.profile.skill.id !== prof.skill.id || o.t <= prof.useTime + 0.3) return false;
+  const reach = o.profile.skill.stormOrb!.radius * o.profile.radiusMult;
+  return Math.hypot(target.x - o.x, target.y - o.y) <= reach + target.r;
+}
+
 /**
  * What the character does now against its target (the Strategy tab, docs/PLAYER-AI.md): the first of its skills, in the order the
  * strategy gives, whose role and condition call for it and that it can use from where it stands; then the first main skill it can
@@ -302,7 +310,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
     if (e.role === 'opener' && !openerDue(s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
     const prof = s.char.profile(c, conds, flaskMask(s));
-    if (e.role === 'keepUp' && debuffHolds(prof, target)) continue;
+    if (e.role === 'keepUp' && (debuffHolds(prof, target) || orbHolds(s, prof, target))) continue;
     if (!usable(c, prof) || !inReach(w, s, prof, target)) continue;
     return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
   }

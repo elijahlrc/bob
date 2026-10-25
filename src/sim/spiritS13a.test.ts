@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DYN_SHIFT } from '../data/buffs';
+import { Character } from '../calc/character';
 import { distanceMult } from '../calc/skill';
 import { buildFor, classFor, layCorpses } from './gemKit';
 import { createDummyWorld, dummyDefence } from './dummy';
@@ -545,6 +546,42 @@ describe('orbs, markers and arrows that wait (orbitingBlades, skyfall, tempestMo
     const before = dummy.life;
     orbAnswers(w, w.sides[0], prof);
     expect(dummy.life).toBeLessThan(before);
+  });
+
+  it('Tempest Mote kept up: cast again only as its orb runs low, and counted so by the sheet', () => {
+    const casts = (role: 'keepUp' | 'periodic' | undefined) => {
+      const b = buildFor(['frostLance', 'tempestMote'], 'wand_3', INT);
+      const uid = b.equipment.body!.sockets[1]!.uid;
+      if (role) b.strategy = { skills: { [uid]: { role } } };
+      const run = createDummyWorld(b, { distance: 2.0, maxTime: 120 });
+      const w = run.world;
+      w.sides[0].opts.freeResources = true;
+      w.sides[0].opts.godMode = true;
+      run.dummy.def = dummyDefence({ maxLife: 1e9 });
+      run.dummy.life = 1e9;
+      let n = 0;
+      let last = 0;
+      let up = 0;
+      for (let i = 0; i < 60 * 13; i++) {
+        stepWorld(w);
+        const o = w.sides[0].stormOrb;
+        if (o && o.t > last) n++;
+        last = o?.t ?? 0;
+        if (o) up++;
+      }
+      // The sheet, with the target as near as here (at its usual 3 tiles the orb is out of reach and never cast).
+      const ch = new Character(b, { targetDistance: 2.0 });
+      const key = ch.actives.find((c) => c.skill.id === 'tempestMote')!.key;
+      return { n, up: up / (60 * 13), planned: ch.plan().acts[key] ?? 0 };
+    };
+    const kept = casts('keepUp');
+    // Six seconds an orb: about two casts in 13 s, and an orb up nearly all the time.
+    expect(kept.n).toBeGreaterThanOrEqual(2);
+    expect(kept.n).toBeLessThanOrEqual(3);
+    expect(kept.up).toBeGreaterThan(0.9);
+    expect(kept.planned).toBeGreaterThan(0);
+    expect(kept.planned).toBeLessThan(0.25);
+    expect(casts('periodic').n).toBeGreaterThan(kept.n);
   });
 
   it('Slag Lob: bursts where it lands, then bounces on and bursts again', () => {
