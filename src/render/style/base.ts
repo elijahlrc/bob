@@ -240,6 +240,14 @@ export abstract class StyleBase implements MapStyle {
     return onFloor ? { x, y } : this.sidePos(watched[0]);
   }
 
+  /** Put the camera on the character at once (a resized or rotated window would otherwise leave it to ease over, in the dark). */
+  protected snapCamera(): void {
+    if (!this.world) return;
+    const pp = this.playerPos(this.world);
+    const p = this.project(pp.x, pp.y);
+    this.scene.cameras.main.centerOn(p.x, p.y);
+  }
+
   protected followCamera(world: World, dt: number): void {
     const cam = this.scene.cameras.main;
     const pp = this.playerPos(world);
