@@ -56,7 +56,11 @@ export function sporeHits(p: SkillProfile, distance: number): number {
   const reach = TARGET_RADIUS + PROJECTILE_RADIUS;
   let hits = 0;
   for (let i = 1; i <= c.cap; i++)
-    hits += spec.arrows * fanShare(Math.abs((far * i) / (c.cap + 1) - distance), reach, spec.range);
+    // One thorn of a pod at most: they share a hit list.
+    hits += Math.min(
+      1,
+      spec.arrows * fanShare(Math.abs((far * i) / (c.cap + 1) - distance), reach, spec.range),
+    );
   return hits;
 }
 
@@ -76,14 +80,14 @@ export function sporeMult(p: SkillProfile, distance: number): number {
 // ---- Thunder Spiral: orbs that jump about the target place and blast where they land
 
 /**
- * Hits of the skill one target takes from each orb of a storm-orb channel. An orb blasts at each of its jumps but the last (it is
- * gone at the moment of that one), each at a place chosen evenly over a disc of `spread` tiles round the target place; the target is
- * hit when the blast reaches it.
+ * Hits of the skill one target takes from each orb of a storm-orb channel. An orb blasts at each of its jumps, the one as its time
+ * ends too (the reference prices a fresh orb's release at that many), each at a place chosen evenly over a disc of `spread` tiles
+ * round the target place; the target is hit when the blast reaches it.
  */
 export function zapMult(p: SkillProfile): number {
   const o = p.skill.orb;
   if (o?.kind !== 'zap') return 0;
-  const jumps = Math.max(1, Math.ceil((o.seconds * p.skillDuration) / o.jump - 1e-6) - 1);
+  const jumps = Math.max(1, Math.floor((o.seconds * p.skillDuration) / o.jump + 1e-6));
   const reach = o.radius * p.radiusMult + TARGET_RADIUS;
   return jumps * Math.min(1, (reach / Math.max(1e-6, o.spread)) ** 2);
 }

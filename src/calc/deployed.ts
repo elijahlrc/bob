@@ -21,8 +21,11 @@ export const TOTEM_AHEAD = 1.5;
 export const MINE_RING = 1.2;
 /** Arrows of a mortar that come down along a line land at least this far apart, in tiles (`MORTAR_APART`, src/sim/shots.ts). */
 export const MORTAR_APART = 0.45;
-/** Seconds from a mine landing to its being armed (`MINE_ARM`), and from its being set off to its going (`DETONATION`). */
-export const MINE_ARM = 0.6;
+/**
+ * Seconds from a mine landing to its being armed (`MINE_ARM`: none, as in the reference, where a mine can be set off as soon as it
+ * lands), and from its being set off to its going (`DETONATION`).
+ */
+export const MINE_ARM = 0;
 export const MINE_DETONATION = 0.25;
 /** The mean distance of a mine laid at random over the wide place of Snare Cluster from the target, tiles (a disc's mean is 2/3 of its radius). */
 const SCATTER_MEAN = (2 / 3) * SCATTER_RADIUS;
@@ -96,13 +99,17 @@ export function mineLife(choice: SkillChoice): number {
 }
 
 /**
- * The mines of a skill that lie near the target while a hit lands, on average: as many as go off in the time one lies, no more than
- * may lie at once, and at least the one that is going off.
+ * The mines of a skill that lie near the target while a hit lands, on average: as many as are laid in the time one lies, and at
+ * least the one going off. A mine that rains bursts after it goes (Mortar Charge) counts itself for its own burst only: the rain
+ * comes down among the others, after it has gone. No more than may lie at once.
  */
 export function minesNear(choice: SkillChoice, p: SkillProfile, fires: number): number {
   // An echo of the use lays a set of mines again.
   const laid = fires * (choice.triggered ? 1 : 1 + p.repeats);
-  return Math.min(deployCap(choice, p), Math.max(1, laid * mineLife(choice)));
+  const lying = laid * mineLife(choice);
+  const rain = mineRainHits(choice, p);
+  const near = rain > 0 ? lying + 1 / (1 + rain) : Math.max(1, lying);
+  return Math.min(deployCap(choice, p), near);
 }
 
 /**

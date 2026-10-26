@@ -94,6 +94,8 @@ export type SkillBehaviour =
       ramp?: number;
       /** Each chain also reaches a second enemy near the one it jumps to, which does not chain further. */
       fork?: boolean;
+      /** Percent more damage to the first enemy hit only (a brand's to the enemy it is attached to). */
+      firstMore?: LevelValue;
     }
   /**
    * An instant area. `origin` 'target' (the default) centres it on the target (slams, item-granted skills; `reach` is how
@@ -131,6 +133,8 @@ export type SkillBehaviour =
       delay?: number;
       reach?: number;
       line?: number;
+      /** The pulses of a line burst one after another along it, from the caster out, each in its own circle (Rime Spires). */
+      travels?: boolean;
       /**
        * A rain of this many arrows (the skill's number of projectiles). The default shower has `count` of them, and supports that
        * add projectiles add more. 'rings': the extra arrows land on outer rings and widen the shower, each enemy hit once (Rain of
@@ -530,6 +534,8 @@ export type ActiveGemDef = SkillFx & {
     tickRadiusPerStage?: number;
     /** A use also builds an extra stage while this many enemies are within the radius (a crowd charges Judgement Tempest faster). */
     crowdStage?: { min: number; radius: number };
+    /** Extra stages for each rare or unique enemy a tick hits (Judgement Tempest: one). */
+    uniqueStage?: number;
     /** What the release does: percent more damage in all and per stage, more area per stage, another shape, one strike per stage. */
     release?: {
       perStage: number;

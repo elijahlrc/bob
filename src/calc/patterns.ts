@@ -124,11 +124,10 @@ export function groundHits(p: SkillProfile, patchesPerSec: number, distance: num
   const atSelf = (b.kind === 'burst' && b.origin === 'self') || b.kind === 'melee';
   if (atSelf && g.creep === undefined && distance > radius + TARGET_RADIUS) return 0;
   const life = g.seconds * p.skillDuration;
-  // Pulses come at the start and then every interval: half a pulse more than the time holds, on average.
-  let perPatch = g.dps * (life + GROUND_INTERVAL / 2);
-  const standing = life * patchesPerSec;
-  if (g.max !== undefined && standing > g.max) perPatch *= g.max / standing;
-  return perPatch;
+  // Pulses come at the start and then every interval: half a pulse more than the time holds, on average. Patches that overlap
+  // hurt a target as one, so it takes no more than the ground's damage a second however many are down.
+  const perPatch = g.dps * (life + GROUND_INTERVAL / 2);
+  return patchesPerSec > 0 ? Math.min(perPatch, g.dps / patchesPerSec) : perPatch;
 }
 
 /**

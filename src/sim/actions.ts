@@ -2,6 +2,7 @@ import { angleDiff } from '../core/math';
 import { MONSTER_TYPES } from '../data/monsters';
 import { BLOCK_WINDOW, ECHO_GAP, HIT_AT, SHOT_ALERT } from '../data/constants';
 import type { SkillProfile } from '../calc/skill';
+import { firstMoreOf } from '../calc/skill';
 import { fallOf, profileElement } from '../calc/skillLook';
 import { areaPace } from '../calc/monster';
 import { rollGains } from './buffs';
@@ -375,6 +376,26 @@ export function tickSkillZones(w: World, s: Side, dt: number): void {
         if (z.pulsesLeft > 0) s.zones[j++] = z;
         continue;
       }
+      if (z.bursts !== undefined && z.x2 !== undefined && z.y2 !== undefined) {
+        // A burst a step further along the line each pulse.
+        const k = z.bursts > 1 ? (z.pulsed - 1) / (z.bursts - 1) : 0;
+        const bx = z.x + (z.x2 - z.x) * k;
+        const by = z.y + (z.y2 - z.y) * k;
+        w.events.push({
+          t: 'explode',
+          x: bx,
+          y: by,
+          r: z.radius,
+          dtype: z.dtype,
+          ...(owner.isPlayer ? { skill: z.profile.skill.id } : {}),
+          ...fallField(z.profile.skill),
+        });
+        for (const e of enemiesOf(w, owner))
+          if (Math.hypot(e.x - bx, e.y - by) <= z.radius + e.r)
+            hit(w, owner, e, z.profile, z.hand, Math.hypot(e.x - owner.x, e.y - owner.y));
+        if (z.pulsesLeft > 0) s.zones[j++] = z;
+        continue;
+      }
       w.events.push({
         t: 'explode',
         x: z.x2 === undefined ? z.x : (z.x + z.x2) / 2,
@@ -658,9 +679,17 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       const d = Math.hypot(cur.x - a.x, cur.y - a.y);
       // The first hit is the strongest: each chain still to come adds to it.
       // (The profile already carries the first hit's share, as the sheet counts it.)
-      const q = b.ramp
-        ? scaleProfile(p, (1 + (b.ramp * (p.chains - i)) / 100) / (1 + (b.ramp * p.chains) / 100))
-        : p;
+      // The first target alone takes a brand's more damage (the profile carries it, as the sheet counts the first hit).
+      const later = i > 0 ? 1 / firstMoreOf(p.skill) : 1;
+      const q =
+        b.ramp || later !== 1
+          ? scaleProfile(
+              p,
+              ((1 + ((b.ramp ?? 0) * (p.chains - i)) / 100) /
+                (1 + ((b.ramp ?? 0) * p.chains) / 100)) *
+                later,
+            )
+          : p;
       hit(w, a, cur, q, act.hand, d);
       w.events.push({ t: 'chain', from: from.id, to: cur.id, dtype: dominantType(p, act.hand) });
       hitIds.push(cur.id);
@@ -806,6 +835,10 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       dtype: dominantType(p, act.hand),
       spots: rain?.spots,
       stack: rain?.stack,
+      bursts:
+        line && b.travels
+          ? Math.max(1, Math.floor((b.duration * p.skillDuration) / p.zoneInterval))
+          : undefined,
     });
     return;
   }

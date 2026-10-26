@@ -73,6 +73,7 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
       out.push(
         `${ch.crowdStage.min} enemies within ${num(ch.crowdStage.radius)} build an extra stage`,
       );
+    if (ch.uniqueStage) out.push('Each rare or unique enemy hit builds an extra stage');
     if (ch.stunImmune) out.push('You cannot be stunned while channelling');
     const r = ch.release;
     if (r)

@@ -129,12 +129,13 @@ describe('mines (Mortar Charge)', () => {
     expect(calcAdd / simAdd).toBeLessThan(1.15);
   });
 
-  it('the rotation stands the mines: as many go off a second as the sim sets off, and the weapon fills the rest', () => {
+  it('the rotation lays mines without a pause: as many go off a second as the sim sets off, up to the mine limit', () => {
     const plan = r.c.plan(r.c.configConds, 'boss');
     const acts = plan.acts[r.c.primary.key] / (r.uses.mortarCharge / r.secs);
     expect(acts).toBeGreaterThan(0.9);
     expect(acts).toBeLessThan(1.1);
-    expect(plan.weapon).toBeGreaterThan(0.5);
+    // Fifteen may lie at once (the reference's limit), more than a fight at the target ever leaves: the weapon has no gap to fill.
+    expect(plan.weapon).toBeLessThan(0.05);
   });
 
   it('the sheet predicts the damage a second', () => {

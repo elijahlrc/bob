@@ -104,6 +104,8 @@ export type Actor = {
   carry: number;
   handIdx: number;
   ail: Ailments;
+  /** When each skill's hurting ground last hurt the actor: one ground of a skill at a time, however many patches overlap. */
+  groundAt?: Record<string, number>;
   stunT: number;
   graceT: number;
   leech: { life: number[]; es: number[]; mana: number[] };
@@ -399,6 +401,8 @@ export type SkillZone = {
   /** A rain with more arrows than its skill starts with: where they burst (src/sim/rain.ts); `stack`: every spot hits an enemy under it. */
   spots?: RainSpot[];
   stack?: boolean;
+  /** A strip whose pulses burst one after another along it (`travels`): how many bursts it has in all. */
+  bursts?: number;
 };
 
 /** One burst of a rain of arrows. */

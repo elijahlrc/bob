@@ -149,7 +149,7 @@ import { deployedEffects, setStanding } from './deployed';
 import { carriedSeconds, renewalGap } from './dot';
 import { geyserHits } from './geyser';
 import { exposureShift, sporeMult, standingHits, zapMult } from './channelFx';
-import { afterHitTargetHits, tornadoHits } from './afterHit';
+import { afterHitTargetHits, TARGET_RADIUS, tornadoHits } from './afterHit';
 import { strongestOf } from './ailmentMax';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
 import { illusionStill, landsPerUse, ownBuffs } from './melee';
@@ -1504,6 +1504,10 @@ export class Character {
         this.db.mult('buffDuration'),
       ))
         c = maskOr(c, this.cond.peek(BUFFS[id].cond));
+    // A war-cry totem's buff on its owner reaches the totem's own blows too: it strikes with the owner's stats (as in the
+    // reference), and it is active only while the owner is near.
+    if (choice.skill.ancestral)
+      c = maskOr(c, this.cond.peek(BUFFS[choice.skill.ancestral.buff].cond));
     const k = `${choice.key}|${c}|${flaskMask}`;
     let p = this.profiles.get(k);
     if (p) return p;
@@ -2597,6 +2601,16 @@ export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): nu
   if (p.skill.pods) hits = podHits(p);
   if (p.skill.volleys) hits *= volleysHits(p);
   if (p.skill.pulse) hits = orbHits(p, distance);
+  // Bursts that travel along a line: the target is under those whose circle reaches it, of the pulses the use counts.
+  if (b.kind === 'ground' && b.travels && b.line !== undefined && p.pulses > 0) {
+    const n = p.pulses;
+    const len = b.line * p.radiusMult;
+    const r = b.radius * p.radiusMult + TARGET_RADIUS;
+    let under = 0;
+    for (let k = 0; k < n; k++)
+      if (Math.abs((n > 1 ? (k * len) / (n - 1) : 0) - distance) <= r) under++;
+    hits *= under / n;
+  }
   return hits + afterHitTargetHits(p, hitChance);
 }
 
@@ -2636,17 +2650,20 @@ export function channelMult(
   // A channel with nothing to release, or one that is held (Twister Blade, Blaze Stream), stays at its cap: over a fight it is the full
   // hit, the weak first one and the last wave aside.
   if (c.tick && (!c.release || c.hold)) return tick * (1 + per * c.cap);
+  // The sheet's one target is a unique: a skill that builds more on one does so with every tick.
+  const gain = 1 + (c.uniqueStage ?? 0);
+  const ticks = Math.ceil(c.cap / gain);
   let total = 0;
   if (c.tick)
-    for (let s = 0; s < c.cap; s++)
-      total += tick * (s === 0 && c.first !== undefined ? c.first / 100 : 1) * (1 + per * s);
+    for (let k = 0; k < ticks; k++)
+      total += tick * (k === 0 && c.first !== undefined ? c.first / 100 : 1) * (1 + per * k * gain);
   if (c.release) {
     const r = c.release;
     total += r.repeat
       ? c.cap * (1 + per * c.cap)
       : Math.max(0, 1 + (r.base ?? 0) / 100 + (r.perStage * c.cap) / 100);
   }
-  return total / c.cap;
+  return total / ticks;
 }
 
 export function skillRange(p: SkillProfile): number {

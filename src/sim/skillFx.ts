@@ -613,9 +613,11 @@ function tickSpores(w: World, side: Side, dt: number): void {
       continue;
     }
     const phase = w.rngCombat.float(0, Math.PI * 2);
+    // The thorns of one pod cannot hit the same enemy twice (those of different pods can).
+    const hitIds: number[] = [];
     for (let i = 0; i < s.arrows; i++)
       launch(w, side.player, s.profile, s.hand, s.x, s.y, phase + (i / s.arrows) * Math.PI * 2, {
-        hitIds: [],
+        hitIds,
         aimId: 0,
         range: s.range,
         pierce: 0,

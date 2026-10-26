@@ -14,14 +14,16 @@ export const DEPLOY_SECONDS: Record<DeployKind, number> = {
   mine: 14,
 };
 
-/** How many sets of traps or mines can lie about at once (a set is as many as the skill puts down together). */
+/** How many sets of traps can lie about at once (a set is as many as the skill puts down together). */
 export const DEPLOY_SETS = 3;
+/** How many mines may lie about at once, the reference's limit (the owner, 2026-10-25). */
+export const MINE_LIMIT = 15;
 
 /** How many of a deploying skill's totems, brands, traps or mines may stand at once. */
 export function deployCap(c: SkillChoice, prof: SkillProfile): number {
-  return c.deploy === 'totem' || c.deploy === 'brand'
-    ? prof.deployCount
-    : prof.deployCount * DEPLOY_SETS;
+  if (c.deploy === 'totem' || c.deploy === 'brand') return prof.deployCount;
+  if (c.deploy === 'mine') return Math.max(MINE_LIMIT, prof.deployCount);
+  return prof.deployCount * DEPLOY_SETS;
 }
 
 /** How long what a skill puts down stands: its own length, or a support's, or the kind's usual. */

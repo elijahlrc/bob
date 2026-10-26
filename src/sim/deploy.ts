@@ -7,6 +7,7 @@ import {
   deploySecondsOf,
   totemInterval,
 } from '../calc/deploy';
+import { MINE_ARM } from '../calc/deployed';
 import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { profileLook } from '../calc/skillLook';
@@ -67,11 +68,10 @@ export type Deployable = {
 };
 
 // The numbers the calc sheet plans with too live in calc/deploy.ts.
-export { DEPLOY_SECONDS, deployCap, deploySecondsOf };
+export { DEPLOY_SECONDS, MINE_ARM, deployCap, deploySecondsOf };
 /** Distance at which an enemy sets off a trap, and at which a mine is set off. */
 export const TRAP_RADIUS = 1.6;
 export const MINE_RADIUS = 3.5;
-export const MINE_ARM = 0.6;
 /** Seconds between a mine being set off and going, unless the skill says otherwise; and between the mines of a chain. */
 const DETONATION = 0.25;
 const CHAIN_GAP = 0.25;

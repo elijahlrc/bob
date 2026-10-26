@@ -495,7 +495,8 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
               ? skill.behaviour.chains + db.sum('base', 'chains', baseCtx)
               : 0)) /
             100
-        : 1);
+        : 1) *
+      firstMoreOf(skill);
     // Crit.
     const baseCrit = isAttack ? (shieldAttack ? 5 : (hand?.crit ?? 0)) : skill.crit;
     let critChance = 0;
@@ -896,4 +897,12 @@ export function fadeShare(p: SkillProfile, d: number): number {
 
 export function typeIndex(t: DamageType): number {
   return DAMAGE_TYPES.indexOf(t);
+}
+
+/** The more damage a chain gives its first target only, as a multiplier (1 for any other skill). */
+export function firstMoreOf(skill: SkillDef): number {
+  const b = skill.behaviour;
+  return b.kind === 'chain' && b.firstMore !== undefined
+    ? 1 + levelValue(b.firstMore, skill.level) / 100
+    : 1;
 }

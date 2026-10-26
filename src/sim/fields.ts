@@ -55,6 +55,8 @@ export type Field = {
   profile?: SkillProfile;
   hand: number;
   pulseT: number;
+  /** A zap: the jumps it has made (it makes one for every jump its time holds). */
+  jumps?: number;
   interval: number;
   /** Chilling ground: the share of a hit it deals in a second. A storm: the damage of a bolt. */
   dps: number;
@@ -654,8 +656,11 @@ export function tickFields(w: World, s: Side, dt: number): void {
     }
     if (f.kind === 'zap') {
       f.pulseT -= dt;
-      if (f.pulseT <= 0 && f.t > 0) {
+      // The jump that falls due as the orb's time ends still comes: an orb blasts at every jump of its life.
+      const most = Math.floor(f.total / f.interval + 1e-6);
+      if (f.pulseT <= 1e-6 && (f.jumps ?? 0) < most) {
         f.pulseT += f.interval;
+        f.jumps = (f.jumps ?? 0) + 1;
         const spec = f.profile!.skill.orb;
         if (spec?.kind === 'zap') {
           // It jumps to a new spot near the target place and blasts there.
@@ -667,7 +672,7 @@ export function tickFields(w: World, s: Side, dt: number): void {
           blast(w, s, f, f.x, f.y, f.radius, true);
         }
       }
-      if (f.t > 0) s.fields[j++] = f;
+      if (f.t > 0 || (f.jumps ?? 0) < most) s.fields[j++] = f;
       continue;
     }
     f.pulseT -= dt;
@@ -721,9 +726,15 @@ export function tickFields(w: World, s: Side, dt: number): void {
           applyStatus(w, e, 'rimed', { seconds: f.interval * 2, v: e.ail.chill * 100 });
       }
     } else if (f.kind === 'chilling' && pulse && f.profile) {
+      // Chilled ground that hurts: one patch of a skill at a time on an enemy, however many overlap (as a damage over time).
       const q = scaleProfile(f.profile, f.dps * f.interval);
-      for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
+      const id = f.profile.skill.id;
+      for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
+        const at = (e.groundAt ??= {});
+        if (w.t - (at[id] ?? -Infinity) < f.interval - 1e-6) continue;
+        at[id] = w.t;
         hit(w, p, e, q, f.hand, Math.hypot(e.x - p.x, e.y - p.y));
+      }
     } else if (f.kind === 'smoke' && pulse) {
       // Smoke blinds what stands in it.
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))

@@ -143,6 +143,18 @@ export function channelUse(w: World, a: Actor, act: Action): void {
       if (Math.hypot(e.x - a.x, e.y - a.y) <= spec.crowdStage.radius) near++;
     if (near >= spec.crowdStage.min) gain += 1;
   }
+  // A tick that hits a rare or unique enemy builds more.
+  if (spec.uniqueStage) {
+    const b = p.skill.behaviour;
+    const r = (b.kind === 'burst' ? b.radius : 2) * p.radiusMult;
+    for (const e of livingEnemiesOf(w, a.team))
+      if (
+        e.rarity !== 'normal' &&
+        e.rarity !== 'magic' &&
+        Math.hypot(e.x - a.x, e.y - a.y) <= r + e.r
+      )
+        gain += spec.uniqueStage;
+  }
   st.stage = Math.min(spec.cap, st.stage + gain);
   if (p.skill.orb) orbUse(w, a, act, st.stage);
   // An orb keeps being fed at the cap, and so does a channel with nothing to release or one that is held (Twister Blade just keeps its

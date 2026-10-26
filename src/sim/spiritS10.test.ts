@@ -120,11 +120,17 @@ describe('Cairns (fatherTotem, warchiefTotem)', () => {
 
   it('the Warchief gives more melee damage while it is active, and the bonuses of the two do not interfere', () => {
     const { world: w } = world(['warchiefTotem'], 2.5, 'mace_3', STR);
-    const key = w.sides[0].char.actives.find((c) => c.skill.id === 'warchiefTotem')!;
-    const plain = w.sides[0].char.profile(key, 0);
-    const cond = w.sides[0].char.cond.peek('warchiefCairn');
-    const buffed = w.sides[0].char.profile(key, cond);
+    // The character's own melee blows (its weapon attack) hit harder with the buff; the totem's own slam always has it.
+    const ch = w.sides[0].char;
+    const plain = ch.profile(ch.defaultAttack, 0);
+    const cond = ch.cond.peek('warchiefCairn');
+    const buffed = ch.profile(ch.defaultAttack, cond);
     expect(buffed.hands[0].chunks[0].max).toBeGreaterThan(plain.hands[0].chunks[0].max);
+    const key = ch.actives.find((c) => c.skill.id === 'warchiefTotem')!;
+    expect(ch.profile(key, 0).hands[0].chunks[0].max).toBeCloseTo(
+      ch.profile(key, cond).hands[0].chunks[0].max,
+      6,
+    );
   });
 });
 

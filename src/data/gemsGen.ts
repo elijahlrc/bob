@@ -511,7 +511,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       seconds: 5,
       radius: 2.2,
       grow: 2,
-      dps: 0.67,
+      dps: 1.39,
       killCharge: {
         kind: 'fervour',
         chance: 25,
@@ -679,6 +679,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           width: 2.4,
         },
       },
+      uniqueStage: 1,
     },
     mods: [
       {
@@ -1539,8 +1540,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 1.6,
       duration: 1,
       interval: 0.2,
-      line: 6,
+      line: 9,
       reach: 6,
+      travels: true,
     },
     spellDamage: [
       {
@@ -3132,7 +3134,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'chilling',
       seconds: 5,
       radius: 1.6,
-      dps: 1.6,
+      dps: 3.17,
       creep: 0.9,
       max: 10,
     },
@@ -4039,7 +4041,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'chilling',
       seconds: 3,
       radius: 2.6,
-      dps: 0.5,
+      dps: 2.15,
     },
     cooldown: 1.8,
     castOn: {
@@ -4985,11 +4987,16 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [19.7, 1014.6],
+      dps: {
+        table: [
+          19, 25.1, 35.6, 49.3, 67.2, 90.3, 120.1, 147.8, 181.3, 221.4, 269.4, 327, 395.8, 477.8,
+          575.6, 692, 830.4, 994.8, 1121.2, 1262.7, 1421.2, 1598.7, 1797.3, 2019.4, 2267.9,
+        ],
+      },
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
-      scales: ['spell'],
+      scales: [],
     },
     spellDamage: [
       {
@@ -6308,7 +6315,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'ground',
       radius: 1.6,
       duration: 3.5,
-      interval: 0.35,
+      interval: 0.2,
       line: 4,
       reach: 8,
       castSpeedPulse: true,
@@ -6796,6 +6803,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       range: 9,
       chains: 3,
       chainRange: 4,
+      firstMore: [80, 130],
     },
     spellDamage: [
       {
@@ -6818,13 +6826,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.6,
     crit: 5.5,
     cost: [8, 21],
-    mods: [
-      {
-        stat: 'damage',
-        kind: 'more',
-        value: [30, 60],
-      },
-    ],
+    mods: [],
     description: 'A sigil that arcs lightning from the enemy it is on to its neighbours.',
   },
   {

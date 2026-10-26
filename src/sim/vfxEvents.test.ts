@@ -22,7 +22,7 @@ describe('what the sim tells the renderer so that an area can be outlined (docs/
     const beams = eventsOf('blazeStream').filter((e) => e.t === 'beam');
     expect(beams.length).toBeGreaterThan(0);
     for (const b of beams) expect((b as { width?: number }).width).toBeGreaterThan(0);
-    const strips = eventsOf('rimeSpires').filter((e) => e.t === 'explode' && e.strip);
+    const strips = eventsOf('fireBreathTrap', 10).filter((e) => e.t === 'explode' && e.strip);
     expect(strips.length).toBeGreaterThan(0);
     for (const s of strips) {
       const e = s as Extract<SimEvent, { t: 'explode' }>;
@@ -30,6 +30,15 @@ describe('what the sim tells the renderer so that an area can be outlined (docs/
       // The event's own centre is the middle of the band.
       expect(e.x).toBeCloseTo((e.strip![0] + e.strip![2]) / 2, 5);
     }
+  });
+
+  it('bursts that travel along a line each say where they are, one step further on', () => {
+    const bursts = eventsOf('rimeSpires').filter(
+      (e) => e.t === 'explode' && (e as { skill?: string }).skill === 'rimeSpires',
+    ) as Extract<SimEvent, { t: 'explode' }>[];
+    expect(bursts.length).toBeGreaterThan(2);
+    expect(bursts.some((b) => b.strip)).toBe(false);
+    expect(Math.hypot(bursts[1].x - bursts[0].x, bursts[1].y - bursts[0].y)).toBeGreaterThan(1);
   });
 
   it('a warcry says how far it goes', () => {

@@ -177,6 +177,8 @@ export type SkillDef = SkillFx & {
     tickRadiusPerStage?: number;
     /** A use also builds an extra stage while this many enemies are within the radius (a crowd charges Judgement Tempest faster). */
     crowdStage?: { min: number; radius: number };
+    /** Extra stages for each rare or unique enemy a tick hits (Judgement Tempest: one). */
+    uniqueStage?: number;
     /** What the release does: percent more damage in all and per stage, more area per stage, another shape, one strike per stage. */
     release?: {
       perStage: number;

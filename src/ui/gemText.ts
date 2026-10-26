@@ -260,6 +260,9 @@ function behaviourLines(b: SkillBehaviour, level: number): string[] {
         `Chains ${n} time${n === 1 ? '' : 's'}`,
         ...(b.ramp ? [`${b.ramp}% more damage for each chain still to come`] : []),
         ...(b.fork ? ['Each chain also reaches a second enemy beside the first'] : []),
+        ...(b.firstMore !== undefined
+          ? [`${num(levelValue(b.firstMore, level))}% more damage to the enemy it is attached to`]
+          : []),
       ];
     }
     case 'burst':
