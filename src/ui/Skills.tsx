@@ -154,12 +154,18 @@ export function Skills({
         }),
     [gemKey],
   );
-  const terms = searchTerms(q);
   // The list's filters (kept between visits): one of each gem, only what the weapons in hand can use, and the supports that
-  // would act on one chosen skill.
-  const [oneEach, setOneEach] = useState(() => loadPref('gemOneEach', false));
-  const [usableOnly, setUsableOnly] = useState(() => loadPref('gemUsable', false));
-  const [forSkill, setForSkill] = useState(() => loadPref('gemSupportsFor', ''));
+  // would act on one chosen skill. They are kept across runs, and the search box and the filter row are only drawn for a bag
+  // of some size, so a filter left over from an earlier run must not act on a bag that cannot show it.
+  const searchShown = gems.length > 8;
+  const filtersShown = gems.length > 1;
+  const terms = searchShown ? searchTerms(q) : [];
+  const [oneEachSet, setOneEach] = useState(() => loadPref('gemOneEach', false));
+  const [usableSet, setUsableOnly] = useState(() => loadPref('gemUsable', false));
+  const [forSkillSet, setForSkill] = useState(() => loadPref('gemSupportsFor', ''));
+  const oneEach = filtersShown && oneEachSet;
+  const usableOnly = filtersShown && usableSet;
+  const forSkill = filtersShown ? forSkillSet : '';
   const hold = ch.weaponHold();
   // The skills a support can be asked about: the ones worn and the ones in the bag, one of each.
   const skillIds = [
@@ -638,7 +644,7 @@ export function Skills({
           }}
         >
           <h4 class="lf-h">Gems{gems.length > 0 ? ` (${gems.length})` : ''}</h4>
-          {gems.length > 8 && (
+          {searchShown && (
             <input
               class="sk-search"
               type="text"
@@ -652,7 +658,7 @@ export function Skills({
               }}
             />
           )}
-          {gems.length > 1 && (
+          {filtersShown && (
             <div class="sk-filters">
               <label class="sk-check">
                 <input
@@ -704,7 +710,24 @@ export function Skills({
             </div>
           )}
           {gems.length > 0 && shownGems.length === 0 && (
-            <p class="sk-none">No gem matches the filters.</p>
+            <p class="sk-none">
+              No gem matches the filters.{' '}
+              <button
+                class="btn small"
+                onClick={() => {
+                  setQ('');
+                  savePref('gemSearch', '');
+                  setOneEach(false);
+                  savePref('gemOneEach', false);
+                  setUsableOnly(false);
+                  savePref('gemUsable', false);
+                  setForSkill('');
+                  savePref('gemSupportsFor', '');
+                }}
+              >
+                Clear filters
+              </button>
+            </p>
           )}
           {gems.length === 0 && (
             <p class="sk-none">
