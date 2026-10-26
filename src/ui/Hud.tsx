@@ -66,6 +66,11 @@ function Orb(props: {
       {...infoProps(
         `${label} ${Math.round(value)} / ${Math.round(max - reserved)}${
           reserved > 0 ? ` (${Math.round(reserved)} of ${Math.round(max)} reserved by auras)` : ''
+        }${
+          // The life orb carries energy shield as a film over it: its numbers are in the same tip.
+          props.esMax
+            ? ` · Energy shield ${Math.round(props.es ?? 0)} / ${Math.round(props.esMax)}`
+            : ''
         }`,
       )}
     >
