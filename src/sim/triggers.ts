@@ -27,13 +27,16 @@ export type TriggerEvent =
   | { on: 'kill'; target: Actor; tags: number }
   | { on: 'block' }
   | { on: 'stunned' }
-  | { on: 'hitTaken'; damage: number };
+  | { on: 'hitTaken'; damage: number }
+  | { on: 'step' }
+  | { on: 'buff'; buff: string };
 
 export const MAX_EXPLOSIONS_PER_TICK = 20;
 const TRIGGERED = tagBit('triggered');
 
 function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
   if (d.on !== ev.on && !(ev.on === 'hit' && ev.crit && d.on === 'crit')) return false;
+  if (ev.on === 'buff' && d.buff && d.buff !== ev.buff) return false;
   if ('tags' in ev && !maskSubset(tagMask, ev.tags)) return false;
   if (ev.on === 'kill' && d.targetHas) {
     const t = ev.target;
@@ -57,7 +60,7 @@ function matches(d: TriggerDef, ev: TriggerEvent, tagMask: number): boolean {
 /** Offer an event to every trigger the player has. Cheap when there are none. */
 export function fireTriggers(w: World, s: Side, ev: TriggerEvent): void {
   const triggers = s.char.triggers;
-  if (triggers.length === 0 || s.trig.busy || !s.player.alive) return;
+  if (triggers.length === 0 || (s.trig.busy && ev.on !== 'buff') || !s.player.alive) return;
   if ('tags' in ev && (ev.tags & TRIGGERED) !== 0) return;
   for (const src of triggers) {
     const d = src.def;

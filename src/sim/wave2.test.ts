@@ -87,11 +87,13 @@ describe('trigger supports and Ember Burst', () => {
     expect(casts).toBe(1);
   });
 
-  it('Ember Burst is item-only: it never drops as a gem and bursts around the target', () => {
-    expect(GRANTED_GEMS.map((g) => g.id)).toContain('emberBurst');
+  it('Slag Spray is item-only: it never drops as a gem, and Cinderfall Axe sets it off about the enemy struck', () => {
+    expect(GRANTED_GEMS.map((g) => g.id)).toContain('slagSpray');
     const b = build('vanguard', 'cinderfallAxe');
     const c = ch(b);
-    expect(c.triggers[0].skills[0].skill.id).toBe('emberBurst');
+    expect(c.triggers[0].skills[0].skill.id).toBe('slagSpray');
+    // An attack: it strikes with the axe, at the reference's 115%.
+    expect(c.triggers[0].skills[0].skill.type).toBe('attack');
     const { world, dummy } = createDummyWorld(b, { distance: 3 });
     const near = spawnMonster(
       world,

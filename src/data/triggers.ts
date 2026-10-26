@@ -1,6 +1,7 @@
 import type { DamageType, SkillTag } from '../mods/types';
 import type { LevelValue } from './gems';
 import { gemDef } from './gems';
+import { BUFFS, type BuffId } from './buffs';
 
 /**
  * Triggers (EXPANSION 5.5). A trigger makes something happen when the player does something, without
@@ -23,7 +24,11 @@ export type TriggerOn =
   /** The player takes damage (see `threshold`). */
   | 'hitTaken'
   /** The character is stunned. */
-  | 'stunned';
+  | 'stunned'
+  /** Each stride of the character's walk (a tile). */
+  | 'step'
+  /** The character gains a buff (`buff`: which one). */
+  | 'buff';
 
 export type TriggerEffect =
   /** Cast one of the active spells socketed in the same item. */
@@ -62,6 +67,8 @@ export type TriggerDef = {
   tags?: SkillTag[];
   /** Kill triggers: only enemies carrying this count. */
   targetHas?: 'shock' | 'ignite' | 'hex' | 'freeze' | 'poison' | 'bleed';
+  /** Buff triggers: only this buff counts. */
+  buff?: string;
   /** Chance each time the trigger is met, percent. */
   chance: number;
   /** Seconds between two firings of this trigger. */
@@ -137,6 +144,12 @@ export function triggerCause(t: TriggerDef): string {
       return t.threshold
         ? `when you take damage (after ${t.threshold}% of maximum life)`
         : 'when you take damage';
+    case 'step':
+      return 'with each step you take';
+    case 'buff':
+      return t.buff
+        ? `when you gain ${BUFFS[t.buff as BuffId]?.name ?? t.buff}`
+        : 'when you gain a buff';
   }
 }
 

@@ -23,7 +23,9 @@ export type MinionId =
   | 'radiant'
   | 'phantasm'
   | 'crawler'
-  | 'decoy';
+  | 'decoy'
+  | 'wolf'
+  | 'spider';
 
 export type MinionDef = {
   id: MinionId;
@@ -87,6 +89,38 @@ export const MINIONS: Record<MinionId, MinionDef> = {
     res: 30,
     respawn: 4,
     color: 0xffd070,
+  },
+  wolf: {
+    id: 'wolf',
+    name: 'Spectral Hound',
+    dmg: 0.5,
+    rate: 1,
+    reach: 1.4,
+    speed: 5,
+    ranged: false,
+    dtype: 'physical',
+    splash: 0,
+    life: 0.6,
+    r: 0.35,
+    res: 30,
+    respawn: 0,
+    color: 0xa8c8e8,
+  },
+  spider: {
+    id: 'spider',
+    name: 'Brood Spider',
+    dmg: 0.5,
+    rate: 1.04,
+    reach: 1.3,
+    speed: 4.6,
+    ranged: false,
+    dtype: 'chaos',
+    splash: 0,
+    life: 0.4,
+    r: 0.3,
+    res: 30,
+    respawn: 0,
+    color: 0x7a9a5a,
   },
   skeleton: {
     id: 'skeleton',

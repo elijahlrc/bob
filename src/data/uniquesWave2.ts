@@ -109,7 +109,7 @@ export const WAVE2_UNIQUES: UniqueDef[] = [
         tags: ['melee'],
         chance: 20,
         cooldown: 0.15,
-        effect: { kind: 'castGranted', skillId: 'emberBurst', level: 16 },
+        effect: { kind: 'castGranted', skillId: 'slagSpray', level: 16 },
       },
     ],
     notes: {

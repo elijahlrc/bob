@@ -871,6 +871,8 @@ export type TriggerRuntime = {
   next: Record<string, number>;
   /** True while a triggered skill is being cast: nothing triggers from it. */
   busy: boolean;
+  /** Tiles walked since the last stride trigger. */
+  stride?: number;
   /** Kill explosions so far this tick (capped, for speed). */
   explosions: number;
   /** Explosions waiting their turn: a chain of kills continues over the next ticks. */

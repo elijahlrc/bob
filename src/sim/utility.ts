@@ -1,3 +1,4 @@
+import { fireTriggers } from './triggers';
 import { skillRange, type SkillChoice } from '../calc/character';
 import type { SkillProfile } from '../calc/skill';
 import { ACTIVE_GEMS } from '../data/gems';
@@ -436,6 +437,7 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
       length * a.side!.char.db.mult('buffDuration') * act.profile.skillDuration,
     );
     if (u.second) a.side!.buffT[u.second.buff] = Math.max(0, a.side!.buffT[u.buff]);
+    fireTriggers(w, a.side!, { on: 'buff', buff: u.buff });
     // A guard's cooldown does not run while it lasts, and the other guards wait out the same time.
     if (isGuard(c.skill)) {
       const until = w.t + a.side!.buffT[u.buff] + (u.cooldown ?? 0);

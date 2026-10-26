@@ -1,3 +1,4 @@
+import { fireTriggers } from './triggers';
 import { bossAI } from './bosses';
 import { abilitiesOf } from '../data/abilities';
 import { skillRange, type SkillChoice } from '../calc/character';
@@ -99,10 +100,23 @@ export function step(w: World, a: Actor, dx: number, dy: number, dt: number): vo
           y: Math.max(0.5, Math.min(w.grid.h - 0.5, ny)),
         }
       : w.grid.collide(nx, ny, a.r);
+  const walked = Math.hypot(c.x - a.x, c.y - a.y);
   a.x = c.x;
   a.y = c.y;
   a.moving = true;
+  // Each stride of the character's walk can set off a trigger (a burst of fire with each step).
+  if (a.isPlayer && a.side && a.side.char.triggers.length) {
+    const t = a.side.trig;
+    t.stride = (t.stride ?? 0) + walked;
+    while (t.stride >= STRIDE) {
+      t.stride -= STRIDE;
+      fireTriggers(w, a.side, { on: 'step' });
+    }
+  }
 }
+
+/** Tiles of walking between two stride triggers. */
+const STRIDE = 1;
 
 /** Walk toward a point using direct movement when visible, otherwise A*. */
 function moveTo(w: World, s: Side, a: Actor, tx: number, ty: number, dt: number): void {
