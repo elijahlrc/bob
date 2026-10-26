@@ -106,7 +106,8 @@ export function launch(
     vy: Math.sin(angle) * speed,
     r: 0.15,
     travelled: 0,
-    maxRange: o.range,
+    // A wanderer lasts a time, not a range: the way it covers in that time at its speed.
+    maxRange: p.skill.wander ? speed * p.skill.wander.seconds * p.skillDuration : o.range,
     profile: p,
     hand,
     hitIds: o.hitIds,

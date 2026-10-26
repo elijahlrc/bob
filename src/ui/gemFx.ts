@@ -154,7 +154,10 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
     out.push(
       `A slow orb: every ${num(def.pulse.interval)} s it hurts every enemy within ${num(def.pulse.radius)} of it, and does not stop on any`,
     );
-  if (def.wander) out.push('The projectiles move at random and bounce off walls');
+  if (def.wander)
+    out.push(
+      `The projectiles move at random and bounce off walls, for ${num(def.wander.seconds)} seconds`,
+    );
   if (def.travelThrough) out.push('Dashes through the target, hitting everything on the way');
   if (def.mineAura?.taken)
     out.push(

@@ -432,8 +432,11 @@ export type SkillFx = {
   sporePods?: { arrows: number; less: number; range: number; delay: number };
   /** The spell is cast on up to `max` of the character's projectiles of this skill instead of the character, with `areaLess` percent less area (Frost Ring on Glacier Dart). */
   castOn?: { skill: string; max: number; areaLess: number };
-  /** The projectile wanders: it turns about at random as it flies, and bounces off walls (Skitter Flash). */
-  wander?: { turn: number };
+  /**
+   * The projectile wanders: it turns about at random as it flies, and bounces off walls (Skitter Flash). It lasts `seconds` (longer
+   * with skill duration), not a range, and is gone once it is `leash` tiles from the character.
+   */
+  wander?: { turn: number; seconds: number; leash: number };
   /** The projectile is a slow orb that hurts every enemy within `radius` of it every `interval` seconds as it drifts, and does not stop on one (Drifting Storm). */
   pulse?: { radius: number; interval: number; speed: number };
   /** The arrow flies to the target place (or the first enemy) and leaves a clone of the character there for `seconds`, which fires with the character's bow and deals `more` percent more damage (Mirror Quiver). */

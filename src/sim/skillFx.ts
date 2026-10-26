@@ -143,6 +143,9 @@ export function projectileFx(w: World, s: Side, pr: Projectile, dt: number): voi
     const speed = Math.hypot(pr.vx, pr.vy);
     pr.vx = Math.cos(heading) * speed;
     pr.vy = Math.sin(heading) * speed;
+    // It is gone once it has gone too far from the character.
+    if (Math.hypot(pr.x - s.player.x, pr.y - s.player.y) > sk.wander.leash)
+      pr.travelled = pr.maxRange;
   }
   const carried = pr.profile.skillDot?.spec.carried;
   if (carried)

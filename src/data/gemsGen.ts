@@ -2987,6 +2987,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     description: 'Sends out sparks that skitter about in every direction.',
     wander: {
       turn: 6,
+      seconds: 2,
+      leash: 17,
     },
   },
   {
