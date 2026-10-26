@@ -815,20 +815,20 @@ tiers keep unlocking throughout the 100-map run. Families:
 
 | Name (ours)         | Effect                                                            | Cost × | Tags       |
 | ------------------- | ----------------------------------------------------------------- | ------ | ---------- |
-| Brute Force         | 40%→59% more melee physical damage                                | 1.4    | melee      |
+| Brute Force         | 30%→49% more melee physical damage                                | 1.4    | melee      |
 | Swift Assault       | 25%→44% increased attack speed                                    | 1.15   | attack     |
 | Quick Cast          | 20%→39% increased cast speed                                      | 1.2    | spell      |
-| Ember Infusion      | Gain 25%→34% of physical as extra fire                            | 1.2    | attack     |
+| Ember Infusion      | Gain 25%→44% of physical as extra fire                            | 1.2    | attack     |
 | Channelled Elements | 30%→49% more elemental damage; cannot inflict elemental ailments  | 1.3    | any        |
 | Focused Ruin        | 30%→49% more spell damage; 100% reduced crit chance               | 1.3    | spell      |
 | Echoing Cast        | Repeats the cast (70% more cast speed); 10% less damage           | 1.4    | spell      |
 | Volley Split        | +2 projectiles; 25% less projectile damage                        | 1.5    | projectile |
-| Piercing Shot       | Projectiles pierce 2→5 targets; 10% more projectile damage at L20 | 1.2    | projectile |
+| Piercing Shot       | Projectiles pierce 2→4 targets; 0%→19% more projectile damage     | 1.2    | projectile |
 | Dense Blast         | 35%→54% more area damage; 30% less area of effect                 | 1.4    | area       |
 | Wide Blast          | 30%→49% increased area of effect                                  | 1.4    | area       |
-| Precision Strikes   | 30%→49% increased crit chance; +15%→34% crit multiplier           | 1.2    | any        |
-| Rending Edge        | 25% chance to bleed; 30%→49% more bleed damage                    | 1.2    | attack     |
-| Toxin Coat          | 40% chance to poison; 20%→39% more poison damage                  | 1.2    | any        |
+| Precision Strikes   | +1%→1.9% base crit chance; 50%→88% increased crit chance          | 1.2    | any        |
+| Rending Edge        | 25% to bleed; 10%→29% more bleed; 1–2 → 44–66 physical to attacks | 1.2    | attack     |
+| Toxin Coat          | 40% chance to poison; adds 1–2 → 94–141 chaos damage              | 1.2    | any        |
 | Kindle              | Attacks only: adds fire damage against burning enemies            | 1.2    | any        |
 | Bloodthirst         | 2% of attack damage leeched as life                               | 1.3    | attack     |
 | Staggering Force    | 30%→49% increased stun duration; 20% reduced enemy stun threshold | 1.15   | attack     |
@@ -840,7 +840,7 @@ aura in these tables follows a reference gem.
 
 | Name (ours)   | Reservation   | Effect at L1 → L20                                                                | Attr    |
 | ------------- | ------------- | --------------------------------------------------------------------------------- | ------- |
-| Kindling Halo | 50%           | Adds 4–7 → 120–180 fire to attacks and spells                                     | Str     |
+| Kindling Halo | 50%           | Adds 16–23 → 109–155 fire to attacks and 15–21 → 99–140 to spells                 | Str     |
 | Storm Halo    | 50%           | Adds 2–16 → 37–248 lightning to attacks; spells deal 15–21% more lightning damage | Int     |
 | Frost Halo    | 50%           | Gain 16% → 25% of physical as extra cold; 14–18% more cold damage                 | Dex/Int |
 | Veil of Grace | 50%           | +60 → +1,700 evasion rating                                                       | Dex     |

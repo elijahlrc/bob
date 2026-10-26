@@ -78,6 +78,7 @@
   `dpsgems` (every gem alone), `dpssupports`, `dpsminions` and `dpsinspect <gem>`, and held to it by `src/calc/sheetVsSim.*.test.ts` and
   `rotationVsSim.test.ts`. **When a skill's behaviour changes in the sim, run `npm run dpsgems -- --only <gem>` and change the count in the calc to
   match.** The sheet counts one target and free mana (docs/MANA.md); the audit's open items are in its section 6.
+- **Damage parity** (2026-10-25/26): [docs/DAMAGE-PARITY.md](docs/DAMAGE-PARITY.md) (milestones Q0-Q7, done): every gem's damage, by gem level, on the reference's own numbers (attack added damage, spell hits, damage over time and minion hits as `{ table: [...] }` level values), judged by what each skill does to one target. The reference tool runs headless locally (`reference/pob/driver/`, its NOTES.md); the per-gem studies and scores are in the local `reference/docs/PARITY-INVENTORY.md`. A gem far from the reference gets a behaviour study, never a ratio fix.
 - **Performance** (2026-10-15): [docs/PERFORMANCE.md](docs/PERFORMANCE.md). A sheet is about 1 ms, and the Skills tab tries every gem in every socket, so what is asked of it is
   counted before what it costs: `npm run perf` times it on a late run. `sheetOf` remembers sheets by build, `ModDB.extend` layers a skill's mods on the character's,
   and `planRotation` remembers its plans; none changes a number, and a change to the calc should keep it so (hash the sheets before and after).
