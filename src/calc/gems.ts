@@ -10,6 +10,7 @@ import {
   type GemAttr,
   type GemDef,
   type GemMod,
+  type LevelTable,
   type LevelValue,
   type SkillBehaviour,
   type SpellDamageDef,
@@ -21,9 +22,22 @@ import type { BuffId } from '../data/buffs';
 import type { HitEffect, PatternId, ProjectileLook } from '../data/encounters';
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 
-/** Interpolate an L1/L20 value; levels above 20 extrapolate the same curve. */
+function tableValue(at: readonly number[], level: number): number {
+  const n = at.length;
+  if (n === 0) return 0;
+  const l = Math.max(1, Math.round(level));
+  if (l <= n) return at[l - 1];
+  if (n === 1) return at[0];
+  const a = at[n - 2];
+  const b = at[n - 1];
+  return a > 0 && b > 0 ? b * (b / a) ** (l - n) : b + (b - a) * (l - n);
+}
+
+/** Interpolate an L1/L20 value; levels above 20 extrapolate the same curve. A table is read at the level, and grows past its end
+ * as its last two entries do. */
 export function levelValue(v: LevelValue, level: number, geometric = false): number {
   if (typeof v === 'number') return v;
+  if (!Array.isArray(v)) return tableValue((v as LevelTable).table, level);
   const t = (level - 1) / 19;
   return geometric ? gerp(v[0], v[1], t) : lerp(v[0], v[1], t);
 }

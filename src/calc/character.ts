@@ -1,6 +1,4 @@
 import {
-  ATTACK_LEVEL_MAX,
-  ATTACK_LEVEL_MIN,
   DUAL_WIELD_BLOCK,
   DUAL_WIELD_MORE_PHYS,
   BASE_ACCURACY,
@@ -555,14 +553,6 @@ export class Character {
       mod('evasion', 'base', BASE_EVASION(level)),
       mod('accuracy', 'base', BASE_ACCURACY(level)),
       mod('moveSpeed', 'base', BASE_MOVE_SPEED),
-      mod('damage.min', 'base', ATTACK_LEVEL_MIN * level, {
-        damageTypes: ['physical'],
-        tags: ['attack'],
-      }),
-      mod('damage.max', 'base', ATTACK_LEVEL_MAX * level, {
-        damageTypes: ['physical'],
-        tags: ['attack'],
-      }),
     ];
     if (this.dualWielding) {
       // Dual wielding (as in the reference game): 20% more physical attack damage and 15% additional chance to block attacks.

@@ -21,9 +21,6 @@ export const BASE_EVASION = (level: number): number => 53 + 3 * level;
 export const BASE_ACCURACY = (level: number): number => 2 * level;
 export const BASE_MANA_REGEN_PCT = 1.75;
 export const BASE_CRIT_MULTI = 150;
-/** Built-in flat physical damage to attacks per character level (tunable; see Appendix A). */
-export const ATTACK_LEVEL_MIN = 0.7;
-export const ATTACK_LEVEL_MAX = 1.4;
 export const DEFAULT_MAX_RES = 75;
 export const HARD_MAX_RES = 90;
 export const BASE_MOVE_SPEED = 4.0;

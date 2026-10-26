@@ -14,6 +14,7 @@ any level is explained before its numbers change. What cannot be explained goes 
 | Source                           | Bob over reference        | How it got there                                                                                                                                                                                                                          |
 | -------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Weapon base damage               | 1.0                       | `WEAPON_DAMAGE_SCALE = 1` (2026-10-18 base audit)                                                                                                                                                                                         |
+| Attack base damage, per level    | about 2.4 (Q0), now 1.0   | a flat 0.7-1.4 physical per character level on every attack (M6), about one more base weapon at every level from 10 up, standing in for the gems' own added damage; removed for the reference's per-gem tables (decision 5)               |
 | Attack multipliers (per hit)     | median 1.0                | `baseMult` from the reference                                                                                                                                                                                                             |
 | Item affixes, flat added damage  | about 1.0                 | the reference affix tables (2026-10-16 audits)                                                                                                                                                                                            |
 | Ailments (ignite, bleed, poison) | the hit's                 | reference formulas (`IGNITE_DPS_FRAC` 0.5, `BLEED_DPS_FRAC` 0.7, `POISON_DPS_FRAC` 0.2) on the hit                                                                                                                                        |
@@ -87,3 +88,6 @@ can be called too strong or right. What stays unexplained is raised with the own
 2. **Damage over time:** parity with the reference, no lift.
 3. **The measure:** the reference tool's own calculator, run headless (Q0).
 4. **Order:** free; cf9478c's DoT numbers are replaced in Q3.
+5. **The per-level attack flat goes (Q0, the owner):** every attack gem gets the reference's own added damage directly, and the
+   character's flat physical damage per level (`ATTACK_LEVEL_MIN/MAX`) is removed. Q0 measured simple attacks at 1.00 without it and
+   about 2.4 with it.

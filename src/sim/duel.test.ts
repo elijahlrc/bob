@@ -185,7 +185,9 @@ describe('a duel of two starters', () => {
     strong.level = 30;
     const r = runDuel(strong, vanguard(2), 1, F4);
     expect(r.winner).toBe(0);
-    expect(r.sides[0].lifeLeft).toBeGreaterThan(0.9);
+    // Far easier than an even fight: the higher level has more life, and its gems are stronger.
+    const even = runDuel(vanguard(1), vanguard(2), 1, F4);
+    expect(r.sides[0].lifeLeft).toBeGreaterThan(even.sides[even.winner!].lifeLeft + 0.4);
   });
 });
 

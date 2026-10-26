@@ -11,8 +11,9 @@
  */
 import { SUPPORT_GEMS, type GemMod, type SupportGemDef } from '../src/data/gems';
 import { isPrice } from '../src/calc/reach';
+import { levelValue } from '../src/calc/gems';
 
-const end = (v: GemMod['value']): number => (typeof v === 'number' ? v : v[1]);
+const end = (v: GemMod['value']): number => levelValue(v, 20);
 const BASE_INC_DAMAGE = 2;
 const BASE_INC_SPEED = 1;
 

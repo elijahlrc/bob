@@ -7,8 +7,12 @@ import type { StatusId } from './statuses';
 import type { SkillType } from './skillTypes';
 import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
 
-/** A value authored at gem level 1 and level 20 (DESIGN.md §11.5). */
-export type LevelValue = number | readonly [number, number];
+/**
+ * A value authored at gem level 1 and level 20 (DESIGN.md §11.5), or a table with one entry for each gem level from the first
+ * (`table`), for numbers that follow a reference damage table the two ends cannot rebuild.
+ */
+export type LevelValue = number | readonly [number, number] | LevelTable;
+export type LevelTable = { readonly table: readonly number[] };
 
 export type GemMod = Omit<Mod, 'value'> & {
   value: LevelValue;
@@ -821,6 +825,28 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     baseMult: [100, 140],
     cost: [1, 9],
     mods: [
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            2, 2, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 45, 52, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 68, 79, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
       { stat: 'attackSpeed', kind: 'more', value: -20 },
       { stat: 'damage', kind: 'more', value: -40, condition: { id: 'dualWielding' } },
     ],
@@ -837,7 +863,30 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     behaviour: { kind: 'projectile', count: 3, countPer5: 1, spread: 30, range: 9 },
     baseMult: [90, 120],
     cost: [1, 9],
-    mods: [],
+    mods: [
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            1, 2, 2, 3, 4, 5, 7, 8, 10, 12, 15, 18, 21, 25, 29, 34, 39, 45, 51, 56, 60, 65, 70, 75,
+            80,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            2, 3, 3, 4, 6, 8, 10, 12, 15, 18, 22, 26, 31, 37, 43, 50, 59, 68, 76, 85, 91, 97, 104,
+            112, 120,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+    ],
     requiresWeapon: ['bow'],
     description: 'Looses a fan of arrows.',
   },
@@ -853,9 +902,29 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [1, 7],
     bothWeapons: true,
     mods: [
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            5, 5, 6, 8, 11, 16, 20, 25, 30, 37, 44, 53, 63, 74, 86, 101, 117, 136, 152, 169, 181,
+            195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            7, 8, 10, 12, 17, 24, 30, 37, 46, 55, 66, 79, 94, 111, 130, 151, 176, 204, 228, 254,
+            272, 292, 313, 335, 359,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
       { stat: 'convertSkill.physical.chaos', kind: 'base', value: 50 },
-      { stat: 'damage.min', kind: 'base', value: [5, 169], damageTypes: ['chaos'] },
-      { stat: 'damage.max', kind: 'base', value: [7, 254], damageTypes: ['chaos'] },
       { stat: 'chance.poison', kind: 'base', value: 60 },
       { stat: 'poison.baseDur', kind: 'base', value: 4 },
       { stat: 'damage', kind: 'more', value: -20, condition: { id: 'dualWielding' } },

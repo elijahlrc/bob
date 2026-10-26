@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { COLLAPSE_START, CRAWL_SEGMENTS, HOLDOUT_FIRST, HOLDOUT_WAVES } from '../data/mapTypes';
 import { DT } from '../data/constants';
+import { makeGem, makeItem } from '../gen/items';
 import { makeMapPlan } from '../gen/mapPlan';
 import { measurePath, pathProgress, tickCollapse } from '../sim/collapse';
 import { killActor } from '../sim/combat';
@@ -190,6 +191,12 @@ describe('Crawl (docs/MAPS.md 9.2)', () => {
     setMap(run, 22);
     run.build.level = 45;
     botCamp(run);
+    // A skill gem in a weapon of the area's level: the starter has neither (its sword is a level 1 base).
+    const uid = () => run.nextUid++;
+    const weapon = makeItem(uid, 'sword_l20', 22, 1);
+    weapon.sockets = [makeGem(uid, 'crushingBlow')];
+    run.build.equipment.mainHand = weapon;
+    run.build.primaryGem = weapon.sockets[0]!.uid;
     run.offers[0] = makeOffer(run.seed, 22, 0, 'ashenCrypt', 0, 'crawl');
     let starts = 0;
     c.bus.on('mapStart', ({ world }) => {

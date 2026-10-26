@@ -1,7 +1,7 @@
 import type { GemMod, SupportGemDef } from '../data/gems';
 import type { DamageType } from '../mods/types';
 import type { SkillType } from '../data/skillTypes';
-import type { SkillDef } from './gems';
+import { levelValue, type SkillDef } from './gems';
 
 /**
  * Whether a support can do anything to a skill, asked of the data (docs/SUPPORTS-PLAN.md 4.1).
@@ -331,7 +331,7 @@ const PRICE_FLAGS = new Set([
   'cannotInflictEle',
 ]);
 
-const levelEnd = (v: GemMod['value']): number => (typeof v === 'number' ? v : v[1]);
+const levelEnd = (v: GemMod['value']): number => levelValue(v, 20);
 
 /** A mod that takes something away (a negative more/inc/base, a flag that forbids): the price of a support, not an upside. */
 export function isPrice(m: GemMod): boolean {

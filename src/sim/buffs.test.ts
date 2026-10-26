@@ -8,7 +8,7 @@ import { mod, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
 import { gainBuff, gainRage, rollGains, tickBuffs } from './buffs';
 import { applyHit, flaskMask, playerConds, refreshPlayerDefence, targetState } from './combat';
-import { createDummyWorld } from './dummy';
+import { createDummyWorld, dummyDefence } from './dummy';
 
 function buildWith(extra: Mod[], gems = ['crushingBlow']): Build {
   const run = newRun('vanguard', 1);
@@ -204,9 +204,11 @@ describe('impale and culling strike', () => {
   it('the calc counts impale as up to +50% physical damage per hit at full chance', () => {
     const plain = arena();
     const imp = arena(impaler);
+    // Against no armour: armour takes more of the smaller impale hits than of the hit, which is another matter.
+    const bare = { def: dummyDefence(), shock: 0, resShift: [0, 0, 0, 0, 0] };
     const dmg = (a: ReturnType<typeof arena>) => {
       const ch = a.w.sides[0].char;
-      return ch.skillSheet(ch.primary, undefined, 0).avgHit;
+      return ch.skillSheet(ch.primary, bare, 0).avgHit;
     };
     expect(dmg(imp) / dmg(plain)).toBeGreaterThan(1.3);
     expect(dmg(imp) / dmg(plain)).toBeLessThan(1.6);

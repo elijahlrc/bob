@@ -100,6 +100,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: 60,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            14, 16, 18, 21, 24, 26, 28, 30, 33, 36, 39, 42, 45, 49, 52, 56, 61, 65, 70, 75, 81, 87,
+            93, 100, 107,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            20, 24, 27, 31, 35, 39, 42, 46, 49, 54, 58, 63, 68, 73, 79, 85, 91, 98, 105, 113, 122,
+            130, 140, 150, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
     ],
     description:
       'A flurry of strikes in a wide arc; each builds a stage, and letting go adds a strike for every stage built.',
@@ -414,6 +436,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: 20,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 10, 13, 17, 20, 25, 30, 35, 42, 49, 58, 67, 78, 91, 101, 113, 121, 130,
+            139, 149, 160,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            5, 5, 6, 8, 11, 16, 20, 25, 30, 37, 44, 53, 63, 74, 86, 101, 117, 136, 152, 169, 181,
+            195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
     ],
     requiresWeapon: ['dagger', 'claw'],
     description: 'A poisonous projectile that flies on from enemy to enemy.',
@@ -612,6 +656,34 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: -20,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 10, 13, 17, 20, 25, 30, 35, 42, 49, 58, 67, 78, 91, 101, 113, 121, 130,
+            139, 149, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+        condition: {
+          id: 'targetBleeding',
+        },
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            5, 5, 6, 8, 11, 16, 20, 25, 30, 37, 44, 53, 63, 74, 86, 101, 117, 136, 152, 169, 181,
+            195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['physical'],
+        condition: {
+          id: 'targetBleeding',
+        },
+      },
     ],
     description: 'Two fast strikes in the time of one.',
   },
@@ -737,13 +809,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [3, 40],
+        value: {
+          table: [
+            2, 2, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 45, 52, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [4, 60],
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 68, 79, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
         damageTypes: ['cold'],
       },
     ],
@@ -772,7 +854,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [22, 480],
+        value: {
+          table: [
+            22, 27, 36, 46, 59, 73, 91, 107, 125, 145, 168, 194, 223, 257, 294, 337, 369, 403, 440,
+            480, 523, 570, 621, 676, 735,
+          ],
+        },
         damageTypes: ['fire'],
         condition: {
           id: 'elemFire',
@@ -781,7 +868,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [40, 891],
+        value: {
+          table: [
+            40, 51, 66, 86, 109, 136, 169, 198, 231, 269, 311, 360, 414, 476, 547, 626, 684, 748,
+            816, 891, 971, 1059, 1153, 1255, 1366,
+          ],
+        },
         damageTypes: ['fire'],
         condition: {
           id: 'elemFire',
@@ -790,7 +882,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [18, 392],
+        value: {
+          table: [
+            18, 22, 29, 38, 48, 60, 75, 87, 102, 118, 137, 158, 183, 210, 241, 276, 302, 329, 360,
+            392, 428, 466, 508, 553, 602,
+          ],
+        },
         damageTypes: ['cold'],
         condition: {
           id: 'elemCold',
@@ -799,7 +896,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [33, 729],
+        value: {
+          table: [
+            33, 41, 54, 70, 89, 112, 139, 162, 189, 220, 255, 294, 339, 390, 447, 512, 560, 612,
+            668, 729, 795, 866, 943, 1027, 1117,
+          ],
+        },
         damageTypes: ['cold'],
         condition: {
           id: 'elemCold',
@@ -808,7 +910,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [4, 77],
+        value: {
+          table: [
+            4, 4, 6, 7, 9, 12, 15, 17, 20, 23, 27, 31, 36, 41, 47, 54, 59, 65, 71, 77, 84, 92, 100,
+            109, 118,
+          ],
+        },
         damageTypes: ['lightning'],
         condition: {
           id: 'elemLightning',
@@ -817,7 +924,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [67, 1465],
+        value: {
+          table: [
+            67, 83, 109, 141, 179, 224, 279, 326, 380, 442, 512, 591, 682, 783, 899, 1029, 1125,
+            1230, 1342, 1465, 1597, 1741, 1896, 2064, 2246,
+          ],
+        },
         damageTypes: ['lightning'],
         condition: {
           id: 'elemLightning',
@@ -940,13 +1052,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [47, 522],
+        value: {
+          table: [
+            47, 57, 69, 83, 100, 112, 126, 141, 158, 177, 198, 222, 247, 276, 307, 342, 381, 423,
+            470, 522, 579, 642, 711, 788, 872,
+          ],
+        },
         damageTypes: ['fire'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [71, 783],
+        value: {
+          table: [
+            71, 86, 104, 125, 149, 168, 189, 212, 238, 266, 298, 333, 371, 414, 461, 513, 571, 635,
+            705, 783, 868, 963, 1067, 1181, 1308,
+          ],
+        },
         damageTypes: ['fire'],
       },
     ],
@@ -1248,13 +1370,20 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 15],
+        value: {
+          table: [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6, 7, 8, 8, 9, 10, 11, 12, 12, 13],
+        },
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [8, 150],
+        value: {
+          table: [
+            5, 6, 7, 9, 12, 17, 21, 26, 32, 39, 47, 56, 66, 78, 92, 107, 125, 144, 161, 179, 192,
+            206, 221, 237, 254,
+          ],
+        },
         damageTypes: ['lightning'],
       },
     ],
@@ -1334,7 +1463,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 75],
+        value: {
+          table: [
+            2, 2, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 45, 52, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
         damageTypes: ['cold'],
         condition: {
           id: 'targetChilled',
@@ -1343,7 +1477,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 113],
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 68, 79, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
         damageTypes: ['cold'],
         condition: {
           id: 'targetChilled',
@@ -1398,6 +1537,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: -10,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            2, 2, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 45, 52, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 68, 79, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
     ],
     description:
       'Slams the ground and sends out a wave; enemies close in are hit harder and stun more easily.',
@@ -1433,6 +1594,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: -30,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            30, 35, 40, 46, 53, 58, 63, 68, 74, 80, 86, 93, 101, 109, 117, 126, 136, 146, 157, 169,
+            181, 195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['cold'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            46, 53, 61, 70, 79, 86, 94, 102, 111, 120, 130, 140, 151, 163, 176, 190, 204, 220, 236,
+            254, 272, 292, 313, 335, 359,
+          ],
+        },
+        damageTypes: ['cold'],
       },
     ],
     description: 'A heavy slam that sends frost out in three waves.',
@@ -1517,6 +1700,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'inc',
         value: [100, 195],
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            2, 2, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 45, 52, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
+        damageTypes: ['cold'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 68, 79, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
+        damageTypes: ['cold'],
+      },
     ],
     description: 'An arrow that chills its target to the bone.',
   },
@@ -1593,13 +1798,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [5, 75],
+        value: {
+          table: [
+            5, 7, 8, 11, 13, 16, 19, 22, 25, 28, 32, 36, 40, 45, 51, 56, 61, 65, 70, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
         damageTypes: ['fire'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [8, 113],
+        value: {
+          table: [
+            8, 10, 13, 16, 19, 24, 28, 32, 37, 42, 47, 54, 60, 68, 76, 85, 91, 98, 105, 113, 122,
+            130, 140, 150, 160,
+          ],
+        },
         damageTypes: ['fire'],
       },
     ],
@@ -1667,6 +1882,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: -40,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            5, 7, 8, 11, 13, 16, 19, 22, 25, 28, 32, 36, 40, 45, 51, 56, 61, 65, 70, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            8, 10, 13, 16, 19, 24, 28, 32, 37, 42, 47, 54, 60, 68, 76, 85, 91, 98, 105, 113, 122,
+            130, 140, 150, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
     ],
     description: 'Two sweeping slashes; bleeding in Blood Stance, a wider sweep in Sand Stance.',
   },
@@ -1697,6 +1934,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: -15,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            20, 23, 27, 31, 35, 38, 42, 45, 49, 53, 58, 62, 67, 73, 78, 84, 91, 98, 105, 113, 121,
+            130, 139, 149, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            30, 35, 40, 46, 53, 58, 63, 68, 74, 80, 86, 93, 101, 109, 117, 126, 136, 146, 157, 169,
+            181, 195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['physical'],
       },
     ],
     description: 'A thrust that hurls a main blade that impales, with shards flying beside it.',
@@ -1795,6 +2054,25 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'inc',
         value: [10, 29],
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9, 9, 10, 11, 12, 12, 13],
+        },
+        damageTypes: ['lightning'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            13, 16, 20, 25, 31, 37, 45, 51, 59, 66, 75, 85, 95, 107, 120, 134, 144, 155, 167, 179,
+            192, 206, 221, 237, 254,
+          ],
+        },
+        damageTypes: ['lightning'],
+      },
     ],
     description: 'An arrow of lightning that arcs from its target to enemies nearby.',
   },
@@ -1825,6 +2103,25 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'convertSkill.physical.lightning',
         kind: 'base',
         value: 50,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9, 9, 10, 11, 12, 12, 13],
+        },
+        damageTypes: ['lightning'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            13, 16, 20, 25, 31, 37, 45, 51, 59, 66, 75, 85, 95, 107, 120, 134, 144, 155, 167, 179,
+            192, 206, 221, 237, 254,
+          ],
+        },
+        damageTypes: ['lightning'],
       },
     ],
     description:
@@ -1895,6 +2192,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'convertSkill.physical.fire',
         kind: 'base',
         value: 60,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            2, 2, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 45, 52, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
+        damageTypes: ['fire'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 6, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 68, 79, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
+        damageTypes: ['fire'],
       },
     ],
     description:
@@ -2027,13 +2346,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [20, 113],
+        value: {
+          table: [
+            20, 23, 27, 31, 35, 38, 42, 45, 49, 53, 58, 62, 67, 73, 78, 84, 91, 98, 105, 113, 121,
+            130, 139, 149, 160,
+          ],
+        },
         damageTypes: ['chaos'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [30, 169],
+        value: {
+          table: [
+            30, 35, 40, 46, 53, 58, 63, 68, 74, 80, 86, 93, 101, 109, 117, 126, 136, 146, 157, 169,
+            181, 195, 209, 224, 239,
+          ],
+        },
         damageTypes: ['chaos'],
       },
       {
@@ -2133,6 +2462,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: -30,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            3, 3, 4, 5, 7, 9, 11, 14, 16, 20, 24, 28, 33, 39, 43, 49, 54, 61, 68, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            4, 5, 7, 8, 11, 13, 17, 20, 25, 30, 35, 42, 49, 58, 65, 73, 82, 91, 102, 113, 122, 130,
+            140, 150, 160,
+          ],
+        },
+        damageTypes: ['physical'],
       },
     ],
     description: 'A stab or a shot that always makes the target bleed for a long while.',
@@ -2260,6 +2611,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: -15,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            8, 10, 13, 16, 19, 23, 28, 32, 37, 42, 47, 53, 60, 67, 75, 84, 91, 98, 105, 113, 121,
+            130, 139, 149, 160,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            12, 15, 19, 24, 29, 35, 42, 48, 55, 63, 71, 80, 90, 101, 113, 126, 136, 146, 157, 169,
+            181, 195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['physical'],
       },
     ],
     description:
@@ -2825,6 +3198,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: 90,
       },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            20, 23, 27, 31, 35, 38, 42, 45, 49, 53, 58, 62, 67, 73, 78, 84, 91, 98, 105, 113, 121,
+            130, 139, 149, 160,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            30, 35, 40, 46, 53, 58, 63, 68, 74, 80, 86, 93, 101, 109, 117, 126, 136, 146, 157, 169,
+            181, 195, 209, 224, 239,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
     ],
     description:
       'Hold the shot to build it up; letting go looses one piercing arrow, much stronger for every stage built.',
@@ -2907,13 +3302,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [18, 182],
+        value: {
+          table: [
+            18, 21, 27, 33, 39, 47, 55, 62, 69, 77, 86, 96, 106, 117, 129, 142, 151, 161, 171, 182,
+            193, 205, 217, 230, 244,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [27, 272],
+        value: {
+          table: [
+            27, 32, 40, 49, 59, 70, 82, 93, 104, 116, 129, 143, 159, 175, 193, 213, 227, 241, 256,
+            272, 289, 307, 326, 345, 366,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
@@ -3174,6 +3579,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: 20,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            10, 12, 16, 20, 24, 29, 35, 40, 46, 52, 59, 67, 75, 84, 94, 105, 113, 122, 131, 141,
+            151, 162, 174, 186, 200,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            15, 18, 24, 29, 36, 44, 53, 61, 69, 78, 89, 100, 112, 126, 141, 158, 170, 183, 197, 211,
+            227, 243, 261, 279, 299,
+          ],
+        },
+        damageTypes: ['chaos'],
       },
     ],
     description: 'A spinning blade that poisons, comes back, and is caught.',
@@ -4488,13 +4915,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [15, 172],
+        value: {
+          table: [
+            15, 18, 23, 28, 34, 40, 48, 54, 61, 68, 76, 84, 94, 103, 114, 126, 138, 152, 162, 172,
+            182, 193, 205, 218, 230,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [22, 258],
+        value: {
+          table: [
+            22, 27, 34, 42, 51, 61, 72, 81, 91, 102, 114, 127, 140, 155, 171, 189, 208, 228, 242,
+            258, 273, 290, 308, 326, 346,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
@@ -4597,6 +5034,28 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: 200,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            5, 6, 7, 8, 9, 10, 10, 11, 12, 13, 14, 16, 17, 18, 20, 21, 23, 24, 26, 28, 30, 32, 35,
+            37, 40,
+          ],
+        },
+        damageTypes: ['physical'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 22, 23, 25, 27, 29, 32, 34, 37, 39, 42, 45, 49,
+            52, 56, 60,
+          ],
+        },
+        damageTypes: ['physical'],
       },
     ],
     description:
@@ -4803,6 +5262,25 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         stat: 'attackSpeed',
         kind: 'more',
         value: -15,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 8, 9, 10, 12, 13, 14, 15, 16, 17],
+        },
+        damageTypes: ['lightning'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            4, 5, 6, 8, 11, 16, 21, 26, 33, 40, 49, 60, 72, 87, 104, 123, 146, 173, 195, 220, 239,
+            258, 280, 302, 327,
+          ],
+        },
+        damageTypes: ['lightning'],
       },
     ],
     description:
@@ -5095,13 +5573,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [3, 40],
+        value: {
+          table: [
+            2, 3, 3, 4, 5, 7, 8, 10, 12, 15, 18, 21, 25, 29, 32, 36, 41, 45, 51, 56, 60, 65, 70, 75,
+            80,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 60],
+        value: {
+          table: [
+            3, 4, 5, 6, 8, 10, 12, 15, 18, 22, 26, 31, 37, 43, 49, 54, 61, 68, 76, 85, 91, 97, 104,
+            112, 120,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
