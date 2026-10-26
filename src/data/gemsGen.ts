@@ -277,7 +277,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [3.1, 257.4],
+      dps: [5.2, 206.8],
       seconds: 2.5,
       stack: 'layers',
       cap: 20,
@@ -356,7 +356,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [4, 9],
     dot: {
       type: 'chaos',
-      dps: [6.9, 401.4],
+      dps: [14.6, 1549.6],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -481,7 +481,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [10.6, 401.4],
+      dps: [6.1, 189.7],
       seconds: 5,
       stack: 'refresh',
       hitless: true,
@@ -667,17 +667,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Quickening Shot',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'projectile', 'bow'],
+    tags: ['attack', 'projectile', 'melee', 'strike', 'bow'],
     types: ['totemable', 'trappable', 'mineable', 'volleyable', 'repeatable', 'triggerable'],
     behaviour: {
       kind: 'projectile',
       count: 1,
       spread: 0,
       range: 9,
+      meleeUnless: ['bow', 'wand'],
+      meleeRange: 1.5,
     },
     baseMult: [115, 135],
     cost: [10, 10],
-    requiresWeapon: ['bow', 'wand'],
     mods: [
       {
         stat: 'chargeOn.hit.fervour',
@@ -704,7 +705,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description:
-      'A quick shot that grants a Fervour charge on hit, and gets stronger and faster with each charge you hold.',
+      'A quick shot or strike that grants a Fervour charge on hit, and gets stronger and faster with each charge you hold.',
   },
   {
     kind: 'active',
@@ -755,11 +756,15 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Primal Strike',
     attr: 'dex',
     skillType: 'attack',
-    tags: ['attack', 'melee', 'strike', 'area', 'fire', 'cold', 'lightning'],
-    types: ['repeatable', 'totemable', 'trappable', 'mineable'],
+    tags: ['attack', 'projectile', 'melee', 'strike', 'area', 'fire', 'cold', 'lightning', 'bow'],
+    types: ['repeatable', 'totemable', 'trappable', 'mineable', 'volleyable'],
     behaviour: {
-      kind: 'melee',
-      range: 1.6,
+      kind: 'projectile',
+      count: 1,
+      spread: 0,
+      range: 9,
+      meleeUnless: ['bow', 'wand'],
+      meleeRange: 1.6,
     },
     baseMult: [100, 100],
     cost: [7, 11],
@@ -869,7 +874,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description:
-      'A strike of fire, cold or lightning, one chosen at random each time, with a burst about its target.',
+      'A strike or a shot of fire, cold or lightning, one chosen at random each time, with a burst about its target.',
     element: {
       noRepeat: true,
     },
@@ -1156,7 +1161,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [33.7, 802.9],
+      dps: [39.1, 1208.8],
       seconds: 3.8,
       stack: 'refresh',
       scales: ['spell'],
@@ -2196,7 +2201,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [16.9, 401.4],
+      dps: [14.6, 353.3],
       seconds: 1.5,
       stack: 'stages',
       cap: 8,
@@ -2869,7 +2874,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [95, 1003],
+      dps: [114.2, 1562.6],
       seconds: 0.6,
       stack: 'refresh',
       carried: 1,
@@ -3117,7 +3122,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [20.2, 480.9],
+      dps: [9.9, 228.9],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -3237,8 +3242,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'inc',
         value: 20,
       },
+      {
+        stat: 'cooldownRecovery',
+        kind: 'inc',
+        value: [0, 76],
+      },
     ],
-    description: 'A whirl of frost that sits where you place it and chills everything in it.',
+    description:
+      'A whirl of frost that forms around you (or your Glacier Darts), lingers and chills everything in it.',
     leaves: {
       kind: 'chilling',
       seconds: 3,
@@ -3584,7 +3595,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [30.8, 401.4],
+      dps: [40.1, 720.1],
       seconds: 2,
       stack: 'refresh',
       hitless: true,
@@ -3706,18 +3717,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     types: ['triggerable'],
     behaviour: {
       kind: 'burst',
-      radius: 3,
+      radius: 4,
       origin: 'self',
     },
     castTime: 0.25,
     cost: [7, 16],
-    mods: [
-      {
-        stat: 'chargeOn.cast.grit',
-        kind: 'base',
-        value: 100,
-      },
-    ],
+    mods: [],
     utility: {
       kind: 'buff',
       buff: 'enduringCry',
@@ -3731,8 +3736,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
           value: [8, 60],
         },
       ],
+      charges: {
+        kind: 'grit',
+        perHundred: [8, 36],
+        min: 1,
+      },
     },
-    description: 'A bellow that steadies you: life regeneration, and a Grit charge.',
+    description:
+      'A bellow that steadies you: life regeneration, and Grit charges for the enemies around you.',
   },
   {
     kind: 'active',
@@ -4167,7 +4178,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [18.9, 1262.7],
+      dps: [19.7, 1014.6],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -4901,7 +4912,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [16.9, 401.4],
+      dps: [29.6, 1411.7],
       seconds: 0.5,
       stack: 'refresh',
       hitless: true,
@@ -5239,7 +5250,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     description: 'A trap that bursts into flame and leaves the ground burning.',
     dot: {
       type: 'fire',
-      dps: [55.4, 1316],
+      dps: [40.7, 1473.8],
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -5329,6 +5340,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       interval: 0.35,
       line: 4,
       reach: 8,
+      castSpeedPulse: true,
     },
     spellDamage: [
       {
@@ -5366,8 +5378,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'ground',
       radius: 2.6,
       duration: 3.5,
-      interval: 0.45,
+      interval: [0.55, 0.36],
       reach: 8,
+      castSpeedPulse: true,
     },
     spellDamage: [
       {
@@ -5455,6 +5468,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       interval: 0.9,
       line: 6,
       reach: 8,
+      castSpeedPulse: true,
     },
     spellDamage: [
       {
@@ -5501,7 +5515,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cooldown: 4,
     dot: {
       type: 'cold',
-      dps: [15.4, 401.4],
+      dps: [21.3, 342.8],
       seconds: 3,
       stack: 'refresh',
       hitless: true,
@@ -5704,7 +5718,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage',
         kind: 'more',
-        value: [40, 80],
+        value: [120, 180],
         tags: ['ignite'],
       },
     ],
@@ -5899,10 +5913,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     utility: {
       kind: 'summon',
       minion: 'spirit',
-      count: [3, 8],
+      count: 20,
       seconds: 5,
+      perCast: 1,
     },
-    description: 'Calls up burning spirits that fly at your enemies.',
+    description:
+      'Calls up a burning spirit with each cast, up to twenty, that flies at your enemies.',
   },
   {
     kind: 'active',
@@ -7222,6 +7238,11 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'more',
         value: [5, 15],
         damageTypes: ['physical'],
+      },
+      {
+        stat: 'impaleEffect',
+        kind: 'inc',
+        value: [20, 49],
       },
     ],
     description: 'Attacks impale, and deal more physical damage.',
@@ -9037,11 +9058,17 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage',
         kind: 'more',
-        value: [15, 19],
+        value: [16, 25],
         damageTypes: ['physical'],
       },
+      {
+        stat: 'armourIgnore',
+        kind: 'base',
+        value: [10, 20],
+      },
     ],
-    description: 'Your physical damage is greater.',
+    description:
+      'Your physical damage is greater, and your hits ignore some of the armour of enemies.',
   },
   {
     kind: 'aura',

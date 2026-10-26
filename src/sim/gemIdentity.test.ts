@@ -8,6 +8,7 @@ import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
 import { playerConds } from './combat';
 import { createDummyWorld } from './dummy';
+import { mod } from '../mods/types';
 import { statusTaken } from './statuses';
 import type { World } from './types';
 import { stepWorld } from './world';
@@ -184,5 +185,86 @@ describe('Glacier Dart and Chilling Shard', () => {
       p.skill.behaviour.kind === 'projectile' ? p.skill.behaviour.shape : undefined;
     expect(shape(dart)).toBe('crystal');
     expect(shape(shard)).toBe('sliver');
+  });
+});
+
+describe('Steadfast Bellow', () => {
+  const grit = (crowd: number) => {
+    const b = holding('mace_3', ['crushingBlow', 'steadfastBellow'], 70);
+    // Attributes enough for the gem's twentieth level.
+    const body = makeItem(() => 9000, 'body_ar_1', 70, 0, 'unique');
+    body.uniqueMods = [mod('allAttr', 'base', 300)];
+    b.equipment.body = body;
+    const { world, dummy } = createDummyWorld(b, {
+      distance: 1.2,
+      rarity: 'boss',
+      bystanders: crowd,
+    });
+    const s = world.sides[0];
+    s.opts.freeResources = true;
+    s.opts.godMode = true;
+    // The crowd close about the character, inside the cry.
+    let i = 0;
+    for (const e of world.actors)
+      if (e !== dummy && e !== s.player && !e.isPlayer) {
+        e.x = s.player.x + 1 + (i % 4) * 0.4;
+        e.y = s.player.y - 1.5 + Math.floor(i / 4) * 0.8;
+        i++;
+      }
+    let got = -1;
+    steps(world, 4, (w) => {
+      if (got < 0 && w.events.some((e) => e.t === 'buff' && e.id === 'enduringCry'))
+        got = s.char.charges.grit;
+    });
+    return got;
+  };
+
+  it('gives at least one Grit charge, and more for a crowd', () => {
+    expect(grit(0)).toBeGreaterThanOrEqual(1);
+    expect(grit(12)).toBeGreaterThan(grit(0));
+  });
+});
+
+describe('Call Furies', () => {
+  it('adds one spirit a cast, each with its own time, and keeps a swarm when cast again and again', () => {
+    const { world } = createDummyWorld(holding('wand_1', ['callFuries'], 70), { distance: 3 });
+    world.sides[0].opts.freeResources = true;
+    let most = 0;
+    let jump = 0;
+    let before = 0;
+    steps(world, 8, (w) => {
+      const n = w.sides[0].minions.filter((m) => m.alive && m.kind === 'spirit').length;
+      jump = Math.max(jump, n - before);
+      before = n;
+      most = Math.max(most, n);
+    });
+    expect(jump).toBe(1);
+    expect(most).toBeGreaterThan(4);
+    expect(most).toBeLessThanOrEqual(20);
+  });
+});
+
+describe('Primal Strike and Quickening Shot', () => {
+  const shoots = (main: string, gem: string) => {
+    const c = new Character(holding(main, [gem]));
+    return c.primary.skill.behaviour.kind;
+  };
+
+  it('shoot with a bow or a wand and strike with anything else', () => {
+    for (const gem of ['primalStrike', 'quickeningShot']) {
+      expect(shoots('bow_1', gem)).toBe('projectile');
+      expect(shoots('wand_1', gem)).toBe('projectile');
+      expect(shoots('sword_3', gem)).toBe('melee');
+    }
+  });
+
+  it('a shot of Primal Strike bursts about what it hits, as the strike does', () => {
+    const { world } = createDummyWorld(holding('bow_1', ['primalStrike']), { distance: 4 });
+    world.sides[0].opts.freeResources = true;
+    let bursts = 0;
+    steps(world, 4, (w) => {
+      for (const e of w.events) if (e.t === 'explode' && e.skill === 'primalStrike') bursts++;
+    });
+    expect(bursts).toBeGreaterThan(0);
   });
 });

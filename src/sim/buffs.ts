@@ -16,6 +16,7 @@ import type { Mod } from '../mods/types';
 import { sumOf } from './charges';
 import { lifeCap } from './combat';
 import { noteRecover } from './recovery';
+import { startShell } from './skillFx';
 import type { World } from './types';
 import type { Side } from './side';
 
@@ -50,7 +51,16 @@ export function rollGains(w: World, s: Side, event: BuffEvent, extra: readonly M
   for (const id of BUFF_IDS) {
     if (!ch.buffSource[id]) continue;
     const chance = ch.db.sum('base', buffStat(event, id)) + sumOf(extra, buffStat(event, id));
-    if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) gainBuff(w, s, id);
+    if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) {
+      gainBuff(w, s, id);
+      // A guard's buff gained this way (Stoneward Gauntlets' Steel Hide) brings its shell, if the guard is socketed.
+      const guard = ch.utilities.find(
+        (c) => c.skill.utility?.kind === 'buff' && c.skill.utility.buff === id,
+      );
+      const u = guard?.skill.utility;
+      if (guard && u?.kind === 'buff' && u.shell)
+        startShell(s, id, u.shell, guard.skill.level, ch.profile(guard));
+    }
   }
   if (ch.rageSource) {
     // Rage from melee hits comes once in 0.4 s, however many enemies the swing hit.

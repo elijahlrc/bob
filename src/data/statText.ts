@@ -387,6 +387,7 @@ Object.assign(STAT_TEXT, {
   'bleed.speed': { name: 'speed at which Bleeding deals its damage' },
   'poison.speed': { name: 'speed at which Poison deals its damage' },
   enemyPhysReduction: { base: 'Your Hits take {v}% off the Physical Damage Reduction of Enemies' },
+  armourIgnore: { base: 'Your Hits ignore {v}% of Enemy Armour' },
   doubleDamage: { base: '{v}% chance to deal Double Damage' },
   shieldDefences: { name: 'Defences from your Shield' },
   shieldEs: { name: 'Energy Shield from your Shield' },

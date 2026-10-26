@@ -106,6 +106,8 @@ export type SkillProfile = {
   repeats: number;
   /** Times one use hits a target that stays put: more than one for a zone that pulses (rain, a cloud). */
   pulses: number;
+  /** Seconds between the pulses of a ground skill, at its level and (for a tower trap) its cast speed. */
+  zoneInterval: number;
   /** What the character's minion modifiers do to minions this skill summons: damage and speed multipliers, extra minions. */
   minionDamage: number;
   /** Multiplier on how long a deployable, a timed minion or a zone lasts. */
@@ -579,6 +581,12 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
   const beh = skill.behaviour;
   // A crystal bursts once, and a wall hurts what stands under it only as it goes up: one hit, whatever the ground behaviour says.
   const singleHit = !!(skill.crystal || skill.wall);
+  // A ground skill pulses at its level's interval; cast speed quickens a tower trap's.
+  const zoneInterval =
+    beh.kind === 'ground'
+      ? levelValue(beh.interval, skill.level) /
+        (beh.castSpeedPulse ? Math.max(0.01, db.mult('castSpeed', baseCtx)) : 1)
+      : 1;
   const aoeMult = db.mult('aoe', baseCtx);
   const ailEffect = db.inc('ailmentEffect', baseCtx);
   const cannotInflictEle = db.flag('cannotInflictEle', baseCtx);
@@ -601,8 +609,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     pulses: singleHit
       ? 1
       : beh.kind === 'ground'
-        ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / beh.interval))
+        ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / zoneInterval))
         : (skill.spin?.hits ?? 1),
+    zoneInterval,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
     deployScatter: db.flag('deployScatter', baseCtx),
     deploySeconds: db.sum('base', 'deploySeconds', baseCtx),

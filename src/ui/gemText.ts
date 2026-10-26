@@ -180,6 +180,10 @@ function utilityLines(def: ActiveGemDef, level: number): { stats: string[]; effe
       lines.push(
         `Raises a corpse near you as that monster, at level ${num(levelValue(u.corpse.level, level))}, with the attack it had; ${level >= 13 ? 2 : 1} at a time`,
       );
+    else if (u.perCast !== undefined)
+      lines.push(
+        `Each cast summons ${u.perCast} ${m.name}${u.seconds ? ` for ${num(u.seconds)} s` : ''}, up to ${n}`,
+      );
     else
       lines.push(
         `Summons ${n} ${m.name}${n === 1 ? '' : 's'}${u.seconds ? ` for ${num(u.seconds)} s` : ''}`,
@@ -271,7 +275,7 @@ function behaviourLines(b: SkillBehaviour, level: number): string[] {
         b.line
           ? `Leaves a strip ${num(b.line)} long for ${num(b.duration)} s`
           : `Leaves a zone of radius ${num(b.radius)} for ${num(b.duration)} s`,
-        `Hits every ${num(b.interval)} s${b.delay ? ` after ${num(b.delay)} s` : ''}`,
+        `Hits every ${num(levelValue(b.interval, level))} s${b.castSpeedPulse ? ', faster with cast speed' : ''}${b.delay ? ` after ${num(b.delay)} s` : ''}`,
         ...(b.count === undefined
           ? []
           : [

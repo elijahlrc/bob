@@ -417,7 +417,7 @@ describe('triggers: item-granted utility skills (buffs, curses, summons, blinks)
   });
 
   it('a granted summon raises its minions, and a repeat renews them instead of adding more', () => {
-    const b = buildFor([granted('callFuries', 10)], []);
+    const b = buildFor([granted('callBonewalkers', 10)], []);
     const { world, seen } = watch(b, () => false, 8);
     const mine = world.sides[0].minions.filter((m) => m.alive);
     expect(mine.length).toBeGreaterThan(0);

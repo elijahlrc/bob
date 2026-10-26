@@ -38,7 +38,9 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
   const out: string[] = [];
   const b = def.behaviour;
   if (b.kind === 'projectile' && b.meleeUnless)
-    out.push(`A shot with a ${b.meleeUnless}, a stab with any other weapon`);
+    out.push(
+      `A shot with a ${[b.meleeUnless].flat().join(' or ')}, a strike with any other weapon`,
+    );
   if (def.cooldown !== undefined && !def.utility)
     out.push(
       `${num(lv(def.cooldown, level))} s cooldown${def.cooldownUses && def.cooldownUses > 1 ? `, ${def.cooldownUses} uses stored` : ''}${
@@ -311,6 +313,10 @@ export function utilityFxLines(u: UtilityDef, level: number): string[] {
         : `; when the buff ends or the pool is spent, ${num(lv(sh.reflect, level))}% of what it took goes out as fire around you`;
     out.push(`${sh.absorb}% of the damage from hits goes into ${pool}${back}`);
   }
+  if (u.kind === 'buff' && u.charges)
+    out.push(
+      `Gives a ${CHARGE[u.charges.kind]} charge for every ${num(Math.round(100 / Math.max(1, lv(u.charges.perHundred, level))))} enemies near you (at least ${u.charges.min})`,
+    );
   if (u.kind === 'buff' && u.consume)
     out.push(
       `Spends up to ${u.consume.max} ${CHARGE[u.consume.charge]} charges: each adds ${num(u.consume.durationPct)}% to how long it lasts and takes ${num(u.consume.physLess)}% off the physical damage you take`,

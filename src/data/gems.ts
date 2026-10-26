@@ -77,7 +77,7 @@ export type SkillBehaviour =
       /** Chains the projectile makes on its own, as with the chains support (Storm Arrow). */
       chains?: number;
       /** With a weapon that does not have this tag the skill is a melee strike of this reach instead (Gouge Shot). */
-      meleeUnless?: SkillTag;
+      meleeUnless?: SkillTag | SkillTag[];
       meleeRange?: number;
     }
   | {
@@ -120,7 +120,10 @@ export type SkillBehaviour =
       kind: 'ground';
       radius: number;
       duration: number;
-      interval: number;
+      /** Seconds between pulses, by gem level. */
+      interval: LevelValue;
+      /** Cast speed quickens the pulses (the tower traps). */
+      castSpeedPulse?: boolean;
       delay?: number;
       reach?: number;
       line?: number;
@@ -200,6 +203,11 @@ export type UtilityDef =
       second?: { buff: BuffId; mods: GemMod[]; keep: number };
       /** Needs this much rage to start, spends rage while it lasts (more each second) and ends when it is gone (Rampage Call). */
       rage?: { min: number; drain: number; accel: number };
+      /**
+       * Charges given on cast for the enemies within the skill's radius: `perHundred` charges for every hundred of them (so many
+       * for each enemy, rounded), at least `min` (Steadfast Bellow).
+       */
+      charges?: { kind: 'grit' | 'fervour' | 'insight'; perHundred: LevelValue; min: number };
       /** The percent of maximum life and energy shield lost a second while it lasts (Surge of Blood), and a kill renews it. */
       degen?: number;
       refreshOnKill?: boolean;
@@ -257,6 +265,11 @@ export type UtilityDef =
       count: LevelValue;
       seconds?: number;
       ownerMods?: GemMod[];
+      /**
+       * Minions each cast adds, each with its own time, up to `count` (Call Furies: one a cast, cast again and again like a main
+       * skill). Without it a cast brings the whole `count` at once and renews them.
+       */
+      perCast?: number;
       /** One summon of the group stands at a time (a single golem): another of the group waits while one stands. */
       group?: 'golem';
       /** The condition that holds while its minions stand; `ownerMods` hold only under it. */
@@ -864,8 +877,11 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     castTime: 0.75,
     crit: 6,
     cost: [3, 22],
-    mods: [{ stat: 'chance.ignite', kind: 'base', value: 25 }],
-    description: 'Hurls a bolt of flame that bursts on impact.',
+    mods: [
+      { stat: 'chance.ignite', kind: 'base', value: [20, 39] },
+      { stat: 'damage', kind: 'more', value: [50, 88], tags: ['ignite'] },
+    ],
+    description: 'Hurls a bolt of flame that bursts on impact and sets its victims burning.',
   },
   {
     kind: 'active',

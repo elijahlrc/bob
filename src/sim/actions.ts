@@ -42,7 +42,7 @@ import {
 } from './skillFx';
 import { applyUtility } from './utility';
 import { castPattern } from './blasts';
-import type { Action, Actor, World } from './types';
+import type { Action, Actor, Projectile, World } from './types';
 import { foeMinions, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
 
@@ -398,6 +398,23 @@ export function tickSkillZones(w: World, s: Side, dt: number): void {
     if (z.pulsesLeft > 0) s.zones[j++] = z;
   }
   s.zones.length = j;
+}
+
+/** The use a projectile in flight stands for, for what follows its hit (the element is the one the side last picked). */
+function shotAction(pr: Projectile, owner: Actor): Action {
+  return {
+    profile: pr.profile,
+    which: 'primary',
+    hand: pr.hand,
+    duration: 0,
+    elapsed: 0,
+    fired: true,
+    echoes: 0,
+    targetId: pr.lastHitId ?? -1,
+    aimX: pr.x,
+    aimY: pr.y,
+    elem: owner.side?.elem,
+  };
 }
 
 /** Resolve an action's effect: strikes, chains or projectiles. Triggers call it with no wind-up. */
@@ -770,10 +787,10 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       y2: line ? a.y + Math.sin(ang) * (b.line as number) * p.radiusMult : undefined,
       radius,
       delayT: b.delay ?? 0,
-      interval: b.interval,
+      interval: p.zoneInterval,
       pulseT: 0,
       // Duration over interval, rounded down, as the calc counts it: a support that lengthens the zone adds pulses.
-      pulsesLeft: Math.max(1, Math.floor((b.duration * p.skillDuration) / b.interval)),
+      pulsesLeft: Math.max(1, Math.floor((b.duration * p.skillDuration) / p.zoneInterval)),
       dtype: dominantType(p, act.hand),
       spots: rain?.spots,
       stack: rain?.stack,
@@ -958,8 +975,20 @@ export function updateProjectiles(w: World, dt: number): void {
           alive = false;
           break;
         }
-        if (owner)
+        if (owner) {
+          if (owner.side) owner.side.lastOutcome = null;
           hit(w, owner, e, pr.profile, pr.hand, Math.hypot(e.x - pr.startX, e.y - pr.startY));
+          // A strike shot from a bow (Primal Strike) bursts about what it hit, as the strike does. (Only a skill that is itself a
+          // shot, and only a burst: the blades and bolts a strike sends out are projectiles too, and must not send out more.)
+          const ah = pr.profile.skill.afterHit;
+          if (
+            ah &&
+            (ah.kind === 'area' || ah.kind === 'element') &&
+            pr.profile.skill.behaviour.kind === 'projectile' &&
+            owner.side?.lastOutcome === 'hit'
+          )
+            afterStrike(w, owner, shotAction(pr, owner), e);
+        }
         if (pr.pierceLeft > 0) pr.pierceLeft--;
         else if (afterProjectileHit(w, pr, owner)) break;
         else {

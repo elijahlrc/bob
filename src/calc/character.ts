@@ -838,7 +838,7 @@ export class Character {
       if (
         skill.behaviour.kind === 'projectile' &&
         skill.behaviour.meleeUnless &&
-        !weaponTags.has(skill.behaviour.meleeUnless)
+        ![skill.behaviour.meleeUnless].flat().some((t) => weaponTags.has(t))
       )
         skill = {
           ...skill,
@@ -2190,14 +2190,27 @@ export class Character {
     const distance = this.config.targetDistance ?? 3;
     const mainUse = this.profile(this.mainFor(scenario), conds).useTime;
     const rows = [];
+    const groups = new Set<string>();
     for (const c of this.utilities) {
       const u = c.skill.utility;
       if (u?.kind !== 'summon') continue;
+      // One of a group stands at a time (the colossi): the first, the one the character keeps up.
+      if (u.group) {
+        if (groups.has(u.group)) continue;
+        groups.add(u.group);
+      }
       const p = this.profile(c, conds);
-      const count = summonCountOf(u, c.skill.level, p.minionCount);
+      const cap = summonCountOf(u, c.skill.level, p.minionCount);
+      // One that adds a minion a cast is cast again and again: as many stand as the casts in one of their lifetimes, up to the cap.
+      const count =
+        u.perCast !== undefined && u.seconds !== undefined
+          ? Math.min(cap, (u.perCast * u.seconds * p.skillDuration) / p.useTime)
+          : cap;
       // Minions that last a while are gone between the end of one lot and the landing of the next.
       const duty =
-        u.seconds === undefined ? 1 : timedDuty(u.seconds * p.skillDuration, p.useTime, mainUse);
+        u.seconds === undefined || u.perCast !== undefined
+          ? 1
+          : timedDuty(u.seconds * p.skillDuration, p.useTime, mainUse);
       const fallen = falls
         ? minionUptime(u.minion, this.config.areaLevel, p.minionLife, p.minionTaken)
         : 1;

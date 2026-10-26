@@ -9,7 +9,7 @@ import { skillReady } from './cooldowns';
 import { levelValue } from '../calc/gems';
 import { gainBuff } from './buffs';
 import { applyStatus } from './statuses';
-import { spendCharges } from './charges';
+import { gainCharge, spendCharges } from './charges';
 import { flaskMask, playerConds, playerCtx, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
@@ -411,6 +411,15 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     gainBuff(w, a.side!, u.buff);
     if (u.second) gainBuff(w, a.side!, u.second.buff);
     if (u.shell) startShell(a.side!, u.buff, u.shell, c.skill.level, act.profile);
+    // A cry that gives charges for the crowd about the character (Steadfast Bellow).
+    if (u.charges) {
+      const b = c.skill.behaviour;
+      const r = (b.kind === 'burst' ? b.radius : PACK_RADIUS) * act.profile.radiusMult;
+      const n = enemiesNear(w, a.team, a.x, a.y, r).length;
+      const per = levelValue(u.charges.perHundred, c.skill.level) / 100;
+      const give = Math.max(u.charges.min, Math.round(n * per));
+      for (let i = 0; i < give; i++) gainCharge(w, a.side!, u.charges.kind);
+    }
     // The charges a guard spends make it last longer and take more of the physical damage away.
     let spent = 0;
     if (u.consume) {

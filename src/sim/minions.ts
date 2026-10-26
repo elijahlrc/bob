@@ -96,7 +96,9 @@ export function summonCount(c: SkillChoice, prof: SkillProfile): number {
 /** Seconds a summon skill waits after a cast before it can be cast again. */
 export function summonRespawn(c: SkillChoice): number {
   const u = c.skill.utility;
-  return u?.kind === 'summon' ? MINIONS[u.minion].respawn : 1;
+  if (u?.kind !== 'summon') return 1;
+  // One that adds a minion a cast is cast again as soon as it can be.
+  return u.perCast === undefined ? MINIONS[u.minion].respawn : 0;
 }
 
 type Make = {
@@ -166,10 +168,13 @@ export function makeMinion(
 export function summonMinions(w: World, s: Side, c: SkillChoice, prof: SkillProfile): void {
   const u = c.skill.utility;
   if (u?.kind !== 'summon') return;
-  const n = summonCount(c, prof);
+  const cap = summonCount(c, prof);
   const have = minionCount(s, c.key);
   const seconds = u.seconds === undefined ? Infinity : u.seconds * prof.skillDuration;
-  for (const m of s.minions) if (m.key === c.key && m.alive) m.t = seconds;
+  // A skill that adds a few each cast (Call Furies) leaves the ones standing their own time; the others renew theirs.
+  const n = u.perCast === undefined ? cap : Math.min(cap, have + u.perCast);
+  if (u.perCast === undefined)
+    for (const m of s.minions) if (m.key === c.key && m.alive) m.t = seconds;
   const p = s.player;
   // The ring starts east on a map, as it always has. Where there are several sides it starts where the character faces (toward
   // the other one), so that two mirror characters get mirror minions: with a fixed east the one standing east had its first minion
