@@ -169,3 +169,20 @@ describe('Chilling Shard', () => {
     expect(fadeShare(lance.profile(lance.primary), 8)).toBe(1);
   });
 });
+
+describe('Glacier Dart and Chilling Shard', () => {
+  it('fly at very different speeds, and are drawn as different shapes', () => {
+    const dart = new Character(holding('wand_1', ['glacierDart'])).profile(
+      new Character(holding('wand_1', ['glacierDart'])).primary,
+    );
+    const shard = new Character(holding('wand_1', ['chillingShard'])).profile(
+      new Character(holding('wand_1', ['chillingShard'])).primary,
+    );
+    expect(dart.projSpeedMult).toBeLessThan(0.45);
+    expect(shard.projSpeedMult).toBeGreaterThanOrEqual(1);
+    const shape = (p: typeof dart) =>
+      p.skill.behaviour.kind === 'projectile' ? p.skill.behaviour.shape : undefined;
+    expect(shape(dart)).toBe('crystal');
+    expect(shape(shard)).toBe('sliver');
+  });
+});

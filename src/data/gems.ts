@@ -70,6 +70,8 @@ export type SkillBehaviour =
       explodeRadius?: number;
       range?: number;
       falloff?: number;
+      /** How the flight is drawn when it is not the usual orb or arrow: a heavy crystal, or a thin sliver that fades as its damage falls. */
+      shape?: 'crystal' | 'sliver';
       /** The projectile turns around at the end of its range and flies back, hitting again on the way. */
       returns?: boolean;
       /** Chains the projectile makes on its own, as with the chains support (Storm Arrow). */

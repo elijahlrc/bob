@@ -1078,6 +1078,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       spread: 0,
       range: 5,
       falloff: 0.4,
+      shape: 'sliver',
     },
     spellDamage: [
       {
@@ -1190,6 +1191,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       spread: 0,
       range: 9,
       pierce: 99,
+      shape: 'crystal',
     },
     spellDamage: [
       {
@@ -1205,10 +1207,10 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'projectileSpeed',
         kind: 'more',
-        value: -40,
+        value: -60,
       },
     ],
-    description: 'A slow shard of ice that pierces everything in its path.',
+    description: 'A heavy crystal of ice that drifts slowly and pierces everything in its path.',
   },
   {
     kind: 'active',

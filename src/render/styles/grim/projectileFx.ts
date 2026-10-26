@@ -37,7 +37,8 @@ export function newProjectileState(p: Projectile, bolt = false): ProjectileState
 }
 
 /** What kind of body a projectile has. */
-export type Body = 'arrow' | 'orb' | 'bigOrb' | 'shield' | 'tornado' | 'skull' | 'mirror';
+export type Body =
+  'arrow' | 'orb' | 'bigOrb' | 'shield' | 'tornado' | 'skull' | 'mirror' | 'crystal' | 'sliver';
 
 export function bodyOf(p: Projectile, bolt = false): Body {
   switch (p.kind) {
@@ -54,6 +55,9 @@ export function bodyOf(p: Projectile, bolt = false): Body {
     default:
       break;
   }
+  // A skill that names its own shape (a heavy crystal, a thin sliver) is drawn as that.
+  const b = p.profile.skill.behaviour;
+  if (b.kind === 'projectile' && b.shape) return b.shape;
   // The lumps a strike throws (an attack, but not a shaft) fly as orbs.
   if (p.profile.skill.afterHit?.kind === 'balls') return 'orb';
   if (p.profile.skill.type === 'attack' && !bolt) return 'arrow';
@@ -65,12 +69,28 @@ export function isLob(p: Projectile): boolean {
   return p.kind === 'mortar' || p.kind === 'nova';
 }
 
+/**
+ * How much of a fading projectile is left (1 up close, a little at the end of its range): a skill whose damage falls with
+ * distance is drawn fainter as it flies, by the same distance. Others stay whole.
+ */
+export function fadeOf(p: Projectile): number {
+  const b = p.profile.skill.behaviour;
+  if (b.kind !== 'projectile' || b.falloff === undefined) return 1;
+  const u = Math.max(0, Math.min(1, p.travelled / Math.max(0.5, p.maxRange)));
+  return 1 - 0.85 * u;
+}
+
 /** The height of a lob at `u` (0 to 1 of its way), in pixels over the usual flight height. */
 export function lobHeight(p: Projectile): number {
   const u = Math.max(0, Math.min(1, p.travelled / Math.max(0.5, p.maxRange)));
   const peak = Math.max(10, Math.min(30, p.maxRange * 4));
   return 4 * u * (1 - u) * peak;
 }
+
+const darken = (c: number, f: number): number => {
+  const m = (v: number) => Math.round(v * (1 - f));
+  return (m((c >> 16) & 255) << 16) | (m((c >> 8) & 255) << 8) | m(c & 255);
+};
 
 const lighten = (c: number, f: number): number => {
   const m = (v: number) => Math.round(v + (255 - v) * f);
@@ -86,6 +106,8 @@ const TRAIL_TILES: Record<Body, number> = {
   tornado: 0.9,
   skull: 1.0,
   mirror: 1.2,
+  crystal: 0.8,
+  sliver: 1.7,
 };
 
 export class ProjectileFx {
@@ -95,6 +117,8 @@ export class ProjectileFx {
   /** Whether the projectile being drawn is a monster's. */
   private hostile = false;
   private dirty = false;
+  /** How whole the projectile being drawn is (1 whole, less as it fades). */
+  private fade = 1;
 
   private host: ProjectileHost;
 
@@ -137,14 +161,15 @@ export class ProjectileFx {
   shadow(x: number, y: number, lift: number, color: number): void {
     const q = this.host.project(x, y);
     const s = Math.max(0.5, 1 - lift / 60);
-    this.body.fillStyle(0x000000, 0.32 * s).fillEllipse(q.x, q.y + 1, 7 * s, 3 * s);
-    this.glow.fillStyle(color, 0.22 * s).fillEllipse(q.x, q.y + 1, 11 * s, 4.5 * s);
+    this.body.fillStyle(0x000000, 0.32 * s * this.fade).fillEllipse(q.x, q.y + 1, 7 * s, 3 * s);
+    this.glow.fillStyle(color, 0.22 * s * this.fade).fillEllipse(q.x, q.y + 1, 11 * s, 4.5 * s);
   }
 
   /** Draw one projectile (and keep its trail). */
   draw(p: Projectile, st: ProjectileState, color: number, time: number): void {
     this.begin(time);
     const body = bodyOf(p, st.bolt);
+    this.fade = fadeOf(p);
     const lift = FLIGHT_HEIGHT + (isLob(p) ? lobHeight(p) : 0);
     // The trail is the last stretch of the flight, in world tiles.
     st.trail.push({ x: p.x, y: p.y, z: lift });
@@ -198,7 +223,14 @@ export class ProjectileFx {
         this.orb(head, 3.2, color, light, st.phase, time);
         this.spin(head, 7, color, time * 9 + st.phase);
         break;
+      case 'crystal':
+        this.crystal(head, color, light, st.phase, time);
+        break;
+      case 'sliver':
+        this.sliver(head, dx, dy, color, light);
+        break;
     }
+    this.fade = 1;
   }
 
   /** The tapered trail: wide and faint at the head's heels, thin and bright at the tail's end fading out. */
@@ -206,11 +238,20 @@ export class ProjectileFx {
     const n = st.trail.length;
     if (n < 2) return;
     const pts = st.trail.map((t) => this.at(t.x, t.y, t.z));
-    const widest = body === 'arrow' ? 3.2 : body === 'bigOrb' ? 8 : 5;
+    const widest =
+      body === 'arrow'
+        ? 3.2
+        : body === 'bigOrb'
+          ? 8
+          : body === 'crystal'
+            ? 7
+            : body === 'sliver'
+              ? 2.4
+              : 5;
     for (let i = 1; i < n; i++) {
       const f = i / (n - 1);
       const w = widest * f;
-      const a = 0.55 * f;
+      const a = 0.55 * f * this.fade;
       this.glow.lineStyle(w, color, a).lineBetween(pts[i - 1].x, pts[i - 1].y, pts[i].x, pts[i].y);
       this.glow
         .lineStyle(Math.max(0.8, w * 0.35), 0xffffff, a * 0.8)
@@ -297,6 +338,84 @@ export class ProjectileFx {
       this.body.lineBetween(x0, y0, x1, y1);
       this.glow.lineBetween(x0, y0, x1, y1);
     }
+  }
+
+  /** A heavy faceted crystal that turns slowly as it drifts, with frost shards circling it. */
+  private crystal(h: Pt, color: number, light: number, phase: number, time: number): void {
+    const R = 7.5;
+    const turn = time * 1.1 + phase;
+    const pts: Pt[] = [];
+    for (let i = 0; i < 6; i++) {
+      const a = turn + (i / 6) * Math.PI * 2;
+      const r = i % 2 === 0 ? R : R * 0.74;
+      pts.push({ x: h.x + Math.cos(a) * r, y: h.y + Math.sin(a) * r * 0.85 });
+    }
+    this.glow.fillStyle(color, 0.3).fillCircle(h.x, h.y, R * 2.2);
+    this.glow.lineStyle(1, light, 0.5).strokeCircle(h.x, h.y, R * 1.6);
+    const g = this.body;
+    // The dark rim first, a little larger than the body.
+    g.fillStyle(this.hostile ? 0x3a0808 : 0x000000, 0.9).fillPoints(
+      pts.map((p) => ({
+        x: h.x + (p.x - h.x) * 1.2,
+        y: h.y + (p.y - h.y) * 1.2,
+      })) as Phaser.Math.Vector2[],
+      true,
+    );
+    const shades = [lighten(color, 0.55), color, darken(color, 0.35)];
+    for (let i = 0; i < 6; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % 6];
+      g.fillStyle(shades[i % 3], 1).fillTriangle(h.x, h.y, a.x, a.y, b.x, b.y);
+    }
+    g.lineStyle(1, light, 0.8).strokePoints(pts as Phaser.Math.Vector2[], true, true);
+    g.fillStyle(0xffffff, 1).fillCircle(h.x - 1.6, h.y - 1.8, 1.4);
+    // Three small shards circle it, in front of and behind its face.
+    for (let i = 0; i < 3; i++) {
+      const a = -turn * 1.7 + (i * Math.PI * 2) / 3;
+      const x = h.x + Math.cos(a) * R * 1.55;
+      const y = h.y + Math.sin(a) * R * 1.55 * 0.6;
+      g.fillStyle(lighten(color, 0.7), 0.95).fillTriangle(x, y - 2.4, x + 1.5, y, x - 1.5, y);
+      g.fillTriangle(x, y + 2.4, x + 1.5, y, x - 1.5, y);
+    }
+  }
+
+  /** A long thin sliver of ice, pointed both ends, that grows fainter as it flies. */
+  private sliver(h: Pt, dx: number, dy: number, color: number, light: number): void {
+    const fade = this.fade;
+    const px = -dy;
+    const py = dx;
+    const tip = { x: h.x + dx * 10, y: h.y + dy * 10 };
+    const tail = { x: h.x - dx * 8, y: h.y - dy * 8 };
+    const l = { x: h.x + dx * 2 + px * 2.1, y: h.y + dy * 2 + py * 2.1 };
+    const r = { x: h.x + dx * 2 - px * 2.1, y: h.y + dy * 2 - py * 2.1 };
+    const g = this.body;
+    const rim = (p: Pt): Pt => ({ x: h.x + (p.x - h.x) * 1.22, y: h.y + (p.y - h.y) * 1.22 });
+    const a = rim(tip);
+    const b = rim(l);
+    const c = rim(r);
+    const d = rim(tail);
+    g.fillStyle(this.hostile ? 0x3a0808 : 0x000000, 0.85 * fade);
+    g.fillTriangle(a.x, a.y, b.x, b.y, c.x, c.y).fillTriangle(d.x, d.y, b.x, b.y, c.x, c.y);
+    g.fillStyle(color, fade);
+    g.fillTriangle(tip.x, tip.y, l.x, l.y, r.x, r.y).fillTriangle(
+      tail.x,
+      tail.y,
+      l.x,
+      l.y,
+      r.x,
+      r.y,
+    );
+    // The lit half, along its spine, and a white point at the tip.
+    g.fillStyle(light, fade).fillTriangle(tip.x, tip.y, l.x, l.y, h.x, h.y);
+    g.fillStyle(0xffffff, fade).fillTriangle(
+      tip.x,
+      tip.y,
+      tip.x - dx * 4 + px * 0.9,
+      tip.y - dy * 4 + py * 0.9,
+      tip.x - dx * 4 - px * 0.9,
+      tip.y - dy * 4 - py * 0.9,
+    );
+    this.glow.fillStyle(color, 0.3 * fade).fillCircle(h.x, h.y, 5);
   }
 
   /** A hexagonal shield, turning edge on to face on as it flies. */

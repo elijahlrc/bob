@@ -53,7 +53,7 @@ const proj = (over: Partial<Projectile>, type: 'attack' | 'spell' = 'attack'): P
     vy: 0,
     travelled: 0,
     maxRange: 6,
-    profile: { skill: { type } },
+    profile: { skill: { type, behaviour: { kind: 'projectile' } } },
     ...over,
   }) as unknown as Projectile;
 
@@ -72,7 +72,9 @@ describe('what a projectile looks like', () => {
   it('the lumps a strike throws fly as orbs, an attack otherwise as an arrow', () => {
     const lump = {
       kind: 'mortar',
-      profile: { skill: { type: 'attack', afterHit: { kind: 'balls' } } },
+      profile: {
+        skill: { type: 'attack', behaviour: { kind: 'projectile' }, afterHit: { kind: 'balls' } },
+      },
     } as Partial<Projectile>;
     expect(bodyOf(proj(lump))).toBe('orb');
     expect(bodyOf(proj({ kind: 'mortar' }))).toBe('arrow');

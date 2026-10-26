@@ -61,6 +61,7 @@ import { MonsterFlightFx } from './monsterFlight';
 import { MoveFx } from './moveFx';
 import { MonsterStateFx, stateSprite } from './monsterStateFx';
 import {
+  fadeOf,
   FLIGHT_HEIGHT,
   isLob,
   lobHeight,
@@ -256,6 +257,7 @@ export class GrimStyle extends StyleBase {
   /** The game area changed size: the camera follows `zoom` every frame, so setting it is enough. */
   resize(width: number): void {
     this.zoom = pickZoom(width);
+    this.snapCamera();
   }
 
   // ---- World -----------------------------------------------------------------------------------
@@ -1074,9 +1076,12 @@ export class GrimStyle extends StyleBase {
       this.pfx.shadow(p.x, p.y, lift - FLIGHT_HEIGHT, q.col);
     } else this.pfx.draw(p, q.state, q.col, this.time);
     q.light?.setPosition(x, y - lift);
+    // A flight that fades (its damage falls with distance) dims its light and sheds fewer motes.
+    const fade = fadeOf(p);
+    if (q.light && fade < 1) q.light.setIntensity(1.2 * fade);
     // A few motes fall behind a spell, now and then: the trail itself is drawn, so the particles only add a little life.
     q.acc += dt;
-    if (p.dtype !== 0 && q.acc > 0.09) {
+    if (p.dtype !== 0 && q.acc > 0.09 && fade > 0.45) {
       q.acc = 0;
       const e =
         p.dtype === 3
