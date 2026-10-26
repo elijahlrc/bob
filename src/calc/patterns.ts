@@ -55,28 +55,6 @@ export function ownDebuffMore(p: SkillProfile, hitsPerSec: number): number {
 export const ELEMENT_SHARE = 1 / 3;
 
 /**
- * The hits a target takes on top of the strike from what an element strike sends after it (Prime Splash), in hits of the
- * strike. Only the cold strike's wave reaches the one struck again (fire bursts on the others near it, lightning leaps to
- * the next enemy), and the element is chosen for each use from the three alike. The wave fans out from the character
- * toward the target, and hits it with every projectile that passes within its width.
- */
-export function elementAfterHits(p: SkillProfile, distance: number): number {
-  const a = p.skill.afterHit;
-  if (a?.kind !== 'element') return 0;
-  const count = a.count + Math.max(0, p.projectiles - 1);
-  const arc = ((a.arc ?? 70) * Math.PI) / 180;
-  const b = p.skill.behaviour;
-  const away = b.kind === 'melee' ? Math.min(distance, b.range + p.rangeBonus) : distance;
-  const width = TARGET_RADIUS + PROJECTILE_RADIUS;
-  let struck = 0;
-  for (let i = 0; i < count; i++) {
-    const off = count > 1 ? Math.abs((i / (count - 1) - 0.5) * arc) : 0;
-    if (off < Math.PI / 2 && away * Math.sin(off) <= width + 1e-6) struck++;
-  }
-  return ((struck * a.mult) / 100) * ELEMENT_SHARE;
-}
-
-/**
  * How many pods of one use burst on the target (Venom Shower). The pods fall evenly over a disc around the target (wider with
  * more arrows and with more area), and one bursts on the target when it falls within the burst radius of the target's edge.
  */

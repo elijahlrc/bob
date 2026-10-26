@@ -232,9 +232,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 100,
       },
     ],
-    description: 'Blades rain down in six volleys, each wider but weaker than the last.',
+    description: 'Blades rain down in five volleys, each wider but weaker than the last.',
     volleys: {
-      extra: 5,
+      extra: 4,
       lessPer: 6,
       critLessPer: 20,
       delay: 0.25,
@@ -264,7 +264,6 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     stanceStorm: {
       seconds: 3,
       radius: 2.4,
-      interval: 0.5,
       more: -50,
       max: 3,
       blood: 'bladestormBlood',
@@ -298,7 +297,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       count: 6,
       spread: 'stack',
     },
-    baseMult: [150, 180],
+    baseMult: [180, 213.6],
     cost: [5, 9],
     mods: [
       {
@@ -1121,11 +1120,6 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     requiresWeapon: ['bow'],
     mods: [
       {
-        stat: 'convertSkill.physical.fire',
-        kind: 'base',
-        value: 100,
-      },
-      {
         stat: 'damage.min',
         kind: 'base',
         value: {
@@ -1286,8 +1280,9 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       cap: 10,
       tick: false,
       release: {
-        perStage: 109,
+        perStage: 110,
         radiusPerStage: 40,
+        base: -110,
       },
     },
     mods: [
@@ -1312,8 +1307,8 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'projectile',
       count: 1,
       spread: 0,
-      range: 5,
-      falloff: 0.4,
+      range: 7,
+      falloff: 0.5,
       shape: 'sliver',
     },
     spellDamage: [
@@ -2344,14 +2339,14 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     effectiveness: 65,
-    castTime: 0.25,
+    castTime: 0.23,
     crit: 6,
     cost: [1, 5],
     mods: [
       {
         stat: 'damage',
         kind: 'more',
-        value: 12,
+        value: 12.5,
       },
     ],
     description: 'Channelled: pulses of lightning crackle in a half circle in front of you.',
@@ -2378,7 +2373,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       count: 4,
       mult: 50,
       range: 5,
-      explodeRadius: 1.2,
+      explodeRadius: 1.06,
     },
     baseMult: [120, 139],
     cost: [6, 6],
@@ -2956,7 +2951,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       returns: true,
       pierce: 99,
     },
-    baseMult: [80, 130],
+    baseMult: [80, 100],
     cost: [7, 9],
     requiresWeapon: ['sword', 'axe', 'mace', 'dagger', 'claw'],
     mods: [
@@ -3107,10 +3102,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'cold',
-        spread: [0.8, 1.2],
+        min: {
+          table: [
+            13, 16, 21, 28, 36, 46, 58, 68, 81, 95, 111, 130, 152, 177, 205, 238, 262, 289, 318,
+            350, 384, 422, 464, 509, 558,
+          ],
+        },
+        max: {
+          table: [
+            19, 24, 32, 42, 54, 68, 87, 103, 121, 142, 167, 195, 228, 265, 308, 357, 393, 433, 477,
+            524, 576, 633, 695, 763, 837,
+          ],
+        },
       },
     ],
-    effectiveness: 55,
+    effectiveness: 80,
     castTime: 0.7,
     crit: 6,
     cost: [8, 24],
@@ -3159,13 +3165,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [8, 56],
+        value: {
+          table: [
+            8, 10, 11, 13, 15, 17, 19, 22, 25, 27, 29, 31, 34, 36, 39, 42, 45, 49, 52, 56, 60, 65,
+            70, 75, 80,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [12, 85],
+        value: {
+          table: [
+            12, 14, 17, 19, 22, 25, 29, 33, 37, 40, 43, 47, 50, 54, 59, 63, 68, 73, 79, 85, 91, 97,
+            104, 112, 120,
+          ],
+        },
         damageTypes: ['physical'],
       },
     ],
@@ -3269,13 +3285,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [16, 56],
+        value: {
+          table: [
+            2, 3, 3, 4, 5, 7, 8, 10, 12, 15, 18, 21, 25, 29, 32, 36, 41, 45, 51, 56, 60, 65, 70, 75,
+            80,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [25, 85],
+        value: {
+          table: [
+            3, 4, 5, 6, 8, 10, 12, 15, 18, 22, 26, 31, 37, 43, 49, 54, 61, 68, 76, 85, 91, 97, 104,
+            112, 120,
+          ],
+        },
         damageTypes: ['physical'],
       },
     ],
@@ -3311,13 +3337,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [5, 75],
+        value: {
+          table: [
+            5, 7, 8, 11, 13, 16, 19, 22, 25, 28, 32, 36, 40, 45, 51, 56, 61, 65, 70, 75, 81, 87, 93,
+            100, 107,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [8, 113],
+        value: {
+          table: [
+            8, 10, 13, 16, 19, 24, 28, 32, 37, 42, 47, 54, 60, 68, 76, 85, 91, 98, 105, 113, 122,
+            130, 140, 150, 160,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
@@ -3408,7 +3444,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'fire',
-        spread: [0.8, 1.2],
+        min: {
+          table: [
+            9, 10, 12, 16, 22, 33, 44, 58, 75, 96, 121, 152, 189, 235, 290, 357, 437, 533, 618, 716,
+            788, 868, 955, 1050, 1154,
+          ],
+        },
+        max: {
+          table: [
+            12, 14, 17, 23, 34, 50, 66, 87, 112, 143, 181, 228, 284, 353, 435, 535, 655, 800, 927,
+            1073, 1182, 1301, 1432, 1574, 1730,
+          ],
+        },
       },
     ],
     effectiveness: 140,
@@ -3620,6 +3667,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       shards: [8, 13],
       less: 25,
     },
+    attackTime: {
+      table: [
+        0.7, 0.695, 0.689, 0.684, 0.679, 0.674, 0.668, 0.663, 0.658, 0.653, 0.647, 0.642, 0.637,
+        0.632, 0.626, 0.621, 0.616, 0.611, 0.605, 0.6, 0.595, 0.589, 0.584, 0.579, 0.574,
+      ],
+    },
   },
   {
     kind: 'active',
@@ -3699,13 +3752,23 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [16, 56],
+        value: {
+          table: [
+            2, 3, 3, 4, 5, 7, 8, 10, 12, 15, 18, 21, 25, 29, 32, 36, 41, 45, 51, 56, 60, 65, 70, 75,
+            80,
+          ],
+        },
         damageTypes: ['physical'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [25, 85],
+        value: {
+          table: [
+            3, 4, 5, 6, 8, 10, 12, 15, 18, 22, 26, 31, 37, 43, 49, 54, 61, 68, 76, 85, 91, 97, 104,
+            112, 120,
+          ],
+        },
         damageTypes: ['physical'],
       },
     ],
@@ -4134,7 +4197,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       interval: 1.6,
       speedPerStage: 15,
       channelMore: 100,
-      count: 3,
+      count: 1,
       radius: 1.8,
       range: 7,
     },
@@ -4931,7 +4994,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'fire',
-        spread: [0.8, 1.2],
+        min: {
+          table: [
+            7, 10, 13, 19, 25, 34, 46, 56, 69, 84, 102, 124, 150, 181, 218, 262, 315, 377, 425, 479,
+            539, 606, 681, 765, 859,
+          ],
+        },
+        max: {
+          table: [
+            11, 14, 20, 28, 38, 51, 68, 84, 103, 126, 153, 186, 225, 272, 327, 393, 472, 565, 637,
+            718, 808, 909, 1022, 1148, 1289,
+          ],
+        },
       },
     ],
     effectiveness: 100,
@@ -4976,7 +5050,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'cold',
-        spread: [0.8, 1.2],
+        min: {
+          table: [
+            9, 11, 15, 20, 28, 39, 52, 68, 89, 116, 148, 190, 241, 304, 361, 428, 507, 599, 706,
+            832, 927, 1032, 1149, 1278, 1421,
+          ],
+        },
+        max: {
+          table: [
+            14, 17, 23, 30, 42, 58, 78, 102, 134, 173, 223, 284, 361, 456, 542, 643, 761, 898, 1060,
+            1248, 1390, 1548, 1723, 1917, 2131,
+          ],
+        },
       },
     ],
     effectiveness: 140,
@@ -5025,7 +5110,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'lightning',
-        spread: [0.8, 1.2],
+        min: {
+          table: [
+            1, 1, 2, 2, 3, 4, 5, 6, 7, 9, 10, 12, 14, 16, 19, 22, 26, 30, 34, 37, 41, 45, 50, 55,
+            61,
+          ],
+        },
+        max: {
+          table: [
+            19, 24, 33, 44, 58, 75, 96, 115, 137, 162, 192, 226, 266, 312, 365, 426, 497, 579, 640,
+            707, 780, 861, 949, 1046, 1152,
+          ],
+        },
       },
     ],
     effectiveness: 60,
@@ -5060,7 +5156,18 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spellDamage: [
       {
         type: 'fire',
-        spread: [0.8, 1.2],
+        min: {
+          table: [
+            3, 5, 6, 8, 11, 15, 19, 23, 27, 33, 39, 46, 55, 65, 77, 90, 106, 125, 139, 154, 171,
+            190, 211, 233, 259,
+          ],
+        },
+        max: {
+          table: [
+            5, 7, 9, 13, 17, 22, 28, 34, 41, 49, 58, 69, 82, 97, 115, 136, 159, 187, 208, 231, 257,
+            285, 316, 350, 388,
+          ],
+        },
       },
     ],
     effectiveness: 70,
@@ -5181,7 +5288,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2,
       reach: 2,
     },
-    baseMult: [140, 170],
+    baseMult: [100, 120],
     cost: [10, 10],
     mods: [
       {
@@ -5201,6 +5308,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'Leap to a target and slam down on it.',
+    addedAttackTime: 0.55,
   },
   {
     kind: 'active',
@@ -5294,6 +5402,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     ],
     description:
       'Charge behind your shield: its weight is the damage, and the longer the run the harder the blow.',
+    attackTime: [0.53, 0.48],
   },
   {
     kind: 'active',
@@ -5308,6 +5417,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     spin: {
       hits: 6,
       radius: 1.7,
+      once: true,
     },
     behaviour: {
       kind: 'melee',
@@ -5315,12 +5425,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       arc: 200,
       radius: 1.6,
     },
-    baseMult: [25, 33],
+    baseMult: [100, 120],
     cost: [10, 10],
     requiresWeapon: ['dagger', 'claw', 'sword', 'axe'],
     mods: [],
     description:
       'Spin through your target with your weapon out, hitting everything around you as you go.',
+    addedAttackTime: 0.6,
   },
   {
     kind: 'active',
@@ -5580,25 +5691,6 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'more',
         value: -15,
       },
-      {
-        stat: 'damage.min',
-        kind: 'base',
-        value: {
-          table: [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 8, 9, 10, 12, 13, 14, 15, 16, 17],
-        },
-        damageTypes: ['lightning'],
-      },
-      {
-        stat: 'damage.max',
-        kind: 'base',
-        value: {
-          table: [
-            4, 5, 6, 8, 11, 16, 21, 26, 33, 40, 49, 60, 72, 87, 104, 123, 146, 173, 195, 220, 239,
-            258, 280, 302, 327,
-          ],
-        },
-        damageTypes: ['lightning'],
-      },
     ],
     description:
       'A strike that calls lightning down about its target, and lights you with a crackling aura.',
@@ -5615,13 +5707,22 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         {
           stat: 'damage.min',
           kind: 'base',
-          value: [1, 4],
+          value: {
+            table: [
+              0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 8, 9, 10, 12, 13, 14, 15, 16, 17,
+            ],
+          },
           damageTypes: ['lightning'],
         },
         {
           stat: 'damage.max',
           kind: 'base',
-          value: [12, 220],
+          value: {
+            table: [
+              4, 5, 6, 8, 11, 16, 21, 26, 33, 40, 49, 60, 72, 87, 104, 123, 146, 173, 195, 220, 239,
+              258, 280, 302, 327,
+            ],
+          },
           damageTypes: ['lightning'],
         },
         {
@@ -6009,7 +6110,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     name: 'Jaws Trap',
     attr: 'dex',
     skillType: 'spell',
-    tags: ['spell', 'trap', 'area', 'physical', 'duration'],
+    tags: ['trap', 'area', 'physical', 'duration'],
     types: ['trap'],
     behaviour: {
       kind: 'burst',
@@ -6522,7 +6623,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     deploySeconds: 5,
     detonation: 0.35,
     mineRain: {
-      count: 2,
+      count: 3,
       perPrior: 2,
       radius: 0.55,
       spread: 2.6,

@@ -109,7 +109,9 @@ describe('Whirlwind Cleave', () => {
     let last = dummy.life;
     let storms = 0;
     let uses = 0;
-    for (let i = 0; i < 60 * 0.95; i++) {
+    // One use's time, short of the next use (the storm's own hits come an attack time after it is made).
+    const useTime = w.sides[0].char.profile(w.sides[0].primary, 0).useTime;
+    for (let i = 0; i < 60 * useTime - 2; i++) {
       stepWorld(w);
       uses += w.events.filter((e) => e.t === 'use' && e.src === w.sides[0].player.id).length;
       storms = Math.max(storms, w.sides[0].fields.filter((f) => f.kind === 'stanceStorm').length);

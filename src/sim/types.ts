@@ -71,6 +71,8 @@ export type Action = {
   aimY: number;
   /** A spin: the hits of it already dealt (Spinning Dash). */
   spinN?: number;
+  /** A spin that hits each enemy once a use: the enemies its sweeps have hit. */
+  spinOnce?: number[];
   /** A skill that runs at its target over the wind-up: the distance run so far, and who it has hit on the way. */
   ran?: number;
   hitIds?: number[];

@@ -498,6 +498,10 @@ export type ActiveGemDef = SkillFx & {
   utility?: UtilityDef;
   /** A damaging skill that also moves the caster this far toward the target (a leap, a charge). */
   travel?: number;
+  /** An attack's own seconds per use in place of the weapon's (a shield attack: the skill sets its off-hand time). */
+  attackTime?: LevelValue;
+  /** Seconds an attack adds to the weapon's time per use (a leap, a dash), before attack speed. */
+  addedAttackTime?: number;
   /** Seconds before the skill can be used again; a use lost to the wait is regained one at a time (docs/SPIRIT.md S2). */
   cooldown?: LevelValue;
   /** How many uses the cooldown stores (default one). */
@@ -582,7 +586,8 @@ export type ActiveGemDef = SkillFx & {
    * A spin that takes the whole of a use: the character moves toward the target (up to `travel` tiles) and hits everything within
    * `radius` of itself `hits` times as it goes, then spins on where it stands (Spinning Dash). `baseMult` is one hit.
    */
-  spin?: { hits: number; radius: number };
+  /** `once`: each enemy is hit by one sweep of a use, however many it makes (a dash through enemies). */
+  spin?: { hits: number; radius: number; once?: boolean };
   /**
    * The skill's travel takes time: over the wind-up the character runs at the target (a `leap` hops, a `charge` hits what it runs
    * into, a `hook` is dragged along a chain, a `run` just runs), and the blow lands on arrival.
@@ -604,7 +609,8 @@ export type ActiveGemDef = SkillFx & {
   stanceStorm?: {
     seconds: number;
     radius: number;
-    interval: number;
+    /** Seconds between its hits; without it, the skill's attack time (it hits as often as the character attacks). */
+    interval?: number;
     /** Percent more (less, when negative) damage than the skill's own hit. */
     more: number;
     max: number;
@@ -822,7 +828,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     skillType: 'attack',
     tags: ['attack', 'melee', 'area'],
     behaviour: { kind: 'melee', range: 2.2, arc: 120, radius: 2.2 },
-    baseMult: [100, 140],
+    baseMult: [125, 170],
     cost: [1, 9],
     mods: [
       {
@@ -978,7 +984,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     behaviour: {
       kind: 'chain',
       range: 7,
-      chains: 2,
+      chains: 3,
       chainsPer5: 1,
       chainRange: 4,
       ramp: 15,
@@ -1002,7 +1008,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     effectiveness: 80,
-    castTime: 0.8,
+    castTime: 0.7,
     crit: 5,
     cost: [3, 22],
     mods: [{ stat: 'chance.shock', kind: 'base', value: 10 }],

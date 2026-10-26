@@ -208,7 +208,8 @@ export function updateAction(w: World, a: Actor, dt: number): void {
     const prof = mult === 1 ? act.profile : scaleProfile(act.profile, mult);
     const sd = a.side;
     if (sd && act.profile.multistrike) sd.critLock = act.crit ?? null;
-    fire(w, a, { ...act, profile: prof });
+    // A repeat is a use of its own: what the first hit once (a dash through enemies) it may hit again.
+    fire(w, a, { ...act, profile: prof, hitIds: [] });
     if (sd) sd.critLock = null;
     w.events.push({ t: 'echo', src: a.id, skill: act.profile.skill.id });
   }
@@ -285,6 +286,7 @@ function spinStep(w: World, a: Actor, act: Action, target: Actor | undefined, dt
   if (!act.fired) {
     act.fired = true;
     act.spinN = 0;
+    act.hitIds = [];
   }
   if (target && target.alive) {
     a.facing = Math.atan2(target.y - a.y, target.x - a.x);
@@ -508,7 +510,11 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
     }
   }
   if (act.profile.skill.spin && a.isPlayer) {
-    fireEffect(w, a, { ...act, profile: spinHit(act.profile) });
+    fireEffect(w, a, {
+      ...act,
+      profile: spinHit(act.profile),
+      spinOnce: act.profile.skill.spin.once && act.spinN !== undefined ? act.hitIds : undefined,
+    });
     return;
   }
   const p = act.profile;
@@ -603,11 +609,17 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
           dtype: dominantType(p, act.hand),
           heavy: isHeavy(a, p),
         });
+      // A dash through enemies hits each once a use, whichever sweep reaches it first.
+      const once = act.spinOnce;
       for (const e of enemiesOf(w, a)) {
         const d = Math.hypot(e.x - a.x, e.y - a.y);
         if (d > radius + e.r + a.r + 0.4) continue;
         const ang = Math.atan2(e.y - a.y, e.x - a.x);
         if (d > e.r && Math.abs(angleDiff(a.facing, ang)) > half) continue;
+        if (once) {
+          if (once.includes(e.id)) continue;
+          once.push(e.id);
+        }
         if (p.bothHands) for (let h = 0; h < p.hands.length; h++) hit(w, a, e, p, h, d);
         else hit(w, a, e, p, act.hand, d);
       }

@@ -96,7 +96,7 @@ describe('the bolts, balls and scatter after a hit are counted on the sheet', ()
   });
 
   it('what a strike sends out has to hit too: against a target that is often missed the sheet counts less', () => {
-    const build = buildForActive(activeGem('boltCleave'));
+    const build = buildForActive(activeGem('slagBlow'));
     const c = new Character(build, { targetDistance: 3, areaLevel: build.level });
     const p = c.profile(c.primary);
     // The strike itself is 1 of the hits; what it sends out is the rest, and lands only as often as a hit does.
@@ -111,7 +111,7 @@ describe('the bolts, balls and scatter after a hit are counted on the sheet', ()
       shock: 0,
       resShift: [0, 0, 0, 0, 0],
     }).skill;
-    // Both the strike and the bolt are missed in the same share of uses, so the two figures keep the same proportions.
+    // Both the strike and the balls are missed in the same share of uses, so the two figures keep the same proportions.
     expect(s.hitDps / bare.hitDps).toBeCloseTo(
       s.hitChance * ((1 + (all - 1) * s.hitChance) / all),
       1,
@@ -119,9 +119,6 @@ describe('the bolts, balls and scatter after a hit are counted on the sheet', ()
   });
 
   it('Rime Splinter: the blades fly at the others, so the sheet adds no hit on the one struck', () => {
-    // (The sim launches them from inside the struck enemy with an empty hit list, so one of them hits it again: that reads as a
-    // sim fault, since the gem says they fly at the others near it. Seed `hitIds` with the struck enemy's id in `afterStrike`,
-    // src/sim/shots.ts, and the sim reads 1.0 here too.)
     const { c } = alone('rimeSplinter');
     expect(volleyHits(c.profile(c.primary), 3)).toBe(1);
   });

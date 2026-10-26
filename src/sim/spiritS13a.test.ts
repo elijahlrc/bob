@@ -1017,17 +1017,17 @@ describe('Mirror Quiver and Shadow Quiver clones', () => {
 });
 
 describe('Rain of Steel, Rime Drift and Brute Force', () => {
-  it('Rain of Steel falls in six volleys, each wider and weaker', () => {
+  it('Rain of Steel falls in five volleys, each wider and weaker', () => {
     const { world: w, dummy } = world(['rainOfSteel'], 6, 'wand_3', DEX);
     const seen: { r: number; hitMult: number }[] = [];
     for (let i = 0; i < 60 * 3; i++) {
       stepWorld(w);
-      if (seen.length === 0 && w.sides[0].zones.length >= 6)
+      if (seen.length === 0 && w.sides[0].zones.length >= 5)
         for (const z of w.sides[0].zones)
           seen.push({ r: z.radius, hitMult: z.profile.hands[0].hitMult });
     }
-    expect(seen).toHaveLength(6);
-    for (let k = 1; k < 6; k++) {
+    expect(seen).toHaveLength(5);
+    for (let k = 1; k < 5; k++) {
       expect(seen[k].r).toBeGreaterThan(seen[k - 1].r);
       expect(seen[k].hitMult).toBeLessThan(seen[k - 1].hitMult);
     }

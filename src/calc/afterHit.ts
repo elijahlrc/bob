@@ -14,11 +14,9 @@ import type { SkillProfile } from './skill';
 
 /** Half the width of the target, in tiles (the training dummy; the sheet's shotgun count assumes the same). */
 export const TARGET_RADIUS = 0.5;
-/** The radius of a projectile in flight (`launch`, src/sim/shots.ts). */
-const PROJECTILE_RADIUS = 0.15;
 /** Balls of a strike land this far from the struck enemy, evenly from the nearest to the farthest (src/sim/shots.ts). */
-const BALL_NEAREST = 0.6;
-const BALL_SPREAD = 1.6;
+export const BALL_NEAREST = 0.59;
+export const BALL_SPREAD = 1.76;
 /** A ball bursts in this radius when its skill does not name one. */
 const BALL_RADIUS = 1.2;
 /** An orb that bounces on bursts in this radius when its skill is not a burst. */
@@ -41,40 +39,28 @@ export function tornadoHits(p: SkillProfile): number | null {
  * a strike's damage and lands counts a half). `hitChance` is the chance that an attack hit lands on the target: what a strike
  * sends out comes only after a hit, and has to hit itself.
  */
-export function afterHitTargetHits(p: SkillProfile, distance: number, hitChance = 1): number {
-  return strikeFollowUp(p, distance, hitChance) + bounceHits(p);
+export function afterHitTargetHits(p: SkillProfile, hitChance = 1): number {
+  return strikeFollowUp(p, hitChance) + bounceHits(p);
 }
 
 /** What a strike sends out after it (the bolts of an arc, the blades from behind the target, the balls on the ground). */
-function strikeFollowUp(p: SkillProfile, distance: number, hitChance: number): number {
+function strikeFollowUp(p: SkillProfile, hitChance: number): number {
   const spec = p.skill.afterHit;
   if (!spec) return 0;
   const share = spec.mult / 100;
   const sent = spec.count + Math.max(0, p.projectiles - 1);
   switch (spec.kind) {
-    case 'bolts': {
-      // Bolts leave the character in an arc about the line to the target; they share a hit list, so the target takes the one
-      // that flies true enough to touch it, and no more.
-      if (sent < 1) return 0;
-      const b = p.skill.behaviour;
-      const reach = b.kind === 'melee' ? b.range + p.rangeBonus : distance;
-      const d = Math.max(TARGET_RADIUS, Math.min(distance, reach));
-      const arc = ((spec.arc ?? 85) * Math.PI) / 180;
-      // With an odd count one flies straight at the target; with an even one the two nearest are half a step off.
-      const off = sent % 2 === 1 || sent < 2 ? 0 : arc / (2 * (sent - 1));
-      const touches = d * Math.sin(off) <= TARGET_RADIUS + PROJECTILE_RADIUS;
-      return touches ? share * hitChance : 0;
-    }
+    // Bolts fly out at the enemies about the one struck, and spare it.
+    case 'bolts':
+      return 0;
     case 'balls': {
       // Balls land on the ground about the struck enemy and burst where they land; each that bursts within reach of the target
       // is a hit of its own, the struck enemy not spared.
       const radius = (spec.explodeRadius ?? BALL_RADIUS) * p.radiusMult;
       const within = (radius + TARGET_RADIUS - BALL_NEAREST) / BALL_SPREAD;
-      return sent * Math.max(0, Math.min(1, within)) * share * hitChance;
+      return sent * Math.max(0, Math.min(1, within)) * share * (p.followShare ?? 1) * hitChance;
     }
-    // Blades fly out at the others near the struck enemy, and the sheet is for one target. (The sim launches them from the
-    // struck enemy's own spot with an empty hit list, so one of them strikes it again; the gem says they fly at the others near
-    // it, so that is a fault of the sim and not something for the sheet to count.)
+    // Blades fly out at the others near the struck enemy, and the sheet is for one target.
     default:
       return 0;
   }

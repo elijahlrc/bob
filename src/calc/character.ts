@@ -76,7 +76,6 @@ import { supportLive } from './reach';
 import {
   cloneDamage,
   ELEMENT_SHARE,
-  elementAfterHits,
   groundHits,
   orbHits,
   ownDebuffMore,
@@ -106,6 +105,7 @@ import {
   maskAnd,
   maskOr,
   SKILL_TAGS,
+  DAMAGE_TYPES,
 } from '../mods/types';
 import {
   expectedAilments,
@@ -807,7 +807,7 @@ export class Character {
       costLifeAll || itemHasRule(build.equipment[slot]!, 'socketedGemsUseLife');
     for (const sg of this.gems) {
       if (sg.def.kind !== 'active') continue;
-      let skill = resolveActive(sg.def, sg.level);
+      let skill = formFor(resolveActive(sg.def, sg.level), weaponTags);
       // Supports can add types (a totem support makes the skill a totem), which change what the others may do.
       const linked = this.gems.filter((o) => o.slot === sg.slot && o.def.kind === 'support');
       const resolved = resolveSupports(
@@ -821,19 +821,12 @@ export class Character {
         return lb === undefined ? n : n + Math.round(levelValue(lb, s.level));
       }, 0);
       if (levelBonus > 0)
-        skill = resolveActive(sg.def, Math.min(MAX_GEM_LEVEL, sg.level + levelBonus));
+        skill = formFor(
+          resolveActive(sg.def, Math.min(MAX_GEM_LEVEL, sg.level + levelBonus)),
+          weaponTags,
+        );
       if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
         skill = { ...skill, behaviour: { ...skill.behaviour, range: skill.behaviour.range2h } };
-      // A shot with a bow, a stab with a blade.
-      if (
-        skill.behaviour.kind === 'projectile' &&
-        skill.behaviour.meleeUnless &&
-        ![skill.behaviour.meleeUnless].flat().some((t) => weaponTags.has(t))
-      )
-        skill = {
-          ...skill,
-          behaviour: { kind: 'melee', range: skill.behaviour.meleeRange ?? 1.5 },
-        };
       // A support that can do nothing to this skill (no projectiles to add to, no area to widen) is not in effect and costs nothing.
       const inert: { gem: SocketedGem; why: string }[] = [];
       // A support the skill fits but is barred from (a melee support that does not take a channelled skill) says so, rather than
@@ -1538,7 +1531,7 @@ export class Character {
       if (!sdb) this.skillDbs.set(dk, (sdb = base.extend([...choice.skill.mods, ...supportMods])));
       db = sdb;
     }
-    p = buildProfile({
+    const input = {
       skill: choice.skill,
       db,
       hands: choice.skill.type === 'attack' ? this.hands : [],
@@ -1549,9 +1542,26 @@ export class Character {
         s === 'rage'
           ? Math.min(this.rageMax, (flaskMask >> DYN_SHIFT) & RAGE_MASK)
           : this.statValue(s),
-    });
+    };
+    p = buildProfile(input);
     // What the skill and its supports give on events (charges, buffs, rage, recovery): rolled when the skill hits.
     p.gains = [...choice.skill.mods, ...supportMods].filter((m) => GAIN_STAT.test(m.stat));
+    // What a strike sends out is not melee (an area about the one struck is the strike's own).
+    const after = choice.skill.afterHit;
+    if (after && after.kind !== 'area' && choice.skill.tags.includes('melee')) {
+      const notMelee = (x: string) => x !== 'melee' && x !== 'strike';
+      const f = buildProfile({
+        ...input,
+        skill: {
+          ...choice.skill,
+          tags: choice.skill.tags.filter(notMelee),
+          types: choice.skill.types.filter(notMelee),
+        },
+      });
+      f.gains = p.gains;
+      p.followUp = f;
+      p.followShare = handAverage(f) / Math.max(1e-9, handAverage(p));
+    }
     this.profiles.set(k, p);
     return p;
   }
@@ -1651,6 +1661,12 @@ export class Character {
       vulnAll: hexed.vulnAll,
     };
     const d = this.config.targetDistance;
+    // A crystal exposes what stands near it before it bursts, so its burst lands on the exposed target (Rime Core).
+    const ex = p.skill.crystal?.exposure;
+    if (ex) {
+      const cold = DAMAGE_TYPES.indexOf('cold');
+      t = { ...t, resShift: t.resShift.map((r, i) => (i === cold ? r - ex : r)) };
+    }
     // Deep Chill: the reference monster the skill keeps chilled takes more cold damage, as much as an average hit chills it.
     if (!target && p.chillTaken) {
       const ex = expectedHit(p, p.hands[0], t, d ?? 3);
@@ -2581,11 +2597,7 @@ export function volleyHits(p: SkillProfile, distance: number, hitChance = 1): nu
   if (p.skill.pods) hits = podHits(p);
   if (p.skill.volleys) hits *= volleysHits(p);
   if (p.skill.pulse) hits = orbHits(p, distance);
-  return (
-    hits +
-    afterHitTargetHits(p, distance, hitChance) +
-    (p.skill.afterHit ? elementAfterHits(p, distance) : 0)
-  );
+  return hits + afterHitTargetHits(p, hitChance);
 }
 
 /**
@@ -2687,4 +2699,28 @@ export function diffSheets(a: CharacterSheet, b: CharacterSheet): SheetDiff {
     res: b.res.map((r, i) => r - a.res[i]),
     ehp: b.ehp - a.ehp,
   };
+}
+
+/**
+ * A shot with a bow, a stab with a blade (`meleeUnless`): the form the weapon gives is the only one the skill has, so a shot is
+ * not melee (no melee bonuses or supports) and a stab is not a projectile.
+ */
+function formFor(skill: SkillDef, weaponTags: ReadonlySet<string>): SkillDef {
+  const b = skill.behaviour;
+  if (b.kind !== 'projectile' || !b.meleeUnless) return skill;
+  const shot = [b.meleeUnless].flat().some((t) => weaponTags.has(t));
+  const drop: readonly string[] = shot ? ['melee', 'strike'] : ['projectile'];
+  return {
+    ...skill,
+    tags: skill.tags.filter((t) => !drop.includes(t)),
+    types: skill.types.filter((t) => !drop.includes(t)),
+    behaviour: shot ? b : { kind: 'melee', range: b.meleeRange ?? 1.5 },
+  };
+}
+
+/** The average hit of a profile's first hand before crits and defences. */
+function handAverage(p: SkillProfile): number {
+  const h = p.hands[0];
+  if (!h) return 0;
+  return h.chunks.reduce((s, c) => s + (c.min + c.max) / 2, 0) * h.hitMult;
 }

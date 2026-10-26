@@ -1,5 +1,6 @@
 import type { SkillProfile } from '../calc/skill';
 import { formedProfile } from '../calc/skill';
+import { BALL_NEAREST, BALL_SPREAD } from '../calc/afterHit';
 import { profileElement } from '../calc/skillLook';
 import { levelValue } from '../calc/gems';
 import { PROJECTILE_SPEED } from '../data/constants';
@@ -494,8 +495,9 @@ export function projectileLanded(w: World, pr: Projectile, owner: Actor | undefi
 export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | null): void {
   const spec = act.profile.skill.afterHit;
   if (!spec || !struck) return;
-  const p = scaleProfile(act.profile, spec.mult / 100);
-  const hitIds: number[] = [];
+  // What it sends out is not the strike: melee bonuses do not reach it (`followUp`), and it spares the enemy struck.
+  const p = scaleProfile(act.profile.followUp ?? act.profile, spec.mult / 100);
+  const hitIds: number[] = [struck.id];
   // More projectiles (a support, an item) send more bolts, blades or balls.
   const count = spec.count + Math.max(0, act.profile.projectiles - 1);
   const toward = Math.atan2(struck.y - a.y, struck.x - a.x);
@@ -532,7 +534,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
     for (let i = 0; i < count; i++) {
       const ang = count > 1 ? toward + (i / (count - 1) - 0.5) * arc : toward;
       launch(w, a, p, act.hand, a.x, a.y, ang, {
-        hitIds: [],
+        hitIds: [struck.id],
         aimId: struck.id,
         range: spec.range,
         pierce: 99,
@@ -590,7 +592,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
       let spot = { x: 0, y: 0 };
       for (let tries = 0; tries < 6; tries++) {
         const ang = toward + (w.rngCombat.float(0, 1) - 0.5) * ((270 * Math.PI) / 180);
-        const d = 0.6 + w.rngCombat.float(0, 1) * 1.6;
+        const d = BALL_NEAREST + w.rngCombat.float(0, 1) * BALL_SPREAD;
         spot = w.grid.collide(struck.x + Math.cos(ang) * d, struck.y + Math.sin(ang) * d, 0.2);
         if (landed.every((l) => Math.hypot(l.x - spot.x, l.y - spot.y) >= BALL_APART)) break;
       }

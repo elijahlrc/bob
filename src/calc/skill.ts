@@ -97,6 +97,12 @@ export type SkillDotProfile = { spec: DotSpec; type: number; dps: number; second
 
 export type SkillProfile = {
   skill: SkillDef;
+  /**
+   * What a strike sends out after it (bolts, blades, balls, an element's follow-up) hits with: the skill without its melee tags,
+   * so melee bonuses do not reach it (Character.profile). `followShare` is its hit over the strike's, for the sheet.
+   */
+  followUp?: SkillProfile;
+  followShare?: number;
   isAttack: boolean;
   tagMask: number;
   hands: HandProfile[];
@@ -506,9 +512,11 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     // Speed.
     let time: number;
     if (isAttack) {
-      const aps = (hand?.aps ?? 1) * db.mult('attackSpeed', ctx);
+      // A skill may set its own time (a shield attack) or add to the weapon's (a leap); attack speed shortens both.
+      const own = skill.attackTime ?? 1 / (hand?.aps ?? 1);
+      const speed = db.mult('attackSpeed', ctx);
       const dw = inp.hands.length > 1 ? 1 + DUAL_WIELD_MORE_APS / 100 : 1;
-      time = 1 / Math.max(0.01, aps * dw);
+      time = (own + (skill.addedAttackTime ?? 0)) / Math.max(0.01, speed * dw);
     } else {
       time = skill.castTime / Math.max(0.01, db.mult('castSpeed', ctx));
     }
@@ -610,7 +618,9 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       ? 1
       : beh.kind === 'ground'
         ? Math.max(1, Math.floor((beh.duration * db.mult('skillDuration', baseCtx)) / zoneInterval))
-        : (skill.spin?.hits ?? 1),
+        : skill.spin?.once
+          ? 1
+          : (skill.spin?.hits ?? 1),
     zoneInterval,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
     deployScatter: db.flag('deployScatter', baseCtx),

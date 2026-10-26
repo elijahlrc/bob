@@ -74,22 +74,23 @@ describe('Spinning Dash', () => {
     expect(steps).toBeGreaterThan(0);
   });
 
-  it('hits again and again as it goes: everything on the way, and the target when it arrives', () => {
+  it('hits everything on the way once a use, and the target when it arrives', () => {
     const { w, dummy } = arena(['spinningDash'], 9, true);
     const mid = neighbour(w, w.sides[0].player.x + 4, w.sides[0].player.y + 0.4);
     mid.life = 1e10;
-    const [onWay, atEnd] = hitsOn(w, [mid, dummy], 1.4);
-    expect(onWay).toBeGreaterThanOrEqual(2);
-    expect(atEnd).toBeGreaterThanOrEqual(3);
+    const useTime = w.sides[0].char.profile(w.sides[0].primary, 0).useTime;
+    // One use's time: each enemy on the path is hit once, as in the reference game.
+    const [onWay, atEnd] = hitsOn(w, [mid, dummy], useTime - 2 / 60);
+    expect(onWay).toBe(1);
+    expect(atEnd).toBe(1);
   });
 
-  it('out-damages the plain weapon attack on a single target', () => {
-    const dps = (gems: string[]) => {
-      const { w, dummy } = arena(gems, 2);
-      const before = dummy.life;
-      for (let i = 0; i < 60 * 10; i++) stepWorld(w);
-      return (before - dummy.life) / 10;
-    };
-    expect(dps(['spinningDash'])).toBeGreaterThan(dps([]));
+  it("takes the time of a weapon attack and the dash's own on top", () => {
+    const { w } = arena(['spinningDash'], 2);
+    const ch = w.sides[0].char;
+    const p = ch.profile(w.sides[0].primary, 0);
+    const plain = ch.profile(ch.defaultAttack, 0);
+    // The dash adds its seconds to the weapon's time (the skill and the plain attack have the same attack speed here).
+    expect(p.useTime).toBeCloseTo(plain.useTime + p.skill.addedAttackTime!, 2);
   });
 });

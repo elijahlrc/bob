@@ -148,6 +148,9 @@ export type SkillDef = SkillFx & {
    * waits the default, 6 uses long and at least 3 s.
    */
   cooldown?: number;
+  /** An attack's own seconds per use in place of the weapon's, and seconds added to the weapon's (ActiveGemDef). */
+  attackTime?: number;
+  addedAttackTime?: number;
   /** How many uses the cooldown stores. */
   cooldownUses?: number;
   /** Charges that can be spent to use the skill while it waits on its cooldown. */
@@ -371,6 +374,8 @@ function resolveActiveUncached(def: ActiveGemDef, level: number): SkillDef {
     utility: def.utility,
     travel: def.travel,
     cooldown: def.cooldown === undefined ? undefined : levelValue(def.cooldown, level),
+    attackTime: def.attackTime === undefined ? undefined : levelValue(def.attackTime, level),
+    addedAttackTime: def.addedAttackTime,
     cooldownUses: def.cooldownUses,
     bypass: def.bypass,
     consumeCharges: def.consumeCharges,

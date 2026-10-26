@@ -32,11 +32,12 @@ export function landsPerUse(p: SkillProfile, o: LandsInput): number {
   const ramp = p.multistrike && !o.triggered ? p.multistrike.ramp / 100 : 0;
   const echoes = repeats + (ramp * repeats * (repeats + 1)) / 2;
   // A spin sweeps `hits` times; an echo or a trigger of it is one sweep. What a use leaves behind (the quake, the storm) is left once.
-  const own = s.spin ? (o.triggered ? 1 : s.spin.hits + echoes) : (1 + echoes) * p.pulses;
+  const sweeps = s.spin?.once ? 1 : (s.spin?.hits ?? 1);
+  const own = s.spin ? (o.triggered ? 1 : sweeps + echoes) : (1 + echoes) * p.pulses;
   const lands = own * o.volley;
   // The hits themselves, whatever their weight: each puts a charge or a stack on the enemy.
   const count =
-    (s.spin ? (o.triggered ? 1 : s.spin.hits + repeats) : (1 + repeats) * p.pulses) * o.volley;
+    (s.spin ? (o.triggered ? 1 : sweeps + repeats) : (1 + repeats) * p.pulses) * o.volley;
   const rate = o.usesPerSec;
   if (!(rate > 0)) return lands;
   // What each fire leaves behind: once for a spin, and for every fire (the repeats too) for anything else.
@@ -54,7 +55,7 @@ export function landsPerUse(p: SkillProfile, o: LandsInput): number {
     const made = rate * placed;
     const life = st.seconds * p.skillDuration;
     const each = Math.min(life, st.max / made);
-    const pulses = Math.floor(each / st.interval + 1e-6);
+    const pulses = Math.floor(each / (st.interval ?? p.useTime) + 1e-6);
     extra += placedBlows * pulses * (1 + st.more / 100) * (s.spin?.hits ?? 1);
   }
 

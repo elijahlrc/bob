@@ -16,7 +16,7 @@ const SECONDS = 60;
 const DISTANCE = 3;
 
 /** What the sheet says a boss training dummy takes a second, and what the sim says it took, from the sim's own ledger. */
-function measure(build: Build): { sheet: number; sim: number; hits: number } {
+function measure(build: Build, seconds = SECONDS): { sheet: number; sim: number; hits: number } {
   const c = new Character(build, { targetDistance: DISTANCE, areaLevel: build.level });
   const sheet = c.sheet(c.configConds, 'boss', {
     def: dummyDefence(),
@@ -25,7 +25,7 @@ function measure(build: Build): { sheet: number; sim: number; hits: number } {
   });
   const { world } = createDummyWorld(build, {
     distance: DISTANCE,
-    maxTime: SECONDS,
+    maxTime: seconds,
     seed: 1,
     rarity: 'boss',
     fixed: true,
@@ -44,8 +44,8 @@ const withSupports = (id: string, ...supports: string[]): Build => {
   return buildFor([id, ...supports], weaponFor(def), classFor(def.attr));
 };
 
-function expectClose(b: Build, lo = 0.9, hi = 1.1): void {
-  const m = measure(b);
+function expectClose(b: Build, lo = 0.9, hi = 1.1, seconds = SECONDS): void {
+  const m = measure(b, seconds);
   expect(m.sim / m.sheet).toBeGreaterThanOrEqual(lo);
   expect(m.sim / m.sheet).toBeLessThanOrEqual(hi);
 }
@@ -67,8 +67,10 @@ describe('projectile patterns: each gem alone, sim against sheet', () => {
   // Three shards in a wide fan: only the one aimed at the target hits it.
   it('Splinter Volley hits with the shard aimed at the target only', () =>
     expectClose(alone('splinterVolley')));
-  // A cold strike sends a wave of three after it, and its middle projectile goes through the target; one use in three.
-  it('Prime Splash counts the wave of its cold strikes', () => expectClose(alone('primeSplash')));
+  // What a strike sends out spares the enemy struck, so one target takes the strike alone. Only its crits ignite, one use in
+  // three, which takes a long fight to average out.
+  it('Prime Splash: one target takes the strike alone', () =>
+    expectClose(alone('primeSplash'), 0.9, 1.1, 240));
   // An ensnared enemy takes more from projectile attack hits, and the arrow ensnares it.
   it('Snare Shot counts the snare on its own later hits', () => expectClose(alone('snareShot')));
 });
@@ -86,8 +88,8 @@ describe('projectile patterns: the gems with supports', () => {
   it('Splinter Volley with Volley Split (seven shards in the same fan)', () =>
     expectClose(withSupports('splinterVolley', 'volleySplit')));
   it('Snare Shot with Piercing Shot', () => expectClose(withSupports('snareShot', 'piercingShot')));
-  it('Prime Splash with Volley Split (a wave of seven)', () =>
-    expectClose(withSupports('primeSplash', 'volleySplit')));
+  it('Prime Splash with Volley Split (a wave of seven, still sparing the one struck)', () =>
+    expectClose(withSupports('primeSplash', 'volleySplit'), 0.9, 1.1, 240));
   it('Mirror Quiver with Volley Split (one arrow still leaves one clone)', () =>
     expectClose(withSupports('mirrorQuiver', 'volleySplit')));
 });

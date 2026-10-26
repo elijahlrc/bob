@@ -151,12 +151,17 @@ describe('landsPerUse', () => {
     expect(landsPerUse(p, ctx(1, { land: 0.5 }))).toBeCloseTo(1 + share / 2, 9);
   });
 
-  it('storms stand only as many as the most: faster uses do not add to the storm hits a second', () => {
+  it('a storm hits once each attack time, and stands only as many as the most', () => {
     const p = profileOf('whirlwindCleave');
+    const st = p.skill.stanceStorm!;
     const hits = p.skill.spin!.hits;
     const storm = (rate: number) => (landsPerUse(p, ctx(rate)) - hits) * rate;
-    // Three storms of three seconds fill at one use a second; beyond that each use only replaces the oldest.
-    expect(storm(2)).toBeCloseTo(storm(3), 6);
+    // At one use a second each storm stands its whole time, hitting every attack time.
+    const life = st.seconds * p.skillDuration;
+    const each = Math.floor(life / p.useTime + 1e-6) * (1 + st.more / 100) * hits;
+    expect(storm(1)).toBeCloseTo(each, 6);
+    // Beyond that each use replaces the oldest, which has stood less time.
+    expect(storm(4)).toBeLessThanOrEqual(storm(1) * 4);
     expect(storm(0.5)).toBeLessThan(storm(1));
   });
 

@@ -104,7 +104,10 @@ describe('every support gem', () => {
         const choice = c.actives.find((x) => x.skill.id === a.id)!;
         expect(choice.supports.map((x) => x.def.id)).toContain(s.id);
       }
-      for (const other of actives.filter((x) => !ok.includes(x))) {
+      // (A skill that changes form with the weapon, a shot with a bow and a stab with a blade, has the types of the form it takes.)
+      const formed = (x: (typeof actives)[number]) =>
+        x.behaviour.kind === 'projectile' && !!x.behaviour.meleeUnless;
+      for (const other of actives.filter((x) => !ok.includes(x) && !formed(x))) {
         const bad = buildFor([other.id, s.id], weaponFor(other), ATTR_CLASS(other.attr));
         const ch = new Character(bad, { areaLevel: 50 });
         const choice = ch.actives.find((x) => x.skill.id === other.id)!;
