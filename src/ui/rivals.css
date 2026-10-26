@@ -163,8 +163,8 @@ html.leaf .rivals-block .duel-cta {
   text-align: center;
 }
 
-/* The high scores screen: each list on a lapis panel that grows with it (the screen scrolls); on a phone only the rank,
-   name, class and rating stay. */
+/* The high scores screen: each list on a lapis panel that grows with it (the screen scrolls); a table too wide for a phone
+   scrolls sideways inside its panel. The end screen's small board drops its extra columns on a phone (`hs-x`). */
 .hs-panel {
   box-sizing: border-box;
   width: min(860px, 100%);
@@ -182,6 +182,7 @@ html.leaf .rivals-block .duel-cta {
 .hs-scroll {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .hs-more {
   display: block;

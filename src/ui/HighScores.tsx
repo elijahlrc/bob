@@ -81,11 +81,11 @@ function ScoreList({ got, onMore }: { got: Loaded | null; onMore?: () => void })
             <th class="num">#</th>
             <th>Name</th>
             <th>Class</th>
-            <th class="num hs-x">Level</th>
+            <th class="num">Level</th>
             <th class="num">Rating</th>
-            <th class="num hs-x">Fights</th>
-            <th class="num hs-x">Won</th>
-            <th class="hs-x">Posted</th>
+            <th class="num">Fights</th>
+            <th class="num">Won</th>
+            <th>Posted</th>
           </tr>
         </thead>
         <tbody>
@@ -94,11 +94,11 @@ function ScoreList({ got, onMore }: { got: Loaded | null; onMore?: () => void })
               <td class="num">{s.rank ?? i + 1}</td>
               <td class="hs-name">{s.name}</td>
               <td>{className(s.classId)}</td>
-              <td class="num hs-x hs-val">{s.level}</td>
+              <td class="num hs-val">{s.level}</td>
               <td class="num hs-val">{s.rating}</td>
-              <td class="num hs-x">{s.fights}</td>
-              <td class="num hs-x">{s.wins}</td>
-              <td class="hs-x">{s.postedOn}</td>
+              <td class="num">{s.fights}</td>
+              <td class="num">{s.wins}</td>
+              <td>{s.postedOn}</td>
             </tr>
           ))}
         </tbody>

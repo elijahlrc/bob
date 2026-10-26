@@ -584,11 +584,10 @@ describe('the high scores', () => {
     ]);
     const heads = hosts(view, (v) => v.type === 'th').map((h) => text(h.props.children));
     expect(heads).toEqual(['#', 'Name', 'Class', 'Level', 'Rating', 'Fights', 'Won', 'Posted']);
-    // What goes on a phone: the rank, name, class and rating stay; the rest are marked to collapse.
-    const extra = hosts(view, (v) => v.type === 'th' && String(v.props.class).includes('hs-x')).map(
-      (h) => text(h.props.children),
+    // Every column stays on a phone: the table scrolls sideways instead.
+    expect(hosts(view, (v) => v.type === 'th' && String(v.props.class).includes('hs-x'))).toEqual(
+      [],
     );
-    expect(extra).toEqual(['Level', 'Fights', 'Won', 'Posted']);
     click(button(view, 'Back'));
     expect(back).toHaveBeenCalled();
   });
