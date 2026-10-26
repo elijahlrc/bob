@@ -68,6 +68,15 @@ export function podHits(p: SkillProfile): number {
   return Math.max(1, 2 * p.projectiles * Math.min(1, (reach / Math.max(0.5, spread)) ** 2));
 }
 
+/** How many pods of one use stand close enough to the target to put their damage over time on it (Venom Shower). */
+export function podsOver(p: SkillProfile): number {
+  const pods = p.skill.pods;
+  if (!pods) return 0;
+  const spread = pods.spread * Math.sqrt(p.projectiles / 5) * p.radiusMult;
+  const reach = pods.radius * p.radiusMult + TARGET_RADIUS;
+  return p.projectiles * Math.min(1, (reach / Math.max(0.5, spread)) ** 2);
+}
+
 /**
  * The damage of one clone a skill leaves (Mirror Quiver): it fires with the character's weapon, the weapon's damage as it
  * stands (flat parts only, the character's increases do not reach it) and a share more, at the weapon's speed, for as long as

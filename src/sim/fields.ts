@@ -695,7 +695,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
       const spec = f.profile.skill.pods!;
       if (pulse)
         for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
-          applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
+          // Each pod puts its own on the enemy: the pods about it add up.
+          applySkillDot(w, e, f.profile, { seconds: 0.5, by: s, source: f.id });
           // Each pod that reaches it slows it a little, up to a limit.
           const reached = s.fields.filter(
             (o) => o.kind === 'pod' && Math.hypot(e.x - o.x, e.y - o.y) <= o.radius + e.r,
@@ -723,9 +724,12 @@ export function tickFields(w: World, s: Side, dt: number): void {
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius))
         applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
     } else if (f.kind === 'chilling' && pulse && f.dps <= 0) {
-      // Chilled ground that deals no damage (Rime Step, a flask's) only chills what stands on it.
+      // Chilled ground chills what stands on it; a skill's own (Sudden Frost) also renews its damage over time on it, one patch
+      // at a time however many overlap. Without one (Rime Step, a flask's) it only chills.
       const effect = f.profile?.chill.effect ?? f.chill ?? 0;
       for (const e of enemiesIn(w, s.team, f.x, f.y, f.radius)) {
+        if (f.profile?.skillDot?.spec.ground)
+          applySkillDot(w, e, f.profile, { seconds: 0.5, by: s });
         if (e.def.cannotBeChilled || effect <= 0) continue;
         e.ail.chill = Math.max(e.ail.chill, effect);
         e.ail.chillT = Math.max(e.ail.chillT, f.interval * 2);

@@ -32,6 +32,8 @@ export type SkillDot = {
   regen: number;
   /** The side whose skill inflicted it: what it deals is credited to that side, and it is that side's character that it mends. */
   by?: Side;
+  /** What holds it, where each source holds its own (a spore pod's id). */
+  from?: number;
 };
 
 /** A hit's worth of damage over time lands on an enemy: after its resistance. */
@@ -58,7 +60,8 @@ export function applySkillDot(
   w: World,
   dst: Actor,
   p: SkillProfile,
-  over: { seconds?: number; more?: number; by?: Side } = {},
+  /** `source`: what holds this debuff, where each holds its own and they add up (a spore pod). */
+  over: { seconds?: number; more?: number; by?: Side; source?: number } = {},
 ): boolean {
   const sd = p.skillDot;
   if (!sd || !dst.alive) return false;
@@ -67,7 +70,9 @@ export function applySkillDot(
   const dps = afterResist(dst, sd.type, raw);
   const seconds = over.seconds ?? sd.seconds;
   const id = p.skill.id;
-  const mine = dst.sdots.filter((d) => d.src === id);
+  const all = dst.sdots.filter((d) => d.src === id);
+  // A source that holds its own (a spore pod) renews only its own.
+  const mine = over.source === undefined ? all : all.filter((d) => d.from === over.source);
   const fresh: SkillDot = {
     src: id,
     dps,
@@ -80,8 +85,9 @@ export function applySkillDot(
     carry: spec.spread === 'carry',
     regen: spec.regen ?? 0,
     by: over.by,
+    from: over.source,
   };
-  if (spec.hinder && mine.length === 0)
+  if (spec.hinder && all.length === 0)
     applyStatus(w, dst, 'hinder', { seconds: spec.hinder.seconds, v: spec.hinder.v });
   if (spec.stack === 'refresh') {
     const have = mine[0];

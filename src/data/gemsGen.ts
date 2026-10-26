@@ -330,7 +330,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [5.2, 206.8],
+      dps: {
+        table: [
+          3.1, 3.5, 4.5, 6, 8.6, 12.7, 16.8, 21.9, 28.2, 35.8, 45.1, 56.4, 70, 86.5, 106.4, 130.2,
+          158.8, 193.1, 223.1, 257.4, 282.9, 310.8, 341.2, 374.4, 410.6,
+        ],
+      },
       seconds: 2.5,
       stack: 'layers',
       cap: 20,
@@ -409,7 +414,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [4, 9],
     dot: {
       type: 'chaos',
-      dps: [14.6, 1549.6],
+      dps: {
+        table: [
+          8.8, 10.1, 13.1, 18.4, 27.8, 44, 61.9, 85.4, 116.2, 156.3, 208.5, 275.9, 362.7, 474.1,
+          616.9, 799.3, 1031.8, 1327.6, 1600.8, 1927.1, 2179.2, 2462.7, 2781.5, 3139.9, 3542.6,
+        ],
+      },
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -511,7 +521,6 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       seconds: 5,
       radius: 2.2,
       grow: 2,
-      dps: 1.39,
       killCharge: {
         kind: 'fervour',
         chance: 25,
@@ -551,6 +560,19 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       },
     ],
     description: 'A sudden burst of frost at a target place.',
+    dot: {
+      type: 'cold',
+      dps: {
+        table: [
+          26.3, 37.2, 51.3, 69.8, 88, 110.4, 137.1, 169.8, 208.5, 255.5, 310.9, 377.6, 456, 550,
+          627.9, 717, 815.4, 927.9, 1051.9, 1193.2, 1351.4, 1525.7, 1723.5, 1941, 2187.2,
+        ],
+      },
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['spell', 'area'],
+    },
   },
   {
     kind: 'active',
@@ -567,7 +589,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [6.1, 189.7],
+      dps: {
+        table: [
+          3.5, 4.3, 5.7, 7.4, 10.2, 13.6, 18, 23.3, 29.9, 38.1, 48.1, 60.3, 75.2, 93.3, 109.5,
+          128.1, 149.6, 174.4, 203, 235.9, 260.5, 287.5, 317.2, 349.7, 385.4,
+        ],
+      },
       seconds: 5,
       stack: 'refresh',
       hitless: true,
@@ -1414,7 +1441,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [39.1, 1208.8],
+      dps: {
+        table: [
+          31.2, 40.6, 56.4, 76.7, 102.7, 136, 178.4, 217.4, 264, 319.4, 385.3, 463.5, 556.1, 665.7,
+          795.2, 948.1, 1065, 1195.5, 1341, 1503.2, 1683.9, 1885.3, 2109.6, 2359.2, 2637,
+        ],
+      },
       seconds: 3.8,
       stack: 'refresh',
       scales: ['spell'],
@@ -2771,7 +2803,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [14.6, 353.3],
+      dps: {
+        table: [
+          11.7, 15, 20.4, 27.3, 36, 46.9, 60.4, 72.7, 87.2, 104.2, 124.1, 147.4, 174.6, 206.4,
+          243.5, 286.6, 319.3, 355.4, 395.3, 439.4, 488.1, 541.8, 601.2, 666.7, 738.9,
+        ],
+      },
       seconds: 1.5,
       stack: 'stages',
       cap: 8,
@@ -3149,9 +3186,21 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'chilling',
       seconds: 5,
       radius: 1.6,
-      dps: 3.17,
       creep: 0.9,
       max: 10,
+    },
+    dot: {
+      type: 'cold',
+      dps: {
+        table: [
+          16.7, 23.4, 34, 48.5, 67.5, 92.4, 124.5, 157.1, 196.6, 244.5, 302.1, 371.3, 454.2, 553.1,
+          670.1, 809.7, 929, 1063.4, 1213.5, 1383.5, 1574.3, 1786.8, 2026.5, 2294.7, 2594.5,
+        ],
+      },
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['spell'],
     },
   },
   {
@@ -3606,7 +3655,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [114.2, 1562.6],
+      dps: {
+        table: [
+          137.1, 169.5, 208.5, 255.2, 311.2, 354.4, 403.1, 457.7, 519.2, 588.1, 665.5, 752.3, 849.6,
+          958.5, 1080.5, 1217, 1369.7, 1540.4, 1731.2, 1944.3, 2182.3, 2447.9, 2744.3, 3075, 3443.7,
+        ],
+      },
       seconds: 0.6,
       stack: 'refresh',
       carried: 1,
@@ -3891,7 +3945,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [9.9, 228.9],
+      dps: {
+        table: [
+          7.9, 10.1, 13.8, 18.4, 24.1, 31.3, 40.3, 48.4, 57.9, 69, 82, 97.1, 114.8, 135.4, 159.3,
+          187.2, 208.2, 231.3, 256.9, 285.1, 316.2, 350.6, 388.4, 430, 475.9,
+        ],
+      },
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -4056,13 +4115,25 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       kind: 'chilling',
       seconds: 3,
       radius: 2.6,
-      dps: 2.15,
     },
     cooldown: 1.8,
     castOn: {
       skill: 'glacierDart',
       max: 5,
       areaLess: 20,
+    },
+    dot: {
+      type: 'cold',
+      dps: {
+        table: [
+          106.5, 131.3, 161.1, 196.8, 239.3, 272.1, 308.9, 350.1, 396.5, 448.4, 506.5, 571.5, 644.3,
+          725.7, 816.6, 918.2, 1031.7, 1158.2, 1299.5, 1456.9, 1632.5, 1828, 2045.8, 2288.4, 2558.4,
+        ],
+      },
+      seconds: 0.5,
+      stack: 'refresh',
+      ground: true,
+      scales: ['spell', 'area'],
     },
   },
   {
@@ -4419,7 +4490,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'chaos',
-      dps: [40.1, 720.1],
+      dps: {
+        table: [
+          45.6, 57.1, 70.8, 87.5, 107.5, 131.5, 160.2, 194.6, 235.7, 267.3, 302.9, 342.9, 387.7,
+          438, 494.4, 557.6, 628.4, 707.6, 796.4, 895.6, 1006.5, 1130.6, 1269.2, 1424, 1596.9,
+        ],
+      },
       seconds: 2,
       stack: 'refresh',
       hitless: true,
@@ -5004,7 +5080,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       type: 'fire',
       dps: {
         table: [
-          19, 25.1, 35.6, 49.3, 67.2, 90.3, 120.1, 147.8, 181.3, 221.4, 269.4, 327, 395.8, 477.8,
+          18.9, 25.1, 35.6, 49.3, 67.2, 90.3, 120.1, 147.8, 181.2, 221.3, 269.4, 327, 395.8, 477.8,
           575.6, 692, 830.4, 994.8, 1121.2, 1262.7, 1421.2, 1598.7, 1797.3, 2019.4, 2267.9,
         ],
       },
@@ -5852,7 +5928,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     dot: {
       type: 'fire',
-      dps: [29.6, 1411.7],
+      dps: {
+        table: [
+          23.6, 31.4, 44.8, 62.8, 86.8, 118.4, 160.1, 199.6, 247.9, 306.8, 378.5, 465.6, 571.5,
+          699.7, 854.9, 1042.6, 1189, 1354.8, 1542.8, 1755.6, 1996.6, 2269.2, 2577.7, 2926.5,
+          3320.7,
+        ],
+      },
       seconds: 0.5,
       stack: 'refresh',
       hitless: true,
@@ -6221,7 +6303,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     description: 'A trap that bursts into flame and leaves the ground burning.',
     dot: {
       type: 'fire',
-      dps: [40.7, 1473.8],
+      dps: {
+        table: [
+          32.5, 42.5, 59.6, 82, 111.2, 148.8, 197.4, 242.6, 297.1, 362.4, 440.8, 534.7, 646.9,
+          780.8, 940.5, 1130.7, 1277.2, 1441.6, 1626, 1832.8, 2064.7, 2324.4, 2615.4, 2941.1,
+          3305.7,
+        ],
+      },
       seconds: 0.5,
       stack: 'refresh',
       ground: true,
@@ -6552,7 +6640,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cooldown: 4,
     dot: {
       type: 'cold',
-      dps: [21.3, 342.8],
+      dps: {
+        table: [
+          15.5, 19.7, 26.3, 34.3, 44.1, 55.9, 70, 82.5, 96.7, 113, 131.6, 152.8, 176.9, 204.3,
+          235.5, 270.8, 310.9, 356.3, 389.9, 426.3, 465.9, 508.8, 555.4, 605.9, 660.6,
+        ],
+      },
       seconds: 3,
       stack: 'refresh',
       hitless: true,

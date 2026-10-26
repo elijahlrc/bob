@@ -80,6 +80,7 @@ import {
   orbHits,
   ownDebuffMore,
   podHits,
+  podsOver,
   shotgunHits,
   volleysHits,
 } from './patterns';
@@ -1887,6 +1888,9 @@ export class Character {
         // Ground that lingers holds the debuff for as long as it lasts; a patch is renewed as the arrows come.
         const ground = choice.skill.leaves ? choice.skill.leaves.seconds * usesPerSec : uptime;
         dps = per * Math.min(1, spec.ground ? ground : uptime);
+        // Spore pods each hold their own on the target: as many as stand about it at once.
+        if (choice.skill.pods)
+          dps = per * podsOver(p) * usesPerSec * choice.skill.pods.seconds * p.skillDuration;
       } else if (spec.stack === 'layers') {
         dps = per * Math.min(spec.cap ?? 20, seconds * usesPerSec);
       } else {
