@@ -72,18 +72,20 @@ function mineDistance(p: SkillProfile): number {
 }
 
 /**
- * The hits a mine's rain lands on the target, beyond its burst: it sends `count` small bursts (more for each mine that went before
+ * The hits a mine's or trap's rain lands on the target, beyond its burst: it sends `count` small bursts (more for each mine that went before
  * it in the sequence) down at random over a disc round the mine, and one that comes down within its reach of the target hits it.
  */
 export function mineRainHits(choice: SkillChoice, p: SkillProfile): number {
   const rain = choice.skill.mineRain;
   const b = choice.skill.behaviour;
-  if (choice.deploy !== 'mine' || !rain || b.kind !== 'burst') return 0;
+  if ((choice.deploy !== 'mine' && choice.deploy !== 'trap') || !rain || b.kind !== 'burst')
+    return 0;
   // The mines of a set go in order; the later ones rain more. A set is the mines laid together.
   const set = Math.max(1, p.deployCount);
+  const count = Math.round(levelValue(rain.count, choice.skill.level));
   let bursts = 0;
   for (let seq = 0; seq < set; seq++)
-    bursts += rain.count + Math.floor(seq / Math.max(1, rain.perPrior));
+    bursts += count + (rain.perPrior ? Math.floor(seq / rain.perPrior) : 0);
   bursts /= set;
   const reach = b.radius * rain.radius * p.radiusMult + TARGET_RADIUS;
   const chance =
@@ -156,7 +158,7 @@ function fireTaken(t: TargetState): number {
 
 /**
  * What a deployed skill's one shot lands on a single target, and what it adds, for `skillSheet`: `hits` multiplies the hits of a use
- * (a mortar's arrows, a mine's burst and its rain), `add` is raw damage added to every hit, and `more` multiplies the hits themselves.
+ * (a mortar's arrows, a mine's or trap's burst and its rain), `add` is raw damage added to every hit, and `more` multiplies the hits themselves.
  */
 export function deployedEffects(
   choice: SkillChoice,
@@ -167,6 +169,7 @@ export function deployedEffects(
 ): { hits: number; add: number; more: number } {
   if (p.skill.mortar)
     return { hits: mortarHits(p, shooterDistance(choice, distance)), add: 0, more: 1 };
+  if (choice.deploy === 'trap') return { hits: 1 + mineRainHits(choice, p), add: 0, more: 1 };
   if (choice.deploy !== 'mine') return { hits: 1, add: 0, more: 1 };
   const aura = mineAura(choice, p, t, fires);
   return { hits: 1 + mineRainHits(choice, p), add: aura.add, more: aura.more };

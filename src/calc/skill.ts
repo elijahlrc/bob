@@ -407,7 +407,12 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     const ctx = ctxOf(tags, conds, statValue);
     // Step 1: base damage.
     const base: Chunk[] = [];
-    const eff = isAttack ? 1 : skill.effectiveness / 100;
+    // An attack takes added damage at its base multiplier (step 2), or at its own share of it (`addedMult`).
+    const eff = isAttack
+      ? skill.addedMult !== undefined
+        ? skill.addedMult / Math.max(1e-9, skill.baseMult)
+        : 1
+      : skill.effectiveness / 100;
     const added = addedFlats(db, ctx, eff);
     for (let t = 0; t < NT; t++) {
       let min = added[t][0];

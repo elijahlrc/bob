@@ -332,10 +332,15 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
       stats.push(
         `Active only while you are within ${num(def.ancestral.range)} of it; the bonus does not stack`,
       );
-    if (def.mineRain)
+    if (def.mineRain) {
+      const n = num(levelValue(def.mineRain.count, level));
+      const what = def.tags.includes('trap') ? 'trap' : 'mine';
       stats.push(
-        `Rains ${def.mineRain.count} smaller bursts around the mine, one more for every ${def.mineRain.perPrior} mines before it`,
+        def.mineRain.perPrior
+          ? `Rains ${n} smaller bursts around the ${what}, one more for every ${def.mineRain.perPrior} mines before it`
+          : `Rains ${n} smaller bursts around the ${what}`,
       );
+    }
     if (def.mineAura) stats.push('Mines near an enemy add fire damage to the hits against it');
     // A blink's own cooldown is the stored-uses one; any other skill's line is made in fxLines or utilityLines.
     if (def.utility?.kind === 'blink' && def.cooldown !== undefined)

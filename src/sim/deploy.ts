@@ -459,32 +459,61 @@ function detonate(
   shoot(w, s, d, c, target, 1 + (prof.mineChain * seq) / 100, crowd);
   // Projectiles rain down around it, a smaller burst each, more of them the further along in the sequence.
   const rain = c.skill.mineRain;
-  if (rain) {
-    const n = rain.count + Math.floor(seq / Math.max(1, rain.perPrior));
-    const small = { ...prof, radiusMult: prof.radiusMult * rain.radius };
-    for (let i = 0; i < n; i++) {
-      const ang = w.rngTrig.float(0, Math.PI * 2);
-      const r = rain.spread * Math.sqrt(w.rngTrig.float(0, 1));
-      const spot = { x: d.x + Math.cos(ang) * r, y: d.y + Math.sin(ang) * r };
-      const from = standIn(s.player);
-      from.x = d.x;
-      from.y = d.y;
-      const act: Action = {
-        profile: small,
-        which: 'deployed',
-        hand: 0,
-        duration: prof.useTime,
-        elapsed: prof.useTime,
-        fired: true,
-        echoes: 0,
-        targetId: target.id,
-        aimX: spot.x,
-        aimY: spot.y,
-        // Each comes down from above (the renderer draws the missiles falling; the hit lands at once, as a rain's does).
-        fall: missileOf(c.skill.type),
-      };
-      fire(w, from, act);
-    }
+  if (rain)
+    rainBlasts(
+      w,
+      s,
+      d,
+      c,
+      prof,
+      target,
+      Math.round(levelValue(rain.count, c.skill.level)) +
+        (rain.perPrior ? Math.floor(seq / rain.perPrior) : 0),
+    );
+}
+
+/** A trap that, going off, sends smaller blasts down around it (Shrapnel Trap). */
+function trapRain(w: World, s: Side, d: Deployable, c: SkillChoice, target: Actor): void {
+  const rain = c.skill.mineRain;
+  if (!rain) return;
+  const prof = s.char.profile(c, playerConds(w, s, target), flaskMask(s));
+  rainBlasts(w, s, d, c, prof, target, Math.round(levelValue(rain.count, c.skill.level)));
+}
+
+/** The smaller blasts a mine or trap sends down around itself as it goes off, at random over its `spread`. */
+function rainBlasts(
+  w: World,
+  s: Side,
+  d: Deployable,
+  c: SkillChoice,
+  prof: SkillProfile,
+  target: Actor,
+  n: number,
+): void {
+  const rain = c.skill.mineRain!;
+  const small = { ...prof, radiusMult: prof.radiusMult * rain.radius };
+  for (let i = 0; i < n; i++) {
+    const ang = w.rngTrig.float(0, Math.PI * 2);
+    const r = rain.spread * Math.sqrt(w.rngTrig.float(0, 1));
+    const spot = { x: d.x + Math.cos(ang) * r, y: d.y + Math.sin(ang) * r };
+    const from = standIn(s.player);
+    from.x = d.x;
+    from.y = d.y;
+    const act: Action = {
+      profile: small,
+      which: 'deployed',
+      hand: 0,
+      duration: prof.useTime,
+      elapsed: prof.useTime,
+      fired: true,
+      echoes: 0,
+      targetId: target.id,
+      aimX: spot.x,
+      aimY: spot.y,
+      // Each comes down from above (the renderer draws the missiles falling; the hit lands at once, as a rain's does).
+      fall: missileOf(c.skill.type),
+    };
+    fire(w, from, act);
   }
 }
 
@@ -693,6 +722,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
         if (best) {
           sprung(w, d, best);
           shoot(w, s, d, c, best, 1, crowd);
+          trapRain(w, s, d, c, best);
           keep = false;
         } else {
           // A skitterbot sets off a trap with enemies about.
@@ -703,6 +733,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
             botSpark(w, bot, d);
             sprung(w, d, far);
             shoot(w, s, d, c, far, 1, crowd);
+            trapRain(w, s, d, c, far);
             keep = false;
           } else d.fireT = 0.05;
         }

@@ -49,7 +49,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     description: 'Looses a slow orb that strikes the ground around it with lightning.',
     pulse: {
       radius: 1.8,
-      interval: 0.35,
+      interval: 0.2,
       speed: 0.3,
     },
   },
@@ -1152,6 +1152,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       maxExtra: [1, 1.9],
       ignitePer: 3,
     },
+    addedMult: 100,
   },
   {
     kind: 'active',
@@ -6295,13 +6296,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         kind: 'base',
         value: 50,
       },
-      {
-        stat: 'repeats',
-        kind: 'base',
-        value: [3, 6],
-      },
     ],
     description: 'A trap that blasts again and again.',
+    mineRain: {
+      count: [4, 7],
+      radius: 0.72,
+      spread: 2.2,
+    },
   },
   {
     kind: 'active',

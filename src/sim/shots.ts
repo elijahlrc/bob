@@ -184,11 +184,12 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
     return;
   }
   if (p.skill.pulse) {
-    // A slow orb: it hurts what is about it as it drifts (src/sim/skillFx.ts) and strikes nothing by touching it.
+    // A slow orb: it hurts what is about it as it drifts (src/sim/skillFx.ts) and strikes nothing by touching it. It flies its
+    // whole range, through and past the target.
     launch(w, a, p, act.hand, a.x, a.y, base, {
       hitIds: [],
       aimId: act.targetId,
-      range: Math.max(3, Math.min(range, aimDist + 1)),
+      range,
       pierce: 99,
       kind: 'orb',
       speedMult: p.skill.pulse.speed,

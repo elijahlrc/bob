@@ -152,7 +152,7 @@ import { exposureShift, sporeMult, standingHits, zapMult } from './channelFx';
 import { afterHitTargetHits, TARGET_RADIUS, tornadoHits } from './afterHit';
 import { strongestOf } from './ailmentMax';
 import { planRotation, type Plan, type PlanSkill } from './rotation';
-import { illusionStill, landsPerUse, ownBuffs } from './melee';
+import { illusionRan, illusionStill, landsPerUse, ownBuffs } from './melee';
 
 export type CalcConfig = {
   /** Conditions assumed true (calc engine toggles). */
@@ -2638,7 +2638,11 @@ export function channelMult(
   if (o?.kind === 'zap') return zapMult(p);
   // An illusion's waves are a hit each (the later ones, once it has stopped, are bigger), and the last wave grows with the stages.
   if (o?.kind === 'illusion') {
-    let total = (o.finalPerStage * c.cap) / 100;
+    // Stages are built only while the illusion runs: the uses before it has arrived (at least the first).
+    let built = 0;
+    for (let k = 1; k <= c.cap; k++)
+      if (k === 1 || !illusionRan(o, p.useTime, k, c.cap, run)) built++;
+    let total = (o.finalPerStage * built) / 100;
     const waves = Math.floor(c.cap / o.waveStages);
     for (let i = 1; i <= waves; i++)
       total += illusionStill(o, p.useTime, i, waves, run) ? 1 + o.stillMore / 100 : 1;

@@ -139,6 +139,8 @@ export type SkillDef = SkillFx & {
   curveLevel: number;
   /** Percent of base damage (attacks). */
   baseMult: number;
+  /** Attacks: the percent flat added damage is taken at, where it is not `baseMult` (ActiveGemDef). */
+  addedMult?: number;
   spellDamage: { type: DamageType; min: number; max: number }[];
   /** Added damage effectiveness, percent. */
   effectiveness: number;
@@ -211,7 +213,7 @@ export type SkillDef = SkillFx & {
   mortar?: { radius: number; from: number };
   ancestral?: { buff: BuffId; range: number; mods: GemMod[] };
   bond?: { width: number; range: number; end: number };
-  mineRain?: { count: number; perPrior: number; radius: number; spread: number };
+  mineRain?: { count: LevelValue; perPrior?: number; radius: number; spread: number };
   mineAura?: ActiveGemDef['mineAura'];
   travelThrough?: boolean;
   spin?: ActiveGemDef['spin'];
@@ -362,6 +364,7 @@ function resolveActiveUncached(def: ActiveGemDef, level: number): SkillDef {
     level,
     curveLevel: scaleLevel(def, level),
     baseMult: def.baseMult ? levelValue(def.baseMult, level) : 100,
+    addedMult: def.addedMult === undefined ? undefined : levelValue(def.addedMult, level),
     spellDamage: (def.spellDamage ?? []).map((d) =>
       spellDamageAt(d, def.effectiveness ?? 100, level, scaleLevel(def, level)),
     ),

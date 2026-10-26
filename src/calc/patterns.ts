@@ -55,15 +55,17 @@ export function ownDebuffMore(p: SkillProfile, hitsPerSec: number): number {
 export const ELEMENT_SHARE = 1 / 3;
 
 /**
- * How many pods of one use burst on the target (Venom Shower). The pods fall evenly over a disc around the target (wider with
- * more arrows and with more area), and one bursts on the target when it falls within the burst radius of the target's edge.
+ * How many hits of one use land on the target (Venom Shower). The arrows fall evenly over a disc around the target (wider with
+ * more arrows and with more area); one that falls within the burst radius of the target's edge hits it as it lands, and its pod
+ * bursts on it later.
  */
 export function podHits(p: SkillProfile): number {
   const pods = p.skill.pods;
   if (!pods) return 1;
   const spread = pods.spread * Math.sqrt(p.projectiles / 5) * p.radiusMult;
   const reach = pods.burstRadius * p.radiusMult + TARGET_RADIUS;
-  return Math.max(1, p.projectiles * Math.min(1, (reach / Math.max(0.5, spread)) ** 2));
+  // An arrow hits where it lands, and its pod bursts there later: two hits for each that falls within reach.
+  return Math.max(1, 2 * p.projectiles * Math.min(1, (reach / Math.max(0.5, spread)) ** 2));
 }
 
 /**
@@ -86,7 +88,7 @@ export function cloneDamage(
 
 /**
  * How many pulses of a drifting orb reach a target `distance` tiles away on its way (Drifting Storm). The orb is loosed toward
- * the target and drifts slowly on for a tile past it at most, striking everything within its reach at each beat, the first
+ * the target and drifts slowly on through it to the end of its range, striking everything within its reach at each beat, the first
  * as it leaves; the beats are on the clock from the moment it is loosed, so the count is that of the beats while it is
  * within reach of the target.
  */
@@ -94,8 +96,8 @@ export function orbHits(p: SkillProfile, distance: number): number {
   const spec = p.skill.pulse;
   if (!spec) return 1;
   const b = p.skill.behaviour;
-  const range = (b.kind === 'projectile' ? (b.range ?? 9) : 9) + 2;
-  const path = Math.max(3, Math.min(range, distance + 1));
+  // It flies its whole range, through and past the target.
+  const path = (b.kind === 'projectile' ? (b.range ?? 9) : 9) + 2;
   const reach = spec.radius * p.radiusMult + TARGET_RADIUS;
   const enter = Math.max(0, distance - reach);
   const exit = Math.min(path, distance + reach);

@@ -55,8 +55,9 @@ export type Field = {
   profile?: SkillProfile;
   hand: number;
   pulseT: number;
-  /** A zap: the jumps it has made (it makes one for every jump its time holds). */
+  /** A zap: the jumps it has made (it makes one for every jump its time holds). An illusion: the uses that fed it. */
   jumps?: number;
+  uses?: number;
   interval: number;
   /** Chilling ground: the share of a hit it deals in a second. A storm: the damage of a bolt. */
   dps: number;
@@ -140,6 +141,10 @@ export function placePods(w: World, a: Actor, act: Action): void {
     const d = spread * Math.sqrt(w.rngTrig.float(0, 1));
     const spot = w.grid.collide(act.aimX + Math.cos(ang) * d, act.aimY + Math.sin(ang) * d, 0.3);
     const r = spec.radius * p.radiusMult;
+    // The arrow hits what is about the spot where it lands, and leaves its pod there (the pod bursts later).
+    const landR = spec.burstRadius * p.radiusMult;
+    for (const e of enemiesIn(w, a.team, spot.x, spot.y, landR))
+      hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
     a.side!.fields.push({
       id: w.nextId++,
       owner: a.id,
@@ -296,11 +301,13 @@ export function orbUse(w: World, a: Actor, act: Action, stage: number): void {
     g.tx = act.aimX;
     g.ty = act.aimY;
     g.profile = p;
-    g.stages = stage;
-    // A wave of damage for each so many stages, harder once the illusion has stopped.
-    if (stage % spec.waveStages === 0) {
-      const still =
-        (g.moved ?? 0) >= spec.distance || Math.hypot((g.tx ?? 0) - g.x, (g.ty ?? 0) - g.y) < 0.3;
+    const still =
+      (g.moved ?? 0) >= spec.distance || Math.hypot((g.tx ?? 0) - g.x, (g.ty ?? 0) - g.y) < 0.3;
+    // Stages are built only while the illusion still runs (the last wave grows with them); the waves come on as the channel does.
+    if (!still) g.stages = (g.stages ?? 0) + 1;
+    g.uses = (g.uses ?? 0) + 1;
+    // A wave of damage for each so many uses, harder once the illusion has stopped.
+    if (g.uses % spec.waveStages === 0) {
       // A wave is one hit of the skill (the reference game: only the final wave grows with the stages), more once the illusion has stopped.
       const q = scaleProfile(p, still ? 1 + spec.stillMore / 100 : 1);
       blast(w, a.side!, { ...g, profile: q }, g.x, g.y, g.radius);
@@ -820,9 +827,11 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     prevX = tx;
     prevY = ty;
   }
-  if (tiles.length === 0) return;
-  for (const idx of tiles) w.grid.tiles[idx] = 0;
-  w.grid.refreshOpen();
+  // Blocks rise where the ground is open (not where the last wall still stands); the rise hurts along the whole line either way.
+  if (tiles.length > 0) {
+    for (const idx of tiles) w.grid.tiles[idx] = 0;
+    w.grid.refreshOpen();
+  }
   const f: Field = {
     id: w.nextId++,
     owner: a.id,
@@ -842,7 +851,7 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     dtype: dominantType(p),
     tiles,
   };
-  a.side!.fields.push(f);
+  if (tiles.length > 0) a.side!.fields.push(f);
   // The band the wall hurts, outlined (the renderer draws the wall itself, tile by tile, from the field).
   const ex = Math.cos(ang) * (len / 2);
   const ey = Math.sin(ang) * (len / 2);

@@ -172,22 +172,25 @@ describe('mines (Storm Charge)', () => {
 describe('traps (Shrapnel Trap)', () => {
   const r = play(['shrapnelTrap']);
 
-  it('one trap is worth what the sheet says; the repeats lay more traps', () => {
-    // The sheet's hit, once for each trap that goes off.
+  it('one trap and the smaller blasts it rains are worth what the sheet says', () => {
+    // The sheet's hit, for the trap's own burst and each of its blasts that reaches the target.
     const traps = r.shots.shrapnelTrap ?? 0;
-    expect(traps).toBeGreaterThan(50);
+    expect(traps).toBeGreaterThan(30);
     const perTrap = r.rows['Shrapnel Trap'].dmg / traps;
     const s = r.c.sheet(r.c.configConds, 'boss', r.target).skill;
-    expect(perTrap / (s.avgHit * s.hitChance)).toBeGreaterThan(0.85);
-    expect(perTrap / (s.avgHit * s.hitChance)).toBeLessThan(1.15);
+    const p = r.c.profile(r.c.primary);
+    const hits = 1 + mineRainHits(r.c.primary, p);
+    expect(hits).toBeGreaterThan(5);
+    expect(perTrap / (s.avgHit * s.hitChance * hits)).toBeGreaterThan(0.85);
+    expect(perTrap / (s.avgHit * s.hitChance * hits)).toBeLessThan(1.15);
   });
 
-  it('the rotation stands the traps: the character cannot lay more while the last ones stand, and uses its weapon', () => {
+  it('the rotation throws a trap with every cast, as the sim does: one goes off before the next lands', () => {
     const plan = r.c.plan(r.c.configConds, 'boss');
     const acts = plan.acts[r.c.primary.key] / (r.uses.shrapnelTrap / r.secs);
     expect(acts).toBeGreaterThan(0.9);
     expect(acts).toBeLessThan(1.1);
-    expect(plan.weapon).toBeGreaterThan(0.3);
+    expect(plan.weapon).toBeLessThan(0.05);
   });
 
   it('the sheet predicts the damage a second', () => {

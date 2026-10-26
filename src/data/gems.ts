@@ -479,6 +479,11 @@ export type ActiveGemDef = SkillFx & {
   behaviour: SkillBehaviour;
   /** Attacks: "deals N% of base damage". */
   baseMult?: LevelValue;
+  /**
+   * Attacks: the percent at which flat added damage (the gem's own and the character's) is taken, where it is not the base
+   * multiplier (Fuse Arrow's explosion deals half the bow's damage and all of its own fire).
+   */
+  addedMult?: LevelValue;
   /** Spells: base damage per type. */
   spellDamage?: SpellDamageDef[];
   /** Added damage effectiveness for spells, percent. */
@@ -573,8 +578,11 @@ export type ActiveGemDef = SkillFx & {
   ancestral?: { buff: BuffId; range: number; mods: GemMod[] };
   /** Totems that cast a beam of damage over time at the character and at each other, in the range given (Cinder Bond). */
   bond?: { width: number; range: number; end: number };
-  /** A mine that, going off, also sends projectiles raining down around it; and an aura that adds fire damage to hits near it. */
-  mineRain?: { count: number; perPrior: number; radius: number; spread: number };
+  /**
+   * A mine or trap that, going off, also sends smaller blasts down around it (`radius` a share of its own, over `spread` tiles; a
+   * mine's later in a set send one more for every `perPrior` before it); and a mine's aura that adds fire damage to hits near it.
+   */
+  mineRain?: { count: LevelValue; perPrior?: number; radius: number; spread: number };
   mineAura?: {
     min: LevelValue;
     max: LevelValue;

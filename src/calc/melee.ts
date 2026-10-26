@@ -113,3 +113,19 @@ export function illusionStill(
   const need = Math.min(o.distance, Math.max(0, run.distance - 0.3));
   return elapsed * run.speed * o.speed >= need;
 }
+
+/**
+ * Whether an illusion has stopped by the `use`-th use of its channel (of `uses`): it has run far enough, or to the place it was sent
+ * to. With no word of the target, the later half of the uses.
+ */
+export function illusionRan(
+  o: { speed: number; distance: number },
+  useTime: number,
+  use: number,
+  uses: number,
+  run?: { distance: number; speed: number },
+): boolean {
+  if (!run) return use > uses / 2;
+  const need = Math.min(o.distance, Math.max(0, run.distance - 0.3));
+  return (use - 1) * useTime * run.speed * o.speed >= need;
+}
