@@ -941,8 +941,24 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     skillType: 'spell',
     tags: ['spell', 'projectile', 'area', 'fire'],
     behaviour: { kind: 'projectile', count: 1, spread: 0, explodeRadius: 1.2, range: 9 },
-    spellDamage: [{ type: 'fire', min: [9, 520], max: [14, 780] }],
-    effectiveness: 240,
+    spellDamage: [
+      {
+        type: 'fire',
+        min: {
+          table: [
+            9, 10, 13, 18, 26, 40, 54, 72, 95, 124, 159, 204, 258, 326, 410, 513, 640, 795, 934,
+            1095, 1217, 1352, 1501, 1665, 1846,
+          ],
+        },
+        max: {
+          table: [
+            14, 16, 20, 27, 40, 60, 81, 109, 143, 186, 239, 305, 388, 490, 615, 770, 960, 1193,
+            1401, 1643, 1826, 2028, 2251, 2497, 2769,
+          ],
+        },
+      },
+    ],
+    effectiveness: 180,
     castTime: 0.75,
     crit: 6,
     cost: [3, 22],
@@ -968,7 +984,23 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       ramp: 15,
       fork: true,
     },
-    spellDamage: [{ type: 'lightning', min: [3, 70], max: [28, 650] }],
+    spellDamage: [
+      {
+        type: 'lightning',
+        min: {
+          table: [
+            6, 7, 9, 12, 16, 20, 25, 29, 34, 39, 46, 53, 61, 70, 81, 93, 102, 111, 122, 133, 145,
+            159, 173, 189, 206,
+          ],
+        },
+        max: {
+          table: [
+            33, 41, 54, 70, 89, 112, 139, 163, 191, 223, 258, 299, 346, 399, 458, 526, 577, 631,
+            690, 754, 824, 900, 982, 1070, 1167,
+          ],
+        },
+      },
+    ],
     effectiveness: 80,
     castTime: 0.8,
     crit: 5,
@@ -985,7 +1017,23 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     tags: ['spell', 'projectile', 'cold'],
     behaviour: { kind: 'projectile', count: 2, spread: 6, range: 9 },
     form: { after: 3, speed: 4, critMore: 600, critMulti: [30, 49] },
-    spellDamage: [{ type: 'cold', spread: [0.8, 1.2] }],
+    spellDamage: [
+      {
+        type: 'cold',
+        min: {
+          table: [
+            22, 28, 36, 45, 56, 69, 85, 98, 113, 129, 148, 169, 192, 218, 247, 279, 302, 327, 354,
+            383, 415, 448, 484, 522, 563,
+          ],
+        },
+        max: {
+          table: [
+            33, 41, 53, 68, 84, 104, 127, 147, 169, 194, 222, 253, 288, 327, 370, 418, 453, 491,
+            532, 575, 622, 672, 726, 783, 845,
+          ],
+        },
+      },
+    ],
     effectiveness: 80,
     castTime: 0.7,
     crit: 7,
