@@ -4,6 +4,23 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-26
+
+### Skills
+
+- Skill damage is rebalanced across the board: attacks no longer gain damage from your level and hit much less hard later on, while spells and most minions hit much harder and damage over time somewhat harder.
+- Many skills are reworked to hit as intended: Spinning Dash hits each enemy only once a dash, Rain of Steel falls in five volleys instead of six, and Faultline's aftershock hits much harder.
+- Mines can lie fifteen at a time and go off as soon as they land, and Shrapnel Trap bursts into smaller blasts instead of throwing extra traps.
+- Exalted Focus raises skill levels much more slowly as you level, Double Set adds traps by chance, and Rime Herald's and Storm Herald's hits now grow with your spell damage.
+- Call Furies builds a swarm of up to twenty spirits, Crushing Halo's hits ignore some armour, and Skitter Flash's sparks last twice as long.
+- Glacier Dart now looks like a slow, heavy crystal and Chilling Shard like a thin sliver that fades as it flies.
+
+### Items and interface
+
+- Several uniques now cast skills of their own, from a lightning bolt to spectral hounds, spiders and fire with each step.
+- The Mystic's west starting passive gives flat energy shield, and the life orb's tooltip shows your energy shield.
+- Fixed a black screen at map start on phones and a Skills search that could hide every gem, now with a Clear filters button; high scores scroll sideways on phones.
+
 ## 2026-10-25
 
 - Slag Blow, Hoarfrost Mote, Pyre Burst and Mortar Charge now visibly throw or drop what they hit with, and Tempest Mote's lightning bolts now show.
