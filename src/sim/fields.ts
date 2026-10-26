@@ -209,6 +209,8 @@ export function startStorm(
   radius: number,
   effectiveness: number,
   dtype: number,
+  /** The spell each bolt hits as; without it, a raw share of the curve at the area's level. */
+  profile?: SkillProfile,
 ): void {
   const level = Math.max(1, Math.min(20, 1 + Math.floor(w.plan.areaLevel / 5)));
   s.fields.push({
@@ -227,6 +229,7 @@ export function startStorm(
     interval,
     dps: (spellBaseDamage(level) * effectiveness) / 100,
     dtype,
+    profile,
     recent: new Map(),
   });
 }
@@ -785,7 +788,8 @@ export function tickFields(w: World, s: Side, dt: number): void {
           dtype: f.dtype,
           skill: f.profile?.skill.id,
         });
-        rawHit(w, e, f.dps * (0.5 + w.rngTrig.float(0, 1)), f.dtype, s, 'Herald');
+        if (f.profile) hit(w, p, e, f.profile, 0, Math.hypot(e.x - p.x, e.y - p.y));
+        else rawHit(w, e, f.dps * (0.5 + w.rngTrig.float(0, 1)), f.dtype, s, 'Herald');
       }
     }
     if (f.t > 0) s.fields[j++] = f;

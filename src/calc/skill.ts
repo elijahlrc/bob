@@ -142,6 +142,8 @@ export type SkillProfile = {
   };
   /** How many totems or brands can stand, or traps or mines go off, at once (1 and the support mods). */
   deployCount: number;
+  /** Extra totems, traps or mines a use puts down on average, by chance (Double Set). */
+  deployExtra: number;
   /** Traps and mines land at random over a wide place instead of in a tight ring (Snare Cluster). */
   deployScatter: boolean;
   cost: number;
@@ -632,6 +634,7 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
           : (skill.spin?.hits ?? 1),
     zoneInterval,
     deployCount: Math.max(1, Math.round(1 + db.sum('base', 'deployCount', baseCtx))),
+    deployExtra: Math.max(0, db.sum('base', 'deployExtra', baseCtx)),
     deployScatter: db.flag('deployScatter', baseCtx),
     deploySeconds: db.sum('base', 'deploySeconds', baseCtx),
     mineChain: db.sum('base', 'mine.chain', baseCtx),

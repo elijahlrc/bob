@@ -243,7 +243,12 @@ export function placeDeployable(w: World, a: Actor, act: Action): void {
   const c = a.side!.char.actives.find((x) => x.skill.id === act.profile.skill.id);
   if (!c?.deploy) return;
   const target = actorById(w, act.targetId);
-  const n = act.profile.deployCount;
+  // A chance of more, by the expected number (Double Set).
+  const extra = act.profile.deployExtra;
+  const n =
+    act.profile.deployCount +
+    Math.floor(extra) +
+    (w.rngTrig.chance(extra - Math.floor(extra)) ? 1 : 0);
   // "Increased duration" of totems, traps, mines and brands.
   const seconds = deploySecondsOf(c, act.profile);
   const mineAura = c.skill.mineAura;

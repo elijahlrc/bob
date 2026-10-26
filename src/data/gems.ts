@@ -772,8 +772,8 @@ export type SupportGemDef = {
   mods: GemMod[];
   /** Raises the level of the skill it supports (Exalted Focus), by gem level. */
   levelBonus?: LevelValue;
-  /** Trigger supports: the linked spells are cast by this trigger instead of by the player. */
-  trigger?: TriggerDef;
+  /** Trigger supports: the linked spells are cast by this trigger instead of by the player (its chance may grow with the level). */
+  trigger?: Omit<TriggerDef, 'chance'> & { chance: LevelValue };
   /** Hexing Strikes: the hex gems in the same item are applied to enemies the supported skill hits. */
   hexOnHit?: boolean;
   /** Mods that act on the whole character while a skill the support applies to is socketed (not only on that skill). */
@@ -1115,7 +1115,7 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'str',
     supports: ['attack'],
     costMult: 1.2,
-    mods: [{ stat: 'gain.physical.fire', kind: 'base', value: [25, 34] }],
+    mods: [{ stat: 'gain.physical.fire', kind: 'base', value: [25, 44] }],
     description: 'Gain physical damage as extra fire damage.',
   },
   {
@@ -1182,8 +1182,14 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['projectile'],
     costMult: 1.2,
     mods: [
-      { stat: 'pierce', kind: 'base', value: [2, 5] },
-      { stat: 'damage', kind: 'more', value: [0, 10], tags: ['projectile'] },
+      {
+        stat: 'pierce',
+        kind: 'base',
+        value: {
+          table: [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5],
+        },
+      },
+      { stat: 'damage', kind: 'more', value: [0, 19], tags: ['projectile'] },
     ],
     description: 'Projectiles pass through enemies.',
   },
@@ -1218,8 +1224,8 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     supports: [],
     costMult: 1.2,
     mods: [
-      { stat: 'critChance', kind: 'inc', value: [30, 49] },
-      { stat: 'critMulti', kind: 'base', value: [15, 34] },
+      { stat: 'critChance', kind: 'inc', value: [50, 88] },
+      { stat: 'critChance', kind: 'base', value: [1, 1.9] },
     ],
     description: 'Better critical strikes.',
   },
@@ -1232,7 +1238,31 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.2,
     mods: [
       { stat: 'chance.bleed', kind: 'base', value: 25 },
-      { stat: 'damage', kind: 'more', value: [30, 49], tags: ['bleed'] },
+      { stat: 'damage', kind: 'more', value: [10, 29], tags: ['bleed'] },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            1, 1, 2, 2, 3, 3, 4, 5, 6, 8, 10, 12, 14, 17, 21, 24, 29, 34, 39, 44, 48, 52, 56, 61,
+            66,
+          ],
+        },
+        damageTypes: ['physical'],
+        tags: ['attack'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            2, 3, 3, 4, 4, 5, 6, 8, 10, 12, 15, 18, 21, 26, 31, 37, 44, 52, 58, 66, 71, 77, 84, 91,
+            98,
+          ],
+        },
+        damageTypes: ['physical'],
+        tags: ['attack'],
+      },
     ],
     description: 'Hits cause stronger bleeding.',
   },
@@ -1245,7 +1275,28 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.2,
     mods: [
       { stat: 'chance.poison', kind: 'base', value: 40 },
-      { stat: 'damage', kind: 'more', value: [20, 39], tags: ['poison'] },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            1, 1, 2, 2, 2, 4, 5, 7, 9, 11, 14, 18, 23, 29, 36, 45, 56, 69, 81, 94, 104, 116, 128,
+            142, 157,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            2, 3, 3, 4, 5, 5, 7, 10, 13, 17, 21, 27, 34, 43, 54, 67, 83, 103, 121, 141, 156, 173,
+            192, 213, 235,
+          ],
+        },
+        damageTypes: ['chaos'],
+      },
     ],
     description: 'Hits poison their targets.',
   },
@@ -1260,14 +1311,24 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [42, 205],
+        value: {
+          table: [
+            42, 47, 52, 58, 64, 71, 79, 87, 96, 106, 117, 129, 141, 155, 163, 171, 179, 187, 196,
+            205, 225, 246, 270, 295, 323,
+          ],
+        },
         damageTypes: ['fire'],
         condition: { id: 'targetIgnited' },
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [63, 308],
+        value: {
+          table: [
+            63, 70, 78, 87, 97, 107, 118, 131, 144, 159, 175, 193, 212, 233, 244, 256, 268, 281,
+            294, 308, 337, 370, 405, 443, 484,
+          ],
+        },
         damageTypes: ['fire'],
         condition: { id: 'targetIgnited' },
       },
@@ -1326,7 +1387,7 @@ SUPPORT_GEMS.push(
     attr: 'int',
     supports: ['spell'],
     costMult: 1.3,
-    mods: [],
+    mods: [{ stat: 'damage', kind: 'more', value: [-70, 6] }],
     trigger: {
       on: 'hitTaken',
       threshold: 30,
@@ -1346,8 +1407,54 @@ export const AURA_GEMS: AuraGemDef[] = [
     attr: 'str',
     reservePct: 50,
     mods: [
-      { stat: 'damage.min', kind: 'base', value: [18, 120], damageTypes: ['fire'] },
-      { stat: 'damage.max', kind: 'base', value: [27, 180], damageTypes: ['fire'] },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            16, 19, 22, 25, 29, 33, 37, 42, 48, 52, 56, 60, 65, 70, 76, 82, 88, 94, 101, 109, 117,
+            125, 134, 143, 154,
+          ],
+        },
+        damageTypes: ['fire'],
+        tags: ['attack'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            23, 27, 31, 36, 41, 47, 53, 60, 68, 74, 80, 86, 93, 100, 108, 116, 125, 135, 145, 155,
+            167, 179, 191, 205, 219,
+          ],
+        },
+        damageTypes: ['fire'],
+        tags: ['attack'],
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            15, 17, 20, 23, 26, 30, 34, 39, 44, 47, 51, 55, 60, 64, 69, 75, 80, 86, 93, 99, 107,
+            114, 122, 131, 140,
+          ],
+        },
+        damageTypes: ['fire'],
+        tags: ['spell'],
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            21, 24, 28, 32, 37, 42, 48, 54, 61, 66, 72, 78, 84, 90, 97, 105, 113, 121, 130, 140,
+            150, 161, 172, 184, 197,
+          ],
+        },
+        damageTypes: ['fire'],
+        tags: ['spell'],
+      },
     ],
     description: 'Adds fire damage to attacks and spells.',
   },
@@ -1361,14 +1468,23 @@ export const AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 16],
+        value: {
+          table: [
+            2, 3, 3, 4, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 11, 12, 13, 13, 14, 16, 17, 18, 19, 20, 22,
+          ],
+        },
         damageTypes: ['lightning'],
         tags: ['attack'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [37, 248],
+        value: {
+          table: [
+            37, 43, 50, 57, 66, 75, 85, 97, 109, 118, 128, 138, 149, 161, 173, 186, 200, 215, 231,
+            248, 267, 286, 306, 328, 351,
+          ],
+        },
         damageTypes: ['lightning'],
         tags: ['attack'],
       },
@@ -1452,6 +1568,71 @@ export const HEXING_STRIKES: SupportGemDef = {
  * casts them.
  */
 export const GRANTED_GEMS: ActiveGemDef[] = [
+  {
+    kind: 'active',
+    id: 'heraldShatter',
+    name: 'Rime Shatter',
+    attr: 'int',
+    skillType: 'spell',
+    tags: ['spell', 'area', 'cold'],
+    types: ['triggerable'],
+    behaviour: { kind: 'burst', radius: 2.5 },
+    spellDamage: [
+      {
+        type: 'cold',
+        min: {
+          table: [
+            18, 23, 30, 38, 45, 53, 62, 73, 85, 99, 115, 134, 154, 178, 195, 214, 235, 257, 282,
+            308, 337, 368, 402, 438, 478,
+          ],
+        },
+        max: {
+          table: [
+            26, 35, 45, 57, 67, 80, 94, 110, 128, 149, 173, 200, 232, 267, 293, 321, 352, 386, 422,
+            462, 505, 552, 603, 658, 717,
+          ],
+        },
+      },
+    ],
+    effectiveness: 80,
+    castTime: 0,
+    crit: 5,
+    cost: [0, 0],
+    mods: [],
+    description: 'A frozen enemy that dies shatters, hurting those about it.',
+  },
+  {
+    kind: 'active',
+    id: 'heraldBolt',
+    name: 'Herald Bolt',
+    attr: 'int',
+    skillType: 'spell',
+    tags: ['spell', 'lightning'],
+    types: ['triggerable'],
+    behaviour: { kind: 'burst', radius: 0.5 },
+    spellDamage: [
+      {
+        type: 'lightning',
+        min: {
+          table: [
+            1, 1, 1, 2, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 15, 17, 19, 21, 24, 27, 31, 34, 38, 43, 48,
+          ],
+        },
+        max: {
+          table: [
+            34, 47, 65, 87, 108, 135, 166, 203, 248, 301, 363, 436, 522, 623, 708, 803, 908, 1026,
+            1157, 1303, 1451, 1615, 1796, 1995, 2215,
+          ],
+        },
+      },
+    ],
+    effectiveness: 120,
+    castTime: 0,
+    crit: 5,
+    cost: [0, 0],
+    mods: [],
+    description: 'A bolt from the storm a shocked enemy leaves as it dies.',
+  },
   {
     kind: 'active',
     id: 'aspectOfPrey',

@@ -51,6 +51,26 @@ export const GEM_LADDERS: Readonly<Record<number, readonly number[]>> = {
   ],
 };
 
+/** The character level gem levels 1 to 25 require, for a gem whose levels follow a ladder of their own. */
+export const GEM_OWN_LADDERS: Readonly<Record<string, readonly number[]>> = {
+  deepInsight: [
+    1, 10, 45, 60, 75, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+    100, 100, 100, 100, 100,
+  ],
+  duneStance: [
+    4, 12, 28, 44, 58, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 91, 92, 93, 94, 95, 96, 97, 98,
+    99,
+  ],
+  exaltedFocus: [
+    1, 10, 45, 60, 75, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+    100, 100, 100, 100, 100,
+  ],
+  refineGem: [
+    1, 10, 45, 60, 75, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
+    100, 100, 100, 100, 100,
+  ],
+};
+
 /** The level a gem's first level requires, by gem id; a gem not listed starts at 1. */
 export const GEM_START: Readonly<Record<string, number>> = {
   anvilDrop: 4,

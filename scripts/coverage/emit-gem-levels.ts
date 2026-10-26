@@ -50,6 +50,8 @@ async function main(): Promise<void> {
   };
 
   const start: Record<string, number> = {};
+  // A gem whose reference levels need other character levels than the ladder of its first level (Empower's few steep ones) has its own.
+  const own: Record<string, number[]> = {};
   const notes: string[] = [];
   for (const [id, entry] of Object.entries(map)) {
     if (!entry.ref) continue;
@@ -63,6 +65,12 @@ async function main(): Promise<void> {
     if (fromSkill !== undefined && fromList !== undefined && fromSkill !== fromList)
       notes.push(`${id}: skill data ${fromSkill}, gem list ${fromList}; kept ${fromSkill}`);
     if (first > 1) start[id] = first;
+    const reqs = skillOf(entry.ref)?.reqs;
+    if (reqs?.length) {
+      const l = ladderOf(reqs[0]);
+      if (!l || reqs.some((r, i) => r !== l[i]))
+        own[id] = Array.from({ length: 25 }, (_, i) => reqs[Math.min(i, reqs.length - 1)]);
+    }
   }
   const firsts = [...new Set([1, ...Object.values(start)])].sort((a, b) => a - b);
   const ladders: Record<number, number[]> = {};
@@ -81,6 +89,14 @@ export const GEM_LADDERS: Readonly<Record<number, readonly number[]>> = {
 ${firsts.map((f) => `  ${f}: [${ladders[f].join(', ')}],`).join('\n')}
 };
 
+/** The character level gem levels 1 to 25 require, for a gem whose levels follow a ladder of their own. */
+export const GEM_OWN_LADDERS: Readonly<Record<string, readonly number[]>> = {
+${Object.keys(own)
+  .sort()
+  .map((id) => `  ${id}: [${own[id].join(', ')}],`)
+  .join('\n')}
+};
+
 /** The level a gem's first level requires, by gem id; a gem not listed starts at 1. */
 export const GEM_START: Readonly<Record<string, number>> = {
 ${ids.map((id) => `  ${id}: ${start[id]},`).join('\n')}
@@ -89,7 +105,7 @@ ${ids.map((id) => `  ${id}: ${start[id]},`).join('\n')}
   const options = await resolveConfig(OUT);
   writeFileSync(OUT, await format(src, { ...options, filepath: OUT }));
   console.log(
-    `gem levels: ${ids.length} gems start above level 1; ladders from ${firsts.join(', ')}`,
+    `gem levels: ${ids.length} gems start above level 1; ladders from ${firsts.join(', ')}; own ladders: ${Object.keys(own).join(', ') || 'none'}`,
   );
   for (const n of notes) console.log(`  ${n}`);
 }

@@ -245,7 +245,8 @@ export type Mod = {
   tags?: SkillTag[];
   condition?: Condition;
   /** value × floor(statValue / div). */
-  per?: { stat: StatId; div: number };
+  /** Times `value` per `div` of the stat, at most `max` times (a threshold when 1: 'while at 10 rage or more'). */
+  per?: { stat: StatId; div: number; max?: number };
   source?: ModSource;
   /** Local item mod: applied to the item's own base stats only. */
   local?: boolean;

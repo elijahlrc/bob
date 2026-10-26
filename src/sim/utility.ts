@@ -294,7 +294,7 @@ const BURN_RADIUS = 2.8;
  * of such a build does, instead of standing off at the range of its attack.
  */
 export function contactRange(_w: World, s: Side): number {
-  let r = s.char.burn.pct > 0 && !burnOff.has(s) ? BURN_RADIUS * 0.8 : 0;
+  let r = (s.char.burn.pct > 0 || s.char.burn.base > 0) && !burnOff.has(s) ? BURN_RADIUS * 0.8 : 0;
   const v = s.vortex;
   if (v && v.blades.length > 0) r = Math.max(r, vortexRadius(s) * 0.8);
   else {
@@ -327,7 +327,7 @@ const burnOff = new WeakSet<Side>();
 /** A burning aura damages the enemies near the player (and the player, without killing it) twice a second. */
 export function tickAuraBurn(w: World, s: Side, dt: number): void {
   const b = s.char.burn;
-  if (b.pct <= 0 && b.self <= 0) return;
+  if (b.pct <= 0 && b.base <= 0 && b.self <= 0) return;
   s.auraBurnT += dt;
   if (s.auraBurnT < BURN_EVERY) return;
   s.auraBurnT -= BURN_EVERY;
@@ -344,8 +344,7 @@ export function tickAuraBurn(w: World, s: Side, dt: number): void {
   // The enemies burn for a share of the character's life, with the character's damage over time modifiers. The life is the
   // sheet's: a duel's larger pool (docs/DUEL-BALANCE.md 4.2) is toughness, not damage.
   const amount =
-    (b.pct / 100) *
-    (p.def.maxLife / s.lifeMult) *
+    ((b.pct / 100) * (p.def.maxLife / s.lifeMult) + b.base) *
     BURN_EVERY *
     s.char.db.mult('damage', playerCtx(w, s));
   if (amount > 0)

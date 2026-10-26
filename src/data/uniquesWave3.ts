@@ -27,7 +27,7 @@ export const WAVE3_UNIQUES: UniqueDef[] = [
         targetHas: 'hex',
         chance: 100,
         cooldown: 0,
-        effect: { kind: 'explode', pctOfMaxLife: 25, dtype: 'chaos', radius: 2.5 },
+        effect: { kind: 'explode', pctOfMaxLife: 3, dtype: 'physical', radius: 2.5 },
       },
     ],
     factions: ['choir'],

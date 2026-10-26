@@ -90,7 +90,9 @@ function perform(
   switch (e.kind) {
     case 'castSocketed':
     case 'castGranted':
-      return skill ? castTriggered(w, s, skill, ev) : false;
+      return skill
+        ? castTriggered(w, s, skill, ev, e.kind === 'castGranted' && e.at === 'dead')
+        : false;
     case 'explode':
       return ev.on === 'kill' && explode(w, s, e, ev.target);
     case 'spread':
@@ -107,6 +109,8 @@ function perform(
         e.radius,
         e.effectiveness,
         DAMAGE_TYPES.indexOf(e.dtype),
+        // Each bolt is the character's own hit of the herald's spell.
+        skill ? s.char.profile(skill, playerConds(w, s, null), flaskMask(s)) : undefined,
       );
       return true;
     case 'recover':
@@ -130,12 +134,21 @@ function nearestEnemy(w: World, s: Side): Actor | null {
   return best;
 }
 
-function castTriggered(w: World, s: Side, choice: SkillChoice, ev: TriggerEvent): boolean {
+function castTriggered(
+  w: World,
+  s: Side,
+  choice: SkillChoice,
+  ev: TriggerEvent,
+  /** Where the enemy that died fell (a herald's shatter). */
+  atDead = false,
+): boolean {
   // A spell cast on a kill goes to the next enemy, or lands where the dead one fell.
   const target =
-    ('target' in ev && ev.target.alive ? ev.target : null) ??
-    nearestEnemy(w, s) ??
-    (ev.on === 'kill' ? ev.target : null);
+    atDead && ev.on === 'kill'
+      ? ev.target
+      : (('target' in ev && ev.target.alive ? ev.target : null) ??
+        nearestEnemy(w, s) ??
+        (ev.on === 'kill' ? ev.target : null));
   if (!target) return false;
   // A triggered blink would carry the character off at the trigger's whim: only the other utility kinds are cast this way.
   if (choice.skill.utility?.kind === 'blink') return false;

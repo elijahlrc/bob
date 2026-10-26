@@ -370,7 +370,7 @@ export function gemCardData(def: GemDef, level: number): GemCardData {
     if (def.excludes?.length) stats.push(`Not ${def.excludes.map(tagLabel).join(' or ')} skills`);
     if (def.trigger)
       stats.push(
-        `Linked spells are cast ${triggerCause(def.trigger)} (${def.trigger.cooldown} s cooldown)`,
+        `Linked spells are cast ${triggerCause({ ...def.trigger, chance: Math.round(levelValue(def.trigger.chance, level)) })} (${def.trigger.cooldown} s cooldown)`,
       );
     for (const t of def.extraTriggers ?? []) stats.push(triggerText(t));
     if (def.curseAura)

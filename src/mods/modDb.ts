@@ -117,7 +117,7 @@ function valueOf(c: Compiled, ctx: ModCtx): number {
   const m = c.mod;
   if (!m.per) return m.value;
   const v = ctx.statValue ? ctx.statValue(m.per.stat) : 0;
-  return m.value * Math.floor(v / m.per.div);
+  return m.value * Math.min(m.per.max ?? Infinity, Math.floor(v / m.per.div));
 }
 
 type Bucket = { all: Compiled[] } & Record<ModKind, Compiled[]>;

@@ -7714,13 +7714,23 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [14, 137],
+        value: {
+          table: [
+            17, 21, 24, 27, 31, 35, 39, 44, 50, 56, 63, 70, 79, 88, 99, 110, 123, 137, 153, 170,
+            190, 211, 234, 260, 289,
+          ],
+        },
         damageTypes: ['chaos'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [21, 205],
+        value: {
+          table: [
+            26, 32, 36, 41, 46, 52, 59, 67, 75, 84, 94, 106, 118, 132, 148, 165, 185, 206, 229, 255,
+            284, 316, 352, 391, 434,
+          ],
+        },
         damageTypes: ['chaos'],
       },
     ],
@@ -7737,13 +7747,23 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [4, 150],
+        value: {
+          table: [
+            4, 5, 6, 8, 11, 14, 18, 23, 29, 35, 41, 49, 57, 67, 79, 92, 108, 125, 146, 169, 187,
+            206, 227, 250, 276,
+          ],
+        },
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 225],
+        value: {
+          table: [
+            6, 7, 9, 12, 16, 21, 27, 35, 44, 52, 62, 73, 86, 101, 118, 138, 161, 188, 219, 254, 280,
+            309, 341, 376, 414,
+          ],
+        },
         damageTypes: ['cold'],
       },
     ],
@@ -7760,13 +7780,22 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 20],
+        value: {
+          table: [
+            0, 1, 1, 1, 1, 2, 2, 3, 4, 4, 5, 6, 7, 8, 10, 11, 13, 16, 18, 21, 23, 26, 29, 32, 35,
+          ],
+        },
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [8, 400],
+        value: {
+          table: [
+            8, 10, 13, 18, 24, 31, 41, 52, 67, 80, 95, 112, 133, 156, 184, 216, 253, 295, 345, 402,
+            445, 492, 543, 600, 663,
+          ],
+        },
         damageTypes: ['lightning'],
       },
     ],
@@ -7832,6 +7861,16 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         stat: 'chillTaken',
         kind: 'flag',
         value: 1,
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [10, 29],
+        damageTypes: ['cold'],
+        tags: ['dot'],
+        condition: {
+          id: 'targetChilled',
+        },
       },
     ],
     description:
@@ -8044,7 +8083,12 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'dot.decay',
         kind: 'base',
-        value: [120, 843],
+        value: {
+          table: [
+            120, 137, 156, 177, 201, 228, 258, 292, 329, 371, 419, 471, 530, 596, 632, 670, 710,
+            752, 796, 843, 945, 1059, 1186, 1328, 1485,
+          ],
+        },
       },
     ],
     description:
@@ -8163,7 +8207,12 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'surge.threshold',
         kind: 'base',
-        value: [15, 400],
+        value: {
+          table: [
+            15, 16, 17, 19, 22, 26, 32, 41, 51, 64, 80, 99, 121, 148, 178, 213, 252, 296, 345, 400,
+            461, 527, 600, 680, 766,
+          ],
+        },
       },
       {
         stat: 'buffOn.surge.arcaneSurge',
@@ -8175,6 +8224,31 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         kind: 'more',
         value: [10, 19],
         tags: ['spell'],
+        condition: {
+          id: 'arcaneSurge',
+        },
+      },
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [0, 9.1],
+        tags: ['spell'],
+        condition: {
+          id: 'arcaneSurge',
+        },
+      },
+      {
+        stat: 'castSpeed',
+        kind: 'inc',
+        value: [0, 9],
+        condition: {
+          id: 'arcaneSurge',
+        },
+      },
+      {
+        stat: 'manaRegenPct',
+        kind: 'base',
+        value: [0, 0.5],
         condition: {
           id: 'arcaneSurge',
         },
@@ -8221,7 +8295,9 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     attr: 'str',
     supports: [],
     costMult: 1.25,
-    levelBonus: [0, 9],
+    levelBonus: {
+      table: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    },
     mods: [],
     description: 'Raises the level of the supported skill.',
   },
@@ -8425,19 +8501,33 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [8, 69],
+        value: {
+          table: [
+            8, 10, 11, 13, 14, 16, 18, 20, 22, 25, 27, 30, 34, 38, 42, 46, 51, 56, 62, 69, 76, 84,
+            93, 102, 112,
+          ],
+        },
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [12, 103],
+        value: {
+          table: [
+            12, 15, 17, 19, 21, 24, 27, 30, 33, 37, 41, 46, 51, 56, 62, 69, 77, 85, 94, 103, 114,
+            126, 139, 153, 168,
+          ],
+        },
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 15],
+        value: {
+          table: [
+            2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 13, 14, 15, 17, 19, 21, 23, 25,
+          ],
+        },
         damageTypes: ['cold'],
         per: {
           stat: 'charges.fervour',
@@ -8447,7 +8537,11 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [3, 23],
+        value: {
+          table: [
+            3, 3, 4, 4, 5, 5, 6, 7, 7, 8, 9, 10, 11, 13, 14, 15, 17, 19, 21, 23, 25, 28, 31, 34, 37,
+          ],
+        },
         damageTypes: ['cold'],
         per: {
           stat: 'charges.fervour',
@@ -8518,13 +8612,22 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [6, 40],
+        value: {
+          table: [
+            2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 6, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 19, 21, 24,
+          ],
+        },
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [60, 520],
+        value: {
+          table: [
+            29, 35, 39, 44, 50, 56, 62, 70, 78, 87, 97, 109, 121, 135, 150, 166, 184, 204, 226, 251,
+            277, 307, 339, 374, 413,
+          ],
+        },
         damageTypes: ['lightning'],
       },
       {
@@ -8536,6 +8639,31 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         stat: 'buffOn.killShocked.innervation',
         kind: 'base',
         value: 100,
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 8, 9, 10, 11, 13],
+        },
+        damageTypes: ['lightning'],
+        condition: {
+          id: 'innervation',
+        },
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            17, 20, 23, 26, 29, 32, 36, 41, 45, 51, 57, 63, 70, 78, 87, 96, 107, 118, 131, 145, 161,
+            178, 197, 217, 240,
+          ],
+        },
+        damageTypes: ['lightning'],
+        condition: {
+          id: 'innervation',
+        },
       },
     ],
     description:
@@ -9256,7 +9384,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'deployCount',
         kind: 'base',
-        value: 4,
+        value: 2,
       },
       {
         stat: 'deployScatter',
@@ -9266,10 +9394,10 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage',
         kind: 'more',
-        value: [-62, -48],
+        value: [-55, -36],
       },
     ],
-    description: 'Throws five traps at once, scattered over a wide place.',
+    description: 'Throws three traps at once, scattered over a wide place.',
   },
   {
     kind: 'support',
@@ -9405,14 +9533,14 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     costMult: 1.2,
     mods: [
       {
-        stat: 'deployCount',
+        stat: 'deployExtra',
         kind: 'base',
-        value: 1,
-      },
-      {
-        stat: 'damage',
-        kind: 'more',
-        value: -15,
+        value: {
+          table: [
+            0.3, 0.31, 0.33, 0.34, 0.37, 0.4, 0.4, 0.41, 0.43, 0.43, 0.47, 0.49, 0.5, 0.5, 0.53,
+            0.53, 0.57, 0.59, 0.6, 0.6, 0.62, 0.63, 0.65, 0.69, 0.69,
+          ],
+        },
       },
     ],
     description: 'Traps and mines come in pairs.',
@@ -9636,7 +9764,9 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage',
         kind: 'inc',
-        value: [0, 20],
+        value: {
+          table: [0, 3.3, 6.7, 10, 13.3, 16.7, 20],
+        },
       },
     ],
     description: 'Raises the quality of the supported gem.',
@@ -9907,21 +10037,59 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [1, 3],
+        value: {
+          table: [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6],
+        },
         damageTypes: ['physical'],
         per: {
           stat: 'rage',
           div: 10,
+          max: 5,
         },
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [2, 6],
+        value: {
+          table: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 7, 7, 8, 9, 10, 10, 11],
+        },
         damageTypes: ['physical'],
         per: {
           stat: 'rage',
           div: 10,
+          max: 5,
+        },
+      },
+      {
+        stat: 'damage.min',
+        kind: 'base',
+        value: {
+          table: [
+            2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 20, 22, 24, 27, 29, 32, 35, 39, 43, 47, 51, 56,
+            62,
+          ],
+        },
+        damageTypes: ['physical'],
+        per: {
+          stat: 'rage',
+          div: 10,
+          max: 1,
+        },
+      },
+      {
+        stat: 'damage.max',
+        kind: 'base',
+        value: {
+          table: [
+            4, 6, 7, 9, 10, 12, 14, 17, 20, 23, 27, 32, 37, 41, 45, 49, 54, 60, 66, 72, 79, 87, 95,
+            105, 115,
+          ],
+        },
+        damageTypes: ['physical'],
+        per: {
+          stat: 'rage',
+          div: 10,
+          max: 1,
         },
       },
     ],
@@ -9945,7 +10113,12 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'shockwave.cooldown',
         kind: 'base',
-        value: 1,
+        value: {
+          table: [
+            1, 0.98, 0.96, 0.94, 0.93, 0.91, 0.89, 0.88, 0.86, 0.85, 0.83, 0.82, 0.81, 0.79, 0.78,
+            0.77, 0.76, 0.75, 0.73, 0.72, 0.71, 0.7, 0.69, 0.69, 0.68,
+          ],
+        },
       },
     ],
     description: 'Blunt hits send a shockwave through the enemies around.',
@@ -10057,7 +10230,14 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     supports: ['spell'],
     excludes: ['totem', 'trap', 'mine'],
     costMult: 1.4,
-    mods: [],
+    mods: [
+      {
+        stat: 'damage',
+        kind: 'more',
+        value: [20, 39],
+        tags: ['spell'],
+      },
+    ],
     trigger: {
       on: 'kill',
       tags: ['melee'],
@@ -10081,7 +10261,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
     mods: [],
     trigger: {
       on: 'stunned',
-      chance: 60,
+      chance: [50, 69],
       cooldown: 0.25,
       effect: {
         kind: 'castSocketed',
@@ -10132,7 +10312,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'minionSpeed',
         kind: 'inc',
-        value: [25, 44],
+        value: [25, 34],
       },
     ],
     description: 'Minions strike and move faster.',
@@ -10159,11 +10339,6 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         stat: 'minion.nearMore',
         kind: 'base',
         value: [20, 30],
-      },
-      {
-        stat: 'minionSpeed',
-        kind: 'inc',
-        value: [10, 29],
       },
     ],
     description: 'Minions guard you: they stay close, take less damage, and hit harder near you.',
@@ -10232,8 +10407,12 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       {
         stat: 'minion.burn',
         kind: 'base',
-        value: [15.6, 1316],
-        geo: true,
+        value: {
+          table: [
+            15.6, 19, 25.3, 35.9, 49.9, 68.1, 91.8, 122.3, 161.7, 198.3, 242.4, 295.2, 358.6, 434.5,
+            525.1, 633.3, 762.3, 916, 1098.7, 1316, 1483, 1670.2, 1879.9, 2114.9, 2378,
+          ],
+        },
       },
       {
         stat: 'minion.selfBurn',
@@ -10470,7 +10649,12 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
           {
             stat: 'damage',
             kind: 'more',
-            value: [10, 15],
+            value: {
+              table: [
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 25, 26, 26, 27, 27,
+                28, 28, 29, 29,
+              ],
+            },
             tags: ['melee', 'area'],
           },
           {
@@ -10486,7 +10670,12 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
           {
             stat: 'aoe',
             kind: 'more',
-            value: [10, 15],
+            value: {
+              table: [
+                10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 25, 26, 26, 27, 27,
+                28, 28, 29, 29,
+              ],
+            },
             tags: ['melee'],
           },
           {
@@ -10590,6 +10779,16 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
         value: [20, 39],
         tags: ['spell'],
       },
+      {
+        stat: 'auraBurnBase',
+        kind: 'base',
+        value: {
+          table: [
+            35.8, 50.2, 69.2, 94.1, 117.5, 146.1, 180.7, 222.6, 273.2, 334.2, 407.7, 496.1, 602.2,
+            729.4, 827.9, 938.9, 1064, 1204.8, 1363.3, 1541.8, 1742.4, 1968, 2221.5, 2506.3, 2826.1,
+          ],
+        },
+      },
     ],
     description: 'A mantle of fire that burns you and the enemies near.',
   },
@@ -10623,6 +10822,12 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
           pct: 25,
           seconds: 4,
           radius: 2.4,
+          more: {
+            table: [
+              0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44,
+              46, 48,
+            ],
+          },
         },
       },
     ],
@@ -10639,13 +10844,23 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [4, 40],
+        value: {
+          table: [
+            4, 5, 6, 7, 8, 9, 10, 12, 13, 15, 17, 19, 22, 24, 26, 28, 30, 33, 35, 38, 40, 43, 46,
+            50, 53,
+          ],
+        },
         damageTypes: ['cold'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [5, 60],
+        value: {
+          table: [
+            5, 7, 8, 10, 12, 14, 16, 18, 20, 23, 26, 29, 33, 37, 39, 42, 46, 49, 53, 56, 61, 65, 70,
+            75, 80,
+          ],
+        },
         damageTypes: ['cold'],
       },
     ],
@@ -10656,10 +10871,9 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
         chance: 100,
         cooldown: 0,
         effect: {
-          kind: 'explode',
-          pctOfMaxLife: 8,
-          dtype: 'cold',
-          radius: 2.5,
+          kind: 'castGranted',
+          skillId: 'heraldShatter',
+          at: 'dead',
         },
       },
     ],
@@ -10675,13 +10889,22 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
       {
         stat: 'damage.min',
         kind: 'base',
-        value: [2, 15],
+        value: {
+          table: [
+            2, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 22, 23, 25, 27,
+          ],
+        },
         damageTypes: ['lightning'],
       },
       {
         stat: 'damage.max',
         kind: 'base',
-        value: [9, 100],
+        value: {
+          table: [
+            7, 9, 11, 14, 16, 18, 21, 24, 27, 31, 35, 39, 44, 49, 53, 57, 61, 66, 71, 76, 81, 87,
+            94, 100, 107,
+          ],
+        },
         damageTypes: ['lightning'],
       },
     ],
@@ -10698,6 +10921,7 @@ export const GEN_AURA_GEMS: AuraGemDef[] = [
           radius: 4.5,
           dtype: 'lightning',
           effectiveness: 120,
+          skillId: 'heraldBolt',
         },
       },
     ],

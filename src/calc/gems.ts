@@ -1,6 +1,6 @@
 import { gerp, lerp } from '../core/math';
 import { spellBaseDamage } from '../data/constants';
-import { GEM_LADDERS, GEM_START } from '../data/gemLevels';
+import { GEM_LADDERS, GEM_OWN_LADDERS, GEM_START } from '../data/gemLevels';
 import {
   MAX_GEM_LEVEL,
   FX_KEYS,
@@ -57,7 +57,7 @@ export function gemStart(def: { id: string }): number {
 
 /** The character level a gem level requires: the reference ladder of the gem's first level. */
 export function gemLevelReq(def: { id: string }, level: number): number {
-  const ladder = GEM_LADDERS[gemStart(def)];
+  const ladder = GEM_OWN_LADDERS[def.id] ?? GEM_LADDERS[gemStart(def)];
   return ladder[Math.max(1, Math.min(level, ladder.length)) - 1];
 }
 

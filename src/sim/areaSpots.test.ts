@@ -64,17 +64,18 @@ const apart = (a: { x: number; y: number }, b: { x: number; y: number }) =>
   Math.hypot(a.x - b.x, a.y - b.y);
 
 describe('what a set of traps, mines or totems does together', () => {
-  const cases: [string, string[]][] = [
-    ['Double Set traps', ['frostTrap', 'doubleSet']],
+  const cases: [string, string[], number?][] = [
+    // (Double Set throws more by chance: a longer fight sees sets of more than one.)
+    ['Double Set traps', ['frostTrap', 'doubleSet'], 60],
     ['Triple Snare traps', ['frostTrap', 'tripleSnare']],
     ['Snare Cluster traps', ['frostTrap', 'snareCluster']],
-    ['Double Set mines', ['mortarCharge', 'doubleSet']],
+    ['Double Set mines', ['mortarCharge', 'doubleSet'], 30],
     ['Field of Charges mines', ['mortarCharge', 'fieldOfCharges']],
     ['Totem Choir totems', ['creepingPlague', 'standingCast', 'totemChoir']],
   ];
-  for (const [name, gems] of cases)
+  for (const [name, gems, seconds] of cases)
     it(`${name}: the areas that go off together do not share a spot, and each holds the enemy`, () => {
-      const { dummy, bursts } = run(gems, 8);
+      const { dummy, bursts } = run(gems, seconds ?? 8);
       // The areas of the skill itself (a mine's rain and a leftover mark are smaller).
       const big = bursts.filter((b) => b.r >= 2);
       const groups = together(big);

@@ -1,4 +1,5 @@
 import type { DamageType, SkillTag } from '../mods/types';
+import type { LevelValue } from './gems';
 import { gemDef } from './gems';
 
 /**
@@ -28,7 +29,11 @@ export type TriggerEffect =
   /** Cast one of the active spells socketed in the same item. */
   | { kind: 'castSocketed'; spellTags?: SkillTag[] }
   /** Cast a skill that exists only through this trigger. */
-  | { kind: 'castGranted'; skillId: string; level: number }
+  /**
+   * Cast a skill that exists only through this trigger, at `level` (an aura's trigger: the aura's level when it names none); `at`
+   * 'dead': where the enemy that died fell (a herald's shatter), not at the next enemy.
+   */
+  | { kind: 'castGranted'; skillId: string; level?: number; at?: 'dead' }
   /** Kill triggers: the dead enemy explodes for a share of its maximum life. */
   | { kind: 'explode'; pctOfMaxLife: number; dtype: DamageType; radius: number }
   /** Kill triggers: the dead enemy's shock or ignite spreads to enemies nearby. */
@@ -36,7 +41,7 @@ export type TriggerEffect =
   /** Give up a share of maximum life to gain that much in another pool (as Seamripper Gloves do). */
   | { kind: 'sacrifice'; pctOfLife: number; pool: 'es' | 'mana' }
   /** Kill triggers: the enemies near the corpse burn for a share of the blow's overkill each second (Cinder Herald). */
-  | { kind: 'overkillBurn'; pct: number; seconds: number; radius: number }
+  | { kind: 'overkillBurn'; pct: number; seconds: number; radius: number; more?: LevelValue }
   /** Kill triggers: bolts strike the enemies around the character for a while (Storm Herald). */
   | {
       kind: 'storm';
@@ -45,6 +50,8 @@ export type TriggerEffect =
       radius: number;
       dtype: DamageType;
       effectiveness: number;
+      /** The granted spell each bolt hits as (the character's own hit of it, at the aura's level); without it, a raw share of the curve. */
+      skillId?: string;
     }
   /** Recover a share of maximum life, or of armour, into a pool. */
   | { kind: 'recover'; pool: 'life' | 'es' | 'mana'; pctOf: 'maxLife' | 'armour'; value: number };
@@ -88,7 +95,11 @@ function effectText(e: TriggerEffect): string {
         'socketed ',
       );
     case 'castGranted':
-      return `cast level ${e.level} ${gemDef(e.skillId).name}`;
+      return e.at === 'dead'
+        ? `it shatters: ${gemDef(e.skillId).name} where it fell`
+        : e.level === undefined
+          ? `cast ${gemDef(e.skillId).name}`
+          : `cast level ${e.level} ${gemDef(e.skillId).name}`;
     case 'explode':
       return `the enemy explodes for ${e.pctOfMaxLife}% of its maximum life as ${e.dtype} damage`;
     case 'spread':

@@ -24,12 +24,16 @@ export const WAVE2_UNIQUES: UniqueDef[] = [
     level: 40,
     sockets: 3,
     req: { int: 120 },
-    mods: [m('damage', 'inc', 60, 90, { damageTypes: ['physical'], ...L }), m('chains', 'base', 1)],
+    mods: [
+      m('damage', 'inc', 60, 90, { damageTypes: ['physical'], ...L }),
+      m('chains', 'base', 1),
+      m('damage', 'inc', 100, 100, { tags: ['spell', 'triggered'] }),
+    ],
     triggers: [
       {
         on: 'hit',
         chance: 100,
-        cooldown: 0.5,
+        cooldown: 0.15,
         effect: { kind: 'castSocketed', spellTags: ['lightning'] },
       },
     ],
@@ -60,7 +64,7 @@ export const WAVE2_UNIQUES: UniqueDef[] = [
         on: 'crit',
         tags: ['melee'],
         chance: 100,
-        cooldown: 0.25,
+        cooldown: 0.15,
         effect: { kind: 'castSocketed', spellTags: ['cold'] },
       },
     ],
@@ -104,8 +108,8 @@ export const WAVE2_UNIQUES: UniqueDef[] = [
         on: 'hit',
         tags: ['melee'],
         chance: 20,
-        cooldown: 0.25,
-        effect: { kind: 'castGranted', skillId: 'emberBurst', level: 20 },
+        cooldown: 0.15,
+        effect: { kind: 'castGranted', skillId: 'emberBurst', level: 16 },
       },
     ],
     notes: {

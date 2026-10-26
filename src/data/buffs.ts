@@ -174,10 +174,8 @@ export const BUFFS: Record<BuffId, BuffDef> = {
     seconds: 8,
     cond: 'innervation',
     text: 'lightning added to your hits',
-    mods: [
-      mod('damage.min', 'base', 11, { damageTypes: ['lightning'], ...when('innervation') }),
-      mod('damage.max', 'base', 160, { damageTypes: ['lightning'], ...when('innervation') }),
-    ],
+    // The added lightning grows with the support's level, so the support carries it (Livewire's mods under this condition).
+    mods: [],
   },
   phaseStrike: {
     id: 'phaseStrike',

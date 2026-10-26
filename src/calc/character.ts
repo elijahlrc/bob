@@ -428,7 +428,8 @@ export class Character {
   /** How many of the hexes of the character a target holds at once. */
   hexLimit = BASE_HEX_LIMIT;
   /** A burning aura (Searing Mantle): fire damage to enemies near, and to the character, as a percent of maximum life a second. */
-  readonly burn: { pct: number; self: number } = { pct: 0, self: 0 };
+  /** A burning aura: a share of maximum life and a base fire damage a second on the enemies near, and the share the character takes. */
+  readonly burn: { pct: number; base: number; self: number } = { pct: 0, base: 0, self: 0 };
   /** The utility skills (curses, buffs, warcries, blinks) the character casts by policy, not as damage. */
   readonly utilities: SkillChoice[] = [];
   /** The conditions of the summons whose minions the sheet assumes standing. */
@@ -1060,15 +1061,44 @@ export class Character {
       }
       this.auras.push({ gem: sg, def, reserved: r, active });
       if (active)
-        (def.triggers ?? []).forEach((t, i) =>
+        (def.triggers ?? []).forEach((t, i) => {
+          const key = `aura${sg.gem.uid}:${i}`;
+          const e = t.effect;
+          // What grows with the aura's level is read at it; a granted spell is the character's own, at the aura's level.
+          const effect =
+            e.kind === 'overkillBurn' && e.more !== undefined
+              ? { ...e, pct: e.pct * (1 + levelValue(e.more, sg.level) / 100) }
+              : e;
+          const grant =
+            e.kind === 'castGranted' ? e.skillId : e.kind === 'storm' ? e.skillId : undefined;
+          const skills: SkillChoice[] = [];
+          const gd = grant ? gemDef(grant) : null;
+          if (gd?.kind === 'active') {
+            const lv = e.kind === 'castGranted' && e.level !== undefined ? e.level : sg.level;
+            skills.push(
+              this.asTriggered(
+                {
+                  key: `granted:${grant}`,
+                  gemUid: null,
+                  skill: resolveActive(gd, lv),
+                  supports: [],
+                  addedTags: [],
+                  costMult: 1,
+                  usable: true,
+                  costsLife: false,
+                },
+                `granted:${key}:${grant}`,
+              ),
+            );
+          }
           this.triggers.push({
-            key: `aura${sg.gem.uid}:${i}`,
-            def: t,
+            key,
+            def: { ...t, effect },
             slot: sg.slot,
-            skills: [],
+            skills,
             tagMask: tagMask(t.tags),
-          }),
-        );
+          });
+        });
     }
     // A skill whose hit gives the character a buff (Thunder Rebuke): the buff's mods are the gem's, by level, and hold while the buff lasts.
     for (const a of this.actives) {
@@ -1230,6 +1260,7 @@ export class Character {
     this.reservedMana = reservedMana;
     this.burn = {
       pct: Math.max(0, db0.sum('base', 'auraBurn', ctx0)),
+      base: Math.max(0, db0.sum('base', 'auraBurnBase', ctx0)),
       self: Math.max(0, db0.sum('base', 'selfBurn', ctx0)),
     };
     this.db = db0;
@@ -1289,7 +1320,7 @@ export class Character {
                 {
                   key: `granted:${eff.skillId}`,
                   gemUid: null,
-                  skill: resolveActive(gd, eff.level),
+                  skill: resolveActive(gd, eff.level ?? 1),
                   supports: [],
                   addedTags: [],
                   costMult: 1,
@@ -1317,7 +1348,7 @@ export class Character {
         this.actives[idx] = trig;
         skills.push(trig);
       }
-      const def = sg.def.trigger;
+      const def = { ...sg.def.trigger, chance: levelValue(sg.def.trigger.chance, sg.level) };
       this.triggers.push({
         key: `${sg.slot}:s${sg.gem.uid}`,
         def,
@@ -1697,7 +1728,7 @@ export class Character {
     // A charge's bonus is for the run it makes; the sheet's fight is at the target, in reach, where nothing is left to run.
     if (p.distMore?.travel) p = { ...p, distMore: null };
     // A totem or brand shoots on its own, whatever the character does; traps and mines go off several at a time.
-    const deployN = choice.deploy ? p.deployCount : 1;
+    const deployN = choice.deploy ? p.deployCount + p.deployExtra : 1;
     const standing = choice.deploy === 'totem' || choice.deploy === 'brand';
     // The mines laid together give the hits near them a chance to deal double damage (Heavy Charge).
     if (choice.deploy === 'mine' && p.mineDouble > 0)
