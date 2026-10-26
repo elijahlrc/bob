@@ -1,4 +1,5 @@
 import { spellBaseDamage } from '../data/constants';
+import { monsterHit } from './formulas';
 import { MINION_ENEMY_RES, type MinionDef } from '../data/minions';
 import { levelValue, type SkillDef } from './gems';
 import type { SkillProfile } from './skill';
@@ -30,8 +31,10 @@ export function minionBlow(
   level: number,
   p: Pick<SkillProfile, 'minionDamage' | 'minionNearMore' | 'minionSup'>,
   targetDistance: number,
+  /** The gem's own strike at its level (`Summon.hit`), in place of the kind's share of the curve. */
+  own?: number,
 ): number {
-  let hit = spellBaseDamage(level) * def.dmg * p.minionDamage * MINION_ENEMY_RES;
+  let hit = (own ?? spellBaseDamage(level) * def.dmg) * p.minionDamage * MINION_ENEMY_RES;
   const elemental = def.dtype === 'lightning' || def.dtype === 'cold' || def.dtype === 'fire';
   if (elemental && p.minionSup.eleMore > 0) hit *= 1 + p.minionSup.eleMore / 100;
   // Elemental Pack: a blow exposes the enemy to its element, which takes that many points off its resistance (the sheet's
@@ -55,8 +58,19 @@ export function relicNova(
   def: MinionDef,
   level: number,
   p: Pick<SkillProfile, 'minionDamage'>,
+  /** The gem's own nova at its level (`Summon.hit`). */
+  own?: number,
 ): number {
-  return spellBaseDamage(level) * (def.nova ?? 0) * p.minionDamage * MINION_ENEMY_RES;
+  return (own ?? spellBaseDamage(level) * (def.nova ?? 0)) * p.minionDamage * MINION_ENEMY_RES;
+}
+
+/**
+ * A summon gem's own minion strike at a gem level (`Summon.hit`), or undefined for the curve. A spectre strikes as the monster it was
+ * raised from does at the level it is raised at (as in the reference).
+ */
+export function summonHit(u: Summon, level: number): number | undefined {
+  if (u.corpse) return monsterHit(Math.round(levelValue(u.corpse.level, level)));
+  return u.hit === undefined ? undefined : levelValue(u.hit, level, true);
 }
 
 /**

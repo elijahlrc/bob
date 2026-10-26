@@ -271,6 +271,8 @@ export type UtilityDef =
       kind: 'summon';
       minion: MinionId;
       count: LevelValue;
+      /** A minion's strike (a relic's nova) at the gem level before minion modifiers, the reference's; without it, the kind's share of the curve. */
+      hit?: LevelValue;
       seconds?: number;
       ownerMods?: GemMod[];
       /**

@@ -1,4 +1,5 @@
 import { levelValue } from '../calc/gems';
+import { summonHit } from '../calc/minionDps';
 import type { SkillChoice } from '../calc/character';
 import type { Defence } from '../calc/combat';
 import { minionBody } from '../calc/minion';
@@ -152,6 +153,12 @@ export function makeMinion(
   m.t = o.seconds === undefined ? Infinity : o.seconds * prof.skillDuration;
   m.atkT = 0;
   m.level = o.blowLevel ?? c.skill.curveLevel;
+  // A gem that names its minion's strike (the reference's at its level) gives it that, not the curve's.
+  const su = c.skill.utility;
+  if (su?.kind === 'summon' && !MINIONS[kind].nova) {
+    const own = summonHit(su, c.skill.level);
+    if (own !== undefined) m.fixedHit = own;
+  }
   m.dmg = prof.minionDamage;
   m.speed = prof.minionSpeed;
   m.sup = prof.minionSup;

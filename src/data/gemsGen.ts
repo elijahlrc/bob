@@ -7047,6 +7047,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       minion: 'zombie',
       count: [3, 7],
       corpseCost: true,
+      hit: {
+        table: [
+          10.2, 11.7, 13.7, 17.2, 25.3, 35.5, 47.1, 62.3, 80.1, 103.4, 131.3, 164.2, 207.3, 256.5,
+          319.3, 395.4, 485.2, 596.8, 694.7, 808.4, 892.5, 986.9, 1088.8, 1202.1, 1325.8,
+        ],
+      },
     },
     description: 'Raises husks of the dead to fight beside you.',
   },
@@ -7071,6 +7077,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       minion: 'skeleton',
       count: [3, 8],
       seconds: 20,
+      hit: {
+        table: [
+          39, 49.2, 65.9, 85.7, 111.5, 144.9, 184, 220, 263, 308.7, 368, 430.4, 508.9, 594.6, 696.6,
+          814.7, 952.7, 1110.4, 1228.6, 1357.1, 1498, 1656.3, 1827.2, 2018.1, 2225.1,
+        ],
+      },
     },
     description: 'Calls up a band of skeletons for twenty seconds.',
   },
@@ -7096,6 +7108,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       count: 20,
       seconds: 5,
       perCast: 1,
+      hit: {
+        table: [
+          7.9, 8.9, 10.1, 12.2, 14.7, 18, 22.3, 28.1, 35.2, 43.3, 53.5, 65.9, 80.9, 100.1, 116.4,
+          135.6, 158.7, 184.1, 213, 247.2, 272.6, 301, 331.7, 365.9, 402.7,
+        ],
+      },
     },
     description:
       'Calls up a burning spirit with each cast, up to twenty, that flies at your enemies.',
@@ -7129,6 +7147,13 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
       group: 'golem',
       standing: 'golemStone',
+      hit: {
+        table: [
+          179.4, 203.7, 228.1, 255.4, 285.8, 322.3, 358.8, 398.4, 447.1, 495.7, 550.5, 614.5, 681.4,
+          754.4, 836.5, 927.9, 1028.3, 1137.8, 1195.6, 1256.7, 1387.5, 1533.5, 1691.8, 1868.5,
+          2060.2,
+        ],
+      },
     },
     description: 'Raises a colossus of stone that regenerates your life.',
   },
@@ -7161,6 +7186,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
       group: 'golem',
       standing: 'golemChaos',
+      hit: {
+        table: [
+          173.3, 196.6, 220.5, 246.8, 276.2, 311.7, 347.2, 385.2, 432.4, 479, 532.2, 594.2, 659.1,
+          729, 808.6, 897, 993.8, 1100.3, 1156.1, 1214.6, 1341.3, 1482.3, 1635.5, 1806.1, 1991.8,
+        ],
+      },
     },
     description: 'Raises a colossus of blight that hardens you against blows.',
   },
@@ -7193,6 +7224,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
       group: 'golem',
       standing: 'golemFlame',
+      hit: {
+        table: [
+          86, 97.5, 110.5, 125, 141, 159, 179, 201.5, 226.5, 254, 285, 319, 356.5, 398.5, 445, 497,
+          554, 617.5, 652, 687.5, 765.5, 851.5, 946.5, 1051.5, 1168,
+        ],
+      },
     },
     description: 'Raises a colossus of embers that makes you hit harder.',
   },
@@ -7230,6 +7267,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
       group: 'golem',
       standing: 'golemIce',
+      hit: {
+        table: [
+          155.6, 176.4, 197.7, 221.5, 247.8, 279.8, 311.2, 345.7, 387.8, 429.9, 477.5, 532.3, 590.6,
+          654, 725, 804.7, 891.4, 986.2, 1036.9, 1089.3, 1202.9, 1329.7, 1466.6, 1620, 1786.4,
+        ],
+      },
     },
     description: 'Raises a colossus of frost that sharpens your strikes.',
   },
@@ -7267,6 +7310,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
       group: 'golem',
       standing: 'golemLightning',
+      hit: {
+        table: [
+          32.5, 36, 39.6, 43.6, 47.2, 51.8, 56.3, 61.9, 67, 73.1, 79.7, 86.3, 93.4, 101.5, 110.1,
+          118.8, 128.4, 138.5, 144.1, 150.2, 161.9, 174.6, 188.3, 202.5, 218.2,
+        ],
+      },
     },
     description: 'Raises a colossus of storm that quickens you.',
   },
@@ -7299,6 +7348,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         life: [30, 68],
       },
       group: 'golem',
+      hit: {
+        table: [
+          61.8, 69.4, 77.5, 87.2, 97.3, 109.5, 121.6, 135.8, 152.1, 169.3, 186.5, 208.9, 231.2, 257,
+          283.9, 315.4, 349.4, 386.9, 407.2, 428, 472.6, 521.8, 575.1, 635.5, 700.4,
+        ],
+      },
     },
     description: 'Raises a colossus of carrion that makes your other minions hit harder.',
   },
@@ -7328,6 +7383,12 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         regen: [3.5, 103],
         minionRegen: [6, 309],
         seconds: 1,
+      },
+      hit: {
+        table: [
+          5, 7, 10, 14, 21, 31.5, 46, 65, 92.5, 130, 181.5, 251, 346, 474, 598.5, 754.5, 949,
+          1191.5, 1493.5, 1869.5, 2169.5, 2516, 2916.5, 3379, 3912.5,
+        ],
       },
     },
     description:

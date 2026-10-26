@@ -825,8 +825,11 @@ export function relicNova(w: World, s: Side): void {
   const level = c.skill.level;
   const r = spec.radius * s.char.profile(c, 0).radiusMult;
   w.events.push({ t: 'explode', x: relic.x, y: relic.y, r, dtype: 0 });
+  const own = u.hit === undefined ? undefined : levelValue(u.hit, level, true);
   const amount =
-    spellBaseDamage(relic.level) * (MINIONS.relic.nova ?? 0) * relic.dmg * MINION_ENEMY_RES;
+    (own ?? spellBaseDamage(relic.level) * (MINIONS.relic.nova ?? 0)) *
+    relic.dmg *
+    MINION_ENEMY_RES;
   eachEnemy(w, s.team, (e) => {
     if (e.phaseT <= 0 && Math.hypot(e.x - relic.x, e.y - relic.y) <= r + e.r)
       rawHit(w, e, amount, 0, s, 'Relic', 'minion');
