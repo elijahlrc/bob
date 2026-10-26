@@ -237,7 +237,8 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     name: 'Protect',
     active: false,
     tag: 'healers',
-    text: (a) => `While it stands, allies within ${s(a.range)} tiles take no damage.`,
+    text: (a) =>
+      `Allies within ${s(a.range)} tiles take no damage, but for one second in every ${PYLON_ON + PYLON_OFF}.`,
   },
   steal: {
     name: 'Steal',
@@ -280,6 +281,10 @@ export const NEST_MAX_ALIVE = 8;
 export const SENTINEL_SLAM_INTERVAL = 4;
 export const SENTINEL_SLAM_RADIUS = 2;
 export const PYLON_RANGE = 5;
+/** A Warden Pylon's ward holds this many seconds, then drops for PYLON_OFF (every pylon on the same clock), so what it guards
+ * can always be hurt in the gaps. */
+export const PYLON_ON = 5;
+export const PYLON_OFF = 1;
 /** Tiles within which a monster with the Rime Aura mod chills the character. */
 export const RIME_AURA_RANGE = 3;
 

@@ -40,6 +40,9 @@ have to handle everything that reaches it. A ranged character can be set to **ki
 - **Nests and pylons come first.** For targeting, they count as 4 tiles closer than they really are, so the
   character breaks off to kill them. It goes for a **pylon even through a wall**: everything a pylon protects is
   untouchable until it falls. A nest it must still see.
+- **What a pylon protects is never a target.** A monster inside a pylon's ward is passed over when the character picks a
+  target, and dropped the moment the ward covers it (a blow already under way still lands). The ward drops for one second
+  in every six, and in that second those monsters are fair game.
 - **So do a boss's creatures** (docs/BOSSES.md): the Magistrate's Witnesses, which it must see, and the Unmaker's
   shards, which it goes for even through a wall, since a shard holds a piece of your build until it breaks.
 - **It doesn't stick to a target.** It looks again about ten times a second and always switches to whatever is

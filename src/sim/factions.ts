@@ -1,7 +1,7 @@
 import { moveFactor } from './statuses';
 import { scaleOf, type MonsterSpec } from '../calc/monster';
 import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
-import { PYLON_RANGE } from '../data/abilities';
+import { PYLON_OFF, PYLON_ON, PYLON_RANGE } from '../data/abilities';
 import { MONSTER_TYPES, leavesBody } from '../data/monsters';
 import { ENRAGE_DAMAGE, ENRAGE_SPEED } from '../data/phases';
 import { monsterHitOf, rawHit } from './combat';
@@ -119,9 +119,14 @@ export function hexPlayerAtRandom(w: World, s: Side, from?: Actor): void {
   hexPlayer(w, s, HEX_IDS[w.rngAi.int(0, HEX_IDS.length - 1)], from);
 }
 
-/** Whether a Warden Pylon within range keeps this monster from taking damage. */
+/** Whether the Warden Pylons' ward is up now: PYLON_ON seconds of every PYLON_ON + PYLON_OFF, on the world's clock. */
+export function pylonsUp(w: World): boolean {
+  return w.t % (PYLON_ON + PYLON_OFF) < PYLON_ON;
+}
+
+/** Whether a Warden Pylon within range keeps this monster from taking damage (never in the ward's off second). */
 export function shieldedByPylon(w: World, a: Actor): boolean {
-  if (a.mon?.spec.type === 'pylon') return false;
+  if (a.mon?.spec.type === 'pylon' || !pylonsUp(w)) return false;
   for (const o of w.actors)
     if (
       o.alive &&

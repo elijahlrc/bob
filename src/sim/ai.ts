@@ -28,7 +28,7 @@ import {
 } from '../data/constants';
 import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, segmentDist, startAction } from './actions';
-import { bloaterBurst, corpseNear, isZone, moveMult } from './factions';
+import { bloaterBurst, corpseNear, isZone, moveMult, shieldedByPylon } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { skillReady, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
@@ -192,6 +192,8 @@ function findTarget(w: World, s: Side): Actor | null {
     if (!duel && real > ENGAGE_RANGE) continue;
     // Spawners and shield-givers come first: a nest feeds the pack and a pylon makes it untouchable.
     if (!revealed(w, m)) continue;
+    // A monster a Warden Pylon wards is never chosen: every blow on it is wasted. It can be chosen in the ward's off second.
+    if (w.hasPylons && shieldedByPylon(w, m)) continue;
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
     // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie). Weakest is
     // the least life left in points, not as a share: by share a boss with a scratch on it outranks its whole fresh escort.
@@ -554,9 +556,13 @@ export function playerAI(w: World, s: Side, dt: number): void {
   // Engage. (A duel has no range to engage within, and no target to give up on: docs/DUEL.md 3.4.)
   const duel = !!s.opts.duel;
   let target = ai.targetId ? actorById(w, ai.targetId) : undefined;
+  // A target the pylons' ward comes up over is let go at once, and another chosen on this tick (findTarget passes over it while
+  // the ward holds).
   if (
     target &&
-    (!target.alive || (!duel && Math.hypot(target.x - p.x, target.y - p.y) > ENGAGE_RANGE + 3))
+    (!target.alive ||
+      (!duel && Math.hypot(target.x - p.x, target.y - p.y) > ENGAGE_RANGE + 3) ||
+      (w.hasPylons && shieldedByPylon(w, target)))
   )
     target = undefined;
   ai.scanT -= dt;

@@ -85,7 +85,7 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   sentinel: 'Slow and armoured; slams the ground where you stand, and pulses a ring.',
   arbalest: 'Stands still, marks a line on the ground and strikes everything on it.',
   golem: 'Immune to its element; leaves burning, chilled or shocked ground.',
-  pylon: 'While it stands, allies near it take no damage.',
+  pylon: 'Allies near it take no damage, but for one second in every six.',
   hound: 'Fast; crouches, then leaps onto you from a distance.',
   boar: 'Lowers its head and rushes in a line, then gores in an arc; its tusks stagger.',
   handler: 'Keeps its distance and whistles the pack into a faster, harder-hitting pack.',
