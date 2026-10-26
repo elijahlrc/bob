@@ -46,7 +46,7 @@ export function landsPerUse(p: SkillProfile, o: LandsInput): number {
   let extra = 0;
 
   // A slam cracks the ground, and the ground erupts a moment later, harder.
-  if (s.aftershock) extra += placedBlows * (1 + s.aftershock.more / 100);
+  if (s.aftershock) extra += placedBlows * (1 + s.aftershock.more / 100) * (p.quakeShare ?? 1);
 
   // A storm of blades stays where the spin was made and hits every interval: as many storms as the uses keep up, and no more than
   // the most (the oldest goes when another is made).

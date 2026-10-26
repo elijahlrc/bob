@@ -127,18 +127,19 @@ describe('landsPerUse', () => {
     const m = { ...p, repeats: 2, multistrike: { ramp: 22 } };
     expect(landsPerUse(m, ctx(1))).toBeCloseTo(1 + 1.22 + 1.44, 9);
     expect(landsPerUse(m, ctx(1, { triggered: true }))).toBe(1);
-    // The quake of a slam repeats with it, as hard as the repeat is.
+    // The quake of a slam repeats with it, as hard as the repeat is (and with the damage it adds of its own).
     const q = profileOf('faultline');
-    const more = 1 + q.skill.aftershock!.more / 100;
+    const more = (1 + q.skill.aftershock!.more / 100) * q.quakeShare!;
     expect(landsPerUse({ ...q, repeats: 2, multistrike: { ramp: 22 } }, ctx(1))).toBeCloseTo(
       (1 + more) * (1 + 1.22 + 1.44),
       9,
     );
   });
 
-  it('an aftershock is one more hit, harder by the share the gem says, for each time the slam lands', () => {
+  it('an aftershock is one more hit, harder by the share the gem says and its own damage, for each time the slam lands', () => {
     const p = profileOf('faultline');
-    const more = 1 + p.skill.aftershock!.more / 100;
+    expect(p.quakeShare!).toBeGreaterThan(1);
+    const more = (1 + p.skill.aftershock!.more / 100) * p.quakeShare!;
     expect(landsPerUse(p, ctx(1))).toBeCloseTo(1 + more, 9);
     expect(landsPerUse({ ...p, repeats: 2 }, ctx(1))).toBeCloseTo(3 * (1 + more), 9);
     expect(landsPerUse({ ...p, repeats: 2 }, ctx(1, { triggered: true }))).toBeCloseTo(1 + more, 9);

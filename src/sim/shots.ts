@@ -60,7 +60,17 @@ export function scaleProfile(p: SkillProfile, f: number): SkillProfile {
   let m = scaled.get(p);
   if (!m) scaled.set(p, (m = new Map()));
   let q = m.get(f);
-  if (!q) m.set(f, (q = { ...p, hands: p.hands.map((h) => ({ ...h, hitMult: h.hitMult * f })) }));
+  if (!q)
+    m.set(
+      f,
+      (q = {
+        ...p,
+        hands: p.hands.map((h) => ({ ...h, hitMult: h.hitMult * f })),
+        // What the use sends after it and the quake it leaves are as much harder.
+        followUp: p.followUp && scaleProfile(p.followUp, f),
+        quake: p.quake && scaleProfile(p.quake, f),
+      }),
+    );
   return q;
 }
 

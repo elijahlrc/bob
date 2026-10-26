@@ -103,6 +103,9 @@ export type SkillProfile = {
    */
   followUp?: SkillProfile;
   followShare?: number;
+  /** A slam's aftershock, with the physical damage it adds of its own, and its hit over the slam's (Character.profile). */
+  quake?: SkillProfile;
+  quakeShare?: number;
   isAttack: boolean;
   tagMask: number;
   hands: HandProfile[];

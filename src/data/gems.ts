@@ -711,8 +711,13 @@ export type ActiveGemDef = SkillFx & {
   };
   /** A wall of ice across the way, that holds the tiles shut for a while and pushes what stands there back (Glacier Wall). */
   wall?: { length: number; seconds: number; push: number };
-  /** A second, harder hit a moment after the first, over a larger area (Faultline). */
-  aftershock?: { delay: number; more: number; radius: number };
+  /** The ground erupts `delay` s after a slam, `more`% harder and `radius`% wider; `added` is physical damage of its own (Faultline). */
+  aftershock?: {
+    delay: number;
+    more: number;
+    radius: number;
+    added?: { min: LevelValue; max: LevelValue };
+  };
   /** A chance to spend a charge to make the use a Charged Slam (Magma Crack). */
   chargedSlam?: {
     chance: number;

@@ -455,7 +455,7 @@ export function fire(w: World, a: Actor, act: Action): void {
   if (aft && a.isPlayer && act.which !== 'deployed') {
     const b = act.profile.skill.behaviour;
     const atSelf = b.kind === 'burst' && b.origin === 'self';
-    const q = scaleProfile(act.profile, 1 + aft.more / 100);
+    const q = scaleProfile(act.profile.quake ?? act.profile, 1 + aft.more / 100);
     a.side!.zones.push({
       id: w.nextId++,
       owner: a.id,

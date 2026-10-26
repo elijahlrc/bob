@@ -1566,6 +1566,21 @@ export class Character {
       p.followUp = f;
       p.followShare = handAverage(f) / Math.max(1e-9, handAverage(p));
     }
+    // An aftershock that adds physical damage of its own hits harder than the slam by more than its share.
+    const quake = choice.skill.aftershock?.added;
+    if (quake) {
+      const lv = choice.skill.level;
+      const q = buildProfile({
+        ...input,
+        db: db.extend([
+          mod('damage.min', 'base', levelValue(quake.min, lv), { damageTypes: ['physical'] }),
+          mod('damage.max', 'base', levelValue(quake.max, lv), { damageTypes: ['physical'] }),
+        ]),
+      });
+      q.gains = p.gains;
+      p.quake = q;
+      p.quakeShare = handAverage(q) / Math.max(1e-9, handAverage(p));
+    }
     this.profiles.set(k, p);
     return p;
   }
