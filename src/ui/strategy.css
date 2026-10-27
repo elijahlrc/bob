@@ -416,3 +416,22 @@ html.leaf .st .st-sel select:focus-visible {
   color: var(--muted);
   text-shadow: 0 2px 0 var(--ink);
 }
+/* A phone: smaller figures and tighter cells, and the pinned skill names wrap, so more of the table is in view at once. */
+@media (max-width: 600px) {
+  .st-calc-table {
+    font-size: 15px;
+  }
+  .st-calc-table th,
+  .st-calc-table td {
+    padding: 5px 6px;
+  }
+  .st-calc-table th:first-child,
+  .st-calc-table td:first-child {
+    min-width: 84px;
+    max-width: 104px;
+    white-space: normal;
+  }
+  .st-calc-table .st-calc-bar {
+    min-width: 96px;
+  }
+}
