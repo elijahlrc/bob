@@ -279,6 +279,20 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
   overflow-wrap: anywhere;
   color: var(--pearl);
 }
+/* A name with the New tag: one line, the name cut short with an ellipsis, the tag always beside it. */
+.sk-name.tagged {
+  display: flex;
+  align-items: baseline;
+}
+.sk-name.tagged .sk-nm {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sk-name.tagged .sk-new {
+  flex: none;
+}
 .sk-empty {
   color: var(--dim);
 }
@@ -323,7 +337,8 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
 }
 
 /* ---- What a gem would do in a place: coloured words, not pills ---- */
-.sk-delta {
+/* Each figure stays whole; a second one (EHP) wraps under the first rather than running past the pane. */
+.sk-delta .badge {
   white-space: nowrap;
 }
 .sk-swap {
@@ -401,35 +416,21 @@ html.leaf .sk-bagrow {
   text-shadow: 0 2px 0 var(--ink);
 }
 
-/* ---- The bar: the picked thing and its buttons, always the same height ---- */
+/* ---- The bar: one row, the picked thing's buttons and its problem if any, always the same height ---- */
 .sk-bar {
   flex: none;
   box-sizing: border-box;
-  height: 84px;
+  height: 60px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
   text-shadow: 0 2px 0 var(--ink);
 }
-.sk-barline {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+.sk-barsub {
+  flex: 1 1 auto;
   min-width: 0;
   white-space: nowrap;
-}
-.sk-barline b {
-  flex: none;
-  max-width: 60%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 600;
-  color: var(--gold-hi);
-}
-.sk-barsub {
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--muted);
@@ -438,6 +439,8 @@ html.leaf .sk-bagrow {
   color: var(--madder);
 }
 .sk-acts {
+  flex: 0 1 auto;
+  min-width: 0;
   display: flex;
   gap: 6px;
   overflow-x: auto;
@@ -595,8 +598,8 @@ html.leaf .item-card.gem .ic-mod.explicit {
     font-size: 11px;
   }
   .sk-bar {
-    height: 76px;
-    padding: 6px 10px;
+    height: 54px;
+    padding: 5px 10px;
   }
   .sk-acts .btn.small {
     padding-left: 10px;

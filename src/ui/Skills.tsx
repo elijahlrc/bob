@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
 import { sheetDps, type Character } from '../calc/character';
 import { naturalGemLevel } from '../calc/gems';
 import { weaponBar } from '../data/weaponFit';
@@ -388,8 +389,11 @@ export function Skills({
   }, [coarse]);
 
   const tap = coarse ? 'Tap' : 'Click';
-  /** The bar: what is picked, a line about it, and its buttons; or what to do when nothing is. Always the same height. */
-  const bar = (() => {
+  /**
+   * The bar: one row, the picked thing's buttons and, when it has one, its problem (why a skill cannot be used, a support does
+   * nothing); with nothing picked, what to do. Always the same height.
+   */
+  const bar: { acts: ComponentChildren; note?: string | null } = (() => {
     const cardBtn = coarse && picked && (
       <button class="btn small" onClick={() => setCard(!card)} aria-pressed={card}>
         Card
@@ -402,8 +406,6 @@ export function Skills({
     );
     if (pick?.from === 'inv' && picked) {
       return {
-        name: picked.d.name,
-        line: `${tap} a lit socket`,
         acts: (
           <>
             <button
@@ -429,9 +431,7 @@ export function Skills({
       const why = a && !a.usable ? a.reason : st && !st.ok ? st.text : null;
       const canMain = d.kind === 'active' && !d.utility && !!a?.usable;
       return {
-        name: (ch.primary.gemUid === uid ? '★ ' : '') + d.name,
-        line: why ?? `${tap} a lit place to move it`,
-        bad: !!why,
+        note: why,
         acts: (
           <>
             {d.kind === 'active' && (
@@ -457,14 +457,11 @@ export function Skills({
       };
     }
     if (pick?.from === 'empty') {
-      return {
-        name: `${slotLabel(pick.slot)} socket`,
-        line: `${tap} a gem to put it here`,
-        acts: cancel,
-      };
+      return { acts: cancel };
     }
-    return { name: '', line: `${tap} a gem or a socket`, acts: null };
+    return { acts: null };
   })();
+  const note = msg || bar.note;
 
   const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
@@ -790,11 +787,14 @@ export function Skills({
                           state={on ? 'sel' : atSocket ? 'target' : ''}
                         />
                         <span class="sk-text">
-                          <span class="sk-name">
-                            {d.name}
-                            {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
-                              <span class="sk-count"> ×{counts.get(g.gemId)}</span>
-                            )}
+                          {/* With the New tag the name keeps to one line, cut short if it must be, so the tag stays beside it. */}
+                          <span class={'sk-name' + (fresh ? ' tagged' : '')}>
+                            <span class="sk-nm">
+                              {d.name}
+                              {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
+                                <span class="sk-count"> ×{counts.get(g.gemId)}</span>
+                              )}
+                            </span>
                             {fresh && <span class="sk-new">New</span>}
                           </span>
                           {b && <Delta p={b} swap={!!atSocket && !!b.replaces} />}
@@ -809,11 +809,14 @@ export function Skills({
         </section>
       </div>
       <div class="sk-bar" ref={barRef} data-paint="panel" data-thin>
-        <div class="sk-barline">
-          {bar.name && <b>{bar.name}</b>}
-          <span class={'sk-barsub' + (msg || bar.bad ? ' sk-bad' : '')}>{msg || bar.line}</span>
-        </div>
         {bar.acts && <div class="sk-acts">{bar.acts}</div>}
+        {note ? (
+          <span class="sk-barsub sk-bad" title={note}>
+            {note}
+          </span>
+        ) : (
+          !pick && <span class="sk-barsub">{tap} a gem or a socket</span>
+        )}
       </div>
       {supportsFor && (
         <SupportsPicker c={c} at={supportsFor} onClose={() => setSupportsFor(null)} />
