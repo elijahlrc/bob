@@ -798,7 +798,14 @@ export class Character {
       if (sg.def.kind !== 'active') continue;
       let skill = formFor(resolveActive(sg.def, sg.level), weaponTags);
       // Supports can add types (a totem support makes the skill a totem), which change what the others may do.
-      const linked = this.gems.filter((o) => o.slot === sg.slot && o.def.kind === 'support');
+      const linkedAll = this.gems.filter((o) => o.slot === sg.slot && o.def.kind === 'support');
+      // Only one of each support works on a skill: the highest level, the first socketed on a tie (the owner, 2026-10-26).
+      const keep = new Map<string, SocketedGem>();
+      for (const o of linkedAll) {
+        const k = keep.get(o.def.id);
+        if (!k || o.level > k.level) keep.set(o.def.id, o);
+      }
+      const linked = linkedAll.filter((o) => keep.get(o.def.id) === o);
       const resolved = resolveSupports(
         skill.types,
         linked.map((o) => ({ ...(o.def as SupportGemDef), gem: o })),
@@ -818,6 +825,12 @@ export class Character {
         skill = { ...skill, behaviour: { ...skill.behaviour, range: skill.behaviour.range2h } };
       // A support that can do nothing to this skill (no projectiles to add to, no area to widen) is not in effect and costs nothing.
       const inert: { gem: SocketedGem; why: string }[] = [];
+      for (const o of linkedAll)
+        if (keep.get(o.def.id) !== o)
+          inert.push({
+            gem: o,
+            why: `${o.def.name} is already linked here, and only one of each support works`,
+          });
       // A support the skill fits but is barred from (a melee support that does not take a channelled skill) says so, rather than
       // looking as if the item had no skill for it.
       for (const o of linked) {

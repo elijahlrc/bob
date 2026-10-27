@@ -60,6 +60,16 @@ describe('gems (§11.5)', () => {
     expect(fb.costMult).toBeGreaterThan(1);
   });
 
+  it('the same support twice in an item works once, and the spare says so', () => {
+    const one = new Character(buildWith('mystic', 20, ['flameBolt', 'quickCast']));
+    const two = new Character(buildWith('mystic', 20, ['flameBolt', 'quickCast', 'quickCast']));
+    const fb = two.actives[0];
+    expect(fb.supports.map((s) => s.def.id)).toEqual(['quickCast']);
+    expect(fb.costMult).toBe(one.actives[0].costMult);
+    expect(fb.inert?.map((x) => x.gem.gem.uid)).toEqual([two.gems[2].gem.uid]);
+    expect(fb.inert?.[0].why).toMatch(/only one of each support/);
+  });
+
   it('falls back to the default attack when the primary needs another weapon', () => {
     const c = new Character(buildWith('vanguard', 10, ['splitVolley']));
     expect(c.primary.gemUid).toBeNull();
