@@ -129,13 +129,31 @@ html.leaf .sk-help {
   margin-bottom: 8px;
 }
 
-/* ---- The two panes: the gear and the bag, each scrolling inside its own painted frame ---- */
+/* ---- The two panes: the gear and the bag in one painted frame, a gold rule between them, each scrolling on its own. A thin
+   panel's box holds 4 px of nothing, then 6 px of gold rim and 2 px of ink (shapes.ts, P = 2): the padding clears them, and
+   the rule reaches into the rim top and bottom so the two meet. ---- */
 .sk-cols {
   flex: 1 1 auto;
   min-height: 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 6px 340px;
+  padding: 12px;
+}
+.sk-divider {
+  position: relative;
+  margin: -8px 0;
+  background: var(--gold);
+}
+.sk-divider::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: -2px;
+  right: -2px;
+  border-left: 2px solid var(--ink);
+  border-right: 2px solid var(--ink);
 }
 .sk-pane {
   position: relative;
@@ -144,7 +162,7 @@ html.leaf .sk-help {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 12px 8px 12px 14px;
+  padding: 4px 4px 2px 10px;
 }
 .sk-scroll {
   flex: 1 1 auto;
@@ -538,10 +556,23 @@ html.leaf .item-card.gem .ic-mod.explicit {
   }
 }
 
+/* Narrower: the panes halve the width, and the frame runs to the screen's edges (its empty margin off them), only the gold rim
+   showing at the sides. */
 @media (max-width: 900px) {
+  .sk {
+    overflow-x: clip;
+    padding-left: 0;
+    padding-right: 0;
+  }
   .sk-cols {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 6px minmax(0, 1fr);
+    margin: 0 -4px;
+  }
+  .sk-top,
+  .sk-hint,
+  .sk-bar {
+    margin-left: 8px;
+    margin-right: 8px;
   }
 }
 
@@ -549,12 +580,13 @@ html.leaf .item-card.gem .ic-mod.explicit {
 @media (max-width: 600px) {
   .sk {
     gap: 4px;
-    padding: 4px 2px 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     font-size: 15px;
   }
   .sk-top {
     justify-content: flex-start;
-    padding: 0 40px 0 8px;
+    padding: 0 40px 0 0;
   }
   .sk-strip {
     gap: 10px;
@@ -562,11 +594,8 @@ html.leaf .item-card.gem .ic-mod.explicit {
   .sk-strip b {
     font-size: 19px;
   }
-  .sk-cols {
-    gap: 2px;
-  }
   .sk-pane {
-    padding: 9px 2px 9px 8px;
+    padding: 2px 2px 0 6px;
   }
   .sk-scroll {
     padding-right: 4px;

@@ -540,8 +540,9 @@ export function Skills({
           the others are used.
         </p>
       )}
-      <div class="sk-cols">
-        <section class="sk-pane sk-gear" data-paint="panel" data-thin>
+      {/* One lapis panel for both panes, a gold rule between them. */}
+      <div class="sk-cols" data-paint="panel" data-thin>
+        <section class="sk-pane sk-gear">
           <div class="sk-scroll">
             {ch.primary.gemUid === null && (
               <div class="sk-warn">No usable skill: using the default attack.</div>
@@ -674,10 +675,9 @@ export function Skills({
             </div>
           </div>
         </section>
+        <span class="sk-divider" aria-hidden="true" />
         <section
           class={'sk-pane sk-bag' + (over === 'inv' ? ' drop' : '')}
-          data-paint="panel"
-          data-thin
           onDragOver={(e) => {
             if (drag?.from === 'socket') {
               e.preventDefault();
