@@ -416,15 +416,15 @@ html.leaf .sk-bagrow {
   text-shadow: 0 2px 0 var(--ink);
 }
 
-/* ---- The bar: one row, the picked thing's buttons and its problem if any, always the same height ---- */
+/* ---- The bar, on the gold: the picked thing's buttons and its problem if any, always the same height ---- */
 .sk-bar {
   flex: none;
   box-sizing: border-box;
-  height: 60px;
+  height: 48px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 14px;
+  padding: 0 4px;
   text-shadow: 0 2px 0 var(--ink);
 }
 .sk-barsub {
@@ -433,7 +433,7 @@ html.leaf .sk-bagrow {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--muted);
+  color: var(--pearl);
 }
 .sk-barsub.sk-bad {
   color: var(--madder);
@@ -598,8 +598,8 @@ html.leaf .item-card.gem .ic-mod.explicit {
     font-size: 11px;
   }
   .sk-bar {
-    height: 54px;
-    padding: 5px 10px;
+    height: 46px;
+    padding: 0 6px;
   }
   .sk-acts .btn.small {
     padding-left: 10px;

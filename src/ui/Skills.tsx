@@ -808,7 +808,7 @@ export function Skills({
           </div>
         </section>
       </div>
-      <div class="sk-bar" ref={barRef} data-paint="panel" data-thin>
+      <div class="sk-bar" ref={barRef}>
         {bar.acts && <div class="sk-acts">{bar.acts}</div>}
         {note ? (
           <span class="sk-barsub sk-bad" title={note}>
