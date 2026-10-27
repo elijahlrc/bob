@@ -359,8 +359,9 @@ export function Items({
     if (visible[n]) setSel({ from, uid: visible[n].uid });
   };
   const bestUpgrade = () => {
-    // Gear by how much it adds; a flask for an empty slot only when no gear is better.
-    const rank = (i: ItemInfo) => (i.fillsFlask && i.scorePct <= 0.5 ? -1 : i.scorePct);
+    // Gear by how much it adds; a flask only when no gear is better.
+    const rank = (i: ItemInfo) =>
+      (i.fillsFlask || i.flaskSlot !== undefined) && i.scorePct <= 0.5 ? -1 : i.scorePct;
     let best: InventoryItem | null = null;
     for (const x of run.inventory) {
       const i = infos.get(x.uid)!;

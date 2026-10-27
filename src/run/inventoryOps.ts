@@ -5,6 +5,7 @@ import {
   type CharacterSheet,
   type SheetDiff,
 } from '../calc/character';
+import { flaskUpgradesOver } from '../calc/flaskUpgrade';
 import { itemMods } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
@@ -61,6 +62,8 @@ export type ItemInfo = {
   skillsIdle: GemItem[];
   /** A flask that would fill an empty flask slot (one of the best few, as many as there are empty slots). */
   fillsFlask?: boolean;
+  /** The worn flask slot this flask is an upgrade for (strictly better, or a higher tier of the same type). */
+  flaskSlot?: number;
 };
 
 const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -182,6 +185,12 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
       .sort((a, b) => flaskRank(b) - flaskRank(a));
     for (const f of flasks.slice(0, empty)) out.get(f.uid)!.fillsFlask = true;
   }
+  for (const it of run.inventory) {
+    const info = out.get(it.uid)!;
+    if (it.kind !== 'flask' || !info.equippable) continue;
+    const slot = flaskUpgradeSlot(run, it);
+    if (slot >= 0) info.flaskSlot = slot;
+  }
   return out;
 }
 
@@ -217,7 +226,11 @@ function name(it: InventoryItem): string {
 
 /** Whether an item is an upgrade worth highlighting. */
 export function isUpgrade(info: ItemInfo): boolean {
-  return info.group !== 'gem' && info.equippable && (info.scorePct > 0.5 || !!info.fillsFlask);
+  return (
+    info.group !== 'gem' &&
+    info.equippable &&
+    (info.scorePct > 0.5 || !!info.fillsFlask || info.flaskSlot !== undefined)
+  );
 }
 
 export function filterItems(
@@ -283,11 +296,24 @@ export function sortItems(
   });
 }
 
-/** The flask slot a flask goes into: an empty one, else the lowest-level flask of the same kind, else the lowest-level one. */
+/** The worn flask this one is an upgrade for (the lowest-level one if several), or -1. */
+export function flaskUpgradeSlot(run: RunState, f: FlaskItem): number {
+  let best = -1;
+  run.build.flasks.forEach((x, i) => {
+    if (!x || !flaskUpgradesOver(f, x)) return;
+    if (best < 0 || flaskBase(x.baseId).level < flaskBase(run.build.flasks[best]!.baseId).level)
+      best = i;
+  });
+  return best;
+}
+
+/** The flask slot a flask goes into: an empty one, else the one it upgrades, else the lowest-level flask of the same kind, else the lowest-level one. */
 export function flaskTarget(run: RunState, f: FlaskItem): number {
   const flasks = run.build.flasks;
   const empty = flasks.findIndex((x) => !x);
   if (empty >= 0) return empty;
+  const up = flaskUpgradeSlot(run, f);
+  if (up >= 0) return up;
   const rank = (x: (typeof flasks)[number]) => (x ? flaskBase(x.baseId).level : -1);
   const kind = flaskBase(f.baseId).kind;
   const same = flasks

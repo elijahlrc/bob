@@ -103,6 +103,9 @@ export function ItemRow(p: RowProps) {
         <span class="muted">{info.slotLabel}</span>
         {slots.length > 1 && info.slot && <span class="ix-best">→ {slotName(info.slot)}</span>}
         {info.fillsFlask && <span class="badge up">▲ empty flask slot</span>}
+        {info.flaskSlot !== undefined && !info.fillsFlask && (
+          <span class="badge up">▲ upgrades flask {info.flaskSlot + 1}</span>
+        )}
         {gear && info.equippable && (
           <>
             <Badge v={info.dpsPct} label="DPS" />

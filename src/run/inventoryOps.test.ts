@@ -14,6 +14,7 @@ import {
   compareFlasks,
   compareSlots,
   filterItems,
+  isUpgrade,
   itemInfos,
   junkItems,
   moveGem,
@@ -47,6 +48,61 @@ describe('a flask for an empty flask slot is an upgrade', () => {
     run.build = { ...run.build, flasks: run.build.flasks.map((f) => f ?? bag[0]) };
     infos = itemInfos(run);
     expect(bag.some((f) => infos.get(f.uid)!.fillsFlask)).toBe(false);
+  });
+});
+
+describe('a flask that upgrades a worn one is an upgrade', () => {
+  const wear = (run: RunState, ...flasks: ReturnType<typeof makeFlask>[]) => {
+    // The rest of the slots hold a mana flask, which none of these flasks is a kind of.
+    const fill = () => makeFlask(() => run.nextUid++, 'flask_mana_l1', 20);
+    run.build = {
+      ...run.build,
+      flasks: Array.from({ length: 5 }, (_, i) => flasks[i] ?? fill()),
+    };
+  };
+
+  it('a higher tier of the same kind, for the slot of that kind only', () => {
+    const { run, uid } = setup();
+    wear(run, makeFlask(uid, 'flask_life_l6', 20));
+    const higher = makeFlask(uid, 'flask_life_l12', 20);
+    const lower = makeFlask(uid, 'flask_life_l3', 20);
+    const utility = makeFlask(uid, 'flask_haste', 20);
+    run.inventory.push(higher, lower, utility);
+    const infos = itemInfos(run);
+    expect(infos.get(higher.uid)!.flaskSlot).toBe(0);
+    expect(infos.get(lower.uid)!.flaskSlot).toBeUndefined();
+    expect(infos.get(utility.uid)!.flaskSlot).toBeUndefined();
+    expect(ids(filterItems(run.inventory, infos, 'upgrades'))).toEqual([higher.uid]);
+  });
+
+  it('a strictly better flask of the same base, once, however many slots hold the kind', () => {
+    const { run, uid } = setup();
+    wear(run, makeFlask(uid, 'flask_life_l6', 20), makeFlask(uid, 'flask_life_l6', 20));
+    const better = makeFlask(uid, 'flask_life_l6', 20);
+    better.affixes = [
+      { family: 'flaskCharges', tier: 1, mods: [{ ...mod('flask.maxCharges', 'inc', 40) }] },
+    ];
+    const same = makeFlask(uid, 'flask_life_l6', 20);
+    run.inventory.push(better, same);
+    const infos = itemInfos(run);
+    expect(ids(filterItems(run.inventory, infos, 'upgrades'))).toEqual([better.uid]);
+    expect(isUpgrade(infos.get(same.uid)!)).toBe(false);
+  });
+
+  it('not one the character is too low a level to wear', () => {
+    const { run, uid } = setup();
+    wear(run, makeFlask(uid, 'flask_life_l6', 20));
+    const high = makeFlask(uid, 'flask_life_l65', 20);
+    run.inventory.push(high);
+    expect(itemInfos(run).get(high.uid)!.flaskSlot).toBeUndefined();
+  });
+
+  it('a plain Equip puts it in the slot it upgrades', () => {
+    const { run, uid } = setup();
+    wear(run, makeFlask(uid, 'flask_life_l12', 20), makeFlask(uid, 'flask_life_l3', 20));
+    const f = makeFlask(uid, 'flask_life_l6', 20);
+    run.inventory.push(f);
+    expect(quickEquip(run, f.uid)).toMatchObject({ ok: true, flask: 1 });
   });
 });
 
