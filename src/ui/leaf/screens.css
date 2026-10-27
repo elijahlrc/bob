@@ -589,6 +589,9 @@ html.leaf .patch-list {
   max-height: none;
   overflow: visible;
 }
+html.leaf .patch-more {
+  align-self: center;
+}
 html.leaf .patch-release {
   padding: 24px 40px 28px;
   line-height: 1.45;

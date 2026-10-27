@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact';
+import { useState } from 'preact/hooks';
 import notes from '../../docs/PATCH-NOTES.md?raw';
 import type { Controller } from '../run/controller';
 
@@ -89,8 +90,13 @@ function body(b: Block, i: number) {
   }
 }
 
-/** Every patch note, newest first, as kept in docs/PATCH-NOTES.md: a lapis panel for each release. */
+/** How many releases show at first, and how many more each press of Show older adds (each is a painted panel, so the cost is theirs). */
+const PAGE = 4;
+
+/** The notes, newest first, as kept in docs/PATCH-NOTES.md: a lapis panel for each release, a few at a time. */
 export function PatchNotes({ c }: { c: Controller }) {
+  const [shown, setShown] = useState(PAGE);
+  const left = RELEASES.length - shown;
   return (
     <div class="screen patchnotes">
       <h1>Patch notes</h1>
@@ -100,12 +106,17 @@ export function PatchNotes({ c }: { c: Controller }) {
         </button>
       </div>
       <div class="patch-list">
-        {RELEASES.map((r, i) => (
+        {RELEASES.slice(0, shown).map((r, i) => (
           <section key={i} class="patch-release lf-panel" data-paint="panel">
             <h2 class="lf-h">{r.date}</h2>
             {r.blocks.map(body)}
           </section>
         ))}
+        {left > 0 && (
+          <button class="btn patch-more" onClick={() => setShown(shown + PAGE)}>
+            Show older ({left} more)
+          </button>
+        )}
       </div>
     </div>
   );
