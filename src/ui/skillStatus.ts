@@ -264,7 +264,7 @@ export function skillSlots(w: World): SkillSlot[] {
   const out: SkillSlot[] = [];
   const first = damageSlot(w, ch.primary, ch.primary.gemUid === null ? 'Basic attack' : 'Primary');
   // Why the weapon's attack stands in (docs/NEWPLAYER.md N7): no skill gem is socketed, or none socketed can be used.
-  if (ch.primary.gemUid === null)
+  if (!ch.hasMainSkill)
     first.detail += ch.actives.length
       ? ' · No socketed skill can be used with this weapon'
       : ' · No skill gem socketed: put one in a socket at camp';

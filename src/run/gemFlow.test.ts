@@ -4,7 +4,7 @@ import { supportLive } from '../calc/reach';
 import { CLASSES } from '../data/classes';
 import { gemDef } from '../data/gems';
 import { typesAllow } from '../data/skillTypes';
-import type { GemItem } from '../data/types';
+import { EQUIP_SLOTS, type GemItem } from '../data/types';
 import { gemWhere, hasSocketedSkill, seatFirstSkill, skillToSocket } from './inventoryOps';
 import { newRun, rollRewards, rollSkillRewards, takeReward, type RunState } from './run';
 import { withStarterGems } from './starterGems';
@@ -69,6 +69,23 @@ describe('the camp’s no-skill warning', () => {
     expect(gemDef(g.gemId).kind).toBe('active');
     seatFirstSkill({ ...run, history: run.history.slice(0, 1) }, uid);
     expect(skillToSocket(run, new Character(run.build))).toBeNull();
+  });
+
+  it('says nothing when the main skill is a summon cast like one (Call Furies)', () => {
+    const run = backFrom(newRun('vanguard', 5), 2);
+    takeReward(run, run.reward![0].uid);
+    const slot = EQUIP_SLOTS.find((s) => run.build.equipment[s]?.sockets.length)!;
+    const item = run.build.equipment[slot]!;
+    const sockets = [...item.sockets];
+    sockets[0] = { kind: 'gem', uid: 9999, gemId: 'callFuries' };
+    run.build = {
+      ...run.build,
+      equipment: { ...run.build.equipment, [slot]: { ...item, sockets } },
+    };
+    const ch = new Character(run.build);
+    expect(ch.primary.gemUid).toBeNull();
+    expect(ch.hasMainSkill).toBe(true);
+    expect(skillToSocket(run, ch)).toBeNull();
   });
 });
 

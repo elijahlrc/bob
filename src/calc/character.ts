@@ -467,6 +467,13 @@ export class Character {
   private readonly defaultDyn: number;
   /** The main skills (fillers), in the order the strategy gives: the first is the primary skill. */
   readonly mains: RotationEntry<SkillChoice>[];
+  /**
+   * Whether a skill gem is among the main skills: a damage skill, or a summon cast like one (Call Furies), which leaves
+   * `primary` the weapon's attack. The no-skill warnings read this, not `primary`.
+   */
+  get hasMainSkill(): boolean {
+    return this.mains.some((e) => e.choice.gemUid !== null);
+  }
   /** The other skills the character casts, utility skills among them, in the order it considers them (see `rotation`). */
   private readonly rotationBase: RotationEntry<SkillChoice>[];
   private rotationCache: RotationEntry<SkillChoice>[] | null = null;

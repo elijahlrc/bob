@@ -565,7 +565,7 @@ export function canQuickSocket(run: RunState, gemUid: number): boolean {
  * offers it); null when one is in use or none would work.
  */
 export function skillToSocket(run: RunState, ch: Character): GemItem | null {
-  if (ch.primary.gemUid !== null) return null;
+  if (ch.hasMainSkill) return null;
   const base = sheetOf(run);
   let best: { g: GemItem; score: number } | null = null;
   for (const g of run.inventory) {

@@ -544,7 +544,7 @@ export function Skills({
       <div class="sk-cols" data-paint="panel" data-thin>
         <section class="sk-pane sk-gear">
           <div class="sk-scroll">
-            {ch.primary.gemUid === null && (
+            {!ch.hasMainSkill && (
               <div class="sk-warn">No usable skill: using the default attack.</div>
             )}
             {!supportSeen && !rehearsal && (
