@@ -17,3 +17,10 @@ Loose ends to come back to. Plans with milestones live in `docs/`; this is the s
   Vary it.
 - **Reprieve cards** (`src/ui/Satchel.tsx`). "Always ready; used up when it saves you." under every reprieve repeats the
   card's own text and the first-use tip. Cut it, or decide it earns its place.
+
+## Bone Dust
+
+- **More ways to earn and spend it.** Bone Dust is the only money (docs/WAYSIDE.md), but it comes almost only from
+  salvage and goes almost only to the stops. Plan more sources and sinks so it is a real economy.
+- **Show how much you hold.** Outside a stop's shop the total is shown nowhere: the camp and the HUD don't show it, and
+  the Workbench pouch that does is closed (`CRAFTING_OPEN = false`). It should be visible in camp at least.
