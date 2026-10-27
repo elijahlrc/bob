@@ -333,3 +333,77 @@ html.leaf .st .st-sel select:focus-visible {
     justify-self: start;
   }
 }
+
+/* ---- Damage in detail: the rotation's figures, skill by skill ---- */
+.st-calc {
+  margin-top: 24px;
+}
+.st-calc > summary {
+  cursor: pointer;
+  text-align: center;
+  list-style: none;
+}
+.st-calc > summary::-webkit-details-marker {
+  display: none;
+}
+.st-calc > summary::after {
+  content: ' ▾';
+}
+.st-calc[open] > summary::after {
+  content: ' ▴';
+}
+.st-calc-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+.st-calc-tabs .btn.on {
+  background: var(--btn-h);
+  color: var(--hi);
+}
+.st-calc-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 12px;
+}
+.st-calc-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-shadow: 0 2px 0 var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.st-calc-table th,
+.st-calc-table td {
+  padding: 6px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+.st-calc-table th:first-child,
+.st-calc-table td:first-child {
+  text-align: left;
+  position: sticky;
+  left: 0;
+}
+.st-calc-table th {
+  color: var(--muted);
+  font-weight: normal;
+  border-bottom: 1px solid var(--border2);
+}
+.st-calc-table td small {
+  display: block;
+  color: var(--dim);
+  font-size: 0.8em;
+}
+.st-calc-table tbody tr + tr td {
+  border-top: 1px solid var(--border2);
+}
+.st-calc-table tfoot td {
+  color: var(--hi);
+  border-top: 1px solid var(--border);
+}
+.st-calc-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  text-shadow: 0 2px 0 var(--ink);
+}

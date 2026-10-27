@@ -20,6 +20,7 @@ import {
 } from '../data/strategy';
 import type { Controller } from '../run/controller';
 import { moveSkill, resetStrategy, setStrategyOption, setTactic } from '../run/strategy';
+import { DpsDetails } from './DpsDetails';
 import { hoverInfo, infoProps } from './info';
 import { entryNote, mainsWarning, usualPause } from './strategyText';
 
@@ -429,6 +430,7 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
           </section>
         </div>
       </div>
+      {!empty && <DpsDetails ch={ch} />}
     </div>
   );
 }
