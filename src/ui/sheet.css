@@ -84,7 +84,7 @@
   top: calc(100% - 34px);
 }
 .cs-four .cs-under .cs-raw {
-  color: var(--madder);
+  color: var(--pearl);
 }
 
 /* ---- The two panels ---- */
@@ -127,10 +127,13 @@
   color: var(--muted);
 }
 .cs-warn {
-  margin-top: 16px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 16px auto 0;
+  padding: 8px 22px 9px;
   text-align: center;
-  color: var(--on-gold);
-  font-weight: 600;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
 }
 
 /* ---- The estimates ---- */
@@ -157,6 +160,7 @@
   }
   .cs-trio,
   .cs-trio:first-child {
+    width: 100%;
     gap: 4px;
   }
   .cs-trio:first-child .cs-tile {
@@ -177,6 +181,17 @@
     max-width: 64px;
     font-size: 14px;
   }
+  .cs-attr {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 140px;
+  }
+  .cs-chip {
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 7px 8px 8px;
+    font-size: 13px;
+  }
   .cs-cols {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -194,8 +209,34 @@
   cursor: help;
 }
 .cs-key {
-  margin: 0 0 10px;
-  color: var(--on-gold);
-  font-weight: 600;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 14px;
+  padding: 8px 22px 9px;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
   text-align: center;
+}
+
+/* What an attribute gives to other stats, in small plaques under its medallion. */
+.cs-attr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 140px;
+}
+.cs-fx {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 14px;
+}
+.cs-chip {
+  padding: 8px 14px 9px;
+  font-size: 14px;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
 }

@@ -5,6 +5,7 @@ import { statTotals, type StatTotal, type TotalSection } from '../calc/statTotal
 import { HEXES, hexText } from '../data/hexes';
 import { GLOSSARY, glossFor } from '../data/glossary';
 import { modLabel } from '../mods/text';
+import type { Mod } from '../mods/types';
 import { infoProps } from './info';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
@@ -60,6 +61,14 @@ function Row({
     </div>
   );
 }
+
+/** What an attribute gives, as a chip: "+84 Life", "+12% Energy Shield". */
+const effectText = (m: Mod) => {
+  const v = Math.round(m.value * 10) / 10;
+  return `+${v.toLocaleString()}${m.kind === 'inc' ? '%' : ''} ${modLabel({ ...m, kind: 'base' })
+    .replace(/^Maximum /, '')
+    .replace(/ Rating$/, '')}`;
+};
 
 const SMALL = new Set([
   'a',
@@ -176,6 +185,21 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
       </div>
     );
   };
+  /** An attribute's medallion with, below it, the total of what it gives to other stats. */
+  const attrTile = (label: string, key: 'str' | 'dex' | 'int', cls: string, tip: string) => (
+    <div key={label} class="cs-attr">
+      {tile(label, f0(s.attrs[key]), [], cls, tip)}
+      <div class="cs-fx">
+        {ch.attrEffects
+          .filter((e) => e.attr === key && e.mod.value)
+          .map((e) => (
+            <span key={modLabel(e.mod)} class="cs-chip" data-paint="panel" data-thin>
+              {effectText(e.mod)}
+            </span>
+          ))}
+      </div>
+    </div>
+  );
   return (
     <div class="cs">
       <div class="cs-top">
@@ -197,9 +221,9 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           )}
         </div>
         <div class="cs-trio">
-          {tile('Strength', f0(s.attrs.str), [], 'cs-str', GLOSSARY.str)}
-          {tile('Dexterity', f0(s.attrs.dex), [], 'cs-dex', GLOSSARY.dex)}
-          {tile('Intelligence', f0(s.attrs.int), [], 'cs-int', GLOSSARY.int)}
+          {attrTile('Strength', 'str', 'cs-str', GLOSSARY.str)}
+          {attrTile('Dexterity', 'dex', 'cs-dex', GLOSSARY.dex)}
+          {attrTile('Intelligence', 'int', 'cs-int', GLOSSARY.int)}
         </div>
         <div class="cs-trio cs-four">
           {RES.map(([i, name, cls]) =>
@@ -213,7 +237,9 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           )}
         </div>
       </div>
-      <p class="cs-key">{GLOSSARY.mult}</p>
+      <p class="cs-key" data-paint="panel" data-thin>
+        {GLOSSARY.mult}
+      </p>
       <div class="cs-cols">
         <div class="cs-col lf-panel" data-paint="panel">
           <Section title="Life and Mana">
@@ -279,7 +305,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
         </div>
       </div>
       {s.warnings.map((w) => (
-        <div key={w} class="warn cs-warn">
+        <div key={w} class="warn cs-warn" data-paint="panel" data-thin data-field="bitumen">
           ⚠ {w}
         </div>
       ))}

@@ -6,12 +6,7 @@ import {
   BASE_LIFE,
   BASE_MANA,
   BASE_MOVE_SPEED,
-  DEX_ACCURACY,
-  DEX_EVASION_INC,
   FISTS,
-  INT_ES_INC,
-  INT_MANA,
-  STR_LIFE,
   STR_MELEE_PHYS_INC,
   SCATTER_HIT_SHARE,
 } from '../data/constants';
@@ -95,6 +90,7 @@ import {
   type GemItem,
   type Item,
 } from '../data/types';
+import { attributeEffects, type AttrEffect } from './attributes';
 import { CondIndex, ModDB, type ModCtx } from '../mods/modDb';
 import { AURA_CONDS, WIELD_CONDS } from './staticConds';
 import {
@@ -409,6 +405,8 @@ export class Character {
   readonly config: Required<Omit<CalcConfig, 'steady' | 'extraMods' | 'charges'>> &
     Pick<CalcConfig, 'steady' | 'charges'> & { extraMods: Mod[] };
   readonly attrs: Attrs;
+  /** What the attributes give to other stats (the Character tab shows them under each attribute). */
+  readonly attrEffects: AttrEffect[];
   readonly db: ModDB;
   readonly gems: SocketedGem[] = [];
   readonly auras: AuraState[] = [];
@@ -738,28 +736,16 @@ export class Character {
                         ? held.insight
                         : 0;
     const src = { kind: 'base' as const, id: 'attributes' };
-    const aMods: Mod[] = [
-      mod('life', 'base', attrs.str * STR_LIFE, { source: src }),
-      mod('damage', 'inc', attrs.str * STR_MELEE_PHYS_INC, {
-        damageTypes: ['physical'],
-        tags: ['melee'],
-        source: src,
-      }),
-      mod('accuracy', 'base', attrs.dex * DEX_ACCURACY, { source: src }),
-      mod('mana', 'base', attrs.int * INT_MANA, { source: src }),
-      mod('es', 'inc', attrs.int * INT_ES_INC, { source: src }),
-    ];
-    if (db0.flag('strongarm', ctx0))
-      aMods.push(
-        mod('damage', 'inc', attrs.str * STR_MELEE_PHYS_INC, {
-          damageTypes: ['physical'],
-          tags: ['projectile', 'attack'],
-          source: src,
-        }),
-      );
     // Plated Hide and Strongarm both take dexterity's evasion bonus away.
-    if (!db0.flag('evasionToArmour', ctx0) && !db0.flag('dexNoEvasion', ctx0))
-      aMods.push(mod('evasion', 'inc', attrs.dex * DEX_EVASION_INC, { source: src }));
+    this.attrEffects = attributeEffects(
+      attrs,
+      {
+        strongarm: db0.flag('strongarm', ctx0),
+        noEvasion: db0.flag('evasionToArmour', ctx0) || db0.flag('dexNoEvasion', ctx0),
+      },
+      src,
+    );
+    const aMods: Mod[] = this.attrEffects.map((e) => e.mod);
     db0.addAll(aMods);
     // "Increased global defences" raises armour, evasion and energy shield alike.
     const globalDef = db0.sum('inc', 'globalDefences', ctx0);
