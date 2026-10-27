@@ -189,15 +189,15 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   const attrTile = (label: string, key: 'str' | 'dex' | 'int', cls: string, tip: string) => (
     <div key={label} class="cs-attr">
       {tile(label, f0(s.attrs[key]), [], cls, tip)}
-      <div class="cs-fx">
-        {ch.attrEffects
-          .filter((e) => e.attr === key && e.mod.value)
-          .map((e) => (
-            <span key={modLabel(e.mod)} class="cs-chip" data-paint="panel" data-thin>
-              {effectText(e.mod)}
-            </span>
-          ))}
-      </div>
+      {ch.attrEffects.some((e) => e.attr === key && e.mod.value) && (
+        <div class="cs-fx" data-paint="panel" data-thin>
+          {ch.attrEffects
+            .filter((e) => e.attr === key && e.mod.value)
+            .map((e) => (
+              <span key={modLabel(e.mod)}>{effectText(e.mod)}</span>
+            ))}
+        </div>
+      )}
     </div>
   );
   return (
