@@ -259,7 +259,9 @@ _Strategy:_
   threshold, which is how to make a guard or a decoy wait longer or fire sooner. **Escape** is for blinks and runs: it uses the
   blink to get away (to the safest spot, not toward the enemy) when hurt with an enemy near (**Low health**) or when boxed in (**Surrounded**), as far as each box is ticked, instead of the
   blink closing a gap. A banner,
-  an offering, a minion summon and a gap-closing blink only have Auto or Off.
+  an offering, a minion summon and a gap-closing blink only have Auto or Off. A summon that adds a minion or two with each cast,
+  each for a short while (Call Furies, Pack of Hounds, Brood of Spiders), is cast like a damage skill instead: Main, Periodic or
+  Off, Main when no damage skill is socketed and Periodic beside one.
 - **Curses mostly go on packs and big enemies.** A lone, normal enemy below half life won't be cursed.
 - **Guards react to damage.** A guard goes up after you've already fallen below 60%. Big single hits can kill
   you first, so don't rely on a guard against burst damage.

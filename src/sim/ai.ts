@@ -360,6 +360,20 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
   for (const e of s.char.mains) {
     if (!whenHolds(w, s, e.when, target)) continue;
     const c = e.choice;
+    // A summon cast like a damage skill (Call Furies) is used whenever it would add a minion.
+    if (c.skill.utility) {
+      const u = utilityPick(w, s, e, target);
+      if (u)
+        return {
+          which: 'utility',
+          prof: u.prof,
+          costsLife: c.costsLife,
+          choice: c,
+          entry: e,
+          cd: u.cd,
+        };
+      continue;
+    }
     const prof = s.char.profile(c, conds, flaskMask(s));
     if (!canPay(s, c.costsLife, prof.cost)) starved = true;
     // Against a target immune to everything the skill deals, the next skill (or the weapon) is used.

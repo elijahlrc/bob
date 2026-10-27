@@ -48,6 +48,8 @@ export function rolesFor(skill: SkillDef): SkillRole[] {
     case 'curse':
       return ['auto', 'keepUp', 'opener', 'off'];
     case 'summon':
+      // One that adds a few minions each cast, each for a short while (Call Furies), is cast like a damage skill.
+      if (u.perCast !== undefined) return ['main', 'periodic', 'off'];
       return u.taunt ? ['auto', 'emergency', 'off'] : ['auto', 'off'];
     case 'blink':
       return u.escape ? ['auto', 'escape', 'emergency', 'off'] : ['auto', 'escape', 'off'];

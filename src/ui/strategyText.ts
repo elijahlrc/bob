@@ -109,8 +109,9 @@ export function describeEntry(ch: Character, e: RotationEntry<SkillChoice>): str
         ? `Whenever its cooldown allows (every ${secs(ch.cooldownOf(c))})`
         : `Every ${secs(ch.cooldownOf(c))}`;
       const short =
+        !c.skill.utility &&
         skillRange(ch.profile(c, ch.configConds)) <
-        skillRange(ch.profile(ch.primary, ch.configConds)) - 0.05;
+          skillRange(ch.profile(ch.primary, ch.configConds)) - 0.05;
       return (
         base +
         when +
@@ -158,8 +159,9 @@ export function entryNote(ch: Character, e: RotationEntry<SkillChoice>): string 
   if (e.role === 'main' || e.role === 'off') return null;
   if (e.role === 'periodic' && e.choice.skill.cooldown === undefined) {
     const short =
+      !e.choice.skill.utility &&
       skillRange(ch.profile(e.choice, ch.configConds)) <
-      skillRange(ch.profile(ch.primary, ch.configConds)) - 0.05;
+        skillRange(ch.profile(ch.primary, ch.configConds)) - 0.05;
     return short ? 'Less reach than the main skill: only when an enemy is within it' : null;
   }
   return describeEntry(ch, e);

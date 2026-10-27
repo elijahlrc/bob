@@ -270,7 +270,9 @@ export function skillSlots(w: World): SkillSlot[] {
       : ' · No skill gem socketed: put one in a socket at camp';
   out.push(first);
   // The other main skills (the Strategy tab), then the other damage skills in the order the character considers them.
-  for (const e of ch.mains.slice(1)) out.push(damageSlot(w, e.choice, 'Primary'));
+  for (const e of ch.mains)
+    if (e.choice !== ch.primary && !e.choice.skill.utility)
+      out.push(damageSlot(w, e.choice, 'Primary'));
   for (const e of ch.rotation)
     if (!e.choice.skill.utility) out.push(damageSlot(w, e.choice, 'Secondary'));
   for (const c of ch.utilities) if (ch.entryOf(c)?.role !== 'off') out.push(utilitySlot(w, c));

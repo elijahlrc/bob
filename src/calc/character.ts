@@ -954,12 +954,23 @@ export class Character {
     }
     // The strategy (the Strategy tab): each skill's role, and the order the character considers them in.
     const strat = build.strategy;
+    // A summon cast like a damage skill (Call Furies) is the main skill when no damage skill is, else periodic.
+    const castLike = (a: SkillChoice) =>
+      a.skill.utility?.kind === 'summon' && a.skill.utility.perCast !== undefined;
     const entries = cast.map((a) =>
       entryOf(
         a,
         a.skill,
         tacticOf(strat, a.gemUid),
-        a.skill.utility ? 'auto' : a === starred ? 'main' : 'periodic',
+        castLike(a)
+          ? starred.gemUid === null
+            ? 'main'
+            : 'periodic'
+          : a.skill.utility
+            ? 'auto'
+            : a === starred
+              ? 'main'
+              : 'periodic',
       ),
     );
     const uidOf = (c: SkillChoice) => c.gemUid;
@@ -967,8 +978,8 @@ export class Character {
     this.mains = ordered(entries.filter(isMain), uidOf, strat?.order);
     this.rotationBase = entries.filter((e) => !isMain(e) && e.role !== 'off');
     this.unused = entries.filter((e) => e.role === 'off');
-    // The primary skill is the first main one; with none, the weapon.
-    this.primary = this.mains[0]?.choice ?? this.defaultAttack;
+    // The primary skill is the first main damage skill (a summon among the mains is not one); with none, the weapon.
+    this.primary = this.mains.find((e) => !e.choice.skill.utility)?.choice ?? this.defaultAttack;
     this.hexes = this.deriveHexes(db0, ctx0);
     this.linkCurses(db0, ctx0);
     this.castCurses = this.deriveCurses(db0, ctx0);
@@ -2046,7 +2057,10 @@ export class Character {
 
   /** The main skill in a kind of fight: the first main skill whose condition fits it, or the weapon. */
   mainFor(scenario: Scenario): SkillChoice {
-    return this.mains.find((e) => whenFits(e.when, scenario))?.choice ?? this.defaultAttack;
+    return (
+      this.mains.find((e) => !e.choice.skill.utility && whenFits(e.when, scenario))?.choice ??
+      this.defaultAttack
+    );
   }
 
   /** Whether any skill waits for a kind of fight: then a pack and a boss make different rotations. */
@@ -2262,10 +2276,17 @@ export class Character {
       }
       const p = this.profile(c, conds);
       const cap = summonCountOf(u, c.skill.level, p.minionCount);
-      // One that adds a minion a cast is cast again and again: as many stand as the casts in one of their lifetimes, up to the cap.
+      // One that adds minions each cast stands as many as the casts in one of their lifetimes bring, up to the cap: the casts
+      // the rotation gives it (as a main skill, back to back while nothing else is called for; as a periodic one, at its pause).
       const count =
         u.perCast !== undefined && u.seconds !== undefined
-          ? Math.min(cap, (u.perCast * u.seconds * p.skillDuration) / p.useTime)
+          ? Math.min(
+              cap,
+              u.perCast *
+                u.seconds *
+                p.skillDuration *
+                (this.plan(conds, scenario).acts[c.key] ?? 0),
+            )
           : cap;
       // Minions that last a while are gone between the end of one lot and the landing of the next.
       const duty =
@@ -2377,7 +2398,10 @@ export class Character {
             : u.kind === 'curse'
               ? HEX_SECONDS * 0.9
               : u.kind === 'summon'
-                ? (u.seconds ?? 90)
+                ? // One that adds minions each cast is cast at its periodic pause.
+                  u.perCast !== undefined
+                  ? this.cooldownOf(choice, conds)
+                  : (u.seconds ?? 90)
                 : u.kind === 'offering'
                   ? u.seconds
                   : u.cooldown;
@@ -2487,7 +2511,7 @@ export class Character {
       });
     };
     for (const e of this.mains)
-      if (e.choice !== main && whenFits(e.when, scenario))
+      if (e.choice !== main && !e.choice.skill.utility && whenFits(e.when, scenario))
         add(e.choice, 1 / Math.max(1e-3, plan.acts[e.choice.key] ?? 0));
     for (const e of this.rotation)
       if (e.role === 'periodic' && !e.choice.skill.utility && whenFits(e.when, scenario))

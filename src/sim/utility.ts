@@ -124,7 +124,10 @@ export function utilityPick(
     if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;
     if (groupStands(s, c)) return null;
     if (d > CAST_RANGE + 6 || minionCount(s, c.key) >= summonCount(c, prof)) return null;
-    return { choice: c, prof, cd: summonRespawn(c) };
+    // A periodic one (Call Furies) keeps its pause between casts.
+    const cd =
+      e.role === 'periodic' ? ch.cooldownOf(c, playerConds(w, s, target)) : summonRespawn(c);
+    return { choice: c, prof, cd };
   }
   if (u.kind === 'blink') {
     if (c.skill.cooldown !== undefined && !skillReady(s, c)) return null;

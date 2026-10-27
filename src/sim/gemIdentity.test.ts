@@ -242,6 +242,71 @@ describe('Call Furies', () => {
     expect(most).toBeGreaterThan(4);
     expect(most).toBeLessThanOrEqual(20);
   });
+
+  // Beside a damage skill it is cast like one (the Strategy tab): periodic by default, or a main skill in the order set.
+  const beside = (furies?: { role: 'main' | 'periodic'; first?: boolean }) => {
+    const b = holding('wand_1', ['flameBolt', 'callFuries'], 70);
+    const [bolt, fury] = b.equipment.mainHand!.sockets.map((g) => g!.uid);
+    if (furies)
+      b.strategy = {
+        skills: { [fury]: { role: furies.role } },
+        order: furies.first ? [fury, bolt] : [bolt, fury],
+      };
+    const { world } = createDummyWorld(b, { distance: 3 });
+    world.sides[0].opts.freeResources = true;
+    const uses = { flameBolt: 0, callFuries: 0 };
+    let spirits = 0;
+    steps(world, 12, (w) => {
+      for (const e of w.events)
+        if (e.t === 'use' && (e.skill === 'flameBolt' || e.skill === 'callFuries')) uses[e.skill]++;
+      spirits = Math.max(spirits, w.sides[0].minions.filter((m) => m.alive).length);
+    });
+    return { ...uses, spirits, ch: world.sides[0].char };
+  };
+
+  it('beside a damage skill it is periodic by default, and both are cast', () => {
+    const r = beside();
+    expect(r.ch.entryOf(r.ch.actives.find((c) => c.skill.id === 'callFuries')!)?.role).toBe(
+      'periodic',
+    );
+    expect(r.ch.primary.skill.id).toBe('flameBolt');
+    // A spirit every three seconds or so, and Flame Bolt the rest of the time.
+    expect(r.callFuries).toBeGreaterThanOrEqual(3);
+    expect(r.callFuries).toBeLessThanOrEqual(5);
+    expect(r.flameBolt).toBeGreaterThan(10);
+  });
+
+  it('as the first main skill it is cast again and again, and the damage skill waits', () => {
+    const r = beside({ role: 'main', first: true });
+    expect(r.ch.primary.skill.id).toBe('flameBolt');
+    expect(r.callFuries).toBeGreaterThan(15);
+    expect(r.spirits).toBeGreaterThan(6);
+    expect(r.flameBolt).toBeLessThan(r.callFuries / 4);
+  });
+
+  it('as a main skill after the damage skill it waits for it', () => {
+    const r = beside({ role: 'main' });
+    expect(r.callFuries).toBe(0);
+    expect(r.flameBolt).toBeGreaterThan(10);
+  });
+
+  it('the sheet counts the spirits the casts it gets would keep', () => {
+    const minions = (furies?: { role: 'main' | 'periodic'; first?: boolean }) => {
+      const b = holding('wand_1', ['flameBolt', 'callFuries'], 70);
+      const [bolt, fury] = b.equipment.mainHand!.sockets.map((g) => g!.uid);
+      if (furies)
+        b.strategy = {
+          skills: { [fury]: { role: furies.role } },
+          order: furies.first ? [fury, bolt] : [bolt, fury],
+        };
+      return new Character(b).minionDps();
+    };
+    const periodic = minions();
+    const main = minions({ role: 'main', first: true });
+    expect(periodic).toBeGreaterThan(0);
+    expect(main).toBeGreaterThan(periodic * 2);
+    expect(minions({ role: 'main' })).toBe(0);
+  });
 });
 
 describe('Primal Strike and Quickening Shot', () => {
