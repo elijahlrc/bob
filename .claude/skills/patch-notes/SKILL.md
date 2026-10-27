@@ -132,16 +132,27 @@ The notes commit stays local until the user says yes. Work out and show what wou
 - `git rev-list --count origin/main..HEAD` and `git log --oneline origin/main..HEAD` (this includes other sessions' unpushed
   commits; summarise a long list), and that `HEAD..origin/main` is 0 (if `origin/main` has commits `main` lacks, stop and tell
   the user rather than merging or rebasing).
-- The notes as filed (fenced plain text).
+- The notes going live (fenced plain text; below).
 - That the push deploys the game on GitHub Pages and that the same commit is then built and uploaded to itch.io
   (`elijahlrc/bob:html5`).
+
+**The notes going live are the ones since the build on itch.io** (the user, 2026-10-26: itch.io is the live game, and a push to
+GitHub alone is sometimes used as a staging deploy). Find the commit itch.io plays:
+
+- `butler.exe status elijahlrc/bob:html5`: its VERSION column is the commit the live build was made from (step 9 stamps it).
+- If VERSION is not a commit git knows (builds before 2026-10-26 carry a plain counter), use the local tag `itch-live` (step 9
+  moves it). If neither exists, say so and ask which commit is live rather than guessing.
+
+Then `git diff <live>..HEAD -- docs/PATCH-NOTES.md`: every bullet added or reworded since then, as it reads now, under its date
+and `###` heading. That includes notes already pushed to GitHub but never uploaded to itch.io; say in one line which of them are
+already on GitHub (`git diff <live>..origin/main -- docs/PATCH-NOTES.md`). Bullets that are live already are not shown, even
+under today's heading.
 
 **Present the notes before asking, and make sure they were seen.** The user wants to read the notes before choosing
 (2026-10-20, twice: a fenced block and option previews in the same turn as the dialog were not enough, the dialog covers
 them). So:
 
-- Show the whole day's section as filed (every bullet under today's heading, not only the ones added this run), as plain text
-  in a fenced block, in the message, before the commit list and before any question.
+- Show the notes going live as plain text in a fenced block, in the message, before the commit list and before any question.
 - Then ask in chat as plain text (no dialog) and end the turn: "Push and upload to itch.io, push only, or stop?" The commit
   count and what a push does go in that text. Only when the user has already seen the notes in an earlier turn may
   AskUserQuestion be used, with the notes repeated as the `preview` of every option.
@@ -167,9 +178,11 @@ uncommitted work may be in it), so build from an export of `HEAD`:
 3. Zip the `dist` folder with the script beside this file, never with `tar` (itch.io refused that zip):
    `pwsh -File .claude/skills/patch-notes/itch-zip.ps1 -Dist <dir>/dist -Out E:\Proj\Auto\bob-itch.zip`. Check that
    `index.html` is at the top level of the listing. `bob-itch.zip` is git-ignored.
-4. `C:\Users\littl\butler\butler.exe push bob-itch.zip elijahlrc/bob:html5`, then one
-   `butler.exe status elijahlrc/bob:html5` after a short wait to see that the build has processed. Do not poll.
-5. Remove the temporary directory (remove the `node_modules` junction with `rmdir` first, so the real folder is not deleted).
+4. `C:\Users\littl\butler\butler.exe push bob-itch.zip elijahlrc/bob:html5 --userversion $(git rev-parse HEAD)` (the build's
+   version is the commit it was made from, which step 7 reads next time), then one `butler.exe status elijahlrc/bob:html5`
+   after a short wait to see that the build has processed and carries that version. Do not poll.
+5. Once it has processed, `git tag -f itch-live HEAD` (a local tag, never pushed: the fallback for step 7).
+6. Remove the temporary directory (remove the `node_modules` junction with `rmdir` first, so the real folder is not deleted).
 
 If butler is missing, not logged in (`butler login`, which needs the user), or the push fails, say so and carry on to the
 report: the GitHub push has already happened and is not undone. One-time settings on the itch.io page that butler cannot set
@@ -177,6 +190,6 @@ report: the GitHub push has already happened and is not undone. One-time setting
 
 ## 10. Report
 
-Show the notes as they were filed (plain text in a fenced block, so they can be copied), then in two or three lines: the commit
+Show the notes that went live, as in step 7 (plain text in a fenced block, so they can be copied), then in two or three lines: the commit
 and push result (hash, how many commits went out), the itch.io upload (build number and whether it processed, or why it was
 skipped), anything you could not confirm, what the audit changed or left standing, and anything left out on purpose.
