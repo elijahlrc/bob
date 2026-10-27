@@ -1995,16 +1995,18 @@ export class Character {
     return pool / Math.max(0.01, taken * def.damageTakenMult * avoid);
   }
 
-  /** The reference monster of the area's hit and the chance its attacks hit the character (what `ehp` and the sheet use). */
-  private againstReference(def: Defence): { hit: number; hc: number } {
+  /**
+   * The reference monster of the area: its hit, its accuracy and the chance its attacks hit the character (what `ehp` and the
+   * sheet use; the Character tab's tips show the numbers).
+   */
+  againstReference(def: Defence = this.defence()): { hit: number; accuracy: number; hc: number } {
     const level = this.config.areaLevel;
     const d = this.config.difficulty;
     const hit = monsterHit(statLevel(level, d)) * Math.sqrt(d.base);
     const mon = referenceMonster(level, d);
-    const hc = def.cannotEvade
-      ? 1
-      : hitChance(mon.defence.maxLife > 0 ? mon.profile(0).hands[0].accuracy : 0, def.evasion);
-    return { hit, hc };
+    const accuracy = mon.defence.maxLife > 0 ? mon.profile(0).hands[0].accuracy : 0;
+    const hc = def.cannotEvade ? 1 : hitChance(accuracy, def.evasion);
+    return { hit, accuracy, hc };
   }
 
   /**

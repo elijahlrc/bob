@@ -76,7 +76,8 @@ export function InfoLayer() {
   // Window and element positions in interface pixels (the layer may be zoomed, uiScale.ts).
   const z = uiZoom();
   const [W, H, x, y] = [window.innerWidth / z, window.innerHeight / z, o.x / z, o.y / z];
-  const w = Math.min(280, W - 16);
+  // A tip of several lines (a formula and its numbers) gets more width, so a formula wraps less.
+  const w = Math.min(o.text.includes('\n') ? 380 : 280, W - 16);
   const left = Math.max(8, Math.min(W - w - 8, x - w / 2));
   const above = y > 120;
   return (

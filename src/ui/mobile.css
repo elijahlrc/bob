@@ -127,6 +127,8 @@ body {
   z-index: 30;
   box-sizing: border-box;
   pointer-events: none;
+  /* A tip of several lines (the Character tab's formulas) keeps them apart. */
+  white-space: pre-line;
 }
 
 /* A touch screen has no hover: a tapped button must not stay lit until the next tap. These repeat the resting looks. */

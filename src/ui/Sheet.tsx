@@ -7,6 +7,21 @@ import { GLOSSARY, glossFor } from '../data/glossary';
 import { modLabel } from '../mods/text';
 import type { Mod } from '../mods/types';
 import { infoProps } from './info';
+import {
+  armourTip,
+  attrTip,
+  blockTip,
+  dpsTip,
+  ehpTip,
+  evasionTip,
+  lifeRegenTip,
+  manaRegenTip,
+  moveTip,
+  poolTip,
+  resistTip,
+  stunTip,
+  totalTip,
+} from './sheetMath';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const f1 = (v: number) => (Math.round(v * 10) / 10).toLocaleString();
@@ -103,7 +118,7 @@ const totalRow = (t: StatTotal) => (
     key={modLabel(t.mod)}
     label={titled(modLabel(t.mod))}
     value={times(t.mult)}
-    tip={glossFor(t.mod.stat)}
+    tip={totalTip(t, glossFor(t.mod.stat))}
   />
 );
 
@@ -188,7 +203,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   /** An attribute's medallion with, below it, the total of what it gives to other stats. */
   const attrTile = (label: string, key: 'str' | 'dex' | 'int', cls: string, tip: string) => (
     <div key={label} class="cs-attr">
-      {tile(label, f0(s.attrs[key]), [], cls, tip)}
+      {tile(label, f0(s.attrs[key]), [], cls, attrTip(ch, key, tip))}
       {ch.attrEffects.some((e) => e.attr === key && e.mod.value) && (
         <div class="cs-fx" data-paint="panel" data-thin>
           {ch.attrEffects
@@ -209,15 +224,21 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             f0(s.life - s.reservedLife),
             [s.reservedLife > 0 && `of ${f0(s.life)}`, times(life?.mult ?? 1)],
             'cs-life',
-            GLOSSARY.life,
+            poolTip(ch, s, 'life', life),
           )}
-          {tile('Energy Shield', f0(s.es), [times(es?.mult ?? 1)], 'cs-es', GLOSSARY.es)}
+          {tile(
+            'Energy Shield',
+            f0(s.es),
+            [times(es?.mult ?? 1)],
+            'cs-es',
+            poolTip(ch, s, 'es', es),
+          )}
           {tile(
             'Mana',
             f0(s.mana - s.reservedMana),
             [`of ${f0(s.mana)}`, times(mana?.mult ?? 1)],
             'cs-mana',
-            GLOSSARY.mana,
+            poolTip(ch, s, 'mana', mana),
           )}
         </div>
         <div class="cs-trio">
@@ -232,7 +253,12 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               `${s.res[i]}%`,
               [`max ${s.maxRes[i]}%`],
               `cs-res-${cls}${s.res[i] < s.maxRes[i] ? ' cs-under' : ''}`,
-              cls === 'chaos' ? GLOSSARY.chaos : GLOSSARY.resist,
+              resistTip(
+                name,
+                s.res[i],
+                s.maxRes[i],
+                cls === 'chaos' ? GLOSSARY.chaos : GLOSSARY.resist,
+              ),
             ),
           )}
         </div>
@@ -250,29 +276,49 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               label="Physical Damage Reduction"
               value={pct(mit.physReduction)}
               raw={`${f0(s.armour)} armour`}
-              tip={GLOSSARY.armour}
+              tip={armourTip(ch, s)}
             />
             {armour && totalRow(armour)}
             <Row
               label="Chance to Evade Attacks"
               value={pct(mit.evade)}
               raw={`${f0(s.evasion)} evasion`}
-              tip={GLOSSARY.evasion}
+              tip={evasionTip(ch, s)}
             />
             {evasion && totalRow(evasion)}
             {defence.filter((t) => t !== armour && t !== evasion).map(totalRow)}
           </Section>
           <Section title="Block and Stun">
-            <Row label="Chance to Block Attacks" value={pct(s.blockAttack)} tip={GLOSSARY.block} />
-            <Row label="Chance to Block Spells" value={pct(s.blockSpell)} tip={GLOSSARY.block} />
-            <Row label="Chance to Avoid Stuns" value={pct(s.stunAvoid)} tip={GLOSSARY.stun} />
+            <Row
+              label="Chance to Block Attacks"
+              value={pct(s.blockAttack)}
+              tip={blockTip(ch, s.blockAttack, 'Attack damage')}
+            />
+            <Row
+              label="Chance to Block Spells"
+              value={pct(s.blockSpell)}
+              tip={blockTip(ch, s.blockSpell, 'Spell damage')}
+            />
+            <Row
+              label="Chance to Avoid Stuns"
+              value={pct(s.stunAvoid)}
+              tip={stunTip(s.stunAvoid)}
+            />
             {of('block').map(totalRow)}
           </Section>
           <Section title="Damage Taken">{of('defenceOther').map(totalRow)}</Section>
           <Section title="Recovery">
-            <Row label="Life Regeneration" value={`${f1(s.lifeRegen)}/s`} tip={GLOSSARY.regen} />
+            <Row
+              label="Life Regeneration"
+              value={`${f1(s.lifeRegen)}/s`}
+              tip={lifeRegenTip(s, lifeRate)}
+            />
             {lifeRate && totalRow(lifeRate)}
-            <Row label="Mana Regeneration" value={`${f1(s.manaRegen)}/s`} tip={GLOSSARY.regen} />
+            <Row
+              label="Mana Regeneration"
+              value={`${f1(s.manaRegen)}/s`}
+              tip={manaRegenTip(s, manaRate)}
+            />
             {manaRate && totalRow(manaRate)}
             {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
           </Section>
@@ -298,7 +344,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               label="Movement Speed"
               value={`${f1(s.moveSpeed)} tiles/s`}
               raw={times(move?.mult ?? 1)}
-              tip={GLOSSARY.move}
+              tip={moveTip(s, move)}
             />
             {other.filter((t) => t !== move).map(totalRow)}
           </Section>
@@ -310,7 +356,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
         </div>
       ))}
       <div class="cs-est" data-paint="panel" data-field="porphyry" data-thin>
-        <span class="tipped" {...infoProps(GLOSSARY.dps)}>
+        <span class="tipped" {...infoProps(dpsTip(s))}>
           Estimated DPS <b>{f0(sc ? sc.pack : scenarioDps(s))}</b>
           {sc && sc.boss !== sc.pack && (
             <>
@@ -319,7 +365,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             </>
           )}
         </span>
-        <span class="tipped" {...infoProps(GLOSSARY.ehp)}>
+        <span class="tipped" {...infoProps(ehpTip(s))}>
           Effective HP <b>{f0(s.ehp)}</b>
         </span>
       </div>

@@ -268,6 +268,8 @@ these to start." It goes once a node is taken.
 
 ## N13. Words a newcomer does not know
 
+_Revised 2026-10-26: the Character tab's tips keep these plain lines and add the formula with the character's numbers (`src/ui/sheetMath.ts`; DESIGN.md Appendix A)._
+
 - `src/data/glossary.ts`: one plain line per term, in our own words. The terms:
   - Armour, evasion, energy shield, block.
   - Resistances and their 75% cap.

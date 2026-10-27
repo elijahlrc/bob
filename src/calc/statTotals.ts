@@ -30,7 +30,14 @@ export type TotalSection = (typeof TOTAL_SECTIONS)[number];
  * One stat's increases and more multipliers added up over the whole character: `mod` stands for the line (its stat, damage
  * types, tags and condition), `mult` is what they multiply the stat by together (1 for a line nothing touches).
  */
-export type StatTotal = { section: TotalSection; mod: Mod; mult: number };
+export type StatTotal = {
+  section: TotalSection;
+  mod: Mod;
+  mult: number;
+  /** The increases added up, in percent, and the more multipliers multiplied together: `mult` = (1 + inc/100) × more. */
+  inc: number;
+  more: number;
+};
 
 type Line = { stat: StatId; damageTypes?: DamageType[]; tags?: SkillTag[] };
 
@@ -160,10 +167,10 @@ export function statTotals(
     const section = sectionOf(mod.stat);
     const si = TOTAL_SECTIONS.indexOf(section);
     const at = fixedAt.get(key) ?? statAt.get(`${section}|${mod.stat}`) ?? si * 1000 + 999;
-    out.push({ section, mod, mult, at, fixed });
+    out.push({ section, mod, mult, inc, more, at, fixed });
   }
   out.sort((a, b) => a.at - b.at || Number(b.fixed) - Number(a.fixed) || keyCmp(a.mod, b.mod));
-  return out.map(({ section, mod, mult }) => ({ section, mod, mult }));
+  return out.map(({ section, mod, mult, inc, more }) => ({ section, mod, mult, inc, more }));
 }
 
 const keyCmp = (a: Mod, b: Mod) => (keyOf(a, a.condition) < keyOf(b, b.condition) ? -1 : 1);
