@@ -27,9 +27,11 @@ import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
 import { useRef, useState } from 'preact/hooks';
 import { autoAbandonAt, canAbandon } from '../sim/abandon';
+import { ask } from './Confirm';
 import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
 import { infoProps } from './info';
 import { reprieveDef } from '../data/reprieves';
+import { MAX_LEVEL, xpToNext } from '../data/xpTable';
 import { SkillBar } from './SkillBar';
 import { manaStarved } from './skillStatus';
 import { FirstMap } from './FirstMap';
@@ -468,9 +470,11 @@ function ReprieveBadge({ w }: { w: World }) {
   );
 }
 
-/** Leave the map early (docs/MAPS.md section 7): a confirm click, then a timer during which the character keeps fighting. */
+/**
+ * Leave the map early (docs/MAPS.md section 7): a question asked with the map paused, then a timer during which the character
+ * keeps fighting.
+ */
 function AbandonButton({ c, w }: { c: Controller; w: World }) {
-  const [asking, setAsking] = useState(false);
   if (w.abandonT !== null) {
     return (
       <div class="hud-abandon">
@@ -509,32 +513,53 @@ function AbandonButton({ c, w }: { c: Controller; w: World }) {
   }
   return (
     <div class="hud-abandon">
-      {asking ? (
-        <>
-          <span
-            class="hud-note"
-            title="You keep the loot and XP you have, but the level earns no clear rewards."
-          >
-            Leave this map?
-          </span>
-          <button
-            class="btn small danger"
-            onClick={() => {
-              setAsking(false);
-              c.abandonMap();
-            }}
-          >
-            Leave
-          </button>
-          <button class="btn small" onClick={() => setAsking(false)}>
-            Stay
-          </button>
-        </>
-      ) : (
-        <button class="btn small" onClick={() => setAsking(true)}>
-          Abandon map
-        </button>
+      <button
+        class="btn small"
+        onClick={async () => {
+          // The map waits while the question is open, and runs on as it was after.
+          const wasPaused = c.paused;
+          if (!wasPaused) c.togglePause();
+          const ok = await ask({
+            title: 'Leave this map?',
+            body: 'You keep the loot and XP you have, but the level earns no clear rewards.',
+            confirm: 'Leave',
+            danger: true,
+          });
+          if (!wasPaused && c.paused) c.togglePause();
+          if (ok) c.abandonMap();
+        }}
+      >
+        Abandon map
+      </button>
+    </div>
+  );
+}
+
+/** Monsters the map has put on the ground so far, summons and other no-reward actors left out: what a kill counts out of. */
+function monstersOnMap(w: World): number {
+  let n = 0;
+  for (const a of w.actors) if (!a.isPlayer && !a.noReward) n++;
+  return n;
+}
+
+/** The character's level and the way to the next one, across the top of the map. */
+function XpBar({ s }: { s: Side }) {
+  const level = s.build.level;
+  const need = xpToNext(level);
+  const maxed = level >= MAX_LEVEL;
+  const pct = maxed ? 100 : Math.min(100, (s.xp / need) * 100);
+  return (
+    <div
+      class="hud-xp"
+      data-nopaint
+      {...infoProps(
+        maxed ? 'Highest level.' : `${Math.floor(s.xp)} / ${need} XP to the next level.`,
       )}
+    >
+      <span class="hud-xp-lv">Lv {level}</span>
+      <div class="hud-xp-bar">
+        <div class="hud-xp-fill" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
@@ -571,8 +596,10 @@ export function Hud({ c }: { c: Controller }) {
   const sel = c.selectedId !== null ? w.actors.find((x) => x.id === c.selectedId) : undefined;
   const flasks = w.sides[0].flasks;
   const sealed = flasksSealed(w);
+  const xpBar = !sc && !duel && !c.gallery;
   return (
-    <div class="hud">
+    <div class={xpBar ? 'hud has-xp' : 'hud'}>
+      {xpBar && <XpBar s={w.sides[0]} />}
       {intro && <FirstMap c={c} onDone={() => setIntroDone(true)} />}
       {!sc && !intro && w.t < 5 && (
         <div class="biome-banner" key={w.plan.seed} data-paint="panel">
@@ -595,7 +622,11 @@ export function Hud({ c }: { c: Controller }) {
                 </span>
               ))}
             <span>Level {w.sides[0].build.level}</span>
-            {!duel && <span>Kills {w.sides[0].stats.kills}</span>}
+            {!duel && (
+              <span>
+                Kills {w.sides[0].stats.kills}/{monstersOnMap(w)}
+              </span>
+            )}
             <span {...infoProps('Time spent on this level. It stops while the game is paused.')}>
               {formatLevelTime(w.t)}
             </span>
