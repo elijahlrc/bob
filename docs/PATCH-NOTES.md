@@ -34,6 +34,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Your character now fetches every drop, however far it fell, and a fight no longer makes it give up on one.
 - The Strategy tab has a Damage details panel showing how often each skill is used and its damage by type, minions and clones included.
 - The Patch notes screen shows a few releases at a time, with a button for older ones.
+- Fixed the no-usable-skill warning showing when Call Furies, Pack of Hounds or Brood of Spiders is your only main skill.
 
 ## 2026-10-25
 
