@@ -330,15 +330,20 @@ export function Skills({
       confirm: 'Swap',
       danger: true,
     }));
+  // A no to the question keeps the pick, so another place can be tapped.
   const putIn = async (to: SocketRef, uid: number) => {
-    done();
+    setDrag(null);
+    setOver(null);
     if (!(await mainOk(mainLostBySocketing(run, to, uid)))) return;
+    done();
     c.act((r) => socketGem(r, to.slot, to.socket, uid));
   };
   const move = async (from: SocketRef, to: SocketRef) => {
-    done();
-    if (sameSocket(from, to)) return;
+    setDrag(null);
+    setOver(null);
+    if (sameSocket(from, to)) return done();
     if (!(await mainOk(mainLostByMove(run, from, to)))) return;
+    done();
     if (!c.act((r) => moveGem(r, from, to))) setMsg('Cannot move the gem there');
   };
   const takeOut = (from: SocketRef) => {

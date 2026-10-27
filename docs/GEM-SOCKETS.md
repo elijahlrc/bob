@@ -27,7 +27,8 @@ before it is tapped ("▲12%", "Swap ▼5%"), so the second tap is the commit. T
 they did are buttons in the bar. A mouse still drags.
 
 - Bag gem picked: every socket lights, with what the gem would do there.
-- Socketed gem picked: every other socket lights (a move, or a swap with what is there); the bag lights as "Take out".
+- Socketed gem picked: every other socket lights (a move, or a swap with what is there), and the bag's gems say what each would do
+  in its place; tapping one swaps it in. Take out is a button in the bar.
 - Empty socket picked: the bag's gems say what each would do in that socket, best first; tapping one places it.
 - A swap is done on the tap, from the bag or between sockets alike; the camp's Undo takes it back. Only a swap that takes away the
   main skill (out of its socket, or left unable to work) asks first, in the shared popup (`ask`, Confirm.tsx).
