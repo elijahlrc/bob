@@ -319,6 +319,16 @@ export type AuraState = {
   active: boolean;
 };
 
+/** What one source of minions deals a second: a summon skill's minions, or the clones a skill leaves. */
+export type MinionPart = {
+  key: string;
+  name: string;
+  kind: 'minion' | 'clone';
+  dps: number;
+  /** The same damage by type, in the order of `DAMAGE_TYPES`. */
+  perType: number[];
+};
+
 export type SkillSheet = {
   name: string;
   id: string;
@@ -2256,11 +2266,23 @@ export class Character {
     // What the minions deal does not depend on the target, and the map cards ask for it once for each monster.
     const k = `${conds}|${scenario}|${falls}`;
     let v = this.minionMemo.get(k);
-    if (v === undefined) this.minionMemo.set(k, (v = this.minionDpsFor(conds, scenario, falls)));
+    if (v === undefined) {
+      v = 0;
+      for (const part of this.summonParts(conds, scenario, falls)) v += part.dps;
+      this.minionMemo.set(k, v);
+    }
     return v;
   }
 
-  private minionDpsFor(conds: number, scenario: Scenario, falls: boolean): number {
+  /**
+   * What the minions and clones deal, source by source (the Strategy tab's Damage details): one part for each summon skill, then
+   * one for each skill that leaves clones. They add up to `minionDps` and `cloneDps`.
+   */
+  minionParts(conds: number = this.configConds, scenario: Scenario = 'pack'): MinionPart[] {
+    return [...this.summonParts(conds, scenario, true), ...this.cloneParts(conds, scenario)];
+  }
+
+  private summonParts(conds: number, scenario: Scenario, falls: boolean): MinionPart[] {
     const distance = this.config.targetDistance ?? 3;
     const mainUse = this.profile(this.mainFor(scenario), conds).useTime;
     const rows = [];
@@ -2300,21 +2322,30 @@ export class Character {
     // A golem that stands gives the other minions flat physical damage, and hits harder for each of them near.
     const golem = rows.find((r) => r.u.golem);
     const others = rows.reduce((n, r) => (r.u.golem ? n : n + r.count * r.stand), 0);
-    let dps = 0;
+    const parts: MinionPart[] = [];
     for (const { c, u, p, def, count, stand } of rows) {
       const own = summonHit(u, c.skill.level);
       let blow = def.nova ? 0 : minionBlow(def, c.skill.curveLevel, p, distance, own);
+      // The golem's flat physical damage, apart, for the types (the sum is the blow as before).
+      let added = 0;
       if (u.golem) blow *= 1 + Math.min(u.golem.cap, others * u.golem.perNearby) / 100;
-      else if (golem?.u.golem)
-        blow += golemAdded(golem.u.golem, golem.c.skill.level, p) * golem.stand;
+      else if (golem?.u.golem) {
+        added = golemAdded(golem.u.golem, golem.c.skill.level, p) * golem.stand;
+        blow += added;
+      }
       let novas = 0;
       if (u.relic && def.nova && distance <= u.relic.radius * p.radiusMult + RELIC_BESIDE)
         novas =
           relicNova(def, c.skill.curveLevel, p, own) *
           relicNovasPerSec(this.attackUsesPerSec(conds, scenario), u.relic.cooldown);
-      dps += (count * blow * def.rate * p.minionSpeed + novas) * stand;
+      const dps = (count * blow * def.rate * p.minionSpeed + novas) * stand;
+      const perType = DAMAGE_TYPES.map(() => 0);
+      const per = count * def.rate * p.minionSpeed * stand;
+      perType[DAMAGE_TYPES.indexOf(def.dtype)] += (blow - added) * per + novas * stand;
+      perType[DAMAGE_TYPES.indexOf('physical')] += added * per;
+      parts.push({ key: c.key, name: c.skill.name, kind: 'minion', dps, perType });
     }
-    return dps;
+    return parts;
   }
 
   /**
@@ -2324,21 +2355,37 @@ export class Character {
   cloneDps(conds: number = this.configConds, scenario: Scenario = 'pack'): number {
     const k = `${conds}|${scenario}`;
     let v = this.cloneMemo.get(k);
-    if (v === undefined) this.cloneMemo.set(k, (v = this.cloneDpsFor(conds, scenario)));
+    if (v === undefined) {
+      v = 0;
+      for (const part of this.cloneParts(conds, scenario)) v += part.dps;
+      this.cloneMemo.set(k, v);
+    }
     return v;
   }
 
-  private cloneDpsFor(conds: number, scenario: Scenario): number {
-    let dps = 0;
+  private cloneParts(conds: number, scenario: Scenario): MinionPart[] {
+    const parts: MinionPart[] = [];
+    const hand = this.hands[0];
     for (const c of this.actives) {
       const spec = c.skill.mirror;
       if (!spec) continue;
       const fires = this.planned(c, conds, scenario).fires;
       if (fires <= 0) continue;
       const p = this.profile(c, conds);
-      dps += fires * (1 + p.repeats) * cloneDamage(this.hands[0], spec, p);
+      const dps = fires * (1 + p.repeats) * cloneDamage(hand, spec, p);
+      // A clone strikes with the weapon's flat damage: its types are the weapon's.
+      const flat = hand.flats.map(([lo, hi]) => (lo + hi) / 2);
+      const all = flat.reduce((a, b) => a + b, 0);
+      const perType = flat.map((f) => (all > 0 ? (dps * f) / all : 0));
+      parts.push({
+        key: `${c.key}:clones`,
+        name: `${c.skill.name} clones`,
+        kind: 'clone',
+        dps,
+        perType,
+      });
     }
-    return dps;
+    return parts;
   }
 
   /**

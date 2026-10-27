@@ -334,7 +334,7 @@ html.leaf .st .st-sel select:focus-visible {
   }
 }
 
-/* ---- Damage in detail: the rotation's figures, skill by skill ---- */
+/* ---- Damage details: the rotation's figures, skill by skill, then the minions source by source ---- */
 .st-calc {
   margin-top: 24px;
 }
@@ -384,6 +384,9 @@ html.leaf .st .st-sel select:focus-visible {
   text-align: left;
   position: sticky;
   left: 0;
+  /* Solid, so the columns scrolled under it do not show through. */
+  z-index: 1;
+  background: var(--panel2);
 }
 .st-calc-table th {
   color: var(--muted);
@@ -401,6 +404,12 @@ html.leaf .st .st-sel select:focus-visible {
 .st-calc-table tfoot td {
   color: var(--hi);
   border-top: 1px solid var(--border);
+}
+/* The hits of a row as a bar by type (TypeBar.tsx), as long as its share of the largest row's. */
+.st-calc-table .st-calc-bar {
+  width: 100%;
+  min-width: 120px;
+  text-align: left;
 }
 .st-calc-note {
   margin: 12px 0 0;

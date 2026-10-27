@@ -3,7 +3,7 @@ import type { Character, Scenario, SkillSheet } from './character';
 import { scenarioDps } from './character';
 
 /** Where a row of the breakdown comes from. */
-export type BreakdownRole = 'main' | 'periodic' | 'weapon' | 'trigger';
+export type BreakdownRole = 'main' | 'periodic' | 'weapon' | 'trigger' | 'minion' | 'clone';
 
 /** One skill's part in the damage the Strategy tab shows: how often it is used and what it does a second. */
 export type BreakdownRow = {
@@ -29,8 +29,8 @@ export type BreakdownRow = {
 export type Breakdown = {
   scenario: Scenario;
   rows: BreakdownRow[];
-  /** What the minions and clones add, a second. */
-  minions: number;
+  /** What the minions and clones add, one row for each summon skill and each skill that leaves clones (their hits only). */
+  minions: BreakdownRow[];
   total: number;
 };
 
@@ -73,5 +73,19 @@ export function dpsBreakdown(ch: Character, scenario: Scenario): Breakdown {
     ),
     ...sheet.triggered.map((t) => row(t.key, 'trigger', t.skill)),
   ];
-  return { scenario, rows, minions: sheet.minionDps, total };
+  const minions: BreakdownRow[] = ch.minionParts(undefined, scenario).map((m) => ({
+    key: m.key,
+    name: m.name,
+    role: m.kind,
+    usesPerSec: 0,
+    hitsPerUse: 0,
+    avgHit: 0,
+    hitChance: 0,
+    critChance: 0,
+    perType: m.perType,
+    overTime: 0,
+    dps: m.dps,
+    share: total > 0 ? m.dps / total : 0,
+  }));
+  return { scenario, rows, minions, total };
 }

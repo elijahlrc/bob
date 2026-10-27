@@ -1,5 +1,6 @@
 import { DAMAGE_TYPES } from '../mods/types';
 import type { LedgerRow, MapReport } from '../sim/ledger';
+import { TypeBar } from './TypeBar';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const pct = (v: number) => `${v >= 10 ? Math.round(v) : v.toFixed(1)}%`;
@@ -18,28 +19,6 @@ const short = (v: number) => {
  * the offer cards' damage bar paints them (leaf/shapes.ts).
  */
 const TYPE_STONE = ['pearl', 'violet', 'teal', 'vermilion', 'green'];
-
-/** A painted bar split by damage type; `scale` is how much of the full width the whole bar takes (1 for the largest row). */
-function TypeBar({ dmg, scale = 1 }: { dmg: number[]; scale?: number }) {
-  const total = sum(dmg);
-  if (total <= 0) return <div class="mr-bar" />;
-  const parts = dmg
-    .map((d, i) => (d > 0 ? `${cap(DAMAGE_TYPES[i])} ${f0(d)} (${pct((d / total) * 100)})` : ''))
-    .filter(Boolean)
-    .join(', ');
-  const mix = dmg.map((d) => (d / total).toFixed(3)).join(',');
-  return (
-    <div class="mr-bar" title={parts}>
-      <div
-        class="mr-fill"
-        data-paint="mix"
-        data-mix={mix}
-        data-pk={mix}
-        style={{ width: `max(16px, ${scale * 100}%)` }}
-      />
-    </div>
-  );
-}
 
 /** The damage of a whole side by type: one bar and a legend of the types that appear. */
 function TypeSplit({ rows }: { rows: LedgerRow[] }) {

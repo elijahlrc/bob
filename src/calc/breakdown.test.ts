@@ -23,13 +23,27 @@ describe('DPS breakdown', () => {
       expect(b.rows.length).toBeGreaterThan(0);
       expect(b.rows[0].name).toBe('Flame Bolt');
       expect(b.rows[0].usesPerSec).toBeGreaterThan(0);
-      const sum = b.rows.reduce((a, r) => a + r.dps, 0) + b.minions;
+      const sum = [...b.rows, ...b.minions].reduce((a, r) => a + r.dps, 0);
       expect(sum).toBeCloseTo(b.total, 6);
       expect(b.total).toBeCloseTo(scenarioDps(ch.sheet(undefined, scenario)), 6);
       for (const r of b.rows) {
         const hits = r.perType.reduce((a, v) => a + v, 0);
         expect(hits + r.overTime).toBeCloseTo(r.dps, 6);
       }
+    }
+  });
+
+  it('gives each summon skill its own row, by type, adding up to the minions of the sheet', () => {
+    const ch = character(['flameBolt', 'packHounds', 'broodSpiders']);
+    for (const scenario of ['pack', 'boss'] as const) {
+      const b = dpsBreakdown(ch, scenario);
+      expect(b.minions.map((m) => m.name)).toEqual(['Pack of Hounds', 'Brood of Spiders']);
+      for (const m of b.minions) {
+        expect(m.dps).toBeGreaterThan(0);
+        expect(m.perType.reduce((a, v) => a + v, 0)).toBeCloseTo(m.dps, 6);
+      }
+      const minions = b.minions.reduce((a, m) => a + m.dps, 0);
+      expect(minions).toBeCloseTo(ch.sheet(undefined, scenario).minionDps, 6);
     }
   });
 });

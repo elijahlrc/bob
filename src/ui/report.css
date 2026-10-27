@@ -112,7 +112,19 @@ html.leaf .mr-bar {
   height: 18px;
 }
 html.leaf .mr-fill {
+  position: relative;
   height: 100%;
+}
+/* Each type's stretch of a bar, unseen over the painting: it answers a hover or a tap with the type's damage (TypeBar.tsx). */
+.mr-seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  cursor: help;
+}
+.mr-seg:hover {
+  outline: 1px solid var(--pearl);
+  outline-offset: -1px;
 }
 html.leaf .mr-split {
   margin: 0 0 14px;
