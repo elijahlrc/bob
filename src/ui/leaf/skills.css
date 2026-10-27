@@ -1,26 +1,31 @@
-/* Gold Leaf: the Skills tab (src/ui/Skills.tsx; docs/mockups/style/STYLE-GUIDE.md, docs/mockups/style/skills.js). The
-   whole DPS and the effective HP as medallions on the gold, the main skill on a plaque under the DPS one (the rotation in
-   its tip); each socketed item a lapis panel, its gems painted stones in gold settings (round skills, lozenge supports,
-   coloured by attribute) on a gold chain, the level on the stone; the gem bag a lapis panel with its filters. A picked
-   gem's line and buttons sit on a plaque that stays in view (a sheet on a touch screen). The old rules are in styles.css
-   and mobile.css; what they would still do is undone here. Class names start with sk-. */
+/* Gold Leaf: the Skills tab (src/ui/Skills.tsx; docs/GEM-SOCKETS.md; docs/mockups/style/STYLE-GUIDE.md). The tab fills the
+   camp's tab body and does not scroll as a whole: the DPS and EHP above (medallions on a desktop, one line on a phone), the gear
+   and the gem bag side by side below as two lapis panes that each scroll on their own, and a bar at the bottom, always the same
+   height, with what is picked and its buttons. Nothing above the panes changes size when a gem is picked. Gems are painted
+   stones in gold settings (round skills, lozenge supports, coloured by attribute) on a gold chain, the level on the stone.
+   Class names start with sk- (the supports popup's with sp-). */
 .sk {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   max-width: 1180px;
   margin: 0 auto;
-  padding: 10px 16px 20px;
+  padding: 10px 16px 10px;
   font-size: var(--size, 17px);
   line-height: 1.2;
   color: var(--pearl);
 }
 
-/* ---- The medallions, small, and beside them the picked gem's line and buttons (the part to look at while choosing) ---- */
+/* ---- Above: the medallions (desktop) or one line (phone), and the help button ---- */
 .sk-top {
   position: relative;
+  flex: none;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 16px;
-  margin-bottom: 8px;
   padding-right: 48px;
 }
 .sk-medals {
@@ -29,7 +34,7 @@
   display: flex;
   flex: none;
   gap: 14px;
-  padding-bottom: 18px;
+  padding-bottom: 14px;
 }
 .sk-medal {
   position: relative;
@@ -38,20 +43,20 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 104px;
-  height: 104px;
+  width: 92px;
+  height: 92px;
   text-align: center;
   color: var(--pearl);
   text-shadow: 0 2px 0 #0b0805aa;
 }
 .sk-medal > span {
   max-width: 72%;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.05;
 }
 .sk-medal > b {
   margin-top: 2px;
-  font: 400 30px / 1 var(--title-font);
+  font: 400 26px / 1 var(--title-font);
   font-size-adjust: none;
 }
 .sk-plaque {
@@ -70,81 +75,127 @@
   text-underline-offset: 4px;
   cursor: help;
 }
+.sk-strip {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+  min-height: 36px;
+  align-self: center;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+  white-space: nowrap;
+}
+.sk-strip b {
+  font: 400 22px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--pearl);
+}
+.sk-mainname {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: normal;
+  color: var(--pearl);
+  text-decoration: underline dotted var(--gold-hi);
+  text-underline-offset: 4px;
+  cursor: help;
+}
 html.leaf .sk-help {
   position: absolute;
   top: 0;
   right: 0;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   font: 400 var(--head-size, 28px) / 1 var(--title-font);
   color: var(--gold-hi);
 }
-.sk-hint,
-.sk-warn {
-  max-width: 100%;
+.sk-hint {
+  flex: none;
   box-sizing: border-box;
   margin: 0;
-  padding: 12px 22px 13px;
+  padding: 10px 18px 11px;
   text-align: center;
   color: var(--pearl);
   text-shadow: 0 2px 0 var(--ink);
 }
 .sk-warn {
-  margin-bottom: 20px;
-}
-
-/* ---- The columns: the items (two columns of panels) and the bag ---- */
-.sk-cols {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 24px;
-  align-items: start;
-}
-.sk-main {
-  min-width: 0;
-}
-.sk-grid {
-  columns: 2;
-  column-gap: 14px;
-}
-/* The panel's rim is 18 px all round: the padding clears it, and the head and the sockets are packed tighter to keep the
-   panel about its old height. */
-.sk-item {
-  break-inside: avoid;
-  margin-bottom: 12px;
-  padding: 21px 24px 19px;
-}
-.sk-item.focus {
-  outline: 2px dashed var(--gold-hi);
-  outline-offset: 4px;
-}
-.sk-head {
-  margin: 0 0 2px;
-  font: 400 20px / 0.95 var(--title-font);
-  font-size-adjust: none;
-  color: var(--pearl);
+  margin: 0 0 8px;
+  color: var(--madder);
   text-shadow: 0 2px 0 var(--ink);
 }
-.sk-slot {
-  display: block;
-  margin-top: 0;
-  font: 14px / 1 var(--font);
+.sk .tip {
+  margin-bottom: 8px;
+}
+
+/* ---- The two panes: the gear and the bag, each scrolling inside its own painted frame ---- */
+.sk-cols {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 14px;
+}
+.sk-pane {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px 12px 14px;
+}
+.sk-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+}
+.sk-grid {
+  column-gap: 18px;
+}
+@media (min-width: 1100px) {
+  .sk-grid {
+    columns: 2;
+  }
+}
+.sk-item {
+  break-inside: avoid;
+  padding-bottom: 8px;
+}
+.sk-item.focus .sk-head {
+  outline: 2px dashed var(--gold-hi);
+  outline-offset: 2px;
+}
+.sk-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 2px;
+  font: 15px / 1.2 var(--font);
   color: var(--muted);
+  white-space: nowrap;
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-head > span:last-child:not(.sk-slot) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sk-slot {
+  flex: none;
+  font: 400 20px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
 }
 .sk-socks {
   display: flex;
   flex-direction: column;
 }
-html.leaf .sk-item .sk-sock {
-  min-height: 40px;
-}
-.sk-item .sk-gemwrap {
-  width: 40px;
-  height: 40px;
-}
 
-/* ---- A socket and a bag row: the stone, the name, the lines under it ---- */
+/* ---- A socket and a bag row: the stone, the name, at most one short line under it ---- */
 .sk-link {
   display: flex;
   flex-direction: column;
@@ -152,12 +203,12 @@ html.leaf .sk-item .sk-sock {
 html.leaf :is(.sk-sock, .sk-bagrow) {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  min-height: 44px;
-  padding: 1px 6px 1px 0;
+  min-height: 40px;
+  padding: 1px 4px 1px 0;
   font: inherit;
-  line-height: 1.2;
+  line-height: 1.15;
   color: inherit;
   text-align: left;
   background: none;
@@ -176,9 +227,12 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
   outline: 2px dashed var(--pearl);
   outline-offset: 2px;
 }
-:is(.sk-sock, .sk-bagrow).on .sk-name,
-.sk-sock.aim .sk-empty {
+/* Picked: the name in gold. A place the pick can go: the same ring on its stone, empty or full, and a faint wash. */
+:is(.sk-sock, .sk-bagrow).on .sk-name {
   color: var(--gold-hi);
+}
+:is(.sk-sock, .sk-bagrow).aim {
+  background: #e8c56a14;
 }
 .sk-sock.drop,
 .sk-bag.drop {
@@ -188,8 +242,8 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
 .sk-gemwrap {
   position: relative;
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
 }
 .sk-stone {
   position: absolute;
@@ -199,8 +253,8 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
   position: absolute;
   right: -6px;
   bottom: -4px;
-  min-width: 24px;
-  font: 400 18px / 1 var(--title-font);
+  min-width: 22px;
+  font: 400 16px / 1 var(--title-font);
   font-size-adjust: none;
   color: var(--pearl);
   text-align: center;
@@ -216,7 +270,13 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
   min-width: 0;
   text-shadow: 0 2px 0 var(--ink);
 }
+/* A long name wraps to a second line rather than being cut. */
 .sk-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
   color: var(--pearl);
 }
 .sk-empty {
@@ -231,9 +291,9 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
 /* A gem found on the last map: a small vermilion tag, read at a glance down the list. */
 .sk-new {
   display: inline-block;
-  margin-left: 8px;
-  padding: 0 5px 1px;
-  font-size: 13px;
+  margin-left: 6px;
+  padding: 0 4px 1px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0.04em;
@@ -259,89 +319,59 @@ html.leaf :is(.sk-sock, .sk-bagrow):focus-visible {
   display: block;
   width: 10px;
   height: 12px;
-  margin: -6px 0 -6px 17px;
+  margin: -6px 0 -6px 13px;
 }
 
-/* ---- What a gem would do: the badges as coloured words, not pills ---- */
-html.leaf .sk .badge {
+/* ---- What a gem would do in a place: coloured words, not pills ---- */
+.sk-delta {
+  white-space: nowrap;
+}
+.sk-swap {
+  color: var(--muted);
+}
+html.leaf .sk .badge,
+html.leaf .sp .badge {
   padding: 0;
-  font-size: var(--size, 17px);
+  font-size: inherit;
   background: none;
   border-radius: 0;
 }
-html.leaf .sk .badge.up {
+html.leaf :is(.sk, .sp) .badge.up {
   color: var(--gain);
 }
-html.leaf .sk .badge.down {
+html.leaf :is(.sk, .sp) .badge.down {
   color: var(--madder);
 }
-html.leaf .sk .badge.neutral {
+html.leaf :is(.sk, .sp) .badge.neutral {
   color: var(--muted);
 }
 html.leaf .sk .badge + .badge {
-  margin-left: 8px;
-}
-html.leaf .sk .sk-badges .small {
-  font-size: var(--size, 17px);
+  margin-left: 6px;
 }
 
-/* ---- The picked gem: its line and buttons, on a plaque beside the medals ---- */
-.sk-pick {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: 560px;
-  box-sizing: border-box;
-  padding: 10px 14px 10px 20px;
-  text-shadow: 0 2px 0 var(--ink);
-}
-.sk-acts .btn.small {
-  white-space: normal;
-}
-.sk-pickrow {
+/* ---- The bag: search and a Filter button above the list, the filters under them when open ---- */
+.sk-find {
+  flex: none;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-}
-.sk-pickname b,
-.sk-confirm b {
-  font-weight: 600;
-  color: var(--gold-hi);
-}
-.sk-acts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.sk-confirm {
-  display: flex;
-  flex-direction: column;
   gap: 6px;
-  margin-top: 12px;
-  padding-top: 12px;
-  background: var(--s-dots);
-  background-position: left top;
-}
-.sk-confirm .sk-acts {
-  margin-top: 4px;
-}
-
-/* ---- The bag ---- */
-.sk-bag {
-  min-width: 0;
-  padding: 26px 22px 24px;
+  margin: 0 6px 6px 0;
 }
 html.leaf .sk-search {
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
   box-sizing: border-box;
-  margin: 0 0 12px;
+  margin: 0;
+}
+html.leaf .sk-filterbtn {
+  flex: none;
+  margin-left: auto;
 }
 .sk-filters {
+  flex: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 2px;
+  margin-bottom: 6px;
 }
 .sk-check {
   display: flex;
@@ -351,55 +381,18 @@ html.leaf .sk-search {
   text-shadow: 0 2px 0 var(--ink);
   cursor: pointer;
 }
-.sk-for {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-.sk-lbl {
-  flex: none;
-  color: var(--muted);
-  text-shadow: 0 2px 0 var(--ink);
-}
-.sk-sel {
-  position: relative;
-  display: block;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.sk-sel::after {
-  content: '▾';
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-52%);
-  color: var(--gold-hi);
-  pointer-events: none;
-}
-html.leaf .sk-sel select {
-  appearance: none;
-  width: 100%;
-  max-width: 100%;
-  padding: 8px 34px 9px 14px;
-  font: var(--size, 17px) / 1.2 var(--font);
-  color: var(--pearl);
-  text-shadow: 0 2px 0 var(--ink);
-  background: none;
-  border: 0;
-  box-shadow: none;
-  cursor: pointer;
-  text-overflow: ellipsis;
-}
 .sk-sh {
-  margin: 18px 0 8px;
-  font: 400 24px / 1 var(--title-font);
+  margin: 10px 0 4px;
+  font: 400 20px / 1 var(--title-font);
   font-size-adjust: none;
   color: var(--gold-hi);
   text-shadow: 0 2px 0 var(--ink);
 }
+.sk-group:first-child .sk-sh {
+  margin-top: 0;
+}
 html.leaf .sk-bagrow {
-  padding: 5px 0;
+  padding: 3px 4px 3px 0;
 }
 .sk-none {
   margin: 4px 0;
@@ -408,7 +401,103 @@ html.leaf .sk-bagrow {
   text-shadow: 0 2px 0 var(--ink);
 }
 
-/* ---- A gem's card (the hover tip, the sheet on a touch screen) ---- */
+/* ---- The bar: the picked thing and its buttons, always the same height ---- */
+.sk-bar {
+  flex: none;
+  box-sizing: border-box;
+  height: 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sk-barline {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.sk-barline b {
+  flex: none;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--gold-hi);
+}
+.sk-barsub {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+.sk-barsub.sk-bad {
+  color: var(--madder);
+}
+.sk-acts {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sk-acts .btn.small {
+  flex: none;
+  white-space: nowrap;
+}
+
+/* ---- The supports popup (SupportsPicker.tsx) ---- */
+.sp-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: calc(86 * var(--vh, 1vh));
+  width: min(440px, calc(100vw - 24px));
+  box-sizing: border-box;
+}
+.sp-sub,
+.sp-out,
+.sp-none {
+  color: var(--muted);
+  text-shadow: 0 2px 0 var(--ink);
+}
+.sp-list {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.sp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+  cursor: pointer;
+}
+.sp-row.full {
+  opacity: 0.55;
+  cursor: default;
+}
+.sp-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sp-where {
+  color: var(--muted);
+}
+.sp-h {
+  margin: 10px 0 2px;
+  font: 400 20px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+  text-shadow: 0 2px 0 var(--ink);
+}
+
+/* ---- A gem's card (the hover tip, or the Card button on a touch screen) ---- */
 html.leaf .item-card.gem {
   background: none;
   border: 0;
@@ -447,49 +536,70 @@ html.leaf .item-card.gem .ic-mod.explicit {
 }
 
 @media (max-width: 900px) {
-  .sk-grid {
-    columns: 1;
+  .sk-cols {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
   }
 }
 
+/* A phone: no gutters, the two panes half the width each, smaller text and stones. */
 @media (max-width: 600px) {
   .sk {
-    padding: 8px 8px 20px;
+    gap: 4px;
+    padding: 4px 2px 4px;
+    font-size: 15px;
   }
-  /* The two medals small, side by side at the left, the picked gem's plaque taking the width beside them. */
   .sk-top {
+    justify-content: flex-start;
+    padding: 0 40px 0 8px;
+  }
+  .sk-strip {
     gap: 10px;
-    padding-right: 40px;
   }
-  .sk-medals {
-    gap: 6px;
-    padding-bottom: 14px;
-  }
-  .sk-medal {
-    width: 80px;
-    height: 80px;
-  }
-  .sk-medal > span {
-    max-width: 78%;
-    font-size: 10px;
-  }
-  .sk-medal > b {
-    font-size: 22px;
-  }
-  .sk-plaque {
-    padding: 2px 8px 3px;
-    font-size: 12px;
-  }
-  .sk-pick {
-    align-self: stretch;
+  .sk-strip b {
+    font-size: 19px;
   }
   .sk-cols {
-    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
   }
-  .sk-item {
-    padding: 21px 24px 19px;
+  .sk-pane {
+    padding: 9px 2px 9px 8px;
   }
-  .lf-panel.sk-bag {
-    padding: 18px 18px 16px;
+  .sk-scroll {
+    padding-right: 4px;
+  }
+  .sk-head {
+    font-size: 13px;
+  }
+  .sk-slot {
+    font-size: 17px;
+  }
+  html.leaf :is(.sk-sock, .sk-bagrow) {
+    gap: 7px;
+  }
+  .sk-gemwrap {
+    width: 30px;
+    height: 30px;
+  }
+  .sk-lvl {
+    font-size: 14px;
+    min-width: 18px;
+  }
+  .sk-chain {
+    margin-left: 10px;
+  }
+  .sk-sh {
+    font-size: 17px;
+  }
+  .sk-new {
+    font-size: 11px;
+  }
+  .sk-bar {
+    height: 76px;
+    padding: 6px 10px;
+  }
+  .sk-acts .btn.small {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }

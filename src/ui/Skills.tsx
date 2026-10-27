@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { sheetDps, type Character } from '../calc/character';
-import { naturalGemLevel, resolveActive } from '../calc/gems';
-import { supportLive } from '../calc/reach';
-import { typesAllow } from '../data/skillTypes';
+import { naturalGemLevel } from '../calc/gems';
 import { weaponBar } from '../data/weaponFit';
 import { gemDef, type GemDef } from '../data/gems';
+import { typesAllow } from '../data/skillTypes';
+import { supportLive } from '../calc/reach';
 import { EQUIP_SLOTS, type EquipSlot, type GemItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { setPrimary, socketGem, unsocketGem } from '../run/inventory';
@@ -13,7 +13,10 @@ import { foundLastLevel } from '../run/found';
 import { gemStatus } from '../run/gemStatus';
 import {
   bestPlacement,
+  mainLostByMove,
+  mainLostBySocketing,
   moveGem,
+  movesFor,
   placementsFor,
   quickSocket,
   slotLabel,
@@ -21,15 +24,16 @@ import {
   type SocketRef,
 } from '../run/inventoryOps';
 
+import { ask } from './Confirm';
 import { useViewport } from './device';
 import { GemTip } from './GemCard';
 import { infoProps } from './info';
-import { Badge } from './SocketPicker';
 import { gemCardData } from './gemText';
 import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
 import { useRehearsal } from './rehearsal';
 import { introSeen, seeIntro } from './intro';
+import { SupportsPicker } from './SupportsPicker';
 
 const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Auras'] as const;
 
@@ -40,7 +44,12 @@ function groupOfGem(d: GemDef): (typeof GEM_GROUPS)[number] {
   return 'Auras';
 }
 
-type Sel = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
+/**
+ * What is picked (docs/GEM-SOCKETS.md 2): a gem in the bag, a socketed gem, or an empty socket. A tap picks; a tap on a lit
+ * place puts the picked gem there; a tap on the picked thing lets go.
+ */
+type Pick = { from: 'inv'; uid: number } | ({ from: 'socket' | 'empty' } & SocketRef);
+/** What a mouse drags: a gem in the bag or a socketed gem. */
 type Drag = { from: 'inv'; uid: number } | ({ from: 'socket' } & SocketRef);
 
 /** How long the badges are worked on at a time before the screen gets its turn, in milliseconds. */
@@ -49,6 +58,7 @@ const BADGE_SLICE_MS = 8;
 const BADGE_DELAY_MS = 250;
 
 const sameSocket = (a: SocketRef, b: SocketRef) => a.slot === b.slot && a.socket === b.socket;
+const keyOf = (r: SocketRef) => `${r.slot}:${r.socket}`;
 const f0 = (v: number) => Math.round(v).toLocaleString();
 
 /** "a, b and c". */
@@ -92,10 +102,38 @@ function Stone({
 }
 
 /**
- * The Skills tab, in Gold Leaf (docs/mockups/style/STYLE-GUIDE.md, docs/mockups/style/skills.js): the whole DPS and the
- * effective HP as medallions; each socketed item a lapis panel with its gems as stones on a gold chain; the gem bag a lapis
- * panel with its filters. Pick a gem in the bag, then a socket ("Place it here"); a socketed gem picked can be made the main
- * skill, taken out, or moved by picking another socket. Gems drag between sockets and the bag with a mouse.
+ * What a gem would do in a place, in as few words as it takes: the DPS change bare ("▲12%"), the EHP change named, "no
+ * effect" when neither moves (an idle support's reason is its tip). `swap` says the place holds a gem that would leave.
+ */
+function Delta({ p, swap }: { p: Placement; swap?: boolean }) {
+  const parts: [string, number][] = [
+    ['', p.dpsPct],
+    [' EHP', p.ehpPct],
+  ];
+  const shown = parts.filter(([, v]) => Math.abs(v) >= 0.5);
+  return (
+    <span class="sk-delta" title={p.idle}>
+      {swap && <span class="sk-swap">Swap </span>}
+      {shown.length === 0 ? (
+        <span class="badge neutral">no effect</span>
+      ) : (
+        shown.map(([l, v]) => (
+          <span key={l} class={'badge ' + (v > 0 ? 'up' : 'down')}>
+            {v > 0 ? '▲' : '▼'}
+            {Math.abs(Math.round(v))}%{l}
+          </span>
+        ))
+      )}
+    </span>
+  );
+}
+
+/**
+ * The Skills tab, in Gold Leaf (docs/GEM-SOCKETS.md; docs/mockups/style/STYLE-GUIDE.md): the gear on the left and the gem bag
+ * on the right, each scrolling on its own, the DPS and effective HP above (medallions on a desktop, one line on a phone), and a
+ * bar at the bottom with what is picked and its buttons. A tap picks a gem or a socket; every place it can go lights and says
+ * what it would do; a tap on one does it (only losing the main skill asks first; Undo takes any of it back). Gems drag
+ * between sockets and the bag with a mouse.
  */
 export function Skills({
   c,
@@ -108,13 +146,15 @@ export function Skills({
   focusSlot?: EquipSlot | null;
 }) {
   const run = c.run!;
-  const { coarse } = useViewport();
-  const [sel, setSel] = useState<Sel | null>(null);
+  const { coarse, layout } = useViewport();
+  const phone = layout === 'phone';
+  const [pick, setPick] = useState<Pick | null>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [msg, setMsg] = useState('');
-  // A gem from the bag picked, and the socket that holds a gem it would replace: read before committing (docs/EQUIP.md 3.6).
-  const [pending, setPending] = useState<SocketRef | null>(null);
+  const [card, setCard] = useState(false);
+  const [supportsFor, setSupportsFor] = useState<SocketRef | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [hint, setHint] = useState(() => !loadPref<boolean>('skills.hintSeen', false));
   const [supportSeen, setSupportSeen] = useState(() => introSeen('support'));
   // A copy painted ahead out of sight (rehearsal.ts) has not been seen.
@@ -122,7 +162,10 @@ export function Skills({
   useEffect(() => {
     if (!rehearsal) savePref('skills.hintSeen', true);
   }, []);
-  useEffect(() => setPending(null), [sel]);
+  useEffect(() => {
+    setCard(false);
+    setMsg('');
+  }, [pick]);
   useEffect(() => {
     if (focusSlot)
       document.querySelector(`[data-slot="${focusSlot}"]`)?.scrollIntoView({ block: 'center' });
@@ -154,28 +197,25 @@ export function Skills({
         }),
     [gemKey],
   );
-  // The list's filters (kept between visits): one of each gem, only what the weapons in hand can use, and the supports that
-  // would act on one chosen skill. They are kept across runs, and the search box and the filter row are only drawn for a bag
-  // of some size, so a filter left over from an earlier run must not act on a bag that cannot show it.
+  // A pick that no longer exists (the gem left the bag, the socket emptied by an undo) lets go.
+  useEffect(() => {
+    if (!pick) return;
+    if (pick.from === 'inv' ? !gems.some((g) => g.uid === pick.uid) : !socketAt(pick))
+      setPick(null);
+    else if (pick.from !== 'inv' && !!socketAt(pick)?.gem !== (pick.from === 'socket'))
+      setPick({ ...pick, from: pick.from === 'socket' ? 'empty' : 'socket' });
+  }, [gemKey, run.build]);
+  // The list's filters (kept between visits): one of each gem, and only what the weapons in hand can use. They are kept across
+  // runs, and the filters are only offered for a bag of some size, so a filter left over from an earlier run must not act on
+  // a bag that cannot show it.
   const searchShown = gems.length > 8;
   const filtersShown = gems.length > 1;
   const terms = searchShown ? searchTerms(q) : [];
   const [oneEachSet, setOneEach] = useState(() => loadPref('gemOneEach', false));
   const [usableSet, setUsableOnly] = useState(() => loadPref('gemUsable', false));
-  const [forSkillSet, setForSkill] = useState(() => loadPref('gemSupportsFor', ''));
   const oneEach = filtersShown && oneEachSet;
   const usableOnly = filtersShown && usableSet;
-  const forSkill = filtersShown ? forSkillSet : '';
   const hold = ch.weaponHold();
-  // The skills a support can be asked about: the ones worn and the ones in the bag, one of each.
-  const skillIds = [
-    ...new Set([
-      ...ch.actives.flatMap((a) => (a.gemUid !== null && !a.skill.utility ? [a.skill.id] : [])),
-      ...gems.filter((g) => gemDef(g.gemId).kind === 'active').map((g) => g.gemId),
-    ]),
-  ];
-  const forDef = forSkill && skillIds.includes(forSkill) ? gemDef(forSkill) : null;
-  const forResolved = forDef?.kind === 'active' ? resolveActive(forDef, 20) : null;
   const counts = new Map<string, number>();
   for (const g of gems) counts.set(g.gemId, (counts.get(g.gemId) ?? 0) + 1);
   // Gems found on the level just played are marked new (with one of each, when any copy is).
@@ -196,11 +236,6 @@ export function Skills({
       )
         return false;
     }
-    if (forResolved) {
-      if (def.kind !== 'support') return false;
-      if (!typesAllow(def, new Set(forResolved.types)) || !supportLive(def, forResolved).live)
-        return false;
-    }
     if (!terms.length) return true;
     const d = gemCardData(def, 20);
     return matchesTerms(
@@ -210,18 +245,32 @@ export function Skills({
   });
   const levelOf = (uid: number) => ch.gems.find((g) => g.gem.uid === uid)?.level ?? 1;
   const bagLevel = (d: GemDef) => naturalGemLevel(d, run.build.level, ch.attrs);
+  function socketAt(r: SocketRef): { gem: GemItem | null } | null {
+    const it = run.build.equipment[r.slot];
+    return it && r.socket < it.sockets.length ? { gem: it.sockets[r.socket] ?? null } : null;
+  }
 
-  // The inventory gem being placed (selected or being dragged), and what each socket would gain.
-  const placing = drag?.from === 'inv' ? drag.uid : sel?.from === 'inv' ? sel.uid : null;
-  const placements = useMemo(() => {
+  // The gem being placed (picked or dragged), and what each socket would make of it: a gem from the bag going in, or a socketed
+  // gem moving (a swap with what is there).
+  const src: Drag | null = drag ?? (pick && pick.from !== 'empty' ? (pick as Drag) : null);
+  const srcKey = !src ? '' : src.from === 'inv' ? `i${src.uid}` : `s${keyOf(src)}`;
+  const targets = useMemo(() => {
     const m = new Map<string, Placement>();
-    if (placing !== null)
-      for (const p of placementsFor(run, placing)) m.set(`${p.slot}:${p.socket}`, p);
+    if (!src) return m;
+    const ps = src.from === 'inv' ? placementsFor(run, src.uid) : movesFor(run, src);
+    for (const p of ps) m.set(keyOf(p), p);
     return m;
-  }, [placing, run.build, gemKey]);
-  // Best placement per inventory gem, for the list badges. Each gem is tried in each socket, which is a lot of sheets, so it is
-  // worked out a little at a time after the screen has been drawn, and the badges already shown stay until their gem is redone.
-  const [best, setBest] = useState<Map<number, Placement | null>>(() => new Map());
+  }, [srcKey, run.build, gemKey]);
+  // The socket picked, when one is: each bag gem's badge says what it would do there (docs/GEM-SOCKETS.md K6).
+  const atSocket: SocketRef | null =
+    pick && pick.from !== 'inv' ? { slot: pick.slot, socket: pick.socket } : null;
+  const mode = atSocket ? keyOf(atSocket) : '';
+  // Each bag gem's badge: its best placement, or what it would do in the picked socket. Each is a few sheets, so they are worked
+  // out a little at a time after the screen has been drawn; badges of another mode are not shown while the new ones come.
+  const [badges, setBadges] = useState<{ mode: string; m: Map<number, Placement | null> }>(() => ({
+    mode: '',
+    m: new Map(),
+  }));
   useEffect(() => {
     // Not for a copy painted ahead: nobody reads its badges, and the open tab works them out again.
     if (rehearsal) return;
@@ -236,228 +285,243 @@ export function Skills({
       base ??= sheetOf(run);
       const done = new Map<number, Placement | null>();
       const t0 = performance.now();
-      while (at < uids.length && performance.now() - t0 < BADGE_SLICE_MS)
-        done.set(uids[at], bestPlacement(run, uids[at++], base));
-      setBest((prev) => {
+      while (at < uids.length && performance.now() - t0 < BADGE_SLICE_MS) {
+        const uid = uids[at++];
+        done.set(
+          uid,
+          atSocket
+            ? (placementsFor(run, uid, { base, at: atSocket })[0] ?? null)
+            : bestPlacement(run, uid, base),
+        );
+      }
+      setBadges((prev) => {
         const m = new Map<number, Placement | null>();
-        for (const [uid, p] of prev) if (alive.has(uid)) m.set(uid, p);
+        if (prev.mode === mode) for (const [uid, p] of prev.m) if (alive.has(uid)) m.set(uid, p);
         for (const [uid, p] of done) m.set(uid, p);
-        return m;
+        return { mode, m };
       });
       if (at < uids.length) timer = setTimeout(step, 0);
     };
-    // (After a pause: a run of moves does not start the work again with every one.)
-    timer = setTimeout(step, BADGE_DELAY_MS);
+    // (After a pause: a run of moves does not start the work again with every one. A socket picked is answered at once.)
+    timer = setTimeout(step, atSocket ? 0 : BADGE_DELAY_MS);
     return () => {
       stopped = true;
       clearTimeout(timer);
     };
-  }, [gems, run.build]);
+  }, [gems, run.build, mode]);
+  const badgeOf = (uid: number) => (badges.mode === mode ? badges.m.get(uid) : undefined);
+  // The order of the bag for a picked socket: by what the badges show (DPS and EHP together).
+  const gain = (p: Placement | null | undefined) =>
+    p ? (100 + p.dpsPct) * (100 + p.ehpPct) : -Infinity;
+  // With a socket picked and every badge in, the bag is ordered best first within each heading.
+  const ranked = !!atSocket && badges.mode === mode && gems.every((g) => badges.m.has(g.uid));
 
-  const place = (to: SocketRef, from: Drag | Sel) => {
-    if (from.from === 'inv') {
-      c.act((r) => socketGem(r, to.slot, to.socket, from.uid));
-    } else {
-      const ok = c.act((r) => moveGem(r, from, to));
-      if (!ok && !sameSocket(from, to)) setMsg('Cannot move the gem there');
-    }
-    setSel(null);
-    setPending(null);
+  const done = () => {
+    setPick(null);
     setDrag(null);
     setOver(null);
-    requestAnimationFrame(() =>
-      document
-        .querySelector(`[data-slot="${to.slot}"]`)
-        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }),
-    );
   };
-  const unsocket = (from: Drag) => {
-    if (from.from === 'socket') c.act((r) => unsocketGem(r, from.slot, from.socket));
-    setDrag(null);
-    setOver(null);
-    setSel(null);
+  /** The question before a change that takes the main skill away; true to go on. */
+  const mainOk = async (lost: string | null) =>
+    !lost ||
+    (await ask({
+      title: 'Lose your main skill?',
+      body: `${lost} will no longer be used.`,
+      confirm: 'Swap',
+      danger: true,
+    }));
+  const putIn = async (to: SocketRef, uid: number) => {
+    done();
+    if (!(await mainOk(mainLostBySocketing(run, to, uid)))) return;
+    c.act((r) => socketGem(r, to.slot, to.socket, uid));
   };
-  const onSocketClick = (ref: SocketRef) => {
-    if (sel) {
-      if (sel.from === 'socket' && sameSocket(sel, ref)) setSel(null);
-      else if (sel.from === 'inv' && run.build.equipment[ref.slot]!.sockets[ref.socket])
-        setPending(pending && sameSocket(pending, ref) ? null : ref);
-      else place(ref, sel);
-    } else {
-      const g = run.build.equipment[ref.slot]!.sockets[ref.socket];
-      if (g) setSel({ from: 'socket', ...ref });
-    }
+  const move = async (from: SocketRef, to: SocketRef) => {
+    done();
+    if (sameSocket(from, to)) return;
+    if (!(await mainOk(mainLostByMove(run, from, to)))) return;
+    if (!c.act((r) => moveGem(r, from, to))) setMsg('Cannot move the gem there');
+  };
+  const takeOut = (from: SocketRef) => {
+    done();
+    c.act((r) => unsocketGem(r, from.slot, from.socket));
+  };
+  const place = (to: SocketRef, from: Drag) =>
+    from.from === 'inv' ? putIn(to, from.uid) : move(from, to);
+
+  const onSocketTap = (ref: SocketRef, filled: boolean) => {
+    if (pick && pick.from !== 'inv' && sameSocket(pick, ref)) return setPick(null);
+    if (pick?.from === 'inv') return void putIn(ref, pick.uid);
+    if (pick?.from === 'socket') return void move(pick, ref);
+    setPick({ from: filled ? 'socket' : 'empty', ...ref });
+  };
+  const onBagTap = (uid: number) => {
+    if (atSocket) return void putIn(atSocket, uid);
+    setPick(pick?.from === 'inv' && pick.uid === uid ? null : { from: 'inv', uid });
   };
 
-  const selGem: { gemId: string; level: number; uid?: number } | null = (() => {
-    if (!sel) return null;
-    if (sel.from === 'inv') {
-      const g = gems.find((x) => x.uid === sel.uid);
-      return g ? { gemId: g.gemId, level: bagLevel(gemDef(g.gemId)) } : null;
+  // The picked gem, for the bar and its card.
+  const picked: { d: GemDef; level: number; uid: number } | null = (() => {
+    if (!pick || pick.from === 'empty') return null;
+    if (pick.from === 'inv') {
+      const g = gems.find((x) => x.uid === pick.uid);
+      return g ? { d: gemDef(g.gemId), level: bagLevel(gemDef(g.gemId)), uid: g.uid } : null;
     }
-    const g = run.build.equipment[sel.slot]?.sockets[sel.socket];
-    return g ? { gemId: g.gemId, level: levelOf(g.uid), uid: g.uid } : null;
+    const g = socketAt(pick)?.gem;
+    return g ? { d: gemDef(g.gemId), level: levelOf(g.uid), uid: g.uid } : null;
   })();
-  const selDef = selGem ? gemDef(selGem.gemId) : null;
-  // A touch screen has no hover: the gem picked shows its card by the tap that picked it, until the next tap or a
-  // scroll (the card does not take taps, so the sockets under it still do).
-  const lastTap = useRef({ x: 0, y: 0 });
+  const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!coarse) return;
-    setTip(selGem ? { gemId: selGem.gemId, level: selGem.level, ...lastTap.current } : null);
-  }, [
-    coarse,
-    sel?.from,
-    sel && 'uid' in sel ? sel.uid : null,
-    sel && 'slot' in sel ? `${sel.slot}:${sel.socket}` : null,
-  ]);
+    if (!card || !picked) return;
+    const r = barRef.current?.getBoundingClientRect();
+    setTip({ gemId: picked.d.id, level: picked.level, x: r ? r.left + 8 : 8, y: r ? r.top : 0 });
+  }, [card]);
   useEffect(() => {
     if (!coarse) return;
     const close = () => setTip(null);
     window.addEventListener('scroll', close, true);
     return () => window.removeEventListener('scroll', close, true);
   }, [coarse]);
-  // What replacing the gem in the picked socket would do, said before it is done.
-  const replaced = pending ? run.build.equipment[pending.slot]?.sockets[pending.socket] : null;
-  const pendingP = pending ? placements.get(`${pending.slot}:${pending.socket}`) : undefined;
-  const replacedStatus = replaced ? gemStatus(ch, replaced.uid, gemDef(replaced.gemId)) : null;
-  const confirm =
-    pending && replaced && sel?.from === 'inv' && selDef ? (
-      <div class="sk-confirm" role="status">
-        <div>
-          Replace <b>{gemDef(replaced.gemId).name}</b>
-          {ch.primary.gemUid === replaced.uid ? ', your main skill' : ''} with <b>{selDef.name}</b>?
-          It goes to the bag.
-        </div>
-        {pendingP && (
-          <div class="sk-badges">
-            <Badge p={pendingP} />
-          </div>
-        )}
-        {replacedStatus && (
-          <div class="sk-sub">
-            {gemDef(replaced.gemId).name}: {replacedStatus.text}
-          </div>
-        )}
-        <div class="sk-acts">
-          <button class="btn small primary" onClick={() => place(pending, sel)}>
-            Replace {gemDef(replaced.gemId).name}
-          </button>
-          <button class="btn small" onClick={() => setPending(null)}>
-            Cancel
-          </button>
-        </div>
-      </div>
-    ) : null;
-  /** What can be done with the picked gem: socket it at its best (from the bag), or make it main and take it out. */
-  const actions =
-    sel && selGem && selDef ? (
-      sel.from === 'inv' ? (
-        <>
-          <button
-            class="btn small"
-            onClick={() => {
-              const ok = c.act((r) => quickSocket(r, sel.uid));
-              setMsg(ok ? '' : `No free socket: ${coarse ? 'tap' : 'click'} one to replace a gem`);
-              if (ok) setSel(null);
-            }}
-          >
-            Socket in the best place
-          </button>
-          <button class="btn small" onClick={() => setSel(null)}>
-            Cancel
-          </button>
-        </>
-      ) : (
-        <>
-          {selDef.kind === 'active' && selGem.uid !== undefined && (
+
+  const tap = coarse ? 'Tap' : 'Click';
+  /** The bar: what is picked, a line about it, and its buttons; or what to do when nothing is. Always the same height. */
+  const bar = (() => {
+    const cardBtn = coarse && picked && (
+      <button class="btn small" onClick={() => setCard(!card)} aria-pressed={card}>
+        Card
+      </button>
+    );
+    const cancel = (
+      <button class="btn small" onClick={() => setPick(null)}>
+        Cancel
+      </button>
+    );
+    if (pick?.from === 'inv' && picked) {
+      return {
+        name: picked.d.name,
+        line: `${tap} a lit socket`,
+        acts: (
+          <>
             <button
               class="btn small"
-              disabled={ch.primary.gemUid === selGem.uid}
-              onClick={() => c.act((r) => setPrimary(r, selGem.uid!))}
+              onClick={() => {
+                const ok = c.act((r) => quickSocket(r, pick.uid));
+                if (ok) setPick(null);
+                else setMsg('No free socket: pick one to swap');
+              }}
             >
-              {ch.primary.gemUid === selGem.uid ? '★ Main skill' : '★ Make main'}
+              Best place
             </button>
-          )}
-          <button class="btn small" onClick={() => unsocket(sel)}>
-            Take out
-          </button>
-          <button class="btn small" onClick={() => setSel(null)}>
-            Done
-          </button>
-        </>
-      )
-    ) : null;
-  const bestOfSel = sel?.from === 'inv' ? best.get(sel.uid) : null;
-  const tap = coarse ? 'tap' : 'click';
-  /** The line that names the picked gem and says what to do next. */
-  const pickLine =
-    sel && selDef ? (
-      <span class="sk-pickname">
-        <b>{selDef.name}</b>
-        {sel.from === 'inv' ? (
-          <>
-            : {tap} a socket
-            {bestOfSel && (
-              <span class="sk-badges">
-                {' '}
-                (<Badge p={bestOfSel} /> in {slotLabel(bestOfSel.slot)})
-              </span>
-            )}
+            {cardBtn}
+            {cancel}
           </>
-        ) : (
-          <>: {tap} another socket to move it</>
-        )}
-      </span>
-    ) : null;
+        ),
+      };
+    }
+    if (pick?.from === 'socket' && picked) {
+      const { d, uid } = picked;
+      const a = ch.actives.find((x) => x.gemUid === uid);
+      const st = gemStatus(ch, uid, d);
+      const why = a && !a.usable ? a.reason : st && !st.ok ? st.text : null;
+      const canMain = d.kind === 'active' && !d.utility && !!a?.usable;
+      return {
+        name: (ch.primary.gemUid === uid ? '★ ' : '') + d.name,
+        line: why ?? `${tap} a lit place to move it`,
+        bad: !!why,
+        acts: (
+          <>
+            {d.kind === 'active' && (
+              <button
+                class="btn small"
+                onClick={() => setSupportsFor({ slot: pick.slot, socket: pick.socket })}
+              >
+                Supports
+              </button>
+            )}
+            {canMain && ch.primary.gemUid !== uid && (
+              <button class="btn small" onClick={() => c.act((r) => setPrimary(r, uid))}>
+                ★ Make main
+              </button>
+            )}
+            <button class="btn small" onClick={() => takeOut(pick)}>
+              Take out
+            </button>
+            {cardBtn}
+            {cancel}
+          </>
+        ),
+      };
+    }
+    if (pick?.from === 'empty') {
+      return {
+        name: `${slotLabel(pick.slot)} socket`,
+        line: `${tap} a gem to put it here`,
+        acts: cancel,
+      };
+    }
+    return { name: '', line: `${tap} a gem or a socket`, acts: null };
+  })();
 
   const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
-  // The headline is the sheet the socket badges compare against, so a "▲13% DPS" moves it by 13% (docs/NEWPLAYER.md N4).
+  // The headline is the sheet the socket badges compare against, so a "▲13%" moves it by 13% (docs/NEWPLAYER.md N4).
   const whole = sheetOf(run);
   const rotationTip =
     `${summary.name}${summary.isDefault ? ' (default attack)' : ''} alone: ${f0(summary.totalDps)} DPS.` +
     (secondary.length
       ? ` Every few seconds also ${listOf(secondary.map((x) => x.skill.name))}.`
       : '');
+  const mainName = summary.isDefault ? summary.name : `★ ${summary.name}`;
+  const filtersOn = +oneEach + +usableOnly;
+  const clearFilters = () => {
+    setQ('');
+    savePref('gemSearch', '');
+    setOneEach(false);
+    savePref('gemOneEach', false);
+    setUsableOnly(false);
+    savePref('gemUsable', false);
+  };
   return (
     <div
       class="sk"
-      onPointerDownCapture={(e) => {
-        // Any tap closes the card; picking a gem opens it again where the tap was.
-        lastTap.current = { x: e.clientX, y: e.clientY };
+      onPointerDownCapture={() => {
+        // Any tap closes a card shown on a touch screen.
         if (coarse) setTip(null);
       }}
     >
       <div class="sk-top">
-        <div class="sk-medals">
-          <div class="sk-medal" data-paint="medal" data-field="vermilion,4">
-            <span>Damage per second</span>
-            <b>{f0(sheetDps(whole))}</b>
-            <i
-              class="sk-plaque"
-              data-paint="panel"
-              data-thin
-              tabIndex={0}
-              {...infoProps(rotationTip)}
-            >
-              {summary.isDefault ? summary.name : `★ ${summary.name}`}
+        {phone ? (
+          <div class="sk-strip">
+            <span>
+              DPS <b>{f0(sheetDps(whole))}</b>
+            </span>
+            <span>
+              EHP <b>{f0(whole.ehp)}</b>
+            </span>
+            <i class="sk-mainname" tabIndex={0} {...infoProps(rotationTip)}>
+              {mainName}
             </i>
           </div>
-          <div class="sk-medal" data-paint="medal" data-field="porphyry,4">
-            <span>Effective HP</span>
-            <b>{f0(whole.ehp)}</b>
-          </div>
-        </div>
-        {sel && selDef ? (
-          <div class="sk-pick" data-paint="panel" data-thin>
-            <div class="sk-pickrow">
-              {pickLine}
-              {!confirm && <span class="sk-acts">{actions}</span>}
+        ) : (
+          <div class="sk-medals">
+            <div class="sk-medal" data-paint="medal" data-field="vermilion,4">
+              <span>Damage per second</span>
+              <b>{f0(sheetDps(whole))}</b>
+              <i
+                class="sk-plaque"
+                data-paint="panel"
+                data-thin
+                tabIndex={0}
+                {...infoProps(rotationTip)}
+              >
+                {mainName}
+              </i>
             </div>
-            {confirm}
+            <div class="sk-medal" data-paint="medal" data-field="porphyry,4">
+              <span>Effective HP</span>
+              <b>{f0(whole.ehp)}</b>
+            </div>
           </div>
-        ) : null}
+        )}
         <button
           class="btn small sk-help"
           aria-label="How this works"
@@ -466,171 +530,152 @@ export function Skills({
         >
           ?
         </button>
-        {hint && (
-          <p class="sk-hint" data-paint="panel" data-thin>
-            Skill gems are your character's skills: put them in sockets on your gear. A support gem
-            changes the skills in the same item. ★ marks the main skill; the Strategy tab says when
-            the others are used.
-          </p>
-        )}
       </div>
+      {hint && (
+        <p class="sk-hint" data-paint="panel" data-thin>
+          Skill gems are your character's skills: put them in sockets on your gear. A support gem
+          changes the skills in the same item. ★ marks the main skill; the Strategy tab says when
+          the others are used.
+        </p>
+      )}
       <div class="sk-cols">
-        <div class="sk-main">
-          {ch.primary.gemUid === null && (
-            <div class="sk-warn" data-paint="panel" data-field="vermilion" data-thin>
-              No usable active skill: using the default attack.
-            </div>
-          )}
-          {!supportSeen && !rehearsal && (
-            <FirstSupport
-              gems={gems}
-              ch={ch}
-              onSeen={() => {
-                seeIntro('support');
-                setSupportSeen(true);
-              }}
-            />
-          )}
-          {msg && (
-            <div class="sk-warn" data-paint="panel" data-field="vermilion" data-thin>
-              {msg}
-            </div>
-          )}
-          <div class="sk-grid">
-            {EQUIP_SLOTS.map((slot) => {
-              const it = run.build.equipment[slot];
-              if (!it || it.sockets.length === 0) return null;
-              return (
-                <section
-                  key={slot}
-                  class={'sk-item' + (focusSlot === slot ? ' focus' : '')}
-                  data-slot={slot}
-                  data-paint="panel"
-                >
-                  <h4 class="sk-head">
-                    <span class={RARITY_TEXT[it.rarity] ?? ''}>{it.name}</span>
-                    <span class="sk-slot">{slotLabel(slot)}</span>
-                  </h4>
-                  <div class="sk-socks">
-                    {it.sockets.map((g, i) => {
-                      const ref: SocketRef = { slot, socket: i };
-                      const key = `${slot}:${i}`;
-                      const p = placements.get(key);
-                      const isSel = sel?.from === 'socket' && sameSocket(sel, ref);
-                      const dropHere = over === key;
-                      const chain = i < it.sockets.length - 1 && (
-                        <span
-                          class="sk-chain"
-                          data-paint="chain"
-                          {...infoProps(
-                            'Linked: a support gem works on the skills in the same item.',
-                          )}
-                        />
-                      );
-                      const common = {
-                        onDragOver: (e: DragEvent) => {
-                          if (drag) {
+        <section class="sk-pane sk-gear" data-paint="panel" data-thin>
+          <div class="sk-scroll">
+            {ch.primary.gemUid === null && (
+              <div class="sk-warn">No usable skill: using the default attack.</div>
+            )}
+            {!supportSeen && !rehearsal && (
+              <FirstSupport
+                gems={gems}
+                ch={ch}
+                onSeen={() => {
+                  seeIntro('support');
+                  setSupportSeen(true);
+                }}
+              />
+            )}
+            <div class="sk-grid">
+              {EQUIP_SLOTS.map((slot) => {
+                const it = run.build.equipment[slot];
+                if (!it || it.sockets.length === 0) return null;
+                return (
+                  <section
+                    key={slot}
+                    class={'sk-item' + (focusSlot === slot ? ' focus' : '')}
+                    data-slot={slot}
+                  >
+                    <h4 class="sk-head">
+                      <span class="sk-slot">{slotLabel(slot)}</span>
+                      {!phone && <span class={RARITY_TEXT[it.rarity] ?? ''}>{it.name}</span>}
+                    </h4>
+                    <div class="sk-socks">
+                      {it.sockets.map((g, i) => {
+                        const ref: SocketRef = { slot, socket: i };
+                        const key = keyOf(ref);
+                        const p = targets.get(key);
+                        const isPick = !!pick && pick.from !== 'inv' && sameSocket(pick, ref);
+                        const dropHere = over === key;
+                        const chain = i < it.sockets.length - 1 && (
+                          <span
+                            class="sk-chain"
+                            data-paint="chain"
+                            {...infoProps(
+                              'Linked: a support gem works on the skills in the same item.',
+                            )}
+                          />
+                        );
+                        const common = {
+                          onDragOver: (e: DragEvent) => {
+                            if (drag) {
+                              e.preventDefault();
+                              if (over !== key) setOver(key);
+                            }
+                          },
+                          onDragLeave: () => over === key && setOver(null),
+                          onDrop: (e: DragEvent) => {
                             e.preventDefault();
-                            if (over !== key) setOver(key);
-                          }
-                        },
-                        onDragLeave: () => over === key && setOver(null),
-                        onDrop: (e: DragEvent) => {
-                          e.preventDefault();
-                          if (drag) place(ref, drag);
-                        },
-                      };
-                      if (!g) {
-                        const aim = !!p || !!drag || sel?.from === 'socket';
+                            if (drag) void place(ref, drag);
+                          },
+                        };
+                        const cls = `sk-sock${isPick ? ' on' : ''}${p ? ' aim' : ''}${dropHere ? ' drop' : ''}`;
+                        if (!g) {
+                          return (
+                            <div key={i} class="sk-link">
+                              <button
+                                class={cls + ' empty'}
+                                aria-label={`Empty ${slotLabel(slot)} socket`}
+                                onClick={() => onSocketTap(ref, false)}
+                                {...common}
+                              >
+                                <Stone d={null} state={isPick ? 'sel' : p ? 'target' : ''} />
+                                <span class="sk-text">
+                                  {p ? (
+                                    <Delta p={p} />
+                                  ) : (
+                                    <span class="sk-name sk-empty">{isPick ? 'Empty' : ''}</span>
+                                  )}
+                                </span>
+                              </button>
+                              {chain}
+                            </div>
+                          );
+                        }
+                        const d = gemDef(g.gemId);
+                        const primary = ch.primary.gemUid === g.uid;
+                        const active = ch.actives.find((a) => a.gemUid === g.uid);
+                        const status = gemStatus(ch, g.uid, d);
+                        const bad =
+                          active && !active.usable
+                            ? 'Unusable'
+                            : status && !status.ok
+                              ? 'Idle'
+                              : null;
                         return (
                           <div key={i} class="sk-link">
                             <button
-                              class={`sk-sock empty${p ? ' aim' : ''}${dropHere ? ' drop' : ''}`}
-                              onClick={() => onSocketClick(ref)}
+                              class={cls}
+                              draggable={!coarse}
+                              onDragStart={() => setDrag({ from: 'socket', ...ref })}
+                              onDragEnd={() => {
+                                setDrag(null);
+                                setOver(null);
+                              }}
                               {...common}
+                              {...hoverGem(g.gemId, levelOf(g.uid))}
+                              onClick={() => onSocketTap(ref, true)}
                             >
-                              <Stone d={null} state={aim ? 'target' : ''} />
+                              <Stone
+                                d={d}
+                                level={levelOf(g.uid)}
+                                state={isPick ? 'sel' : p ? 'target' : ''}
+                              />
                               <span class="sk-text">
-                                <span class="sk-name sk-empty">
-                                  {p
-                                    ? 'Place it here'
-                                    : sel?.from === 'socket'
-                                      ? 'Move it here'
-                                      : drag
-                                        ? 'Drop it here'
-                                        : 'Empty'}
+                                <span class="sk-name">
+                                  {primary && <span class="sk-star">★ </span>}
+                                  {d.name}
                                 </span>
-                                {p && (
-                                  <span class="sk-sub sk-badges">
-                                    <Badge p={p} />
-                                  </span>
+                                {p ? (
+                                  <Delta p={p} swap />
+                                ) : (
+                                  bad && <span class="sk-sub sk-bad">{bad}</span>
                                 )}
                               </span>
                             </button>
                             {chain}
                           </div>
                         );
-                      }
-                      const d = gemDef(g.gemId);
-                      const primary = ch.primary.gemUid === g.uid;
-                      const active = ch.actives.find((a) => a.gemUid === g.uid);
-                      const status = gemStatus(ch, g.uid, d);
-                      const pend = !!pending && sameSocket(pending, ref);
-                      return (
-                        <div key={i} class="sk-link">
-                          <button
-                            class={`sk-sock${isSel || pend ? ' on' : ''}${p ? ' aim' : ''}${
-                              dropHere ? ' drop' : ''
-                            }`}
-                            draggable={!coarse}
-                            onDragStart={() => setDrag({ from: 'socket', ...ref })}
-                            onDragEnd={() => {
-                              setDrag(null);
-                              setOver(null);
-                            }}
-                            {...common}
-                            {...hoverGem(g.gemId, levelOf(g.uid))}
-                            onClick={() => onSocketClick(ref)}
-                            onDblClick={() => c.act((r) => unsocketGem(r, slot, i))}
-                          >
-                            <Stone
-                              d={d}
-                              level={levelOf(g.uid)}
-                              state={isSel || pend ? 'sel' : p ? 'target' : ''}
-                            />
-                            <span class="sk-text">
-                              <span class="sk-name">
-                                {primary && <span class="sk-star">★ </span>}
-                                {d.name}
-                              </span>
-                              {p && (
-                                <span class="sk-sub sk-badges">
-                                  <Badge p={p} /> if you replace it
-                                </span>
-                              )}
-                              {active && !active.usable && (
-                                <span class="sk-sub sk-bad">{active.reason}</span>
-                              )}
-                              {status && (
-                                <span class={'sk-sub' + (status.ok ? '' : ' sk-bad')}>
-                                  {status.text}
-                                </span>
-                              )}
-                            </span>
-                          </button>
-                          {chain}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
+                      })}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </section>
         <section
-          class={'lf-panel sk-bag' + (over === 'inv' ? ' drop' : '')}
+          class={'sk-pane sk-bag' + (over === 'inv' ? ' drop' : '')}
           data-paint="panel"
+          data-thin
           onDragOver={(e) => {
             if (drag?.from === 'socket') {
               e.preventDefault();
@@ -640,25 +685,37 @@ export function Skills({
           onDragLeave={() => over === 'inv' && setOver(null)}
           onDrop={(e) => {
             e.preventDefault();
-            if (drag) unsocket(drag);
+            if (drag?.from === 'socket') takeOut(drag);
           }}
         >
-          <h4 class="lf-h">Gems{gems.length > 0 ? ` (${gems.length})` : ''}</h4>
-          {searchShown && (
-            <input
-              class="sk-search"
-              type="text"
-              placeholder="Search by name, tag or type"
-              title="Commas join terms: area, attack"
-              value={q}
-              onInput={(e) => {
-                const v = (e.target as HTMLInputElement).value;
-                setQ(v);
-                savePref('gemSearch', v);
-              }}
-            />
+          {(searchShown || filtersShown) && (
+            <div class="sk-find">
+              {searchShown && (
+                <input
+                  class="sk-search"
+                  type="text"
+                  placeholder="Search"
+                  title="Name, tag or type; commas join terms: area, attack"
+                  value={q}
+                  onInput={(e) => {
+                    const v = (e.target as HTMLInputElement).value;
+                    setQ(v);
+                    savePref('gemSearch', v);
+                  }}
+                />
+              )}
+              {filtersShown && (
+                <button
+                  class="btn small sk-filterbtn"
+                  aria-expanded={filtersOpen}
+                  onClick={() => setFiltersOpen(!filtersOpen)}
+                >
+                  Filter{filtersOn ? ` (${filtersOn})` : ''}
+                </button>
+              )}
+            </div>
           )}
-          {filtersShown && (
+          {filtersShown && filtersOpen && (
             <div class="sk-filters">
               <label class="sk-check">
                 <input
@@ -684,112 +741,78 @@ export function Skills({
                 />
                 <span>Usable with my weapons</span>
               </label>
-              <label class="sk-for">
-                <span class="sk-lbl">Supports for</span>
-                <span class="sk-sel" data-paint="panel" data-thin>
-                  <select
-                    value={forDef ? forSkill : ''}
-                    onChange={(e) => {
-                      const v = (e.target as HTMLSelectElement).value;
-                      setForSkill(v);
-                      savePref('gemSupportsFor', v);
-                    }}
-                  >
-                    <option value="">any skill</option>
-                    {skillIds
-                      .map((id) => gemDef(id))
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((d) => (
-                        <option key={d.id} value={d.id}>
-                          {d.name}
-                        </option>
-                      ))}
-                  </select>
-                </span>
-              </label>
             </div>
           )}
-          {gems.length > 0 && shownGems.length === 0 && (
-            <p class="sk-none">
-              No gem matches the filters.{' '}
-              <button
-                class="btn small"
-                onClick={() => {
-                  setQ('');
-                  savePref('gemSearch', '');
-                  setOneEach(false);
-                  savePref('gemOneEach', false);
-                  setUsableOnly(false);
-                  savePref('gemUsable', false);
-                  setForSkill('');
-                  savePref('gemSupportsFor', '');
-                }}
-              >
-                Clear filters
-              </button>
-            </p>
-          )}
-          {gems.length === 0 && (
-            <p class="sk-none">
-              No spare gems.{' '}
-              {coarse
-                ? 'Tap a socketed gem to take it out'
-                : 'Drag a socketed gem here to take it out'}
-              .
-            </p>
-          )}
-          {GEM_GROUPS.map((group) => {
-            const list = shownGems.filter((g) => groupOfGem(gemDef(g.gemId)) === group);
-            if (!list.length) return null;
-            return (
-              <div key={group} class="sk-group">
-                <h5 class="sk-sh">{group}</h5>
-                {list.map((g) => {
-                  const d = gemDef(g.gemId);
-                  const b = best.get(g.uid);
-                  const on = sel?.from === 'inv' && sel.uid === g.uid;
-                  const fresh = oneEach ? newIds.has(g.gemId) : foundLastLevel(run, g.uid);
-                  return (
-                    <button
-                      key={g.uid}
-                      class={'sk-bagrow' + (on ? ' on' : '')}
-                      draggable={!coarse}
-                      {...hoverGem(g.gemId, bagLevel(d))}
-                      onDragStart={() => setDrag({ from: 'inv', uid: g.uid })}
-                      onDragEnd={() => {
-                        setDrag(null);
-                        setOver(null);
-                      }}
-                      onClick={() => setSel(on ? null : { from: 'inv', uid: g.uid })}
-                      onDblClick={() => {
-                        const ok = c.act((r) => quickSocket(r, g.uid));
-                        setMsg(ok ? '' : 'No free socket: click a socket to replace a gem');
-                        setSel(null);
-                      }}
-                    >
-                      <Stone d={d} level={bagLevel(d)} state={on ? 'sel' : ''} />
-                      <span class="sk-text">
-                        <span class="sk-name">
-                          {d.name}
-                          {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
-                            <span class="sk-count"> ×{counts.get(g.gemId)}</span>
-                          )}
-                          {fresh && <span class="sk-new">New</span>}
-                        </span>
-                        {b && (
-                          <span class="sk-sub sk-badges">
-                            <Badge p={{ ...b, idle: b.idle?.replace(' on this item', '') }} />
+          <div class="sk-scroll">
+            {gems.length > 0 && shownGems.length === 0 && (
+              <p class="sk-none">
+                No gem matches.{' '}
+                <button class="btn small" onClick={clearFilters}>
+                  Clear filters
+                </button>
+              </p>
+            )}
+            {gems.length === 0 && <p class="sk-none">No spare gems.</p>}
+            {GEM_GROUPS.map((group) => {
+              let list = shownGems.filter((g) => groupOfGem(gemDef(g.gemId)) === group);
+              if (!list.length) return null;
+              if (ranked)
+                list = [...list].sort((a, b) => gain(badgeOf(b.uid)) - gain(badgeOf(a.uid)));
+              return (
+                <div key={group} class="sk-group">
+                  <h5 class="sk-sh">{group}</h5>
+                  {list.map((g) => {
+                    const d = gemDef(g.gemId);
+                    const b = badgeOf(g.uid);
+                    const on = pick?.from === 'inv' && pick.uid === g.uid;
+                    const fresh = oneEach ? newIds.has(g.gemId) : foundLastLevel(run, g.uid);
+                    return (
+                      <button
+                        key={g.uid}
+                        class={'sk-bagrow' + (on ? ' on' : '') + (atSocket ? ' aim' : '')}
+                        draggable={!coarse}
+                        {...hoverGem(g.gemId, bagLevel(d))}
+                        onDragStart={() => setDrag({ from: 'inv', uid: g.uid })}
+                        onDragEnd={() => {
+                          setDrag(null);
+                          setOver(null);
+                        }}
+                        onClick={() => onBagTap(g.uid)}
+                      >
+                        <Stone
+                          d={d}
+                          level={bagLevel(d)}
+                          state={on ? 'sel' : atSocket ? 'target' : ''}
+                        />
+                        <span class="sk-text">
+                          <span class="sk-name">
+                            {d.name}
+                            {oneEach && (counts.get(g.gemId) ?? 1) > 1 && (
+                              <span class="sk-count"> ×{counts.get(g.gemId)}</span>
+                            )}
+                            {fresh && <span class="sk-new">New</span>}
                           </span>
-                        )}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            );
-          })}
+                          {b && <Delta p={b} swap={!!atSocket && !!b.replaces} />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         </section>
       </div>
+      <div class="sk-bar" ref={barRef} data-paint="panel" data-thin>
+        <div class="sk-barline">
+          {bar.name && <b>{bar.name}</b>}
+          <span class={'sk-barsub' + (msg || bar.bad ? ' sk-bad' : '')}>{msg || bar.line}</span>
+        </div>
+        {bar.acts && <div class="sk-acts">{bar.acts}</div>}
+      </div>
+      {supportsFor && (
+        <SupportsPicker c={c} at={supportsFor} onClose={() => setSupportsFor(null)} />
+      )}
       {tip && <GemTip {...tip} />}
     </div>
   );

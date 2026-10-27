@@ -11,7 +11,9 @@ import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { modsText } from '../mods/text';
 import { gemDef } from '../data/gems';
-import { aSkill } from '../data/skillTypes';
+import { aSkill, typesAllow } from '../data/skillTypes';
+import { resolveActive } from '../calc/gems';
+import { supportLive } from '../calc/reach';
 import {
   EQUIP_SLOTS,
   type InventoryItem,
@@ -389,6 +391,8 @@ export type PlacementOpts = {
    * Skills tab's badges and `quickSocket` want this; the sockets a selected gem could go into want all of them.
    */
   emptiesFirst?: boolean;
+  /** Only this socket (the Skills tab asks what each bag gem would do in the socket picked). */
+  at?: SocketRef;
 };
 
 /** Every socket the gem could go into, with the effect of putting it there. */
@@ -409,7 +413,12 @@ export function placementsFor(
     if (it) it.sockets.forEach((cur, socket) => spots.push({ slot, it, socket, cur }));
   }
   const empties = spots.filter((p) => !p.cur);
-  const wanted = opts.emptiesFirst && empties.length ? empties : spots;
+  const at = opts.at;
+  const wanted = at
+    ? spots.filter((p) => p.slot === at.slot && p.socket === at.socket)
+    : opts.emptiesFirst && empties.length
+      ? empties
+      : spots;
   const out: Placement[] = [];
   for (const { slot, it, socket, cur } of wanted) {
     const replaces = cur ? gemDef(cur.gemId).name : undefined;
@@ -568,15 +577,15 @@ export function skillToSocket(run: RunState, ch: Character): GemItem | null {
   return best?.g ?? null;
 }
 
-/** Move a socketed gem to another socket (swapping with whatever is there). */
-export function moveGem(run: RunState, from: SocketRef, to: SocketRef): boolean {
-  if (from.slot === to.slot && from.socket === to.socket) return false;
-  const a = run.build.equipment[from.slot];
-  const b = run.build.equipment[to.slot];
+/** The build with a socketed gem moved to another socket (swapping with whatever is there), or null when it cannot be. */
+function movedBuild(build: Build, from: SocketRef, to: SocketRef): Build | null {
+  if (from.slot === to.slot && from.socket === to.socket) return null;
+  const a = build.equipment[from.slot];
+  const b = build.equipment[to.slot];
   const ga = a?.sockets[from.socket];
-  if (!a || !b || !ga || to.socket >= b.sockets.length) return false;
+  if (!a || !b || !ga || to.socket >= b.sockets.length) return null;
   const gb = b.sockets[to.socket] ?? null;
-  const eq = { ...run.build.equipment };
+  const eq = { ...build.equipment };
   if (from.slot === to.slot) {
     const sockets = [...a.sockets];
     sockets[from.socket] = gb;
@@ -590,8 +599,202 @@ export function moveGem(run: RunState, from: SocketRef, to: SocketRef): boolean 
     eq[from.slot] = { ...a, sockets: sa };
     eq[to.slot] = { ...b, sockets: sb };
   }
-  run.build = { ...run.build, equipment: eq };
+  return { ...build, equipment: eq };
+}
+
+/** Move a socketed gem to another socket (swapping with whatever is there). */
+export function moveGem(run: RunState, from: SocketRef, to: SocketRef): boolean {
+  const b = movedBuild(run.build, from, to);
+  if (b) run.build = b;
+  return !!b;
+}
+
+/**
+ * Every other socket a socketed gem could move to, with the effect of moving it there (a swap with the gem there, which goes to
+ * the picked gem's socket). `replaces` names that gem.
+ */
+export function movesFor(run: RunState, from: SocketRef, base?: CharacterSheet): Placement[] {
+  base ??= sheetOf(run);
+  const baseDps = sheetDps(base);
+  const baseScore = score(base);
+  const out: Placement[] = [];
+  for (const slot of EQUIP_SLOTS) {
+    const it = run.build.equipment[slot];
+    if (!it) continue;
+    it.sockets.forEach((cur, socket) => {
+      const moved = movedBuild(run.build, from, { slot, socket });
+      if (!moved) return;
+      const s = sheetOf(run, settlePrimary(run, moved));
+      out.push({
+        slot,
+        socket,
+        dpsPct: pct(baseDps, sheetDps(s)),
+        ehpPct: pct(base.ehp, s.ehp),
+        scorePct: pct(baseScore, score(s)),
+        ...(cur ? { replaces: gemDef(cur.gemId).name } : {}),
+      });
+    });
+  }
+  return out;
+}
+
+/** The build after a gem from the bag goes into a socket (what `socketGem` would make of it). */
+function socketedBuild(run: RunState, to: SocketRef, gemUid: number): Build | null {
+  const it = run.build.equipment[to.slot];
+  const g = run.inventory.find((x) => x.uid === gemUid);
+  if (!it || g?.kind !== 'gem' || to.socket >= it.sockets.length) return null;
+  const sockets = [...it.sockets];
+  sockets[to.socket] = g;
+  return { ...run.build, equipment: { ...run.build.equipment, [to.slot]: { ...it, sockets } } };
+}
+
+/**
+ * The main skill a change would take away: the name of the gem that is the main skill now, when after the change it is no longer
+ * socketed or can no longer be used; null when the main skill stays (or there is none). The Skills tab asks before such a swap
+ * (docs/GEM-SOCKETS.md 2).
+ */
+export function mainLostBy(run: RunState, after: Build | null): string | null {
+  if (!after) return null;
+  const main = new Character(run.build, cfgFor(run)).primary;
+  if (main.gemUid === null) return null;
+  const still = new Character(after, cfgFor(run)).actives.find((a) => a.gemUid === main.gemUid);
+  return still?.usable ? null : main.skill.name;
+}
+
+/** The main skill a gem from the bag would take away in a socket (`mainLostBy`). */
+export function mainLostBySocketing(run: RunState, to: SocketRef, gemUid: number): string | null {
+  return mainLostBy(run, socketedBuild(run, to, gemUid));
+}
+
+/** The main skill moving a socketed gem would take away (`mainLostBy`). */
+export function mainLostByMove(run: RunState, from: SocketRef, to: SocketRef): string | null {
+  return mainLostBy(run, movedBuild(run.build, from, to));
+}
+
+// ---- Supports for a skill (docs/GEM-SOCKETS.md 4) -------------------------------------------
+
+/** A support that works with a skill, and where it is: in the skill's item, in the bag, or in another worn item. */
+export type SupportChoice = {
+  gem: GemItem;
+  where: 'linked' | 'bag' | EquipSlot;
+};
+
+/** Whether a support works with a skill gem (the test the bag's old "Supports for" filter used). */
+export function supportFits(support: GemItem, skill: GemItem): boolean {
+  const sup = gemDef(support.gemId);
+  const sk = gemDef(skill.gemId);
+  if (sup.kind !== 'support' || sk.kind !== 'active') return false;
+  const r = resolveActive(sk, 20);
+  return typesAllow(sup, new Set(r.types)) && supportLive(sup, r).live;
+}
+
+/**
+ * The supports that work with the skill in a socket: the ones linked to it already, then the bag's (one of each kind, the
+ * first found), then those in other worn items. Supports already linked come first and are listed even when they do not fit.
+ */
+export function supportChoices(run: RunState, at: SocketRef): SupportChoice[] {
+  const it = run.build.equipment[at.slot];
+  const skill = it?.sockets[at.socket];
+  if (!it || !skill || gemDef(skill.gemId).kind !== 'active') return [];
+  const out: SupportChoice[] = [];
+  it.sockets.forEach((g, i) => {
+    if (g && i !== at.socket && gemDef(g.gemId).kind === 'support')
+      out.push({ gem: g, where: 'linked' });
+  });
+  const has = new Set(out.map((c) => c.gem.gemId));
+  const bag = new Map<string, GemItem>();
+  for (const g of run.inventory) {
+    if (g.kind !== 'gem' || has.has(g.gemId) || !supportFits(g, skill)) continue;
+    if (!bag.has(g.gemId)) bag.set(g.gemId, g);
+  }
+  const bagList = [...bag.values()].sort((a, b) =>
+    gemDef(a.gemId).name.localeCompare(gemDef(b.gemId).name),
+  );
+  for (const g of bagList) out.push({ gem: g, where: 'bag' });
+  for (const slot of EQUIP_SLOTS) {
+    if (slot === at.slot) continue;
+    for (const g of run.build.equipment[slot]?.sockets ?? [])
+      if (g && !has.has(g.gemId) && !bag.has(g.gemId) && supportFits(g, skill))
+        out.push({ gem: g, where: slot });
+  }
+  return out;
+}
+
+/** What linking a set of supports to a skill would do: the build after, and the gems that leave the skill's item for the bag. */
+export type SupportPlan = { build: Build; inventory: InventoryItem[]; out: GemItem[] };
+
+/**
+ * The skill in `at` with exactly the supports `uids` beside it in its item (docs/GEM-SOCKETS.md 4): chosen supports already
+ * there keep their sockets; the others take the empty sockets first, then those of the supports not chosen, then those of other
+ * gems. Linked supports not chosen go to the bag, as does whatever a chosen one displaces; a support taken from another item
+ * leaves its socket empty. Null when more are chosen than the item has sockets beside the skill.
+ */
+export function planSupports(run: RunState, at: SocketRef, uids: number[]): SupportPlan | null {
+  const it = run.build.equipment[at.slot];
+  const skill = it?.sockets[at.socket];
+  if (!it || !skill || uids.length > it.sockets.length - 1) return null;
+  const chosen = new Set(uids);
+  const equipment = { ...run.build.equipment };
+  const inventory = [...run.inventory];
+  const sockets = [...it.sockets];
+  const out: GemItem[] = [];
+  // Linked supports not chosen leave.
+  sockets.forEach((g, i) => {
+    if (g && i !== at.socket && gemDef(g.gemId).kind === 'support' && !chosen.has(g.uid)) {
+      out.push(g);
+      sockets[i] = null;
+    }
+  });
+  const here = new Set(sockets.flatMap((g) => (g ? [g.uid] : [])));
+  const incoming: GemItem[] = [];
+  for (const uid of uids) {
+    if (here.has(uid)) continue;
+    const bi = inventory.findIndex((x) => x.uid === uid);
+    if (bi >= 0) {
+      incoming.push(inventory.splice(bi, 1)[0] as GemItem);
+      continue;
+    }
+    for (const slot of EQUIP_SLOTS) {
+      const other = equipment[slot];
+      const si = slot === at.slot ? -1 : (other?.sockets.findIndex((g) => g?.uid === uid) ?? -1);
+      if (other && si >= 0) {
+        incoming.push(other.sockets[si]!);
+        const s2 = [...other.sockets];
+        s2[si] = null;
+        equipment[slot] = { ...other, sockets: s2 };
+        break;
+      }
+    }
+  }
+  // Where they go: empty sockets first, then sockets of other gems (never the skill's own).
+  const free = sockets.flatMap((g, i) => (i !== at.socket && !g ? [i] : []));
+  const others = sockets.flatMap((g, i) => (i !== at.socket && g && !chosen.has(g.uid) ? [i] : []));
+  const spots = [...free, ...others];
+  for (const g of incoming) {
+    const i = spots.shift();
+    if (i === undefined) return null;
+    const old = sockets[i];
+    if (old) out.push(old);
+    sockets[i] = g;
+  }
+  equipment[at.slot] = { ...it, sockets };
+  inventory.push(...out);
+  const build = { ...run.build, equipment };
+  return { build, inventory, out };
+}
+
+/** Link exactly the supports `uids` to the skill in `at` (`planSupports`). Returns whether it was done. */
+export function linkSupports(run: RunState, at: SocketRef, uids: number[]): boolean {
+  const p = planSupports(run, at, uids);
+  if (!p) return false;
+  run.build = p.build;
+  run.inventory.splice(0, run.inventory.length, ...p.inventory);
   return true;
+}
+
+/** The sheet of the build a support plan makes (its primary settled as camp would). */
+export function planSheet(run: RunState, p: SupportPlan): CharacterSheet {
+  return sheetOf(run, settlePrimary(run, p.build));
 }
 
 /** Inventory items the "discard junk" button removes: non-upgrade normal/magic items that are not favourites. */

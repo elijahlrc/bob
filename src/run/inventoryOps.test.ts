@@ -17,13 +17,21 @@ import {
   isUpgrade,
   itemInfos,
   junkItems,
+  linkSupports,
+  mainLostByMove,
+  mainLostBySocketing,
   moveGem,
+  movesFor,
   placementsFor,
+  planSupports,
   quickEquip,
   quickSocket,
   searchText,
   sortItems,
+  supportChoices,
+  supportFits,
 } from './inventoryOps';
+import { settlePrimary } from './primary';
 import { newRun, type RunState } from './run';
 import { withStarterGems } from './starterGems';
 
@@ -322,6 +330,103 @@ describe('gem placement', () => {
     expect(moveGem(run, { slot: 'body', socket: 0 }, { slot: 'body', socket: 1 })).toBe(true);
     expect(run.build.equipment.body!.sockets.map((s) => s!.gemId)).toEqual([b, a]);
     expect(moveGem(run, { slot: 'body', socket: 0 }, { slot: 'body', socket: 0 })).toBe(false);
+  });
+
+  it('movesFor gives every other socket, as the sheet of the build with the gem moved there says', () => {
+    const { run, uid } = setup();
+    const body = run.build.equipment.body!;
+    run.build.equipment.body = { ...body, sockets: [...body.sockets, null] };
+    const helmet = run.build.equipment.helmet;
+    if (helmet) run.build.equipment.helmet = { ...helmet, sockets: [makeGem(uid, 'kindle')] };
+    const from = { slot: 'body' as const, socket: 1 };
+    const base = sheetOf(run);
+    const ms = movesFor(run, from);
+    const sockets = Object.values(run.build.equipment).reduce(
+      (n, it) => n + (it?.sockets.length ?? 0),
+      0,
+    );
+    expect(ms).toHaveLength(sockets - 1);
+    for (const m of ms) {
+      const cur = run.build.equipment[m.slot]!.sockets[m.socket];
+      expect(m.replaces).toBe(cur ? gemDef(cur.gemId).name : undefined);
+      const r = { ...run, build: run.build };
+      moveGem(r, from, m);
+      const want =
+        ((sheetDps(sheetOf(run, settlePrimary(run, r.build))) - sheetDps(base)) / sheetDps(base)) *
+        100;
+      expect(m.dpsPct).toBeCloseTo(want, 9);
+    }
+  });
+
+  it('mainLostBy names the main skill only when a change takes it away', () => {
+    const { run, uid } = setup();
+    run.build.equipment.body = {
+      ...run.build.equipment.body!,
+      sockets: [...run.build.equipment.body!.sockets, null],
+    };
+    const g = makeGem(uid, 'swiftAssault');
+    run.inventory.push(g);
+    const main = gemDef(run.build.equipment.body!.sockets[0]!.gemId).name;
+    expect(mainLostBySocketing(run, { slot: 'body', socket: 0 }, g.uid)).toBe(main);
+    expect(mainLostBySocketing(run, { slot: 'body', socket: 2 }, g.uid)).toBeNull();
+    // Moving the main skill to another socket of the same item keeps it.
+    expect(
+      mainLostByMove(run, { slot: 'body', socket: 0 }, { slot: 'body', socket: 2 }),
+    ).toBeNull();
+  });
+});
+
+describe('supports for a skill (docs/GEM-SOCKETS.md 4)', () => {
+  /** A body of four sockets: the reaver's skill, a support, another skill and an empty socket; supports in the bag and the helmet. */
+  const board = () => {
+    const { run, uid } = setup();
+    const [skill, supA] = run.build.equipment.body!.sockets as ReturnType<typeof makeGem>[];
+    const other = makeGem(uid, 'flameBolt');
+    run.build.equipment.body = {
+      ...run.build.equipment.body!,
+      sockets: [skill, supA, other, null],
+    };
+    const supB = makeGem(uid, 'swiftAssault');
+    const supC = makeGem(uid, 'kindle');
+    run.inventory.push(supB, supC);
+    const supD = makeGem(uid, 'precisionStrikes');
+    const helmet = run.build.equipment.helmet ?? makeItem(uid, 'helmet_ar_1', 20, 2);
+    run.build.equipment.helmet = { ...helmet, sockets: [supD, null] };
+    return { run, skill, supA, other, supB, supC, supD };
+  };
+  const at = { slot: 'body' as const, socket: 0 };
+
+  it('lists the linked supports first, then the fitting ones of the bag, then of other gear', () => {
+    const { run, skill, supA } = board();
+    const cs = supportChoices(run, at);
+    expect(cs[0]).toEqual({ gem: supA, where: 'linked' });
+    const order = cs.map((c) => (c.where === 'linked' ? 0 : c.where === 'bag' ? 1 : 2));
+    expect(order).toEqual([...order].sort());
+    for (const c of cs.filter((x) => x.where !== 'linked'))
+      expect(supportFits(c.gem, skill)).toBe(true);
+  });
+
+  it('puts the chosen ones in: empty sockets first, then other gems; what leaves goes to the bag', () => {
+    const { run, skill, supA, other, supB, supC, supD } = board();
+    expect(linkSupports(run, at, [supB.uid, supD.uid, supC.uid])).toBe(true);
+    const body = run.build.equipment.body!.sockets;
+    expect(body[0]).toBe(skill);
+    // supA was not chosen and left: supB took its socket, supD the empty one, supC the other skill's.
+    expect(body.slice(1).map((g) => g?.uid)).toEqual([supB.uid, supC.uid, supD.uid]);
+    expect(run.build.equipment.helmet!.sockets[0]).toBeNull();
+    const bag = new Set(run.inventory.map((x) => x.uid));
+    expect(bag.has(supA.uid) && bag.has(other.uid)).toBe(true);
+    expect(bag.has(supB.uid) || bag.has(supC.uid)).toBe(false);
+  });
+
+  it('keeps a chosen support where it is, and refuses more than the sockets beside the skill', () => {
+    const { run, supA, supB, supC, supD } = board();
+    const p = planSupports(run, at, [supA.uid, supB.uid])!;
+    expect(p.build.equipment.body!.sockets[1]).toBe(supA);
+    expect(p.out).toEqual([]);
+    expect(planSupports(run, at, [supA.uid, supB.uid, supC.uid, supD.uid])).toBeNull();
+    // A plan leaves the run as it was.
+    expect(run.inventory.some((x) => x.uid === supB.uid)).toBe(true);
   });
 });
 

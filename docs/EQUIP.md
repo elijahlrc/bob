@@ -184,6 +184,8 @@ A first-class row at the top of the diff and under the slot tab, drawn from `Soc
 
 ### 3.6 The Skills tab (Q5)
 
+_Revised 2026-10-26 by docs/GEM-SOCKETS.md: a lit socket says what the gem would do before it is tapped, so a swap is done on the tap (Undo takes it back) and only losing the main skill asks first; the question panel below is gone._
+
 - **Sockets by item as cards**: item name (one line, no wrap), `4 sockets, linked`, the pips row as buttons, each filled one with the
   gem's name and `gemStatus` line (what it supports, why it does nothing). Items with no sockets stay hidden, with a single quiet line
   "Not socketable: Helmet, Gloves" so a missing row is not a mystery.

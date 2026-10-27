@@ -1,5 +1,7 @@
 # Gem sockets: one tap model, a compact Skills tab (milestones K1–K6)
 
+**Built 2026-10-26** (all six; `src/ui/Skills.tsx`, `src/ui/SupportsPicker.tsx`, `src/ui/leaf/skills.css`; the moves, the main-skill check and the supports plan are `movesFor`, `mainLostBy`, `supportChoices` and `planSupports` in `src/run/inventoryOps.ts`). Not yet tried on a real phone.
+
 The owner, 2026-10-26: swapping gems on the Skills tab is confusing. On a phone the sockets sit above a long list of gems; a tap
 picks a gem, then a second tap opens a panel (often off screen) to swap; a double tap sometimes takes a gem out and sometimes not;
 picking a gem moves the whole screen; only empty sockets light up as targets; and the "Supports for" filter is clunky. This plan
