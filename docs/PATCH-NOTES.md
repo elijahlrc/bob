@@ -14,9 +14,18 @@ change, and our own names only. Dash bullets under plain headings.
 - Exalted Focus raises skill levels much more slowly as you level, Double Set adds traps by chance, and Rime Herald's and Storm Herald's hits now grow with your spell damage.
 - Call Furies builds a swarm of up to twenty spirits, Crushing Halo's hits ignore some armour, and Skitter Flash's sparks last twice as long.
 - Glacier Dart now looks like a slow, heavy crystal and Chilling Shard like a thin sliver that fades as it flies.
+- Call Furies, Pack of Hounds and Brood of Spiders can be set to Main, Periodic or Off on the Strategy tab, so they no longer take every turn beside a damage skill.
+
+### Monsters and maps
+
+- Warden Pylons' protection now drops for one second in every six, and your character no longer wastes hits on monsters it covers.
+- Map bonuses that promised currency now pay in items instead.
 
 ### Items and interface
 
+- The kill counter now counts out of the monsters on the map, and an XP bar with your level runs across the top of the screen.
+- The Character tab shows what each attribute gives under it, and its explanatory text and resistance caps are easier to read.
+- The Upgrades list now suggests flasks that improve on one you wear.
 - Several uniques now cast skills of their own, from a lightning bolt to spectral hounds, spiders and fire with each step.
 - The Mystic's west starting passive gives flat energy shield, and the life orb's tooltip shows your energy shield.
 - Fixed a black screen at map start on phones and a Skills search that could hide every gem, now with a Clear filters button; high scores scroll sideways on phones.
