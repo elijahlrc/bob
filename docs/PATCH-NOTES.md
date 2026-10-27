@@ -15,6 +15,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Call Furies builds a swarm of up to twenty spirits, Crushing Halo's hits ignore some armour, and Skitter Flash's sparks last twice as long.
 - Glacier Dart now looks like a slow, heavy crystal and Chilling Shard like a thin sliver that fades as it flies.
 - Call Furies, Pack of Hounds and Brood of Spiders can be set to Main, Periodic or Off on the Strategy tab, so they no longer take every turn beside a damage skill.
+- The same support gem no longer stacks on a skill: linked twice, only the higher level works, and the spare says so.
 
 ### Monsters and maps
 
@@ -29,6 +30,9 @@ change, and our own names only. Dash bullets under plain headings.
 - Several uniques now cast skills of their own, from a lightning bolt to spectral hounds, spiders and fire with each step.
 - The Mystic's west starting passive gives flat energy shield, and the life orb's tooltip shows your energy shield.
 - Fixed a black screen at map start on phones and a Skills search that could hide every gem, now with a Clear filters button; high scores scroll sideways on phones.
+- Your character now fetches every drop, however far it fell, and a fight no longer makes it give up on one.
+- The Strategy tab has a Damage in detail panel showing how often each skill is used and its damage by type.
+- The Patch notes screen shows a few releases at a time, with a button for older ones.
 
 ## 2026-10-25
 
