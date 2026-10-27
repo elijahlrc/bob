@@ -25,13 +25,14 @@ change, and our own names only. Dash bullets under plain headings.
 ### Items and interface
 
 - The kill counter now counts out of the monsters on the map, and an XP bar with your level runs across the top of the screen.
-- The Character tab shows what each attribute gives under it, and its explanatory text and resistance caps are easier to read.
+- The Character tab shows what each attribute gives, and every number's tip works out its formula with your own numbers.
+- The Skills tab is reworked: tap a gem or socket, then a lit spot to place or swap it, and a skill's Supports button chooses all its supports in one place.
 - The Upgrades list now suggests flasks that improve on one you wear.
 - Several uniques now cast skills of their own, from a lightning bolt to spectral hounds, spiders and fire with each step.
 - The Mystic's west starting passive gives flat energy shield, and the life orb's tooltip shows your energy shield.
 - Fixed a black screen at map start on phones and a Skills search that could hide every gem, now with a Clear filters button; high scores scroll sideways on phones.
 - Your character now fetches every drop, however far it fell, and a fight no longer makes it give up on one.
-- The Strategy tab has a Damage in detail panel showing how often each skill is used and its damage by type.
+- The Strategy tab has a Damage details panel showing how often each skill is used and its damage by type, minions and clones included.
 - The Patch notes screen shows a few releases at a time, with a button for older ones.
 
 ## 2026-10-25
