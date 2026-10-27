@@ -33,3 +33,8 @@ Loose ends to come back to. Plans with milestones live in `docs/`; this is the s
   `leaf/leaf.css`, `leaf/items.css` and others) onto those variables; key the cached panel paintings
   (`src/ui/leaf/painter.ts`, kept between sessions) by palette; add a setting. Item rarity and damage-type colours are
   the bulk of the cleanup. The base theme (backgrounds, gold, text) swaps cheaply.
+
+## Meta progression
+
+- **A winner's heirloom** (asked 2026-10-26). A save that wins its run passes one item on to a future character, as a
+  first step of progression from one run to the next.
