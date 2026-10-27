@@ -216,7 +216,19 @@ export function pullLanding(
   const d = Math.hypot(from.x - p.x, from.y - p.y);
   const k = Math.min(tiles, Math.max(0, d - (from.r + p.r + 0.6)));
   if (k <= 0.05) return null;
-  return w.grid.collide(p.x + ((from.x - p.x) / d) * k, p.y + ((from.y - p.y) / d) * k, p.r);
+  // Dragged along the line, and stopped by the first wall on it: a hook thrown from behind a wall does not carry the character through.
+  const ux = (from.x - p.x) / d;
+  const uy = (from.y - p.y) / d;
+  let x = p.x;
+  let y = p.y;
+  for (let s = Math.min(0.25, k); ; s = Math.min(s + 0.25, k)) {
+    const c = w.grid.collide(p.x + ux * s, p.y + uy * s, p.r);
+    if (Math.hypot(c.x - (p.x + ux * s), c.y - (p.y + uy * s)) > 0.05) break;
+    x = c.x;
+    y = c.y;
+    if (s >= k) break;
+  }
+  return Math.hypot(x - p.x, y - p.y) > 0.05 ? { x, y } : null;
 }
 
 /** Tiles a Tidewarden's hook drags the character, how often it is thrown, and the warning the renderer shows before it. */

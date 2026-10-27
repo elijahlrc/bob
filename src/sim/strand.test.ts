@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { MonsterSpec } from '../calc/monster';
 import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { newRun, planFor, worldOptsFor } from '../run/run';
-import { STRAND_GRACE } from './strand';
+import { pullLanding } from './factions';
+import { PLAYER_STRAND_GRACE, STRAND_GRACE } from './strand';
 import type { World } from './types';
 import { createWorld, spawnMonster, stepWorld } from './world';
 
@@ -110,5 +111,44 @@ describe('a monster out of reach', () => {
     m.def.maxLife = 1e12;
     for (let i = 0; i < STRAND_GRACE * 60 * 3; i++) stepWorld(w);
     expect(m.alive).toBe(true);
+  });
+});
+
+describe('the character out of reach', () => {
+  it('is set down on floor after a short grace when it ends up in rock or off the map', () => {
+    for (const where of ['rock', 'off'] as const) {
+      const w = mapWorld(5);
+      const p = w.sides[0].player;
+      const rock = deepRock(w);
+      p.x = where === 'rock' ? rock.x : -6;
+      p.y = where === 'rock' ? rock.y : -6;
+      for (let i = 0; i < (PLAYER_STRAND_GRACE * 60) / 2; i++) stepWorld(w);
+      expect(w.grid.reachable(p.x, p.y)).toBe(false);
+      for (let i = 0; i < PLAYER_STRAND_GRACE * 60; i++) stepWorld(w);
+      expect(w.grid.reachable(p.x, p.y)).toBe(true);
+    }
+  });
+
+  it('is not dragged through a wall by a hook', () => {
+    let tested = 0;
+    for (let seed = 1; seed <= 12 && tested < 3; seed++) {
+      const w = mapWorld(seed);
+      const p = w.sides[0].player;
+      const { grid } = w;
+      // A floor tile, one tile of wall to its east, and open floor beyond it: the way a hook from the next room would come.
+      for (let ty = 2; ty < grid.h - 2 && tested < 3; ty++)
+        for (let tx = 2; tx < grid.w - 10; tx += 5) {
+          const open = [2, 3, 4, 5, 6, 7].every((d) => grid.reachable(tx + d + 0.5, ty + 0.5));
+          if (!grid.reachable(tx + 0.5, ty + 0.5) || grid.isFloor(tx + 1, ty) || !open) continue;
+          p.x = tx + 0.5;
+          p.y = ty + 0.5;
+          const hooker = spawnMonster(w, rare('warrior'), tx + 7.5, ty + 0.5, 0, 0, 'Hooker');
+          const land = pullLanding(w, p, hooker, 4);
+          expect(land === null || land.x < tx + 1).toBe(true);
+          tested++;
+          break;
+        }
+    }
+    expect(tested).toBeGreaterThan(0);
   });
 });
