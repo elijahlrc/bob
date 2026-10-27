@@ -324,4 +324,20 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(w.drops).toHaveLength(0);
     expect(w.sides[0].ai.mode).not.toBe('loot');
   });
+  it('the player fetches a drop wherever it fell, and a fight does not use up the time it has to reach it', () => {
+    const w = arena(true);
+    const p = w.sides[0].player;
+    p.stunT = 0;
+    const far = { kind: 'currency', uid: 1, id: 'ember', count: 1 } as const;
+    w.drops.push({ id: 7778, x: p.x + 20.5, y: p.y, item: far });
+    // A long fight first: the hunt for the drop starts when the character is free to go.
+    const m = put(w, 'gnawer', 3);
+    m.life = m.def.maxLife = 1e9;
+    run(w, 25);
+    expect(w.drops).toHaveLength(1);
+    m.alive = false;
+    run(w, 10);
+    expect(w.drops).toHaveLength(0);
+    expect(w.sides[0].picked).toHaveLength(1);
+  });
 });

@@ -206,7 +206,7 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       stuckX: inp.x,
       stuckY: inp.y,
       lootId: 0,
-      lootSince: 0,
+      lootT: 0,
       fight: 0,
       lastEngaged: -1e9,
       kiteT: 0,

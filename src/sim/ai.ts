@@ -704,7 +704,8 @@ export function playerAI(w: World, s: Side, dt: number): void {
   // Loot.
   let lootX = 0;
   let lootY = 0;
-  let lootD = LOOT_RANGE;
+  // Anything that dropped is fetched, wherever it fell; a chest still on the map is opened only when it is near.
+  let lootD = Infinity;
   let lootKind: 'drop' | 'chest' | null = null;
   let lootIdx = -1;
   w.drops.forEach((d, i) => {
@@ -720,7 +721,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
   w.chests.forEach((c, i) => {
     if (c.opened) return;
     const dd = Math.hypot(c.x - p.x, c.y - p.y);
-    if (dd < lootD) {
+    if (dd < lootD && dd < LOOT_RANGE) {
       lootD = dd;
       lootX = c.x;
       lootY = c.y;
@@ -728,13 +729,14 @@ export function playerAI(w: World, s: Side, dt: number): void {
       lootIdx = i;
     }
   });
-  // A hunt for something that cannot be reached is given up after a while, rather than for ever.
+  // A hunt for something that cannot be reached is given up after a while, rather than for ever. The time counts only while the
+  // character is on its way to it, not while a fight has called it away.
   if (lootKind) {
     const id = lootKind === 'drop' ? w.drops[lootIdx].id : w.chests[lootIdx].id;
     if (ai.lootId !== id) {
       ai.lootId = id;
-      ai.lootSince = w.t;
-    } else if (w.t - ai.lootSince > LOOT_GIVE_UP) {
+      ai.lootT = 0;
+    } else if ((ai.lootT += dt) > LOOT_GIVE_UP) {
       if (lootKind === 'drop') w.drops.splice(lootIdx, 1);
       else w.chests[lootIdx].opened = true;
       ai.lootId = 0;

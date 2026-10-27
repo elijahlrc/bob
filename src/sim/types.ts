@@ -810,9 +810,9 @@ export type PlayerAI = {
   stuckT: number;
   stuckX: number;
   stuckY: number;
-  /** The drop or chest the player is heading for, and since when (a loot hunt that goes nowhere is dropped). */
+  /** The drop or chest the player is heading for, and how long it has been on its way (a loot hunt that goes nowhere is dropped). */
   lootId: number;
-  lootSince: number;
+  lootT: number;
   /** The fights so far (an opener is used once a fight), and when the character last had a target. */
   fight: number;
   lastEngaged: number;
