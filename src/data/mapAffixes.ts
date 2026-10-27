@@ -210,7 +210,7 @@ export const MAP_AFFIXES: MapAffixDef[] = [
     name: 'Piercing',
     text: 'Monsters penetrate {15}% of elemental resistances',
     monsterMods: [mod('penetration', 'base', 15, { damageTypes: ['fire', 'cold', 'lightning'] })],
-    reward: { currency: 0.2 },
+    reward: { quantity: 0.2 },
     pressure: 1.12,
   },
   {
@@ -222,7 +222,7 @@ export const MAP_AFFIXES: MapAffixDef[] = [
       mod('chance.freeze', 'base', 20),
       mod('chance.shock', 'base', 20),
     ],
-    reward: { currency: 0.15 },
+    reward: { rarity: 0.15 },
     pressure: 1.08,
   },
   {
@@ -271,7 +271,7 @@ export const MAP_AFFIXES: MapAffixDef[] = [
     name: 'Dry',
     text: 'Players gain {40}% fewer flask charges',
     playerMods: [mod('flaskCharges', 'more', -40)],
-    reward: { currency: 0.15 },
+    reward: { quantity: 0.15 },
     pressure: 1.05,
   },
   {
