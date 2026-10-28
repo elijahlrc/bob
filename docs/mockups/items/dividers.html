@@ -1,0 +1,470 @@
+<meta charset="utf-8" />
+<title>Divider Prototypes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&family=Jacquard+24&display=swap"
+/>
+<style>
+  /* One look on purpose: the game's Gold Leaf palette (src/ui/leaf/ramps.ts), dividers drawn at 2 CSS px per art pixel. */
+  :root {
+    color-scheme: dark;
+    --page: #8c6a2c;
+    --lapis: #172049;
+    --lapis-2: #1d2958;
+    --gold: #c09d4e;
+    --gold-hi: #e2c681;
+    --pearl: #e6dfca;
+    --muted: #a8adc4;
+    --gain: #a3d293;
+    --madder: #dca196;
+    --ink: #0b0805;
+    --font: 'Grenze', 'Palatino Linotype', Georgia, serif;
+    --title: 'Jacquard 24', 'Grenze', Georgia, serif;
+  }
+  body {
+    margin: 0;
+    padding-block: 20px 40px;
+    padding-inline: 16px;
+    background: var(--page);
+    color: var(--pearl);
+    font: 16px/1.25 var(--font);
+  }
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font: 400 40px/1 var(--title);
+    color: var(--ink);
+  }
+  .lead {
+    margin: 0 0 14px;
+    color: #2a1d0c;
+    max-width: 70ch;
+  }
+  .modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .modes button {
+    font: inherit;
+    color: var(--pearl);
+    background: var(--lapis);
+    border: 2px solid var(--gold);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  .modes button[aria-pressed='true'] {
+    background: var(--gold-hi);
+    color: var(--ink);
+  }
+  .modes button:focus-visible {
+    outline: 2px dashed var(--pearl);
+    outline-offset: 2px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    min-width: 0;
+    background: var(--lapis);
+    box-shadow:
+      0 0 0 3px var(--gold),
+      0 0 0 4px var(--ink),
+      4px 6px 0 3px #0b080566;
+    display: flex;
+    flex-direction: column;
+  }
+  .card h2 {
+    margin: 0;
+    padding: 10px 12px 2px;
+    font: 400 26px/1 var(--title);
+    color: var(--gold-hi);
+  }
+  .card .note {
+    margin: 0;
+    padding: 2px 12px 10px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .swatch {
+    height: 10px;
+    margin: 0 12px 10px;
+    image-rendering: pixelated;
+  }
+  .hdr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-top: 1px solid #0b080588;
+    background: var(--lapis-2);
+  }
+  .hdr .b {
+    border: 2px solid var(--gold);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    padding: 1px 8px;
+    font-size: 14px;
+  }
+  .up {
+    color: var(--gain);
+  }
+  .down {
+    color: var(--madder);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .body {
+    padding: 10px;
+  }
+  /* The compare: the two items on the niche's dark material. Which lines take the divider depends on the mode. */
+  .cmp {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 14px;
+    padding: var(--pad) 12px;
+    font-size: 15px;
+    line-height: 1.25;
+    image-rendering: pixelated;
+    background-color: #291711;
+  }
+  .cmp > div {
+    min-width: 0;
+    padding: 1px 2px;
+    overflow-wrap: anywhere;
+  }
+  .cmp .cap {
+    color: var(--muted);
+  }
+  .cmp .nm {
+    font-weight: 600;
+  }
+  .rare {
+    color: var(--gold-hi);
+  }
+  .gain {
+    color: var(--gain);
+  }
+  .lost {
+    color: var(--madder);
+  }
+  .cmp .sec {
+    grid-column: 1 / -1;
+    height: var(--hh);
+    margin: 4px -12px;
+    padding: 0;
+    background: var(--h) 0 0 / auto var(--hh) repeat-x;
+  }
+  body[data-mode='all'] .cmp {
+    --pad: calc(var(--hh) + 2px);
+    background:
+      var(--h) 0 0 / auto var(--hh) repeat-x,
+      var(--h) 0 100% / auto var(--hh) repeat-x,
+      var(--v) 0 0 / var(--hh) auto repeat-y,
+      var(--v) 100% 0 / var(--hh) auto repeat-y,
+      var(--v) 50% 0 / var(--hh) auto repeat-y,
+      var(--bitumen) 0 0 / 192px 192px;
+  }
+  body[data-mode='groups'] .cmp {
+    --pad: 8px;
+    background:
+      linear-gradient(#0b0805, #0b0805) 50% 0 / 1px 100% no-repeat,
+      var(--bitumen) 0 0 / 192px 192px;
+    box-shadow: inset 0 0 0 1px #0b0805;
+  }
+  body[data-mode='frame'] .cmp {
+    --pad: calc(var(--hh) + 2px);
+    background:
+      var(--h) 0 0 / auto var(--hh) repeat-x,
+      var(--h) 0 100% / auto var(--hh) repeat-x,
+      var(--v) 0 0 / var(--hh) auto repeat-y,
+      var(--v) 100% 0 / var(--hh) auto repeat-y,
+      linear-gradient(#0b0805, #0b0805) 50% 0 / 1px 100% no-repeat,
+      var(--bitumen) 0 0 / 192px 192px;
+  }
+  .foot {
+    margin-top: 24px;
+    color: #2a1d0c;
+    max-width: 75ch;
+  }
+</style>
+
+<div class="wrap">
+  <h1>Divider prototypes</h1>
+  <p class="lead">
+    Each card is the Items tab's compare (the amulet from the test run) with one divider in place of
+    the coloured tile row. Pick which lines take it; the pixels are the game's own palette at its
+    scale.
+  </p>
+  <div class="modes" role="group" aria-label="Which lines take the divider">
+    <button data-mode="all" aria-pressed="true">Every line (frame, middle, groups)</button>
+    <button data-mode="frame" aria-pressed="false">Frame and groups, thin middle</button>
+    <button data-mode="groups" aria-pressed="false">Between the groups only</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="foot">
+    The dark ground is drawn here with a simple crackle of the game's bitumen colours; in the game
+    it is the gear niche's own texture.
+  </p>
+</div>
+
+<script>
+  // The game's ramps (src/ui/leaf/ramps.ts, col(ramp, index)).
+  const C = {
+    ink: ['#0b0805', '#17110b', '#251c13'],
+    gold: ['#4a3616', '#634a21', '#7e622c', '#977835', '#ad8b40', '#c09d4e', '#d1b062', '#e2c681'],
+    pearl: ['#7a7262', '#9a917c', '#b6ad95', '#cec6ad', '#e0d9c2', '#eee8d6'],
+    lapis: ['#0c1129', '#11183a', '#172049', '#1d2958', '#24336a', '#2f417e', '#3f5291'],
+    bitumen: ['#0e0907', '#160d0a', '#1f120d', '#291711', '#341c15', '#412318', '#4f2a1e'],
+    blood: ['#2e140d', '#5a2414', '#7a2e18', '#93391f'],
+    vermilion: ['#3b120c', '#541a12', '#702418', '#8a3020', '#a23f2b', '#b6553d', '#c87257'],
+    green: ['#112118', '#193022', '#23422d', '#2f5639', '#3f6c48', '#55845a', '#709c71'],
+  };
+  const px = (ctx, x, y, c, w = 1, h = 1) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(x, y, w, h);
+  };
+
+  // Each divider: a name, a line about it, its height in art pixels, the width of one repeat, and how to draw the repeat.
+  const tiles = (cols) => (ctx, W) => {
+    px(ctx, 0, 0, C.ink[0], W, 5);
+    for (let x = 1, i = 0; x < W - 1; x += 4, i++) px(ctx, x, 1, cols[i % cols.length], 3, 3);
+  };
+  const DIVIDERS = [
+    {
+      name: 'Tile row (now)',
+      note: 'The coloured tesserae the tab uses today, for reference.',
+      H: 5,
+      W: 24,
+      draw: tiles([C.vermilion[5], C.pearl[4], C.lapis[5], C.gold[6], C.green[5], C.pearl[4]]),
+    },
+    {
+      name: 'Gold tesserae',
+      note: 'The same tile row in gold alone: a mosaic, without the colour.',
+      H: 5,
+      W: 24,
+      draw: tiles([C.gold[6], C.gold[5], C.gold[4], C.gold[5], C.gold[7], C.gold[5]]),
+    },
+    {
+      name: 'Gold and pearl',
+      note: 'Gold tesserae with every third a pearl, like the bag rows’ dots but tiled.',
+      H: 5,
+      W: 12,
+      draw: tiles([C.gold[5], C.gold[6], C.pearl[3]]),
+    },
+    {
+      name: 'Tesserae dots',
+      note: 'The thin dotted line that divides the bag’s rows today.',
+      H: 3,
+      W: 24,
+      draw: (ctx, W) => {
+        for (let x = 0, i = 0; x < W; x += 4, i++) {
+          const pearl = i % 3 === 2;
+          px(ctx, x + 1, 0, pearl ? C.pearl[3] : C.gold[5], 2, 2);
+          px(ctx, x + 1, 0, pearl ? C.pearl[4] : C.gold[6]);
+          px(ctx, x + 2, 2, C.ink[0]);
+        }
+      },
+    },
+    {
+      name: 'Gold cord',
+      note: 'A twisted gilt rope: strands slanting one way, lit from above.',
+      H: 6,
+      W: 8,
+      draw: (ctx, W) => {
+        px(ctx, 0, 0, C.ink[0], W, 6);
+        const shade = [C.gold[1], C.gold[4], C.gold[7], C.gold[5]];
+        for (let y = 1; y < 5; y++) for (let x = 0; x < W; x++) px(ctx, x, y, shade[(x + y) % 4]);
+      },
+    },
+    {
+      name: 'Red and gold twist',
+      note: 'Two strands, gold and madder red, twisted together: warmer, quieter on the dark ground.',
+      H: 6,
+      W: 8,
+      draw: (ctx, W) => {
+        px(ctx, 0, 0, C.ink[0], W, 6);
+        const shade = [C.ink[1], C.blood[3], C.gold[6], C.gold[4]];
+        for (let y = 1; y < 5; y++) for (let x = 0; x < W; x++) px(ctx, x, y, shade[(x + y) % 4]);
+      },
+    },
+    {
+      name: 'Pearl string',
+      note: 'Pearls on a fine gold thread, spaced out: the lightest of the decorated ones.',
+      H: 4,
+      W: 8,
+      draw: (ctx, W) => {
+        px(ctx, 0, 1, C.gold[3], W, 1);
+        px(ctx, 0, 2, C.ink[0], W, 1);
+        px(ctx, 3, 0, C.pearl[4], 2, 2);
+        px(ctx, 3, 0, C.pearl[5]);
+        px(ctx, 3, 2, C.pearl[2], 2, 1);
+        px(ctx, 5, 2, C.ink[0], 1, 1);
+      },
+    },
+    {
+      name: 'Beaded gold',
+      note: 'Gold beads touching, each with its own light: like the pearl rim of the gear’s niche.',
+      H: 4,
+      W: 4,
+      draw: (ctx) => {
+        px(ctx, 0, 0, C.ink[0], 4, 4);
+        px(ctx, 1, 0, C.gold[5], 2, 3);
+        px(ctx, 0, 1, C.gold[4], 1, 1);
+        px(ctx, 1, 0, C.gold[7]);
+        px(ctx, 2, 2, C.gold[3]);
+      },
+    },
+    {
+      name: 'Gilt rule with lozenges',
+      note: 'A plain gold line with a small lozenge now and then: the line kept, the ornament rare.',
+      H: 5,
+      W: 40,
+      draw: (ctx, W) => {
+        px(ctx, 0, 2, C.gold[5], W, 1);
+        px(ctx, 0, 3, C.ink[0], W, 1);
+        const cx = 20;
+        px(ctx, cx - 1, 1, C.gold[6], 3, 3);
+        px(ctx, cx, 0, C.gold[7], 1, 5);
+        px(ctx, cx - 2, 2, C.gold[6], 5, 1);
+        px(ctx, cx, 2, C.vermilion[5]);
+      },
+    },
+    {
+      name: 'Gold chain',
+      note: 'Small oval links, the same chain that joins linked sockets in the Skills tab.',
+      H: 5,
+      W: 8,
+      draw: (ctx) => {
+        // An oval link lying flat, then one seen edge-on.
+        px(ctx, 1, 0, C.gold[6], 4, 1);
+        px(ctx, 1, 4, C.gold[4], 4, 1);
+        px(ctx, 0, 1, C.gold[5], 1, 3);
+        px(ctx, 5, 1, C.gold[4], 1, 3);
+        px(ctx, 1, 1, C.ink[0], 4, 3);
+        px(ctx, 5, 2, C.gold[6], 3, 1);
+        px(ctx, 5, 3, C.ink[0], 3, 1);
+      },
+    },
+    {
+      name: 'Incised groove',
+      note: 'No ornament: a line cut into the dark material, a shadow over a lit edge.',
+      H: 2,
+      W: 4,
+      draw: (ctx, W) => {
+        px(ctx, 0, 0, C.ink[0], W, 1);
+        px(ctx, 0, 1, C.bitumen[6], W, 1);
+      },
+    },
+    {
+      name: 'Plain gilt line',
+      note: 'The gold line the tab had before the mosaic, a little finer, with its ink shadow.',
+      H: 2,
+      W: 4,
+      draw: (ctx, W) => {
+        px(ctx, 0, 0, C.gold[5], W, 1);
+        px(ctx, 0, 1, C.ink[0], W, 1);
+      },
+    },
+  ];
+
+  const P = 2;
+  /** One repeat of a divider, lying (h) and stood on end (v), as image URLs. */
+  function paint(d) {
+    const h = document.createElement('canvas');
+    h.width = d.W;
+    h.height = d.H;
+    d.draw(h.getContext('2d'), d.W);
+    const v = document.createElement('canvas');
+    v.width = d.H;
+    v.height = d.W;
+    const ctx = v.getContext('2d');
+    ctx.translate(d.H, 0);
+    ctx.rotate(Math.PI / 2);
+    ctx.drawImage(h, 0, 0);
+    return { h: h.toDataURL(), v: v.toDataURL() };
+  }
+
+  /** A stand-in for the niche's dark material: the bitumen colours with a crackle of seams. */
+  function bitumen() {
+    const S = 96;
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = S;
+    const ctx = cv.getContext('2d');
+    const img = ctx.createImageData(S, S);
+    const cell = 9;
+    const n = Math.ceil(S / cell);
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const pts = [];
+    for (let j = 0; j < n; j++)
+      for (let i = 0; i < n; i++)
+        pts.push([(i + 0.15 + rnd() * 0.7) * cell, (j + 0.15 + rnd() * 0.7) * cell]);
+    const hex = (h) => [1, 3, 5].map((k) => parseInt(h.slice(k, k + 2), 16));
+    const [base, seam, lit] = [hex(C.bitumen[3]), hex(C.bitumen[1]), hex(C.bitumen[4])];
+    for (let y = 0; y < S; y++)
+      for (let x = 0; x < S; x++) {
+        let d1 = 1e9,
+          d2 = 1e9;
+        for (const [px0, py0] of pts)
+          for (const ox of [-S, 0, S])
+            for (const oy of [-S, 0, S]) {
+              const d = Math.hypot(x - px0 - ox, y - py0 - oy);
+              if (d < d1) {
+                d2 = d1;
+                d1 = d;
+              } else if (d < d2) d2 = d;
+            }
+        const c = d2 - d1 < 0.9 ? seam : (x + y * 3) % 17 === 0 ? lit : base;
+        const o = (y * S + x) * 4;
+        img.data.set([...c, 255], o);
+      }
+    ctx.putImageData(img, 0, 0);
+    return cv.toDataURL();
+  }
+  document.documentElement.style.setProperty('--bitumen', `url(${bitumen()})`);
+
+  // The sample: the amulet compared with the one worn, as the game shows it.
+  const sample = `
+    <div class="cap">New</div><div class="cap">Worn: Amulet</div>
+    <div class="nm rare">Gloom Spiral</div><div class="nm">Ember Charm</div>
+    <div class="muted">Mending Charm</div><div class="muted">—</div>
+    <div class="muted">Requires level 1 · ilvl 18</div><div class="muted">Requires level 1 · ilvl 18</div>
+    <div class="sec"></div>
+    <div class="gain">Regenerate 3 Life per second</div><div class="lost">+25% to Fire Resistance</div>
+    <div class="sec"></div>
+    <div class="gain">+19 to maximum Mana</div><div></div>
+    <div class="gain">+9 to maximum Energy Shield</div><div></div>
+    <div class="gain">5% increased Cast Speed</div><div></div>`;
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = DIVIDERS.map((d, i) => {
+    const u = paint(d);
+    const vars = `--h:url(${u.h});--v:url(${u.v});--hh:${d.H * P}px`;
+    return `<article class="card" style="${vars}">
+      <h2>${d.name}</h2>
+      <p class="note">${d.note}</p>
+      <div class="swatch" style="background:url(${u.h}) 0 0 / auto ${d.H * P}px repeat-x;height:${d.H * P}px"></div>
+      <div class="hdr"><span class="b">‹ Item</span><span><span class="up">▲4% DPS</span> <span class="muted">·</span> <span class="down">▼1% EHP</span></span></div>
+      <div class="body"><div class="cmp">${sample}</div></div>
+    </article>`;
+  }).join('');
+
+  document.querySelectorAll('.modes button').forEach((b) =>
+    b.addEventListener('click', () => {
+      document.body.dataset.mode = b.dataset.mode;
+      document
+        .querySelectorAll('.modes button')
+        .forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    }),
+  );
+  document.body.dataset.mode = 'all';
+</script>
