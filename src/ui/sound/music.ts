@@ -244,14 +244,32 @@ interface StringOpts {
 }
 
 export interface Music {
-  /** The intensity to move toward: 0 calm, 1 fight, 2 boss or low life. */
-  setIntensity(x: number): void;
+  /**
+   * The intensity to move toward: 0 calm, 1 fight, 2 boss or low life. Given the context's time, a rise is heard from
+   * the next beat; without it (an offline render) changes wait for the next bar.
+   */
+  setIntensity(x: number, now?: number): void;
   /** Starts the first bar at time `t`. */
   start(t: number): void;
   /** Schedules every bar that begins before `tEnd`; bars already in the past (a stalled page) are skipped. */
   scheduleUntil(tEnd: number, now?: number): void;
   /** The music's own gain, for a duck under a moment (a death). */
   readonly out: GainNode;
+}
+
+/** How long a lower intensity must last before the music comes down (seconds): a skirmish at 8x does not flicker it. */
+export const FALL_HOLD = 4;
+
+interface BarRecord {
+  t: number;
+  barInPhrase: number;
+  newChord: boolean;
+  /** The chord the bar belongs to: when it started and ends, and its voicing and bass. */
+  chordStart: number;
+  chordEnd: number;
+  chord: Chord;
+  voices: number[];
+  bass: number;
 }
 
 export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
@@ -267,6 +285,10 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
     bass: 38,
     line: 57,
     density: 'full' as Density,
+    /** When the intensity asked for fell below the playing one (null while it hasn't). */
+    lowSince: null as number | null,
+    /** The bars scheduled and not yet over, so a rise can join them part way. */
+    bars: [] as BarRecord[],
   };
 
   // Master: the layers, the hall and the grit meet in a gentle compressor; no sub below 30 Hz (phones can't play it,
@@ -677,8 +699,7 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
     ]);
   }
 
-  function chordNotes(t: number, on: Record<LayerId, boolean>): void {
-    const dur = BAR * CHORD_BARS;
+  function chordNotes(t: number, on: Record<LayerId, boolean>, dur = BAR * CHORD_BARS): void {
     const voices = st.voices!;
     if (on.drone) drone(t, dur + 0.4);
     if (on.pad)
@@ -753,7 +774,7 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
     [0, 6, 8, 14],
     [0, 2, 8, 10, 12],
   ];
-  function barNotes(t: number, on: Record<LayerId, boolean>, barInPhrase: number): void {
+  function barNotes(t: number, on: Record<LayerId, boolean>, barInPhrase: number, from = 0): void {
     const root = st.chord.pcs[0]!;
     if (on.pulse) {
       const pattern = pick([
@@ -762,20 +783,21 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
         [0, 2, 3, 4, 6, 8, 10, 11, 12, 14],
       ]);
       for (const s of pattern) {
+        if (s < from) continue;
         const up = s === 6 && chance(0.25) ? 12 : s === 14 && chance(0.3) ? 7 : 0;
         pluckBass(t + s * STEP, st.bass + up, s % 8 === 0 ? 0.34 : 0.24, s % 8 === 0 ? 1 : 0.5);
       }
     }
     if (on.perc) {
-      for (const s of pick(KICKS)) {
+      for (const s of pick(KICKS).filter((x) => x >= from)) {
         boom('perc', t + s * STEP, 95, 48, 0.07, 0.7);
         noise('perc', t + s * STEP, { type: 'lowpass', f: 320, g: 0.35, r: 0.04 });
       }
-      for (const s of [4, 12]) {
+      for (const s of [4, 12].filter((x) => x >= from)) {
         noise('perc', t + s * STEP, { f: 1800, Q: 2, g: 0.28, r: 0.03, pan: 0.15 });
         boom('perc', t + s * STEP, 380, 300, 0.015, 0.12);
       }
-      for (let s = 0; s < 16; s += 2)
+      for (let s = from + (from % 2); s < 16; s += 2)
         noise('perc', t + s * STEP + rand(0, 0.006), {
           type: 'highpass',
           f: 6000,
@@ -785,17 +807,17 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
         });
     }
     if (on.heavy) {
-      for (const s of pick(TAIKO)) {
+      for (const s of pick(TAIKO).filter((x) => x >= from)) {
         boom('heavy', t + s * STEP, 82, 40, 0.11, 0.8);
         noise('heavy', t + s * STEP, { f: 700, f2: 260, ft: 0.08, Q: 0.8, g: 0.75, r: 0.07 });
       }
-      for (const s of [4, 12]) {
+      for (const s of [4, 12].filter((x) => x >= from)) {
         noise('heavy', t + s * STEP, { f: 1500, Q: 0.8, g: 0.5, r: 0.09 });
         boom('heavy', t + s * STEP, 200, 150, 0.03, 0.3);
       }
       // A tom fill closing every phrase.
       if (barInPhrase === PHRASE_BARS - 1)
-        for (let s = 8; s < 16; s++)
+        for (let s = Math.max(8, from); s < 16; s++)
           boom('heavy', t + s * STEP, 170 - s * 6, 90 - s * 3, 0.05, 0.35 + s * 0.03);
     }
     if (on.ost) {
@@ -808,7 +830,7 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
         [0, 4, 6, 8, 12, 14],
       ]);
       const body = stringBody(0.35);
-      for (let s = 0; s < 16; s++) {
+      for (let s = from; s < 16; s++) {
         const m = turn && s >= 12 ? base + turn[s % 2]! : base;
         spiccato(t + s * STEP + rand(0, 0.006), m, accents.includes(s) ? 0.2 : 0.11, body);
       }
@@ -816,9 +838,9 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
   }
 
   function scheduleBar(t: number): void {
-    // Intensity moves at bar lines: up quickly, down slowly, so a fight that ends doesn't cut the music off.
-    const d = st.target - st.intensity;
-    st.intensity = clamp(st.intensity + (d > 0 ? Math.min(d, 0.8) : Math.max(d, -0.35)), 0, 2);
+    if (st.target > st.intensity) st.intensity = st.target;
+    else if (st.target < st.intensity && st.lowSince !== null && t - st.lowSince >= FALL_HOLD)
+      st.intensity = st.target;
     const barInPhrase = st.bar % PHRASE_BARS;
     if (barInPhrase === 0) newPhrase();
     const newChord = barInPhrase % CHORD_BARS === 0;
@@ -840,12 +862,79 @@ export function createMusic(ctx: BaseAudioContext, dest: AudioNode): Music {
     // Chord-long layers start with the chord; one fading in starts now so it can grow.
     if (newChord) chordNotes(t, on);
     barNotes(t, on, barInPhrase);
+    const prevRec = st.bars[st.bars.length - 1];
+    const chordStart = newChord || !prevRec ? t : prevRec.chordStart;
+    st.bars.push({
+      t,
+      barInPhrase,
+      newChord,
+      chordStart,
+      chordEnd: chordStart + BAR * CHORD_BARS,
+      chord: st.chord,
+      voices: st.voices!,
+      bass: st.bass,
+    });
+    if (st.bars.length > 4) st.bars.shift();
+  }
+
+  /** Runs `fn` with a scheduled bar's chord, voicing and bass in place (the state has moved on to later bars). */
+  function asOf(b: BarRecord, fn: () => void): void {
+    const keep = { chord: st.chord, voices: st.voices, bass: st.bass };
+    st.chord = b.chord;
+    st.voices = b.voices;
+    st.bass = b.bass;
+    fn();
+    st.chord = keep.chord;
+    st.voices = keep.voices;
+    st.bass = keep.bass;
+  }
+
+  /**
+   * A rise, heard from the next beat: every layer fades to its new level within a third of a second, and the layers
+   * it brings in are scheduled for what is left of the bars already scheduled and of the chord.
+   */
+  function rise(x: number, now: number): void {
+    const before = {} as Record<LayerId, number>;
+    for (const name of LAYER_IDS) before[name] = L[name].level;
+    st.intensity = x;
+    const live = st.bars.filter((b) => b.t + BAR > now);
+    const first = live[0];
+    if (!first) return;
+    const tb = first.t + Math.ceil(Math.max(0, now + 0.06 - first.t) / BEAT) * BEAT;
+    const on = {} as Record<LayerId, boolean>;
+    for (const name of LAYER_IDS) {
+      const lv = levelOf(name, x);
+      const g = L[name].node.gain;
+      g.cancelScheduledValues(now);
+      g.setValueAtTime(g.value, now);
+      g.linearRampToValueAtTime(lv, tb + 0.3);
+      on[name] = before[name] <= 0.001 && lv > 0.001;
+      L[name].level = lv;
+    }
+    if (!LAYER_IDS.some((n) => on[n])) return;
+    for (const b of live) {
+      const from = Math.round((Math.max(b.t, tb) - b.t) / STEP);
+      if (from < 16) asOf(b, () => barNotes(b.t, on, b.barInPhrase, from));
+      // A chord starting in a bar already scheduled gets the new layers in full; the chord under way, for its rest.
+      if (b.newChord && b.t >= tb) asOf(b, () => chordNotes(b.t, on));
+      else if (
+        b.chordStart < tb &&
+        tb < b.chordEnd - 0.8 &&
+        b === live.find((x) => x.chordStart === b.chordStart)
+      )
+        asOf(b, () => chordNotes(tb, on, b.chordEnd - tb));
+    }
   }
 
   return {
     out,
-    setIntensity(x) {
+    setIntensity(x, now) {
       st.target = clamp(x, 0, 2);
+      if (st.target > st.intensity + 0.01) {
+        st.lowSince = null;
+        if (now !== undefined) rise(st.target, now);
+      } else if (st.target < st.intensity - 0.01) st.lowSince ??= now ?? -Infinity;
+      else st.lowSince = null;
     },
     start(t) {
       st.nextBarTime = t;

@@ -151,7 +151,7 @@ function unlock(): void {
 }
 
 /**
- * The music (docs/AUDIO.md, "Music"), synthesised live on the shared context: bars are scheduled a little ahead every
+ * The music (docs/AUDIO.md, "Music"), synthesised live on the shared context: bars are scheduled 0.4 s ahead every
  * tenth of a second while the context runs and the music is on; nothing is scheduled while it is off or hidden.
  */
 function startMusic(c: AudioContext): void {
@@ -164,14 +164,14 @@ function startMusic(c: AudioContext): void {
   music = m;
   window.setInterval(() => {
     if (c.state === 'running' && musicVolume > 0)
-      m.scheduleUntil(c.currentTime + 1.2, c.currentTime);
+      m.scheduleUntil(c.currentTime + 0.4, c.currentTime);
   }, 100);
 }
 
 /** The music's intensity to move toward: 0 calm, 1 fight, 2 boss or low life. */
 export function setMusicIntensity(x: number): void {
   musicTarget = x;
-  music?.setIntensity(x);
+  if (music && ctx) music.setIntensity(x, ctx.currentTime);
 }
 
 /** Dips the music for a moment (a death), then brings it back over a few seconds. */
