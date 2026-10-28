@@ -797,22 +797,29 @@ html.leaf .ix-page {
     0 0 0 3px #c09d4e,
     5px 7px 0 2px #0b080566;
 }
-/* The header and the bar are set off from the body by the mosaic's row of tiles (the camp bar's). */
+/* The item page's lines are an incised groove (the owner, 2026-10-28, over the mosaic's tiles): a line cut into the
+   material, its shadow over a lit edge, two art pixels each. On the lapis the edge is the lapis lit; on the dark material
+   (the item itself) its own lit brown. */
+html.leaf .ix-page {
+  --groove-lapis: linear-gradient(#0b0805 50%, #3f5291 50%);
+  --groove: linear-gradient(#0b0805 50%, #4f2a1e 50%);
+  --groove-up: linear-gradient(to right, #0b0805 50%, #4f2a1e 50%);
+}
 html.leaf .ix-phead {
   position: relative;
   flex: none;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 8px 16px;
+  padding: 6px 8px 10px;
 }
 html.leaf :is(.ix-phead, .ix-pbar)::after {
   content: '';
   position: absolute;
   left: 0;
   right: 0;
-  height: 10px;
-  background: var(--s-tiles);
+  height: 4px;
+  background: var(--groove-lapis);
 }
 html.leaf .ix-phead::after {
   bottom: 0;
@@ -851,7 +858,7 @@ html.leaf .ix-pbar {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 10px;
-  padding: 16px 12px calc(8px + var(--safe-bottom, 0px));
+  padding: 12px 12px calc(8px + var(--safe-bottom, 0px));
   background: #111a40;
 }
 html.leaf .ix-why {
@@ -1085,13 +1092,13 @@ html.leaf .ix-socks {
 html.leaf .ix-gemnames {
   color: var(--muted);
 }
-/* The base's lines and the affixes', each under a row of the mosaic's tiles, tight. */
+/* The base's lines and the affixes', each under a groove, tight. */
 html.leaf .ix-lines {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding-top: 14px;
-  background: var(--s-tiles);
+  padding-top: 8px;
+  background: var(--groove) 0 0 / 100% 4px no-repeat;
 }
 html.leaf .ix-lines .ic-mod {
   margin: 0;
@@ -1143,24 +1150,20 @@ html.leaf .ix-sline .ix-sk-note {
 html.leaf .ix-sk-note.good {
   color: var(--gain);
 }
-/* The two items on the niche's dark material, framed and divided by the mosaic's tiles: a row above and below, an upright
-   one at either side and between the columns. */
+/* The two items on the niche's dark material, framed and divided by grooves: along each edge and between the columns. */
 html.leaf .ix-cmp {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   column-gap: 14px;
-  padding: 12px 12px;
+  padding: 8px 10px;
   background:
-    var(--s-tiles), var(--s-tiles), var(--sv-tiles), var(--sv-tiles), var(--sv-tiles),
+    var(--groove) 0 0 / 100% 4px no-repeat,
+    var(--groove) 0 100% / 100% 4px no-repeat,
+    var(--groove-up) 0 0 / 4px 100% no-repeat,
+    var(--groove-up) 100% 0 / 4px 100% no-repeat,
+    var(--groove-up) 50% 0 / 4px 100% no-repeat,
     var(--t-bitumen, #2a130e);
-  background-position:
-    0 0,
-    0 100%,
-    0 0,
-    100% 0,
-    50% 0,
-    0 0;
 }
 html.leaf .ix-cmp > div {
   min-width: 0;
@@ -1190,11 +1193,11 @@ html.leaf .ix-cmp .sec {
   position: relative;
   z-index: 1;
   grid-column: 1 / -1;
-  height: 10px;
-  /* From the frame's one side to the other, over the upright line between the columns. */
-  margin: 3px -12px;
+  height: 4px;
+  /* From the frame's one side to the other, over the groove between the columns. */
+  margin: 4px -10px;
   padding: 0;
-  background: var(--s-tiles);
+  background: var(--groove);
 }
 html.leaf :is(.ix-cmp, .ix-sheet) :is(.magic, .ix-name-magic) {
   color: #b9cbe6;

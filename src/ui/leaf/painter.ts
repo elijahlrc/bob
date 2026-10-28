@@ -82,25 +82,6 @@ function makeShared() {
     });
     strips[k] = { label, W, H, url };
   }
-  // The row of tiles stood on end, for an upright line of the mosaic (the Items tab's compare, docs/ITEM-SLOTS.md).
-  const [, tW, tH, drawTiles] = STRIPS.tiles;
-  const upright = cached(`strip:tiles:v:${tW}x${tH}`, () => {
-    const cv = canvas(tW, tH);
-    drawTiles(ctx2d(cv), tW);
-    age(cv, rng(seedOf('tiles')), {
-      wrapX: true,
-      loss: 0.04,
-      cracks: 1,
-      crackLen: 8,
-      goldLoss: 0.15,
-    });
-    const v = canvas(tH, tW);
-    const ctx = ctx2d(v);
-    ctx.translate(tH, 0);
-    ctx.rotate(Math.PI / 2);
-    ctx.drawImage(cv, 0, 0);
-    return v.toDataURL();
-  });
   const tile = (field: Ramp, idx: number, W: number, H: number, seed: number, o: AgeOpts) =>
     cached(`tile:${field}:${idx}:${W}x${H}:${seed}`, () => {
       const cv = canvas(W, H);
@@ -121,7 +102,6 @@ function makeShared() {
   );
   for (const [k, s] of Object.entries(strips))
     root.setProperty(`--s-${k}`, `url(${s.url}) 0 0 / ${s.W * P}px ${s.H * P}px repeat-x`);
-  root.setProperty('--sv-tiles', `url(${upright}) 0 0 / ${tH * P}px ${tW * P}px repeat-y`);
   // The dark material of the gear's niche, as a ground for text: its craquelure, no flaking.
   const bitumen = cached('tile:bitumen-ground:96', () => {
     const cv = canvas(96, 96);
