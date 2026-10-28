@@ -832,7 +832,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
     skillType: 'attack',
     tags: ['attack', 'melee', 'strike'],
     behaviour: { kind: 'melee', range: 1.4, range2h: 1.7 },
-    baseMult: [150, 190],
+    baseMult: [176, 222],
     cost: [1, 8],
     mods: [
       { stat: 'stunDuration', kind: 'inc', value: 25 },
