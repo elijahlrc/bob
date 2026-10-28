@@ -34,7 +34,7 @@ export const GLOSSARY = {
   hexes: 'Curses your character puts on enemies.',
   minions: 'What your summoned allies, totems and lasting effects do.',
   move: 'How fast your character walks.',
-  mult: '×1.10 here is 10% more than without your gear, passives and gems; ×1.00 is none.',
+  mult: 'A value of ×1.10 indicates a 10% increase to the value provided by your gear.',
   dps: "Damage per second: the game's estimate of what your character deals in a fight.",
   hit: 'The physical damage of each hit, before your modifiers.',
   aps: 'Attacks per second with this weapon, before your modifiers.',
