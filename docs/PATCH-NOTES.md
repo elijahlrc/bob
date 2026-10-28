@@ -12,6 +12,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Hooks that pull your character stop at the first wall, and a character left in rock or off the map is set back on the floor.
 - Saves take about a quarter of the space, and when the browser has no room for a run a warning says so instead of the game crashing.
 - The game now has interface sounds and music.
+- Sound and Music volumes sit beside the interface size on the title screen and in camp.
 
 ## 2026-10-26
 
