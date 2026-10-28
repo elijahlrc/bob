@@ -11,6 +11,9 @@ change, and our own names only. Dash bullets under plain headings.
 - The Items tab opens a page for the picked item, with Compare beside what it would replace and Swap to wear it.
 - Hooks that pull your character stop at the first wall, and a character left in rock or off the map is set back on the floor.
 - Saves take about a quarter of the space, and when the browser has no room for a run a warning says so instead of the game crashing.
+- The game now has sound: interface clicks and stings for the big moments of a run, from level ups and rare finds to bosses and death.
+- Music now plays throughout, calm between fights and rising through combat to its height for bosses and low life.
+- Sound and Music volumes sit beside the interface size on the title screen and in camp.
 
 ## 2026-10-26
 
