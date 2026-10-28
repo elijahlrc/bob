@@ -872,14 +872,14 @@ html.leaf .ix-why {
   html.leaf .tab-body:has(> .tab-scope > .ix) {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
   html.leaf .tab-body:has(> .tab-scope > .ix) > .tab-scope > :not(.ix) {
     flex: none;
   }
+  /* Never squashed below a usable height (a map's reward shown above it, a short window): the tab scrolls instead. */
   html.leaf .ix {
     flex: 1 1 auto;
-    min-height: 0;
+    min-height: 520px;
     box-sizing: border-box;
     grid-template-rows: minmax(0, 1fr);
     align-items: stretch;
