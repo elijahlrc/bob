@@ -16,20 +16,29 @@ export function CampGems({
   ch,
   taken,
   onSkills,
+  onDismiss,
   box,
 }: {
   c: Controller;
   ch: Character;
   taken: number | null;
   onSkills: () => void;
+  /** Put the reminder about the gem just taken away. */
+  onDismiss: () => void;
   /** A class for a wrapper drawn only when there is a line (the Items tab's band above the bag). */
   box?: string;
 }) {
-  const line = useCampGemLine(c, ch, taken, onSkills);
+  const line = useCampGemLine(c, ch, taken, onSkills, onDismiss);
   return line && box ? <div class={box}>{line}</div> : line;
 }
 
-function useCampGemLine(c: Controller, ch: Character, taken: number | null, onSkills: () => void) {
+function useCampGemLine(
+  c: Controller,
+  ch: Character,
+  taken: number | null,
+  onSkills: () => void,
+  onDismiss: () => void,
+) {
   const run = c.run!;
   const missing = useMemo(() => skillToSocket(run, ch), [ch, run.inventory]);
   const where = taken === null ? null : gemWhere(run, taken);
@@ -49,15 +58,8 @@ function useCampGemLine(c: Controller, ch: Character, taken: number | null, onSk
         </button>
       </div>
     );
-  if (taken === null || !where) return null;
-  if (where.at === 'worn') {
-    const g = where.item.sockets.find((x) => x?.uid === taken)!;
-    return (
-      <div class="notice gem-taken" data-paint="panel" data-thin>
-        {gemDef(g.gemId).name} is socketed in your {where.item.name}.
-      </div>
-    );
-  }
+  // Once the gem is socketed the reminder has done its work: nothing is left to say (the owner, 2026-10-28).
+  if (taken === null || !where || where.at === 'worn') return null;
   return (
     <div class="notice gem-taken" data-paint="panel" data-thin>
       <span>{gemDef(where.gem.gemId).name} is in your bag.</span>
@@ -73,6 +75,9 @@ function useCampGemLine(c: Controller, ch: Character, taken: number | null, onSk
           Skills
         </button>
       )}
+      <button class="btn small" aria-label="Dismiss" title="Dismiss" onClick={onDismiss}>
+        ×
+      </button>
     </div>
   );
 }

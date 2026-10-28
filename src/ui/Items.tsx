@@ -391,7 +391,8 @@ export function Items({
     );
     return () => cancelAnimationFrame(id);
   }, []);
-  // On a desktop the tab does not scroll: the gear is scaled down to fit a short window's height rather than scroll.
+  // On a desktop the tab does not scroll and its columns end level: the gear is scaled to the column's height, down for a
+  // short window, up a little for a tall one.
   const gearRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const col = gearRef.current;
@@ -401,8 +402,8 @@ export function Items({
       if (!g) return;
       g.style.zoom = '';
       if (!matchMedia('(min-width: 1100px)').matches) return;
-      const z = Math.min(1, (col.clientHeight - 2) / g.offsetHeight);
-      if (z < 1) g.style.zoom = String(Math.max(0.6, z));
+      const z = Math.max(0.6, Math.min(1.3, col.clientHeight / g.offsetHeight));
+      if (Math.abs(z - 1) > 0.005) g.style.zoom = String(z);
     };
     fit();
     const ro = new ResizeObserver(fit);

@@ -866,15 +866,20 @@ html.leaf .ix-why {
   color: var(--madder);
 }
 /* A desktop does not scroll as a whole (the owner, 2026-10-27): the tab fills the camp's tab body, and only the bag's
-   list, a long item page and, on a short screen, the gear scroll, each inside its own column. */
+   list and a long item page scroll, each inside its own column. The three columns stand edge to edge and end level
+   (2026-10-28): the gear is scaled to the column's height (Items.tsx), the item page and the bag fill theirs. The painted
+   panels draw their rim 6 px inside their box and the item page's sits 3 px outside it, which the page's margins make up. */
 @media (min-width: 1100px) {
-  /* The columns' visible edges a short, equal way under the tabs: the painted panels draw their rim 6 px inside their box,
-     the item page's sits 3 px outside it. */
   html.leaf .ix {
-    padding-top: 4px;
-  }
-  html.leaf .ix-page {
-    margin-top: 9px;
+    flex: 1 1 auto;
+    /* Never squashed below a usable height (a map's reward shown above it, a short window): the tab scrolls instead. */
+    min-height: 520px;
+    box-sizing: border-box;
+    grid-template-columns: auto minmax(0, 1fr) clamp(400px, 34vw, 520px);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0;
+    padding: 0 8px 4px;
   }
   html.leaf .tab-body:has(> .tab-scope > .ix) {
     display: flex;
@@ -883,29 +888,25 @@ html.leaf .ix-why {
   html.leaf .tab-body:has(> .tab-scope > .ix) > .tab-scope > :not(.ix) {
     flex: none;
   }
-  /* Never squashed below a usable height (a map's reward shown above it, a short window): the tab scrolls instead. */
-  html.leaf .ix {
-    flex: 1 1 auto;
-    min-height: 520px;
-    box-sizing: border-box;
-    grid-template-rows: minmax(0, 1fr);
-    align-items: stretch;
-  }
-  html.leaf :is(.ix-gearcol, .ix-detailcol) {
+  html.leaf .ix-gearcol {
     position: static;
     min-height: 0;
-    max-height: none;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
   }
   html.leaf .ix-detailcol {
+    position: static;
     display: flex;
     flex-direction: column;
     align-self: stretch;
+    min-height: 0;
+    max-height: none;
     overflow: visible;
   }
   html.leaf .ix-page {
-    max-height: calc(100% - 9px);
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    margin: 7px -3px;
   }
   html.leaf .ix-listcol {
     display: flex;
@@ -924,6 +925,10 @@ html.leaf .ix-why {
   html.leaf .ix-cta {
     flex: none;
     margin-bottom: 8px;
+  }
+  /* Nothing picked: the middle column is the gold between the gear and the bag. */
+  html.leaf .ix-empty {
+    padding-top: 12px;
   }
 }
 /* A tablet scrolls as before, the item page held in sight beside the gear and the bag. */
@@ -985,27 +990,6 @@ html.leaf .ix-why {
   html.leaf .ix-tidy-row .btn {
     min-height: 0;
     padding: 4px 8px 5px;
-  }
-}
-/* A desktop: a wider bag, the item page in what is left between it and the gear. */
-@media (min-width: 1100px) {
-  html.leaf .ix {
-    grid-template-columns: 320px minmax(0, 1fr) clamp(400px, 34vw, 520px);
-  }
-}
-/* A desktop: a wider bag, the item page in what is left between it and the gear. */
-@media (min-width: 1100px) {
-  html.leaf .ix {
-    grid-template-columns: 320px minmax(0, 1fr) clamp(400px, 34vw, 520px);
-  }
-}
-/* A tablet: the gear above the bag at the left, the bag taking the height left. */
-@media (min-width: 601px) and (max-width: 1099px) {
-  html.leaf .ix {
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-  html.leaf .ix-gearcol {
-    overflow: visible;
   }
 }
 @media (max-width: 600px) {
@@ -1147,6 +1131,34 @@ html.leaf .ix-sline .ix-sk-note {
   padding: 0;
   white-space: nowrap;
 }
+/* In the compare's header, at its right: the sockets before and after and what happens to the gems. */
+html.leaf .ix-phead {
+  flex-wrap: wrap;
+}
+html.leaf .ix-phead .ix-sline {
+  flex: none;
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+html.leaf .ix-phead .ix-sline .ix-sk-note {
+  margin-left: 4px;
+}
+/* A line with the item's sockets at its right (the base, or what wearing it takes). */
+html.leaf .ix-subrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+html.leaf .ix-subrow > :first-child {
+  min-width: 0;
+}
+/* A caption keeps its words on one line; its sockets go under it when there is no room beside. */
+html.leaf .ix-cmp .cap > span:first-child {
+  white-space: nowrap;
+}
 html.leaf .ix-sk-note.good {
   color: var(--gain);
 }
@@ -1172,6 +1184,11 @@ html.leaf .ix-cmp > div {
   overflow-wrap: anywhere;
 }
 html.leaf .ix-cmp .cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 6px;
   padding-top: 2px;
   padding-bottom: 2px;
   color: var(--muted);

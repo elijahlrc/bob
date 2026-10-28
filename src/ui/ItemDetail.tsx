@@ -307,35 +307,35 @@ function ItemSheet({
   const b = itemBase(it.baseId);
   const all = [...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])];
   const gems = it.sockets.filter((g): g is GemItem => g !== null);
+  const base = [
+    it.name !== b.name ? b.name : '',
+    isWeaponClass(b.itemClass) ? WEAPON_TYPE_NAME[b.itemClass] : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  // The sockets sit at the right of the first line under the name, not on a line of their own.
+  const stones = it.sockets.length > 0 && <Stones sockets={it.sockets} />;
   return (
     <div class="ix-sheet">
       <NamePlaque it={it} name={it.name} />
-      {(it.name !== b.name || isWeaponClass(b.itemClass)) && (
-        <div class="ic-base">
-          {[
-            it.name !== b.name ? b.name : '',
-            isWeaponClass(b.itemClass) ? WEAPON_TYPE_NAME[b.itemClass] : '',
-          ]
-            .filter(Boolean)
-            .join(' · ')}
+      {base && (
+        <div class="ix-subrow">
+          <span class="ic-base">{base}</span>
+          {stones}
         </div>
       )}
       <KeyNumbers it={it} />
-      <div class={bad ? 'ix-req bad' : 'ix-req muted'}>
-        Requires {reqText(it)} · item level {it.ilvl}
-        {bad && <div>{bad}</div>}
+      <div class={'ix-subrow ' + (bad ? 'ix-req bad' : 'ix-req muted')}>
+        <span>
+          Requires {reqText(it)} · item level {it.ilvl}
+          {bad && <div>{bad}</div>}
+        </span>
+        {!base && stones}
       </div>
-      {it.sockets.length > 0 && (
-        <div class="ix-socks">
-          <Stones sockets={it.sockets} />
-          {worn && gems.length > 0 && (
-            <span class="ix-gemnames">
-              {joinNames(
-                gems.map(
-                  (g) => (g.uid === run.build.primaryGem ? '★ ' : '') + gemDef(g.gemId).name,
-                ),
-              )}
-            </span>
+      {worn && gems.length > 0 && (
+        <div class="ix-gemnames">
+          {joinNames(
+            gems.map((g) => (g.uid === run.build.primaryGem ? '★ ' : '') + gemDef(g.gemId).name),
           )}
         </div>
       )}
@@ -487,8 +487,15 @@ function CompareGrid({
     ]);
   return (
     <div class="ix-cmp">
-      <div class="cap">New</div>
-      <div class="cap">{worn ? `Worn: ${label}` : `${label}: nothing worn`}</div>
+      {/* Each item's sockets at the right of its caption, not on a row of their own. */}
+      <div class="cap">
+        <span>New</span>
+        {sockets(it)}
+      </div>
+      <div class="cap">
+        <span>{worn ? `Worn: ${label}` : `${label}: nothing worn`}</span>
+        {sockets(worn)}
+      </div>
       <div class={'nm ' + rarityClass(it)}>{itemTitle(it)}</div>
       <div class={worn ? 'nm ' + rarityClass(worn) : ''}>{worn ? itemTitle(worn) : none}</div>
       {(sub(it) || (worn && sub(worn))) && [
@@ -506,10 +513,6 @@ function CompareGrid({
         <div key="rb" class="lbl">
           {worn ? req(worn) : none}
         </div>,
-      ]}
-      {(sockets(it) || sockets(worn)) && [
-        <div key="ka">{sockets(it) ?? <span class="none">no sockets</span>}</div>,
-        <div key="kb">{sockets(worn) ?? <span class="none">no sockets</span>}</div>,
       ]}
       {g.base.length > 0 && <div class="sec" />}
       {rows(g.base)}
@@ -553,6 +556,10 @@ function ItemCompare({
           )}
         </span>
       }
+      extra={
+        // The sockets before and after, and what happens to the gems, in the header's room at the right.
+        ok && <SocketLine was={active.equipped} o={active.sockets} primary={run.build.primaryGem} />
+      }
       back="‹ Item"
       a={a}
       bar={
@@ -569,9 +576,7 @@ function ItemCompare({
       }
     >
       <SlotTabs slots={slots} active={active.slot} pick={onAim} />
-      {ok ? (
-        <SocketLine was={active.equipped} o={active.sockets} primary={run.build.primaryGem} />
-      ) : (
+      {!ok && (
         <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
           {whyNot(active.check)}
         </div>

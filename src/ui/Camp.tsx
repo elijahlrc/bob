@@ -382,7 +382,15 @@ export function Camp({ c }: { c: Controller }) {
         </div>
       )}
       {run.reward && <Reward c={c} onTaken={setTaken} />}
-      {!run.reward && <CampGems c={c} ch={ch} taken={taken} onSkills={() => setTab('skills')} />}
+      {!run.reward && (
+        <CampGems
+          c={c}
+          ch={ch}
+          taken={taken}
+          onSkills={() => setTab('skills')}
+          onDismiss={() => setTaken(null)}
+        />
+      )}
       {pts > 0 && (
         <button class="btn notice" data-paint="panel" data-thin onClick={() => setTab('tree')}>
           You have {pts} unspent passive point{pts > 1 ? 's' : ''}.
@@ -530,6 +538,7 @@ export function Camp({ c }: { c: Controller }) {
           ch={ch}
           taken={taken}
           onSkills={() => setTab('skills')}
+          onDismiss={() => setTaken(null)}
           box="items-reward"
         />
       )}

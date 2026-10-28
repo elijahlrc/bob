@@ -108,7 +108,7 @@ html.leaf .reward-preview .provision .muted {
 }
 /* Above the Items tab, after a map: the same pick, so the drops stay in view below. */
 html.leaf .items-reward {
-  margin: 4px 0 14px;
+  margin: 0 0 4px;
   padding: 0 20px;
 }
 html.leaf .items-reward .reward {
