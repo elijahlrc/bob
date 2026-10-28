@@ -38,3 +38,12 @@ Loose ends to come back to. Plans with milestones live in `docs/`; this is the s
 
 - **A winner's heirloom** (asked 2026-10-26). A save that wins its run passes one item on to a future character, as a
   first step of progression from one run to the next.
+
+## Balance
+
+- **Thunder Rebuke and Slag Blow may be too strong early** (noted 2026-10-27). Both match the reference data (the strike
+  multipliers, added damage, conversion and Slag Blow's molten balls), so it is not a translation error, but they lead the
+  early melee attacks: against a stationary dummy at character level 1 Slag Blow does about 47 damage a second and Thunder
+  Rebuke 30 (Crushing Blow 24); against a pack of five, 145 and 122. Slag Blow stays ahead at level 12. Thunder Rebuke's
+  aura grows to 12-220 lightning at gem level 20, so it matters more later. Not yet checked: the same comparison at gem
+  level 20, and the reference's Frost Sunder and Primal Strike flat damage tables, which sit well above both.
