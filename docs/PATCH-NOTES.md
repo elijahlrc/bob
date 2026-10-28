@@ -4,6 +4,14 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-28
+
+- Crushing Blow hits about 17% harder.
+- Refine Gem and Exalted Focus are removed; a saved run that holds either loses it.
+- The Items tab opens a page for the picked item, with Compare beside what it would replace and Swap to wear it.
+- Hooks that pull your character stop at the first wall, and a character left in rock or off the map is set back on the floor.
+- Saves take about a quarter of the space, and when the browser has no room for a run a warning says so instead of the game crashing.
+
 ## 2026-10-26
 
 ### Skills
