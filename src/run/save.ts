@@ -1,5 +1,5 @@
 import { stampAll } from './found';
-import { releaseStrandedGems } from './inventory';
+import { dropRetiredGems, releaseStrandedGems } from './inventory';
 import { LEGACY } from '../data/difficulty';
 import { pack, unpack } from './pack';
 import { SAVE_VERSION, type RunState } from './run';
@@ -45,6 +45,8 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
     const run = migrate(data.version, data.run);
     // A gem left inside a carried item (an older save) is set free: it would be lost with the item.
     if (run) releaseStrandedGems(run);
+    // A gem since removed from the game (Refine Gem and Exalted Focus, 2026-10-28) is taken out of the run.
+    if (run) dropRetiredGems(run);
     return run ? { status: 'ok', run } : { status: 'incompatible' };
   } catch {
     return { status: 'incompatible' };

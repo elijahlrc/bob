@@ -61,14 +61,6 @@ export const GEM_OWN_LADDERS: Readonly<Record<string, readonly number[]>> = {
     4, 12, 28, 44, 58, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 91, 92, 93, 94, 95, 96, 97, 98,
     99,
   ],
-  exaltedFocus: [
-    1, 10, 45, 60, 75, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-    100, 100, 100, 100, 100,
-  ],
-  refineGem: [
-    1, 10, 45, 60, 75, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,
-    100, 100, 100, 100, 100,
-  ],
 };
 
 /** The level a gem's first level requires, by gem id; a gem not listed starts at 1. */

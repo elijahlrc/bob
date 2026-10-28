@@ -28,10 +28,11 @@ Conventions follow DESIGN.md:
 - **What is deliberately not covered:** jewels, abyss sockets and socket colours, vaal skills, crab barriers, spirit
   charges, rampage, ground-effect conditions, corpse skills (making corpses, exploding them, raising bone spikes from
   them, volatile corpse orbs), the mana-spending lightning nova, the poison-storing buff, the herald that summons
-  sentinels, the lightning shield buff, trap and mine remote controls, and a few unique flasks. Each is listed in
+  sentinels, the lightning shield buff, trap and mine remote controls, the supports that raise a gem's level or quality
+  (cut 2026-10-28: Bob has neither as a system), and a few unique flasks. Each is listed in
   `npm run coverage -- --list`.
 - **Known divergences to keep in mind:** the character, not a player, decides when to use a skill (the policies of [SPIRIT.md](SPIRIT.md) section 5);
-  there is no gem quality (Refine Gem is a stand-in); the corpse skills left out above stay out; two gems are recorded as drifted in the spirit ledger,
+  there is no gem quality; the corpse skills left out above stay out; two gems are recorded as drifted in the spirit ledger,
   each with the reason (`reference/coverage/spirit.json`); many "support gem on item" lines are folded into stats.
 - **Spirit ledger (2026-10-08, after S14):** `covered` in `reference/coverage/map.json` now means `faithful` in `reference/coverage/spirit.json` (local reference material; 318 of 320 gems; `npm run spirit`), judged twice, the second time by reviewers who had not seen the first verdicts (the local gem audit, `reference/docs/AUDIT-GEMS.md`, not in the repository; second section).
 - **Spirit audit (2026-10-08):** `covered` meant "has the defining mechanic" and was judged coarsely. The local gem audit (`reference/docs/AUDIT-GEMS.md`) re-judged all 326 gems against what each one is _for_ in the reference game: 155 faithful, 133 drifted, 38 gutted, with the missing engine pieces ranked (cooldowns and spending charges, channelling, an enemy status layer, ground effects, the projectile hit rule).

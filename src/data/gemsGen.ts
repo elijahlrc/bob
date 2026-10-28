@@ -8290,19 +8290,6 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
   },
   {
     kind: 'support',
-    id: 'exaltedFocus',
-    name: 'Exalted Focus',
-    attr: 'str',
-    supports: [],
-    costMult: 1.25,
-    levelBonus: {
-      table: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    },
-    mods: [],
-    description: 'Raises the level of the supported skill.',
-  },
-  {
-    kind: 'support',
     id: 'kindledFrost',
     name: 'Kindled Frost',
     attr: 'str',
@@ -9752,24 +9739,6 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
       },
     ],
     description: 'Damage dealt returns as energy shield, and you hit harder while it does.',
-  },
-  {
-    kind: 'support',
-    id: 'refineGem',
-    name: 'Refine Gem',
-    attr: 'dex',
-    supports: [],
-    costMult: 1.15,
-    mods: [
-      {
-        stat: 'damage',
-        kind: 'inc',
-        value: {
-          table: [0, 3.3, 6.7, 10, 13.3, 16.7, 20],
-        },
-      },
-    ],
-    description: 'Raises the quality of the supported gem.',
   },
   {
     kind: 'support',

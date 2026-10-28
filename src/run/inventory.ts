@@ -2,6 +2,7 @@ import { Character } from '../calc/character';
 import { itemHasRule, itemReq } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
+import { isGem } from '../data/gems';
 import type {
   InventoryItem,
   Attrs,
@@ -143,6 +144,40 @@ export function releaseStrandedGems(run: RunState): number {
     } else out.push(it);
   }
   if (n > 0) run.inventory = out;
+  return n;
+}
+
+/**
+ * Take out every gem this version no longer has (a removed gem in an older save): from the bag, the discards, the sockets of
+ * worn and carried items, the reward pick and a reforge waiting to be chosen. Returns how many.
+ */
+export function dropRetiredGems(run: RunState): number {
+  let n = 0;
+  const keep = (g: GemItem | null): GemItem | null => {
+    if (!g || isGem(g.gemId)) return g;
+    n++;
+    return null;
+  };
+  const clean = <T extends InventoryItem>(it: T): T =>
+    it.kind === 'item' && it.sockets.some((g) => g && !isGem(g.gemId))
+      ? { ...it, sockets: it.sockets.map(keep) }
+      : it;
+  const list = <T extends InventoryItem>(xs: T[]): T[] =>
+    xs.filter((it) => it.kind !== 'gem' || keep(it) !== null).map(clean);
+  run.inventory = list(run.inventory);
+  if (run.discarded) run.discarded = list(run.discarded);
+  if (run.reward)
+    run.reward = run.reward
+      .filter((c) => c.kind !== 'gem' || keep(c) !== null)
+      .map((c) => (c.kind === 'item' ? clean(c) : c));
+  if (run.pendingCraft)
+    run.pendingCraft = { ...run.pendingCraft, options: run.pendingCraft.options.map(clean) };
+  const equipment = { ...run.build.equipment };
+  for (const s of Object.keys(equipment) as EquipSlot[]) {
+    const it = equipment[s];
+    if (it) equipment[s] = clean(it);
+  }
+  if (n > 0) run.build = { ...run.build, equipment };
   return n;
 }
 

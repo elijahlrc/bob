@@ -770,7 +770,7 @@ export type SupportGemDef = {
   adds?: SkillType[];
   costMult: number;
   mods: GemMod[];
-  /** Raises the level of the skill it supports (Exalted Focus), by gem level. */
+  /** Raises the level of the skill it supports, by gem level (no support has used it since Exalted Focus was removed, 2026-10-28). */
   levelBonus?: LevelValue;
   /** Trigger supports: the linked spells are cast by this trigger instead of by the player (its chance may grow with the level). */
   trigger?: Omit<TriggerDef, 'chance'> & { chance: LevelValue };
@@ -1886,6 +1886,11 @@ const GEM_BY_ID = new Map<string, GemDef>([...ALL_GEMS, ...GRANTED_GEMS].map((g)
 
 /** Gems that were folded into another: a saved run may still hold the old id. */
 const GEM_ALIASES: Record<string, string> = { cindering: 'kindle' };
+
+/** Whether this version has the gem: a saved run may hold one that was removed (`dropRetiredGems`). */
+export function isGem(id: string): boolean {
+  return GEM_BY_ID.has(GEM_ALIASES[id] ?? id);
+}
 
 export function gemDef(id: string): GemDef {
   const g = GEM_BY_ID.get(GEM_ALIASES[id] ?? id);

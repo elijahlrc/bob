@@ -40,16 +40,7 @@ describe('gem levels from anywhere', () => {
   });
 });
 
-describe('supports that raise a level or grant things on events', () => {
-  it('Exalted Focus raises the level of the skill it supports', () => {
-    const plain = new Character(build(['crushingBlow'], [], 'vanguard'), { areaLevel: 40 });
-    const c = new Character(build(['crushingBlow', 'exaltedFocus'], [], 'vanguard'), {
-      areaLevel: 40,
-    });
-    expect(c.primary.skill.level).toBeGreaterThan(plain.primary.skill.level);
-    expect(c.primary.skill.level).toBeLessThanOrEqual(25);
-  });
-
+describe('supports that grant things on events', () => {
   it('a support that grants a buff or charge on an event makes the character a source of it', () => {
     const c = new Character(build(['crushingBlow', 'bulwarkStrikes'], [], 'vanguard'), {
       areaLevel: 40,

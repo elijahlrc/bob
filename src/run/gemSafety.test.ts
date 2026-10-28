@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { Character } from '../calc/character';
 import { Rng } from '../core/rng';
 import { makeGem, makeItem } from '../gen/items';
 import type { InventoryItem } from '../data/types';
@@ -183,5 +184,33 @@ describe('gems survive any sequence of equipment changes', () => {
         expect(total(run), `seed ${seed} step ${step}`).toEqual(before);
       }
     }
+  });
+});
+
+describe('a gem since removed from the game', () => {
+  it('is taken out of an older save on load, wherever it was, and the run still makes a character', () => {
+    const run = withStarterGems(newRun('vanguard', 1));
+    const slot = (Object.keys(run.build.equipment) as (keyof typeof run.build.equipment)[]).find(
+      (s) => run.build.equipment[s]?.sockets.some((g) => g === null),
+    )!;
+    const item = run.build.equipment[slot]!;
+    const free = item.sockets.indexOf(null);
+    const sockets = [...item.sockets];
+    sockets[free] = { kind: 'gem', uid: 9001, gemId: 'exaltedFocus' };
+    run.build = {
+      ...run.build,
+      equipment: { ...run.build.equipment, [slot]: { ...item, sockets } },
+    };
+    run.inventory.push({ kind: 'gem', uid: 9002, gemId: 'refineGem' });
+    run.reward = [{ kind: 'gem', uid: 9003, gemId: 'refineGem' }];
+    const before = total(run).filter((u) => u < 9000);
+    const store = new MemoryStore();
+    saveRun(store, run);
+    const res = loadRun(store);
+    expect(res.status).toBe('ok');
+    if (res.status !== 'ok') return;
+    expect(total(res.run)).toEqual(before);
+    expect(res.run.reward).toEqual([]);
+    expect(() => new Character(res.run.build)).not.toThrow();
   });
 });
