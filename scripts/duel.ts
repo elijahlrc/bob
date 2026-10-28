@@ -7,7 +7,7 @@
  *
  * A build is named by `class:seed:map` (the bot is played from that class and seed to that map and the character taken as it stands
  * there, as scripts/ladder-probe.ts does), by a number (an entry of the probe's `--save` file, read with `--load`), or by a file: a
- * save exported as JSON (`localStorage.getItem('bob.save.1')` in the game's console, or a slot's key), a run's or a build's.
+ * save exported as JSON (the Copy button of a run on the title screen; the stored value is packed), a run's or a build's.
  *
  * `--seeds` fights several seeds (the winner and the time of each; the ledgers are those of the first). `--both` fights each seed
  * in both orders: the characters stand mirrored, but they are two different builds, so one order says less than two.

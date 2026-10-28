@@ -1,6 +1,7 @@
 import { stampAll } from './found';
 import { releaseStrandedGems } from './inventory';
 import { LEGACY } from '../data/difficulty';
+import { pack, unpack } from './pack';
 import { SAVE_VERSION, type RunState } from './run';
 
 /** The subset of the Web Storage API the game needs (injected so `run/` stays headless). */
@@ -18,16 +19,28 @@ export const SLOTS_KEY = 'bob.saves';
 export type LoadResult =
   { status: 'none' } | { status: 'incompatible' } | { status: 'ok'; run: RunState };
 
-/** §5.5: `{ version, run }` under the given key (a slot's, see `slotKey`). */
+/** A stored save starting with this is packed (pack.ts); one starting with `{` is plain JSON, as saves were before packing. */
+const PACKED = '~';
+
+/** The JSON text of a stored save, whether it was stored packed or plain; null when there is none. */
+export function savedJson(store: KeyValueStore, key: string = SAVE_KEY): string | null {
+  const raw = store.getItem(key);
+  if (raw === null) return null;
+  return raw.startsWith(PACKED) ? unpack(raw.slice(PACKED.length)) : raw;
+}
+
+/**
+ * §5.5: `{ version, run }` under the given key (a slot's, see `slotKey`), packed: a browser keeps about five million
+ * characters for a page, the save of a long run is hundreds of thousands, and every run has its own.
+ */
 export function saveRun(store: KeyValueStore, run: RunState, key: string = SAVE_KEY): void {
-  store.setItem(key, JSON.stringify({ version: SAVE_VERSION, run }));
+  store.setItem(key, PACKED + pack(JSON.stringify({ version: SAVE_VERSION, run })));
 }
 
 export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResult {
-  const raw = store.getItem(key);
-  if (!raw) return { status: 'none' };
+  if (!store.getItem(key)) return { status: 'none' };
   try {
-    const data = JSON.parse(raw) as { version?: number; run?: RunState };
+    const data = JSON.parse(savedJson(store, key) ?? '') as { version?: number; run?: RunState };
     if (data.version === undefined || !data.run) return { status: 'incompatible' };
     const run = migrate(data.version, data.run);
     // A gem left inside a carried item (an older save) is set free: it would be lost with the item.
@@ -109,7 +122,12 @@ export function clearSave(store: KeyValueStore, key: string = SAVE_KEY): void {
 export type SlotId = number;
 
 /** What the title screen needs to show one slot. */
-export type SlotSummary = { id: SlotId; result: LoadResult };
+export type SlotSummary = {
+  id: SlotId;
+  result: LoadResult;
+  /** Characters the save takes in the browser's storage. */
+  size: number;
+};
 
 type SlotIndex = { next: number; slots: SlotId[] };
 
@@ -158,11 +176,19 @@ function allocate(store: KeyValueStore, index: SlotIndex): SlotId {
 /** Every slot, the most recently saved first. A slot whose save is gone is dropped from the list. */
 export function listSlots(store: KeyValueStore): SlotSummary[] {
   const index = readIndex(store);
-  const out = index.slots.map((id) => ({ id, result: loadRun(store, slotKey(id)) }));
+  const out = index.slots.map((id) => ({
+    id,
+    result: loadRun(store, slotKey(id)),
+    size: store.getItem(slotKey(id))?.length ?? 0,
+  }));
   const kept = out.filter((s) => s.result.status !== 'none');
   if (kept.length !== index.slots.length) {
     index.slots = kept.map((s) => s.id);
-    writeIndex(store, index);
+    try {
+      writeIndex(store, index);
+    } catch {
+      // A full store: the list is tidied on a later start.
+    }
   }
   return kept;
 }

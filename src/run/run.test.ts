@@ -21,6 +21,7 @@ import {
   MemoryStore,
   newSlot,
   SAVE_KEY,
+  savedJson,
   saveRun,
   saveSlot,
   slotKey,
@@ -104,7 +105,7 @@ describe('saving (§5.5)', () => {
     const run = newRun('zealot', 11);
     finishMap(run, cleared(2));
     saveRun(store, run);
-    expect(JSON.parse(store.getItem(SAVE_KEY)!).version).toBe(SAVE_VERSION);
+    expect(JSON.parse(savedJson(store, SAVE_KEY)!).version).toBe(SAVE_VERSION);
     const r = loadRun(store);
     expect(r.status).toBe('ok');
     if (r.status === 'ok') expect(r.run).toEqual(JSON.parse(JSON.stringify(run)));
@@ -254,6 +255,45 @@ describe('save slots', () => {
     };
     expect(() => c.act((r) => (r.refundPoints = 2))).not.toThrow();
     expect(c.saveFailed).toBe(true);
+  });
+
+  it('starting a run in a full store does not crash, warns, and saves once there is room', () => {
+    const store = new MemoryStore();
+    const real = store.setItem.bind(store);
+    let full = true;
+    store.setItem = (k, v) => {
+      if (full) throw new Error('QuotaExceededError');
+      real(k, v);
+    };
+    const c = new Controller(store);
+    expect(() => c.beginRun('vanguard', 1)).not.toThrow();
+    expect(c.run).not.toBeNull();
+    expect(c.saveFailed).toBe(true);
+    // Room is made; the next change in camp takes a slot and saves the run.
+    full = false;
+    c.goTo('camp');
+    expect(c.saveFailed).toBe(false);
+    c.quit();
+    expect(c.saves).toHaveLength(1);
+    expect(okRun(c.saves[0])!.classId).toBe('vanguard');
+  });
+
+  it('saves are stored packed, plain saves of before still load, and a copy is plain JSON', () => {
+    const store = new MemoryStore();
+    const c = new Controller(store);
+    c.startRun('mystic', 3);
+    const id = c.saves[0]?.id ?? c.currentSlot!;
+    const stored = store.getItem(slotKey(id))!;
+    expect(stored.startsWith('{')).toBe(false);
+    const json = JSON.stringify({ version: SAVE_VERSION, run: c.run });
+    expect(stored.length).toBeLessThan(json.length / 2);
+    expect(JSON.parse(c.exportSave(id)!).run.classId).toBe('mystic');
+    // A save written before packing is plain JSON under its key.
+    store.setItem(slotKey(id), json);
+    expect(okRun({ id, result: loadRun(store, slotKey(id)), size: 0 })!.classId).toBe('mystic');
+    // A damaged packed save is reported as incompatible, never thrown.
+    store.setItem(slotKey(id), '~{nope');
+    expect(loadRun(store, slotKey(id)).status).toBe('incompatible');
   });
 });
 

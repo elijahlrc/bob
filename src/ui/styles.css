@@ -225,6 +225,32 @@ textarea {
   flex-direction: column;
   min-width: 0;
 }
+/* A run the browser would not store (src/ui/SaveWarning.tsx): over every screen until it is saved. */
+.save-warning {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  z-index: 30;
+  pointer-events: auto;
+  box-sizing: border-box;
+  width: min(640px, calc(100vw - 16px));
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 10px 16px 12px;
+  transform: translateX(-50%);
+  color: var(--pearl, #fff);
+}
+.save-warning-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 12px;
+  text-align: center;
+}
+.save-warning .saves {
+  margin-top: 8px;
+}
 /* The nudge to reload a tab left on an older build (src/ui/UpdateNotice.tsx). */
 .notice.update {
   margin: 8px 0;

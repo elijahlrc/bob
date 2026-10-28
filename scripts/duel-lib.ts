@@ -13,7 +13,7 @@ import { loadRun, MemoryStore } from '../src/run/save';
 // The bot builds are made in src/run/duelBot.ts (the Debug panel plays them too).
 export { botSeed, LEGACY_PLAY, snapshotBuild, type Snap } from '../src/run/duelBot';
 
-/** A build from a file: a save (`localStorage['bob.save.<id>']`), a run's JSON, or a build's. */
+/** A build from a file: a save (the title screen's Copy button), a run's JSON, or a build's. */
 export function buildFromFile(path: string): Build {
   const data = JSON.parse(readFileSync(path, 'utf8')) as Record<string, unknown>;
   if (data.run && typeof data.version === 'number') {

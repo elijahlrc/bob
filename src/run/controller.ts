@@ -52,6 +52,7 @@ import {
   deleteSlot,
   listSlots,
   newSlot,
+  savedJson,
   saveSlot,
   slotKey,
   type KeyValueStore,
@@ -218,6 +219,10 @@ export class Controller {
   saves: SlotSummary[] = [];
   /** The slot the current run is saved in; null for showcase, gallery and runs without a store. */
   private slot: SlotId | null = null;
+  /** The slot of the run in progress, if it has one. */
+  get currentSlot(): SlotId | null {
+    return this.slot;
+  }
   /** True when the last save did not fit in the browser's storage (the camp warns about it). */
   saveFailed = false;
 
@@ -235,8 +240,10 @@ export class Controller {
 
   private changed(): void {
     // The game saves on entering camp and on any camp change (§5.5), into the run's own slot.
-    if (this.store && this.run && this.screen === 'camp' && this.slot !== null) {
+    if (this.store && this.run && this.screen === 'camp') {
       try {
+        // A run whose slot could not be reserved when it began tries again here.
+        this.slot ??= newSlot(this.store);
         saveSlot(this.store, this.slot, this.run);
         this.saveFailed = false;
       } catch {
@@ -582,6 +589,7 @@ export class Controller {
     this.run.build = settlePrimary(this.run);
     this.rivals = null;
     this.slot = id;
+    this.saveFailed = false;
     this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
@@ -603,7 +611,16 @@ export class Controller {
     this.run = newRun(classId, seed, this.startDifficulty);
     this.rivals = null;
     // A new run gets a slot of its own: the saves of earlier runs stay as they are.
-    this.slot = this.store ? newSlot(this.store) : null;
+    this.slot = null;
+    this.saveFailed = false;
+    if (this.store) {
+      try {
+        this.slot = newSlot(this.store);
+      } catch {
+        // A full store: the run goes on, the warning says it is not being saved, and camp tries again.
+        this.saveFailed = true;
+      }
+    }
     this.undoStack = [];
     this.lastResult = null;
     this.goTo('camp');
@@ -905,7 +922,7 @@ export class Controller {
 
   /** The raw saved run of a slot (for bug reports), or null. */
   exportSave(id: SlotId): string | null {
-    return this.store?.getItem(slotKey(id)) ?? null;
+    return this.store ? savedJson(this.store, slotKey(id)) : null;
   }
 
   /** Leave the run (it stays saved) and return to the title screen. */
@@ -918,6 +935,7 @@ export class Controller {
     this.run = null;
     this.rivals = null;
     this.slot = null;
+    this.saveFailed = false;
     this.refreshSaves();
     this.goTo('title');
   }

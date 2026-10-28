@@ -11,6 +11,7 @@ import { InfoLayer } from './info';
 import { useControllerState } from './hooks';
 import { PatchNotes } from './PatchNotes';
 import { Rivals } from './Rivals';
+import { SaveWarning } from './SaveWarning';
 import { Summary } from './Summary';
 import { Title } from './Title';
 
@@ -35,6 +36,7 @@ export function App({ c }: { c: Controller }) {
   return (
     <>
       <Screen c={c} />
+      <SaveWarning c={c} />
       <InfoLayer />
       <ConfirmHost />
     </>

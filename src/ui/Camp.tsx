@@ -476,15 +476,24 @@ export function Camp({ c }: { c: Controller }) {
       )}
       <div class="camp-foot">
         <DebugPanel c={c} />
-        {c.saveFailed && (
-          <div class="warn">
-            The browser has no room to save this run. Delete an old save on the title screen to make
-            room.
-          </div>
-        )}
         <UiScalePicker />
-        <button class="btn" onClick={() => c.quit()}>
-          Save and quit
+        <button
+          class="btn"
+          onClick={async () => {
+            if (
+              c.saveFailed &&
+              !(await ask({
+                title: 'Quit without saving?',
+                body: 'This run could not be saved, so leaving now loses it.',
+                confirm: 'Quit anyway',
+                danger: true,
+              }))
+            )
+              return;
+            c.quit();
+          }}
+        >
+          {c.saveFailed ? 'Quit' : 'Save and quit'}
         </button>
         <button
           class="btn danger"
