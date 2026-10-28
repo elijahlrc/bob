@@ -14,6 +14,7 @@ import {
   type SupportChoice,
 } from '../run/inventoryOps';
 import { ask } from './Confirm';
+import { sfx } from './sound/engine';
 
 const pct = (a: number, b: number) => (a > 0 ? ((b - a) / a) * 100 : 0);
 
@@ -122,7 +123,7 @@ export function SupportsPicker({
       }))
     )
       return;
-    c.act((r) => linkSupports(r, at, ticked));
+    sfx(c.act((r) => linkSupports(r, at, ticked)) ? 'equip' : 'denied');
   };
   return (
     <div class="modal sp" onClick={onClose}>

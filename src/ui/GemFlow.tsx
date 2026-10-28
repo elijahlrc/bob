@@ -4,6 +4,7 @@ import { gemDef } from '../data/gems';
 import type { Controller } from '../run/controller';
 import { ask } from './Confirm';
 import { canQuickSocket, gemWhere, quickSocket, skillToSocket } from '../run/inventoryOps';
+import { sfx } from './sound/engine';
 
 /**
  * The camp's line about gems (docs/NEWPLAYER.md N7). With no skill the character can use while one waits in the bag: a
@@ -40,7 +41,10 @@ function useCampGemLine(c: Controller, ch: Character, taken: number | null, onSk
     return (
       <div class="sk-warn gem-taken" data-paint="panel" data-field="vermilion" data-thin>
         <span>No usable skill socketed: your character will only use its weapon's attack.</span>
-        <button class="btn small primary" onClick={() => c.act((r) => quickSocket(r, missing.uid))}>
+        <button
+          class="btn small primary"
+          onClick={() => sfx(c.act((r) => quickSocket(r, missing.uid)) ? 'equip' : 'denied')}
+        >
           Socket {gemDef(missing.gemId).name}
         </button>
       </div>
@@ -58,7 +62,10 @@ function useCampGemLine(c: Controller, ch: Character, taken: number | null, onSk
     <div class="notice gem-taken" data-paint="panel" data-thin>
       <span>{gemDef(where.gem.gemId).name} is in your bag.</span>
       {free ? (
-        <button class="btn small primary" onClick={() => c.act((r) => quickSocket(r, taken))}>
+        <button
+          class="btn small primary"
+          onClick={() => sfx(c.act((r) => quickSocket(r, taken)) ? 'equip' : 'denied')}
+        >
           Socket it
         </button>
       ) : (

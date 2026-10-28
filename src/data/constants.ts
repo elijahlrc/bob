@@ -251,3 +251,10 @@ export const CRAFTING_OPEN = false;
  * the Workbench stay as they are, for when crafting returns.
  */
 export const CURRENCY_DROPS = false;
+
+/**
+ * Whether the game makes any sound (docs/AUDIO.md). Shut while the first pass is being built (the owner, 2026-10-28: it
+ * may be committed half done and must then be silent): with it false no audio is set up, nothing renders and nothing
+ * plays, and the volume setting is hidden. `?sound` in the address turns it on for one visit, to try it.
+ */
+export const SOUND_OPEN = false;

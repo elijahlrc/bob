@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { currencyLabel, currencyText } from '../data/currency';
 import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
@@ -14,6 +14,8 @@ import { ProvisionCard } from './Satchel';
 import { provisionDef } from '../data/provisions';
 import type { RewardCard } from '../run/run';
 import { uiZoom } from './uiScale';
+import { sfx } from './sound/engine';
+import { rewardSound } from './sound/hooks';
 
 /** What a card of the pick is called on its button. */
 function cardTitle(o: RewardCard): string {
@@ -111,6 +113,7 @@ export function Reward({ c, onTaken }: { c: Controller; onTaken?: (uid: number) 
   const offers = run.reward ?? [];
   const shown = offers.find((o) => o.uid === (coarse ? (picked ?? hover) : hover));
   const [note, setNote] = useState<string | null>(null);
+  useEffect(() => rewardSound(offers), [offers]);
   const take = (uid: number | null) => {
     // The run's first skill gem goes straight into a socket (docs/NEWPLAYER.md N7); the camp then says where it is.
     const ok = c.act((r) => {
@@ -118,6 +121,8 @@ export function Reward({ c, onTaken }: { c: Controller; onTaken?: (uid: number) 
       if (took && uid !== null) seatFirstSkill(r, uid);
       return took;
     });
+    if (ok === false) sfx('denied');
+    else if (ok && uid !== null) sfx('equip');
     setNote(ok === false ? 'That does not fit now: your pouch is full.' : null);
     if (ok && uid !== null) onTaken?.(uid);
   };

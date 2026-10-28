@@ -35,6 +35,7 @@ import { matchesTerms, searchTerms } from './search';
 import { useRehearsal } from './rehearsal';
 import { introSeen, seeIntro } from './intro';
 import { SupportsPicker } from './SupportsPicker';
+import { sfx } from './sound/engine';
 
 const GEM_GROUPS = ['Skills', 'Utility skills', 'Supports', 'Auras'] as const;
 
@@ -340,7 +341,7 @@ export function Skills({
     setOver(null);
     if (!(await mainOk(mainLostBySocketing(run, to, uid)))) return;
     done();
-    c.act((r) => socketGem(r, to.slot, to.socket, uid));
+    sfx(c.act((r) => socketGem(r, to.slot, to.socket, uid)) ? 'equip' : 'denied');
   };
   const move = async (from: SocketRef, to: SocketRef) => {
     setDrag(null);
@@ -348,7 +349,11 @@ export function Skills({
     if (sameSocket(from, to)) return done();
     if (!(await mainOk(mainLostByMove(run, from, to)))) return;
     done();
-    if (!c.act((r) => moveGem(r, from, to))) setMsg('Cannot move the gem there');
+    if (c.act((r) => moveGem(r, from, to))) sfx('equip');
+    else {
+      sfx('denied');
+      setMsg('Cannot move the gem there');
+    }
   };
   const takeOut = (from: SocketRef) => {
     done();
@@ -415,6 +420,7 @@ export function Skills({
               class="btn small"
               onClick={() => {
                 const ok = c.act((r) => quickSocket(r, pick.uid));
+                sfx(ok ? 'equip' : 'denied');
                 if (ok) setPick(null);
                 else setMsg('No free socket: pick one to swap');
               }}

@@ -36,6 +36,7 @@ import {
   type Want,
 } from './leaf/vault';
 import { edgePath } from './treeStyle';
+import { passiveSound } from './sound/hooks';
 
 /** On a coarse pointer a node is hit within this many screen pixels, however small it is drawn; a mouse within this. */
 const FINGER_PX = 22;
@@ -537,7 +538,7 @@ export function TreeView({ c }: { c: Controller }) {
   };
   const commit = (n: number) => {
     if (allocSet.has(n)) c.act((r) => refund(r, n));
-    else c.act((r) => allocate(r, n));
+    else passiveSound(c.act((r) => allocate(r, n)));
   };
   const onDown = (e: PointerEvent) => {
     const p = local(e);

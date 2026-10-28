@@ -6,6 +6,7 @@ import { DEFAULT_CLEAN, type CleanOpts } from '../run/found';
 import { ask } from './Confirm';
 import { itemTitle, rarityClass } from './ItemCard';
 import { loadPref, savePref } from './prefs';
+import { sfx } from './sound/engine';
 
 const RARITIES: [Rarity, string][] = [
   ['normal', 'Normal'],
@@ -58,6 +59,7 @@ export function CleanUp({ c, onClose }: { c: Controller; onClose: () => void }) 
     });
     if (!ok) return;
     c.craft((r) => applyClean(r, opts));
+    sfx('dust', s.count > 1 ? 'many' : 'one');
     onClose();
   };
   const check = (label: string, on: boolean, change: (v: boolean) => void) => (

@@ -37,6 +37,7 @@ import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
 import { useRehearsal } from './rehearsal';
+import { sfx } from './sound/engine';
 
 type Drag = { kind: 'inv'; uid: number } | { kind: 'slot'; slot: EquipSlot } | null;
 
@@ -241,10 +242,12 @@ export function Items({
       if (!ok || c.run !== run || !run.inventory.some((x) => x.uid === uid)) return;
     }
     const r = c.act((rn) => equip(rn, uid, slot));
+    if (r?.ok) sfx('equip');
     after(r, () => backToGear(slot));
   };
   const equipFlaskTo = (uid: number, idx: number) => {
     const r = c.act((rn) => equipFlask(rn, uid, idx));
+    if (r) sfx('equip');
     after(r === undefined ? undefined : { ok: !!r }, () => backToGear(`f${idx}`));
   };
   /** After a swap: back to the bag with the gear open and scrolled into view, the slot just filled lit for a moment. */
@@ -263,13 +266,15 @@ export function Items({
     if (!it) return;
     if (it.kind === 'item') {
       const slot = infos.get(uid)?.slot;
-      return slot && equipTo(uid, slot);
+      if (!slot) return sfx('denied');
+      return equipTo(uid, slot);
     }
     if (it.kind === 'flask') {
-      if (!infos.get(uid)?.equippable) return;
+      if (!infos.get(uid)?.equippable) return sfx('denied');
       return equipFlaskTo(uid, flaskTarget(run, it));
     }
     const r = c.act((rn) => quickEquip(rn, uid));
+    sfx(r?.ok ? 'equip' : 'denied');
     after(r, () => {
       setSel(null);
     });
@@ -333,6 +338,7 @@ export function Items({
     });
     if (!ok) return;
     c.craft((r) => salvageDiscarded(r));
+    sfx('dust', pile.length > 1 ? 'many' : 'one');
     setSel(null);
     if (view === 'discarded') setView('all');
   };
@@ -348,6 +354,7 @@ export function Items({
     });
     if (!ok) return;
     c.craft((r) => junk.forEach((x) => salvage(r, x.uid)));
+    sfx('dust', junk.length > 1 ? 'many' : 'one');
     setSel(null);
   };
   const step = (dir: -1 | 1) => {

@@ -7,6 +7,7 @@ import { installUpdateCheck } from './update';
 import { Controller } from './run/controller';
 import { App } from './ui/App';
 import { installUiScale } from './ui/uiScale';
+import { installSound } from './ui/sound/hooks';
 import { monsterPortrait } from './render/styles/grim/portrait';
 // The interface faces, shipped with the game (SIL Open Font License): Grenze for text, Jacquard 24 for headings.
 import '@fontsource/grenze/400.css';
@@ -49,6 +50,7 @@ installCrashLog(controller);
 installTelemetry(controller);
 installRivals(controller);
 installUpdateCheck(controller);
+installSound(controller);
 const game = createGame('app', controller.bus);
 render(h(App, { c: controller }), document.getElementById('ui')!);
 document.documentElement.classList.add('leaf');

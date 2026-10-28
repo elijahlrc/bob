@@ -23,6 +23,7 @@ import { ReprieveCard } from './Satchel';
 import { WareCard } from './WareCard';
 import { itemTitle, rarityClass } from './ItemCard';
 import { matchesTerms, searchTerms } from './search';
+import { sfx } from './sound/engine';
 
 /**
  * A stop's emblem: a few of the painted objects it deals in, standing in its niche (the empty middle of a stop card,
@@ -142,9 +143,14 @@ export function StopScreen({
 
   const take = () => {
     if (!choice) return;
+    const dust = run.dust;
     const res = c.takeStop(slot, choice);
-    if (!res.ok) setError(res.reason);
-    else onBack();
+    // Paying Bone Dust pours it; the other stops answer with the tap's own Press.
+    if (res.ok && run.dust < dust) sfx('dust');
+    if (!res.ok) {
+      sfx('denied');
+      setError(res.reason);
+    } else onBack();
   };
 
   return (

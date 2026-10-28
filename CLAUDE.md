@@ -57,6 +57,11 @@
   seats itself and camp guards a map with no skill (`src/ui/GemFlow.tsx`); first-time screens are remembered per device
   (`src/ui/intro.ts`, "Show the tips again" on the title), unlike the per-run `Tip`; plain words for terms live in
   `src/data/glossary.ts`. New UI that brings a new word should give it a line there.
+- **Sound** (2026-10-28): [docs/AUDIO.md](docs/AUDIO.md). Twelve sounds synthesised with Web Audio in `src/ui/sound/`
+  (`kit.ts` the building blocks, `recipes.ts` the sounds as the owner approved them by ear, `engine.ts` playback and
+  caps, `hooks.ts` what plays when); the rest of the UI calls `sfx(id, variant)`, and every enabled button sounds a
+  Press by itself (`data-sfx` picks another or "none"). **`SOUND_OPEN` in `data/constants.ts` shuts all of it** and
+  stays false until the first pass is done; `?sound` in the address opens it for one visit. Change a recipe only by ear.
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
   spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
   `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet

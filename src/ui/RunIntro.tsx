@@ -36,7 +36,7 @@ export function RunIntro({ onDone }: { onDone: () => void }) {
             </div>
           ))}
         </dl>
-        <button class="btn primary" onClick={done}>
+        <button class="btn primary" data-sfx="begin" onClick={done}>
           To camp
         </button>
       </div>
