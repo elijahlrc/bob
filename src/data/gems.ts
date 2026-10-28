@@ -6,6 +6,7 @@ import type { HexId } from './hexes';
 import type { StatusId } from './statuses';
 import type { SkillType } from './skillTypes';
 import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
+import { RETIRED_GEMS } from './retiredGems';
 
 /**
  * A value authored at gem level 1 and level 20 (DESIGN.md §11.5), or a table with one entry for each gem level from the first
@@ -770,7 +771,7 @@ export type SupportGemDef = {
   adds?: SkillType[];
   costMult: number;
   mods: GemMod[];
-  /** Raises the level of the skill it supports, by gem level (no support has used it since Exalted Focus was removed, 2026-10-28). */
+  /** Raises the level of the skill it supports, by gem level (only the retired Exalted Focus, in a rival's build). */
   levelBonus?: LevelValue;
   /** Trigger supports: the linked spells are cast by this trigger instead of by the player (its chance may grow with the level). */
   trigger?: Omit<TriggerDef, 'chance'> & { chance: LevelValue };
@@ -1882,14 +1883,21 @@ AURA_GEMS.push(...GEN_AURA_GEMS);
 
 /** Every gem that can drop. */
 export const ALL_GEMS: GemDef[] = [...ACTIVE_GEMS, ...SUPPORT_GEMS, HEXING_STRIKES, ...AURA_GEMS];
-const GEM_BY_ID = new Map<string, GemDef>([...ALL_GEMS, ...GRANTED_GEMS].map((g) => [g.id, g]));
+const GEM_BY_ID = new Map<string, GemDef>(
+  [...ALL_GEMS, ...GRANTED_GEMS, ...RETIRED_GEMS].map((g) => [g.id, g]),
+);
+const RETIRED_IDS = new Set(RETIRED_GEMS.map((g) => g.id));
 
 /** Gems that were folded into another: a saved run may still hold the old id. */
 const GEM_ALIASES: Record<string, string> = { cindering: 'kindle' };
 
-/** Whether this version has the gem: a saved run may hold one that was removed (`dropRetiredGems`). */
+/**
+ * Whether a run may hold the gem: this version has it and it is not retired. A saved run may hold one that is neither
+ * (`dropRetiredGems`); a retired gem still resolves with `gemDef`, for a rival's posted build.
+ */
 export function isGem(id: string): boolean {
-  return GEM_BY_ID.has(GEM_ALIASES[id] ?? id);
+  const key = GEM_ALIASES[id] ?? id;
+  return GEM_BY_ID.has(key) && !RETIRED_IDS.has(key);
 }
 
 export function gemDef(id: string): GemDef {

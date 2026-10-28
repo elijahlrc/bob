@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../core/rng';
-import { ACTIVE_GEMS, ALL_GEMS } from '../data/gems';
+import { ACTIVE_GEMS, ALL_GEMS, gemDef } from '../data/gems';
+import { Character } from '../calc/character';
+import { gemLevelReq } from '../calc/gems';
 import { ipViolations } from '../data/ipScan';
 import { hasReference, loadDenyList } from '../../scripts/coverage/reference';
 import { RIVAL_EPITHETS, RIVAL_PLACES, MAX_GENERATED_NAME } from '../data/rivalNames';
@@ -468,6 +470,16 @@ describe('checking a rival before it is shown', () => {
     const old = structuredClone(build);
     old.equipment.mainHand!.sockets[1] = { kind: 'gem', uid: 9002, gemId: 'cindering' };
     expect(validateRival(rowOf(recordOf(old)), SAVE_VERSION)).not.toBeNull();
+  });
+
+  it('accepts a build that holds a retired gem, and the gem still works in it', () => {
+    const build = withPrimaryGem(deadRun().build);
+    build.equipment.mainHand!.sockets[1] = { kind: 'gem', uid: 9002, gemId: 'exaltedFocus' };
+    expect(validateRival(rowOf(recordOf(build)), SAVE_VERSION)).not.toBeNull();
+    const ch = new Character(build);
+    expect(ch.primary.supports.map((s) => s.def.id)).toContain('exaltedFocus');
+    expect(gemLevelReq(gemDef('exaltedFocus'), 3)).toBe(45);
+    expect(ALL_GEMS.some((g) => g.id === 'exaltedFocus' || g.id === 'refineGem')).toBe(false);
   });
 
   it('skips a row with an id this version does not have, or a primary gem that is not socketed', () => {
