@@ -60,8 +60,8 @@
 - **Sound** (2026-10-28): [docs/AUDIO.md](docs/AUDIO.md). Twelve sounds synthesised with Web Audio in `src/ui/sound/`
   (`kit.ts` the building blocks, `recipes.ts` the sounds as the owner approved them by ear, `engine.ts` playback and
   caps, `hooks.ts` what plays when); the rest of the UI calls `sfx(id, variant)`, and every enabled button sounds a
-  Press by itself (`data-sfx` picks another or "none"). **`SOUND_OPEN` in `data/constants.ts` shuts all of it** and
-  stays false until the first pass is done; `?sound` in the address opens it for one visit. Change a recipe only by ear.
+  Press by itself (`data-sfx` picks another or "none"). **`SOUND_OPEN` in `data/constants.ts` shuts all of it** when
+  false (open since 2026-10-28; with it shut, `?sound` in the address opens it for one visit). Change a recipe only by ear.
   The music is `music.ts` (one layered piece blended by an intensity, `musicIntensity` in `hooks.ts`), also changed
   only by ear; judge a change from offline renders measured through a 150 Hz high-pass and from spectrograms.
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,

@@ -44,9 +44,10 @@ map report (K1, covered by Cleared).
   - `hooks.ts`: what plays when (the wiring below). `sfx(id, variant?)` is the one call the rest of the UI makes.
 - **Settings:** Sound, with Off, Quiet, Normal and Loud, beside the interface size wherever that is offered (title
   and camp), saved with `prefs.ts` (`SoundSettings.tsx`). Music gets its own setting when there is music.
-- **The switch:** `SOUND_OPEN` in `src/data/constants.ts` shuts all of it (the owner, 2026-10-28: the first pass may be
-  committed half done and must then be silent). Shut, no AudioContext is made, nothing renders, nothing plays and the
-  setting is hidden. `?sound` in the address opens it for one visit, to try it.
+- **The switch:** `SOUND_OPEN` in `src/data/constants.ts` shuts all of it when false, as it was while the first pass
+  was built (the owner, 2026-10-28: half-done work had to be committable and silent). Shut, no AudioContext is made,
+  nothing renders, nothing plays and the settings are hidden; `?sound` in the address opens it for one visit. Opened
+  in the build on 2026-10-28 (the owner).
 
 ### How the engine behaves
 
