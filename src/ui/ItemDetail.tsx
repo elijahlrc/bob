@@ -1,36 +1,45 @@
 import type { ComponentChildren } from 'preact';
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { SheetDiff } from '../calc/character';
+import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { CRAFTING_OPEN } from '../data/constants';
-import type { Build, EquipSlot, FlaskItem, GemItem, InventoryItem, Item } from '../data/types';
 import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
-import { joinNames } from '../run/socketText';
+import type { EquipSlot, FlaskItem, GemItem, InventoryItem, Item } from '../data/types';
 import { salvageValue } from '../run/craft';
+import { slotsFor, type EquipCheck, type SocketOutcome } from '../run/inventory';
 import {
   compareFlasks,
   compareSlots,
-  type SocketRef,
+  slotName,
   type FlaskCompare,
   type ItemInfo,
   type SlotCompare,
 } from '../run/inventoryOps';
-import type { EquipCheck, SocketOutcome } from '../run/inventory';
 import type { RunState } from '../run/run';
-import { ItemCard, itemTitle, lineMarks, rarityClass, Stones } from './ItemCard';
+import { joinNames, socketBrief, socketsMatter } from '../run/socketText';
+import { modsText } from '../mods/text';
+import { triggerText } from '../data/triggers';
+import {
+  armourLine,
+  flaskBaseLines,
+  ItemCard,
+  itemTitle,
+  NamePlaque,
+  rarityClass,
+  reqText,
+  Stones,
+  weaponLine,
+} from './ItemCard';
 import { infoProps } from './info';
-import { DiffLines } from './DiffCard';
-import { diffRows, type DiffRow } from './itemDiff';
-import { SocketsRow } from './SocketPips';
-import { SocketPicker } from './SocketPicker';
+import { compareGroups, type CompareRow } from './itemDiff';
+import { SocketPips } from './SocketPips';
 
 export type Sel =
   | { from: 'inv'; uid: number }
   | { from: 'pile'; uid: number }
   | { from: 'slot'; slot: EquipSlot }
   | { from: 'flask'; idx: number };
-
-/** What the last action did; `depth` is the undo depth it was said at (the line goes stale when that moves). */
 
 /** "Needs 40 int, you have 28" from a failed check. */
 export function whyNot(check: EquipCheck): string {
@@ -78,7 +87,7 @@ function Big({ v, label }: { v: number; label: string }) {
   );
 }
 
-/** What wearing the item does to the character, on a plaque: damage and effective HP large, then the rest. */
+/** What a change does to the character, on a plaque: damage and effective HP large, then the rest (the Workbench's result). */
 export function Delta({ d, dpsPct, ehpPct }: { d: SheetDiff; dpsPct: number; ehpPct: number }) {
   return (
     <div class="ix-delta" data-paint="panel" data-field="porphyry" data-thin>
@@ -105,9 +114,8 @@ type Actions = {
   onFavourite: (uid: number) => void;
   onDiscard: (uid: number) => void;
   onPutBack: (uid: number) => void;
+  /** Go to the Skills tab with this bag gem picked, to socket it there. */
   onSocket: (uid: number) => void;
-  /** Put this gem in that socket. */
-  onSocketAt: (uid: number, ref: SocketRef) => void;
   onCraft: (uid: number) => void;
   /** Open the Skills tab at this slot's sockets. */
   onEditGems?: (slot: EquipSlot) => void;
@@ -122,72 +130,13 @@ type Props = Actions & {
   selected: InventoryItem | null;
   info: ItemInfo | undefined;
   favourite: boolean;
-  upgrades: number;
-  onBestUpgrade: () => void;
-  /** Where the picked item is aimed (lifted to the Items tab, so the reliquary and the tabs agree). */
+  /** Where the picked bag item is compared (a lit slot on the reliquary, or a tab); unset, the best one. */
   aimSlot: EquipSlot | null;
   aimFlask: number | null;
-  /** The item just taken off by a swap (its leaf is captioned so). */
-  justOff: number | null;
   onAim: (slot: EquipSlot | undefined, idx: number | undefined) => void;
   coarse: boolean;
   phone: boolean;
 };
-
-/** The one way to get rid of something: put it aside in the discarded pile (it can be put back, or salvaged with the rest). */
-function DiscardButton({ it, a }: { it: InventoryItem; a: Actions }) {
-  return (
-    <button class="btn small danger" onClick={() => a.onDiscard(it.uid)}>
-      Discard
-    </button>
-  );
-}
-
-/** The card of the item and the one it would replace, side by side, with what differs marked. */
-function Pair({
-  item,
-  against,
-  empty,
-  build,
-  fresh = 'New',
-}: {
-  item: Item | FlaskItem;
-  against?: Item | FlaskItem;
-  empty: string;
-  build?: Build;
-  /** The new leaf's caption. */
-  fresh?: string;
-}) {
-  return (
-    <div class="ix-pair">
-      {/* What each leaf is to you sits on the gold above it: not a property of the item. */}
-      <div class="ix-side">
-        <div class="ix-cap" data-paint="panel" data-thin>
-          {fresh}
-        </div>
-        <div class="ix-leaf" data-paint="panel">
-          <ItemCard it={item} build={build} marks={lineMarks(item, against, 'new')} />
-        </div>
-      </div>
-      <span class="ix-hinge" aria-hidden="true">
-        <i data-paint="chain" />
-        <i data-paint="chain" />
-      </span>
-      <div class="ix-side">
-        <div class="ix-cap" data-paint="panel" data-thin>
-          {empty}
-        </div>
-        <div class="ix-leaf" data-paint="panel">
-          {against ? (
-            <ItemCard it={against} marks={lineMarks(against, item, 'old')} />
-          ) : (
-            <div class="item-card empty-card muted">Nothing worn here.</div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 /** One signed change, the way the bag's rows say it: "▼22% DPS", "▲7% EHP"; nothing when it does not move. */
 function Signed({ v, label }: { v: number; label: string }) {
@@ -205,10 +154,10 @@ function Signed({ v, label }: { v: number; label: string }) {
 function tabGems(o: SocketOutcome): string {
   if (o.out.length) return `⚠ ${o.out.length} gem${o.out.length > 1 ? 's' : ''} out`;
   if (o.idle.length) return '⚠ a gem idles';
-  if (o.before.filled || o.after.filled) return 'gems stay';
-  return 'no gems';
+  return '';
 }
 
+/** A tab for each slot the item fits, with what it would do there. */
 function SlotTabs({
   slots,
   active,
@@ -235,9 +184,8 @@ function SlotTabs({
           {s.check.ok ? (
             <span class="ix-tab-d">
               <Signed v={s.dpsPct} label="DPS" /> <Signed v={s.ehpPct} label="EHP" />
-              {(s.sockets.out.length > 0 || s.sockets.idle.length > 0) && (
-                <span class="warn"> {tabGems(s.sockets)}</span>
-              )}
+              {!Math.round(s.dpsPct) && !Math.round(s.ehpPct) && <span class="muted">±0%</span>}
+              {tabGems(s.sockets) && <span class="warn"> {tabGems(s.sockets)}</span>}
             </span>
           ) : (
             <span class="ix-tab-d down">can't</span>
@@ -248,202 +196,6 @@ function SlotTabs({
   );
 }
 
-/** The actions of a selected bag item. On a phone they are one compact row, with the peek/full switch at its end. */
-function ActionRow({
-  swap,
-  title,
-  disabled,
-  onSwap,
-  a,
-  it,
-  favourite,
-  craft,
-  phone,
-  full,
-  setFull,
-}: {
-  swap: string;
-  title?: string;
-  disabled: boolean;
-  onSwap: () => void;
-  a: Actions;
-  it: InventoryItem;
-  favourite: boolean;
-  craft?: Item;
-  phone: boolean;
-  full: boolean;
-  setFull: (f: boolean) => void;
-}) {
-  return (
-    <div class="item-actions ix-actions">
-      <button class="btn primary" disabled={disabled} title={title} onClick={onSwap}>
-        {swap}
-      </button>
-      <button
-        class="btn small"
-        aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
-        onClick={() => a.onFavourite(it.uid)}
-      >
-        {phone ? (favourite ? '★' : '☆') : favourite ? '★ Favourite' : '☆ Favourite'}
-      </button>
-      {craft && CRAFTING_OPEN && (
-        <button class="btn small" onClick={() => a.onCraft(craft.uid)} disabled={!!craft.sealed}>
-          Craft…
-        </button>
-      )}
-      <DiscardButton it={it} a={a} />
-      {phone && (
-        <button
-          class="btn small ix-expand"
-          aria-label={full ? 'Show less' : 'Show everything'}
-          aria-expanded={full}
-          onClick={() => setFull(!full)}
-        >
-          {full ? '▾' : '▴'}
-        </button>
-      )}
-    </div>
-  );
-}
-
-/**
- * The phone's compare (docs/EQUIP.md 3.4). The peek opens on the lines that change and what happens to the gems; the full view adds
- * the calculated changes, the gems by name and the whole card, one merged card with the old values beside the new ones.
- */
-function PhoneCompare({
-  it,
-  against,
-  rows,
-  full,
-  build,
-  extra,
-  sockets,
-}: {
-  it: Item | FlaskItem;
-  against: Item | FlaskItem | undefined;
-  rows: DiffRow[];
-  full: boolean;
-  build: Build;
-  /** The calculated changes, on their plaque. */
-  extra?: ComponentChildren;
-  sockets?: ComponentChildren;
-}) {
-  // The result first; then the changed lines (the peek) or both cards, the worn one always in sight (the full view).
-  if (!full)
-    return (
-      <>
-        {extra}
-        <DiffLines rows={rows} />
-        {sockets}
-      </>
-    );
-  return (
-    <>
-      {extra}
-      {sockets}
-      <Pair item={it} against={against} empty="Worn" build={build} />
-    </>
-  );
-}
-
-/** What the wear button says: "Wear in Off hand", "Wear as Ring 1". */
-const wearLabel = (label: string) =>
-  /^Ring/.test(label) ? `Wear as ${label}` : `Wear in ${label}`;
-
-function ItemBody({
-  run,
-  item,
-  a,
-  favourite,
-  phone,
-  full,
-  setFull,
-  aim,
-  onAim,
-  justOff,
-}: {
-  run: RunState;
-  item: Item;
-  a: Actions;
-  favourite: boolean;
-  phone: boolean;
-  full: boolean;
-  setFull: (f: boolean) => void;
-  /** The slot the item is aimed at (a lit slot on the reliquary, or a tab); unset, the best one. */
-  aim: EquipSlot | null;
-  onAim: (slot: EquipSlot) => void;
-  /** The item was just taken off for the one now worn: its leaf says so. */
-  justOff: boolean;
-}) {
-  const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
-  const best = slots.find((s) => s.best) ?? slots[0];
-  const active = (aim && slots.find((s) => s.slot === aim)) || best;
-  if (!active) return null;
-  const ok = active.check.ok;
-  const chips =
-    ok && active.delta ? (
-      <Delta d={active.delta} dpsPct={active.dpsPct} ehpPct={active.ehpPct} />
-    ) : null;
-  const sockets = ok ? (
-    <SocketsRow
-      was={active.equipped}
-      o={active.sockets}
-      primary={run.build.primaryGem}
-      names={!phone || full}
-    />
-  ) : null;
-  const action = (
-    <ActionRow
-      swap={wearLabel(active.label)}
-      title={ok ? `Into ${active.label}` : whyNot(active.check)}
-      disabled={!ok}
-      onSwap={() => a.onEquip(item.uid, active.slot)}
-      a={a}
-      it={item}
-      favourite={favourite}
-      craft={item}
-      phone={phone}
-      full={full}
-      setFull={setFull}
-    />
-  );
-  return (
-    <>
-      {/* On a wider screen the reliquary's lit slots aim the item; the tabs are a phone's way. */}
-      {phone && <SlotTabs slots={slots} active={active.slot} pick={onAim} />}
-      {!ok && (
-        <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
-          {whyNot(active.check)}
-        </div>
-      )}
-      {phone ? (
-        <PhoneCompare
-          it={item}
-          against={active.equipped}
-          rows={diffRows(item, active.equipped)}
-          full={full}
-          build={run.build}
-          extra={chips}
-          sockets={sockets}
-        />
-      ) : (
-        <>
-          {chips}
-          {sockets}
-          <Pair
-            item={item}
-            against={active.equipped}
-            empty={`Worn: ${active.label}`}
-            fresh={justOff ? 'Just taken off' : 'New'}
-          />
-          {action}
-        </>
-      )}
-      {phone && action}
-    </>
-  );
-}
-
 /** A flask slot's tab: the kind of flask in it ("Life", "Mana", "Hybrid"), a utility flask's first word ("Haste"). */
 function flaskTab(f: FlaskItem | null | undefined): string {
   if (!f) return 'Empty';
@@ -451,163 +203,476 @@ function flaskTab(f: FlaskItem | null | undefined): string {
   return b.kind === 'utility' ? b.name.split(' ')[0] : b.kind[0].toUpperCase() + b.kind.slice(1);
 }
 
-function FlaskBody({
+/** The base's own numbers in boxes of their own: a weapon's damage, speed and crit, or the defences. */
+function KeyNumbers({ it }: { it: Item }) {
+  const w = weaponLine(it);
+  const cells: { v: string; l: string; aug: boolean }[] = [];
+  if (w) {
+    cells.push(
+      { v: w.phys.replace(' physical', ''), l: 'physical damage', aug: w.aug[0] },
+      { v: w.speed.replace(' APS', ''), l: 'attacks a second', aug: w.aug[1] },
+      { v: w.crit.replace(' crit', ''), l: 'critical chance', aug: w.aug[2] },
+    );
+    for (const e of w.extra) {
+      const [v, type] = e.split(' ');
+      cells.push({ v, l: `${type} added`, aug: true });
+    }
+  }
+  for (const p of armourLine(it) ?? []) {
+    const i = p.text.indexOf(' ');
+    cells.push({ v: p.text.slice(0, i), l: p.text.slice(i + 1), aug: p.aug });
+  }
+  if (!cells.length) return null;
+  return (
+    <div class="ix-nums">
+      {cells.map((c, i) => (
+        <div key={i} class={'ix-num' + (c.aug ? ' aug' : '')}>
+          <b>{c.v}</b>
+          <span>{c.l}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Lines of one group (what the base gives, or what the affixes give). */
+function Lines({ lines, cls }: { lines: string[]; cls: string }) {
+  if (!lines.length) return null;
+  return (
+    <div class="ix-lines">
+      {lines.map((l, i) => (
+        <div key={i} class={'ic-mod ' + cls}>
+          {l}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Everything about one item, laid out (docs/ITEM-SLOTS.md 2.2): its name, base and kind, its base's numbers in boxes, what
+ * wearing it takes, its sockets, then the stats its base gives and, below a line, those its affixes give.
+ */
+function ItemSheet({
+  it,
   run,
-  flask,
-  a,
-  favourite,
-  phone,
-  full,
-  setFull,
-  aim,
-  onAim,
+  bad,
+  worn,
 }: {
+  it: InventoryItem;
   run: RunState;
-  flask: FlaskItem;
-  a: Actions;
-  favourite: boolean;
-  phone: boolean;
-  full: boolean;
-  setFull: (f: boolean) => void;
-  aim: number | null;
-  onAim: (idx: number) => void;
+  /** Why it cannot be worn, said beside its requirements. */
+  bad?: string;
+  /** A worn item names the gems in its sockets. */
+  worn?: boolean;
 }) {
-  const slots = useMemo(() => compareFlasks(run, flask.uid), [run.build, run.inventory, flask.uid]);
-  const chosen = slots.find((s) => s.chosen) ?? slots[0];
-  const active: FlaskCompare = (aim !== null && slots.find((s) => s.idx === aim)) || chosen;
+  if (it.kind === 'gem')
+    return (
+      <div class="ix-sheet">
+        <ItemCard it={it} build={run.build} />
+      </div>
+    );
+  if (it.kind === 'flask') {
+    const b = flaskBase(it.baseId);
+    return (
+      <div class="ix-sheet">
+        <NamePlaque it={it} name={it.name} />
+        <div class="muted">
+          Requires level {b.level} · {b.perUse}/{b.maxCharges} charges · {b.duration} s
+        </div>
+        <Lines lines={flaskBaseLines(it)} cls="implicit" />
+        <Lines lines={it.affixes.flatMap((a) => modsText(a.mods))} cls="explicit" />
+      </div>
+    );
+  }
+  const b = itemBase(it.baseId);
+  const all = [...it.affixes.flatMap((a) => a.mods), ...(it.uniqueMods ?? [])];
+  const gems = it.sockets.filter((g): g is GemItem => g !== null);
+  return (
+    <div class="ix-sheet">
+      <NamePlaque it={it} name={it.name} />
+      {(it.name !== b.name || isWeaponClass(b.itemClass)) && (
+        <div class="ic-base">
+          {[
+            it.name !== b.name ? b.name : '',
+            isWeaponClass(b.itemClass) ? WEAPON_TYPE_NAME[b.itemClass] : '',
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+        </div>
+      )}
+      <KeyNumbers it={it} />
+      <div class={bad ? 'ix-req bad' : 'ix-req muted'}>
+        Requires {reqText(it)} · item level {it.ilvl}
+        {bad && <div>{bad}</div>}
+      </div>
+      {it.sockets.length > 0 && (
+        <div class="ix-socks">
+          <Stones sockets={it.sockets} />
+          {worn && gems.length > 0 && (
+            <span class="ix-gemnames">
+              {joinNames(
+                gems.map(
+                  (g) => (g.uid === run.build.primaryGem ? '★ ' : '') + gemDef(g.gemId).name,
+                ),
+              )}
+            </span>
+          )}
+        </div>
+      )}
+      <Lines lines={modsText(it.implicits)} cls="implicit" />
+      <Lines
+        lines={[
+          ...modsText(all.filter((m) => m.kind !== 'flag')),
+          ...modsText(all.filter((m) => m.kind === 'flag')),
+          ...(it.uniqueTriggers ?? []).map((t) => triggerText(t)),
+        ]}
+        cls="explicit"
+      />
+    </div>
+  );
+}
+
+/** What wearing a bag item would do, for the page's header: the slot only when it fits more than one ("Ring 1: ▲5% EHP"). */
+function Verdict({ it, info }: { it: InventoryItem; info: ItemInfo }) {
+  if (it.kind === 'gem') return <span class="ix-where" />;
+  if (it.kind === 'flask') {
+    if (info.fillsFlask) return <span class="ix-where ix-verdict up">▲ empty flask slot</span>;
+    if (info.flaskSlot !== undefined)
+      return <span class="ix-where ix-verdict up">▲ upgrades flask {info.flaskSlot + 1}</span>;
+    return <span class="ix-where" />;
+  }
+  if (!info.equippable)
+    return (
+      <span class="ix-where ix-verdict">
+        <span class="down">can't use</span>
+      </span>
+    );
+  const parts: ComponentChildren[] = [];
+  const d = Math.round(info.dpsPct);
+  const e = Math.round(info.ehpPct);
+  if (d) parts.push(<Signed v={info.dpsPct} label="DPS" />);
+  if (e) parts.push(<Signed v={info.ehpPct} label="EHP" />);
+  if (!d && !e) parts.push(<span class="muted">no change</span>);
+  if (info.gemsOut.length)
+    parts.push(
+      <span class="warn">
+        ⚠ {info.gemsOut.length} gem{info.gemsOut.length > 1 ? 's' : ''} out
+      </span>,
+    );
+  if (info.skillsIdle.length)
+    parts.push(<span class="warn">⚠ {gemDef(info.skillsIdle[0].gemId).name} stops</span>);
+  return (
+    <span class="ix-where ix-verdict">
+      {slotsFor(it).length > 1 && info.slot && <span class="muted">{slotName(info.slot)}: </span>}
+      {parts.map((p, i) => (
+        <span key={i}>
+          {i > 0 && <span class="muted">{' · '}</span>}
+          {p}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/** The change a swap makes, for the header: "▲4% DPS · ▼1% EHP", or "no change". */
+function Change({ dps, ehp }: { dps: number; ehp: number }) {
+  if (!Math.round(dps) && !Math.round(ehp)) return <span class="muted">no change</span>;
   return (
     <>
-      {phone && (
-        <div class="ix-tabs" role="tablist" aria-label="Flask slot">
-          {slots.map((s) => (
-            <button
-              key={s.idx}
-              role="tab"
-              aria-selected={s.idx === active.idx}
-              class={'ix-tab ix-ftab' + (s.idx === active.idx ? ' on' : '')}
-              data-paint="panel"
-              data-thin
-              data-field={s.idx === active.idx ? 'gold' : undefined}
-              aria-label={`Flask ${s.idx + 1}`}
-              onClick={() => onAim(s.idx)}
-            >
-              <b>{flaskTab(s.equipped)}</b>
-            </button>
-          ))}
-        </div>
-      )}
-      {phone ? (
-        <PhoneCompare
-          it={flask}
-          against={active.equipped ?? undefined}
-          rows={diffRows(flask, active.equipped ?? undefined)}
-          full={full}
-          build={run.build}
-        />
-      ) : (
-        <Pair
-          item={flask}
-          against={active.equipped ?? undefined}
-          empty={`Worn: Flask ${active.idx + 1}`}
-          build={run.build}
-        />
-      )}
-      {!active.ok && (
-        <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
-          {active.reason}.
-        </div>
-      )}
-      <ActionRow
-        swap={`Carry as Flask ${active.idx + 1}`}
-        title={`Into Flask ${active.idx + 1}`}
-        disabled={!active.ok}
-        onSwap={() => a.onEquipFlask(flask.uid, active.idx)}
-        a={a}
-        it={flask}
-        favourite={favourite}
-        phone={phone}
-        full={full}
-        setFull={setFull}
-      />
+      <Signed v={dps} label="DPS" />
+      {Math.round(dps) !== 0 && Math.round(ehp) !== 0 && <span class="muted">{' · '}</span>}
+      <Signed v={ehp} label="EHP" />
     </>
   );
 }
 
-/** The gems a worn item holds, by name, and the way to the Skills tab to change them. */
-function WornGems({
-  it,
+/** The sockets before and after a swap, and what happens to the gems, on one line. */
+function SocketLine({
+  was,
+  o,
   primary,
-  onEdit,
 }: {
-  it: Item;
+  was: Item | undefined;
+  o: SocketOutcome;
   primary: number | undefined;
-  onEdit: () => void;
 }) {
-  if (it.sockets.length === 0) return null;
-  const gems = it.sockets.filter((g): g is GemItem => g !== null);
-  const free = it.sockets.length - gems.length;
+  if (!socketsMatter(o)) return null;
+  const note = socketBrief(o, primary);
   return (
-    <div class="ix-worngems" data-paint="panel" data-thin>
-      <Stones sockets={it.sockets} />
-      <span class="ix-note">
-        {gems.length
-          ? joinNames(gems.map((g) => (g.uid === primary ? '★ ' : '') + gemDef(g.gemId).name))
-          : 'No gems'}
-        {free > 0 ? ` · ${free} free socket${free === 1 ? '' : 's'}` : ''}
-      </span>
-      <button class="btn small" onClick={onEdit}>
-        Edit gems →
-      </button>
+    <div class="ix-sline">
+      {was?.sockets.length ? (
+        <SocketPips sockets={was.sockets} primary={primary} />
+      ) : (
+        <span class="muted">none</span>
+      )}
+      <span aria-hidden="true">→</span>
+      <SocketPips sockets={o.placed} primary={primary} out={o.out} />
+      {note.text && (
+        <span class={'ix-sk-note ' + note.severity} role="status">
+          {note.severity === 'good' ? '' : '⚠ '}
+          {note.text}
+        </span>
+      )}
     </div>
   );
 }
 
-/** The panel for what is selected: a carried item with its comparison per slot, a worn item, a flask, a gem, or a guide. */
-export function ItemDetail(p: Props) {
-  const { run, sel, selected } = p;
-  // The phone sheet opens on a peek of the answer; the full view is one tap (or the grab bar) away.
-  const [full, setFull] = useState(false);
-  const a: Actions = p;
-  const head = (title: string, cls: string, star?: number) => (
-    <div class="ix-head">
-      {p.phone && (
-        <button
-          class="ix-grab"
-          aria-label={full ? 'Show less' : 'Show everything'}
-          onClick={() => setFull(!full)}
-        />
-      )}
-      <span class={'ix-title ' + cls}>{title}</span>
-      {p.phone && (
-        <>
-          <button class="btn small" aria-label="Previous item" onClick={() => a.onStep(-1)}>
-            ◂
-          </button>
-          <button class="btn small" aria-label="Next item" onClick={() => a.onStep(1)}>
-            ▸
-          </button>
-        </>
-      )}
-      {star !== undefined && (
-        <button
-          class={'ix-star' + (p.favourite ? ' on' : '')}
-          aria-label={p.favourite ? 'Remove from favourites' : 'Add to favourites'}
-          onClick={() => a.onFavourite(star)}
-        >
-          {p.favourite ? '★' : '☆'}
-        </button>
-      )}
-      <button class="sheet-x ix-close" aria-label="Close" onClick={a.onClose}>
-        ×
-      </button>
+const MARK_A: Record<CompareRow['mark'], string> = {
+  same: '',
+  better: 'gain',
+  worse: 'lost',
+  apart: 'gain',
+};
+
+/**
+ * The two items side by side (docs/ITEM-SLOTS.md 2.3): what each is, then the stats its base gives, then those its affixes
+ * give. A stat both have is one row; the rest fill the rows beside each other.
+ */
+function CompareGrid({
+  it,
+  worn,
+  label,
+}: {
+  it: Item | FlaskItem;
+  worn: Item | FlaskItem | undefined;
+  label: string;
+}) {
+  const g = compareGroups(it, worn);
+  const none = <span class="none">—</span>;
+  const sub = (x: Item | FlaskItem) => {
+    if (x.kind === 'flask') {
+      const b = flaskBase(x.baseId);
+      return `Requires level ${b.level} · ${b.perUse}/${b.maxCharges} charges · ${b.duration} s`;
+    }
+    const b = itemBase(x.baseId);
+    return [
+      x.name !== b.name ? b.name : '',
+      isWeaponClass(b.itemClass) ? WEAPON_TYPE_NAME[b.itemClass] : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  };
+  const req = (x: Item | FlaskItem) =>
+    x.kind === 'item' ? `Requires ${reqText(x)} · ilvl ${x.ilvl}` : '';
+  const sockets = (x: Item | FlaskItem | undefined) =>
+    x?.kind === 'item' && x.sockets.length ? <Stones sockets={x.sockets} /> : null;
+  const rows = (list: CompareRow[]) =>
+    list.map((r, i) => [
+      <div key={`a${i}`} class={MARK_A[r.mark]}>
+        {r.a ?? ''}
+      </div>,
+      <div key={`b${i}`} class={r.mark === 'apart' ? 'lost' : ''}>
+        {r.b ?? ''}
+      </div>,
+    ]);
+  return (
+    <div class="ix-cmp">
+      <div class="cap">New</div>
+      <div class="cap">{worn ? `Worn: ${label}` : `${label}: nothing worn`}</div>
+      <div class={'nm ' + rarityClass(it)}>{itemTitle(it)}</div>
+      <div class={worn ? 'nm ' + rarityClass(worn) : ''}>{worn ? itemTitle(worn) : none}</div>
+      {(sub(it) || (worn && sub(worn))) && [
+        <div key="sa" class="lbl">
+          {sub(it) || none}
+        </div>,
+        <div key="sb" class="lbl">
+          {worn ? sub(worn) || none : none}
+        </div>,
+      ]}
+      {req(it) && [
+        <div key="ra" class="lbl">
+          {req(it)}
+        </div>,
+        <div key="rb" class="lbl">
+          {worn ? req(worn) : none}
+        </div>,
+      ]}
+      {(sockets(it) || sockets(worn)) && [
+        <div key="ka">{sockets(it) ?? <span class="none">no sockets</span>}</div>,
+        <div key="kb">{sockets(worn) ?? <span class="none">no sockets</span>}</div>,
+      ]}
+      {g.base.length > 0 && <div class="sec" />}
+      {rows(g.base)}
+      {g.affix.length > 0 && <div class="sec" />}
+      {rows(g.affix)}
     </div>
   );
+}
+
+/** "Wear in Off hand", "Wear as Ring 1" for an empty slot; "Swap into Body" for one with an item in it. */
+const wearLabel = (label: string, worn: boolean) =>
+  worn ? `Swap into ${label}` : /^Ring/.test(label) ? `Wear as ${label}` : `Wear in ${label}`;
+
+/** The compare of a bag item with what each slot it fits holds, and the swap. */
+function ItemCompare({
+  run,
+  item,
+  aim,
+  onAim,
+  a,
+}: {
+  run: RunState;
+  item: Item;
+  aim: EquipSlot | null;
+  onAim: (slot: EquipSlot) => void;
+  a: Actions;
+}) {
+  const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
+  const best = slots.find((s) => s.best) ?? slots[0];
+  const active = (aim && slots.find((s) => s.slot === aim)) || best;
+  if (!active) return null;
+  const ok = active.check.ok;
+  return (
+    <Page
+      head={
+        <span class="ix-where ix-verdict">
+          {ok ? (
+            <Change dps={active.dpsPct} ehp={active.ehpPct} />
+          ) : (
+            <span class="down">can't</span>
+          )}
+        </span>
+      }
+      back="‹ Item"
+      a={a}
+      bar={
+        <>
+          <button
+            class="btn primary"
+            disabled={!ok}
+            onClick={() => a.onEquip(item.uid, active.slot)}
+          >
+            {wearLabel(active.label, !!active.equipped)}
+          </button>
+          {!ok && <span class="ix-why">{whyNot(active.check)}</span>}
+        </>
+      }
+    >
+      <SlotTabs slots={slots} active={active.slot} pick={onAim} />
+      {ok ? (
+        <SocketLine was={active.equipped} o={active.sockets} primary={run.build.primaryGem} />
+      ) : (
+        <div class="warn ix-warn" data-paint="panel" data-field="vermilion" data-thin>
+          {whyNot(active.check)}
+        </div>
+      )}
+      <CompareGrid it={item} worn={active.equipped} label={active.label} />
+    </Page>
+  );
+}
+
+/** The compare of a bag flask with each flask slot, and the swap. */
+function FlaskCompareView({
+  run,
+  flask,
+  aim,
+  onAim,
+  a,
+}: {
+  run: RunState;
+  flask: FlaskItem;
+  aim: number | null;
+  onAim: (idx: number) => void;
+  a: Actions;
+}) {
+  const slots = useMemo(() => compareFlasks(run, flask.uid), [run.build, run.inventory, flask.uid]);
+  const chosen = slots.find((s) => s.chosen) ?? slots[0];
+  const active: FlaskCompare = (aim !== null && slots.find((s) => s.idx === aim)) || chosen;
+  const label = `Flask ${active.idx + 1}`;
+  return (
+    <Page
+      head={<span class="ix-where">Compare</span>}
+      back="‹ Item"
+      a={a}
+      bar={
+        <>
+          <button
+            class="btn primary"
+            disabled={!active.ok}
+            onClick={() => a.onEquipFlask(flask.uid, active.idx)}
+          >
+            {active.equipped ? `Swap into ${label}` : `Carry as ${label}`}
+          </button>
+          {!active.ok && <span class="ix-why">{active.reason}.</span>}
+        </>
+      }
+    >
+      <div class="ix-tabs" role="tablist" aria-label="Flask slot">
+        {slots.map((s) => (
+          <button
+            key={s.idx}
+            role="tab"
+            aria-selected={s.idx === active.idx}
+            class={'ix-tab ix-ftab' + (s.idx === active.idx ? ' on' : '')}
+            data-paint="panel"
+            data-thin
+            data-field={s.idx === active.idx ? 'gold' : undefined}
+            aria-label={`Flask ${s.idx + 1}`}
+            onClick={() => onAim(s.idx)}
+          >
+            <b>{flaskTab(s.equipped)}</b>
+          </button>
+        ))}
+      </div>
+      <CompareGrid it={flask} worn={active.equipped ?? undefined} label={label} />
+    </Page>
+  );
+}
+
+/** The frame of the item page and the compare: a header, the body that scrolls, the bar of actions always in sight. */
+function Page({
+  head,
+  back,
+  a,
+  bar,
+  extra,
+  children,
+}: {
+  head: ComponentChildren;
+  back: string;
+  a: Actions & { onBack?: () => void };
+  bar: ComponentChildren;
+  /** More controls at the right of the header (previous/next, the favourite star). */
+  extra?: ComponentChildren;
+  children: ComponentChildren;
+}) {
+  return (
+    <div class="ix-detail ix-page">
+      <div class="ix-phead">
+        <button class="btn small ix-back" onClick={a.onBack ?? a.onClose}>
+          {back}
+        </button>
+        {head}
+        {extra}
+      </div>
+      <div class="ix-pbody">{children}</div>
+      <div class="ix-pbar">{bar}</div>
+    </div>
+  );
+}
+
+/**
+ * What is selected, as a page (docs/ITEM-SLOTS.md): everything about the item, with Compare (a bag item), Socket (a gem),
+ * Take off (a worn item) or Put back (a discarded one); Compare shows the item beside what it would replace, with the swap.
+ * On a phone the page covers the tab; on a wider screen it is the middle column.
+ */
+export function ItemDetail(p: Props) {
+  const { run, sel, selected } = p;
+  const [compare, setCompare] = useState(false);
+  const key = sel ? JSON.stringify(sel) : '';
+  useEffect(() => setCompare(false), [key]);
+  // A lit slot on the reliquary (a wider screen) compares the picked item with what that slot holds.
+  useEffect(() => {
+    if (p.aimSlot !== null || p.aimFlask !== null) setCompare(true);
+  }, [p.aimSlot, p.aimFlask]);
+  const a: Actions = p;
   if (!sel || !selected) {
+    // The keys, for a keyboard; the empty column needs no instructions.
     return (
       <div class="ix-detail ix-empty">
-        <div class="ix-guide">
-          {/* The keys, for a keyboard; the empty column needs no instructions. */}
-          {!p.coarse && (
+        {!p.coarse && (
+          <div class="ix-guide">
             <span
               class="ix-keys"
               {...infoProps(
@@ -616,128 +681,146 @@ export function ItemDetail(p: Props) {
             >
               ?
             </span>
-          )}
-          {p.upgrades > 0 && (
-            <button class="btn primary" onClick={p.onBestUpgrade}>
-              {p.upgrades} upgrade{p.upgrades > 1 ? 's' : ''} in the bag: show the best
-            </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
-
-  if (sel.from === 'pile') {
-    return (
-      <div class="ix-detail">
-        {head(itemTitle(selected), rarityClass(selected))}
-        <div class="ix-body">
-          <ItemCard it={selected} build={run.build} />
-          <div class="item-actions ix-actions">
-            <button class="btn primary" onClick={() => a.onPutBack(selected.uid)}>
-              Put back in the bag
-            </button>
-          </div>
-          <div class="ix-note">
-            Worth {salvageValue(selected)} Bone Dust when you salvage the pile.
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const inBag = sel.from === 'inv';
+  if (compare && inBag && selected.kind === 'item')
+    return (
+      <ItemCompare
+        run={run}
+        item={selected}
+        aim={p.aimSlot}
+        onAim={(slot) => p.onAim(slot, undefined)}
+        a={{ ...a, onBack: () => setCompare(false) } as Actions}
+      />
+    );
+  if (compare && inBag && selected.kind === 'flask')
+    return (
+      <FlaskCompareView
+        run={run}
+        flask={selected}
+        aim={p.aimFlask}
+        onAim={(idx) => p.onAim(undefined, idx)}
+        a={{ ...a, onBack: () => setCompare(false) } as Actions}
+      />
+    );
+
+  const where =
+    sel.from === 'slot'
+      ? `Worn: ${slotName(sel.slot)}`
+      : sel.from === 'flask'
+        ? `Worn: Flask ${sel.idx + 1}`
+        : sel.from === 'pile'
+          ? 'Discarded'
+          : '';
+  const steps = (sel.from === 'inv' || sel.from === 'pile') && (
+    <>
+      <button class="btn small" aria-label="Previous item" onClick={() => a.onStep(-1)}>
+        ◂
+      </button>
+      <button class="btn small" aria-label="Next item" onClick={() => a.onStep(1)}>
+        ▸
+      </button>
+    </>
+  );
+  const star = inBag && (
+    <button
+      class={'btn small ix-fav' + (p.favourite ? ' on' : '')}
+      aria-label={p.favourite ? 'Remove from favourites' : 'Add to favourites'}
+      onClick={() => a.onFavourite(selected.uid)}
+    >
+      {p.favourite ? '★' : '☆'}
+    </button>
+  );
+  const craft = selected.kind === 'item' && CRAFTING_OPEN && (
+    <button class="btn small" onClick={() => a.onCraft(selected.uid)} disabled={!!selected.sealed}>
+      Craft…
+    </button>
+  );
+  const discard = (
+    <button class="btn small danger" onClick={() => a.onDiscard(selected.uid)}>
+      Discard
+    </button>
+  );
+  let bar: ComponentChildren;
+  if (sel.from === 'pile')
+    bar = (
+      <button class="btn primary" onClick={() => a.onPutBack(selected.uid)}>
+        Put back in the bag
+      </button>
+    );
+  else if (!inBag)
+    bar = (
+      <>
+        <button
+          class="btn primary"
+          onClick={() => (sel.from === 'slot' ? a.onUnequip(sel.slot) : a.onUnequipFlask(sel.idx))}
+        >
+          Take off
+        </button>
+        {sel.from === 'slot' && selected.kind === 'item' && selected.sockets.length > 0 && (
+          <button class="btn small" onClick={() => a.onEditGems?.(sel.slot)}>
+            Edit gems →
+          </button>
+        )}
+        {craft}
+      </>
+    );
+  else if (selected.kind === 'gem')
+    bar = (
+      <>
+        <button class="btn primary" onClick={() => a.onSocket(selected.uid)}>
+          Socket
+        </button>
+        {discard}
+      </>
+    );
+  else
+    bar = (
+      <>
+        <button class="btn primary" onClick={() => setCompare(true)}>
+          Compare
+        </button>
+        {craft}
+        {discard}
+      </>
+    );
+  // Why a bag item cannot be worn, beside its requirements: the check of the slot it would go in.
+  const bad =
+    inBag && selected.kind === 'item' && p.info && !p.info.equippable
+      ? (() => {
+          const s = compareSlots(run, selected.uid).find((x) => !x.check.ok);
+          return s ? whyNot(s.check) : p.info.reason;
+        })()
+      : undefined;
   return (
-    <div class={'ix-detail' + (p.phone ? (full ? ' full' : ' peek') : '')}>
-      {head(itemTitle(selected), rarityClass(selected), inBag ? selected.uid : undefined)}
-      <div class="ix-body">
-        {inBag && selected.kind === 'item' && (
-          <ItemBody
-            run={run}
-            item={selected}
-            a={a}
-            favourite={p.favourite}
-            phone={p.phone}
-            full={full}
-            setFull={setFull}
-            aim={p.aimSlot}
-            onAim={(slot) => p.onAim(slot, undefined)}
-            justOff={p.justOff === selected.uid}
-          />
-        )}
-        {inBag && selected.kind === 'flask' && (
-          <FlaskBody
-            run={run}
-            flask={selected}
-            a={a}
-            favourite={p.favourite}
-            phone={p.phone}
-            full={full}
-            setFull={setFull}
-            aim={p.aimFlask}
-            onAim={(idx) => p.onAim(undefined, idx)}
-          />
-        )}
-        {inBag && selected.kind === 'gem' && (
-          <>
-            <ItemCard it={selected} build={run.build} />
-            <SocketPicker
-              run={run}
-              gemUid={selected.uid}
-              onPlace={(ref) => a.onSocketAt(selected.uid, ref)}
-            />
-            <ActionRow
-              swap="Socket"
-              title="Into the place it helps most"
-              disabled={false}
-              onSwap={() => a.onSocket(selected.uid)}
-              a={a}
-              it={selected}
-              favourite={p.favourite}
-              phone={p.phone}
-              full={full}
-              setFull={setFull}
-            />
-          </>
-        )}
-        {!inBag && (
-          <>
-            <ItemCard it={selected} build={run.build} />
-            <div class="item-actions ix-actions">
-              <button
-                class="btn primary"
-                onClick={() =>
-                  sel.from === 'slot' ? a.onUnequip(sel.slot) : a.onUnequipFlask(sel.idx)
-                }
-              >
-                Take off
-              </button>
-              {selected.kind === 'item' && CRAFTING_OPEN && (
-                <button
-                  class="btn small"
-                  onClick={() => a.onCraft(selected.uid)}
-                  disabled={!!selected.sealed}
-                >
-                  Craft…
-                </button>
-              )}
-            </div>
-            {sel.from === 'slot' && selected.kind === 'item' && (
-              <WornGems
-                it={selected}
-                primary={run.build.primaryGem}
-                onEdit={() => a.onEditGems?.(sel.slot)}
-              />
-            )}
-          </>
-        )}
-        {p.info &&
-          !p.info.equippable &&
-          inBag &&
-          selected.kind !== 'gem' &&
-          p.info.reason &&
-          selected.kind === 'flask' && <div class="warn">{p.info.reason}.</div>}
-      </div>
-    </div>
+    <Page
+      head={
+        inBag && p.info ? (
+          <Verdict it={selected} info={p.info} />
+        ) : (
+          <span class="ix-where">{where}</span>
+        )
+      }
+      back={p.phone ? '‹ Bag' : '×'}
+      a={a}
+      bar={bar}
+      extra={
+        <>
+          {steps}
+          {star}
+        </>
+      }
+    >
+      <ItemSheet it={selected} run={run} bad={bad} worn={!inBag && sel.from !== 'pile'} />
+      {sel.from === 'pile' && (
+        <div class="ix-verdict muted">
+          Worth {salvageValue(selected)} Bone Dust when you salvage the pile.
+        </div>
+      )}
+    </Page>
   );
 }

@@ -166,9 +166,6 @@ html.leaf .ix-gear-toggle {
     overflow: visible;
   }
   /* The action row has the favourite: the header keeps only its close. */
-  html.leaf .ix-head .ix-star {
-    display: none;
-  }
 }
 html.leaf .ix-detail {
   display: flex;
@@ -179,38 +176,9 @@ html.leaf .ix-detail {
   border: 0;
   box-shadow: none;
 }
-html.leaf .ix-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+
 /* The header repeats the card's name on a desktop: only its star and close stay. */
-html.leaf .ix-head {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin: 0;
-}
-html.leaf .ix-head .ix-title {
-  display: none;
-}
-html.leaf .ix-head :is(.ix-star, .ix-close) {
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  font-size: 22px;
-  color: var(--gold-hi);
-  text-shadow: var(--text-shadow);
-  background: #172049;
-  border: 0;
-  border-radius: 0;
-  box-shadow: var(--ring);
-  cursor: pointer;
-}
-html.leaf .ix-head .ix-close {
-  display: block;
-}
+
 html.leaf .ix-guide {
   display: flex;
   flex-direction: column;
@@ -362,65 +330,11 @@ html.leaf .ix-pair {
   gap: 0;
   align-items: stretch;
 }
-html.leaf .ix-side {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-html.leaf .ix-side > .ix-leaf {
-  flex: 1;
-}
-html.leaf .ix-leaf {
-  min-width: 0;
-  padding: 18px 20px 22px;
-  text-shadow: var(--text-shadow);
-}
-html.leaf .ix-hinge {
-  position: relative;
-}
-html.leaf .ix-hinge i {
-  position: absolute;
-  left: -6px;
-  right: -6px;
-  height: 16px;
-}
-html.leaf .ix-hinge i:first-child {
-  top: 80px;
-}
-html.leaf .ix-hinge i:last-child {
-  bottom: 50px;
-}
+
 /* A leaf's caption ("New", "Worn: Main hand") is a small plaque above it, apart from the card: not a property of the item. */
-html.leaf .ix-cap {
-  align-self: flex-start;
-  margin-bottom: 6px;
-  padding: 6px 16px 7px;
-  font: 400 22px/1 var(--title-font);
-  font-size-adjust: none;
-  color: var(--gold-hi);
-  text-shadow: var(--text-shadow);
-}
+
 /* The sockets and the gems a swap moves */
-html.leaf .ix-sockets {
-  padding: 14px 20px;
-  color: var(--pearl);
-  text-shadow: var(--text-shadow);
-  background-color: transparent;
-  border: 0;
-}
-html.leaf .ix-arrow {
-  font-size: var(--size);
-}
-html.leaf .ix-sk-lab {
-  color: var(--muted);
-  font-size: var(--size);
-}
-html.leaf .ix-gc {
-  font-size: var(--size);
-  border: 0;
-  background: none;
-  padding: 0 8px 0 0;
-}
+
 html.leaf .ix-sk-note {
   font-size: var(--size);
 }
@@ -433,43 +347,14 @@ html.leaf .ix-sk-note.warn,
 html.leaf .ix-sk-note.bad {
   color: var(--madder);
 }
-html.leaf .ix-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-}
+
 html.leaf .ix-note {
   color: var(--on-gold);
   font-weight: 600;
   font-size: var(--size);
 }
-html.leaf .ix-worngems {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 20px;
-  color: var(--pearl);
-  text-shadow: var(--text-shadow);
-  background-color: transparent;
-}
-html.leaf .ix-worngems .ix-note {
-  color: var(--pearl);
-  font-weight: 400;
-}
+
 /* A worn item or a gem shown alone sits on a leaf of its own. */
-html.leaf .ix-body > .item-card,
-html.leaf .ix-body > .gem-card {
-  padding: 18px 20px 22px;
-  background: var(--t-lapis, #172049);
-  box-shadow:
-    0 0 0 3px #c09d4e,
-    5px 7px 0 2px #0b080566;
-}
 
 /* ---- An item card (inside a leaf) ---- */
 html.leaf .item-card {
@@ -583,13 +468,6 @@ html.leaf .ix-list-col {
 html.leaf .ix-list-col.drop {
   filter: brightness(1.12);
 }
-html.leaf .ix-baghead {
-  margin: 0;
-  font: 400 var(--head-size) / 1 var(--title-font);
-  font-size-adjust: none;
-  color: var(--gold-hi);
-  text-shadow: var(--text-shadow);
-}
 html.leaf .ix-views {
   display: flex;
   flex-wrap: wrap;
@@ -671,26 +549,30 @@ html.leaf .ix-rm.clr {
 html.leaf .ix-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
   max-height: 470px;
   overflow-y: auto;
   margin: 0 -8px;
   padding: 2px 8px 4px;
   border: 0;
 }
-/* An item of the bag: a plaque of its own. */
+/* An item of the bag: a tight row of the bag's panel, the rows divided by tesserae (the owner, 2026-10-27: plaques of their
+   own left too much gold between them). */
 html.leaf .ix-row {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0;
   width: 100%;
   margin: 0;
-  padding: 10px 14px 11px;
+  padding: 4px 8px 7px;
   font: inherit;
   font-size: var(--size);
+  line-height: 1.2;
   text-align: left;
   color: var(--pearl);
   text-shadow: var(--text-shadow);
+  background: var(--s-dots);
+  background-position: left bottom;
   background-color: transparent;
   border: 0;
   border-radius: 0;
@@ -698,7 +580,12 @@ html.leaf .ix-row {
   cursor: pointer;
 }
 html.leaf .ix-row:hover:not(.sel) {
-  filter: brightness(1.15);
+  background-color: #ffffff0d;
+}
+html.leaf .ix-row.sel {
+  outline: 0;
+  background-color: #2c4185;
+  box-shadow: inset 3px 0 0 var(--gold-hi);
 }
 html.leaf .ix-row.unusable {
   opacity: 0.75;
@@ -810,9 +697,7 @@ html.leaf .clean-group {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
-  html.leaf .ix-hinge {
-    display: none;
-  }
+
   html.leaf .ix {
     grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
     grid-template-areas:
@@ -854,54 +739,11 @@ html.leaf .clean-group {
   html.leaf .ix-list {
     max-height: none;
   }
-  html.leaf .ix-detailcol.has-sel {
-    padding: 18px 16px 20px;
-    border-top: 0;
-    background: var(--t-lapis, #172049);
-    box-shadow:
-      0 -3px 0 #c09d4e,
-      0 -6px 0 #7e622c,
-      0 -10px 18px #000a;
-  }
-  html.leaf .ix-head {
-    justify-content: flex-start;
-  }
-  html.leaf .ix-head .ix-title {
-    display: block;
-    flex: 1;
-    min-width: 0;
-    font: 400 24px/1.05 var(--title-font);
-    color: var(--gold-hi);
-    text-shadow: var(--text-shadow);
-  }
-  html.leaf .ix-detail .ix-head .btn.small {
-    color: var(--gold-hi);
-  }
-  html.leaf .ix-grab::after {
-    background: #c09d4e;
-    border-radius: 0;
-  }
   html.leaf .ix-pair {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
-  html.leaf .ix-hinge {
-    display: none;
-  }
-  html.leaf .ix-actions {
-    position: sticky;
-    bottom: -20px;
-    margin: 0 -16px -20px;
-    padding: 10px 16px 14px;
-    background: var(--t-lapis, #172049);
-    border-top: 0;
-    box-shadow: 0 -2px 0 #c09d4e;
-  }
-  html.leaf .ix-detail .ix-actions .btn {
-    min-height: 40px;
-    padding: 0 12px;
-    font-size: var(--size);
-  }
+
   html.leaf .ix-big b {
     font-size: 32px;
   }
@@ -933,139 +775,444 @@ html.leaf .clean-group {
 }
 
 /* ---- The phone's changed lines and merged card (DiffCard): a marker square, old values beside the new ---- */
-html.leaf .ix-dls {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: var(--size);
-  text-shadow: var(--text-shadow);
-}
-html.leaf .ix-dl {
-  position: relative;
-  padding: 0 0 0 18px;
-  font-size: var(--size);
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  color: var(--pearl);
-}
-html.leaf .ix-dl::before {
-  content: '';
-  position: absolute;
-  left: 1px;
-  top: 0.5em;
-  width: 8px;
-  height: 8px;
-  background: #c09d4e66;
-  box-shadow: 2px 2px 0 var(--ink);
-}
-html.leaf .ix-dl.mark-gain::before {
-  background: #a3d293;
-}
-html.leaf .ix-dl.mark-lost::before {
-  background: #c4553d;
-}
-html.leaf .ix-dl.mark-diff::before {
-  background: #e2c681;
-}
-html.leaf .ix-dl.mark-lost .t {
-  color: var(--madder);
-}
-html.leaf .ix-dl .was {
-  font-size: var(--size);
-  color: var(--dim);
-}
-html.leaf .ix-fold {
-  font-size: var(--size);
-  color: var(--gold-hi);
-}
 
 /* ---- A gem picked in the bag: its card on a leaf, then where it could go (SocketPicker) ---- */
-html.leaf .ix-body > .item-card.gem {
-  padding: 18px 20px 22px;
+
+html.leaf .item-card.gem .gem-tags {
+  color: var(--muted);
+  font-size: var(--size);
+}
+
+/* ---- The item page and the compare (ItemDetail.tsx, docs/ITEM-SLOTS.md): a lapis page with a header, a body that scrolls
+   and the bar of actions always in sight. On a phone it covers the tab; on a wider screen it is the middle column. ---- */
+html.leaf .ix-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
   background: var(--t-lapis, #172049);
   box-shadow:
     0 0 0 3px #c09d4e,
     5px 7px 0 2px #0b080566;
 }
-html.leaf .item-card.gem .gem-tags {
-  color: var(--muted);
-  font-size: var(--size);
-}
-html.leaf .ix-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 22px 20px 22px;
-  background-color: transparent;
-  border: 0;
-}
-html.leaf .ix-prow {
+/* The header and the bar are set off from the body by the mosaic's row of tiles (the camp bar's). */
+html.leaf .ix-phead {
+  position: relative;
+  flex: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 10px 14px 11px;
-  font: inherit;
-  text-align: left;
-  color: var(--pearl);
-  text-shadow: var(--text-shadow);
-  background-color: transparent;
-  border: 0;
-  border-radius: 0;
-  cursor: pointer;
+  gap: 6px;
+  padding: 6px 8px 16px;
 }
-html.leaf .ix-prow:hover:not(.on) {
-  filter: brightness(1.15);
+html.leaf :is(.ix-phead, .ix-pbar)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: var(--s-tiles);
 }
-html.leaf .ix-prow .m {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+html.leaf .ix-phead::after {
+  bottom: 0;
 }
-html.leaf .ix-prow-sub {
-  color: var(--muted);
+html.leaf .ix-pbar::after {
+  top: 0;
 }
-html.leaf .ix-prow.best .ix-prow-name {
+html.leaf .ix-phead .btn.small {
+  min-width: 40px;
+  min-height: 40px;
+}
+html.leaf .ix-phead .ix-fav.on {
   color: var(--gold-hi);
 }
-html.leaf .ix-prow-b {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0 8px;
-  max-width: 50%;
-  text-align: right;
-}
-html.leaf .ix-picker .badge,
-html.leaf .ix-confirm .badge {
-  padding: 0;
-  font-size: var(--size);
-  border: 0;
-  border-radius: 0;
-  background: none;
-}
-html.leaf .ix-picker .badge.neutral {
+html.leaf .ix-where {
+  flex: 1;
+  min-width: 0;
   color: var(--muted);
 }
-html.leaf .ix-picker .muted.small,
-html.leaf .ix-confirm .muted.small {
-  font-size: var(--size);
-  color: var(--muted);
+html.leaf .ix-phead .ix-verdict {
+  font-weight: 600;
 }
-html.leaf .ix-confirm {
+html.leaf .ix-pbody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 6px;
-  padding: 14px 18px 16px;
-  color: var(--pearl);
-  text-shadow: var(--text-shadow);
-  background-color: transparent;
-  border: 0;
+  padding: 10px 14px 12px;
 }
-html.leaf .ix-prow :is(.m, .ix-prow-name, .ix-prow-sub) {
-  font-size: var(--size);
-  line-height: 1.3;
+html.leaf .ix-pbar {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 16px 12px calc(8px + var(--safe-bottom, 0px));
+  background: #111a40;
+}
+html.leaf .ix-why {
+  min-width: 0;
+  color: var(--madder);
+}
+/* A desktop does not scroll as a whole (the owner, 2026-10-27): the tab fills the camp's tab body, and only the bag's
+   list, a long item page and, on a short screen, the gear scroll, each inside its own column. */
+@media (min-width: 1100px) {
+  /* The columns' visible edges a short, equal way under the tabs: the painted panels draw their rim 6 px inside their box,
+     the item page's sits 3 px outside it. */
+  html.leaf .ix {
+    padding-top: 4px;
+  }
+  html.leaf .ix-page {
+    margin-top: 9px;
+  }
+  html.leaf .tab-body:has(> .tab-scope > .ix) {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  html.leaf .tab-body:has(> .tab-scope > .ix) > .tab-scope > :not(.ix) {
+    flex: none;
+  }
+  html.leaf .ix {
+    flex: 1 1 auto;
+    min-height: 0;
+    box-sizing: border-box;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+  }
+  html.leaf :is(.ix-gearcol, .ix-detailcol) {
+    position: static;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  html.leaf .ix-detailcol {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    overflow: visible;
+  }
+  html.leaf .ix-page {
+    max-height: calc(100% - 9px);
+  }
+  html.leaf .ix-listcol {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  html.leaf .ix-list-col {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  html.leaf .ix-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+  html.leaf .ix-cta {
+    flex: none;
+    margin-bottom: 8px;
+  }
+}
+/* A tablet scrolls as before, the item page held in sight beside the gear and the bag. */
+@media (min-width: 601px) and (max-width: 1099px) {
+  html.leaf .ix-detailcol {
+    position: sticky;
+    top: 8px;
+  }
+  html.leaf .ix-page {
+    max-height: calc(100 * var(--vh, 1vh) - 170px);
+  }
+}
+/* Wider than a phone, the bag's controls are compact. */
+@media (min-width: 601px) {
+  /* The bag's controls in three short rows (the views; search and sort; the kinds), its housekeeping on one line when
+     it fits, so the list keeps most of the column. The views show the upgrades' count, so the upgrades button goes. */
+  html.leaf .ix-list-col {
+    gap: 6px;
+    padding: 14px 14px 12px;
+  }
+  html.leaf .ix-listcol > .ix-cta {
+    display: none;
+  }
+  html.leaf .ix-view {
+    padding: 2px 8px 3px;
+  }
+  html.leaf .ix-tools {
+    gap: 6px;
+  }
+  html.leaf .ix-tools :is(.ix-search, .ix-sort) {
+    height: 32px;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  html.leaf .ix-rev {
+    width: 32px;
+    height: 32px;
+    min-height: 0;
+    padding: 0;
+  }
+  html.leaf .ix-kind {
+    width: 34px;
+    height: 34px;
+  }
+  html.leaf .ix-kind i {
+    inset: 5px;
+  }
+  html.leaf .ix-tidy {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 10px;
+  }
+  html.leaf .ix-tidy-row {
+    flex: 1 1 auto;
+    gap: 6px;
+  }
+  html.leaf .ix-tidy-row .btn {
+    min-height: 0;
+    padding: 4px 8px 5px;
+  }
+}
+/* A desktop: a wider bag, the item page in what is left between it and the gear. */
+@media (min-width: 1100px) {
+  html.leaf .ix {
+    grid-template-columns: 320px minmax(0, 1fr) clamp(400px, 34vw, 520px);
+  }
+}
+/* A desktop: a wider bag, the item page in what is left between it and the gear. */
+@media (min-width: 1100px) {
+  html.leaf .ix {
+    grid-template-columns: 320px minmax(0, 1fr) clamp(400px, 34vw, 520px);
+  }
+}
+/* A tablet: the gear above the bag at the left, the bag taking the height left. */
+@media (min-width: 601px) and (max-width: 1099px) {
+  html.leaf .ix {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  html.leaf .ix-gearcol {
+    overflow: visible;
+  }
+}
+@media (max-width: 600px) {
+  html.leaf .ix-detailcol.has-sel {
+    padding: 0;
+    background: var(--t-lapis, #172049);
+    box-shadow: 0 -3px 0 #c09d4e;
+  }
+  html.leaf .ix-detailcol.has-sel .ix-page {
+    height: 100%;
+    box-shadow: none;
+  }
+  html.leaf .ix-pbody {
+    padding: 8px 10px 12px;
+  }
+}
+
+/* The item: its plaque, its base's numbers in boxes, what wearing it takes, its sockets, then its base's lines and, below a
+   line, its affixes'. */
+html.leaf .ix-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1.2;
+}
+html.leaf .ix-sheet > .ic-name {
+  margin: 0;
+  padding: 9px 14px 10px;
+  font-size: 24px;
+  line-height: 1.05;
+  color: var(--on-gold);
+  text-shadow: 0 1px 0 #ffffff33;
+  text-wrap: balance;
+}
+html.leaf .ix-sheet :is(.ic-base, .muted) {
+  color: var(--muted);
+}
+html.leaf .ix-sheet > .item-card {
+  padding: 0;
+  background: none;
+}
+html.leaf .ix-nums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 6px;
+}
+html.leaf .ix-num {
+  padding: 3px 8px 4px;
+  background: #0f1838;
+  box-shadow: inset 0 0 0 1px #3c4f8f;
+}
+html.leaf .ix-num b {
+  display: block;
+  font: 600 20px/1.05 var(--font);
+}
+html.leaf .ix-num span {
+  color: var(--muted);
+}
+html.leaf .ix-num.aug b {
+  color: #9ab8ff;
+}
+html.leaf .ix-req.bad {
+  color: var(--madder);
+}
+html.leaf .ix-socks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+html.leaf .ix-gemnames {
+  color: var(--muted);
+}
+/* The base's lines and the affixes', each under a row of the mosaic's tiles, tight. */
+html.leaf .ix-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-top: 14px;
+  background: var(--s-tiles);
+}
+html.leaf .ix-lines .ic-mod {
+  margin: 0;
+  padding: 0;
+  line-height: 1.25;
+  background: none;
+}
+html.leaf .ix-lines .ic-mod::before {
+  content: none;
+}
+html.leaf .ix-lines .ic-mod.explicit {
+  color: #b9cbe6;
+}
+html.leaf .ix-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+html.leaf :is(.ix-verdict, .ix-cmp) .up,
+html.leaf .ix-verdict.up {
+  color: var(--gain);
+}
+html.leaf :is(.ix-verdict, .ix-cmp) .down {
+  color: var(--madder);
+}
+html.leaf .ix-verdict .warn {
+  color: var(--gold-hi);
+}
+
+/* The compare: the sockets on one line, then the two items side by side (the change to damage and EHP is in the header). */
+html.leaf .ix-sline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+  padding: 5px 10px;
+  background: #0f1838;
+  box-shadow: inset 0 0 0 1px #3c4f8f;
+}
+html.leaf .ix-sline {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+html.leaf .ix-sline .ix-sk-note {
+  margin-left: auto;
+  padding: 0;
+  white-space: nowrap;
+}
+html.leaf .ix-sk-note.good {
+  color: var(--gain);
+}
+html.leaf .ix-cmp {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  box-shadow: 0 0 0 2px #c09d4e;
+}
+html.leaf .ix-cmp::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: #c09d4e;
+}
+html.leaf .ix-cmp > div {
+  min-width: 0;
+  padding: 1px 8px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+html.leaf .ix-cmp .cap {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  color: var(--muted);
+  background: #22346f;
+}
+html.leaf .ix-cmp .nm {
+  font-weight: 600;
+  line-height: 1.15;
+}
+html.leaf .ix-cmp :is(.lbl, .none) {
+  color: var(--muted);
+}
+html.leaf .ix-cmp .gain {
+  color: var(--gain);
+}
+html.leaf .ix-cmp .lost {
+  color: var(--madder);
+}
+html.leaf .ix-cmp .sec {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  height: 10px;
+  margin: 3px 0;
+  padding: 0;
+  background: var(--s-tiles);
+}
+html.leaf :is(.ix-cmp, .ix-sheet) :is(.magic, .ix-name-magic) {
+  color: #b9cbe6;
+}
+html.leaf .ix-cmp .rare {
+  color: var(--gold-hi);
+}
+html.leaf .ix-cmp .unique {
+  color: #ffa040;
+}
+html.leaf .ix-cmp .gem {
+  color: var(--gain);
+}
+
+/* "n upgrades in the bag: show them", above the bag. */
+html.leaf .ix-cta {
+  display: block;
+  margin: 0 auto 12px;
+}
+
+/* The slot a swap just filled, lit for a moment. */
+html.leaf :is(.ix-slot, .ix-flask).fresh {
+  outline: 3px solid var(--gold-hi);
+  outline-offset: 2px;
+  border-radius: 50%;
+  box-shadow: 0 0 16px 6px #e2c681aa;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.leaf :is(.ix-slot, .ix-flask).fresh {
+    animation: ix-fresh 1.2s ease-out 3;
+  }
+  @keyframes ix-fresh {
+    50% {
+      box-shadow: 0 0 4px 1px #e2c68155;
+    }
+  }
 }

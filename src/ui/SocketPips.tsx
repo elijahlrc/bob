@@ -1,7 +1,5 @@
 import { gemDef } from '../data/gems';
-import type { GemItem, Item } from '../data/types';
-import type { SocketOutcome } from '../run/inventory';
-import { socketNote, socketsMatter } from '../run/socketText';
+import type { GemItem } from '../data/types';
 
 type Gem = GemItem | null;
 
@@ -45,72 +43,5 @@ export function SocketPips({
         <span key={g.uid} class="ix-pip out" />
       ))}
     </span>
-  );
-}
-
-/** The gems of a swap by name, one chip each: the primary starred, the ones with no socket crossed. */
-function GemChips({
-  placed,
-  out,
-  primary,
-}: {
-  placed: Gem[];
-  out: GemItem[];
-  primary: number | undefined;
-}) {
-  const chip = (g: GemItem, cls: string) => (
-    <span key={g.uid} class={`ix-gc ${gemDef(g.gemId).kind} ${cls}`}>
-      {g.uid === primary ? '★ ' : ''}
-      {gemDef(g.gemId).name}
-    </span>
-  );
-  return (
-    <div class="ix-gemchips">
-      {placed.filter((g): g is GemItem => g !== null).map((g) => chip(g, ''))}
-      {out.map((g) => chip(g, 'out'))}
-    </div>
-  );
-}
-
-/**
- * What a swap does to the gems (docs/EQUIP.md 3.3): the old item's sockets, an arrow, the new item's with the gems that moved,
- * the count, and one sentence when something comes out or stops working. Hidden when no gem is touched.
- */
-export function SocketsRow({
-  was,
-  o,
-  primary,
-  names = false,
-}: {
-  was: Item | undefined;
-  o: SocketOutcome;
-  primary: number | undefined;
-  /** Name the gems under the pips (the full view). */
-  names?: boolean;
-}) {
-  if (!socketsMatter(o)) return null;
-  const note = socketNote(o, primary);
-  return (
-    <div class="ix-sockets" data-paint="panel" data-thin>
-      <div class="ix-sk">
-        <span class="ix-sk-lab">Sockets</span>
-        {was?.sockets.length ? (
-          <SocketPips sockets={was.sockets} primary={primary} />
-        ) : (
-          <span class="muted">none</span>
-        )}
-        <span class="ix-arrow" aria-hidden="true">
-          →
-        </span>
-        <SocketPips sockets={o.placed} primary={primary} out={o.out} />
-      </div>
-      {names && <GemChips placed={o.placed} out={o.out} primary={primary} />}
-      {note.text && (
-        <div class={'ix-sk-note ' + note.severity} role="status">
-          {note.severity === 'good' ? '' : '⚠ '}
-          {note.text}
-        </div>
-      )}
-    </div>
   );
 }

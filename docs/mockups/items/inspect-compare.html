@@ -1,328 +1,1968 @@
 <meta charset="utf-8" />
 <title>Items Tab Mock-up</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500&family=Jacquard+24&display=swap" />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500&family=Jacquard+24&display=swap"
+/>
 <style>
-/* One look on purpose: the game's Gold Leaf interface (lapis panels with gold rims on a gilded ground), at phone size. */
-:root {
-  color-scheme: dark;
-  --ground: #b8913f;
-  --ground-2: #a17a2c;
-  --lapis: #1b2a5c;
-  --lapis-2: #22346f;
-  --lapis-3: #2c4185;
-  --rim: #d9b65e;
-  --rim-hi: #f3d98c;
-  --ink: #0b0805;
-  --pearl: #efe6d0;
-  --muted: #a9b0cc;
-  --dim: #7d84a3;
-  --up: #9fdc8a;
-  --down: #ff9a8a;
-  --warn: #f2c14e;
-  --diff: #f2c14e;
-  --magic: #8fb3ff;
-  --rare: #f3d36a;
-  --unique: #e6893b;
-  --gem: #79d39b;
-  --vermilion: #8e2a1c;
-  --font: 'Grenze', 'Palatino Linotype', Georgia, serif;
-  --title: 'Jacquard 24', 'Grenze', Georgia, serif;
-}
-html, body { height: 100%; }
-body { margin: 0; background: #2a2116; color: var(--pearl); font: 17px/1.25 var(--font); padding-inline: 16px; padding-block: 16px; box-sizing: border-box; }
-button { font: inherit; color: inherit; cursor: pointer; }
-.phone { position: relative; width: 375px; max-width: 100%; height: min(780px, calc(100vh - 32px)); min-height: 560px; margin: 0 auto; border-radius: 22px; overflow: hidden; background: var(--ground); box-shadow: 0 0 0 6px #120d08; display: flex; flex-direction: column; }
-.tabsbar { flex: none; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--lapis); border-bottom: 4px solid var(--rim); font-family: var(--title); font-size: 22px; }
-.tabsbar b { font-weight: 400; color: var(--ink); background: var(--rim-hi); padding: 0 10px; border: 2px solid var(--ink); }
-.tabsbar span { color: var(--pearl); }
-.view { position: relative; flex: 1; min-height: 0; }
-.scroll { position: absolute; inset: 0; overflow-y: auto; padding: 10px 8px 16px; }
-.campfoot { flex: none; height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #2f5a35; border-top: 4px solid var(--rim); }
-.campfoot .who { flex: 1; font-family: var(--title); font-size: 20px; }
-.btn { background: var(--lapis-2); border: 2px solid var(--rim); box-shadow: inset 0 0 0 1px var(--ink); color: var(--pearl); padding: 6px 12px; min-height: 40px; }
-.btn.small { padding: 4px 10px; min-height: 36px; font-size: 16px; }
-.btn.primary { background: var(--vermilion); color: #fff1dc; }
-.btn.danger { color: var(--down); }
-.btn:disabled { opacity: .45; cursor: default; }
-.btn.on { background: var(--rim-hi); color: var(--ink); }
-.panel { background: var(--lapis); border: 3px solid var(--rim); box-shadow: inset 0 0 0 2px var(--ink), 0 0 0 1px var(--ink); }
-.muted { color: var(--muted); }
-.up { color: var(--up); } .down { color: var(--down); } .warn { color: var(--warn); }
-.normal { color: var(--pearl); } .magic { color: var(--magic); } .rare { color: var(--rare); } .unique { color: var(--unique); } .gem { color: var(--gem); } .flaskitem { color: var(--pearl); }
+  /* One look on purpose: the game's Gold Leaf interface (lapis panels with gold rims on a gilded ground), at phone size. */
+  :root {
+    color-scheme: dark;
+    --ground: #b8913f;
+    --ground-2: #a17a2c;
+    --lapis: #1b2a5c;
+    --lapis-2: #22346f;
+    --lapis-3: #2c4185;
+    --rim: #d9b65e;
+    --rim-hi: #f3d98c;
+    --ink: #0b0805;
+    --pearl: #efe6d0;
+    --muted: #a9b0cc;
+    --dim: #7d84a3;
+    --up: #9fdc8a;
+    --down: #ff9a8a;
+    --warn: #f2c14e;
+    --diff: #f2c14e;
+    --magic: #8fb3ff;
+    --rare: #f3d36a;
+    --unique: #e6893b;
+    --gem: #79d39b;
+    --vermilion: #8e2a1c;
+    --font: 'Grenze', 'Palatino Linotype', Georgia, serif;
+    --title: 'Jacquard 24', 'Grenze', Georgia, serif;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    background: #2a2116;
+    color: var(--pearl);
+    font: 17px/1.25 var(--font);
+    padding-inline: 16px;
+    padding-block: 16px;
+    box-sizing: border-box;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  .phone {
+    position: relative;
+    width: 375px;
+    max-width: 100%;
+    height: min(780px, calc(100vh - 32px));
+    min-height: 560px;
+    margin: 0 auto;
+    border-radius: 22px;
+    overflow: hidden;
+    background: var(--ground);
+    box-shadow: 0 0 0 6px #120d08;
+    display: flex;
+    flex-direction: column;
+  }
+  .tabsbar {
+    flex: none;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: var(--lapis);
+    border-bottom: 4px solid var(--rim);
+    font-family: var(--title);
+    font-size: 22px;
+  }
+  .tabsbar b {
+    font-weight: 400;
+    color: var(--ink);
+    background: var(--rim-hi);
+    padding: 0 10px;
+    border: 2px solid var(--ink);
+  }
+  .tabsbar span {
+    color: var(--pearl);
+  }
+  .view {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+  .scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 10px 8px 16px;
+  }
+  .campfoot {
+    flex: none;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    background: #2f5a35;
+    border-top: 4px solid var(--rim);
+  }
+  .campfoot .who {
+    flex: 1;
+    font-family: var(--title);
+    font-size: 20px;
+  }
+  .btn {
+    background: var(--lapis-2);
+    border: 2px solid var(--rim);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    color: var(--pearl);
+    padding: 6px 12px;
+    min-height: 40px;
+  }
+  .btn.small {
+    padding: 4px 10px;
+    min-height: 36px;
+    font-size: 16px;
+  }
+  .btn.primary {
+    background: var(--vermilion);
+    color: #fff1dc;
+  }
+  .btn.danger {
+    color: var(--down);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .btn.on {
+    background: var(--rim-hi);
+    color: var(--ink);
+  }
+  .panel {
+    background: var(--lapis);
+    border: 3px solid var(--rim);
+    box-shadow:
+      inset 0 0 0 2px var(--ink),
+      0 0 0 1px var(--ink);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .up {
+    color: var(--up);
+  }
+  .down {
+    color: var(--down);
+  }
+  .warn {
+    color: var(--warn);
+  }
+  .normal {
+    color: var(--pearl);
+  }
+  .magic {
+    color: var(--magic);
+  }
+  .rare {
+    color: var(--rare);
+  }
+  .unique {
+    color: var(--unique);
+  }
+  .gem {
+    color: var(--gem);
+  }
+  .flaskitem {
+    color: var(--pearl);
+  }
 
-/* Bag screen, as it is now */
-.geartoggle { width: 100%; text-align: left; font-size: 16px; padding: 9px 12px; }
-.reliq { margin-top: 8px; padding: 14px 10px 12px; border-radius: 120px 120px 6px 6px; background: #3a1d14; border: 3px solid var(--rim); box-shadow: inset 0 0 0 2px var(--ink); }
-.doll { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 62px); justify-items: center; align-items: center; }
-.slotw { position: relative; }
-.slot { width: 50px; height: 50px; border-radius: 50%; background: var(--lapis); border: 3px solid var(--rim); box-shadow: inset 0 0 0 2px var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); padding: 0; }
-.slot.empty { border-color: #6b5631; background: #24170f; }
-.slot.magic { border-color: var(--magic); } .slot.rare { border-color: var(--rare); } .slot.unique { border-color: var(--unique); }
-.slot .g { font-family: var(--font); font-size: 14px; color: var(--pearl); line-height: 1; }
-.slot .pp { display: flex; gap: 2px; margin-top: 2px; }
-.slot.fresh, .bottle.fresh { box-shadow: inset 0 0 0 2px var(--ink), 0 0 0 3px var(--rim-hi), 0 0 16px 6px #f3d98caa; }
-@media (prefers-reduced-motion: no-preference) { .fresh { animation: fresh 1.2s ease-out 3; } @keyframes fresh { 50% { box-shadow: inset 0 0 0 2px var(--ink), 0 0 0 3px var(--rim-hi), 0 0 4px 1px #f3d98c55; } } }
-.slotx { position: absolute; top: -6px; right: -8px; width: 22px; height: 22px; padding: 0; border: 2px solid var(--rim); background: var(--lapis-2); font-size: 13px; line-height: 1; }
-.flasks { display: flex; justify-content: center; gap: 14px; margin-top: 6px; }
-.bottle { width: 22px; height: 34px; border-radius: 6px 6px 9px 9px; border: 2px solid var(--rim); background: #120c08; position: relative; overflow: hidden; padding: 0; }
-.bottle i { position: absolute; left: 0; right: 0; bottom: 0; height: 72%; }
-.upgrade-cta { display: block; margin: 10px auto 0; }
-.bag { margin-top: 10px; padding: 12px 10px 10px; }
-.baghead { margin: 0 0 8px; font: 400 26px/1 var(--title); }
-.tools { display: flex; gap: 6px; }
-.search { flex: 1; min-width: 0; background: #0f1838; color: var(--pearl); border: 2px solid var(--rim); box-shadow: inset 0 0 0 1px var(--ink); padding: 0 10px; font: 16px var(--font); height: 38px; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.chip { background: #0f1838; border: 1px solid var(--rim); color: var(--pearl); font-size: 15px; padding: 2px 8px; }
-.chip i { font-style: normal; color: var(--rim-hi); margin-left: 4px; }
-.list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
-.row { display: flex; flex-direction: column; gap: 2px; text-align: left; background: var(--lapis-2); border: 2px solid var(--rim); box-shadow: inset 0 0 0 1px var(--ink); padding: 7px 10px 8px; }
-.row.unusable .rname { opacity: .6; }
-.rmain { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.rname { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.newmark { width: 9px; height: 9px; flex: none; background: var(--rim-hi); transform: rotate(45deg); }
-.favmark { color: var(--rim-hi); }
-.rsub { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 15px; }
-.nothing { color: var(--muted); padding: 8px 2px; }
-.tidy { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
-.tidy .btn { font-size: 15px; }
+  /* Bag screen, as it is now */
+  .geartoggle {
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    padding: 9px 12px;
+  }
+  .reliq {
+    margin-top: 8px;
+    padding: 14px 10px 12px;
+    border-radius: 120px 120px 6px 6px;
+    background: #3a1d14;
+    border: 3px solid var(--rim);
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .doll {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 62px);
+    justify-items: center;
+    align-items: center;
+  }
+  .slotw {
+    position: relative;
+  }
+  .slot {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--lapis);
+    border: 3px solid var(--rim);
+    box-shadow: inset 0 0 0 2px var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 0;
+  }
+  .slot.empty {
+    border-color: #6b5631;
+    background: #24170f;
+  }
+  .slot.magic {
+    border-color: var(--magic);
+  }
+  .slot.rare {
+    border-color: var(--rare);
+  }
+  .slot.unique {
+    border-color: var(--unique);
+  }
+  .slot .g {
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--pearl);
+    line-height: 1;
+  }
+  .slot .pp {
+    display: flex;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .slot.fresh,
+  .bottle.fresh {
+    box-shadow:
+      inset 0 0 0 2px var(--ink),
+      0 0 0 3px var(--rim-hi),
+      0 0 16px 6px #f3d98caa;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fresh {
+      animation: fresh 1.2s ease-out 3;
+    }
+    @keyframes fresh {
+      50% {
+        box-shadow:
+          inset 0 0 0 2px var(--ink),
+          0 0 0 3px var(--rim-hi),
+          0 0 4px 1px #f3d98c55;
+      }
+    }
+  }
+  .slotx {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 2px solid var(--rim);
+    background: var(--lapis-2);
+    font-size: 13px;
+    line-height: 1;
+  }
+  .flasks {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .bottle {
+    width: 22px;
+    height: 34px;
+    border-radius: 6px 6px 9px 9px;
+    border: 2px solid var(--rim);
+    background: #120c08;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+  }
+  .bottle i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 72%;
+  }
+  .upgrade-cta {
+    display: block;
+    margin: 10px auto 0;
+  }
+  .bag {
+    margin-top: 10px;
+    padding: 12px 10px 10px;
+  }
+  .baghead {
+    margin: 0 0 8px;
+    font: 400 26px/1 var(--title);
+  }
+  .tools {
+    display: flex;
+    gap: 6px;
+  }
+  .search {
+    flex: 1;
+    min-width: 0;
+    background: #0f1838;
+    color: var(--pearl);
+    border: 2px solid var(--rim);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    padding: 0 10px;
+    font: 16px var(--font);
+    height: 38px;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .chip {
+    background: #0f1838;
+    border: 1px solid var(--rim);
+    color: var(--pearl);
+    font-size: 15px;
+    padding: 2px 8px;
+  }
+  .chip i {
+    font-style: normal;
+    color: var(--rim-hi);
+    margin-left: 4px;
+  }
+  .list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+    background: var(--lapis-2);
+    border: 2px solid var(--rim);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    padding: 7px 10px 8px;
+  }
+  .row.unusable .rname {
+    opacity: 0.6;
+  }
+  .rmain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .rname {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .newmark {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    background: var(--rim-hi);
+    transform: rotate(45deg);
+  }
+  .favmark {
+    color: var(--rim-hi);
+  }
+  .rsub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    font-size: 15px;
+  }
+  .nothing {
+    color: var(--muted);
+    padding: 8px 2px;
+  }
+  .tidy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tidy .btn {
+    font-size: 15px;
+  }
 
-/* Sheets and popups */
-.veil { position: absolute; inset: 0; background: #0008; }
-.sheet { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 12px 12px; display: flex; flex-direction: column; gap: 10px; max-height: 92%; overflow-y: auto; }
-.sheethead { display: flex; align-items: center; justify-content: space-between; font-size: 19px; }
-.btnrow { display: flex; flex-wrap: wrap; gap: 6px; }
-.ask { position: absolute; left: 16px; right: 16px; top: 22%; padding: 16px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
-.ask h3 { margin: 0; font: 400 26px/1.05 var(--title); }
-.ask ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  /* Sheets and popups */
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: #0008;
+  }
+  .sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 14px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 92%;
+    overflow-y: auto;
+  }
+  .sheethead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 19px;
+  }
+  .btnrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ask {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 22%;
+    padding: 16px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ask h3 {
+    margin: 0;
+    font: 400 26px/1.05 var(--title);
+  }
+  .ask ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+  }
 
-/* The item page and the compare page (the new parts) */
-.page { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--lapis); border-top: 3px solid var(--rim); }
-.phead { flex: none; height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 8px; border-bottom: 2px solid var(--rim); background: var(--lapis-2); }
-.phead .sp { flex: 1; min-width: 0; color: var(--muted); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pbody { flex: 1; overflow-y: auto; padding: 12px 12px 16px; }
-.pbar { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-top: 2px solid var(--rim); background: var(--lapis-2); min-height: 56px; box-sizing: border-box; }
-.pbar .why { font-size: 15px; color: var(--down); min-width: 0; }
-.plaque { padding: 6px 10px 7px; border: 2px solid var(--ink); font: 400 26px/1.05 var(--title); text-wrap: balance; }
-.plaque.normal { background: #d9d0bb; color: var(--ink); }
-.plaque.magic { background: #9cb8ee; color: #0e1a3a; }
-.plaque.rare { background: #e9c35a; color: #2a1b04; }
-.plaque.unique { background: #2a1a10; color: var(--unique); }
-.plaque.gem { background: #7fcf9b; color: #0b2414; }
-.plaque.flaskitem { background: #c9c3b4; color: var(--ink); }
-.caption { display: inline-block; margin-bottom: 6px; font-size: 15px; background: var(--rim-hi); color: var(--ink); padding: 1px 8px; }
-.basel { margin-top: 6px; font-size: 16px; color: var(--muted); }
-.verdict { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 16px; }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 6px; margin-top: 12px; }
-.stat { background: #0f1838; border: 1px solid #3c4f8f; padding: 6px 8px; }
-.stat b { display: block; font-weight: 500; font-size: 20px; line-height: 1.05; }
-.stat span { font-size: 14px; color: var(--muted); }
-.stat.aug b { color: var(--magic); }
-.sect { margin-top: 12px; padding-top: 10px; border-top: 1px solid #3c4f8f; }
-.sect h4 { margin: 0 0 6px; font: 400 15px var(--font); color: var(--muted); letter-spacing: .04em; }
-.line { padding: 2px 0; }
-.line.imp { color: var(--pearl); }
-.line.exp { color: var(--magic); }
-.line.rule { color: var(--rare); }
-.req.bad { color: var(--down); }
-.stones { display: inline-flex; gap: 4px; vertical-align: middle; }
-.stone { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--rim); background: #120c08; box-sizing: border-box; }
-.stone.s { border-radius: 2px; transform: rotate(45deg) scale(.85); }
-.stone.str { background: #e0664f; } .stone.dex { background: #4fbf72; } .stone.int { background: #5b8fe8; }
-.stone.p { box-shadow: 0 0 0 2px var(--rim-hi); }
-.wgems { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: 16px; }
-.picker { display: flex; flex-direction: column; gap: 6px; }
-.prow { display: flex; justify-content: space-between; gap: 8px; text-align: left; background: var(--lapis-2); border: 2px solid var(--rim); padding: 6px 10px; }
-.prow small { display: block; color: var(--muted); font-size: 14px; }
-.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-.tab { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; background: #0f1838; border: 2px solid #3c4f8f; padding: 5px 4px; font-size: 15px; }
-.tab b { font-weight: 500; font-size: 16px; }
-.tab.on { border-color: var(--rim-hi); background: var(--lapis-3); }
-.warnbox { margin-bottom: 10px; padding: 8px 10px; background: #5a1d14; border: 2px solid var(--rim); color: #ffd9cf; }
-.delta { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; padding: 5px 10px; background: #0f1838; border: 1px solid #3c4f8f; font-size: 16px; }
-.delta b { font-weight: 500; }
-.socks .stones { margin: 0 6px; }
-.socks span:last-child:not(.stones) { margin-left: auto; white-space: nowrap; }
-.socks { display: flex; align-items: center; margin-top: 8px; padding: 6px 10px; background: #0f1838; border: 1px solid #3c4f8f; font-size: 15px; }
-.cmp { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); font-size: 15px; border: 2px solid var(--rim); }
-.cmp > div { padding: 4px 7px; border-bottom: 1px solid #33447c; min-width: 0; overflow-wrap: anywhere; }
-.cmp { position: relative; }
-.cmp::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: var(--rim); }
-.cmp .sec { position: relative; z-index: 1; }
-.cmp .cap { background: var(--lapis-3); color: var(--muted); font-size: 14px; }
-.cmp .nm { font-size: 17px; font-weight: 500; line-height: 1.1; }
-.cmp .gain { color: var(--up); }
-.cmp .lost { color: var(--down); }
-.cmp .diff { color: var(--diff); }
-.cmp .none { color: var(--dim); }
-.cmp .lbl { color: var(--muted); }
-.cmp .hd { background: #182456; }
-.cmp .sec { grid-column: 1 / -1; padding: 0; height: 0; border-bottom: 2px solid var(--rim); }
-.sect .stats { margin: 0 0 6px; }
-@media (prefers-reduced-motion: no-preference) { .page { animation: slide .14s ease-out; } @keyframes slide { from { transform: translateY(14px); opacity: .6; } } }
+  /* The item page and the compare page (the new parts) */
+  .page {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--lapis);
+    border-top: 3px solid var(--rim);
+  }
+  .phead {
+    flex: none;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    border-bottom: 2px solid var(--rim);
+    background: var(--lapis-2);
+  }
+  .phead .sp {
+    flex: 1;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pbody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 12px 16px;
+  }
+  .pbar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 2px solid var(--rim);
+    background: var(--lapis-2);
+    min-height: 56px;
+    box-sizing: border-box;
+  }
+  .pbar .why {
+    font-size: 15px;
+    color: var(--down);
+    min-width: 0;
+  }
+  .plaque {
+    padding: 6px 10px 7px;
+    border: 2px solid var(--ink);
+    font: 400 26px/1.05 var(--title);
+    text-wrap: balance;
+  }
+  .plaque.normal {
+    background: #d9d0bb;
+    color: var(--ink);
+  }
+  .plaque.magic {
+    background: #9cb8ee;
+    color: #0e1a3a;
+  }
+  .plaque.rare {
+    background: #e9c35a;
+    color: #2a1b04;
+  }
+  .plaque.unique {
+    background: #2a1a10;
+    color: var(--unique);
+  }
+  .plaque.gem {
+    background: #7fcf9b;
+    color: #0b2414;
+  }
+  .plaque.flaskitem {
+    background: #c9c3b4;
+    color: var(--ink);
+  }
+  .caption {
+    display: inline-block;
+    margin-bottom: 6px;
+    font-size: 15px;
+    background: var(--rim-hi);
+    color: var(--ink);
+    padding: 1px 8px;
+  }
+  .basel {
+    margin-top: 6px;
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .verdict {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    font-size: 16px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .stat {
+    background: #0f1838;
+    border: 1px solid #3c4f8f;
+    padding: 6px 8px;
+  }
+  .stat b {
+    display: block;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.05;
+  }
+  .stat span {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .stat.aug b {
+    color: var(--magic);
+  }
+  .sect {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #3c4f8f;
+  }
+  .sect h4 {
+    margin: 0 0 6px;
+    font: 400 15px var(--font);
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .line {
+    padding: 2px 0;
+  }
+  .line.imp {
+    color: var(--pearl);
+  }
+  .line.exp {
+    color: var(--magic);
+  }
+  .line.rule {
+    color: var(--rare);
+  }
+  .req.bad {
+    color: var(--down);
+  }
+  .stones {
+    display: inline-flex;
+    gap: 4px;
+    vertical-align: middle;
+  }
+  .stone {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--rim);
+    background: #120c08;
+    box-sizing: border-box;
+  }
+  .stone.s {
+    border-radius: 2px;
+    transform: rotate(45deg) scale(0.85);
+  }
+  .stone.str {
+    background: #e0664f;
+  }
+  .stone.dex {
+    background: #4fbf72;
+  }
+  .stone.int {
+    background: #5b8fe8;
+  }
+  .stone.p {
+    box-shadow: 0 0 0 2px var(--rim-hi);
+  }
+  .wgems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 6px;
+    font-size: 16px;
+  }
+  .picker {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .prow {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+    background: var(--lapis-2);
+    border: 2px solid var(--rim);
+    padding: 6px 10px;
+  }
+  .prow small {
+    display: block;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .tab {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    background: #0f1838;
+    border: 2px solid #3c4f8f;
+    padding: 5px 4px;
+    font-size: 15px;
+  }
+  .tab b {
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .tab.on {
+    border-color: var(--rim-hi);
+    background: var(--lapis-3);
+  }
+  .warnbox {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: #5a1d14;
+    border: 2px solid var(--rim);
+    color: #ffd9cf;
+  }
+  .delta {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 5px 10px;
+    background: #0f1838;
+    border: 1px solid #3c4f8f;
+    font-size: 16px;
+  }
+  .delta b {
+    font-weight: 500;
+  }
+  .socks .stones {
+    margin: 0 6px;
+  }
+  .socks span:last-child:not(.stones) {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .socks {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: #0f1838;
+    border: 1px solid #3c4f8f;
+    font-size: 15px;
+  }
+  .cmp {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    font-size: 15px;
+    border: 2px solid var(--rim);
+  }
+  .cmp > div {
+    padding: 4px 7px;
+    border-bottom: 1px solid #33447c;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .cmp {
+    position: relative;
+  }
+  .cmp::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--rim);
+  }
+  .cmp .sec {
+    position: relative;
+    z-index: 1;
+  }
+  .cmp .cap {
+    background: var(--lapis-3);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .cmp .nm {
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .cmp .gain {
+    color: var(--up);
+  }
+  .cmp .lost {
+    color: var(--down);
+  }
+  .cmp .diff {
+    color: var(--diff);
+  }
+  .cmp .none {
+    color: var(--dim);
+  }
+  .cmp .lbl {
+    color: var(--muted);
+  }
+  .cmp .hd {
+    background: #182456;
+  }
+  .cmp .sec {
+    grid-column: 1 / -1;
+    padding: 0;
+    height: 0;
+    border-bottom: 2px solid var(--rim);
+  }
+  .sect .stats {
+    margin: 0 0 6px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .page {
+      animation: slide 0.14s ease-out;
+    }
+    @keyframes slide {
+      from {
+        transform: translateY(14px);
+        opacity: 0.6;
+      }
+    }
+  }
 </style>
 
 <div class="phone" id="phone">
   <div class="tabsbar"><span>◂</span><b>Items</b><span>Skills ▸</span></div>
-  <div class="view" id="view"><div class="scroll"><p class="muted">Loading the mock-up…</p></div></div>
-  <div class="campfoot"><span class="who">Mystic · Level 32</span><button class="btn small" id="undo" data-a="undo" disabled>↶ Undo</button><button class="btn small primary">Next: Skills ▸</button></div>
+  <div class="view" id="view">
+    <div class="scroll"><p class="muted">Loading the mock-up…</p></div>
+  </div>
+  <div class="campfoot">
+    <span class="who">Mystic · Level 32</span
+    ><button class="btn small" id="undo" data-a="undo" disabled>↶ Undo</button
+    ><button class="btn small primary">Next: Skills ▸</button>
+  </div>
 </div>
 
 <script>
-// Real items, comparisons and wording taken from a level 32 test run of the game (2026-10-27).
-const DATA = {"worn":{"mainHand":{"uid":1,"kind":"item","name":"Willow Twig","rar":"normal","wtype":"Wand","wl":{"phys":"8–15 physical","speed":"1.4 APS","crit":"7% crit","extra":[],"aug":[true,false,false]},"req":"level 1, 14 Int","ilvl":1,"sockets":[null],"imp":["10% increased Spell Damage","Adds 3 to 6 Physical Damage"]},"body":{"uid":2,"kind":"item","name":"Threadbare Vestment","rar":"normal","al":[{"text":"40 energy shield","aug":true}],"req":"level 1, 17 Int","ilvl":1,"sockets":[{"a":"int","s":false,"n":"Flame Bolt","p":true},{"a":"int","s":true,"n":"Echoing Cast","p":false},{"a":"str","s":true,"n":"Kindle","p":false},{"a":"str","s":true,"n":"Brute Force","p":false}],"imp":["+28 to maximum Energy Shield"]},"helmet":{"uid":9,"kind":"item","name":"Dented Helm","rar":"normal","al":[{"text":"9 armour","aug":false}],"req":"level 1, 9 Str","ilvl":20,"sockets":[{"a":"int","s":true,"n":"Echoing Cast","p":false},null]},"boots":{"uid":14,"kind":"item","name":"Patched Striders","rar":"normal","al":[{"text":"13 evasion","aug":false}],"req":"level 1, 11 Dex","ilvl":18,"sockets":[null]},"ring1":{"uid":19,"kind":"item","name":"Gritty Spiked Ring of the Ox","rar":"magic","base":"Spiked Ring","req":"level 1","ilvl":18,"sockets":[],"imp":["Adds 1 to 4 Physical Damage to Attacks"],"exp":["Adds 1 to 2 Physical Damage to Attacks","+14 to Strength"]},"amulet":{"uid":22,"kind":"item","name":"Ember Charm","rar":"normal","req":"level 1","ilvl":18,"sockets":[],"imp":["+25% to Fire Resistance"]},"ring2":{"uid":27,"kind":"item","name":"Cinder Ring of the Owl","rar":"magic","base":"Cinder Ring","req":"level 16","ilvl":18,"sockets":[],"imp":["+25% to Fire Resistance"],"exp":["+12 to Intelligence"]},"offHand":{"uid":39,"kind":"item","name":"Smouldering Chipped Hatchet of Needling","rar":"magic","base":"Chipped Hatchet","wtype":"One-Handed Axe","wl":{"phys":"6–11 physical","speed":"1.5 APS","crit":"5.6% crit","extra":["12–25 fire"],"aug":[false,false,true]},"req":"level 1, 12 Str, 6 Dex","ilvl":18,"sockets":[null],"exp":["12% increased Critical Strike Chance","Adds 12 to 25 Fire Damage"]}},
-"flasks":[{"uid":3,"kind":"flask","name":"Cracked Life Draught","rar":"flaskitem","sub":"Requires level 1 · 7/21 charges · 6 s","lines":["Recovers 70 life"],"liquid":"life"},{"uid":4,"kind":"flask","name":"Cracked Mana Draught","rar":"flaskitem","sub":"Requires level 1 · 6/24 charges · 3 s","lines":["Recovers 50 mana"],"liquid":"mana"},null,null,null],
-"bag":[
-{"uid":901,"kind":"item","name":"Supple Spark Ring of Embers","rar":"magic","base":"Spark Ring","req":"level 12","ilvl":18,"sockets":[],"imp":["+25% to Lightning Resistance"],"exp":["+8% to Fire Resistance","+7 to Evasion Rating"],"info":{"slotLabel":"Ring","slot":"ring1","slotName":"Ring 1","eq":true,"dps":0,"ehp":5,"gemsOut":0,"idle":[],"group":"jewellery","upgrade":true},"cmp":[{"slot":"ring1","label":"Ring 1","eq":19,"ok":true,"dps":0,"ehp":5,"chips":{"life":-7,"es":0,"mana":0,"res":[0,25,0,8,0]},"note":{"severity":"none","text":""},"out":0,"idle":0,"best":true},{"slot":"ring2","label":"Ring 2","eq":27,"ok":true,"dps":-64,"ehp":3,"chips":{"life":0,"es":-1,"mana":-6,"res":[0,25,0,-17,0]},"note":{"severity":"none","text":""},"out":0,"idle":0,"best":false}],"multi":true},
-{"uid":11,"kind":"item","name":"Spare Body","rar":"normal","base":"Threadbare Vestment","al":[{"text":"40 energy shield","aug":true}],"req":"level 1, 17 Int","ilvl":1,"sockets":[null,null],"imp":["+28 to maximum Energy Shield"],"info":{"slotLabel":"Body","slot":"body","slotName":"Body","eq":true,"dps":0,"ehp":0,"gemsOut":2,"idle":[],"group":"armour","upgrade":true},"cmp":[{"slot":"body","label":"Body","eq":2,"ok":true,"dps":0,"ehp":0,"chips":{"life":0,"es":0,"mana":0,"res":[0,0,0,0,0]},"note":{"severity":"warn","text":"No socket for Kindle and Brute Force, they will be unequipped"},"out":2,"idle":0,"best":true}]},
-{"uid":12,"kind":"item","name":"Spare Helm","rar":"normal","base":"Dented Helm","al":[{"text":"9 armour","aug":false}],"req":"level 1, 9 Str","ilvl":20,"sockets":[null,null,null,null,null,null],"info":{"slotLabel":"Helmet","slot":"helmet","slotName":"Helmet","eq":true,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"group":"armour","upgrade":false},"cmp":[{"slot":"helmet","label":"Helmet","eq":9,"ok":true,"dps":0,"ehp":0,"chips":{"life":0,"es":0,"mana":0,"res":[0,0,0,0,0]},"note":{"severity":"good","text":"5 free sockets"},"out":0,"idle":0,"best":true}]},
-{"uid":13,"kind":"item","name":"Grave Rags","rar":"normal","req":"level 1","ilvl":18,"sockets":[null],"info":{"slotLabel":"Body","slot":"body","slotName":"Body","eq":true,"dps":-23,"ehp":-9,"gemsOut":3,"idle":[],"group":"armour","upgrade":false},"cmp":[{"slot":"body","label":"Body","eq":2,"ok":true,"dps":-23,"ehp":-9,"chips":{"life":0,"es":-44,"mana":0,"res":[0,0,0,0,0]},"note":{"severity":"warn","text":"No socket for Echoing Cast, Kindle and Brute Force, they will be unequipped"},"out":3,"idle":0,"best":true}]},
-{"uid":15,"kind":"item","name":"Linen Circlet","rar":"normal","al":[{"text":"19 energy shield","aug":false}],"req":"level 17, 40 Int","ilvl":18,"sockets":[null,null],"info":{"slotLabel":"Helmet","slot":"helmet","slotName":"Helmet","eq":true,"dps":0,"ehp":1,"gemsOut":0,"idle":[],"group":"armour","upgrade":true},"cmp":[{"slot":"helmet","label":"Helmet","eq":9,"ok":true,"dps":0,"ehp":1,"chips":{"life":0,"es":20,"mana":0,"res":[0,0,0,0,0]},"note":{"severity":"none","text":""},"out":0,"idle":0,"best":true}]},
-{"uid":16,"kind":"item","name":"Raven Ward","rar":"rare","base":"Grave Rags","req":"level 1","ilvl":18,"sockets":[null],"exp":["+13% to Fire Resistance","16% increased Armour","8% increased Armour","7% increased Stun and Block Recovery","+20 to maximum Life","+11 to Strength","14% increased Stun and Block Recovery"],"info":{"slotLabel":"Body","slot":"body","slotName":"Body","eq":true,"dps":-23,"ehp":-2,"gemsOut":3,"idle":[],"group":"armour","upgrade":false},"cmp":[{"slot":"body","label":"Body","eq":2,"ok":true,"dps":-23,"ehp":-2,"chips":{"life":26,"es":-44,"mana":0,"res":[0,0,0,13,0]},"note":{"severity":"warn","text":"No socket for Echoing Cast, Kindle and Brute Force, they will be unequipped"},"out":3,"idle":0,"best":true}]},
-{"uid":17,"kind":"flask","name":"Brimming Murky Blended Draught of Stanching","rar":"flaskitem","sub":"Requires level 10 · 20/40 charges · 5 s","lines":["Recovers 100 life","Recovers 70 mana","38% increased Amount Recovered","Removes Bleeding on use; Immunity to Bleeding during Flask effect"],"liquid":"hybrid","info":{"slotLabel":"Flask","eq":true,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"fillsFlask":true,"group":"flask","upgrade":true},"fcmp":[{"idx":0,"eq":3,"ok":true},{"idx":1,"eq":4,"ok":true},{"idx":2,"eq":null,"ok":true,"chosen":true},{"idx":3,"eq":null,"ok":true},{"idx":4,"eq":null,"ok":true}]},
-{"uid":18,"kind":"gem","name":"Shadow Swap","rar":"gem","info":{"slotLabel":"Gem","eq":false,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"group":"gem"},"gemLines":["Active skill · Spell · Level 1","Spell, Movement, Fire, Area","Costs 8 mana","Deals 3 to 5 Fire damage","Cast time 0.7 s","Base critical chance 6%","Jumps up to 8 toward a target out of reach","0.3 s cooldown","Go to a corpse or an enemy in a burst of fire at both ends.","Requires level 10, 27 Dex"],"picker":[["Willow Twig","Main hand · 1 free socket","▼7% DPS"],["Smouldering Chipped Hatchet of Needling","Off hand · 1 free socket","▼7% DPS"],["Dented Helm","Helmet · 1 free socket","▼8% DPS"],["Dented Helm","Helmet · replaces Echoing Cast","▼7% DPS"],["Threadbare Vestment","Body · replaces Flame Bolt","▼91% DPS"],["Threadbare Vestment","Body · replaces Echoing Cast","▼28% DPS"],["Threadbare Vestment","Body · replaces Kindle","▼8% DPS"],["Threadbare Vestment","Body · replaces Brute Force","▼8% DPS"],["Patched Striders","Boots · 1 free socket","▼7% DPS"]]},
-{"uid":20,"kind":"item","name":"Sinewed Patched Jerkin of Mending","rar":"magic","base":"Patched Jerkin","al":[{"text":"29 evasion","aug":false}],"req":"level 1, 14 Dex","ilvl":18,"sockets":[null,null],"exp":["+30 to maximum Life","Regenerate 1 Life per second"],"info":{"slotLabel":"Body","slot":"body","slotName":"Body","eq":true,"dps":0,"ehp":3,"gemsOut":2,"idle":[],"group":"armour","upgrade":true},"cmp":[{"slot":"body","label":"Body","eq":2,"ok":true,"dps":0,"ehp":3,"chips":{"life":30,"es":-44,"mana":0,"res":[0,0,0,0,0]},"note":{"severity":"warn","text":"No socket for Kindle and Brute Force, they will be unequipped"},"out":2,"idle":0,"best":true}]},
-{"uid":21,"kind":"item","name":"Hollow Bulwark","rar":"rare","base":"Grave Rags","req":"level 1","ilvl":18,"sockets":[null],"exp":["+29 to Armour","+5 to maximum Life","38% increased Armour","+10% to Lightning Resistance"],"info":{"slotLabel":"Body","slot":"body","slotName":"Body","eq":true,"dps":-23,"ehp":-7,"gemsOut":3,"idle":[],"group":"armour","upgrade":false},"cmp":[{"slot":"body","label":"Body","eq":2,"ok":true,"dps":-23,"ehp":-7,"chips":{"life":5,"es":-44,"mana":0,"res":[0,10,0,0,0]},"note":{"severity":"warn","text":"No socket for Echoing Cast, Kindle and Brute Force, they will be unequipped"},"out":3,"idle":0,"best":true}]},
-{"uid":23,"kind":"flask","name":"Frost Draught","rar":"flaskitem","sub":"Requires level 18 · 30/60 charges · 4 s","lines":["+50% to Cold Resistance","+6% to maximum Cold Resistance"],"liquid":"utility","info":{"slotLabel":"Flask","eq":true,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"fillsFlask":true,"group":"flask","upgrade":true},"fcmp":[{"idx":0,"eq":3,"ok":true},{"idx":1,"eq":4,"ok":true},{"idx":2,"eq":null,"ok":true,"chosen":true},{"idx":3,"eq":null,"ok":true},{"idx":4,"eq":null,"ok":true}]},
-{"uid":24,"kind":"gem","name":"Rime Drift","rar":"gem","info":{"slotLabel":"Gem","eq":false,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"group":"gem"},"gemLines":["Active skill · Spell · Level 4","Spell, Projectile, Area, Duration, Cold","Costs 11 mana","Deals 28 to 42 Cold damage","Cast time 0.7 s","Base critical chance 6%","Fires 1 projectile","Explodes in a radius of 1.8","Hits also inflict 48.5 cold damage a second for 0.5 s (renewed by each application) from the ground it leaves","Leaves chilling ground of radius 1.6 for 5 s","20% increased Effect of Chill","A frozen skull that bursts and leaves chilled ground that creeps toward enemies.","Requires level 23, 41 Int"],"picker":[["Willow Twig","Main hand · 1 free socket","▲10% DPS"],["Smouldering Chipped Hatchet of Needling","Off hand · 1 free socket","▲10% DPS"],["Dented Helm","Helmet · 1 free socket","▲8% DPS"],["Dented Helm","Helmet · replaces Echoing Cast","▲10% DPS"],["Threadbare Vestment","Body · replaces Flame Bolt","▼53% DPS"],["Threadbare Vestment","Body · replaces Echoing Cast","▼11% DPS"],["Threadbare Vestment","Body · replaces Kindle","▲8% DPS"],["Threadbare Vestment","Body · replaces Brute Force","▲8% DPS"],["Patched Striders","Boots · 1 free socket","▲10% DPS"]]},
-{"uid":25,"kind":"item","name":"Gilded Sollerets","rar":"normal","al":[{"text":"25 armour","aug":false},{"text":"5 energy shield","aug":false}],"req":"level 13, 15 Str, 15 Int","ilvl":18,"sockets":[null,null,null],"info":{"slotLabel":"Boots","slot":"boots","slotName":"Boots","eq":true,"dps":0,"ehp":6,"gemsOut":0,"idle":[],"group":"armour","upgrade":true},"cmp":[{"slot":"boots","label":"Boots","eq":14,"ok":true,"dps":0,"ehp":6,"chips":{"life":0,"es":5,"mana":0,"res":[0,0,0,0,0]},"note":{"severity":"good","text":"3 free sockets"},"out":0,"idle":0,"best":true}]},
-{"uid":26,"kind":"item","name":"Gloom Spiral","rar":"rare","base":"Mending Charm","req":"level 1","ilvl":18,"sockets":[],"imp":["Regenerate 3 Life per second"],"exp":["3% increased Evasion Rating","+19 to maximum Mana","+9 to maximum Energy Shield","3% increased Cold Damage","Regenerate 2 Life per second","5% increased Cast Speed"],"info":{"slotLabel":"Amulet","slot":"amulet","slotName":"Amulet","eq":true,"dps":4,"ehp":-1,"gemsOut":0,"idle":[],"group":"jewellery","upgrade":true},"cmp":[{"slot":"amulet","label":"Amulet","eq":22,"ok":true,"dps":4,"ehp":-1,"chips":{"life":0,"es":9,"mana":19,"res":[0,0,0,-25,0]},"note":{"severity":"none","text":""},"out":0,"idle":0,"best":true}]},
-{"uid":28,"kind":"item","name":"Ribbone Rapier","rar":"normal","wtype":"One-Handed Sword","wl":{"phys":"4–17 physical","speed":"1.6 APS","crit":"5.5% crit","extra":[],"aug":[false,false,false]},"req":"level 7, 32 Dex","ilvl":18,"sockets":[null],"imp":["+25% to Critical Strike Multiplier"],"info":{"slotLabel":"One-hand","eq":false,"reason":"Requires 32 dex","dps":0,"ehp":0,"gemsOut":0,"idle":[],"group":"weapon","upgrade":false},"cmp":[{"slot":"mainHand","label":"Main hand","eq":1,"ok":false,"why":"Needs 32 Dex, you have 14.","dps":0,"ehp":0,"chips":null,"note":{"severity":"none","text":""},"out":0,"idle":0,"best":false},{"slot":"offHand","label":"Off hand","eq":39,"ok":false,"why":"Needs 32 Dex, you have 14.","dps":0,"ehp":0,"chips":null,"note":{"severity":"none","text":""},"out":0,"idle":0,"best":false}],"multi":true},
-{"uid":29,"kind":"flask","name":"Storm Draught","rar":"flaskitem","sub":"Requires level 18 · 30/60 charges · 4 s","lines":["+50% to Lightning Resistance","+6% to maximum Lightning Resistance"],"liquid":"utility","info":{"slotLabel":"Flask","eq":true,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"fillsFlask":true,"group":"flask","upgrade":true},"fcmp":[{"idx":0,"eq":3,"ok":true},{"idx":1,"eq":4,"ok":true},{"idx":2,"eq":null,"ok":true,"chosen":true},{"idx":3,"eq":null,"ok":true},{"idx":4,"eq":null,"ok":true}]},
-{"uid":30,"kind":"gem","name":"Flame Bolt","rar":"gem","info":{"slotLabel":"Gem","eq":false,"dps":0,"ehp":0,"gemsOut":0,"idle":[],"group":"gem"},"gemLines":["Active skill · Spell · Level 8","Spell, Projectile, Area, Fire","Costs 10 mana","Deals 72 to 109 Fire damage","Cast time 0.8 s","Base critical chance 6%","Fires 1 projectile","Explodes in a radius of 1.2","27% chance to Ignite","64% more Damage with Ignite","Hurls a bolt of flame that bursts on impact and sets its victims burning.","Requires level 24, 42 Int"],"picker":[["Willow Twig","Main hand · 1 free socket","no change"],["Smouldering Chipped Hatchet of Needling","Off hand · 1 free socket","no change"],["Dented Helm","Helmet · 1 free socket","no change"],["Dented Helm","Helmet · replaces Echoing Cast","no change"],["Threadbare Vestment","Body · replaces Flame Bolt","no change"],["Threadbare Vestment","Body · replaces Echoing Cast","▼23% DPS"],["Threadbare Vestment","Body · replaces Kindle","no change"],["Threadbare Vestment","Body · replaces Brute Force","no change"],["Patched Striders","Boots · 1 free socket","no change"]]}],
-"pile":[{"uid":31,"kind":"item","name":"Wellspring Charm","rar":"normal","req":"level 1","ilvl":18,"sockets":[],"imp":["25% increased Mana Regeneration Rate"],"info":{"slotLabel":"Amulet","slot":"amulet","slotName":"Amulet","eq":true,"dps":0,"ehp":-4,"gemsOut":0,"idle":[],"group":"jewellery","upgrade":false},"dust":1},{"uid":32,"kind":"item","name":"Rusted Greatsword","rar":"normal","wtype":"Two-Handed Sword","wl":{"phys":"7–13 physical","speed":"1.45 APS","crit":"5% crit","extra":[],"aug":[false,false,false]},"req":"level 1, 11 Str, 11 Dex","ilvl":18,"sockets":[null,null],"imp":["40% increased Accuracy Rating"],"info":{"slotLabel":"Two-hand","slot":"mainHand","slotName":"Main hand","eq":true,"dps":-6,"ehp":-15,"gemsOut":0,"idle":[],"group":"weapon","upgrade":false},"dust":1}],
-"unseen":[901,11,12,13,15,16,17,18],"last":[901,11,12,13,15,16],"fav":[15]};
-
-const SLOT_LABEL = { mainHand: 'Main hand', offHand: 'Off hand', helmet: 'Helmet', body: 'Body', gloves: 'Gloves', boots: 'Boots', amulet: 'Amulet', ring1: 'Ring 1', ring2: 'Ring 2', belt: 'Belt' };
-const SLOT_GROUP = { mainHand: 'Two-hand', offHand: 'Off hand', helmet: 'Helmet', body: 'Body', gloves: 'Gloves', boots: 'Boots', amulet: 'Amulet', ring1: 'Ring', ring2: 'Ring', belt: 'Belt' };
-const PLACE = { helmet: [3, 1], ring1: [2, 2], amulet: [3, 2], ring2: [4, 2], mainHand: [1, 3], body: [3, 3], offHand: [5, 3], gloves: [1, 4], belt: [3, 4], boots: [3, 5] };
-const GLYPH = { helmet: 'Hm', ring1: 'R', amulet: 'Am', ring2: 'R', mainHand: 'W', body: 'Bd', offHand: 'Oh', gloves: 'Gl', belt: 'Bt', boots: 'Bo' };
-const LIQUID = { life: '#c0392b', mana: '#2e5fc9', hybrid: '#8e44ad', utility: '#c9a227' };
-const VIEWS = [['all', 'All'], ['new', 'New'], ['upgrades', 'Upgrades'], ['last', 'Last map'], ['fav', '★'], ['discarded', 'Discarded']];
-const WHATS = [['all', 'Everything'], ['weapon', 'Weapons'], ['armour', 'Armour'], ['jewellery', 'Jewellery'], ['flask', 'Flasks'], ['gem', 'Gems']];
-const SORTS = [['newest', 'Newest'], ['slot', 'Slot'], ['rarity', 'Rarity'], ['ilvl', 'Item level'], ['dps', 'Δ DPS'], ['ehp', 'Δ Effective HP'], ['upgrade', 'Best upgrade'], ['name', 'Name'], ['fav', 'Favourites']];
-const RES = ['', 'lightning', 'cold', 'fire', 'chaos'];
-
-const clone = (o) => JSON.parse(JSON.stringify(o));
-let S;
-function reset() {
-  S = {
-    worn: clone(DATA.worn), flasks: clone(DATA.flasks), bag: clone(DATA.bag), pile: clone(DATA.pile),
-    unseen: new Set(DATA.unseen), last: new Set(DATA.last), fav: new Set(DATA.fav),
-    gearOpen: true, search: '', view: 'all', what: 'all', sort: 'newest', desc: false,
-    screen: 'bag', sel: null, aim: null, justOff: null, sheet: false, ask: null, undo: [],
+  // Real items, comparisons and wording taken from a level 32 test run of the game (2026-10-27).
+  const DATA = {
+    worn: {
+      mainHand: {
+        uid: 1,
+        kind: 'item',
+        name: 'Willow Twig',
+        rar: 'normal',
+        wtype: 'Wand',
+        wl: {
+          phys: '8–15 physical',
+          speed: '1.4 APS',
+          crit: '7% crit',
+          extra: [],
+          aug: [true, false, false],
+        },
+        req: 'level 1, 14 Int',
+        ilvl: 1,
+        sockets: [null],
+        imp: ['10% increased Spell Damage', 'Adds 3 to 6 Physical Damage'],
+      },
+      body: {
+        uid: 2,
+        kind: 'item',
+        name: 'Threadbare Vestment',
+        rar: 'normal',
+        al: [{ text: '40 energy shield', aug: true }],
+        req: 'level 1, 17 Int',
+        ilvl: 1,
+        sockets: [
+          { a: 'int', s: false, n: 'Flame Bolt', p: true },
+          { a: 'int', s: true, n: 'Echoing Cast', p: false },
+          { a: 'str', s: true, n: 'Kindle', p: false },
+          { a: 'str', s: true, n: 'Brute Force', p: false },
+        ],
+        imp: ['+28 to maximum Energy Shield'],
+      },
+      helmet: {
+        uid: 9,
+        kind: 'item',
+        name: 'Dented Helm',
+        rar: 'normal',
+        al: [{ text: '9 armour', aug: false }],
+        req: 'level 1, 9 Str',
+        ilvl: 20,
+        sockets: [{ a: 'int', s: true, n: 'Echoing Cast', p: false }, null],
+      },
+      boots: {
+        uid: 14,
+        kind: 'item',
+        name: 'Patched Striders',
+        rar: 'normal',
+        al: [{ text: '13 evasion', aug: false }],
+        req: 'level 1, 11 Dex',
+        ilvl: 18,
+        sockets: [null],
+      },
+      ring1: {
+        uid: 19,
+        kind: 'item',
+        name: 'Gritty Spiked Ring of the Ox',
+        rar: 'magic',
+        base: 'Spiked Ring',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [],
+        imp: ['Adds 1 to 4 Physical Damage to Attacks'],
+        exp: ['Adds 1 to 2 Physical Damage to Attacks', '+14 to Strength'],
+      },
+      amulet: {
+        uid: 22,
+        kind: 'item',
+        name: 'Ember Charm',
+        rar: 'normal',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [],
+        imp: ['+25% to Fire Resistance'],
+      },
+      ring2: {
+        uid: 27,
+        kind: 'item',
+        name: 'Cinder Ring of the Owl',
+        rar: 'magic',
+        base: 'Cinder Ring',
+        req: 'level 16',
+        ilvl: 18,
+        sockets: [],
+        imp: ['+25% to Fire Resistance'],
+        exp: ['+12 to Intelligence'],
+      },
+      offHand: {
+        uid: 39,
+        kind: 'item',
+        name: 'Smouldering Chipped Hatchet of Needling',
+        rar: 'magic',
+        base: 'Chipped Hatchet',
+        wtype: 'One-Handed Axe',
+        wl: {
+          phys: '6–11 physical',
+          speed: '1.5 APS',
+          crit: '5.6% crit',
+          extra: ['12–25 fire'],
+          aug: [false, false, true],
+        },
+        req: 'level 1, 12 Str, 6 Dex',
+        ilvl: 18,
+        sockets: [null],
+        exp: ['12% increased Critical Strike Chance', 'Adds 12 to 25 Fire Damage'],
+      },
+    },
+    flasks: [
+      {
+        uid: 3,
+        kind: 'flask',
+        name: 'Cracked Life Draught',
+        rar: 'flaskitem',
+        sub: 'Requires level 1 · 7/21 charges · 6 s',
+        lines: ['Recovers 70 life'],
+        liquid: 'life',
+      },
+      {
+        uid: 4,
+        kind: 'flask',
+        name: 'Cracked Mana Draught',
+        rar: 'flaskitem',
+        sub: 'Requires level 1 · 6/24 charges · 3 s',
+        lines: ['Recovers 50 mana'],
+        liquid: 'mana',
+      },
+      null,
+      null,
+      null,
+    ],
+    bag: [
+      {
+        uid: 901,
+        kind: 'item',
+        name: 'Supple Spark Ring of Embers',
+        rar: 'magic',
+        base: 'Spark Ring',
+        req: 'level 12',
+        ilvl: 18,
+        sockets: [],
+        imp: ['+25% to Lightning Resistance'],
+        exp: ['+8% to Fire Resistance', '+7 to Evasion Rating'],
+        info: {
+          slotLabel: 'Ring',
+          slot: 'ring1',
+          slotName: 'Ring 1',
+          eq: true,
+          dps: 0,
+          ehp: 5,
+          gemsOut: 0,
+          idle: [],
+          group: 'jewellery',
+          upgrade: true,
+        },
+        cmp: [
+          {
+            slot: 'ring1',
+            label: 'Ring 1',
+            eq: 19,
+            ok: true,
+            dps: 0,
+            ehp: 5,
+            chips: { life: -7, es: 0, mana: 0, res: [0, 25, 0, 8, 0] },
+            note: { severity: 'none', text: '' },
+            out: 0,
+            idle: 0,
+            best: true,
+          },
+          {
+            slot: 'ring2',
+            label: 'Ring 2',
+            eq: 27,
+            ok: true,
+            dps: -64,
+            ehp: 3,
+            chips: { life: 0, es: -1, mana: -6, res: [0, 25, 0, -17, 0] },
+            note: { severity: 'none', text: '' },
+            out: 0,
+            idle: 0,
+            best: false,
+          },
+        ],
+        multi: true,
+      },
+      {
+        uid: 11,
+        kind: 'item',
+        name: 'Spare Body',
+        rar: 'normal',
+        base: 'Threadbare Vestment',
+        al: [{ text: '40 energy shield', aug: true }],
+        req: 'level 1, 17 Int',
+        ilvl: 1,
+        sockets: [null, null],
+        imp: ['+28 to maximum Energy Shield'],
+        info: {
+          slotLabel: 'Body',
+          slot: 'body',
+          slotName: 'Body',
+          eq: true,
+          dps: 0,
+          ehp: 0,
+          gemsOut: 2,
+          idle: [],
+          group: 'armour',
+          upgrade: true,
+        },
+        cmp: [
+          {
+            slot: 'body',
+            label: 'Body',
+            eq: 2,
+            ok: true,
+            dps: 0,
+            ehp: 0,
+            chips: { life: 0, es: 0, mana: 0, res: [0, 0, 0, 0, 0] },
+            note: {
+              severity: 'warn',
+              text: 'No socket for Kindle and Brute Force, they will be unequipped',
+            },
+            out: 2,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 12,
+        kind: 'item',
+        name: 'Spare Helm',
+        rar: 'normal',
+        base: 'Dented Helm',
+        al: [{ text: '9 armour', aug: false }],
+        req: 'level 1, 9 Str',
+        ilvl: 20,
+        sockets: [null, null, null, null, null, null],
+        info: {
+          slotLabel: 'Helmet',
+          slot: 'helmet',
+          slotName: 'Helmet',
+          eq: true,
+          dps: 0,
+          ehp: 0,
+          gemsOut: 0,
+          idle: [],
+          group: 'armour',
+          upgrade: false,
+        },
+        cmp: [
+          {
+            slot: 'helmet',
+            label: 'Helmet',
+            eq: 9,
+            ok: true,
+            dps: 0,
+            ehp: 0,
+            chips: { life: 0, es: 0, mana: 0, res: [0, 0, 0, 0, 0] },
+            note: { severity: 'good', text: '5 free sockets' },
+            out: 0,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 13,
+        kind: 'item',
+        name: 'Grave Rags',
+        rar: 'normal',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [null],
+        info: {
+          slotLabel: 'Body',
+          slot: 'body',
+          slotName: 'Body',
+          eq: true,
+          dps: -23,
+          ehp: -9,
+          gemsOut: 3,
+          idle: [],
+          group: 'armour',
+          upgrade: false,
+        },
+        cmp: [
+          {
+            slot: 'body',
+            label: 'Body',
+            eq: 2,
+            ok: true,
+            dps: -23,
+            ehp: -9,
+            chips: { life: 0, es: -44, mana: 0, res: [0, 0, 0, 0, 0] },
+            note: {
+              severity: 'warn',
+              text: 'No socket for Echoing Cast, Kindle and Brute Force, they will be unequipped',
+            },
+            out: 3,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 15,
+        kind: 'item',
+        name: 'Linen Circlet',
+        rar: 'normal',
+        al: [{ text: '19 energy shield', aug: false }],
+        req: 'level 17, 40 Int',
+        ilvl: 18,
+        sockets: [null, null],
+        info: {
+          slotLabel: 'Helmet',
+          slot: 'helmet',
+          slotName: 'Helmet',
+          eq: true,
+          dps: 0,
+          ehp: 1,
+          gemsOut: 0,
+          idle: [],
+          group: 'armour',
+          upgrade: true,
+        },
+        cmp: [
+          {
+            slot: 'helmet',
+            label: 'Helmet',
+            eq: 9,
+            ok: true,
+            dps: 0,
+            ehp: 1,
+            chips: { life: 0, es: 20, mana: 0, res: [0, 0, 0, 0, 0] },
+            note: { severity: 'none', text: '' },
+            out: 0,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 16,
+        kind: 'item',
+        name: 'Raven Ward',
+        rar: 'rare',
+        base: 'Grave Rags',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [null],
+        exp: [
+          '+13% to Fire Resistance',
+          '16% increased Armour',
+          '8% increased Armour',
+          '7% increased Stun and Block Recovery',
+          '+20 to maximum Life',
+          '+11 to Strength',
+          '14% increased Stun and Block Recovery',
+        ],
+        info: {
+          slotLabel: 'Body',
+          slot: 'body',
+          slotName: 'Body',
+          eq: true,
+          dps: -23,
+          ehp: -2,
+          gemsOut: 3,
+          idle: [],
+          group: 'armour',
+          upgrade: false,
+        },
+        cmp: [
+          {
+            slot: 'body',
+            label: 'Body',
+            eq: 2,
+            ok: true,
+            dps: -23,
+            ehp: -2,
+            chips: { life: 26, es: -44, mana: 0, res: [0, 0, 0, 13, 0] },
+            note: {
+              severity: 'warn',
+              text: 'No socket for Echoing Cast, Kindle and Brute Force, they will be unequipped',
+            },
+            out: 3,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 17,
+        kind: 'flask',
+        name: 'Brimming Murky Blended Draught of Stanching',
+        rar: 'flaskitem',
+        sub: 'Requires level 10 · 20/40 charges · 5 s',
+        lines: [
+          'Recovers 100 life',
+          'Recovers 70 mana',
+          '38% increased Amount Recovered',
+          'Removes Bleeding on use; Immunity to Bleeding during Flask effect',
+        ],
+        liquid: 'hybrid',
+        info: {
+          slotLabel: 'Flask',
+          eq: true,
+          dps: 0,
+          ehp: 0,
+          gemsOut: 0,
+          idle: [],
+          fillsFlask: true,
+          group: 'flask',
+          upgrade: true,
+        },
+        fcmp: [
+          { idx: 0, eq: 3, ok: true },
+          { idx: 1, eq: 4, ok: true },
+          { idx: 2, eq: null, ok: true, chosen: true },
+          { idx: 3, eq: null, ok: true },
+          { idx: 4, eq: null, ok: true },
+        ],
+      },
+      {
+        uid: 18,
+        kind: 'gem',
+        name: 'Shadow Swap',
+        rar: 'gem',
+        info: { slotLabel: 'Gem', eq: false, dps: 0, ehp: 0, gemsOut: 0, idle: [], group: 'gem' },
+        gemLines: [
+          'Active skill · Spell · Level 1',
+          'Spell, Movement, Fire, Area',
+          'Costs 8 mana',
+          'Deals 3 to 5 Fire damage',
+          'Cast time 0.7 s',
+          'Base critical chance 6%',
+          'Jumps up to 8 toward a target out of reach',
+          '0.3 s cooldown',
+          'Go to a corpse or an enemy in a burst of fire at both ends.',
+          'Requires level 10, 27 Dex',
+        ],
+        picker: [
+          ['Willow Twig', 'Main hand · 1 free socket', '▼7% DPS'],
+          ['Smouldering Chipped Hatchet of Needling', 'Off hand · 1 free socket', '▼7% DPS'],
+          ['Dented Helm', 'Helmet · 1 free socket', '▼8% DPS'],
+          ['Dented Helm', 'Helmet · replaces Echoing Cast', '▼7% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Flame Bolt', '▼91% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Echoing Cast', '▼28% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Kindle', '▼8% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Brute Force', '▼8% DPS'],
+          ['Patched Striders', 'Boots · 1 free socket', '▼7% DPS'],
+        ],
+      },
+      {
+        uid: 20,
+        kind: 'item',
+        name: 'Sinewed Patched Jerkin of Mending',
+        rar: 'magic',
+        base: 'Patched Jerkin',
+        al: [{ text: '29 evasion', aug: false }],
+        req: 'level 1, 14 Dex',
+        ilvl: 18,
+        sockets: [null, null],
+        exp: ['+30 to maximum Life', 'Regenerate 1 Life per second'],
+        info: {
+          slotLabel: 'Body',
+          slot: 'body',
+          slotName: 'Body',
+          eq: true,
+          dps: 0,
+          ehp: 3,
+          gemsOut: 2,
+          idle: [],
+          group: 'armour',
+          upgrade: true,
+        },
+        cmp: [
+          {
+            slot: 'body',
+            label: 'Body',
+            eq: 2,
+            ok: true,
+            dps: 0,
+            ehp: 3,
+            chips: { life: 30, es: -44, mana: 0, res: [0, 0, 0, 0, 0] },
+            note: {
+              severity: 'warn',
+              text: 'No socket for Kindle and Brute Force, they will be unequipped',
+            },
+            out: 2,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 21,
+        kind: 'item',
+        name: 'Hollow Bulwark',
+        rar: 'rare',
+        base: 'Grave Rags',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [null],
+        exp: [
+          '+29 to Armour',
+          '+5 to maximum Life',
+          '38% increased Armour',
+          '+10% to Lightning Resistance',
+        ],
+        info: {
+          slotLabel: 'Body',
+          slot: 'body',
+          slotName: 'Body',
+          eq: true,
+          dps: -23,
+          ehp: -7,
+          gemsOut: 3,
+          idle: [],
+          group: 'armour',
+          upgrade: false,
+        },
+        cmp: [
+          {
+            slot: 'body',
+            label: 'Body',
+            eq: 2,
+            ok: true,
+            dps: -23,
+            ehp: -7,
+            chips: { life: 5, es: -44, mana: 0, res: [0, 10, 0, 0, 0] },
+            note: {
+              severity: 'warn',
+              text: 'No socket for Echoing Cast, Kindle and Brute Force, they will be unequipped',
+            },
+            out: 3,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 23,
+        kind: 'flask',
+        name: 'Frost Draught',
+        rar: 'flaskitem',
+        sub: 'Requires level 18 · 30/60 charges · 4 s',
+        lines: ['+50% to Cold Resistance', '+6% to maximum Cold Resistance'],
+        liquid: 'utility',
+        info: {
+          slotLabel: 'Flask',
+          eq: true,
+          dps: 0,
+          ehp: 0,
+          gemsOut: 0,
+          idle: [],
+          fillsFlask: true,
+          group: 'flask',
+          upgrade: true,
+        },
+        fcmp: [
+          { idx: 0, eq: 3, ok: true },
+          { idx: 1, eq: 4, ok: true },
+          { idx: 2, eq: null, ok: true, chosen: true },
+          { idx: 3, eq: null, ok: true },
+          { idx: 4, eq: null, ok: true },
+        ],
+      },
+      {
+        uid: 24,
+        kind: 'gem',
+        name: 'Rime Drift',
+        rar: 'gem',
+        info: { slotLabel: 'Gem', eq: false, dps: 0, ehp: 0, gemsOut: 0, idle: [], group: 'gem' },
+        gemLines: [
+          'Active skill · Spell · Level 4',
+          'Spell, Projectile, Area, Duration, Cold',
+          'Costs 11 mana',
+          'Deals 28 to 42 Cold damage',
+          'Cast time 0.7 s',
+          'Base critical chance 6%',
+          'Fires 1 projectile',
+          'Explodes in a radius of 1.8',
+          'Hits also inflict 48.5 cold damage a second for 0.5 s (renewed by each application) from the ground it leaves',
+          'Leaves chilling ground of radius 1.6 for 5 s',
+          '20% increased Effect of Chill',
+          'A frozen skull that bursts and leaves chilled ground that creeps toward enemies.',
+          'Requires level 23, 41 Int',
+        ],
+        picker: [
+          ['Willow Twig', 'Main hand · 1 free socket', '▲10% DPS'],
+          ['Smouldering Chipped Hatchet of Needling', 'Off hand · 1 free socket', '▲10% DPS'],
+          ['Dented Helm', 'Helmet · 1 free socket', '▲8% DPS'],
+          ['Dented Helm', 'Helmet · replaces Echoing Cast', '▲10% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Flame Bolt', '▼53% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Echoing Cast', '▼11% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Kindle', '▲8% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Brute Force', '▲8% DPS'],
+          ['Patched Striders', 'Boots · 1 free socket', '▲10% DPS'],
+        ],
+      },
+      {
+        uid: 25,
+        kind: 'item',
+        name: 'Gilded Sollerets',
+        rar: 'normal',
+        al: [
+          { text: '25 armour', aug: false },
+          { text: '5 energy shield', aug: false },
+        ],
+        req: 'level 13, 15 Str, 15 Int',
+        ilvl: 18,
+        sockets: [null, null, null],
+        info: {
+          slotLabel: 'Boots',
+          slot: 'boots',
+          slotName: 'Boots',
+          eq: true,
+          dps: 0,
+          ehp: 6,
+          gemsOut: 0,
+          idle: [],
+          group: 'armour',
+          upgrade: true,
+        },
+        cmp: [
+          {
+            slot: 'boots',
+            label: 'Boots',
+            eq: 14,
+            ok: true,
+            dps: 0,
+            ehp: 6,
+            chips: { life: 0, es: 5, mana: 0, res: [0, 0, 0, 0, 0] },
+            note: { severity: 'good', text: '3 free sockets' },
+            out: 0,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 26,
+        kind: 'item',
+        name: 'Gloom Spiral',
+        rar: 'rare',
+        base: 'Mending Charm',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [],
+        imp: ['Regenerate 3 Life per second'],
+        exp: [
+          '3% increased Evasion Rating',
+          '+19 to maximum Mana',
+          '+9 to maximum Energy Shield',
+          '3% increased Cold Damage',
+          'Regenerate 2 Life per second',
+          '5% increased Cast Speed',
+        ],
+        info: {
+          slotLabel: 'Amulet',
+          slot: 'amulet',
+          slotName: 'Amulet',
+          eq: true,
+          dps: 4,
+          ehp: -1,
+          gemsOut: 0,
+          idle: [],
+          group: 'jewellery',
+          upgrade: true,
+        },
+        cmp: [
+          {
+            slot: 'amulet',
+            label: 'Amulet',
+            eq: 22,
+            ok: true,
+            dps: 4,
+            ehp: -1,
+            chips: { life: 0, es: 9, mana: 19, res: [0, 0, 0, -25, 0] },
+            note: { severity: 'none', text: '' },
+            out: 0,
+            idle: 0,
+            best: true,
+          },
+        ],
+      },
+      {
+        uid: 28,
+        kind: 'item',
+        name: 'Ribbone Rapier',
+        rar: 'normal',
+        wtype: 'One-Handed Sword',
+        wl: {
+          phys: '4–17 physical',
+          speed: '1.6 APS',
+          crit: '5.5% crit',
+          extra: [],
+          aug: [false, false, false],
+        },
+        req: 'level 7, 32 Dex',
+        ilvl: 18,
+        sockets: [null],
+        imp: ['+25% to Critical Strike Multiplier'],
+        info: {
+          slotLabel: 'One-hand',
+          eq: false,
+          reason: 'Requires 32 dex',
+          dps: 0,
+          ehp: 0,
+          gemsOut: 0,
+          idle: [],
+          group: 'weapon',
+          upgrade: false,
+        },
+        cmp: [
+          {
+            slot: 'mainHand',
+            label: 'Main hand',
+            eq: 1,
+            ok: false,
+            why: 'Needs 32 Dex, you have 14.',
+            dps: 0,
+            ehp: 0,
+            chips: null,
+            note: { severity: 'none', text: '' },
+            out: 0,
+            idle: 0,
+            best: false,
+          },
+          {
+            slot: 'offHand',
+            label: 'Off hand',
+            eq: 39,
+            ok: false,
+            why: 'Needs 32 Dex, you have 14.',
+            dps: 0,
+            ehp: 0,
+            chips: null,
+            note: { severity: 'none', text: '' },
+            out: 0,
+            idle: 0,
+            best: false,
+          },
+        ],
+        multi: true,
+      },
+      {
+        uid: 29,
+        kind: 'flask',
+        name: 'Storm Draught',
+        rar: 'flaskitem',
+        sub: 'Requires level 18 · 30/60 charges · 4 s',
+        lines: ['+50% to Lightning Resistance', '+6% to maximum Lightning Resistance'],
+        liquid: 'utility',
+        info: {
+          slotLabel: 'Flask',
+          eq: true,
+          dps: 0,
+          ehp: 0,
+          gemsOut: 0,
+          idle: [],
+          fillsFlask: true,
+          group: 'flask',
+          upgrade: true,
+        },
+        fcmp: [
+          { idx: 0, eq: 3, ok: true },
+          { idx: 1, eq: 4, ok: true },
+          { idx: 2, eq: null, ok: true, chosen: true },
+          { idx: 3, eq: null, ok: true },
+          { idx: 4, eq: null, ok: true },
+        ],
+      },
+      {
+        uid: 30,
+        kind: 'gem',
+        name: 'Flame Bolt',
+        rar: 'gem',
+        info: { slotLabel: 'Gem', eq: false, dps: 0, ehp: 0, gemsOut: 0, idle: [], group: 'gem' },
+        gemLines: [
+          'Active skill · Spell · Level 8',
+          'Spell, Projectile, Area, Fire',
+          'Costs 10 mana',
+          'Deals 72 to 109 Fire damage',
+          'Cast time 0.8 s',
+          'Base critical chance 6%',
+          'Fires 1 projectile',
+          'Explodes in a radius of 1.2',
+          '27% chance to Ignite',
+          '64% more Damage with Ignite',
+          'Hurls a bolt of flame that bursts on impact and sets its victims burning.',
+          'Requires level 24, 42 Int',
+        ],
+        picker: [
+          ['Willow Twig', 'Main hand · 1 free socket', 'no change'],
+          ['Smouldering Chipped Hatchet of Needling', 'Off hand · 1 free socket', 'no change'],
+          ['Dented Helm', 'Helmet · 1 free socket', 'no change'],
+          ['Dented Helm', 'Helmet · replaces Echoing Cast', 'no change'],
+          ['Threadbare Vestment', 'Body · replaces Flame Bolt', 'no change'],
+          ['Threadbare Vestment', 'Body · replaces Echoing Cast', '▼23% DPS'],
+          ['Threadbare Vestment', 'Body · replaces Kindle', 'no change'],
+          ['Threadbare Vestment', 'Body · replaces Brute Force', 'no change'],
+          ['Patched Striders', 'Boots · 1 free socket', 'no change'],
+        ],
+      },
+    ],
+    pile: [
+      {
+        uid: 31,
+        kind: 'item',
+        name: 'Wellspring Charm',
+        rar: 'normal',
+        req: 'level 1',
+        ilvl: 18,
+        sockets: [],
+        imp: ['25% increased Mana Regeneration Rate'],
+        info: {
+          slotLabel: 'Amulet',
+          slot: 'amulet',
+          slotName: 'Amulet',
+          eq: true,
+          dps: 0,
+          ehp: -4,
+          gemsOut: 0,
+          idle: [],
+          group: 'jewellery',
+          upgrade: false,
+        },
+        dust: 1,
+      },
+      {
+        uid: 32,
+        kind: 'item',
+        name: 'Rusted Greatsword',
+        rar: 'normal',
+        wtype: 'Two-Handed Sword',
+        wl: {
+          phys: '7–13 physical',
+          speed: '1.45 APS',
+          crit: '5% crit',
+          extra: [],
+          aug: [false, false, false],
+        },
+        req: 'level 1, 11 Str, 11 Dex',
+        ilvl: 18,
+        sockets: [null, null],
+        imp: ['40% increased Accuracy Rating'],
+        info: {
+          slotLabel: 'Two-hand',
+          slot: 'mainHand',
+          slotName: 'Main hand',
+          eq: true,
+          dps: -6,
+          ehp: -15,
+          gemsOut: 0,
+          idle: [],
+          group: 'weapon',
+          upgrade: false,
+        },
+        dust: 1,
+      },
+    ],
+    unseen: [901, 11, 12, 13, 15, 16, 17, 18],
+    last: [901, 11, 12, 13, 15, 16],
+    fav: [15],
   };
-}
-reset();
 
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const rnd = Math.round;
-function signed(v, label) { const r = rnd(v); if (!r) return ''; return `<span class="${r > 0 ? 'up' : 'down'}">${r > 0 ? '▲' : '▼'}${Math.abs(r)}% ${label}</span>`; }
-function stones(sockets) {
-  if (!sockets || !sockets.length) return '';
-  return `<span class="stones">${sockets.map((g) => g ? `<span class="stone ${g.a}${g.s ? ' s' : ''}${g.p ? ' p' : ''}" title="${esc(g.n)}"></span>` : '<span class="stone"></span>').join('')}</span>`;
-}
-const linesOf = (it) => it.kind === 'flask' ? (it.lines || []) : [...(it.imp || []), ...(it.exp || []), ...(it.rules || [])];
-const lineKey = (l) => l.replace(/\d+(\.\d+)?/g, 'N');
-const findAny = (uid) => S.bag.find((x) => x.uid === uid) || S.pile.find((x) => x.uid === uid) || Object.values(S.worn).find((x) => x && x.uid === uid) || S.flasks.find((x) => x && x.uid === uid);
-const cur = () => {
-  const s = S.sel; if (!s) return null;
-  if (s.from === 'inv') return S.bag.find((x) => x.uid === s.uid) || null;
-  if (s.from === 'pile') return S.pile.find((x) => x.uid === s.uid) || null;
-  if (s.from === 'slot') return S.worn[s.slot] || null;
-  return S.flasks[s.idx] || null;
-};
-const flaskTab = (f) => !f ? 'Empty' : f.liquid === 'utility' ? f.name.split(' ')[0] : f.liquid[0].toUpperCase() + f.liquid.slice(1);
-function counts() {
-  return {
-    new: S.bag.filter((x) => S.unseen.has(x.uid)).length,
-    upgrades: S.bag.filter((x) => x.info && x.info.upgrade).length,
-    last: S.bag.filter((x) => S.last.has(x.uid)).length,
-    fav: S.bag.filter((x) => S.fav.has(x.uid)).length,
-    discarded: S.pile.length,
+  const SLOT_LABEL = {
+    mainHand: 'Main hand',
+    offHand: 'Off hand',
+    helmet: 'Helmet',
+    body: 'Body',
+    gloves: 'Gloves',
+    boots: 'Boots',
+    amulet: 'Amulet',
+    ring1: 'Ring 1',
+    ring2: 'Ring 2',
+    belt: 'Belt',
   };
-}
-function visible() {
-  let pool = S.view === 'discarded' ? S.pile : S.bag;
-  if (S.view === 'new') pool = pool.filter((x) => S.unseen.has(x.uid));
-  if (S.view === 'last') pool = pool.filter((x) => S.last.has(x.uid));
-  if (S.view === 'fav') pool = pool.filter((x) => S.fav.has(x.uid));
-  if (S.view === 'upgrades') pool = pool.filter((x) => x.info && x.info.upgrade);
-  if (S.what !== 'all') pool = pool.filter((x) => x.info && x.info.group === S.what);
-  const q = S.search.trim().toLowerCase();
-  if (q) pool = pool.filter((x) => x.name.toLowerCase().includes(q));
-  const rar = { normal: 0, magic: 1, rare: 2, unique: 3, flaskitem: 0, gem: 0 };
-  const key = {
-    newest: () => 0, name: (x) => x.name, rarity: (x) => -rar[x.rar], ilvl: (x) => -(x.ilvl || 0), dps: (x) => -(x.info?.dps || 0),
-    ehp: (x) => -(x.info?.ehp || 0), upgrade: (x) => -((x.info?.dps || 0) + (x.info?.ehp || 0)), slot: (x) => x.info?.slotLabel || '', fav: (x) => (S.fav.has(x.uid) ? 0 : 1),
-  }[S.sort];
-  let out = pool.map((x, i) => [x, i]).sort((a, b) => { const ka = key(a[0]), kb = key(b[0]); return ka < kb ? -1 : ka > kb ? 1 : a[1] - b[1]; }).map((p) => p[0]);
-  if (S.desc) out = out.reverse();
-  return out;
-}
-const junk = () => S.bag.filter((x) => x.kind === 'item' && (x.rar === 'normal' || x.rar === 'magic') && !(x.info && x.info.upgrade) && !S.fav.has(x.uid));
+  const SLOT_GROUP = {
+    mainHand: 'Two-hand',
+    offHand: 'Off hand',
+    helmet: 'Helmet',
+    body: 'Body',
+    gloves: 'Gloves',
+    boots: 'Boots',
+    amulet: 'Amulet',
+    ring1: 'Ring',
+    ring2: 'Ring',
+    belt: 'Belt',
+  };
+  const PLACE = {
+    helmet: [3, 1],
+    ring1: [2, 2],
+    amulet: [3, 2],
+    ring2: [4, 2],
+    mainHand: [1, 3],
+    body: [3, 3],
+    offHand: [5, 3],
+    gloves: [1, 4],
+    belt: [3, 4],
+    boots: [3, 5],
+  };
+  const GLYPH = {
+    helmet: 'Hm',
+    ring1: 'R',
+    amulet: 'Am',
+    ring2: 'R',
+    mainHand: 'W',
+    body: 'Bd',
+    offHand: 'Oh',
+    gloves: 'Gl',
+    belt: 'Bt',
+    boots: 'Bo',
+  };
+  const LIQUID = { life: '#c0392b', mana: '#2e5fc9', hybrid: '#8e44ad', utility: '#c9a227' };
+  const VIEWS = [
+    ['all', 'All'],
+    ['new', 'New'],
+    ['upgrades', 'Upgrades'],
+    ['last', 'Last map'],
+    ['fav', '★'],
+    ['discarded', 'Discarded'],
+  ];
+  const WHATS = [
+    ['all', 'Everything'],
+    ['weapon', 'Weapons'],
+    ['armour', 'Armour'],
+    ['jewellery', 'Jewellery'],
+    ['flask', 'Flasks'],
+    ['gem', 'Gems'],
+  ];
+  const SORTS = [
+    ['newest', 'Newest'],
+    ['slot', 'Slot'],
+    ['rarity', 'Rarity'],
+    ['ilvl', 'Item level'],
+    ['dps', 'Δ DPS'],
+    ['ehp', 'Δ Effective HP'],
+    ['upgrade', 'Best upgrade'],
+    ['name', 'Name'],
+    ['fav', 'Favourites'],
+  ];
+  const RES = ['', 'lightning', 'cold', 'fire', 'chaos'];
 
-/* ---------- The bag screen: as the game has it now ---------- */
-function rowHtml(it, pile) {
-  const i = it.info || {};
-  const gear = i.group !== 'gem' && i.group !== 'flask';
-  const sub = [`<span class="muted">${esc(i.slotLabel || '')}</span>`];
-  if (it.multi && i.slot) sub.push(`<span>→ ${esc(i.slotName)}</span>`);
-  if (i.fillsFlask) sub.push('<span class="up">▲ empty flask slot</span>');
-  if (gear && i.eq) { sub.push(signed(i.dps, 'DPS'), signed(i.ehp, 'EHP')); }
-  if (gear && i.eq && i.gemsOut) sub.push(`<span class="warn">⚠ ${i.gemsOut} gem${i.gemsOut > 1 ? 's' : ''} out</span>`);
-  if (gear && i.eq && i.idle && i.idle.length) sub.push(`<span class="warn">⚠ ${esc(i.idle[0])} stops</span>`);
-  if (!i.eq && i.group !== 'gem') sub.push('<span class="down">can\'t use</span>');
-  return `<button class="row ${i.eq || i.group === 'gem' ? '' : 'unusable'}" data-a="open" data-v="${it.uid}" data-pile="${pile ? 1 : ''}">
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  let S;
+  function reset() {
+    S = {
+      worn: clone(DATA.worn),
+      flasks: clone(DATA.flasks),
+      bag: clone(DATA.bag),
+      pile: clone(DATA.pile),
+      unseen: new Set(DATA.unseen),
+      last: new Set(DATA.last),
+      fav: new Set(DATA.fav),
+      gearOpen: true,
+      search: '',
+      view: 'all',
+      what: 'all',
+      sort: 'newest',
+      desc: false,
+      screen: 'bag',
+      sel: null,
+      aim: null,
+      justOff: null,
+      sheet: false,
+      ask: null,
+      undo: [],
+    };
+  }
+  reset();
+
+  const esc = (s) =>
+    String(s).replace(
+      /[&<>"]/g,
+      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
+    );
+  const rnd = Math.round;
+  function signed(v, label) {
+    const r = rnd(v);
+    if (!r) return '';
+    return `<span class="${r > 0 ? 'up' : 'down'}">${r > 0 ? '▲' : '▼'}${Math.abs(r)}% ${label}</span>`;
+  }
+  function stones(sockets) {
+    if (!sockets || !sockets.length) return '';
+    return `<span class="stones">${sockets.map((g) => (g ? `<span class="stone ${g.a}${g.s ? ' s' : ''}${g.p ? ' p' : ''}" title="${esc(g.n)}"></span>` : '<span class="stone"></span>')).join('')}</span>`;
+  }
+  const linesOf = (it) =>
+    it.kind === 'flask'
+      ? it.lines || []
+      : [...(it.imp || []), ...(it.exp || []), ...(it.rules || [])];
+  const lineKey = (l) => l.replace(/\d+(\.\d+)?/g, 'N');
+  const findAny = (uid) =>
+    S.bag.find((x) => x.uid === uid) ||
+    S.pile.find((x) => x.uid === uid) ||
+    Object.values(S.worn).find((x) => x && x.uid === uid) ||
+    S.flasks.find((x) => x && x.uid === uid);
+  const cur = () => {
+    const s = S.sel;
+    if (!s) return null;
+    if (s.from === 'inv') return S.bag.find((x) => x.uid === s.uid) || null;
+    if (s.from === 'pile') return S.pile.find((x) => x.uid === s.uid) || null;
+    if (s.from === 'slot') return S.worn[s.slot] || null;
+    return S.flasks[s.idx] || null;
+  };
+  const flaskTab = (f) =>
+    !f
+      ? 'Empty'
+      : f.liquid === 'utility'
+        ? f.name.split(' ')[0]
+        : f.liquid[0].toUpperCase() + f.liquid.slice(1);
+  function counts() {
+    return {
+      new: S.bag.filter((x) => S.unseen.has(x.uid)).length,
+      upgrades: S.bag.filter((x) => x.info && x.info.upgrade).length,
+      last: S.bag.filter((x) => S.last.has(x.uid)).length,
+      fav: S.bag.filter((x) => S.fav.has(x.uid)).length,
+      discarded: S.pile.length,
+    };
+  }
+  function visible() {
+    let pool = S.view === 'discarded' ? S.pile : S.bag;
+    if (S.view === 'new') pool = pool.filter((x) => S.unseen.has(x.uid));
+    if (S.view === 'last') pool = pool.filter((x) => S.last.has(x.uid));
+    if (S.view === 'fav') pool = pool.filter((x) => S.fav.has(x.uid));
+    if (S.view === 'upgrades') pool = pool.filter((x) => x.info && x.info.upgrade);
+    if (S.what !== 'all') pool = pool.filter((x) => x.info && x.info.group === S.what);
+    const q = S.search.trim().toLowerCase();
+    if (q) pool = pool.filter((x) => x.name.toLowerCase().includes(q));
+    const rar = { normal: 0, magic: 1, rare: 2, unique: 3, flaskitem: 0, gem: 0 };
+    const key = {
+      newest: () => 0,
+      name: (x) => x.name,
+      rarity: (x) => -rar[x.rar],
+      ilvl: (x) => -(x.ilvl || 0),
+      dps: (x) => -(x.info?.dps || 0),
+      ehp: (x) => -(x.info?.ehp || 0),
+      upgrade: (x) => -((x.info?.dps || 0) + (x.info?.ehp || 0)),
+      slot: (x) => x.info?.slotLabel || '',
+      fav: (x) => (S.fav.has(x.uid) ? 0 : 1),
+    }[S.sort];
+    let out = pool
+      .map((x, i) => [x, i])
+      .sort((a, b) => {
+        const ka = key(a[0]),
+          kb = key(b[0]);
+        return ka < kb ? -1 : ka > kb ? 1 : a[1] - b[1];
+      })
+      .map((p) => p[0]);
+    if (S.desc) out = out.reverse();
+    return out;
+  }
+  const junk = () =>
+    S.bag.filter(
+      (x) =>
+        x.kind === 'item' &&
+        (x.rar === 'normal' || x.rar === 'magic') &&
+        !(x.info && x.info.upgrade) &&
+        !S.fav.has(x.uid),
+    );
+
+  /* ---------- The bag screen: as the game has it now ---------- */
+  function rowHtml(it, pile) {
+    const i = it.info || {};
+    const gear = i.group !== 'gem' && i.group !== 'flask';
+    const sub = [`<span class="muted">${esc(i.slotLabel || '')}</span>`];
+    if (it.multi && i.slot) sub.push(`<span>→ ${esc(i.slotName)}</span>`);
+    if (i.fillsFlask) sub.push('<span class="up">▲ empty flask slot</span>');
+    if (gear && i.eq) {
+      sub.push(signed(i.dps, 'DPS'), signed(i.ehp, 'EHP'));
+    }
+    if (gear && i.eq && i.gemsOut)
+      sub.push(`<span class="warn">⚠ ${i.gemsOut} gem${i.gemsOut > 1 ? 's' : ''} out</span>`);
+    if (gear && i.eq && i.idle && i.idle.length)
+      sub.push(`<span class="warn">⚠ ${esc(i.idle[0])} stops</span>`);
+    if (!i.eq && i.group !== 'gem') sub.push('<span class="down">can\'t use</span>');
+    return `<button class="row ${i.eq || i.group === 'gem' ? '' : 'unusable'}" data-a="open" data-v="${it.uid}" data-pile="${pile ? 1 : ''}">
     <span class="rmain">${S.unseen.has(it.uid) ? '<i class="newmark" aria-label="New"></i>' : ''}${S.fav.has(it.uid) ? '<span class="favmark">★</span>' : ''}<span class="rname ${it.rar}">${esc(it.name)}</span></span>
     <span class="rsub">${sub.filter(Boolean).join('')}</span></button>`;
-}
-function bagHtml() {
-  const c = counts();
-  const rows = visible();
-  const filtered = S.what !== 'all' || S.view !== 'all' || S.search.trim() !== '';
-  const active = (S.what !== 'all' ? 1 : 0) + (S.view !== 'all' ? 1 : 0);
-  const worn = Object.values(S.worn).filter(Boolean);
-  const sockets = worn.reduce((n, x) => n + x.sockets.length, 0), gems = worn.reduce((n, x) => n + x.sockets.filter(Boolean).length, 0);
-  const summary = `Gear · ${worn.length} of 10 worn` + (gems ? ` · ${gems} gem${gems === 1 ? '' : 's'}` : '') + (sockets - gems ? ` · ${sockets - gems} free socket${sockets - gems === 1 ? '' : 's'}` : '');
-  let h = `<button class="btn geartoggle" data-a="gear" aria-expanded="${S.gearOpen}">${summary} ${S.gearOpen ? '▴' : '▾'}</button>`;
-  if (S.gearOpen) {
-    const slots = Object.keys(PLACE).map((k) => {
-      const it = S.worn[k];
-      const [col, row] = PLACE[k];
-      return `<div class="slotw" style="grid-column:${col};grid-row:${row}">
-        <button class="slot ${it ? it.rar : 'empty'}${S.fresh === k ? ' fresh' : ''}" data-a="slot" data-v="${k}" aria-label="${SLOT_LABEL[k]}: ${it ? esc(it.name) : 'empty'}"><span class="g">${GLYPH[k]}</span>${it && it.sockets.length ? `<span class="pp">${stones(it.sockets).replace(/stone /g, 'stone ').replace(/class="stones"/, 'class="stones" style="gap:1px;transform:scale(.6)"')}</span>` : ''}</button>
-        ${it ? `<button class="slotx" data-a="takeoff" data-v="${k}" aria-label="Take off ${esc(it.name)}">×</button>` : ''}</div>`;
-    }).join('');
-    const fl = S.flasks.map((f, i) => `<button class="bottle${S.fresh === 'f' + i ? ' fresh' : ''}" data-a="flask" data-v="${i}" aria-label="Flask ${i + 1}: ${f ? esc(f.name) : 'empty'}">${f ? `<i style="background:${LIQUID[f.liquid]}"></i>` : ''}</button>`).join('');
-    h += `<div class="reliq"><div class="doll">${slots}</div><div class="flasks">${fl}</div></div>`;
   }
-  if (c.upgrades && S.view !== 'upgrades') h += `<button class="btn primary upgrade-cta" data-a="best">${c.upgrades} upgrade${c.upgrades > 1 ? 's' : ''} in the bag: show them</button>`;
-  h += `<div class="panel bag"><h4 class="baghead">Bag</h4>
+  function bagHtml() {
+    const c = counts();
+    const rows = visible();
+    const filtered = S.what !== 'all' || S.view !== 'all' || S.search.trim() !== '';
+    const active = (S.what !== 'all' ? 1 : 0) + (S.view !== 'all' ? 1 : 0);
+    const worn = Object.values(S.worn).filter(Boolean);
+    const sockets = worn.reduce((n, x) => n + x.sockets.length, 0),
+      gems = worn.reduce((n, x) => n + x.sockets.filter(Boolean).length, 0);
+    const summary =
+      `Gear · ${worn.length} of 10 worn` +
+      (gems ? ` · ${gems} gem${gems === 1 ? '' : 's'}` : '') +
+      (sockets - gems ? ` · ${sockets - gems} free socket${sockets - gems === 1 ? '' : 's'}` : '');
+    let h = `<button class="btn geartoggle" data-a="gear" aria-expanded="${S.gearOpen}">${summary} ${S.gearOpen ? '▴' : '▾'}</button>`;
+    if (S.gearOpen) {
+      const slots = Object.keys(PLACE)
+        .map((k) => {
+          const it = S.worn[k];
+          const [col, row] = PLACE[k];
+          return `<div class="slotw" style="grid-column:${col};grid-row:${row}">
+        <button class="slot ${it ? it.rar : 'empty'}${S.fresh === k ? ' fresh' : ''}" data-a="slot" data-v="${k}" aria-label="${SLOT_LABEL[k]}: ${it ? esc(it.name) : 'empty'}"><span class="g">${GLYPH[k]}</span>${
+          it && it.sockets.length
+            ? `<span class="pp">${stones(it.sockets)
+                .replace(/stone /g, 'stone ')
+                .replace(
+                  /class="stones"/,
+                  'class="stones" style="gap:1px;transform:scale(.6)"',
+                )}</span>`
+            : ''
+        }</button>
+        ${it ? `<button class="slotx" data-a="takeoff" data-v="${k}" aria-label="Take off ${esc(it.name)}">×</button>` : ''}</div>`;
+        })
+        .join('');
+      const fl = S.flasks
+        .map(
+          (f, i) =>
+            `<button class="bottle${S.fresh === 'f' + i ? ' fresh' : ''}" data-a="flask" data-v="${i}" aria-label="Flask ${i + 1}: ${f ? esc(f.name) : 'empty'}">${f ? `<i style="background:${LIQUID[f.liquid]}"></i>` : ''}</button>`,
+        )
+        .join('');
+      h += `<div class="reliq"><div class="doll">${slots}</div><div class="flasks">${fl}</div></div>`;
+    }
+    if (c.upgrades && S.view !== 'upgrades')
+      h += `<button class="btn primary upgrade-cta" data-a="best">${c.upgrades} upgrade${c.upgrades > 1 ? 's' : ''} in the bag: show them</button>`;
+    h += `<div class="panel bag"><h4 class="baghead">Bag</h4>
     <div class="tools"><input class="search" id="search" type="search" placeholder="Search the bag" aria-label="Search the bag" value="${esc(S.search)}" />
     <button class="btn small" data-a="sheet">Filter${active ? ` <span class="warn">${active}</span>` : ''} ▾</button></div>`;
-  if (filtered) {
-    h += '<div class="chips">';
-    if (S.what !== 'all') h += `<button class="chip" data-a="clrwhat">${WHATS.find((w) => w[0] === S.what)[1]}<i>×</i></button>`;
-    if (S.view !== 'all') h += `<button class="chip" data-a="clrview">${VIEWS.find((w) => w[0] === S.view)[1]} (${c[S.view]})<i>×</i></button>`;
-    h += '<button class="chip" data-a="clear">Clear filters</button></div>';
-  }
-  h += '<div class="list">';
-  if (!rows.length) h += `<div class="nothing">${S.view === 'discarded' && !filtered ? 'Nothing is discarded.' : 'Nothing matches.'}</div>`;
-  h += rows.map((x) => rowHtml(x, S.view === 'discarded')).join('');
-  h += `</div><div class="tidy">
+    if (filtered) {
+      h += '<div class="chips">';
+      if (S.what !== 'all')
+        h += `<button class="chip" data-a="clrwhat">${WHATS.find((w) => w[0] === S.what)[1]}<i>×</i></button>`;
+      if (S.view !== 'all')
+        h += `<button class="chip" data-a="clrview">${VIEWS.find((w) => w[0] === S.view)[1]} (${c[S.view]})<i>×</i></button>`;
+      h += '<button class="chip" data-a="clear">Clear filters</button></div>';
+    }
+    h += '<div class="list">';
+    if (!rows.length)
+      h += `<div class="nothing">${S.view === 'discarded' && !filtered ? 'Nothing is discarded.' : 'Nothing matches.'}</div>`;
+    h += rows.map((x) => rowHtml(x, S.view === 'discarded')).join('');
+    h += `</div><div class="tidy">
     <button class="btn small" data-a="seen" ${c.new ? '' : 'disabled'}>Mark all seen</button>
     <button class="btn small" data-a="cleanup">Clean up old items…</button>
     <button class="btn small danger" data-a="junk" ${junk().length ? '' : 'disabled'}>Salvage junk (${junk().length})</button>
     <button class="btn small danger" data-a="salvpile" ${S.pile.length ? '' : 'disabled'}>Salvage discarded (${S.pile.length})</button>
   </div></div>`;
-  return h;
-}
-function sheetHtml() {
-  const c = counts();
-  const n = visible().length;
-  const filtered = S.what !== 'all' || S.view !== 'all' || S.search.trim() !== '';
-  return `<div class="veil" data-a="closesheet"></div><div class="panel sheet" role="dialog" aria-label="Filter and sort">
+    return h;
+  }
+  function sheetHtml() {
+    const c = counts();
+    const n = visible().length;
+    const filtered = S.what !== 'all' || S.view !== 'all' || S.search.trim() !== '';
+    return `<div class="veil" data-a="closesheet"></div><div class="panel sheet" role="dialog" aria-label="Filter and sort">
     <div class="sheethead"><b style="font-weight:500">Filter and sort</b><button class="btn small" data-a="closesheet" aria-label="Close">×</button></div>
     <div class="btnrow">${VIEWS.map(([k, l]) => `<button class="btn small ${S.view === k ? 'on' : ''}" data-a="view" data-v="${k}">${l}${k !== 'all' && c[k] ? ` <span class="${S.view === k ? '' : 'warn'}">${c[k]}</span>` : ''}</button>`).join('')}</div>
     <div class="btnrow">${WHATS.map(([k, l]) => `<button class="btn small ${S.what === k ? 'on' : ''}" data-a="what" data-v="${k}">${l}</button>`).join('')}</div>
@@ -330,347 +1970,769 @@ function sheetHtml() {
     <button class="btn small ${S.desc ? 'on' : ''}" data-a="desc" aria-label="Turn the sort the other way round">⇅</button></div>
     <div class="btnrow"><button class="btn primary" data-a="closesheet">Show ${n} item${n === 1 ? '' : 's'}</button><button class="btn" data-a="clear" ${filtered ? '' : 'disabled'}>Reset filters</button></div>
   </div>`;
-}
+  }
 
-/* ---------- The item page: everything about one item, laid out (new) ---------- */
-function statCells(it) {
-  const cells = [];
-  if (it.wl) {
-    const [lo, label] = [it.wl.phys.replace(' physical', ''), 'physical damage'];
-    cells.push([lo, label, it.wl.aug[0]], [it.wl.speed.replace(' APS', ''), 'attacks a second', it.wl.aug[1]], [it.wl.crit.replace(' crit', ''), 'critical chance', it.wl.aug[2]]);
-    for (const e of it.wl.extra) { const p = e.split(' '); cells.push([p[0], `${p[1]} damage added`, true]); }
-  }
-  for (const a of it.al || []) { const m = a.text.match(/^(\S+)\s+(.*)$/); cells.push([m[1], m[2], a.aug]); }
-  if (!cells.length) return '';
-  return `<div class="stats">${cells.map(([v, l, aug]) => `<div class="stat ${aug ? 'aug' : ''}"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`;
-}
-function cardHtml(it, opts = {}) {
-  if (it.kind === 'gem') {
-    return `<div class="plaque gem">${esc(it.name)}</div>${it.gemLines.map((l, i) => `<div class="line ${i === 0 ? 'muted' : i === it.gemLines.length - 1 ? 'muted' : ''}">${esc(l)}</div>`).join('')}`;
-  }
-  if (it.kind === 'flask') {
-    return `<div class="plaque flaskitem">${esc(it.name)}</div><div class="basel">${esc(it.sub)}</div>
-      <div class="sect">${it.lines.map((l) => `<div class="line imp">${esc(l)}</div>`).join('')}</div>`;
-  }
-  const bad = opts.bad;
-  let h = `<div class="plaque ${it.rar}">${esc(it.name)}</div>`;
-  const sub = [it.base, it.wtype].filter(Boolean);
-  if (sub.length) h += `<div class="basel">${esc(sub.join(' · '))}</div>`;
-  h += `<div class="sect"><div class="req ${bad ? 'bad' : ''}">Requires ${esc(it.req)}${bad ? ` — ${esc(bad)}` : ''}</div><div class="muted">Item level ${it.ilvl}</div>`;
-  if (it.sockets.length) {
-    h += `<div style="margin-top:6px">${it.sockets.length} socket${it.sockets.length > 1 ? 's' : ''} ${stones(it.sockets)}</div>`;
-    if (opts.worn && it.sockets.some(Boolean)) h += `<div class="wgems">${it.sockets.filter(Boolean).map((g) => `<span>${g.p ? '★ ' : ''}${esc(g.n)}</span>`).join('')}</div>`;
-  }
-  h += '</div>';
-  // What the base gives (its numbers and implicit lines), then what the affixes give.
-  const base = statCells(it) + (it.imp || []).map((l) => `<div class="line imp">${esc(l)}</div>`).join('');
-  if (base) h += `<div class="sect">${base}</div>`;
-  const aff = (it.exp || []).map((l) => `<div class="line exp">${esc(l)}</div>`).join('') + (it.rules || []).map((l) => `<div class="line rule">${esc(l)}</div>`).join('');
-  if (aff) h += `<div class="sect">${aff}</div>`;
-  return h;
-}
-function itemPage() {
-  const it = cur(); const s = S.sel;
-  if (!it) { S.screen = 'bag'; return null; }
-  const inBag = s.from === 'inv';
-  let body = '', bar = '';
-  if (S.justOff === it.uid) body += '<span class="caption">Just taken off</span>';
-  if (inBag && it.kind === 'item') {
-    const i = it.info;
-    // What wearing it does; the slot is named only when the item fits more than one.
-    const verdict = i.eq
-      ? [it.multi ? `<span class="muted">${esc(i.slotName)}:</span>` : '', signed(i.dps, 'DPS') || '', signed(i.ehp, 'EHP') || '', !rnd(i.dps) && !rnd(i.ehp) ? '<span class="muted">no change</span>' : '', i.gemsOut ? `<span class="warn">⚠ ${i.gemsOut} gem${i.gemsOut > 1 ? 's' : ''} out</span>` : ''].filter(Boolean).join(' <span class="muted">·</span> ').replace(/:<\/span> <span class="muted">·<\/span>/, ':</span>')
-      : '<span class="down">can\'t use</span>';
-    body += cardHtml(it, { bad: i.eq ? null : (it.cmp[0].why || i.reason) });
-    body += `<div class="verdict">${verdict}</div>`;
-    bar = `<button class="btn primary" data-a="compare">Compare</button><button class="btn small danger" data-a="discard">Discard</button>`;
-  } else if (inBag && it.kind === 'flask') {
-    body += cardHtml(it);
-    body += `<div class="verdict"><span class="up">▲ empty flask slot</span></div>`;
-    bar = `<button class="btn primary" data-a="compare">Compare</button><button class="btn small danger" data-a="discard">Discard</button>`;
-  } else if (inBag && it.kind === 'gem') {
-    body += cardHtml(it);
-    bar = `<button class="btn primary" data-a="socket">Socket</button><button class="btn small danger" data-a="discard">Discard</button>`;
-  } else if (s.from === 'pile') {
-    body += cardHtml(it);
-    body += `<div class="verdict muted">Worth ${it.dust} Bone Dust when you salvage the pile.</div>`;
-    bar = `<button class="btn primary" data-a="putback">Put back in the bag</button>`;
-  } else {
-    body += cardHtml(it, { worn: true });
-    if (s.from === 'slot' && it.sockets.length) body += `<div class="verdict"><button class="btn small" data-a="noop">Edit gems →</button></div>`;
-    bar = `<button class="btn primary" data-a="${s.from === 'slot' ? 'takeoff' : 'takeoffflask'}" data-v="${s.from === 'slot' ? s.slot : s.idx}">Take off</button>`;
-  }
-  const where = s.from === 'slot' ? `Worn: ${SLOT_LABEL[s.slot]}` : s.from === 'flask' ? `Worn: Flask ${s.idx + 1}` : s.from === 'pile' ? 'Discarded' : '';
-  const steps = s.from === 'inv' || s.from === 'pile' ? '<button class="btn small" data-a="step" data-v="-1" aria-label="Previous item">◂</button><button class="btn small" data-a="step" data-v="1" aria-label="Next item">▸</button>' : '';
-  const star = inBag ? `<button class="btn small" data-a="fav" aria-label="Favourite">${S.fav.has(it.uid) ? '★' : '☆'}</button>` : '';
-  return `<div class="page"><div class="phead"><button class="btn small" data-a="back">‹ Bag</button><span class="sp">${where}</span>${steps}${star}</div>
-    <div class="pbody">${body}</div><div class="pbar">${bar}</div></div>`;
-}
-
-/* ---------- The compare page: both items side by side, lines aligned (new) ---------- */
-function alignLines(a, b) {
-  const la = a ? linesOf(a) : [], lb = b ? linesOf(b) : [];
-  const rows = [], used = new Set();
-  for (const l of la) {
-    const k = lineKey(l);
-    const j = lb.findIndex((m, idx) => !used.has(idx) && lineKey(m) === k);
-    if (j >= 0) { used.add(j); rows.push([l, lb[j], l === lb[j] ? 'same' : 'diff']); }
-    else rows.push([l, null, 'gain']);
-  }
-  lb.forEach((m, idx) => { if (!used.has(idx)) rows.push([null, m, 'lost']); });
-  return rows;
-}
-function keyNumbers(it) {
-  const m = {};
-  if (!it || it.kind !== 'item') return m;
-  if (it.wl) { m['Physical'] = it.wl.phys.replace(' physical', ''); m['Attacks a second'] = it.wl.speed.replace(' APS', ''); m['Critical chance'] = it.wl.crit.replace(' crit', ''); }
-  for (const a of it.al || []) { const p = a.text.match(/^(\S+)\s+(.*)$/); m[p[2][0].toUpperCase() + p[2].slice(1)] = p[1]; }
-  return m;
-}
-const num = (v) => { const m = String(v).match(/[\d.]+/g); return m ? m.map(Number).reduce((a, b) => a + b, 0) / m.length : null; };
-/** The stats an item's base gives: its defences or weapon numbers, then its implicit lines. */
-function baseEntries(x) {
-  if (!x) return [];
-  const out = [];
-  const big = (t) => { const m = t.match(/^(\S+)\s+(.*)$/); return { k: lineKey(t), t, html: `<b style="font-weight:500">${esc(m[1])}</b> ${esc(m[2])}` }; };
-  if (x.wl) { out.push(big(x.wl.phys), big(x.wl.speed), big(x.wl.crit)); for (const e of x.wl.extra) out.push(big(`${e} added`)); }
-  for (const a of x.al || []) out.push(big(a.text));
-  for (const l of x.imp || []) out.push({ k: lineKey(l), t: l, html: esc(l) });
-  return out;
-}
-/** The stats an item's affixes give. */
-function affixEntries(x) {
-  return x ? [...(x.exp || []), ...(x.rules || [])].map((l) => ({ k: lineKey(l), t: l, html: esc(l) })) : [];
-}
-/**
- * One section of the compare: the stats both items have first, a row each (the new value green when higher, red when lower);
- * then what only one has, side by side (green on the new item, red on the worn one), with no empty rows between.
- */
-function section(title, A, B) {
-  if (!A.length && !B.length) return '';
-  const shared = [], restA = [], used = new Set();
-  for (const a of A) {
-    const j = B.findIndex((b, i) => !used.has(i) && b.k === a.k);
-    if (j >= 0) { used.add(j); shared.push([a, B[j]]); } else restA.push(a);
-  }
-  const restB = B.filter((_, i) => !used.has(i));
-  let h = '<div class="sec"></div>';
-  for (const [a, b] of shared) {
-    const na = num(a.t), nb = num(b.t);
-    const cls = a.t === b.t || na === nb ? '' : na > nb ? 'gain' : 'lost';
-    h += `<div class="${cls}">${a.html}</div><div>${b.html}</div>`;
-  }
-  for (let i = 0; i < Math.max(restA.length, restB.length); i++) {
-    h += restA[i] ? `<div class="gain">${restA[i].html}</div>` : '<div></div>';
-    h += restB[i] ? `<div class="lost">${restB[i].html}</div>` : '<div></div>';
-  }
-  return h;
-}
-function comparePage() {
-  const it = cur();
-  if (!it) { S.screen = 'bag'; return null; }
-  const flask = it.kind === 'flask';
-  let tabs = '', top = '', old = null, label = '', ok = true, why = '';
-  if (flask) {
-    const fc = it.fcmp; const idx = S.aim ?? fc.find((x) => x.chosen).idx;
-    old = S.flasks[idx];
-    tabs = `<div class="tabs" role="tablist">${fc.map((x) => `<button class="tab ${x.idx === idx ? 'on' : ''}" data-a="aim" data-v="${x.idx}"><b>${flaskTab(S.flasks[x.idx])}</b><span class="muted">Flask ${x.idx + 1}</span></button>`).join('')}</div>`;
-    label = `Flask ${idx + 1}`;
-  } else {
-    const slots = it.cmp;
-    const a = slots.find((x) => x.slot === S.aim) || slots.find((x) => x.best) || slots[0];
-    old = S.worn[a.slot] || null; label = a.label; ok = a.ok; why = a.why || '';
-    if (slots.length > 1) {
-      tabs = `<div class="tabs" role="tablist">${slots.map((x) => `<button class="tab ${x.slot === a.slot ? 'on' : ''}" data-a="aim" data-v="${x.slot}"><b>${x.label}</b>${x.ok ? `<span>${signed(x.dps, 'DPS') || ''} ${signed(x.ehp, 'EHP') || ''}${!rnd(x.dps) && !rnd(x.ehp) ? '<span class="muted">±0%</span>' : ''}</span>${x.out ? `<span class="warn">⚠ ${x.out} gem${x.out > 1 ? 's' : ''} out</span>` : ''}` : '<span class="down">can\'t</span>'}</button>`).join('')}</div>`;
-    }
-    if (!a.ok) top += `<div class="warnbox">${esc(a.why)}</div>`;
-    else {
-      const big = (v, l) => { const r = rnd(v); return `<span><b class="${r > 0 ? 'up' : r < 0 ? 'down' : ''}">${r > 0 ? '+' : r < 0 ? '−' : '±'}${Math.abs(r)}%</b> ${l}</span>`; };
-      top += `<div class="delta">${big(a.dps, 'damage')}${big(a.ehp, 'effective HP')}</div>`;
-      if (old && (old.sockets.length || it.sockets.length) && (a.note.text || old.sockets.some(Boolean))) {
-        const cls = { warn: 'warn', bad: 'down', good: 'up', none: 'muted' }[a.note.severity];
-        // One line: the sockets before and after, and what happens to the gems, counted rather than named.
-        const note = a.out ? `⚠ ${a.out} gem${a.out > 1 ? 's' : ''} unequipped` : a.note.text;
-        top += `<div class="socks">${stones(old.sockets)} → ${stones(it.sockets)}${note ? `<span class="${cls}">${esc(note)}</span>` : ''}</div>`;
+  /* ---------- The item page: everything about one item, laid out (new) ---------- */
+  function statCells(it) {
+    const cells = [];
+    if (it.wl) {
+      const [lo, label] = [it.wl.phys.replace(' physical', ''), 'physical damage'];
+      cells.push(
+        [lo, label, it.wl.aug[0]],
+        [it.wl.speed.replace(' APS', ''), 'attacks a second', it.wl.aug[1]],
+        [it.wl.crit.replace(' crit', ''), 'critical chance', it.wl.aug[2]],
+      );
+      for (const e of it.wl.extra) {
+        const p = e.split(' ');
+        cells.push([p[0], `${p[1]} damage added`, true]);
       }
     }
+    for (const a of it.al || []) {
+      const m = a.text.match(/^(\S+)\s+(.*)$/);
+      cells.push([m[1], m[2], a.aug]);
+    }
+    if (!cells.length) return '';
+    return `<div class="stats">${cells.map(([v, l, aug]) => `<div class="stat ${aug ? 'aug' : ''}"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>`;
   }
-  // The two items side by side: what each is, then the stats its base gives, then the stats its affixes give. A stat both
-  // have sits on one row; the rest fill the rows beside each other.
-  const cell = (cls, html) => `<div class="${cls}">${html}</div>`;
-  const none = '<span class="none">—</span>';
-  let g = cell('cap', 'New') + cell('cap', old ? `Worn: ${label}` : `${label}: nothing worn`);
-  g += cell('hd', `<div class="nm ${it.rar}">${esc(it.name)}</div>`) + cell('hd', old ? `<div class="nm ${old.rar}">${esc(old.name)}</div>` : none);
-  if (!flask) {
-    const sb = (x) => x ? [x.base, x.wtype].filter(Boolean).join(' · ') : '';
-    if (sb(it) || sb(old)) g += cell('lbl', esc(sb(it)) || none) + cell('lbl', esc(sb(old)) || none);
-    g += cell(ok ? 'lbl' : 'lost', `Requires ${esc(it.req)} · ilvl ${it.ilvl}`) + cell('lbl', old ? `Requires ${esc(old.req)} · ilvl ${old.ilvl}` : none);
-    if (it.sockets.length || (old && old.sockets.length)) g += cell('', it.sockets.length ? stones(it.sockets) : '<span class="none">no sockets</span>') + cell('', old && old.sockets.length ? stones(old.sockets) : '<span class="none">no sockets</span>');
-    g += section('From the base', baseEntries(it), baseEntries(old));
-    g += section('From affixes', affixEntries(it), affixEntries(old));
-  } else {
-    g += cell('lbl', esc(it.sub)) + cell('lbl', old ? esc(old.sub) : none);
-    const fl = (x) => (x ? x.lines : []).map((t) => ({ k: lineKey(t), t, html: esc(t) }));
-    g += section('Stats', fl(it), fl(old));
+  function cardHtml(it, opts = {}) {
+    if (it.kind === 'gem') {
+      return `<div class="plaque gem">${esc(it.name)}</div>${it.gemLines.map((l, i) => `<div class="line ${i === 0 ? 'muted' : i === it.gemLines.length - 1 ? 'muted' : ''}">${esc(l)}</div>`).join('')}`;
+    }
+    if (it.kind === 'flask') {
+      return `<div class="plaque flaskitem">${esc(it.name)}</div><div class="basel">${esc(it.sub)}</div>
+      <div class="sect">${it.lines.map((l) => `<div class="line imp">${esc(l)}</div>`).join('')}</div>`;
+    }
+    const bad = opts.bad;
+    let h = `<div class="plaque ${it.rar}">${esc(it.name)}</div>`;
+    const sub = [it.base, it.wtype].filter(Boolean);
+    if (sub.length) h += `<div class="basel">${esc(sub.join(' · '))}</div>`;
+    h += `<div class="sect"><div class="req ${bad ? 'bad' : ''}">Requires ${esc(it.req)}${bad ? ` — ${esc(bad)}` : ''}</div><div class="muted">Item level ${it.ilvl}</div>`;
+    if (it.sockets.length) {
+      h += `<div style="margin-top:6px">${it.sockets.length} socket${it.sockets.length > 1 ? 's' : ''} ${stones(it.sockets)}</div>`;
+      if (opts.worn && it.sockets.some(Boolean))
+        h += `<div class="wgems">${it.sockets
+          .filter(Boolean)
+          .map((g) => `<span>${g.p ? '★ ' : ''}${esc(g.n)}</span>`)
+          .join('')}</div>`;
+    }
+    h += '</div>';
+    // What the base gives (its numbers and implicit lines), then what the affixes give.
+    const base =
+      statCells(it) + (it.imp || []).map((l) => `<div class="line imp">${esc(l)}</div>`).join('');
+    if (base) h += `<div class="sect">${base}</div>`;
+    const aff =
+      (it.exp || []).map((l) => `<div class="line exp">${esc(l)}</div>`).join('') +
+      (it.rules || []).map((l) => `<div class="line rule">${esc(l)}</div>`).join('');
+    if (aff) h += `<div class="sect">${aff}</div>`;
+    return h;
   }
-  const btn = old ? `Swap into ${label}` : flask ? `Carry as ${label}` : `Wear in ${label}`;
-  const bar = `<button class="btn primary" data-a="swap" ${ok ? '' : 'disabled'}>${btn}</button>${ok ? '' : `<span class="why">${esc(why)}</span>`}`;
-  return `<div class="page"><div class="phead"><button class="btn small" data-a="back">‹ Item</button><span class="sp">Compare</span></div>
+  function itemPage() {
+    const it = cur();
+    const s = S.sel;
+    if (!it) {
+      S.screen = 'bag';
+      return null;
+    }
+    const inBag = s.from === 'inv';
+    let body = '',
+      bar = '';
+    if (S.justOff === it.uid) body += '<span class="caption">Just taken off</span>';
+    if (inBag && it.kind === 'item') {
+      const i = it.info;
+      // What wearing it does; the slot is named only when the item fits more than one.
+      const verdict = i.eq
+        ? [
+            it.multi ? `<span class="muted">${esc(i.slotName)}:</span>` : '',
+            signed(i.dps, 'DPS') || '',
+            signed(i.ehp, 'EHP') || '',
+            !rnd(i.dps) && !rnd(i.ehp) ? '<span class="muted">no change</span>' : '',
+            i.gemsOut
+              ? `<span class="warn">⚠ ${i.gemsOut} gem${i.gemsOut > 1 ? 's' : ''} out</span>`
+              : '',
+          ]
+            .filter(Boolean)
+            .join(' <span class="muted">·</span> ')
+            .replace(/:<\/span> <span class="muted">·<\/span>/, ':</span>')
+        : '<span class="down">can\'t use</span>';
+      body += cardHtml(it, { bad: i.eq ? null : it.cmp[0].why || i.reason });
+      body += `<div class="verdict">${verdict}</div>`;
+      bar = `<button class="btn primary" data-a="compare">Compare</button><button class="btn small danger" data-a="discard">Discard</button>`;
+    } else if (inBag && it.kind === 'flask') {
+      body += cardHtml(it);
+      body += `<div class="verdict"><span class="up">▲ empty flask slot</span></div>`;
+      bar = `<button class="btn primary" data-a="compare">Compare</button><button class="btn small danger" data-a="discard">Discard</button>`;
+    } else if (inBag && it.kind === 'gem') {
+      body += cardHtml(it);
+      bar = `<button class="btn primary" data-a="socket">Socket</button><button class="btn small danger" data-a="discard">Discard</button>`;
+    } else if (s.from === 'pile') {
+      body += cardHtml(it);
+      body += `<div class="verdict muted">Worth ${it.dust} Bone Dust when you salvage the pile.</div>`;
+      bar = `<button class="btn primary" data-a="putback">Put back in the bag</button>`;
+    } else {
+      body += cardHtml(it, { worn: true });
+      if (s.from === 'slot' && it.sockets.length)
+        body += `<div class="verdict"><button class="btn small" data-a="noop">Edit gems →</button></div>`;
+      bar = `<button class="btn primary" data-a="${s.from === 'slot' ? 'takeoff' : 'takeoffflask'}" data-v="${s.from === 'slot' ? s.slot : s.idx}">Take off</button>`;
+    }
+    const where =
+      s.from === 'slot'
+        ? `Worn: ${SLOT_LABEL[s.slot]}`
+        : s.from === 'flask'
+          ? `Worn: Flask ${s.idx + 1}`
+          : s.from === 'pile'
+            ? 'Discarded'
+            : '';
+    const steps =
+      s.from === 'inv' || s.from === 'pile'
+        ? '<button class="btn small" data-a="step" data-v="-1" aria-label="Previous item">◂</button><button class="btn small" data-a="step" data-v="1" aria-label="Next item">▸</button>'
+        : '';
+    const star = inBag
+      ? `<button class="btn small" data-a="fav" aria-label="Favourite">${S.fav.has(it.uid) ? '★' : '☆'}</button>`
+      : '';
+    return `<div class="page"><div class="phead"><button class="btn small" data-a="back">‹ Bag</button><span class="sp">${where}</span>${steps}${star}</div>
+    <div class="pbody">${body}</div><div class="pbar">${bar}</div></div>`;
+  }
+
+  /* ---------- The compare page: both items side by side, lines aligned (new) ---------- */
+  function alignLines(a, b) {
+    const la = a ? linesOf(a) : [],
+      lb = b ? linesOf(b) : [];
+    const rows = [],
+      used = new Set();
+    for (const l of la) {
+      const k = lineKey(l);
+      const j = lb.findIndex((m, idx) => !used.has(idx) && lineKey(m) === k);
+      if (j >= 0) {
+        used.add(j);
+        rows.push([l, lb[j], l === lb[j] ? 'same' : 'diff']);
+      } else rows.push([l, null, 'gain']);
+    }
+    lb.forEach((m, idx) => {
+      if (!used.has(idx)) rows.push([null, m, 'lost']);
+    });
+    return rows;
+  }
+  function keyNumbers(it) {
+    const m = {};
+    if (!it || it.kind !== 'item') return m;
+    if (it.wl) {
+      m['Physical'] = it.wl.phys.replace(' physical', '');
+      m['Attacks a second'] = it.wl.speed.replace(' APS', '');
+      m['Critical chance'] = it.wl.crit.replace(' crit', '');
+    }
+    for (const a of it.al || []) {
+      const p = a.text.match(/^(\S+)\s+(.*)$/);
+      m[p[2][0].toUpperCase() + p[2].slice(1)] = p[1];
+    }
+    return m;
+  }
+  const num = (v) => {
+    const m = String(v).match(/[\d.]+/g);
+    return m ? m.map(Number).reduce((a, b) => a + b, 0) / m.length : null;
+  };
+  /** The stats an item's base gives: its defences or weapon numbers, then its implicit lines. */
+  function baseEntries(x) {
+    if (!x) return [];
+    const out = [];
+    const big = (t) => {
+      const m = t.match(/^(\S+)\s+(.*)$/);
+      return { k: lineKey(t), t, html: `<b style="font-weight:500">${esc(m[1])}</b> ${esc(m[2])}` };
+    };
+    if (x.wl) {
+      out.push(big(x.wl.phys), big(x.wl.speed), big(x.wl.crit));
+      for (const e of x.wl.extra) out.push(big(`${e} added`));
+    }
+    for (const a of x.al || []) out.push(big(a.text));
+    for (const l of x.imp || []) out.push({ k: lineKey(l), t: l, html: esc(l) });
+    return out;
+  }
+  /** The stats an item's affixes give. */
+  function affixEntries(x) {
+    return x
+      ? [...(x.exp || []), ...(x.rules || [])].map((l) => ({ k: lineKey(l), t: l, html: esc(l) }))
+      : [];
+  }
+  /**
+   * One section of the compare: the stats both items have first, a row each (the new value green when higher, red when lower);
+   * then what only one has, side by side (green on the new item, red on the worn one), with no empty rows between.
+   */
+  function section(title, A, B) {
+    if (!A.length && !B.length) return '';
+    const shared = [],
+      restA = [],
+      used = new Set();
+    for (const a of A) {
+      const j = B.findIndex((b, i) => !used.has(i) && b.k === a.k);
+      if (j >= 0) {
+        used.add(j);
+        shared.push([a, B[j]]);
+      } else restA.push(a);
+    }
+    const restB = B.filter((_, i) => !used.has(i));
+    let h = '<div class="sec"></div>';
+    for (const [a, b] of shared) {
+      const na = num(a.t),
+        nb = num(b.t);
+      const cls = a.t === b.t || na === nb ? '' : na > nb ? 'gain' : 'lost';
+      h += `<div class="${cls}">${a.html}</div><div>${b.html}</div>`;
+    }
+    for (let i = 0; i < Math.max(restA.length, restB.length); i++) {
+      h += restA[i] ? `<div class="gain">${restA[i].html}</div>` : '<div></div>';
+      h += restB[i] ? `<div class="lost">${restB[i].html}</div>` : '<div></div>';
+    }
+    return h;
+  }
+  function comparePage() {
+    const it = cur();
+    if (!it) {
+      S.screen = 'bag';
+      return null;
+    }
+    const flask = it.kind === 'flask';
+    let tabs = '',
+      top = '',
+      old = null,
+      label = '',
+      ok = true,
+      why = '';
+    if (flask) {
+      const fc = it.fcmp;
+      const idx = S.aim ?? fc.find((x) => x.chosen).idx;
+      old = S.flasks[idx];
+      tabs = `<div class="tabs" role="tablist">${fc.map((x) => `<button class="tab ${x.idx === idx ? 'on' : ''}" data-a="aim" data-v="${x.idx}"><b>${flaskTab(S.flasks[x.idx])}</b><span class="muted">Flask ${x.idx + 1}</span></button>`).join('')}</div>`;
+      label = `Flask ${idx + 1}`;
+    } else {
+      const slots = it.cmp;
+      const a = slots.find((x) => x.slot === S.aim) || slots.find((x) => x.best) || slots[0];
+      old = S.worn[a.slot] || null;
+      label = a.label;
+      ok = a.ok;
+      why = a.why || '';
+      if (slots.length > 1) {
+        tabs = `<div class="tabs" role="tablist">${slots.map((x) => `<button class="tab ${x.slot === a.slot ? 'on' : ''}" data-a="aim" data-v="${x.slot}"><b>${x.label}</b>${x.ok ? `<span>${signed(x.dps, 'DPS') || ''} ${signed(x.ehp, 'EHP') || ''}${!rnd(x.dps) && !rnd(x.ehp) ? '<span class="muted">±0%</span>' : ''}</span>${x.out ? `<span class="warn">⚠ ${x.out} gem${x.out > 1 ? 's' : ''} out</span>` : ''}` : '<span class="down">can\'t</span>'}</button>`).join('')}</div>`;
+      }
+      if (!a.ok) top += `<div class="warnbox">${esc(a.why)}</div>`;
+      else {
+        const big = (v, l) => {
+          const r = rnd(v);
+          return `<span><b class="${r > 0 ? 'up' : r < 0 ? 'down' : ''}">${r > 0 ? '+' : r < 0 ? '−' : '±'}${Math.abs(r)}%</b> ${l}</span>`;
+        };
+        top += `<div class="delta">${big(a.dps, 'damage')}${big(a.ehp, 'effective HP')}</div>`;
+        if (
+          old &&
+          (old.sockets.length || it.sockets.length) &&
+          (a.note.text || old.sockets.some(Boolean))
+        ) {
+          const cls = { warn: 'warn', bad: 'down', good: 'up', none: 'muted' }[a.note.severity];
+          // One line: the sockets before and after, and what happens to the gems, counted rather than named.
+          const note = a.out ? `⚠ ${a.out} gem${a.out > 1 ? 's' : ''} unequipped` : a.note.text;
+          top += `<div class="socks">${stones(old.sockets)} → ${stones(it.sockets)}${note ? `<span class="${cls}">${esc(note)}</span>` : ''}</div>`;
+        }
+      }
+    }
+    // The two items side by side: what each is, then the stats its base gives, then the stats its affixes give. A stat both
+    // have sits on one row; the rest fill the rows beside each other.
+    const cell = (cls, html) => `<div class="${cls}">${html}</div>`;
+    const none = '<span class="none">—</span>';
+    let g = cell('cap', 'New') + cell('cap', old ? `Worn: ${label}` : `${label}: nothing worn`);
+    g +=
+      cell('hd', `<div class="nm ${it.rar}">${esc(it.name)}</div>`) +
+      cell('hd', old ? `<div class="nm ${old.rar}">${esc(old.name)}</div>` : none);
+    if (!flask) {
+      const sb = (x) => (x ? [x.base, x.wtype].filter(Boolean).join(' · ') : '');
+      if (sb(it) || sb(old))
+        g += cell('lbl', esc(sb(it)) || none) + cell('lbl', esc(sb(old)) || none);
+      g +=
+        cell(ok ? 'lbl' : 'lost', `Requires ${esc(it.req)} · ilvl ${it.ilvl}`) +
+        cell('lbl', old ? `Requires ${esc(old.req)} · ilvl ${old.ilvl}` : none);
+      if (it.sockets.length || (old && old.sockets.length))
+        g +=
+          cell(
+            '',
+            it.sockets.length ? stones(it.sockets) : '<span class="none">no sockets</span>',
+          ) +
+          cell(
+            '',
+            old && old.sockets.length
+              ? stones(old.sockets)
+              : '<span class="none">no sockets</span>',
+          );
+      g += section('From the base', baseEntries(it), baseEntries(old));
+      g += section('From affixes', affixEntries(it), affixEntries(old));
+    } else {
+      g += cell('lbl', esc(it.sub)) + cell('lbl', old ? esc(old.sub) : none);
+      const fl = (x) => (x ? x.lines : []).map((t) => ({ k: lineKey(t), t, html: esc(t) }));
+      g += section('Stats', fl(it), fl(old));
+    }
+    const btn = old ? `Swap into ${label}` : flask ? `Carry as ${label}` : `Wear in ${label}`;
+    const bar = `<button class="btn primary" data-a="swap" ${ok ? '' : 'disabled'}>${btn}</button>${ok ? '' : `<span class="why">${esc(why)}</span>`}`;
+    return `<div class="page"><div class="phead"><button class="btn small" data-a="back">‹ Item</button><span class="sp">Compare</span></div>
     <div class="pbody">${tabs}${top}<div class="cmp">${g}</div></div><div class="pbar">${bar}</div></div>`;
-}
-
-function askHtml() {
-  const a = S.ask;
-  return `<div class="veil"></div><div class="panel ask" role="dialog"><h3>${esc(a.title)}</h3><div>${esc(a.body)}</div>${a.facts ? `<ul>${a.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
-    <div class="btnrow"><button class="btn ${a.danger ? 'primary' : 'primary'}" data-a="askyes">${esc(a.confirm)}</button><button class="btn" data-a="askno">Cancel</button></div></div>`;
-}
-
-/* ---------- Actions ---------- */
-function snapshot() { S.undo.push(JSON.stringify({ worn: S.worn, flasks: S.flasks, bag: S.bag, pile: S.pile, unseen: [...S.unseen], fav: [...S.fav] })); }
-function restore() {
-  const o = JSON.parse(S.undo.pop());
-  Object.assign(S, { worn: o.worn, flasks: o.flasks, bag: o.bag, pile: o.pile, unseen: new Set(o.unseen), fav: new Set(o.fav) });
-  if (!cur()) { S.sel = null; S.screen = 'bag'; }
-}
-function infoFor(it, slot) {
-  const g = it.wtype ? 'weapon' : ['ring1', 'ring2', 'amulet', 'belt'].includes(slot) ? 'jewellery' : 'armour';
-  return { slotLabel: SLOT_GROUP[slot], slot, slotName: SLOT_LABEL[slot], eq: true, dps: 0, ehp: 0, gemsOut: 0, idle: [], group: g, upgrade: false };
-}
-function wear() {
-  const it = cur();
-  if (it.kind === 'flask') {
-    const idx = S.aim ?? it.fcmp.find((x) => x.chosen).idx;
-    const old = S.flasks[idx];
-    snapshot();
-    S.bag = S.bag.filter((x) => x.uid !== it.uid);
-    S.flasks[idx] = { uid: it.uid, kind: 'flask', name: it.name, rar: it.rar, sub: it.sub, lines: it.lines, liquid: it.liquid };
-    if (old) S.bag.unshift({ ...old, info: { slotLabel: 'Flask', eq: true, dps: 0, ehp: 0, gemsOut: 0, idle: [], group: 'flask', upgrade: false }, fcmp: [0, 1, 2, 3, 4].map((k) => ({ idx: k, eq: null, ok: true, chosen: k === idx })) });
-    backToGear('f' + idx); return;
   }
-  const a = it.cmp.find((x) => x.slot === S.aim) || it.cmp.find((x) => x.best) || it.cmp[0];
-  const go = () => {
-    snapshot();
-    const old = S.worn[a.slot];
-    S.bag = S.bag.filter((x) => x.uid !== it.uid);
-    const { info, cmp, multi, ...bare } = it;
-    S.worn[a.slot] = bare;
-    if (old) {
-      // What the old item would do if it went back: the swap undone (the mock-up does not recalculate the rest).
-      const back = { slot: a.slot, label: a.label, eq: bare.uid, ok: true, dps: -a.dps, ehp: -a.ehp, chips: { life: -a.chips.life, es: -a.chips.es, mana: -a.chips.mana, res: a.chips.res.map((v) => -v) }, note: { severity: 'none', text: '' }, out: 0, idle: 0, best: true };
-      S.bag.unshift({ ...old, info: { ...infoFor(old, a.slot), dps: -a.dps, ehp: -a.ehp }, cmp: [back], multi: !!it.multi });
+
+  function askHtml() {
+    const a = S.ask;
+    return `<div class="veil"></div><div class="panel ask" role="dialog"><h3>${esc(a.title)}</h3><div>${esc(a.body)}</div>${a.facts ? `<ul>${a.facts.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>` : ''}
+    <div class="btnrow"><button class="btn ${a.danger ? 'primary' : 'primary'}" data-a="askyes">${esc(a.confirm)}</button><button class="btn" data-a="askno">Cancel</button></div></div>`;
+  }
+
+  /* ---------- Actions ---------- */
+  function snapshot() {
+    S.undo.push(
+      JSON.stringify({
+        worn: S.worn,
+        flasks: S.flasks,
+        bag: S.bag,
+        pile: S.pile,
+        unseen: [...S.unseen],
+        fav: [...S.fav],
+      }),
+    );
+  }
+  function restore() {
+    const o = JSON.parse(S.undo.pop());
+    Object.assign(S, {
+      worn: o.worn,
+      flasks: o.flasks,
+      bag: o.bag,
+      pile: o.pile,
+      unseen: new Set(o.unseen),
+      fav: new Set(o.fav),
+    });
+    if (!cur()) {
+      S.sel = null;
+      S.screen = 'bag';
     }
-    backToGear(a.slot);
-  };
-  // The game asks first only when a skill gem would stop working; no swap in this data does that.
-  go();
-}
-/** After wearing something: back to the bag, the gear open and scrolled into view, the slot just filled lit for a moment. */
-function backToGear(slot) {
-  Object.assign(S, { screen: 'bag', sel: null, aim: null, justOff: null, gearOpen: true, fresh: slot });
-  render();
-  const sc = document.getElementById('scroll');
-  const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  sc.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
-}
-function discard() {
-  const it = cur();
-  const go = () => {
-    const list = visible(); const i = list.findIndex((x) => x.uid === it.uid); const next = list[i + 1] || list[i - 1];
-    snapshot();
-    S.bag = S.bag.filter((x) => x.uid !== it.uid); S.pile.unshift({ ...it, dust: 1 });
-    if (next && next.uid !== it.uid) S.sel = { from: 'inv', uid: next.uid }; else { S.sel = null; S.screen = 'bag'; }
-    render();
-  };
-  if (S.fav.has(it.uid)) { S.ask = { title: 'Discard a favourite?', body: `${it.name} is starred.`, confirm: 'Discard it', onYes: go }; render(); return; }
-  go();
-}
-function act(a, v, el) {
-  S.fresh = null;
-  switch (a) {
-    case 'gear': S.gearOpen = !S.gearOpen; break;
-    case 'open': {
-      const uid = Number(v); const pile = el.dataset.pile === '1';
-      S.sel = { from: pile ? 'pile' : 'inv', uid }; S.screen = 'item'; S.aim = null; S.justOff = null;
-      if (!pile) S.unseen.delete(uid);
-      break;
-    }
-    case 'slot': if (S.worn[v]) { S.sel = { from: 'slot', slot: v }; S.screen = 'item'; S.justOff = null; } else return; break;
-    case 'flask': if (S.flasks[v]) { S.sel = { from: 'flask', idx: Number(v) }; S.screen = 'item'; S.justOff = null; } else return; break;
-    case 'takeoff': { const it = S.worn[v]; if (!it) return; snapshot(); S.worn[v] = null; S.bag.unshift({ ...it, info: infoFor(it, v), cmp: [{ slot: v, label: SLOT_LABEL[v], eq: null, ok: true, dps: 0, ehp: 0, chips: { life: 0, es: 0, mana: 0, res: [0, 0, 0, 0, 0] }, note: { severity: 'none', text: '' }, out: 0, idle: 0, best: true }] }); S.sel = { from: 'inv', uid: it.uid }; S.screen = 'item'; S.justOff = null; break; }
-    case 'takeoffflask': { const i = Number(v), f = S.flasks[i]; if (!f) return; snapshot(); S.flasks[i] = null; S.bag.unshift({ ...f, info: { slotLabel: 'Flask', eq: true, dps: 0, ehp: 0, gemsOut: 0, idle: [], fillsFlask: true, group: 'flask', upgrade: true }, fcmp: [0, 1, 2, 3, 4].map((k) => ({ idx: k, eq: null, ok: true, chosen: k === i })) }); S.sel = { from: 'inv', uid: f.uid }; S.screen = 'item'; break; }
-    case 'back': S.screen = S.screen === 'compare' ? 'item' : 'bag'; if (S.screen === 'bag') { S.sel = null; S.justOff = null; } break;
-    case 'compare': S.screen = 'compare'; break;
-    case 'aim': S.aim = isNaN(Number(v)) ? v : Number(v); break;
-    case 'swap': wear(); break;
-    case 'fav': { const it = cur(); S.fav.has(it.uid) ? S.fav.delete(it.uid) : S.fav.add(it.uid); break; }
-    case 'step': {
-      const list = visible(); const i = list.findIndex((x) => x.uid === S.sel.uid);
-      const n = list[Math.max(0, Math.min(list.length - 1, i + Number(v)))];
-      if (n) { S.sel = { from: S.sel.from, uid: n.uid }; S.unseen.delete(n.uid); S.justOff = null; }
-      break;
-    }
-    case 'discard': discard(); return;
-    case 'putback': { const it = cur(); snapshot(); S.pile = S.pile.filter((x) => x.uid !== it.uid); S.bag.unshift(it); S.sel = null; S.screen = 'bag'; break; }
-    case 'socket': S.ask = { title: 'Socket', body: 'The Skills tab opens here, with this gem picked and every socket it can go in lit.', confirm: 'OK', onYes: () => {} }; break;
-    case 'best': {
-      // Filter the bag to its upgrades, best first, and bring the bag into view.
-      Object.assign(S, { search: '', what: 'all', view: 'upgrades', sort: 'upgrade', desc: false });
-      render();
-      const sc = document.getElementById('scroll'), bag = sc.querySelector('.bag');
-      sc.scrollTo({ top: bag.offsetTop - 8, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+  function infoFor(it, slot) {
+    const g = it.wtype
+      ? 'weapon'
+      : ['ring1', 'ring2', 'amulet', 'belt'].includes(slot)
+        ? 'jewellery'
+        : 'armour';
+    return {
+      slotLabel: SLOT_GROUP[slot],
+      slot,
+      slotName: SLOT_LABEL[slot],
+      eq: true,
+      dps: 0,
+      ehp: 0,
+      gemsOut: 0,
+      idle: [],
+      group: g,
+      upgrade: false,
+    };
+  }
+  function wear() {
+    const it = cur();
+    if (it.kind === 'flask') {
+      const idx = S.aim ?? it.fcmp.find((x) => x.chosen).idx;
+      const old = S.flasks[idx];
+      snapshot();
+      S.bag = S.bag.filter((x) => x.uid !== it.uid);
+      S.flasks[idx] = {
+        uid: it.uid,
+        kind: 'flask',
+        name: it.name,
+        rar: it.rar,
+        sub: it.sub,
+        lines: it.lines,
+        liquid: it.liquid,
+      };
+      if (old)
+        S.bag.unshift({
+          ...old,
+          info: {
+            slotLabel: 'Flask',
+            eq: true,
+            dps: 0,
+            ehp: 0,
+            gemsOut: 0,
+            idle: [],
+            group: 'flask',
+            upgrade: false,
+          },
+          fcmp: [0, 1, 2, 3, 4].map((k) => ({ idx: k, eq: null, ok: true, chosen: k === idx })),
+        });
+      backToGear('f' + idx);
       return;
     }
-    case 'sheet': S.sheet = true; break;
-    case 'closesheet': S.sheet = false; break;
-    case 'view': S.view = v; break;
-    case 'what': S.what = v; break;
-    case 'desc': S.desc = !S.desc; break;
-    case 'clrwhat': S.what = 'all'; break;
-    case 'clrview': S.view = 'all'; break;
-    case 'clear': S.what = 'all'; S.view = 'all'; S.search = ''; break;
-    case 'seen': S.unseen.clear(); break;
-    case 'cleanup': S.ask = { title: 'Clean up old items', body: 'The Clean up screen opens here, as it does now.', confirm: 'OK', onYes: () => {} }; break;
-    case 'junk': { const j = junk(); S.ask = { title: 'Salvage the junk?', body: 'Every normal or magic item that is not an upgrade and not a favourite is broken down for good.', facts: [`${j.length} item${j.length > 1 ? 's' : ''}`, `${j.length} Bone Dust`], confirm: `Salvage ${j.length} for ${j.length} Bone Dust`, onYes: () => { const ids = new Set(j.map((x) => x.uid)); S.bag = S.bag.filter((x) => !ids.has(x.uid)); } }; break; }
-    case 'salvpile': S.ask = { title: 'Salvage everything discarded?', body: 'Every discarded item is broken down for good. This cannot be undone.', facts: [`${S.pile.length} item${S.pile.length > 1 ? 's' : ''}`, `${S.pile.length} Bone Dust`], confirm: `Salvage ${S.pile.length} for ${S.pile.length} Bone Dust`, onYes: () => { S.pile = []; S.undo = []; if (S.view === 'discarded') S.view = 'all'; } }; break;
-    case 'askyes': { const f = S.ask.onYes; S.ask = null; f(); break; }
-    case 'askno': S.ask = null; break;
-    case 'undo': if (S.undo.length) restore(); break;
-    default: return;
+    const a = it.cmp.find((x) => x.slot === S.aim) || it.cmp.find((x) => x.best) || it.cmp[0];
+    const go = () => {
+      snapshot();
+      const old = S.worn[a.slot];
+      S.bag = S.bag.filter((x) => x.uid !== it.uid);
+      const { info, cmp, multi, ...bare } = it;
+      S.worn[a.slot] = bare;
+      if (old) {
+        // What the old item would do if it went back: the swap undone (the mock-up does not recalculate the rest).
+        const back = {
+          slot: a.slot,
+          label: a.label,
+          eq: bare.uid,
+          ok: true,
+          dps: -a.dps,
+          ehp: -a.ehp,
+          chips: {
+            life: -a.chips.life,
+            es: -a.chips.es,
+            mana: -a.chips.mana,
+            res: a.chips.res.map((v) => -v),
+          },
+          note: { severity: 'none', text: '' },
+          out: 0,
+          idle: 0,
+          best: true,
+        };
+        S.bag.unshift({
+          ...old,
+          info: { ...infoFor(old, a.slot), dps: -a.dps, ehp: -a.ehp },
+          cmp: [back],
+          multi: !!it.multi,
+        });
+      }
+      backToGear(a.slot);
+    };
+    // The game asks first only when a skill gem would stop working; no swap in this data does that.
+    go();
   }
-  render();
-}
+  /** After wearing something: back to the bag, the gear open and scrolled into view, the slot just filled lit for a moment. */
+  function backToGear(slot) {
+    Object.assign(S, {
+      screen: 'bag',
+      sel: null,
+      aim: null,
+      justOff: null,
+      gearOpen: true,
+      fresh: slot,
+    });
+    render();
+    const sc = document.getElementById('scroll');
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    sc.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+  }
+  function discard() {
+    const it = cur();
+    const go = () => {
+      const list = visible();
+      const i = list.findIndex((x) => x.uid === it.uid);
+      const next = list[i + 1] || list[i - 1];
+      snapshot();
+      S.bag = S.bag.filter((x) => x.uid !== it.uid);
+      S.pile.unshift({ ...it, dust: 1 });
+      if (next && next.uid !== it.uid) S.sel = { from: 'inv', uid: next.uid };
+      else {
+        S.sel = null;
+        S.screen = 'bag';
+      }
+      render();
+    };
+    if (S.fav.has(it.uid)) {
+      S.ask = {
+        title: 'Discard a favourite?',
+        body: `${it.name} is starred.`,
+        confirm: 'Discard it',
+        onYes: go,
+      };
+      render();
+      return;
+    }
+    go();
+  }
+  function act(a, v, el) {
+    S.fresh = null;
+    switch (a) {
+      case 'gear':
+        S.gearOpen = !S.gearOpen;
+        break;
+      case 'open': {
+        const uid = Number(v);
+        const pile = el.dataset.pile === '1';
+        S.sel = { from: pile ? 'pile' : 'inv', uid };
+        S.screen = 'item';
+        S.aim = null;
+        S.justOff = null;
+        if (!pile) S.unseen.delete(uid);
+        break;
+      }
+      case 'slot':
+        if (S.worn[v]) {
+          S.sel = { from: 'slot', slot: v };
+          S.screen = 'item';
+          S.justOff = null;
+        } else return;
+        break;
+      case 'flask':
+        if (S.flasks[v]) {
+          S.sel = { from: 'flask', idx: Number(v) };
+          S.screen = 'item';
+          S.justOff = null;
+        } else return;
+        break;
+      case 'takeoff': {
+        const it = S.worn[v];
+        if (!it) return;
+        snapshot();
+        S.worn[v] = null;
+        S.bag.unshift({
+          ...it,
+          info: infoFor(it, v),
+          cmp: [
+            {
+              slot: v,
+              label: SLOT_LABEL[v],
+              eq: null,
+              ok: true,
+              dps: 0,
+              ehp: 0,
+              chips: { life: 0, es: 0, mana: 0, res: [0, 0, 0, 0, 0] },
+              note: { severity: 'none', text: '' },
+              out: 0,
+              idle: 0,
+              best: true,
+            },
+          ],
+        });
+        S.sel = { from: 'inv', uid: it.uid };
+        S.screen = 'item';
+        S.justOff = null;
+        break;
+      }
+      case 'takeoffflask': {
+        const i = Number(v),
+          f = S.flasks[i];
+        if (!f) return;
+        snapshot();
+        S.flasks[i] = null;
+        S.bag.unshift({
+          ...f,
+          info: {
+            slotLabel: 'Flask',
+            eq: true,
+            dps: 0,
+            ehp: 0,
+            gemsOut: 0,
+            idle: [],
+            fillsFlask: true,
+            group: 'flask',
+            upgrade: true,
+          },
+          fcmp: [0, 1, 2, 3, 4].map((k) => ({ idx: k, eq: null, ok: true, chosen: k === i })),
+        });
+        S.sel = { from: 'inv', uid: f.uid };
+        S.screen = 'item';
+        break;
+      }
+      case 'back':
+        S.screen = S.screen === 'compare' ? 'item' : 'bag';
+        if (S.screen === 'bag') {
+          S.sel = null;
+          S.justOff = null;
+        }
+        break;
+      case 'compare':
+        S.screen = 'compare';
+        break;
+      case 'aim':
+        S.aim = isNaN(Number(v)) ? v : Number(v);
+        break;
+      case 'swap':
+        wear();
+        break;
+      case 'fav': {
+        const it = cur();
+        S.fav.has(it.uid) ? S.fav.delete(it.uid) : S.fav.add(it.uid);
+        break;
+      }
+      case 'step': {
+        const list = visible();
+        const i = list.findIndex((x) => x.uid === S.sel.uid);
+        const n = list[Math.max(0, Math.min(list.length - 1, i + Number(v)))];
+        if (n) {
+          S.sel = { from: S.sel.from, uid: n.uid };
+          S.unseen.delete(n.uid);
+          S.justOff = null;
+        }
+        break;
+      }
+      case 'discard':
+        discard();
+        return;
+      case 'putback': {
+        const it = cur();
+        snapshot();
+        S.pile = S.pile.filter((x) => x.uid !== it.uid);
+        S.bag.unshift(it);
+        S.sel = null;
+        S.screen = 'bag';
+        break;
+      }
+      case 'socket':
+        S.ask = {
+          title: 'Socket',
+          body: 'The Skills tab opens here, with this gem picked and every socket it can go in lit.',
+          confirm: 'OK',
+          onYes: () => {},
+        };
+        break;
+      case 'best': {
+        // Filter the bag to its upgrades, best first, and bring the bag into view.
+        Object.assign(S, {
+          search: '',
+          what: 'all',
+          view: 'upgrades',
+          sort: 'upgrade',
+          desc: false,
+        });
+        render();
+        const sc = document.getElementById('scroll'),
+          bag = sc.querySelector('.bag');
+        sc.scrollTo({
+          top: bag.offsetTop - 8,
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'auto'
+            : 'smooth',
+        });
+        return;
+      }
+      case 'sheet':
+        S.sheet = true;
+        break;
+      case 'closesheet':
+        S.sheet = false;
+        break;
+      case 'view':
+        S.view = v;
+        break;
+      case 'what':
+        S.what = v;
+        break;
+      case 'desc':
+        S.desc = !S.desc;
+        break;
+      case 'clrwhat':
+        S.what = 'all';
+        break;
+      case 'clrview':
+        S.view = 'all';
+        break;
+      case 'clear':
+        S.what = 'all';
+        S.view = 'all';
+        S.search = '';
+        break;
+      case 'seen':
+        S.unseen.clear();
+        break;
+      case 'cleanup':
+        S.ask = {
+          title: 'Clean up old items',
+          body: 'The Clean up screen opens here, as it does now.',
+          confirm: 'OK',
+          onYes: () => {},
+        };
+        break;
+      case 'junk': {
+        const j = junk();
+        S.ask = {
+          title: 'Salvage the junk?',
+          body: 'Every normal or magic item that is not an upgrade and not a favourite is broken down for good.',
+          facts: [`${j.length} item${j.length > 1 ? 's' : ''}`, `${j.length} Bone Dust`],
+          confirm: `Salvage ${j.length} for ${j.length} Bone Dust`,
+          onYes: () => {
+            const ids = new Set(j.map((x) => x.uid));
+            S.bag = S.bag.filter((x) => !ids.has(x.uid));
+          },
+        };
+        break;
+      }
+      case 'salvpile':
+        S.ask = {
+          title: 'Salvage everything discarded?',
+          body: 'Every discarded item is broken down for good. This cannot be undone.',
+          facts: [
+            `${S.pile.length} item${S.pile.length > 1 ? 's' : ''}`,
+            `${S.pile.length} Bone Dust`,
+          ],
+          confirm: `Salvage ${S.pile.length} for ${S.pile.length} Bone Dust`,
+          onYes: () => {
+            S.pile = [];
+            S.undo = [];
+            if (S.view === 'discarded') S.view = 'all';
+          },
+        };
+        break;
+      case 'askyes': {
+        const f = S.ask.onYes;
+        S.ask = null;
+        f();
+        break;
+      }
+      case 'askno':
+        S.ask = null;
+        break;
+      case 'undo':
+        if (S.undo.length) restore();
+        break;
+      default:
+        return;
+    }
+    render();
+  }
 
-const view = document.getElementById('view');
-const undoBtn = document.getElementById('undo');
-function render() {
-  let h = `<div class="scroll" id="scroll">${bagHtml()}</div>`;
-  if (S.sheet) h += sheetHtml();
-  if (S.screen === 'item') { const p = itemPage(); if (p) h += p; }
-  if (S.screen === 'compare') { const p = comparePage(); if (p) h += p; }
-  if (S.ask) h += askHtml();
-  const top = document.getElementById('scroll')?.scrollTop ?? 0;
-  view.innerHTML = h;
-  const sc = document.getElementById('scroll'); if (sc) sc.scrollTop = top;
-  undoBtn.disabled = !S.undo.length;
-}
-document.getElementById('phone').addEventListener('click', (e) => {
-  const t = e.target.closest('[data-a]');
-  if (!t || t.disabled) return;
-  if (t.dataset.a === 'takeoff' || t.dataset.a === 'takeoffflask') e.stopPropagation();
-  act(t.dataset.a, t.dataset.v, t);
-});
-view.addEventListener('input', (e) => {
-  if (e.target.id === 'search') { S.search = e.target.value; const pos = e.target.selectionStart; render(); const s = document.getElementById('search'); s.focus(); s.setSelectionRange(pos, pos); }
-});
-view.addEventListener('change', (e) => { if (e.target.id === 'sort') { S.sort = e.target.value; render(); } });
-render();
-// The worn gear is open, but the tab opens scrolled past it, on the bag: scroll up to see it.
-function scrollPastGear() {
-  const sc = document.getElementById('scroll');
-  const first = sc && (sc.querySelector('.upgrade-cta') || sc.querySelector('.bag'));
-  if (first) sc.scrollTop = first.offsetTop - 8;
-}
-scrollPastGear();
-// Again once the fonts are in, since they change the gear's height.
-if (document.fonts) document.fonts.ready.then(() => { if (S.screen === 'bag' && !S.undo.length) scrollPastGear(); });
+  const view = document.getElementById('view');
+  const undoBtn = document.getElementById('undo');
+  function render() {
+    let h = `<div class="scroll" id="scroll">${bagHtml()}</div>`;
+    if (S.sheet) h += sheetHtml();
+    if (S.screen === 'item') {
+      const p = itemPage();
+      if (p) h += p;
+    }
+    if (S.screen === 'compare') {
+      const p = comparePage();
+      if (p) h += p;
+    }
+    if (S.ask) h += askHtml();
+    const top = document.getElementById('scroll')?.scrollTop ?? 0;
+    view.innerHTML = h;
+    const sc = document.getElementById('scroll');
+    if (sc) sc.scrollTop = top;
+    undoBtn.disabled = !S.undo.length;
+  }
+  document.getElementById('phone').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-a]');
+    if (!t || t.disabled) return;
+    if (t.dataset.a === 'takeoff' || t.dataset.a === 'takeoffflask') e.stopPropagation();
+    act(t.dataset.a, t.dataset.v, t);
+  });
+  view.addEventListener('input', (e) => {
+    if (e.target.id === 'search') {
+      S.search = e.target.value;
+      const pos = e.target.selectionStart;
+      render();
+      const s = document.getElementById('search');
+      s.focus();
+      s.setSelectionRange(pos, pos);
+    }
+  });
+  view.addEventListener('change', (e) => {
+    if (e.target.id === 'sort') {
+      S.sort = e.target.value;
+      render();
+    }
+  });
+  render();
+  // The worn gear is open, but the tab opens scrolled past it, on the bag: scroll up to see it.
+  function scrollPastGear() {
+    const sc = document.getElementById('scroll');
+    const first = sc && (sc.querySelector('.upgrade-cta') || sc.querySelector('.bag'));
+    if (first) sc.scrollTop = first.offsetTop - 8;
+  }
+  scrollPastGear();
+  // Again once the fonts are in, since they change the gear's height.
+  if (document.fonts)
+    document.fonts.ready.then(() => {
+      if (S.screen === 'bag' && !S.undo.length) scrollPastGear();
+    });
 </script>

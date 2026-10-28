@@ -140,11 +140,14 @@ export function Skills({
   c,
   ch,
   focusSlot,
+  focusGem,
 }: {
   c: Controller;
   ch: Character;
   /** Scroll to the sockets of this slot when the tab opens. */
   focusSlot?: EquipSlot | null;
+  /** Pick this bag gem when it changes (the Items tab's Socket): every place it can go lights. */
+  focusGem?: { uid: number; n: number } | null;
 }) {
   const run = c.run!;
   const { coarse, layout } = useViewport();
@@ -482,6 +485,17 @@ export function Skills({
     setUsableOnly(false);
     savePref('gemUsable', false);
   };
+  // The Items tab's Socket: that gem picked, with whatever hides it cleared, and brought into view.
+  useEffect(() => {
+    if (!focusGem || rehearsal || !gems.some((g) => g.uid === focusGem.uid)) return;
+    if (!shownGems.some((g) => g.uid === focusGem.uid)) clearFilters();
+    setPick({ from: 'inv', uid: focusGem.uid });
+    requestAnimationFrame(() =>
+      document
+        .querySelector(`.sk-bagrow[data-uid="${focusGem.uid}"]`)
+        ?.scrollIntoView({ block: 'center' }),
+    );
+  }, [focusGem?.n]);
   return (
     <div
       class="sk"
@@ -771,6 +785,7 @@ export function Skills({
                     return (
                       <button
                         key={g.uid}
+                        data-uid={g.uid}
                         class={'sk-bagrow' + (on ? ' on' : '') + (atSocket ? ' aim' : '')}
                         draggable={!coarse}
                         {...hoverGem(g.gemId, bagLevel(d))}

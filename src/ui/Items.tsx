@@ -1,16 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { EquipSlot, InventoryItem } from '../data/types';
 import type { Controller } from '../run/controller';
 import { discardedValue, salvageDiscarded, salvage, salvageValue } from '../run/craft';
 import {
   canEquip,
   discardToPile,
-  dryEquip,
   equip,
   equipFlask,
   putBack,
   slotsFor,
-  socketGem,
   unequip,
   unequipFlask,
 } from '../run/inventory';
@@ -19,13 +17,11 @@ import {
   flaskTarget,
   isUpgrade,
   itemInfos,
-  type ItemInfo,
   junkItems,
   quickEquip,
   searchText,
   skillsLost,
   swapSockets,
-  type SocketRef,
   sortItems,
 } from '../run/inventoryOps';
 import { Character } from '../calc/character';
@@ -40,6 +36,7 @@ import { ItemList, type ListSort, type View, type What } from './ItemList';
 import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
+import { useRehearsal } from './rehearsal';
 
 type Drag = { kind: 'inv'; uid: number } | { kind: 'slot'; slot: EquipSlot } | null;
 
@@ -66,6 +63,7 @@ export function Items({
   focus,
   onCraft,
   onEditGems,
+  onSocketGem,
   startView,
 }: {
   c: Controller;
@@ -75,6 +73,8 @@ export function Items({
   onCraft?: (uid: number) => void;
   /** Open the Skills tab at the sockets of this slot. */
   onEditGems?: (slot: EquipSlot) => void;
+  /** Open the Skills tab with this bag gem picked, to socket it there. */
+  onSocketGem?: (uid: number) => void;
   /**
    * Open on this view with every kind of item shown, for this visit only: the player's own filters are not overwritten
    * (the camp opens on the last map's drops after a map, docs/STREAMLINE.md S2).
@@ -96,14 +96,16 @@ export function Items({
   const keepWhat = useRef(startView !== undefined);
   const keepView = useRef(startView !== undefined);
   const [cleaning, setCleaning] = useState(false);
-  const [gearOpen, setGearOpen] = useState(false);
+  // The worn gear is open, but on a phone the tab opens scrolled past it, on the bag (docs/ITEM-SLOTS.md 2.1).
+  const [gearOpen, setGearOpen] = useState(true);
+  // The slot just filled by a swap, lit for a moment ('f2' for the third flask).
+  const [fresh, setFresh] = useState<string | null>(null);
+  const rehearsal = useRehearsal();
   // Where the picked bag item is aimed (a slot, or a flask slot): a lit slot on the reliquary or a tab re-aims it, and
   // Wear puts it there. Unset, it is the best slot.
   const [aim, setAim] = useState<{ uid: number; slot?: EquipSlot; idx?: number } | null>(null);
   // A new pick starts aimed at the best slot again.
   useEffect(() => setAim(null), [sel]);
-  // The item a swap just took off, for its caption.
-  const [justOff, setJustOff] = useState<number | null>(null);
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);
   useEffect(() => {
@@ -219,7 +221,6 @@ export function Items({
   const equipTo = async (uid: number, slot: EquipSlot) => {
     const item = run.inventory.find((x) => x.uid === uid);
     if (!item) return;
-    const dry = dryEquip(run, uid, slot);
     // A swap that takes a skill away asks first (docs/NEWPLAYER.md N8).
     const lost = skillsLost(swapSockets(run, uid, slot));
     if (lost.length) {
@@ -240,19 +241,22 @@ export function Items({
       if (!ok || c.run !== run || !run.inventory.some((x) => x.uid === uid)) return;
     }
     const r = c.act((rn) => equip(rn, uid, slot));
-    after(r, () => {
-      const back = dry.toBag;
-      // Next you want to know whether the old one was worth keeping: select it.
-      setSel(back.length ? { from: 'inv', uid: back[0].uid } : { from: 'slot', slot });
-      setJustOff(back.length ? back[0].uid : null);
-    });
+    after(r, () => backToGear(slot));
   };
   const equipFlaskTo = (uid: number, idx: number) => {
-    const old = run.build.flasks[idx];
     const r = c.act((rn) => equipFlask(rn, uid, idx));
-    after(r === undefined ? undefined : { ok: !!r }, () => {
-      setSel(old ? { from: 'inv', uid: old.uid } : { from: 'flask', idx });
-    });
+    after(r === undefined ? undefined : { ok: !!r }, () => backToGear(`f${idx}`));
+  };
+  /** After a swap: back to the bag with the gear open and scrolled into view, the slot just filled lit for a moment. */
+  const backToGear = (slot: string) => {
+    setSel(null);
+    setGearOpen(true);
+    setFresh(slot);
+    requestAnimationFrame(() =>
+      rootRef.current
+        ?.querySelector('.ix-gearcol')
+        ?.scrollIntoView({ block: 'start', behavior: 'smooth' }),
+    );
   };
   const doQuick = (uid: number) => {
     const it = run.inventory.find((x) => x.uid === uid);
@@ -269,12 +273,6 @@ export function Items({
     after(r, () => {
       setSel(null);
     });
-  };
-  /** Put a bag gem in a chosen socket; a gem that was there goes to the bag. */
-  const socketAt = (uid: number, ref: SocketRef) => {
-    const gem = run.inventory.find((x) => x.uid === uid);
-    if (gem?.kind !== 'gem') return;
-    if (c.act((rn) => socketGem(rn, ref.slot, ref.socket, uid))) setSel(null);
   };
   const unequipSlot = (slot: EquipSlot) => {
     const it = run.build.equipment[slot];
@@ -358,21 +356,47 @@ export function Items({
     const n = Math.max(0, Math.min(visible.length - 1, cur + dir));
     if (visible[n]) setSel({ from, uid: visible[n].uid });
   };
-  const bestUpgrade = () => {
-    // Gear by how much it adds; a flask only when no gear is better.
-    const rank = (i: ItemInfo) =>
-      (i.fillsFlask || i.flaskSlot !== undefined) && i.scorePct <= 0.5 ? -1 : i.scorePct;
-    let best: InventoryItem | null = null;
-    for (const x of run.inventory) {
-      const i = infos.get(x.uid)!;
-      if (isUpgrade(i) && (!best || rank(i) > rank(infos.get(best.uid)!))) best = x;
-    }
-    if (!best) return;
+  /** Filter the bag to its upgrades, best first, and bring the bag into view (docs/ITEM-SLOTS.md 2.5). */
+  const showUpgrades = () => {
     setSearch('');
     setWhat('all');
     setView('upgrades');
-    setSel({ from: 'inv', uid: best.uid });
+    setSort('upgrade');
+    setDesc(false);
+    setSel(null);
+    requestAnimationFrame(() =>
+      rootRef.current
+        ?.querySelector('.ix-listcol')
+        ?.scrollIntoView({ block: 'start', behavior: 'smooth' }),
+    );
   };
+  // The lit slot goes out with the next pick.
+  useEffect(() => {
+    if (sel) setFresh(null);
+  }, [sel]);
+  // On a phone the tab opens on the bag, the open gear above it, out of sight until scrolled to.
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!phone || rehearsal || focus) return;
+    // After the camp has put the new tab at its top.
+    const id = requestAnimationFrame(() =>
+      rootRef.current?.querySelector('.ix-cta, .ix-listcol')?.scrollIntoView({ block: 'start' }),
+    );
+    return () => cancelAnimationFrame(id);
+  }, []);
+  // On a phone the selection is a page over the tab, from under the tabs to the camp bar.
+  const detailRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const el = detailRef.current;
+    if (!phone || !el || !selected) return;
+    const place = () => {
+      const top = el.closest('.tab-body')?.getBoundingClientRect().top ?? 0;
+      el.style.setProperty('--ix-top', `${Math.max(0, top)}px`);
+    };
+    place();
+    addEventListener('resize', place);
+    return () => removeEventListener('resize', place);
+  }, [phone, !!selected]);
 
   // Slots the selected (or dragged) carried item can go into.
   const carried =
@@ -429,7 +453,7 @@ export function Items({
       : null);
   const showGear = !phone || gearOpen;
   return (
-    <div class="ix" tabIndex={0} onKeyDown={onKey}>
+    <div class="ix" ref={rootRef} tabIndex={0} onKeyDown={onKey}>
       {cleaning && <CleanUp c={c} onClose={() => setCleaning(false)} />}
       <section class="ix-gearcol" aria-label="Worn gear">
         {phone && (
@@ -458,20 +482,22 @@ export function Items({
             onUnequipFlask={unequipFlaskAt}
             onDragSlot={(slot) => setDrag(slot ? { kind: 'slot', slot } : null)}
             onDropSlot={(slot) => drag?.kind === 'inv' && equipTo(drag.uid, slot)}
+            fresh={fresh}
           />
         )}
       </section>
-      <section class={'ix-detailcol' + (selected ? ' has-sel' : '')} aria-label="Selected item">
+      <section
+        ref={detailRef}
+        class={'ix-detailcol' + (selected ? ' has-sel' : '')}
+        aria-label="Selected item"
+      >
         <ItemDetail
           run={run}
           sel={sel}
           selected={selected}
           info={info}
           favourite={selected ? favs.has(selected.uid) : false}
-          upgrades={counts.upgrades}
-          onBestUpgrade={bestUpgrade}
           aimSlot={aimed?.slot ?? null}
-          justOff={justOff}
           aimFlask={aimed?.idx ?? null}
           onAim={(slot, idx) => sel?.from === 'inv' && setAim({ uid: sel.uid, slot, idx })}
           coarse={coarse}
@@ -483,8 +509,7 @@ export function Items({
           onFavourite={star}
           onPutBack={doPutBack}
           onDiscard={(uid) => void doDiscard(uid)}
-          onSocket={doQuick}
-          onSocketAt={socketAt}
+          onSocket={(uid) => (onSocketGem ? onSocketGem(uid) : doQuick(uid))}
           onCraft={(uid) => onCraft?.(uid)}
           onEditGems={onEditGems}
           onClose={() => setSel(null)}
@@ -492,6 +517,11 @@ export function Items({
         />
       </section>
       <section class="ix-listcol" aria-label="Bag">
+        {counts.upgrades > 0 && view !== 'upgrades' && (
+          <button class="btn primary ix-cta" onClick={showUpgrades}>
+            {counts.upgrades} upgrade{counts.upgrades > 1 ? 's' : ''} in the bag: show them
+          </button>
+        )}
         <ItemList
           rows={visible}
           infos={listInfos}

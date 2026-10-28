@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { makeGem } from '../gen/items';
 import type { SocketOutcome } from './inventory';
-import { joinNames, socketNote, socketsMatter } from './socketText';
+import { joinNames, socketBrief, socketNote, socketsMatter } from './socketText';
 
 let n = 1;
 const gem = (id: string) => makeGem(() => n++, id);
@@ -100,5 +100,29 @@ describe('the sentence a swap says about the gems', () => {
     expect(joinNames(['A'])).toBe('A');
     expect(joinNames(['A', 'B'])).toBe('A and B');
     expect(joinNames(['A', 'B', 'C'])).toBe('A, B and C');
+  });
+});
+
+describe('the same outcome on one line', () => {
+  it('counts the gems that lose their socket instead of naming them', () => {
+    const o = calm({ out: [gem('kindle'), gem('bruteForce')] });
+    expect(socketBrief(o)).toEqual({ severity: 'warn', text: '2 gems unequipped' });
+    expect(socketBrief(calm({ out: [gem('kindle')] })).text).toBe('1 gem unequipped');
+  });
+
+  it('always calls out the main skill', () => {
+    const a = gem('flameBolt');
+    const o = calm({ out: [a, gem('kindle')], lostPrimary: true });
+    expect(socketBrief(o, a.uid)).toEqual({
+      severity: 'bad',
+      text: 'Main skill unequipped (+1 gem)',
+    });
+  });
+
+  it('says what else happens in a few words, and the free sockets as before', () => {
+    const k = gem('kindle');
+    expect(socketBrief(calm({ out: [k], fromOffHand: [k] })).text).toBe('Off hand to the bag');
+    expect(socketBrief(calm({ freeAfter: 3 }))).toEqual(socketNote(calm({ freeAfter: 3 })));
+    expect(socketBrief(calm())).toEqual({ severity: 'none', text: '' });
   });
 });

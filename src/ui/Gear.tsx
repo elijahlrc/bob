@@ -76,6 +76,8 @@ type Props = {
   onUnequipFlask: (idx: number) => void;
   onDragSlot: (slot: EquipSlot | null) => void;
   onDropSlot: (slot: EquipSlot) => void;
+  /** The slot a swap just filled, lit for a moment: a slot id, or 'f2' for the third flask. */
+  fresh?: string | null;
 };
 
 /**
@@ -97,6 +99,7 @@ export function Gear(p: Props) {
       p.selSlot === id ? 'sel' : '',
       t ? (t.ok ? 'target' : 'blocked') : '',
       aimed ? 'aimed' : '',
+      p.fresh === id ? 'fresh' : '',
       aiming && !t ? 'dim' : '',
       !t && p.peek.has(id) ? 'peek' : '',
       p.dragging && t?.ok ? 'drop' : '',
@@ -157,7 +160,7 @@ export function Gear(p: Props) {
         <button
           class={`ix-slot ix-flask ${f ? 'flaskitem' : 'empty'}${p.selFlask === i ? ' sel' : ''}${
             p.flaskTargets ? ' target' : ''
-          }${aimed ? ' aimed' : ''}${aiming && !p.flaskTargets ? ' dim' : ''}`}
+          }${aimed ? ' aimed' : ''}${p.fresh === `f${i}` ? ' fresh' : ''}${aiming && !p.flaskTargets ? ' dim' : ''}`}
           onClick={() => p.onFlask(i)}
           aria-label={`Flask ${i + 1}: ${f ? f.name : 'empty'}`}
         >

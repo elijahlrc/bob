@@ -34,7 +34,7 @@ export function rarityField(it: InventoryItem): string {
 }
 
 /** An item's name on its rarity's plaque, at the head of its card. */
-function NamePlaque({ it, name }: { it: InventoryItem; name: string }) {
+export function NamePlaque({ it, name }: { it: InventoryItem; name: string }) {
   return (
     <div class="ic-name" data-paint="panel" data-thin data-field={rarityField(it)}>
       {name}
@@ -173,15 +173,19 @@ function flaskBuffLines(b: ReturnType<typeof flaskBase>): string[] {
   ];
 }
 
-/** Every line a flask shows: what it recovers, its buff, and its affixes. */
-export function flaskLines(f: FlaskItem): string[] {
+/** What a flask's base gives: what it recovers and its buff. */
+export function flaskBaseLines(f: FlaskItem): string[] {
   const b = flaskBase(f.baseId);
   return [
     ...(b.life > 0 ? [`Recovers ${b.life} life`] : []),
     ...(b.mana > 0 ? [`Recovers ${b.mana} mana`] : []),
     ...flaskBuffLines(b),
-    ...f.affixes.flatMap((a) => modsText(a.mods)),
   ];
+}
+
+/** Every line a flask shows: what it recovers, its buff, and its affixes. */
+export function flaskLines(f: FlaskItem): string[] {
+  return [...flaskBaseLines(f), ...f.affixes.flatMap((a) => modsText(a.mods))];
 }
 
 const linesOf = (x: Item | FlaskItem): string[] =>

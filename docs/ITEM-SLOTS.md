@@ -1,7 +1,10 @@
 # Items tab: inspect, compare, swap
 
-**Plan, 2026-10-27. Not built.** The interactive mock-up is `docs/mockups/items/inspect-compare.html`; it uses real items,
-comparisons and wording taken from a test run. Every point below is the owner's decision.
+**Built 2026-10-27** (`src/ui/ItemDetail.tsx`, `src/ui/Items.tsx`, `src/ui/ItemList.tsx`, `src/ui/leaf/items.css`; the
+side-by-side rows are `compareGroups` in `src/ui/itemDiff.ts`, the one-line gem note `socketBrief` in `src/run/socketText.ts`).
+Not yet tried on a real phone. The interactive mock-up it was built from is `docs/mockups/items/inspect-compare.html`; it
+uses real items, comparisons and wording taken from a test run. Every point below is the owner's decision; section 4 holds
+the ones made while building.
 
 The owner, 2026-10-27: the bag and the mannequin are not the problem on a phone. The problem is inspecting and swapping
 items. So the layout stays as it is, and only what happens when you tap an item changes. The earlier version of this plan
@@ -58,7 +61,24 @@ items. So the layout stays as it is, and only what happens when you tap an item 
 
 ## 3. Not in the mock-up
 
+The game does all of these: Socket opens the Skills tab with the gem picked, Clean up opens its screen, every number
+is worked out again after a swap, and a flask's base lines are set apart from its affixes'.
+
 - Going to the Skills tab from Socket (the mock-up says where it would go).
 - Clean up opens a placeholder.
 - After a swap, the other bag items' numbers are not worked out again.
 - A flask's base lines and affix lines are not told apart, because the data taken from the game did not separate them.
+
+## 4. Decided while building (2026-10-27)
+
+- **The change goes in the header.** The item page's header says what wearing it would do ("▲3% EHP · ⚠ 2 gems out"), and
+  the compare's says the change to damage and EHP ("▲4% DPS · ▼1% EHP"); the strip under the compare's tabs goes.
+- **Tight, with the mosaic.** The base's lines and the affixes' sit close together, and the header, the bar and the line
+  between the two groups are the mosaic's row of tiles (`--s-tiles`, the camp bar's), not gold lines.
+- **A desktop does not scroll as a whole.** From 1100 px wide the tab fills the camp's tab body: the gear, the item page
+  and the bag are columns that line up a short way under the tabs, and only the bag's list (and a long item page) scrolls
+  inside its column. A tablet keeps scrolling as before, the item page held in sight.
+- **A compact bag.** The "Bag" heading goes. Wider than a phone, the bag is wider (about a third of the screen on a
+  desktop), its controls are three short rows (the views; search and sort; the kinds), its housekeeping one line when it
+  fits, and the upgrades button is not shown (the Upgrades view beside it has the count). Its rows are tight lines of the
+  bag's panel, divided by tesserae, instead of plaques of their own (about 47 px instead of about 76 on a phone).

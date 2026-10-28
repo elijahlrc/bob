@@ -157,6 +157,9 @@ A first-class row at the top of the diff and under the slot tab, drawn from `Soc
 
 ### 3.4 The phone sheet (Q3)
 
+_Revised 2026-10-27 (docs/ITEM-SLOTS.md): the sheet is now a full page with everything about the item, and Compare
+shows both items side by side; the peek and the merged card are gone._
+
 - **Open by default**, and it opens on **the affixes that change**, not on calculated numbers: the changed lines of the item against
   the one worn (every one of them, never cut off behind a "show more": a long list scrolls inside the peek, which stops at 52 vh with the actions pinned; gained green, lost red and struck, changed amber with `was …`), then the sockets row and its one-line warning, then
   the actions. The calculated chips (damage, effective HP, resistances) show only with the Both cards switch (phone). No toggle between
@@ -200,6 +203,9 @@ _Revised 2026-10-26 by docs/GEM-SOCKETS.md: a lit socket says what the gem would
 - **The hint paragraph** (7 lines on a phone) collapses to a `?` that opens it; it is shown once, on the first visit.
 
 ### 3.7 A socket picker where the gem is (Q6)
+
+_Removed 2026-10-27 (docs/ITEM-SLOTS.md): a bag gem's Socket opens the Skills tab with the gem picked, and it is
+placed there._
 
 Selecting a gem in the Items bag replaces "Choose which socket on the Skills tab" with the same socket list the Skills tab has, built
 from `placementsFor`: one row per item that has sockets, its pips, the badge, and "replaces X" where it would. Tap a row to place (empty

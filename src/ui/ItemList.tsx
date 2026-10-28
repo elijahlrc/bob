@@ -69,8 +69,8 @@ type RowProps = {
 };
 
 /**
- * One item of the bag, a small plaque of its own (an object, not a line of text): its name in its rarity's colour, a
- * gold mark while it is new, then where it goes and what it would change.
+ * One item of the bag, a tight row of the bag's panel: its name in its rarity's colour, a gold mark while it is new, then
+ * where it goes and what it would change.
  */
 export function ItemRow(p: RowProps) {
   const { it, info } = p;
@@ -79,9 +79,6 @@ export function ItemRow(p: RowProps) {
   return (
     <button
       class={`ix-row ${rarityClass(it)}${p.selected ? ' sel' : ''}${info.equippable ? '' : ' unusable'}`}
-      data-paint="panel"
-      data-thin
-      data-pk={p.selected ? 'sel' : ''}
       draggable={!p.coarse && it.kind !== 'gem'}
       onDragStart={(e) => {
         e.dataTransfer?.setData('text/plain', `inv:${it.uid}`);
@@ -312,7 +309,6 @@ export function ItemList(p: Props) {
         p.onDropOnList();
       }}
     >
-      <h4 class="ix-baghead">Bag</h4>
       {p.phone ? (
         <>
           <div class="ix-tools phone">
@@ -379,12 +375,12 @@ export function ItemList(p: Props) {
       ) : (
         <>
           {views}
-          {kinds}
           <div class="ix-tools">
             {search}
             {sortSelect}
             {reverse}
           </div>
+          {kinds}
           {(p.what !== 'all' || p.search.trim() !== '') && (
             <div class="ix-chips">{clearButton('ix-rm clr')}</div>
           )}

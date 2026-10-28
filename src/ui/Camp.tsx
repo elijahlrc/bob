@@ -212,6 +212,8 @@ export function Camp({ c }: { c: Controller }) {
   const [showDrops, setShowDrops] = useState(fromMap);
   // The slot whose sockets the Skills tab scrolls to (the Items tab's "Edit gems"), for that visit only.
   const [gemSlot, setGemSlot] = useState<EquipSlot | null>(null);
+  // A bag gem sent from the Items tab to be socketed: the Skills tab opens with it picked (`n` makes a repeat count).
+  const [gemPick, setGemPick] = useState<{ uid: number; n: number } | null>(null);
   // Back from a player's very first map: how a run goes, before the camp (docs/NEWPLAYER.md N10).
   const [runIntro, setRunIntro] = useState(
     () => fromMap && run!.history.length === 1 && !introSeen('run'),
@@ -506,7 +508,7 @@ export function Camp({ c }: { c: Controller }) {
     <>
       {t === 'tree' && <TreeView c={c} />}
       {t === 'sheet' && <Sheet s={sheet} ch={ch} />}
-      {t === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} />}
+      {t === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} focusGem={gemPick} />}
       {t === 'strategy' && <Strategy c={c} ch={ch} />}
       {t === 'items' && run.reward && (
         <div class="items-reward">
@@ -529,6 +531,10 @@ export function Camp({ c }: { c: Controller }) {
           onCraft={(uid) => goTo('workbench', uid)}
           onEditGems={(slot) => {
             setGemSlot(slot);
+            setTab('skills');
+          }}
+          onSocketGem={(uid) => {
+            setGemPick({ uid, n: (gemPick?.n ?? 0) + 1 });
             setTab('skills');
           }}
           startView={showDrops ? 'upgrades' : undefined}

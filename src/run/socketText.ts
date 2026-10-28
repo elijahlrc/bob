@@ -53,3 +53,32 @@ export function socketNote(o: SocketOutcome, primaryUid?: number): SocketNote {
     };
   return { severity: 'none', text: '' };
 }
+
+/**
+ * The same outcome in a few words for one line (the compare, docs/ITEM-SLOTS.md): the gems counted, not named, except the main
+ * skill, which is always called out.
+ */
+export function socketBrief(o: SocketOutcome, primaryUid?: number): SocketNote {
+  const overflow = o.out.filter((g) => !o.fromOffHand.some((x) => x.uid === g.uid));
+  const parts: string[] = [];
+  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  if (overflow.length) {
+    const main = overflow.some((g) => g.uid === primaryUid);
+    parts.push(
+      main
+        ? 'main skill unequipped' +
+            (overflow.length > 1 ? ` (+${plural(overflow.length - 1, 'gem', 'gems')})` : '')
+        : `${plural(overflow.length, 'gem', 'gems')} unequipped`,
+    );
+  }
+  if (o.fromOffHand.length) parts.push('off hand to the bag');
+  if (o.idle.length) parts.push(`${plural(o.idle.length, 'gem stops', 'gems stop')} working`);
+  if (parts.length) {
+    const text = parts.join(', ');
+    return {
+      severity: o.lostPrimary ? 'bad' : 'warn',
+      text: text[0].toUpperCase() + text.slice(1),
+    };
+  }
+  return socketNote(o, primaryUid);
+}

@@ -109,6 +109,9 @@ they are. This plan changes presentation, ordering, wording and a few pure helpe
 
 ### 3.1 One model: select → see → act
 
+_Revised 2026-10-27 by docs/ITEM-SLOTS.md: a tap opens the item's page, Compare shows it beside what it would
+replace, and Swap wears it._
+
 - **Selecting** is a click or tap on a row, a slot, or a flask, or an arrow key. The detail panel is **pinned** to the
   selection. **Hover never changes the panel**: on desktop it only **outlines the slots** the hovered row could go into
   and shows its delta chips (it already does the first). `Esc` clears the selection.
