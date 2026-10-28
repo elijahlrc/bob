@@ -3,6 +3,7 @@
 import { SOUND_OPEN } from '../../data/constants';
 import { loadPref, savePref } from '../prefs';
 import { build, level, SR } from './kit';
+import { createMusic, type Music } from './music';
 import { SOUNDS, type SoundId, type Variant, type VariantOf } from './recipes';
 
 /** Whether the game makes any sound at all: the switch in constants.ts, or ?sound in the address to try it. */
@@ -29,6 +30,21 @@ export function setSoundVolume(v: number): void {
   if (out) out.gain.value = volume;
 }
 
+const MUSIC_PREF = 'music.volume';
+let musicVolume = loadPref<number>(MUSIC_PREF, 0.7);
+
+export function musicVolumeNow(): number {
+  return musicVolume;
+}
+export function setMusicVolume(v: number): void {
+  musicVolume = Math.max(0, Math.min(1, v));
+  savePref(MUSIC_PREF, musicVolume);
+  if (musicGain && ctx) {
+    musicGain.gain.cancelScheduledValues(ctx.currentTime);
+    musicGain.gain.setValueAtTime(musicVolume, ctx.currentTime);
+  }
+}
+
 /** How often a sound may start again (seconds): a tap that lands twice, or an 8x map dropping three rares at once. */
 const GAP: Partial<Record<SoundId, number>> = {
   press: 0.04,
@@ -46,6 +62,9 @@ const TAKES = 2;
 
 let ctx: AudioContext | null = null;
 let out: GainNode | null = null;
+let music: Music | null = null;
+let musicGain: GainNode | null = null;
+let musicTarget = 0;
 const takes = new Map<string, AudioBuffer[]>();
 const queue: string[] = [];
 let rendering = false;
@@ -126,8 +145,45 @@ function unlock(): void {
     out.connect(ctx.destination);
     for (let n = 0; n < TAKES; n++)
       for (const id of ORDER) for (const v of Object.keys(SOUNDS[id])) want(`${id}.${v}`);
+    startMusic(ctx);
   }
   if (ctx.state === 'suspended' && !document.hidden) void ctx.resume();
+}
+
+/**
+ * The music (docs/AUDIO.md, "Music"), synthesised live on the shared context: bars are scheduled a little ahead every
+ * tenth of a second while the context runs and the music is on; nothing is scheduled while it is off or hidden.
+ */
+function startMusic(c: AudioContext): void {
+  musicGain = c.createGain();
+  musicGain.gain.value = musicVolume;
+  musicGain.connect(c.destination);
+  const m = createMusic(c, musicGain);
+  m.setIntensity(musicTarget);
+  m.start(c.currentTime + 0.3);
+  music = m;
+  window.setInterval(() => {
+    if (c.state === 'running' && musicVolume > 0)
+      m.scheduleUntil(c.currentTime + 1.2, c.currentTime);
+  }, 100);
+}
+
+/** The music's intensity to move toward: 0 calm, 1 fight, 2 boss or low life. */
+export function setMusicIntensity(x: number): void {
+  musicTarget = x;
+  music?.setIntensity(x);
+}
+
+/** Dips the music for a moment (a death), then brings it back over a few seconds. */
+export function duckMusic(secs: number): void {
+  if (!musicGain || !ctx) return;
+  const g = musicGain.gain;
+  const t = ctx.currentTime;
+  g.cancelScheduledValues(t);
+  g.setValueAtTime(g.value, t);
+  g.linearRampToValueAtTime(musicVolume * 0.1, t + 0.4);
+  g.setValueAtTime(musicVolume * 0.1, t + secs);
+  g.linearRampToValueAtTime(musicVolume, t + secs + 3);
 }
 
 let installed = false;

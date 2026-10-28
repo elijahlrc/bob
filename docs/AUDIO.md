@@ -95,7 +95,33 @@ The pure parts (the event-to-sound mapping, the caps) get unit tests; the sounds
    modest phone) and a volume balance across the set.
 
 Then the decision goes in DESIGN.md Appendix A, a line in CLAUDE.md, and the patch notes through `/patch-notes`.
-Music is a separate plan.
+
+## Music
+
+Built 2026-10-28 from the "Bob Music Sketch" artifact the owner approved by ear (`src/ui/sound/music.ts`).
+
+- **One piece in layers**, D minor at 96 BPM, two bars a chord, eight-bar phrases. Every layer shares the tempo and the
+  harmony, so any mix fits, and the music moves between tiers at a bar line with no seam.
+- **Three tiers by an intensity** from 0 to 2. Calm: a drone, bowed strings and a sparse low cello line, some stretches
+  thin or sparse but never silent. Fight: adds a soft plucked bass pulse and frame drums. Boss: adds war drums with a
+  fill each phrase, fast acoustic strings on a repeated-note ostinato, a low choir "aah" and a gritty low swell; the
+  cello drops out. Fight and boss feel faster through busier rhythm, never a faster tempo.
+- **What varies:** six hand-written progressions chosen by the mood of the moment, the voicings (moving as little as
+  they can), the cello line, the bass and drum patterns, and how full a calm stretch is. The harmony itself is not
+  generated: a generated progression was judged a poor bet (the owner, 2026-10-28).
+- **When:** calm in camp, on the title and on a quiet stretch of a map; fight while a monster is within 8 tiles; boss
+  for a boss in sight, below half life, or with every life flask short of a drink's charges (the owner, 2026-10-28;
+  `musicIntensity` in `hooks.ts`). The music rises within a bar or two and comes down a little over a bar at a time,
+  so a fight that ends does not cut it off. Showcase and the gallery stay calm; a duel is at least a fight. A death
+  dips the music under its sigh for a few seconds.
+- **How it plays:** synthesised live on the sound's AudioContext, a bar scheduled about a second ahead every tenth of
+  a second; nothing is scheduled while the music is off or the page is hidden, and a page that stalled skips the
+  bars it missed. A Music setting (Off, Quiet, Normal, Loud) sits under Sound. It is shut with the rest by
+  `SOUND_OPEN`.
+- **Mix:** levels were set from renders measured through a 150 Hz high-pass and checked on spectrograms: the tiers
+  step up about 4 dB each (calm −28, fight −24, boss −20), nothing below 30 Hz, a limiter and a soft clip last.
+- **Open:** the boss tier makes many voices at once and may stutter on a modest phone; if it does, render bars ahead
+  in idle time as the sound effects do.
 
 ## The long list
 

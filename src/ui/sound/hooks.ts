@@ -5,7 +5,14 @@ import { getTree, type TreeNode } from '../../data/tree';
 import type { Controller } from '../../run/controller';
 import type { RewardCard } from '../../run/run';
 import type { SimEvent, World } from '../../sim/types';
-import { installSoundEngine, sfx, soundOpen, soundSince } from './engine';
+import {
+  duckMusic,
+  installSoundEngine,
+  setMusicIntensity,
+  sfx,
+  soundOpen,
+  soundSince,
+} from './engine';
 import { SOUNDS, type SoundId } from './recipes';
 
 /** A sound to play, with its variant. */
@@ -41,6 +48,31 @@ export function mapCues(world: World, events: readonly SimEvent[], seen: { boss:
     }
   }
   return cues;
+}
+
+/** How near (tiles) a monster must be for the music to count it as a fight. */
+export const FIGHT_NEAR = 8;
+
+/**
+ * The music's intensity for a frame of a map (the owner, 2026-10-28): 2 (boss) for a boss in sight, below half life, or
+ * with every life flask short of a drink's charges; 1 (fight) while a monster is near; 0 (calm) on a quiet stretch.
+ * The music itself rises at once and falls slowly, so this can change every frame.
+ */
+export function musicIntensity(world: World): number {
+  const side = world.sides[0];
+  const me = side?.player;
+  if (!side || !me || !me.alive) return 0;
+  let fight = false;
+  for (const a of world.actors) {
+    if (!a.alive || a.isPlayer || a.dummy || a.team === me.team) continue;
+    const d = Math.hypot(a.x - me.x, a.y - me.y);
+    if (a.rarity === 'boss' && d <= BOSS_NEAR) return 2;
+    if (d <= FIGHT_NEAR) fight = true;
+  }
+  if (me.life < 0.5 * me.def.maxLife) return 2;
+  const life = side.flasks.filter((x) => x.spec.life > 0);
+  if (life.length && life.every((x) => x.charges < x.spec.perUse)) return 2;
+  return fight ? 1 : 0;
 }
 
 let nodes: Map<number, TreeNode> | null = null;
@@ -110,7 +142,15 @@ export function installSound(c: Controller): void {
     if (!quiet(c)) sfx('begin');
   });
   c.bus.on('ticked', ({ world, events }) => {
+    // Showcase and the gallery stay calm; a duel is a fight, by the same rule as a map.
+    const x = musicIntensity(world);
+    setMusicIntensity(c.showcase || c.gallery ? 0 : c.duel ? Math.max(1, x) : x);
     if (quiet(c)) return;
-    for (const q of mapCues(world, events, seen)) sfx(q.id, q.variant as never);
+    for (const q of mapCues(world, events, seen)) {
+      sfx(q.id, q.variant as never);
+      // A death dips the music under its sigh.
+      if (q.id === 'death') duckMusic(4);
+    }
   });
+  c.bus.on('mapEnd', () => setMusicIntensity(0));
 }

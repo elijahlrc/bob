@@ -62,6 +62,8 @@
   caps, `hooks.ts` what plays when); the rest of the UI calls `sfx(id, variant)`, and every enabled button sounds a
   Press by itself (`data-sfx` picks another or "none"). **`SOUND_OPEN` in `data/constants.ts` shuts all of it** and
   stays false until the first pass is done; `?sound` in the address opens it for one visit. Change a recipe only by ear.
+  The music is `music.ts` (one layered piece blended by an intensity, `musicIntensity` in `hooks.ts`), also changed
+  only by ear; judge a change from offline renders measured through a 150 Hz high-pass and from spectrograms.
 - **Strategy tab** (2026-10-09): `Build.strategy` gives each skill a role, a condition and an order, plus target priority,
   spacing (hold, close in, kite) and flask thresholds (`src/data/strategy.ts`, `src/calc/strategy.ts`, `src/ui/Strategy.tsx`).
   `Character.mains` / `rotation` hold the resolved order; the sim's `chooseSkill` (`src/sim/ai.ts`) walks it. The sheet
