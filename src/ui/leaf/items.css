@@ -1036,6 +1036,15 @@ html.leaf .ix-sheet > .ic-name {
 html.leaf .ix-sheet :is(.ic-base, .muted) {
   color: var(--muted);
 }
+/* A gem's name on its green plaque is pearl, as on its card. */
+html.leaf .ix-sheet > .ic-name[data-field='green'] {
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .ix-gemdesc {
+  font-style: italic;
+  color: var(--muted);
+}
 html.leaf .ix-sheet > .item-card {
   padding: 0;
   background: none;

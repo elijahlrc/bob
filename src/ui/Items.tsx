@@ -384,6 +384,24 @@ export function Items({
     );
     return () => cancelAnimationFrame(id);
   }, []);
+  // On a desktop the tab does not scroll: the gear is scaled down to fit a short window's height rather than scroll.
+  const gearRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const col = gearRef.current;
+    if (!col || phone) return;
+    const fit = () => {
+      const g = col.querySelector<HTMLElement>('.ix-reliq');
+      if (!g) return;
+      g.style.zoom = '';
+      if (!matchMedia('(min-width: 1100px)').matches) return;
+      const z = Math.min(1, (col.clientHeight - 2) / g.offsetHeight);
+      if (z < 1) g.style.zoom = String(Math.max(0.6, z));
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(col);
+    return () => ro.disconnect();
+  }, [phone]);
   // On a phone the selection is a page over the tab, from under the tabs to the camp bar.
   const detailRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
@@ -455,7 +473,7 @@ export function Items({
   return (
     <div class="ix" ref={rootRef} tabIndex={0} onKeyDown={onKey}>
       {cleaning && <CleanUp c={c} onClose={() => setCleaning(false)} />}
-      <section class="ix-gearcol" aria-label="Worn gear">
+      <section class="ix-gearcol" ref={gearRef} aria-label="Worn gear">
         {phone && (
           <button
             class="ix-gear-toggle"

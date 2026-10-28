@@ -20,10 +20,12 @@ import type { RunState } from '../run/run';
 import { joinNames, socketBrief, socketsMatter } from '../run/socketText';
 import { modsText } from '../mods/text';
 import { triggerText } from '../data/triggers';
+import { TAG_GLOSSARY } from '../data/glossary';
+import { gemCardData } from './gemText';
 import {
   armourLine,
   flaskBaseLines,
-  ItemCard,
+  gemLevelIn,
   itemTitle,
   NamePlaque,
   rarityClass,
@@ -266,12 +268,29 @@ function ItemSheet({
   /** A worn item names the gems in its sockets. */
   worn?: boolean;
 }) {
-  if (it.kind === 'gem')
+  if (it.kind === 'gem') {
+    // A gem laid out like an item: what it is and takes, then its numbers and, below a line, what it does.
+    const d = gemCardData(gemDef(it.gemId), gemLevelIn(run.build, it.gemId));
     return (
       <div class="ix-sheet">
-        <ItemCard it={it} build={run.build} />
+        <NamePlaque it={it} name={d.name} />
+        <div class="muted">
+          {d.type} · Level {d.level}
+          {d.tags.length > 0 && ' · '}
+          {d.tags.map((t, i) => (
+            <span key={t}>
+              {i > 0 && ', '}
+              <span {...infoProps(TAG_GLOSSARY[t.toLowerCase()])}>{t}</span>
+            </span>
+          ))}
+        </div>
+        <div class="ix-req muted">Requires {d.requires}</div>
+        <Lines lines={d.stats} cls="implicit" />
+        <Lines lines={d.effects} cls="explicit" />
+        <div class="ix-gemdesc">{d.description}</div>
       </div>
     );
+  }
   if (it.kind === 'flask') {
     const b = flaskBase(it.baseId);
     return (
