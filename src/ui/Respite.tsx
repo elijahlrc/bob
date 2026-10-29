@@ -1,5 +1,7 @@
 import { useState } from 'preact/hooks';
 import type { Item } from '../data/types';
+import { Character } from '../calc/character';
+import type { RunState } from '../run/run';
 import { affixLabel } from '../run/affixText';
 import type { Controller } from '../run/controller';
 import { nextTier } from '../run/craft';
@@ -18,6 +20,20 @@ const KINDS: [RespiteCraft['kind'], string][] = [
   ['tier', 'Raise a tier'],
   ['socket', 'Add a socket'],
 ];
+
+/** What the character carries now, so resting can be weighed: life, mana and each flask's charges. */
+function carried(run: RunState): string {
+  const v = run.vitals;
+  const specs = new Character(run.build).flasks;
+  const flasks = run.build.flasks
+    .filter((f) => f !== null)
+    .map((f) => {
+      const max = specs.find((s) => s.uid === f.uid)?.maxCharges ?? 0;
+      return `${f.name} ${Math.floor(max * (v.flasks[f.uid] ?? 1))}/${max}`;
+    });
+  const pct = (x: number) => `${Math.round(x * 100)}%`;
+  return `You carry life ${pct(v.life)}, mana ${pct(v.mana)}${flasks.length ? `; ${flasks.join(', ')}` : ''}.`;
+}
 
 const plaque = (on: boolean) => ({
   'data-paint': 'panel',
@@ -81,6 +97,7 @@ export function RespiteScreen({
           ? `Crafts made: ${visit.crafts}. The next costs ${cost ? `${cost} Bone Dust` : 'nothing'}; you have ${run.dust}.`
           : 'Rest, or craft on one of your items. The first craft is free; more cost Bone Dust.'}
       </p>
+      <p class="muted stop-how">{carried(run)}</p>
       {!visit && (
         <div class="stop-buttons">
           <button class="btn primary" onClick={() => c.startMap(slot)}>
@@ -130,7 +147,7 @@ export function RespiteScreen({
                 <span class="muted">
                   {kind === 'socket'
                     ? `${it.sockets.length} → ${it.sockets.length + 1} sockets`
-                    : `${it.affixes.length} affixes`}
+                    : `${it.affixes.length} affix${it.affixes.length === 1 ? '' : 'es'}`}
                 </span>
               </button>
             ))}

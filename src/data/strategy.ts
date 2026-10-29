@@ -91,7 +91,7 @@ export const STRATEGY_DEFAULTS = {
   target: 'nearest' as TargetPriority,
   spacing: 'hold' as Spacing,
   lifeFlask: 0.5,
-  utilityFlask: 'packs' as UtilityFlaskUse,
+  utilityFlask: 'bosses' as UtilityFlaskUse,
 };
 
 /** How close a ranged character with the `close` spacing stands, in tiles. */
@@ -134,8 +134,8 @@ export const ESCAPE_LIFE_CHOICES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
  * The flasks drink in belt order, life (and hybrid) flasks and mana flasks each in their own order, and each takes the threshold
  * of its position: the first life flask drinks first, the last is kept for the worst moment (docs/ATTRITION.md, 2026-10-29).
  */
-export const LIFE_FLASK_AT = [0.7, 0.5, 0.35, 0.25, 0.15];
-export const MANA_FLASK_AT = [0.4, 0.25, 0.15, 0.1, 0.05];
+export const LIFE_FLASK_AT = [0.5, 0.35, 0.25, 0.15, 0.1];
+export const MANA_FLASK_AT = [0.25, 0.15, 0.1, 0.05, 0.05];
 /** The thresholds a flask can be given. */
 export const FLASK_AT_CHOICES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
 

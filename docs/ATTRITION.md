@@ -91,6 +91,9 @@ that later design work starts from it.
 - What makes the Gem Hoard and the Ferryman stronger.
 - The run rewards, where they come from, and whether a new stop is built around them.
 - The two automatic flask rules (end of the plan).
+- Baseline life recovery between maps (raised by a playtest, 2026-10-29): with no regeneration, life lost on one map
+  carries into every map after it. Some base regeneration or out-of-combat recovery would be a departure from the
+  reference game; for the owner to decide.
 
 ## 4. Work, roughly in order
 
@@ -194,3 +197,31 @@ The order will change as we learn.
   - **Foresight.** Camp says when the next Respite comes ("Next Respite in 2 levels (map 23)"), looking up to twenty
     levels ahead; the sets follow from the seed alone, so it is exact. Upcoming stops are not shown (still open).
   - **Saves.** `SAVE_VERSION` 24; a version-23 run switches to the new rules on load with its passives handed back.
+- **2026-10-29, playtests.** Three agents played one run each: a Vanguard (text harness, `scripts/play.ts`; four runs,
+  the best to map 18), a Mystic (text harness, map 20) and a Strider (browser, map 10). All died to bosses or to a map
+  after a bad one. What they found, sorted, and what became of it:
+  - _The game, agreed by two or three of them:_
+    1. One ordinary map can empty full flasks, so the Respite before a boss is not a choice. Lower default thresholds
+       (the first life flask drank at 70%).
+    2. Mana drained casters and the Strider alike: both mana flasks empty by map 8. Bigger mana flasks, lower mana
+       thresholds, and the "main skill can't be paid" floor (my addition) removed.
+    3. Rest always beat craft: a free craft gave +6 life. The Respite's added affix rolls at the best tier the level
+       allows.
+    4. A utility flask on "packs and rares" emptied in one map. The default becomes "bosses only".
+    5. "Next Respite" skipped the Respite on offer. Camp says when one is on offer, and calls the one before a boss
+       the last rest before it.
+    6. Flask charges are shown nowhere as numbers: camp, the Flasks panel and the Respite screen show them.
+    7. The Ferryman's price is not on its card. It is now.
+    8. "Players gain fewer flask charges" (Dry) is nearly free now. It becomes "flasks use more charges a drink".
+  - _The game, one report each:_ 9. One life flask in seventeen maps (Vanguard): the starting belt gets a second life flask. 10. Run rewards lost to resistance gear at 43–56 Bone Dust (one report had 74 Dust by map 12, another 9 by map
+    9: mixed). Prices come down about a quarter. 11. A reward pick offered the same gem twice (pre-existing): a pick no longer repeats a gem. 12. "1 affixes" on the Respite screen; flask charges a drink shown with decimals. Fixed. 13. The Strategy tab leaves its left half empty at some widths, the Flasks panel squeezed (to look at).
+  - _The harness, not the game:_ resistances read from the wrong slots in `char`; uniques printed as "no affixes";
+    flasks marked "UPGRADE for null"; raw affix ids in the tier craft list; "1 levels"; a silent "Not possible" when
+    equipping; the crafted item not shown; a worn flask's affixes left out of its charges; the Ferryman's price not in
+    `look`. All fixed in `scripts/play.ts`. The 403 errors in the browser are the fonts failing through the
+    worktree's linked packages, not telemetry.
+  - _Not taken up:_ partial XP for stops and Respites, a Respite that also refills when you craft, mana refilling on
+    kills (each reverses a decision of the owner's); baseline life recovery (in Open, for the owner); the bot's
+    `auto` helpers undoing manual sockets and "Best place" choosing an idle socket (tools, not this plan); long
+    early maps and a rare on a +2 map killing a level-3 character (balance before this plan); the Gem Hoard laying out
+    few supports (its pool does include supports of the tag; left).

@@ -96,12 +96,24 @@ html.leaf .arriving-mana {
 }
 /* The flasks are the HUD's painted bottles (hud.css), a size smaller. */
 html.leaf .arriving-flasks {
-  gap: 6px;
+  gap: 14px;
+  padding-bottom: 16px;
 }
 html.leaf .arriving-flasks .flask {
   position: relative;
   width: 32px;
   height: 48px;
+}
+/* The charges carried, as numbers under the bottle (docs/ATTRITION.md). */
+html.leaf .arriving-flasks .flask-count {
+  position: absolute;
+  left: 50%;
+  bottom: -16px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
 html.leaf .arriving-flasks .flask-glass {
   left: 6px;

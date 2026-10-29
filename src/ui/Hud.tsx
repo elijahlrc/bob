@@ -743,7 +743,7 @@ export function Hud({ c }: { c: Controller }) {
                       class="flask"
                       data-st={st}
                       {...infoProps(
-                        `${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${f.spec.perUse} per use. Used automatically.`,
+                        `${f.spec.name} (${kindLabel}) · ${f.charges.toFixed(0)}/${f.spec.maxCharges} charges, ${Math.round(f.spec.perUse * 10) / 10} per use. Used automatically.`,
                       )}
                     >
                       <div

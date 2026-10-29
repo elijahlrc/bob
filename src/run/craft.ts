@@ -189,7 +189,7 @@ export function previewPolish(it: Item, familyId: string): Item {
 
 // ---- The Respite's crafts (docs/ATTRITION.md) -----------------------------------------------------
 
-/** Add a random affix to an item: one of the families it can take, weighed as the drops are. */
+/** Add a random affix to an item: one of the families it can take, weighed as the drops are, at its best tier. */
 export function addRandomAffix(run: RunState, itemUid: number): CraftResult {
   const loc = locate(run, itemUid);
   if (!loc) return fail('No such item');
@@ -202,7 +202,13 @@ export function addRandomAffix(run: RunState, itemUid: number): CraftResult {
     f.tiers.filter((t) => t.minIlvl <= it.ilvl).reduce((s, t) => s + t.weight, 0),
   );
   const f = fams[rng.weightedIndex(weights)];
-  replace(run, loc, withAffix(it, rollAffixOfFamily(rng, f, it.ilvl)!, rng));
+  // At the best tier the item's level or the level being played allows, so a craft is worth a level (the playtests:
+  // a drop-weighted roll gave +6 life).
+  const cap = Math.max(it.ilvl, run.map);
+  const tier = f.tiers.filter((t) => t.minIlvl <= cap).at(-1)!;
+  const values = tier.ranges.map(([lo, hi], i) => rollValue(rng, lo, hi, f.mods[i].dec));
+  const roll = { family: f.id, tier: tier.tier, mods: familyMods(f, values) };
+  replace(run, loc, withAffix(it, roll, rng));
   return OK;
 }
 

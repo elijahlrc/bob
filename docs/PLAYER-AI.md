@@ -156,8 +156,8 @@ A main skill that is a **renewable debuff** (like Creeping Plague) also waits wh
 
 _Strategy:_
 
-- **Running out of mana costs damage.** Watch your mana. A mana flask drinks below its threshold, or when the main
-  skill can't be paid for at all (section 6); kills don't refill it.
+- **Running out of mana costs damage.** Watch your mana. A mana flask drinks only below its threshold (section 6), and
+  kills don't refill it: between drinks, regeneration pays for the skills.
 - **A main skill with a cooldown of its own** leaves gaps. They are filled by a ready periodic skill if you have
   one, or by the weapon if you don't.
 - **Every other skill takes time from the main one.** Each cast uses its own cast time, which the main skill doesn't
@@ -276,14 +276,13 @@ passives say so (docs/ATTRITION.md), so every drink counts. Each flask in the be
 tab:
 
 - **Life** (or hybrid): life flasks drink in **belt order**, each when life is below **its own threshold**: by default
-  70% for the first, then 50%, 35%, 25% and 15%. So the first is drunk early and the last is kept for the worst moment;
+  50% for the first, then 35%, 25%, 15% and 10%. So the first is drunk early and the last is kept for the worst moment;
   put a slow flask first and an instant one last. A flask that is already working isn't drunk again, but the next one
   can be. Only one life flask per tick.
-- **Mana** (or hybrid): mana flasks drink in their own belt order, below their threshold (by default 40%, then 25%,
-  15%...), or whenever the main skill can't be paid for at all. A hybrid's setting is its life threshold; for mana it
-  takes the default of its position.
-- **Utility:** each utility flask has a condition: **bosses only**, **rares and bosses** (a rare, champion or boss
-  within 8 tiles), **packs and rares** (also 5+ enemies within 8 tiles; the default) or **any fight**.
+- **Mana** (or hybrid): mana flasks drink in their own belt order, below their threshold (by default 25%, then 15%,
+  10%...). A hybrid's setting is its life threshold; for mana it takes the default of its position.
+- **Utility:** each utility flask has a condition: **bosses only** (the default), **rares and bosses** (a rare,
+  champion or boss within 8 tiles), **packs and rares** (also 5+ enemies within 8 tiles) or **any fight**.
 - **Life-to-energy-shield flask** (one that leaves you at 1 life for two seconds): only at **90%+ life**, with
   the nearest enemy **6 to 16 tiles away**, and only if your energy shield is at least 70% of your life. The
   character drinks it before a fight, not in one.

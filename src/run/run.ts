@@ -196,7 +196,8 @@ export function newRun(classId: string, seed: number, difficulty: Difficulty = D
   run.build.flasks = [
     makeFlask(uid, 'flask_life_1', 1),
     makeFlask(uid, 'flask_mana_1', 1),
-    null,
+    // A second life flask (docs/ATTRITION.md, the playtests): kills no longer refill the first.
+    makeFlask(uid, 'flask_life_1', 1),
     null,
     null,
   ];
@@ -554,16 +555,20 @@ export function rollRewards(run: RunState): RewardCard[] {
       CURRENCY_DROPS ? 15 : 0,
     ]);
     if (pool === 'currency') out.push(rollCurrencyBundle(rng, uid, run.map));
-    else if (pool === 'gem')
-      out.push(
+    else if (pool === 'gem') {
+      const roll = () =>
         rollGem(rng, uid, {
           classId: run.build.classId,
           ilvl,
           hold: new Character(run.build).weaponHold(),
           ownAttrs: run.map <= OWN_ATTR_PICK_MAPS,
-        }),
-      );
-    else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
+        });
+      // A pick never offers the same gem twice.
+      const shown = new Set(out.flatMap((c) => (c.kind === 'gem' ? [c.gemId] : [])));
+      let gem = roll();
+      for (let k = 0; k < 6 && shown.has(gem.gemId); k++) gem = roll();
+      out.push(gem);
+    } else if (pool === 'flask') out.push(rollFlask(rng, uid, ilvl, 1));
     else out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, rng.chance(0.7)));
   }
   // A pick may hold something for the Wayside in place of one of the three (docs/WAYSIDE.md 6.1 and 7.4): a reprieve (more often on a

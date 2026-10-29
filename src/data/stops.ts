@@ -58,7 +58,7 @@ export const STOPS: StopDef[] = [
   {
     id: 'ferryman',
     name: 'The Ferryman',
-    text: 'A reprieve and full flasks, at a price.',
+    text: 'A reprieve and full flasks, for 15% less life over five levels.',
     how: 'Choose a reprieve.',
     flavour: "He doesn't ask where you're going. Only what you'll give.",
     weight: 20,

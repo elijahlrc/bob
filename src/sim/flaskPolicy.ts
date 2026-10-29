@@ -53,7 +53,6 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   const brace = w.effects.length > 0 && braceFor(w, s);
   const cap = lifeCap(p);
   const manaCap = Math.max(0, p.def.maxMana - s.char.reservedMana);
-  const cost = s.primary.usable ? s.char.profile(s.primary).cost : 0;
   // What the Strategy tab sets for each belt slot (thresholds by position unless set).
   const rules = flaskRules(
     s.flasks.map((f) => f.spec.kind),
@@ -101,13 +100,10 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
       usedLife = true;
       return;
     }
-    // Mana flasks below their own threshold, or when the main skill cannot be paid for at all. A hybrid flask also refills
-    // mana: it is drunk for low mana as a mana flask is.
-    if (
-      (k === 'mana' || k === 'hybrid') &&
-      idle &&
-      p.mana < Math.max(manaCap * (rule.mana ?? 0), cost)
-    ) {
+    // Mana flasks below their own threshold only: regeneration covers a skill that can't be paid for this moment, and a
+    // floor at its cost drained casters' flasks (the playtests, docs/ATTRITION.md). A hybrid flask also refills mana: it is
+    // drunk for low mana as a mana flask is.
+    if ((k === 'mana' || k === 'hybrid') && idle && p.mana < manaCap * (rule.mana ?? 0)) {
       out.push(i);
       return;
     }

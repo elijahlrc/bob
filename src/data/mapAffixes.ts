@@ -271,8 +271,9 @@ export const MAP_AFFIXES: MapAffixDef[] = [
   {
     id: 'dry',
     name: 'Dry',
-    text: 'Players gain {40}% fewer flask charges',
-    playerMods: [mod('flaskCharges', 'more', -40)],
+    // Kills give no charges of their own (docs/ATTRITION.md), so fewer gained cost nearly nothing: a drink costs more instead.
+    text: "Players' flasks use {30}% more charges a drink",
+    playerMods: [mod('flaskChargesUsed', 'base', -30)],
     reward: { quantity: 0.15 },
     pressure: 1.05,
   },

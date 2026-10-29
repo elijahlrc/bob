@@ -352,7 +352,13 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
         </p>
       )}
       <div class={'st-cols' + (ch.rotation.length ? '' : ' one')}>
-        {ch.rotation.length > 0 && <div class="st-first">{first}</div>}
+        {ch.rotation.length > 0 && (
+          <div class="st-first">
+            {first}
+            {/* In two columns the belt fills the wider left one, under the rotation (the playtests found it squeezed). */}
+            <FlaskBelt c={c} ch={ch} />
+          </div>
+        )}
         <div class="st-side">
           <Group
             c={c}
@@ -411,7 +417,7 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
               <li>{SPACING_TEXT[spacing]}</li>
             </ul>
           </section>
-          <FlaskBelt c={c} />
+          {ch.rotation.length === 0 && <FlaskBelt c={c} ch={ch} />}
         </div>
       </div>
       {!empty && <DpsDetails ch={ch} />}
@@ -435,7 +441,7 @@ const SPACING_TEXT: Record<Spacing, string> = {
 };
 
 /** The belt's own settings (docs/ATTRITION.md): every worn flask in belt order, with what it is drunk for. */
-function FlaskBelt({ c }: { c: Controller }) {
+function FlaskBelt({ c, ch }: { c: Controller; ch: Character }) {
   const run = c.run!;
   const belt = run.build.flasks;
   const kinds = belt.map((f) => (f ? flaskBase(f.baseId).kind : null));
@@ -447,7 +453,10 @@ function FlaskBelt({ c }: { c: Controller }) {
       <div class="st-ctls two">
         {belt.map((f, slot) => {
           if (!f) return null;
-          const label = `${slot + 1}. ${f.name}`;
+          const spec = ch.flasks.find((s) => s.uid === f.uid);
+          const max = spec?.maxCharges ?? 0;
+          const have = Math.floor(max * (run.vitals.flasks[f.uid] ?? 1));
+          const label = `${slot + 1}. ${f.name} · ${have}/${max}`;
           const rule = rules[slot];
           if (kinds[slot] === 'utility')
             return (

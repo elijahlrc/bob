@@ -149,6 +149,17 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
 
 /** When the next Respite comes (docs/ATTRITION.md): the sets follow from the seed alone, so camp can say. */
 function RespiteAhead({ run }: { run: RunState }) {
+  // The one on offer now counts first (the playtests: skipping it hid the last rest before a boss).
+  if (run.offers.some((o) => o.kind === 'respite')) {
+    const boss = bossForMap(run.map + 1);
+    return (
+      <div class="camp-last" data-paint="panel" data-thin>
+        {boss
+          ? `The last rest before ${BOSSES[boss].name}: a Respite is on offer.`
+          : 'A Respite is on offer.'}
+      </div>
+    );
+  }
   const at = nextRespite(run.seed, run.map);
   if (!at) return null;
   const n = at - run.map;
@@ -160,7 +171,7 @@ function RespiteAhead({ run }: { run: RunState }) {
 }
 
 /** What the character carries into the next map (docs/MAPS.md section 8). */
-function Arriving({ run }: { run: RunState }) {
+function Arriving({ run, ch }: { run: RunState; ch: Character }) {
   const v = run.vitals;
   const flasks = run.build.flasks.filter((f) => f !== null);
   const pct = (f: number) => Math.round(Math.max(0, Math.min(1, f)) * 100);
@@ -185,10 +196,22 @@ function Arriving({ run }: { run: RunState }) {
       {flasks.length > 0 && (
         <div class="arriving-flasks">
           {flasks.map((f) => {
-            const fill = pct(v.flasks[f!.uid] ?? 1);
+            const frac = v.flasks[f!.uid] ?? 1;
+            const fill = pct(frac);
+            // The charges as numbers (docs/ATTRITION.md: kills don't refill them, so they are worth reading).
+            const spec = ch.flasks.find((s) => s.uid === f!.uid);
+            const max = spec?.maxCharges ?? flaskBase(f!.baseId).maxCharges;
+            const have = Math.floor(max * frac);
+            const per = spec?.perUse ?? flaskBase(f!.baseId).perUse;
+            const drinks = Math.floor(have / per);
             return (
               // The bottle the map's HUD shows, its glass emptied to the charges carried over.
-              <div key={f!.uid} class="flask" data-st="ready" title={`${f!.name}: ${fill}%`}>
+              <div
+                key={f!.uid}
+                class="flask"
+                data-st="ready"
+                title={`${f!.name}: ${have} of ${max} charges, ${drinks} drink${drinks === 1 ? '' : 's'} left`}
+              >
                 <div
                   class="flask-bottle"
                   data-paint="bottle"
@@ -200,6 +223,9 @@ function Arriving({ run }: { run: RunState }) {
                     <div class="flask-empty" style={{ height: `${100 - fill}%` }} />
                   </div>
                 )}
+                <span class="flask-count">
+                  {have}/{max}
+                </span>
               </div>
             );
           })}
@@ -386,7 +412,7 @@ export function Camp({ c }: { c: Controller }) {
           Next: map {run.map} of 100 · {run.dust} Bone Dust
         </div>
       </div>
-      <Arriving run={run} />
+      <Arriving run={run} ch={ch} />
       {run.offers.some((o) => o.kind === 'stop') && <Tip c={c} id="stop" />}
       <Satchel c={c} />
       <BossAhead map={run.map} />

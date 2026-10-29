@@ -95,6 +95,11 @@
   max-width: 720px;
   margin: 0 auto;
 }
+.st-first {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
 .st-side {
   display: grid;
   gap: 24px;
