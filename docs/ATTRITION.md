@@ -97,7 +97,8 @@ that later design work starts from it.
 
 ## 4. Work, roughly in order
 
-The order will change as we learn.
+The order will change as we learn. Status on 2026-10-29 at the end of each line; section 6 has the detail, including
+the changes after three playtests.
 
 **Already built (2026-10-28)**
 
@@ -110,27 +111,28 @@ The order will change as we learn.
 
 **The attrition core**
 
-- Refill sources, with the flat on-kill gains.
-- Flask controls on the Strategy tab (and docs/PLAYER-AI.md).
-- Flask uniques and affixes.
-- The energy shield cut; the two keystones removed.
-- The tree rebuild, region by region, pausing whenever it starts to lose intent.
-- Emergencies.
+- Refill sources, with the flat on-kill gains. Built.
+- Flask controls on the Strategy tab (and docs/PLAYER-AI.md). Built.
+- Flask uniques and affixes. A first pass built; the uniques not yet re-thought one by one.
+- The energy shield cut; the two keystones removed. The cut is built (item bases); the keystones wait for the tree pass.
+- The tree rebuild, region by region, pausing whenever it starts to lose intent. Waits for the owner.
+- Emergencies. Map affixes and monster mods built; monster types and bosses not yet.
 
 **Levels without a fight**
 
-- The Respite: rest or craft; Bone Dust at camp.
+- The Respite: rest or craft; Bone Dust at camp. Built.
 - Stops: the new schedule, the stronger Shrine, Gem Hoard and Ferryman, the rebuilt Quartermaster, the Awlsmith gone.
-- The effects bar.
-- Run rewards: the list first, then building them.
+  Built.
+- The effects bar. Built.
+- Run rewards: the list first, then building them. A first list of four built, sold by the Quartermaster.
 
 **Close-out**
 
-- Re-evaluate the two automatic flask rules.
-- Update the tests to the settled design.
-- The save migration with a passive refund.
-- Note the departure from the reference game in the READMEs (and DESIGN.md, CLAUDE.md).
-- Merge to main.
+- Re-evaluate the two automatic flask rules. Done.
+- Update the tests to the settled design. Waits for the design to settle.
+- The save migration with a passive refund. Built (`SAVE_VERSION` 24).
+- Note the departure from the reference game in the READMEs (and DESIGN.md, CLAUDE.md). Waits for the design to settle.
+- Merge to main. The owner's call.
 
 ## 5. How we work on it
 
