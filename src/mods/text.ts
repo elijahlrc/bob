@@ -66,6 +66,10 @@ export function modText(m: Mod): string {
   }
   const sfx = suffix(m);
   const v = fmt(m.value);
+  // Kills give no flask charges of their own (docs/ATTRITION.md): "increased flask charges gained" is a flat gain, 1% of a
+  // charge a kill per 1%.
+  if (m.stat === 'flaskCharges' && m.kind === 'inc')
+    return `${m.value < 0 ? '-' : '+'}${fmt(m.value / 100)} Flask Charges per kill${sfx}`;
   // "of Physical Attack Damage Leeched as Life": leech from attacks names the attacks before the damage.
   if ((m.stat === 'leech.life' || m.stat === 'leech.mana') && m.tags?.includes('attack')) {
     const tp = typesPhrase(m.damageTypes);

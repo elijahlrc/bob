@@ -21,7 +21,8 @@ export const GLOSSARY = {
   stun: 'A stun stops a fighter for a moment. Big hits stun.',
   regen: 'Refills by itself every second.',
   leech: 'Part of the damage you deal comes back to you as life or mana.',
-  flask: 'Flasks are drunk by themselves (the Strategy tab says when). A Respite refills them.',
+  flask:
+    'Flasks are drunk by themselves (the Strategy tab says when). Kills refill them only with gear or passives that say so; a Respite or a fallen boss refills them all.',
   taken: 'Changes how much damage reaches you, after your other defences.',
   damage: 'How hard your character hits.',
   speed: 'How often your character attacks or casts.',

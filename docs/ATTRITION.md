@@ -139,3 +139,11 @@ The order will change as we learn.
 
 - **2026-10-28.** Plan started; the first pieces built (section 4). On a first playtest the Mystic didn't feel very
   different; left to iterate on later.
+- **2026-10-29.** The owner asked for the whole plan to be built without them, the open items decided as I go and
+  logged here, and no tree rework (only small tree changes the game needs, recorded). Decisions, each a first version:
+  - **Charges on kill.** "Increased flask charges gained" now adds to a base of zero instead of multiplying a base of one:
+    +50% is half a charge a kill, weighed by the rarity of what fell as before (normal 1, magic 3.5, rare 6, unique 11),
+    and a mark's bonus adds one a mark. Items read "+0.5 Flask Charges per kill". The data is unchanged, so every item,
+    unique and the map affix that cut charges keep working. The tree has no charge-gain node yet (the tree pass).
+  - **Tapper's Brine**, a staple provision from level 3: the flasks start the map full.
+  - **A fallen boss** refills every flask.

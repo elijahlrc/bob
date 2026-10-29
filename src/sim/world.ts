@@ -327,7 +327,10 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
   player.life = Math.max(1, lifeCap(player) * frac(o?.start?.life));
   player.es = player.def.maxEs * frac(o?.start?.es);
   player.mana = Math.max(0, player.def.maxMana - char.reservedMana) * frac(o?.start?.mana);
-  for (const f of side.flasks) f.charges = f.spec.maxCharges * frac(o?.start?.flasks[f.spec.uid]);
+  // A provision may fill them first (Tapper's Brine).
+  const full = char.db.flag('flaskStartFull');
+  for (const f of side.flasks)
+    f.charges = f.spec.maxCharges * (full ? 1 : frac(o?.start?.flasks[f.spec.uid]));
   player.name = inp.name ?? (id === 0 ? 'You' : 'Rival');
   seedCharacters(side);
   return side;

@@ -17,6 +17,7 @@ export type EffectProvisionId =
   | 'whettedPowder'
   | 'wardOil'
   | 'bloodsalt'
+  | 'tappersBrine'
   | 'glassDraught'
   | 'greedyLantern'
   | 'rushingTonic'
@@ -73,6 +74,17 @@ const EFFECTS: (ProvisionDef & { id: EffectProvisionId })[] = [
     weight: 24,
     from: 3,
     affix: { playerMods: [mod('leech.life', 'base', 2)], reward: {} },
+  },
+  {
+    // Kills no longer refill flasks (docs/ATTRITION.md): a refill to carry.
+    id: 'tappersBrine',
+    name: "Tapper's Brine",
+    kind: 'staple',
+    text: 'Your flasks start the map full',
+    base: 8,
+    weight: 26,
+    from: 3,
+    affix: { playerMods: [mod('flaskStartFull', 'flag', 1)], reward: {} },
   },
   {
     id: 'glassDraught',

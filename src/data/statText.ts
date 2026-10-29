@@ -116,6 +116,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   warcryEffect: { name: 'effect of your Warcries' },
   flaskEffect: { name: 'effect of Flasks' },
   flaskCharges: { name: 'Flask Charges gained' },
+  flaskStartFull: { flag: 'Flasks start the map full' },
   flaskRecovery: { name: 'Flask Recovery amount' },
   flaskDuration: { name: 'Flask effect Duration' },
   damageTaken: { name: 'Damage taken' },

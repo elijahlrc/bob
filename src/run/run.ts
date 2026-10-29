@@ -50,6 +50,7 @@ import { reprieveBlocker, spendReprieve } from './reprieves';
 import { REPRIEVES } from '../data/reprieves';
 import { PROVISIONS, type ProvisionId } from '../data/provisions';
 import { CURRENCY_DROPS } from '../data/constants';
+import { bossForMap } from '../data/bosses';
 
 export { rollThemes } from './offers';
 
@@ -384,6 +385,8 @@ export function finishMap(run: RunState, res: MapResult): void {
   });
   if (res.status === 'cleared') {
     run.refundPoints += 1;
+    // A boss that falls refills every flask (docs/ATTRITION.md).
+    if (bossForMap(run.map)) run.vitals = { ...run.vitals, flasks: {} };
     // A cleared map may leave a provision in the pouch (docs/WAYSIDE.md 6.1); camp says so after the level advances.
     found = forage(run);
     if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;

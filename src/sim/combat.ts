@@ -25,7 +25,8 @@ import type { SkillProfile } from '../calc/skill';
 import {
   BLEED_MOVING_MULT,
   CULLING_SHARE,
-  FLASK_CHARGES_ON_KILL,
+  FLASK_CHARGES_PER_KILL,
+  FLASK_KILL_WEIGHT,
   LEECH_INSTANCE_MAX,
   LEECH_RATE_CAP,
   LEECH_RATE_PER_INSTANCE,
@@ -1206,20 +1207,22 @@ function noteCause(
 }
 
 /**
- * What a kill gives a side besides experience and loot: the charges every flask gets (by the rarity of what fell; `hexFlasks` is how
- * many marks on it double that), and life and mana on kill. What a kill may give holds only under a condition (while a flask is
- * active) or per charge held: asked as the character is now.
+ * What a kill gives a side besides experience and loot: the charges every flask gets, and life and mana on kill. Charges come
+ * only from investment (docs/ATTRITION.md): "increased flask charges gained" adds to `FLASK_CHARGES_PER_KILL` (+50% is half a
+ * charge), each mark on what fell (`hexFlasks`) adds one, and the sum is weighed by the rarity of what fell. What a kill may give
+ * holds only under a condition (while a flask is active) or per charge held: asked as the character is now.
  */
 function killGains(
   w: World,
   fs: Side,
-  kind: keyof typeof FLASK_CHARGES_ON_KILL,
+  kind: keyof typeof FLASK_KILL_WEIGHT,
   hexFlasks: number,
 ): void {
   const p = fs.player;
   const kctx = playerCtx(w, fs);
+  const perKill = FLASK_CHARGES_PER_KILL + fs.char.db.inc('flaskCharges', kctx) + hexFlasks;
   const gain =
-    FLASK_CHARGES_ON_KILL[kind] * fs.char.db.mult('flaskCharges', kctx) * (1 + hexFlasks);
+    FLASK_KILL_WEIGHT[kind] * Math.max(0, perKill) * fs.char.db.more('flaskCharges', kctx);
   for (const f of fs.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
   const lok =
     fs.char.db.sum('base', 'lifeOnKill', kctx) +
