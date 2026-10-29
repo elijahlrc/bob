@@ -124,6 +124,8 @@ export const FLASK_KILL_WEIGHT = { normal: 1, magic: 3.5, rare: 6, unique: 11 } 
 export const FLASK_CHARGES_PER_KILL = 0;
 /** Every flask base holds this many times the reference game's charges (2026-10-28: five drinks of the first life flask, not three). */
 export const FLASK_CAPACITY_SCALE = 1.75;
+/** A utility flask's effect lasts this many times the reference game's (2026-10-29: each drink is scarcer, so worth more). */
+export const FLASK_UTILITY_DURATION_SCALE = 1.5;
 
 // Duels (docs/DUEL.md 4.4).
 /**

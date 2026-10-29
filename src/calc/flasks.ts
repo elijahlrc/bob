@@ -14,6 +14,8 @@ export type FlaskSpec = {
   duration: number;
   maxCharges: number;
   perUse: number;
+  /** Charges this flask gains a kill, on its own (of Gleaning), before the kill's rarity weight. */
+  chargesPerKill: number;
   instant: boolean;
   /** Mods granted while the flask is active (utility buffs and "during effect" affixes). */
   buff: Mod[];
@@ -70,7 +72,13 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
             : 1),
     ),
     maxCharges: Math.round(base.maxCharges * local.mult('flask.maxCharges')),
-    perUse: base.perUse * Math.max(0.1, 1 - charDb.sum('base', 'flaskChargesUsed') / 100),
+    perUse:
+      base.perUse *
+      Math.max(
+        0.1,
+        1 - (charDb.sum('base', 'flaskChargesUsed') + local.sum('base', 'flask.chargesUsed')) / 100,
+      ),
+    chargesPerKill: local.sum('base', 'flask.chargesPerKill') / 100,
     instant: local.flag('flask.instant'),
     buff,
     ...(base.ground ? { ground: base.ground } : {}),

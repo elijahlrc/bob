@@ -312,6 +312,7 @@ Object.assign(STAT_TEXT, {
   // A flask's own affixes ("Brimming", "Deep", "Lasting", "Bursting"), local to the flask.
   'flask.amount': { name: 'Amount Recovered' },
   'flask.maxCharges': { name: 'maximum Charges' },
+  'flask.chargesUsed': { base: '{v}% reduced Charges used' },
   'flask.duration': { name: 'Duration' },
   'flask.instant': { flag: 'Recovers instantly' },
   'flask.lifeToEs': {

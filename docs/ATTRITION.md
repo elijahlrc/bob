@@ -152,3 +152,10 @@ The order will change as we learn.
     the main skill can't be paid for at all (a present state, not a look-ahead). A life flask still running no longer
     stops the next one from drinking at its own threshold. A hybrid's setting is its life threshold. Utility
     conditions gained "bosses only". An old save's single life threshold becomes its first life flask's.
+  - **Flask items, first pass.** Two new flask affixes: Thrifty (15-30% fewer charges a drink) and of Gleaning (the
+    flask gains 0.2-0.4 charges a kill on its own). Brimming (30-60% more recovered), Lasting (40-80% longer) and of the
+    Rampart (50-100% armour) roll higher. Every utility flask, unique ones included, lasts 1.5 times longer
+    (`FLASK_UTILITY_DURATION_SCALE`). The weaker unique flasks got bigger numbers: Gambler's Tonic, Emberwell Urn,
+    Hollow Oak Draught, Stonebrew Flask, Bellowing Draught, Hexfire Brew, Last Light Flask. The Brimming Cup's +100%
+    charges gained is now +1 charge a kill while it runs, which suits it. Not yet re-thought one by one: the rest of
+    the uniques' identities.

@@ -1221,9 +1221,13 @@ function killGains(
   const p = fs.player;
   const kctx = playerCtx(w, fs);
   const perKill = FLASK_CHARGES_PER_KILL + fs.char.db.inc('flaskCharges', kctx) + hexFlasks;
-  const gain =
-    FLASK_KILL_WEIGHT[kind] * Math.max(0, perKill) * fs.char.db.more('flaskCharges', kctx);
-  for (const f of fs.flasks) f.charges = Math.min(f.spec.maxCharges, f.charges + gain);
+  const weight = FLASK_KILL_WEIGHT[kind] * fs.char.db.more('flaskCharges', kctx);
+  // A flask "of Gleaning" adds its own share to what every flask gets.
+  for (const f of fs.flasks)
+    f.charges = Math.min(
+      f.spec.maxCharges,
+      f.charges + weight * Math.max(0, perKill + f.spec.chargesPerKill),
+    );
   const lok =
     fs.char.db.sum('base', 'lifeOnKill', kctx) +
     (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;

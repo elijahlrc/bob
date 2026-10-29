@@ -1,7 +1,7 @@
 import { mod, type Mod } from '../mods/types';
 import { BASE_ROWS } from './baseTables';
 import type { BuffId } from './buffs';
-import { FLASK_CAPACITY_SCALE } from './constants';
+import { FLASK_CAPACITY_SCALE, FLASK_UTILITY_DURATION_SCALE } from './constants';
 
 /**
  * DESIGN.md §11.6. The flask bases are the reference game's (reference/docs/AUDIT-ITEM-BASES.md): twelve life and twelve mana
@@ -69,7 +69,7 @@ function flasksOf(kind: FlaskKind): FlaskBase[] {
       mana,
       maxCharges: Math.round(maxCharges * FLASK_CAPACITY_SCALE),
       perUse,
-      duration,
+      duration: kind === 'utility' ? duration * FLASK_UTILITY_DURATION_SCALE : duration,
       buff: u?.buff ?? [],
       ...(u?.ground ? { ground: u.ground } : {}),
       ...(u?.grants ? { grants: u.grants } : {}),
@@ -86,7 +86,7 @@ const util = (id: string, name: string, level: number): FlaskBase => ({
   mana: 0,
   maxCharges: Math.round(50 * FLASK_CAPACITY_SCALE),
   perUse: 25,
-  duration: 6,
+  duration: 6 * FLASK_UTILITY_DURATION_SCALE,
   buff: [],
   uniqueOnly: true,
 });
@@ -172,7 +172,17 @@ export const FLASK_AFFIXES: FlaskAffixDef[] = [
     kinds: ['life', 'mana', 'hybrid'],
     minIlvl: 1,
     weight: 100,
-    mods: [{ stat: 'flask.amount', kind: 'inc', min: 20, max: 40 }],
+    mods: [{ stat: 'flask.amount', kind: 'inc', min: 30, max: 60 }],
+  },
+  {
+    // Charges are scarce (docs/ATTRITION.md): fewer a drink.
+    id: 'flaskThrifty',
+    type: 'prefix',
+    name: 'Thrifty',
+    kinds: [],
+    minIlvl: 3,
+    weight: 80,
+    mods: [{ stat: 'flask.chargesUsed', kind: 'base', min: 15, max: 30 }],
   },
   {
     id: 'flaskCharges',
@@ -214,7 +224,17 @@ export const FLASK_AFFIXES: FlaskAffixDef[] = [
     kinds: ['utility'],
     minIlvl: 1,
     weight: 100,
-    mods: [{ stat: 'flask.duration', kind: 'inc', min: 20, max: 40 }],
+    mods: [{ stat: 'flask.duration', kind: 'inc', min: 40, max: 80 }],
+  },
+  {
+    // Kills give no charges of their own (docs/ATTRITION.md): this flask refills itself, 1% of a charge a kill per 1%.
+    id: 'flaskGleaning',
+    type: 'suffix',
+    name: 'of Gleaning',
+    kinds: [],
+    minIlvl: 5,
+    weight: 80,
+    mods: [{ stat: 'flask.chargesPerKill', kind: 'base', min: 20, max: 40 }],
   },
   {
     id: 'flaskRemoveIgnite',
@@ -278,6 +298,6 @@ export const FLASK_AFFIXES: FlaskAffixDef[] = [
     kinds: [],
     minIlvl: 10,
     weight: 80,
-    mods: [{ stat: 'armour', kind: 'inc', min: 30, max: 60 }],
+    mods: [{ stat: 'armour', kind: 'inc', min: 50, max: 100 }],
   },
 ];

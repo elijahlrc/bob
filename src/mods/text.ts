@@ -70,6 +70,7 @@ export function modText(m: Mod): string {
   // charge a kill per 1%.
   if (m.stat === 'flaskCharges' && m.kind === 'inc')
     return `${m.value < 0 ? '-' : '+'}${fmt(m.value / 100)} Flask Charges per kill${sfx}`;
+  if (m.stat === 'flask.chargesPerKill') return `+${fmt(m.value / 100)} Charges per kill${sfx}`;
   // "of Physical Attack Damage Leeched as Life": leech from attacks names the attacks before the damage.
   if ((m.stat === 'leech.life' || m.stat === 'leech.mana') && m.tags?.includes('attack')) {
     const tp = typesPhrase(m.damageTypes);

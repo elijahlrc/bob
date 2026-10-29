@@ -46,7 +46,7 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     name: 'Last Light Flask',
     baseId: 'flask_lastlight',
     level: 40,
-    mods: [m('projectiles', 'base', 2), m('aoe', 'inc', 20, 30)],
+    mods: [m('projectiles', 'base', 2), m('aoe', 'inc', 30, 40)],
     factions: ['swarm'],
     notes: {
       pairsWith: ['projectile skills and pierce', 'Flame Bolt and other area skills'],
@@ -78,7 +78,7 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     name: 'Stonebrew Flask',
     baseId: 'flask_stonebrew',
     level: 20,
-    mods: [m('blockAttack', 'base', 12, 15), m('blockSpell', 'base', 12, 15)],
+    mods: [m('blockAttack', 'base', 15, 20), m('blockSpell', 'base', 15, 20)],
     factions: ['ossuary'],
     notes: {
       pairsWith: ['shields and block notables', 'life on block'],
@@ -91,7 +91,7 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     name: "Gambler's Tonic",
     baseId: 'flask_tonic',
     level: 22,
-    mods: [m('itemRarity', 'inc', 20, 30), m('itemQuantity', 'inc', 20, 30)],
+    mods: [m('itemRarity', 'inc', 40, 60), m('itemQuantity', 'inc', 40, 60)],
     notes: {
       pairsWith: [
         'fast clearing: only kills made during the effect count',
@@ -120,9 +120,9 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     baseId: 'flask_emberwell',
     level: 22,
     mods: [
-      m('recoverPct.kill.life', 'base', 1, 3),
-      m('recoverPct.kill.mana', 'base', 1, 3),
-      m('recoverPct.kill.es', 'base', 1, 3),
+      m('recoverPct.kill.life', 'base', 2, 4),
+      m('recoverPct.kill.mana', 'base', 2, 4),
+      m('recoverPct.kill.es', 'base', 2, 4),
       m('damage', 'more', 10, 10, { condition: { id: 'targetIgnited' } }),
     ],
     notes: {
@@ -182,7 +182,7 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     baseId: 'flask_bellowing',
     level: 27,
     mods: [
-      m('damage', 'more', 20, 25, { damageTypes: ['physical'], tags: ['melee'] }),
+      m('damage', 'more', 25, 35, { damageTypes: ['physical'], tags: ['melee'] }),
       m('stunDuration', 'inc', 30),
     ],
     notes: {
@@ -239,7 +239,7 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     name: 'Hexfire Brew',
     baseId: 'flask_hexfire',
     level: 48,
-    mods: [m('damage', 'inc', 25, 40, { tags: ['dot'] }), m('hexOnHit.chaosSap', 'base', 21)],
+    mods: [m('damage', 'inc', 40, 60, { tags: ['dot'] }), m('hexOnHit.chaosSap', 'base', 21)],
     notes: {
       pairsWith: ['damage over time builds', 'chaos damage'],
       weakAgainst: ['hit-based builds'],
@@ -264,7 +264,7 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     baseId: 'flask_hollowoak',
     level: 8,
     mods: [
-      m('hitTaken', 'more', -10),
+      m('hitTaken', 'more', -15),
       m('penetration', 'base', 10, 15, { damageTypes: ['fire', 'cold', 'lightning'] }),
     ],
     notes: {
