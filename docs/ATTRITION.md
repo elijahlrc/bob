@@ -147,3 +147,8 @@ The order will change as we learn.
     unique and the map affix that cut charges keep working. The tree has no charge-gain node yet (the tree pass).
   - **Tapper's Brine**, a staple provision from level 3: the flasks start the map full.
   - **A fallen boss** refills every flask.
+  - **Flask controls.** The Strategy tab lists the worn flasks in belt order, each with its own setting. Default
+    thresholds by position: life 70%, 50%, 35%, 25%, 15%; mana 40%, 25%, 15%, 10%, 5%. A mana flask also drinks when
+    the main skill can't be paid for at all (a present state, not a look-ahead). A life flask still running no longer
+    stops the next one from drinking at its own threshold. A hybrid's setting is its life threshold. Utility
+    conditions gained "bosses only". An old save's single life threshold becomes its first life flask's.

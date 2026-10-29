@@ -57,8 +57,20 @@ export type TargetPriority = 'nearest' | 'rares' | 'lowest' | 'stick';
  */
 export type Spacing = 'hold' | 'close' | 'kite';
 
-/** When a utility flask is drunk: with a rare (or a boss) about, with a pack or a rare about, or whenever an enemy is near. */
-export type UtilityFlaskUse = 'rares' | 'packs' | 'always';
+/**
+ * When a utility flask is drunk: with a boss about, with a rare (or a boss) about, with a pack or a rare about, or whenever an
+ * enemy is near.
+ */
+export type UtilityFlaskUse = 'bosses' | 'rares' | 'packs' | 'always';
+
+/**
+ * The flask belt's own settings, by belt slot (docs/ATTRITION.md): a life or hybrid flask's share of life below which it is
+ * drunk, a mana flask's share of mana, a utility flask's condition. Unset slots take the defaults by position.
+ */
+export type FlaskRules = {
+  at?: (number | null)[];
+  use?: (UtilityFlaskUse | null)[];
+};
 
 export type Strategy = {
   /** Per skill gem, by the gem's uid. */
@@ -67,9 +79,11 @@ export type Strategy = {
   order?: number[];
   target?: TargetPriority;
   spacing?: Spacing;
-  /** The share of life below which a life flask is drunk. */
+  /** The share of life below which a life flask is drunk (before the belt had its own settings: now the first life flask's). */
   lifeFlask?: number;
+  /** The utility flasks' condition where `flasks.use` sets none. */
   utilityFlask?: UtilityFlaskUse;
+  flasks?: FlaskRules;
 };
 
 /** The defaults of the global settings. */
@@ -116,7 +130,46 @@ export const EVERY_CHOICES = [1.5, 3, 5, 8, 12];
 export const LIFE_CHOICES = [0.3, 0.4, 0.5, 0.6, 0.7];
 /** The life thresholds an escape skill can be given: a wider range, since a blink can wait until the last moment or go early. */
 export const ESCAPE_LIFE_CHOICES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
-export const LIFE_FLASK_CHOICES = [0.35, 0.5, 0.65, 0.8];
+/**
+ * The flasks drink in belt order, life (and hybrid) flasks and mana flasks each in their own order, and each takes the threshold
+ * of its position: the first life flask drinks first, the last is kept for the worst moment (docs/ATTRITION.md, 2026-10-29).
+ */
+export const LIFE_FLASK_AT = [0.7, 0.5, 0.35, 0.25, 0.15];
+export const MANA_FLASK_AT = [0.4, 0.25, 0.15, 0.1, 0.05];
+/** The thresholds a flask can be given. */
+export const FLASK_AT_CHOICES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+
+export type FlaskRule = { life?: number; mana?: number; use?: UtilityFlaskUse };
+
+/**
+ * What each belt slot's flask is drunk for, from the kinds in the belt and the strategy: a life threshold for a life or hybrid
+ * flask, a mana threshold for a mana or hybrid flask (a hybrid's own setting is its life threshold), a condition for a utility
+ * flask. Defaults go by position in the life and mana orders.
+ */
+export function flaskRules(
+  kinds: readonly ('life' | 'mana' | 'hybrid' | 'utility' | null)[],
+  s: Strategy | undefined,
+): FlaskRule[] {
+  let lifePos = 0;
+  let manaPos = 0;
+  return kinds.map((k, slot) => {
+    const set = s?.flasks?.at?.[slot] ?? undefined;
+    const rule: FlaskRule = {};
+    if (k === 'life' || k === 'hybrid') {
+      const legacy = lifePos === 0 ? s?.lifeFlask : undefined;
+      rule.life = set ?? legacy ?? LIFE_FLASK_AT[Math.min(lifePos, LIFE_FLASK_AT.length - 1)];
+      lifePos++;
+    }
+    if (k === 'mana' || k === 'hybrid') {
+      const own = k === 'mana' ? set : undefined;
+      rule.mana = own ?? MANA_FLASK_AT[Math.min(manaPos, MANA_FLASK_AT.length - 1)];
+      manaPos++;
+    }
+    if (k === 'utility')
+      rule.use = s?.flasks?.use?.[slot] ?? s?.utilityFlask ?? STRATEGY_DEFAULTS.utilityFlask;
+    return rule;
+  });
+}
 
 export const ROLE_NAMES: Record<SkillRole, string> = {
   main: 'Main',
@@ -151,6 +204,7 @@ export const SPACING_NAMES: Record<Spacing, string> = {
 };
 
 export const UTILITY_FLASK_NAMES: Record<UtilityFlaskUse, string> = {
+  bosses: 'Bosses only',
   rares: 'Rares and bosses',
   packs: 'Packs and rares',
   always: 'Any fight',

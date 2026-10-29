@@ -669,6 +669,14 @@ function strategyOk(s: unknown): boolean {
   const oneOf = (v: unknown, names: object) => v === undefined || (isStr(v, 32) && v in names);
   if (!oneOf(s.target, TARGET_NAMES) || !oneOf(s.spacing, SPACING_NAMES)) return false;
   if (!oneOf(s.utilityFlask, UTILITY_FLASK_NAMES)) return false;
+  if (s.flasks !== undefined) {
+    if (!isObj(s.flasks)) return false;
+    const { at, use } = s.flasks;
+    const list = (v: unknown, ok: (x: unknown) => boolean) =>
+      v === undefined || (Array.isArray(v) && v.length <= 5 && v.every((x) => x === null || ok(x)));
+    if (!list(at, (x) => typeof x === 'number' && x >= 0 && x <= 1)) return false;
+    if (!list(use, (x) => isStr(x, 32) && x in UTILITY_FLASK_NAMES)) return false;
+  }
   if (
     s.lifeFlask !== undefined &&
     !(typeof s.lifeFlask === 'number' && s.lifeFlask >= 0 && s.lifeFlask <= 1)

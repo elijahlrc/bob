@@ -156,8 +156,8 @@ A main skill that is a **renewable debuff** (like Creeping Plague) also waits wh
 
 _Strategy:_
 
-- **Running out of mana costs damage.** Watch your mana. The auto flask drinks when mana falls below two casts of
-  the main skill (section 6).
+- **Running out of mana costs damage.** Watch your mana. A mana flask drinks below its threshold, or when the main
+  skill can't be paid for at all (section 6); kills don't refill it.
 - **A main skill with a cooldown of its own** leaves gaps. They are filled by a ready periodic skill if you have
   one, or by the weapon if you don't.
 - **Every other skill takes time from the main one.** Each cast uses its own cast time, which the main skill doesn't
@@ -271,29 +271,33 @@ _Strategy:_
 
 ## 6. Flasks
 
-Flasks are drunk automatically, on top of whatever else the character is doing:
+Flasks are drunk automatically, on top of whatever else the character is doing. Kills don't refill them unless gear or
+passives say so (docs/ATTRITION.md), so every drink counts. Each flask in the belt has its own setting on the Strategy
+tab:
 
-- **Life** (or hybrid): when life is below **50% of your unreserved life**, and no life flask is already working.
-  Only one per tick. The Strategy tab sets the threshold: 35%, 50%, 65% or 80%.
-- **Mana** (or hybrid): when mana is below **two casts of your primary**.
-- **Utility:** when a **rare, champion or boss is within 8 tiles**, **or 5+ enemies are within 8 tiles**. On the
-  Strategy tab you can save them for **rares and bosses** only, or drink them in **any fight**.
+- **Life** (or hybrid): life flasks drink in **belt order**, each when life is below **its own threshold**: by default
+  70% for the first, then 50%, 35%, 25% and 15%. So the first is drunk early and the last is kept for the worst moment;
+  put a slow flask first and an instant one last. A flask that is already working isn't drunk again, but the next one
+  can be. Only one life flask per tick.
+- **Mana** (or hybrid): mana flasks drink in their own belt order, below their threshold (by default 40%, then 25%,
+  15%...), or whenever the main skill can't be paid for at all. A hybrid's setting is its life threshold; for mana it
+  takes the default of its position.
+- **Utility:** each utility flask has a condition: **bosses only**, **rares and bosses** (a rare, champion or boss
+  within 8 tiles), **packs and rares** (also 5+ enemies within 8 tiles; the default) or **any fight**.
 - **Life-to-energy-shield flask** (one that leaves you at 1 life for two seconds): only at **90%+ life**, with
   the nearest enemy **6 to 16 tiles away**, and only if your energy shield is at least 70% of your life. The
   character drinks it before a fight, not in one.
 - **Cleansing flasks** (a suffix that removes an ailment and keeps it off while the flask runs): drunk as soon as
-  that ailment is on the character, whatever the life threshold. A life flask that cleanses still waits for no other
-  life flask to be running.
+  that ailment is on the character, whatever the life threshold.
 - **Before a blow it cannot dodge**: when a Sentence is about to land and would take more than the character's life and
   energy shield, a life flask is drunk at once, whatever the threshold.
 - **Stolen flasks**: while the Unmaker holds them (docs/BOSSES.md 9), none can be drunk.
 - **Burning aura** (Searing Mantle): it is **switched off below 40% life** and back on at **75%**, the way
   a player would click it off.
 
-_Strategy:_ Life flasks wait until 50% by default, which is late against hard hitters; raise the threshold if you
-have the charges. Instant or fast recovery, flask
-charge gain and other defences matter more than they do when you play by hand. A utility flask holds its charges
-for the fights that count.
+_Strategy:_ Charges are scarce: a Respite, a fallen boss, a reprieve or Tapper's Brine refills them, and charge gain on
+gear or passives tops them up as you kill. Lower thresholds save charges; higher ones keep you safer against hard
+hitters. A utility flask set to bosses only keeps its charges for the fights that count.
 
 ---
 
@@ -381,8 +385,8 @@ from the same Strategy tab, so everything above holds except this:
   costs. A minion takes full damage;
   ailments and stuns are as strong as on a map (their damage is scaled like any other). Regeneration, leech and flasks work as on a
   map, so a duel is long, and it favours builds that recover well.
-- **A kill of a minion by the other character** fills the flasks and gives life and mana on kill, as a monster's kill does. The
-  other character's death ends the fight.
+- **A kill of a minion by the other character** gives flask charges only through charge gain on gear or passives, and life
+  and mana on kill, as a monster's kill does. Each life lost refills the flasks. The other character's death ends the fight.
 
 ---
 

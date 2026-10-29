@@ -1,4 +1,4 @@
-import { STRATEGY_DEFAULTS } from '../data/strategy';
+import { flaskRules, STRATEGY_DEFAULTS } from '../data/strategy';
 import { armourReduction } from '../calc/formulas';
 import type { FlaskSpec } from '../calc/flasks';
 import { lifeCap } from './combat';
@@ -52,12 +52,15 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   if (flasksSealed(w)) return out;
   const brace = w.effects.length > 0 && braceFor(w, s);
   const cap = lifeCap(p);
+  const manaCap = Math.max(0, p.def.maxMana - s.char.reservedMana);
   const cost = s.primary.usable ? s.char.profile(s.primary).cost : 0;
-  // The thresholds the Strategy tab sets.
-  const strategy = s.char.build.strategy;
-  const lifeAt = strategy?.lifeFlask ?? STRATEGY_DEFAULTS.lifeFlask;
-  const utilityUse = strategy?.utilityFlask ?? STRATEGY_DEFAULTS.utilityFlask;
+  // What the Strategy tab sets for each belt slot (thresholds by position unless set).
+  const rules = flaskRules(
+    s.flasks.map((f) => f.spec.kind),
+    s.char.build.strategy,
+  );
   let nearbyRare = false;
+  let nearbyBoss = false;
   let nearby = 0;
   let nearest = Infinity;
   // The surroundings only matter to a utility flask that could be drunk now: most ticks there is none.
@@ -74,31 +77,38 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
       if (d2 > 64) continue;
       nearby++;
       if (m.rarity === 'rare' || m.rarity === 'miniboss' || m.rarity === 'boss') nearbyRare = true;
+      if (m.rarity === 'miniboss' || m.rarity === 'boss') nearbyBoss = true;
     }
     nearest = Math.sqrt(nearest2);
   }
-  const lifeActive = s.flasks.some(
-    (f) => (f.spec.kind === 'life' || f.spec.kind === 'hybrid') && (f.activeT > 0 || f.queued),
-  );
   let usedLife = false;
   s.flasks.forEach((f, i) => {
     if (f.charges < f.spec.perUse) return;
     const k = f.spec.kind;
+    const rule = rules[i];
+    const idle = f.activeT <= 0 && !f.queued;
     // A flask that cleanses is drunk for what it cleanses, as a player would (the reference game's cleansing suffixes).
     const cleanse = f.activeT <= 0 && cleansNow(s, f.spec);
+    // Life flasks in belt order, each below its own threshold; one a tick, and one still running does not stop the next
+    // (docs/ATTRITION.md: a slow flask first, the last kept for the worst moment).
     if (
       (k === 'life' || k === 'hybrid') &&
       !usedLife &&
-      !lifeActive &&
-      (p.life < cap * lifeAt || brace || cleanse)
+      idle &&
+      (p.life < cap * (rule.life ?? 0) || brace || cleanse)
     ) {
       out.push(i);
       usedLife = true;
       return;
     }
-    // A hybrid flask also refills mana: it is drunk for low mana as a mana flask is.
-    if ((k === 'mana' || k === 'hybrid') && !f.queued && p.mana < 2 * cost) {
-      if (f.activeT <= 0) out.push(i);
+    // Mana flasks below their own threshold, or when the main skill cannot be paid for at all. A hybrid flask also refills
+    // mana: it is drunk for low mana as a mana flask is.
+    if (
+      (k === 'mana' || k === 'hybrid') &&
+      idle &&
+      p.mana < Math.max(manaCap * (rule.mana ?? 0), cost)
+    ) {
+      out.push(i);
       return;
     }
     if (k === 'mana' && cleanse) {
@@ -113,12 +123,16 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
         const safe =
           nearest > 6 && nearest < 16 && p.life >= cap * 0.9 && p.def.maxEs >= p.life * 0.7;
         if (safe) out.push(i);
-      } else if (
-        nearbyRare ||
-        (utilityUse === 'packs' && nearby >= 5) ||
-        (utilityUse === 'always' && nearby >= 1)
-      )
-        out.push(i);
+      } else {
+        const use = rule.use ?? STRATEGY_DEFAULTS.utilityFlask;
+        if (
+          (use === 'bosses' && nearbyBoss) ||
+          (use === 'rares' && nearbyRare) ||
+          (use === 'packs' && (nearbyRare || nearby >= 5)) ||
+          (use === 'always' && nearby >= 1)
+        )
+          out.push(i);
+      }
     }
   });
   return out;

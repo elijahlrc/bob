@@ -5,7 +5,8 @@ import {
   ESCAPE_LIFE_CHOICES,
   EVERY_CHOICES,
   LIFE_CHOICES,
-  LIFE_FLASK_CHOICES,
+  FLASK_AT_CHOICES,
+  flaskRules,
   ROLE_NAMES,
   SPACING_NAMES,
   STRATEGY_DEFAULTS,
@@ -19,7 +20,14 @@ import {
   type UtilityFlaskUse,
 } from '../data/strategy';
 import type { Controller } from '../run/controller';
-import { moveSkill, resetStrategy, setStrategyOption, setTactic } from '../run/strategy';
+import { flaskBase } from '../data/flasks';
+import {
+  moveSkill,
+  resetStrategy,
+  setFlaskRule,
+  setStrategyOption,
+  setTactic,
+} from '../run/strategy';
 import { DpsDetails } from './DpsDetails';
 import { hoverInfo, infoProps } from './info';
 import { entryNote, mainsWarning, usualPause } from './strategyText';
@@ -292,8 +300,6 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
     c.act((r) => setStrategyOption(r, patch));
   const target = s.target ?? STRATEGY_DEFAULTS.target;
   const spacing = s.spacing ?? STRATEGY_DEFAULTS.spacing;
-  const lifeFlask = s.lifeFlask ?? STRATEGY_DEFAULTS.lifeFlask;
-  const utilityFlask = s.utilityFlask ?? STRATEGY_DEFAULTS.utilityFlask;
   const empty = ch.mains.length + ch.rotation.length + ch.unused.length === 0;
   const first = (
     <Group
@@ -399,35 +405,13 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
                 ])}
                 onChange={(v) => opt({ spacing: v === STRATEGY_DEFAULTS.spacing ? undefined : v })}
               />
-              <Pick<number>
-                label="Life flask below"
-                value={lifeFlask}
-                options={LIFE_FLASK_CHOICES.map((v): [number, string] => [v, `${pct(v)} life`])}
-                onChange={(v) =>
-                  opt({ lifeFlask: v === STRATEGY_DEFAULTS.lifeFlask ? undefined : v })
-                }
-              />
-              <Pick<UtilityFlaskUse>
-                label="Utility flasks for"
-                value={utilityFlask}
-                options={(Object.keys(UTILITY_FLASK_NAMES) as UtilityFlaskUse[]).map((k) => [
-                  k,
-                  UTILITY_FLASK_NAMES[k],
-                ])}
-                onChange={(v) =>
-                  opt({ utilityFlask: v === STRATEGY_DEFAULTS.utilityFlask ? undefined : v })
-                }
-              />
             </div>
             <ul class="st-says">
               <li>{TARGET_TEXT[target]}</li>
               <li>{SPACING_TEXT[spacing]}</li>
-              <li>
-                Drinks life flasks below {pct(lifeFlask)} life; utility flasks{' '}
-                {UTILITY_FLASK_TEXT[utilityFlask]}.
-              </li>
             </ul>
           </section>
+          <FlaskBelt c={c} />
         </div>
       </div>
       {!empty && <DpsDetails ch={ch} />}
@@ -450,8 +434,57 @@ const SPACING_TEXT: Record<Spacing, string> = {
   kite: 'A ranged character stands at full range and steps back when an enemy comes within 3 tiles, if its target stays in reach.',
 };
 
-const UTILITY_FLASK_TEXT: Record<UtilityFlaskUse, string> = {
-  rares: 'only with a rare or a boss near',
-  packs: 'with a rare near or 5 or more enemies',
-  always: 'in any fight',
-};
+/** The belt's own settings (docs/ATTRITION.md): every worn flask in belt order, with what it is drunk for. */
+function FlaskBelt({ c }: { c: Controller }) {
+  const run = c.run!;
+  const belt = run.build.flasks;
+  const kinds = belt.map((f) => (f ? flaskBase(f.baseId).kind : null));
+  const rules = flaskRules(kinds, run.build.strategy);
+  if (!belt.some(Boolean)) return null;
+  return (
+    <section class="lf-panel st-group" data-paint="panel">
+      <h4 class="lf-h">Flasks</h4>
+      <div class="st-ctls two">
+        {belt.map((f, slot) => {
+          if (!f) return null;
+          const label = `${slot + 1}. ${f.name}`;
+          const rule = rules[slot];
+          if (kinds[slot] === 'utility')
+            return (
+              <Pick<UtilityFlaskUse>
+                key={slot}
+                label={label}
+                value={rule.use!}
+                options={(Object.keys(UTILITY_FLASK_NAMES) as UtilityFlaskUse[]).map((k) => [
+                  k,
+                  UTILITY_FLASK_NAMES[k],
+                ])}
+                onChange={(v) => c.act((r) => setFlaskRule(r, slot, { use: v }))}
+              />
+            );
+          const mana = kinds[slot] === 'mana';
+          const at = (mana ? rule.mana : rule.life)!;
+          const choices = [...new Set([...FLASK_AT_CHOICES, at])].sort((a, b) => a - b);
+          return (
+            <Pick<number>
+              key={slot}
+              label={label}
+              value={at}
+              options={choices.map((v): [number, string] => [
+                v,
+                `Below ${pct(v)} ${mana ? 'mana' : 'life'}`,
+              ])}
+              onChange={(v) => c.act((r) => setFlaskRule(r, slot, { at: v }))}
+            />
+          );
+        })}
+      </div>
+      <ul class="st-says">
+        <li>
+          Life and mana flasks drink in belt order: the first earliest, the last kept for the worst
+          moment.
+        </li>
+      </ul>
+    </section>
+  );
+}
