@@ -4,6 +4,7 @@ import type { Controller } from '../run/controller';
 import type { Ware } from '../run/wayside';
 import { compareDelta, ItemCard } from './ItemCard';
 import { ProvisionCard, ReprieveCard } from './Satchel';
+import { runRewardDef } from '../data/runRewards';
 
 /** What a ware is: its card (the item with what it would change, the provision, the reprieve, the currency bundle). */
 export function WareCard({ w, run }: { w: Ware; run: NonNullable<Controller['run']> }) {
@@ -22,6 +23,18 @@ export function WareCard({ w, run }: { w: Ware; run: NonNullable<Controller['run
     );
   if (w.kind === 'provision') return <ProvisionCard id={w.ref!} />;
   if (w.kind === 'reprieve') return <ReprieveCard id={w.ref!} />;
+  if (w.kind === 'reward') {
+    const r = runRewardDef(w.ref!);
+    return (
+      <div class="item-card flaskitem">
+        <div class="ic-name" data-paint="panel" data-thin data-field="porphyry">
+          {r.name}
+        </div>
+        <div>{r.text}</div>
+        <div class="muted">For the rest of the run.</div>
+      </div>
+    );
+  }
   return (
     <div class="item-card flaskitem">
       <div class="ic-name" data-paint="panel" data-thin data-field="plaster">

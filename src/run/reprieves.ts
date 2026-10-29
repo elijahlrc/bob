@@ -1,11 +1,13 @@
 import {
   CURSE_LEVELS,
   curseAffixId,
+  curseDef,
   reprieveDef,
   type CurseId,
   type ReprieveId,
 } from '../data/reprieves';
-import { blessingAffixId } from '../data/blessings';
+import { blessingAffixId, blessingDef } from '../data/blessings';
+import { runRewardDef } from '../data/runRewards';
 import type { CraftResult } from './craft';
 import { addProvision, pouchRoom } from './provisions';
 import type { RunState } from './run';
@@ -57,4 +59,40 @@ export function spendReprieve(run: RunState, id: string): void {
   if (w.pouch[id] <= 0) delete w.pouch[id];
   const def = reprieveDef(id);
   if (def.curse) addCurse(run, def.curse);
+}
+
+/** Something the character carries from level to level (docs/ATTRITION.md), for the effects bar of the Character tab. */
+export type StandingEffect = {
+  kind: 'blessing' | 'curse' | 'reward';
+  name: string;
+  text: string;
+  /** The levels it still holds on, counting the next one; null when it has no end of its own. */
+  left: number | null;
+};
+
+/** The blessing and curses the character carries into the next level, with how long each lasts. */
+export function standingEffects(run: RunState): StandingEffect[] {
+  const w = waysideOf(run);
+  const out: StandingEffect[] = [];
+  if (w.blessing && (w.blessingUntil === null || w.blessingUntil >= run.map)) {
+    const b = blessingDef(w.blessing);
+    const left = w.blessingUntil === null ? null : w.blessingUntil - run.map + 1;
+    out.push({ kind: 'blessing', name: b.name, text: b.text, left });
+  }
+  for (const c of w.curses)
+    if (c.until >= run.map) {
+      const d = curseDef(c.id);
+      out.push({ kind: 'curse', name: d.name, text: d.text, left: c.until - run.map + 1 });
+    }
+  for (const [id, n] of Object.entries(w.rewards))
+    if (n > 0) {
+      const r = runRewardDef(id);
+      out.push({
+        kind: 'reward',
+        name: n > 1 ? `${r.name} ×${n}` : r.name,
+        text: r.text,
+        left: null,
+      });
+    }
+  return out;
 }

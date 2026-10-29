@@ -183,3 +183,11 @@ The order will change as we learn.
     are unchanged, since lasting about twice as long is already the strengthening. The Gem Hoard lays out 10 gems and
     lets you take 4 (was 3 of 8). The Ferryman also refills every flask. The Quartermaster sells a refill of every flask
     (12 Bone Dust at the base, priced by level as wares are) and restocks (8 at the base, paid at once, new wares).
+  - **The effects bar.** At the top of the Character tab, on porphyry: the blessing, each curse and each run reward,
+    with the levels left (counting the next) or "for the run".
+  - **Run rewards, a first list** (`data/runRewards.ts`): Deeper Pouch (one more provision held and armed; up to two),
+    Keen Eye (one more choice on every reward pick), Waystation Cup (every stop refills the flasks), Thrifty Hands
+    (Respite crafts cost half). The Quartermaster lays out one among its wares (now nine; a provision when none is left
+    to buy). Considered and left for later: a fourth offer in every set (it changes the layout of every set and the
+    offer code), foresight of upcoming Respites as a reward rather than for everyone. Where else run rewards come
+    from (a stop of their own, bosses) is still open.

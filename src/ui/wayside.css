@@ -375,3 +375,35 @@ html.leaf .tip-text {
     padding: 22px 24px 26px;
   }
 }
+
+/* ---- The effects bar (docs/ATTRITION.md): what the character carries from level to level, atop the Character tab ---- */
+html.leaf .effects-bar {
+  box-sizing: border-box;
+  margin: 0 0 14px;
+  padding: 16px 24px 18px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .effects-bar ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html.leaf .effects-bar li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
+}
+html.leaf .effects-bar b {
+  color: var(--gold-hi);
+}
+html.leaf .effects-bar .eff-curse b {
+  color: #f0a0a0;
+}
+html.leaf .effects-bar .muted {
+  color: #c7b8c6;
+}

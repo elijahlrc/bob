@@ -36,6 +36,7 @@ import { Skills } from './Skills';
 import { Strategy } from './Strategy';
 import { StopEmblem, StopScreen } from './Stop';
 import { RespiteScreen } from './Respite';
+import { EffectsBar } from './EffectsBar';
 import { waysideOf } from '../run/wayside';
 import { reprieveDef } from '../data/reprieves';
 import { Satchel } from './Satchel';
@@ -529,7 +530,12 @@ export function Camp({ c }: { c: Controller }) {
   const body = (t: Tab) => (
     <>
       {t === 'tree' && <TreeView c={c} />}
-      {t === 'sheet' && <Sheet s={sheet} ch={ch} />}
+      {t === 'sheet' && (
+        <>
+          <EffectsBar run={run} />
+          <Sheet s={sheet} ch={ch} />
+        </>
+      )}
       {t === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} focusGem={gemPick} />}
       {t === 'strategy' && <Strategy c={c} ch={ch} />}
       {t === 'items' && run.reward && (

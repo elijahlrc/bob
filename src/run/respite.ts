@@ -10,7 +10,7 @@ import {
 } from './craft';
 import { advanceLevel, takeRespite, TOTAL_MAPS, type RunState } from './run';
 import { awlsmithItems } from './stops';
-import { waysideOf } from './wayside';
+import { heldReward, waysideOf } from './wayside';
 
 /**
  * The Respite (docs/ATTRITION.md): rest or craft. Rest refills everything and passes the level at once. Craft works on an
@@ -35,7 +35,9 @@ export const respiteVisit = (run: RunState) => waysideOf(run).respite;
 /** What the next craft of this visit costs. */
 export function respiteCraftCost(run: RunState): number {
   const n = respiteVisit(run)?.crafts ?? 0;
-  return RESPITE_CRAFT_DUST[Math.min(n, RESPITE_CRAFT_DUST.length - 1)];
+  const dust = RESPITE_CRAFT_DUST[Math.min(n, RESPITE_CRAFT_DUST.length - 1)];
+  // Thrifty Hands halves it (docs/ATTRITION.md).
+  return heldReward(run, 'thriftyHands') > 0 ? Math.ceil(dust / 2) : dust;
 }
 
 /** The items a craft can work on: worn items for the affix crafts, worn or carried ones with room for a socket. */

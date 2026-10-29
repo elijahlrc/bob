@@ -16,7 +16,7 @@ import { awlsmithDust, awlsmithSockets, socketCeiling, type CraftResult } from '
 import { noteFound } from './found';
 import type { MapOffer } from './offers';
 import { advanceLevel, TOTAL_MAPS, uidSource, type RunState } from './run';
-import { waysideOf, type Ware } from './wayside';
+import { heldReward, waysideOf, type Ware } from './wayside';
 import { BLESSING_LEVELS, BLESSINGS, SHRINE_CHOICES, type BlessingId } from '../data/blessings';
 import { priceAt, REFILL_BASE, RESTOCK_BASE } from '../data/sale';
 import { REPRIEVES, type ReprieveId } from '../data/reprieves';
@@ -252,7 +252,8 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
   });
   way.stops++;
   run.vitals = restAtCamp(run.build, run.map, run.vitals);
-  if (refill) run.vitals = { ...run.vitals, flasks: {} };
+  // A Waystation Cup refills them at every stop (docs/ATTRITION.md).
+  if (refill || heldReward(run, 'waystationCup') > 0) run.vitals = { ...run.vitals, flasks: {} };
   advanceLevel(run);
   return { ok: true };
 }

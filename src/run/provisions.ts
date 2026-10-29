@@ -5,7 +5,6 @@ import {
   isReprieveId,
   POUCH_LIMIT,
   PROVISIONS,
-  PROVISIONS_PER_MAP,
   provisionAffixId,
   provisionDef,
   type ProvisionId,
@@ -15,7 +14,12 @@ import type { CraftResult } from './craft';
 import type { MapOffer } from './offers';
 import type { RunState } from './run';
 import { standingAffixes } from './reprieves';
-import { waysideOf } from './wayside';
+import { heldReward, waysideOf } from './wayside';
+
+/** How many provisions the pouch can hold, and arm for one map: three, and one more for each Deeper Pouch (docs/ATTRITION.md). */
+export function pouchLimit(run: RunState): number {
+  return POUCH_LIMIT + heldReward(run, 'deeperPouch');
+}
 
 /** How many provisions the pouch holds in all (a reprieve counts). */
 export function pouchCount(run: RunState): number {
@@ -24,7 +28,7 @@ export function pouchCount(run: RunState): number {
 
 /** Whether the pouch has room for `n` more. */
 export function pouchRoom(run: RunState, n = 1): boolean {
-  return pouchCount(run) + n <= POUCH_LIMIT;
+  return pouchCount(run) + n <= pouchLimit(run);
 }
 
 /** Put a provision in the pouch (found, picked, bought or given). False when the pouch is full. */
@@ -52,8 +56,8 @@ export function armProvision(run: RunState, id: ProvisionId): CraftResult {
   if (isReprieveId(id))
     return { ok: false, reason: 'A reprieve is always ready: there is nothing to arm' };
   if (spare(run, id) <= 0) return { ok: false, reason: 'You have none to arm' };
-  if (w.armed.length >= PROVISIONS_PER_MAP)
-    return { ok: false, reason: `Only ${PROVISIONS_PER_MAP} can be armed for one map` };
+  if (w.armed.length >= pouchLimit(run))
+    return { ok: false, reason: `Only ${pouchLimit(run)} can be armed for one map` };
   w.armed.push(id);
   return { ok: true };
 }

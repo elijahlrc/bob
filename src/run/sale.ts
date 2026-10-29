@@ -16,9 +16,10 @@ import { addProvision } from './provisions';
 import { acquireReprieve } from './reprieves';
 import type { RunState } from './run';
 import { uidSource } from './run';
-import type { Ware } from './wayside';
+import { heldReward, waysideOf, type Ware } from './wayside';
+import { RUN_REWARDS } from '../data/runRewards';
 
-/** The Quartermaster's: eight wares, a reprieve among them (docs/WAYSIDE.md 5.2). */
+/** The Quartermaster's: nine wares, a reprieve and a run reward among them (docs/WAYSIDE.md 5.2, docs/ATTRITION.md). */
 const SALE_SLOTS = [
   'gear',
   'gear',
@@ -28,6 +29,8 @@ const SALE_SLOTS = [
   'provision',
   'provision',
   'reprieve',
+  // A run reward (docs/ATTRITION.md): a provision instead when none is left to buy.
+  'reward',
 ] as const;
 
 type Slot = (typeof SALE_SLOTS)[number];
@@ -102,7 +105,7 @@ function ware(run: RunState, slot: Slot, index: number, rng: Rng): Ware {
 }
 
 /**
- * The Quartermaster's stock for the offer at hand (docs/WAYSIDE.md 5.2): eight wares, a reprieve among them.
+ * The Quartermaster's stock for the offer at hand (docs/WAYSIDE.md 5.2): nine wares, a reprieve and a run reward among them.
  * Drawn from the run seed, the level and the offer, so it is the same every time it is looked at.
  */
 export function rollSale(run: RunState, offerId: string): Ware[] {
@@ -110,7 +113,21 @@ export function rollSale(run: RunState, offerId: string): Ware[] {
   const slots = SALE_SLOTS.slice(0, QUARTERMASTER_SIZE).map((s) =>
     s === 'reprieve' && !REPRIEVES.some((r) => r.from <= run.map) ? 'gear' : s,
   );
-  return slots.map((slot, i) => ware(run, slot, i, rng));
+  // The run reward draws from a stream of its own, so the other wares are what they were before it was added.
+  const rr = new Rng(run.seed).fork(`salereward${offerId}`);
+  return slots.map((slot, i) =>
+    slot === 'reward'
+      ? (rewardWare(run, i, rr) ?? ware(run, 'provision', i, rr))
+      : ware(run, slot, i, rng),
+  );
+}
+
+/** A run reward the run can still take (fewer held than its most), for sale (docs/ATTRITION.md); null when there is none. */
+function rewardWare(run: RunState, index: number, rng: Rng): Ware | null {
+  const open = RUN_REWARDS.filter((r) => r.from <= run.map && heldReward(run, r.id) < r.max);
+  if (!open.length) return null;
+  const r = rng.pick(open);
+  return { id: String(index), kind: 'reward', price: priceAt(r.base, run.map), ref: r.id };
 }
 
 /** The ware joins the run (the Dust is the caller's business). */
@@ -123,5 +140,8 @@ export function grantWare(run: RunState, ware: Ware): void {
     acquireReprieve(run, ware.ref as ReprieveId);
   } else if (ware.kind === 'provision' && ware.ref) {
     addProvision(run, ware.ref as ProvisionId);
+  } else if (ware.kind === 'reward' && ware.ref) {
+    const held = waysideOf(run).rewards;
+    held[ware.ref] = (held[ware.ref] ?? 0) + 1;
   }
 }

@@ -9,7 +9,7 @@ import type { RunState } from './run';
 export type Ware = {
   /** Stable within the stock: `${slot}`. */
   id: string;
-  kind: 'gear' | 'gem' | 'flask' | 'provision' | 'currency' | 'reprieve';
+  kind: 'gear' | 'gem' | 'flask' | 'provision' | 'currency' | 'reprieve' | 'reward';
   /** Bone Dust, after the level factor. */
   price: number;
   /** The item itself, for gear, a gem and a flask (it joins the inventory when bought). */
@@ -48,6 +48,8 @@ export type Wayside = {
   respite: { slot: number; crafts: number } | null;
   /** Restocks bought at a Quartermaster this level, by offer id. */
   restocks: Record<string, number>;
+  /** Run rewards held (data/runRewards.ts), by id: how many of each. */
+  rewards: Record<string, number>;
 };
 
 export const newWayside = (): Wayside => ({
@@ -62,6 +64,7 @@ export const newWayside = (): Wayside => ({
   found: null,
   respite: null,
   restocks: {},
+  rewards: {},
 });
 
 /** The run's Wayside state, filled in with defaults the first time it is asked for (an older save has none). */
@@ -80,3 +83,6 @@ export function waysideOf(run: RunState): Wayside {
   delete old.reprieves;
   return w;
 }
+
+/** How many of a run reward the run holds (docs/ATTRITION.md). */
+export const heldReward = (run: RunState, id: string): number => waysideOf(run).rewards[id] ?? 0;

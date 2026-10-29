@@ -1,12 +1,7 @@
-import {
-  isReprieveId,
-  PROVISIONS_PER_MAP,
-  provisionDef,
-  type ProvisionId,
-} from '../data/provisions';
+import { isReprieveId, provisionDef, type ProvisionId } from '../data/provisions';
 import { curseDef, reprieveDef } from '../data/reprieves';
 import type { Controller } from '../run/controller';
-import { spare } from '../run/provisions';
+import { pouchLimit, spare } from '../run/provisions';
 import { waysideOf } from '../run/wayside';
 import { Tip } from './Tip';
 
@@ -96,7 +91,7 @@ export function Satchel({ c }: { c: Controller }) {
                   {!ready && (
                     <button
                       class="btn small"
-                      disabled={spare(run, id) <= 0 || w.armed.length >= PROVISIONS_PER_MAP}
+                      disabled={spare(run, id) <= 0 || w.armed.length >= pouchLimit(run)}
                       onClick={() => c.arm(id, true)}
                     >
                       Arm

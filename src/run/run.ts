@@ -36,7 +36,7 @@ import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
-import { waysideOf, type Wayside } from './wayside';
+import { heldReward, waysideOf, type Wayside } from './wayside';
 import type { StopId } from '../data/stops';
 import {
   addProvision,
@@ -543,6 +543,7 @@ export function rollRewards(run: RunState): RewardCard[] {
       seen.add(uniqueIdOf(u) ?? '');
     }
     while (out.length < 3) out.push(rollDrop(rng, uid, { ilvl, monster: 'rare' }, true));
+    keenEyeCards(run, out);
     return out;
   }
   for (let i = 0; i < 3; i++) {
@@ -584,7 +585,18 @@ export function rollRewards(run: RunState): RewardCard[] {
     const at = out.findIndex((c) => c.kind !== 'pouch');
     if (sup && at >= 0) out[at] = sup;
   }
+  keenEyeCards(run, out);
   return out;
+}
+
+/** A Keen Eye (docs/ATTRITION.md) adds a choice to a pick: a rare item, from a stream of its own so the other cards stay put. */
+function keenEyeCards(run: RunState, out: RewardCard[]): void {
+  const n = heldReward(run, 'keenEye');
+  if (!n) return;
+  const rng = new Rng(run.seed).fork(`rewardkeen${run.map}`);
+  const uid = uidSource(run);
+  for (let i = 0; i < n; i++)
+    out.push(rollDrop(rng, uid, { ilvl: run.map, monster: 'rare' }, true));
 }
 
 /** The pick at the end of a Crawl: three offers, the first a unique the character could wear. */
