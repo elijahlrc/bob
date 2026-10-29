@@ -22,7 +22,7 @@ import { Items } from './Items';
 import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
 import { Rehearsal } from './rehearsal';
-import { CampGems, startGuarded } from './GemFlow';
+import { CampGems, restGuarded, startGuarded } from './GemFlow';
 import { introSeen } from './intro';
 import { RunIntro } from './RunIntro';
 import { BossAhead, BossCard } from './BossCard';
@@ -411,7 +411,7 @@ export function Camp({ c }: { c: Controller }) {
                     data-arch
                     data-pearls
                     data-foot
-                    onClick={() => c.startMap(i)}
+                    onClick={() => void restGuarded(c, i)}
                   >
                     <div class="theme-name">Respite</div>
                     <div class="muted">Level {o.areaLevel}</div>

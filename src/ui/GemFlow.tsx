@@ -1,7 +1,12 @@
 import { useMemo } from 'preact/hooks';
 import { Character } from '../calc/character';
+import { BOSSES, bossForMap } from '../data/bosses';
 import { gemDef } from '../data/gems';
+import { affixText, mapAffixDef } from '../data/mapAffixes';
+import { mapTypeDef } from '../data/mapTypes';
+import { themeDef } from '../data/themes';
 import type { Controller } from '../run/controller';
+import { offersFor } from '../run/preview';
 import { ask } from './Confirm';
 import { canQuickSocket, gemWhere, quickSocket, skillToSocket } from '../run/inventoryOps';
 import { sfx } from './sound/engine';
@@ -83,22 +88,48 @@ function useCampGemLine(
 }
 
 /**
- * Start the map of offer `i`, asking first when the character has no skill it can use and one waits in the bag (the path
- * around the Skills tab: the map choice, a reload that opens camp on it).
+ * Start the map of offer `i` once the player has confirmed it, which says where it leads. With no skill the character can
+ * use while one waits in the bag, that question is the confirmation (the path around the Skills tab: the map choice, a
+ * reload that opens camp on it).
  */
 export async function startGuarded(c: Controller, i: number): Promise<void> {
   const run = c.run;
   if (!run) return;
   const g = skillToSocket(run, new Character(run.build));
-  if (g) {
-    const ok = await ask({
-      title: 'Start without a skill?',
-      body: `No usable skill is socketed: your character will only use its weapon's attack. ${gemDef(g.gemId).name} is in your bag.`,
-      confirm: 'Start anyway',
-      // Cancel has the focus: starting this way is the choice to make on purpose.
-      danger: true,
-    });
-    if (!ok || c.run !== run) return;
-  }
+  const o = offersFor(run)[i];
+  const boss = run.offers.length === 1 ? bossForMap(run.map) : null;
+  const ok = await ask(
+    g
+      ? {
+          title: 'Start without a skill?',
+          body: `No usable skill is socketed: your character will only use its weapon's attack. ${gemDef(g.gemId).name} is in your bag.`,
+          confirm: 'Start anyway',
+          // Cancel has the focus: starting this way is the choice to make on purpose.
+          danger: true,
+        }
+      : {
+          title: boss ? `Face ${BOSSES[boss].name}?` : `Enter ${themeDef(o.themeId).name}?`,
+          facts: [
+            `Level ${o.areaLevel}`,
+            ...(o.type !== 'plain' ? [mapTypeDef(o.type).name] : []),
+            ...o.affixes.map((id) => affixText(mapAffixDef(id), o.areaLevel)),
+          ],
+          confirm: boss ? 'Face the boss' : 'Begin map',
+        },
+  );
+  if (!ok || c.run !== run) return;
+  c.startMap(i);
+}
+
+/** Take the Respite of offer `i` once the player has confirmed it. */
+export async function restGuarded(c: Controller, i: number): Promise<void> {
+  const run = c.run;
+  if (!run) return;
+  const ok = await ask({
+    title: 'Rest at the Respite?',
+    body: 'Refills life, mana, shield and flasks. The level passes.',
+    confirm: 'Rest',
+  });
+  if (!ok || c.run !== run) return;
   c.startMap(i);
 }
