@@ -23,7 +23,8 @@ function cleansNow(side: Side, s: FlaskSpec): boolean {
 
 /**
  * A blow that cannot be dodged is about to land (a Sentence, docs/BOSSES.md 11.1), and it would take more than the character
- * has: a life flask now, whatever the threshold.
+ * has: an instant life flask now, whatever the threshold (one that heals over seconds would come too late, and charges are scarce:
+ * docs/ATTRITION.md, 2026-10-29).
  */
 function braceFor(w: World, s: Side): boolean {
   const p = s.player;
@@ -94,7 +95,7 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
       (k === 'life' || k === 'hybrid') &&
       !usedLife &&
       idle &&
-      (p.life < cap * (rule.life ?? 0) || brace || cleanse)
+      (p.life < cap * (rule.life ?? 0) || (brace && f.spec.instant) || cleanse)
     ) {
       out.push(i);
       usedLife = true;

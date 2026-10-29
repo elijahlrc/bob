@@ -289,7 +289,8 @@ tab:
 - **Cleansing flasks** (a suffix that removes an ailment and keeps it off while the flask runs): drunk as soon as
   that ailment is on the character, whatever the life threshold.
 - **Before a blow it cannot dodge**: when a Sentence is about to land and would take more than the character's life and
-  energy shield, a life flask is drunk at once, whatever the threshold.
+  energy shield, an instant life flask (Bursting) is drunk at once, whatever the threshold. A slow flask is not: it would
+  heal too late and waste the charges.
 - **Stolen flasks**: while the Unmaker holds them (docs/BOSSES.md 9), none can be drunk.
 - **Burning aura** (Searing Mantle): it is **switched off below 40% life** and back on at **75%**, the way
   a player would click it off.

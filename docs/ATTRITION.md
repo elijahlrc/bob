@@ -90,7 +90,7 @@ that later design work starts from it.
 - How long a Shrine blessing lasts, now that stops come at random.
 - What makes the Gem Hoard and the Ferryman stronger.
 - The run rewards, where they come from, and whether a new stop is built around them.
-- The two automatic flask rules (end of the plan).
+- The two automatic flask rules: decided 2026-10-29 (bracing with instant flasks only, cleansing kept; section 6); open to change.
 - Baseline life recovery between maps (raised by a playtest, 2026-10-29): with no regeneration, life lost on one map
   carries into every map after it. Some base regeneration or out-of-combat recovery would be a departure from the
   reference game; for the owner to decide.
@@ -225,3 +225,12 @@ The order will change as we learn.
     `auto` helpers undoing manual sockets and "Best place" choosing an idle socket (tools, not this plan); long
     early maps and a rare on a +2 map killing a level-3 character (balance before this plan); the Gem Hoard laying out
     few supports (its pool does include supports of the tag; left).
+  - _Status:_ 1 to 12 done, with these first numbers: life thresholds 50/35/25/15/10%, mana 25/15/10/5/5%, utility
+    "bosses only", mana flasks 2.75 times the reference charges (`FLASK_MANA_CAPACITY_SCALE`), a second Cracked Life
+    Draught in the starting belt, Dry 30% more charges a drink, run rewards 30/35/40/25 Bone Dust at the base. 13: in
+    two columns the Flasks panel now sits in the wider left one, under the rotation. The harness is fixed. Still heavy
+    after the fixes: mana for a caster. In one harness check, a bot-geared Mystic drained a 129-charge mana flask to 3
+    by map 9. The next levers, if play agrees, are mana regeneration and skill costs (not decided).
+- **2026-10-29, the two automatic flask rules.** Bracing before an unavoidable blow now drinks only an instant life
+  flask (Bursting): one that heals over seconds came too late and spent scarce charges. Cleansing is kept: a flask
+  with a cleansing suffix exists to be drunk for its ailment.
