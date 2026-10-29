@@ -88,6 +88,26 @@ export type FigureKind =
 /** `windup` is a boss's big move held over its tell, `release` the blow when it lands (anim.ts). */
 export type AnimName = 'idle' | 'walk' | 'attack' | 'stun' | 'death' | 'windup' | 'release';
 
+/**
+ * The views a hero is drawn in (the owner, 2026-10-28: a hero should face the camera and turn its back, not only look left
+ * or right): 0 faces the camera, 1 is three-quarters toward it, 2 is side on, 3 is three-quarters away, 4 has its back to
+ * it. A hero that looks left is the mirror of one that looks right.
+ */
+export const HERO_VIEWS = 5;
+export const HERO_FRONT = 0;
+export const HERO_THREE_QUARTER = 1;
+export const HERO_SIDE = 2;
+
+/** The screen heading (degrees down from side on: 90 toward the camera, -90 away) a view is drawn for. */
+export const viewAngle = (view: number): number => (2 - view) * 45;
+
+/** The nearest view to a screen heading in degrees. */
+export const viewFor = (deg: number): number =>
+  Math.max(0, Math.min(HERO_VIEWS - 1, 2 - Math.round(deg / 45)));
+
+/** Degrees a heading must pass the edge between two views before the figure turns to the next. */
+export const VIEW_HOLD = 9;
+
 /** How far through `release` the blow lands (the Tollkeeper's bell reaches the floor), 0 to 1. */
 export const RELEASE_LANDS = 0.2;
 
@@ -545,6 +565,14 @@ export function isHero(kind: FigureKind): boolean {
   return kind.startsWith('hero_');
 }
 
+/**
+ * How a hero is turned to the camera, for a weapon drawn in the plane the body walks in: `s` is how much of the way a
+ * weapon points shows on screen (1 side on, 0 facing the camera or away), `c` how much sideways shows (0 side on, 1 front
+ * or back). A guard across a blade is seen edge on from the side and end on from the front.
+ */
+type Turn = { s: number; c: number };
+const SIDE_ON: Turn = { s: 1, c: 0 };
+
 function weapon(
   b: B,
   kind: FigureKind,
@@ -554,8 +582,9 @@ function weapon(
   charge: number,
   bx: number,
   by: number,
+  turn: Turn = SIDE_ON,
 ) {
-  const dx = Math.cos(ang);
+  const dx = Math.cos(ang) * turn.s;
   const dy = Math.sin(ang);
   const along = (len: number) => ({ x: hx + dx * len, y: hy + dy * len });
   switch (kind) {
@@ -563,11 +592,12 @@ function weapon(
     case 'hero_sword': {
       const tip = along(17);
       cap(b, hx - dx * 2, hy - dy * 2, hx + dx * 3, hy + dy * 3, 1.3, 'wood');
+      const gx = -dy * turn.s * 3 + turn.c * 3;
       cap(
         b,
-        hx + dx * 2.5 - dy * 3,
+        hx + dx * 2.5 + gx,
         hy + dy * 2.5 + dx * 3,
-        hx + dx * 2.5 + dy * 3,
+        hx + dx * 2.5 - gx,
         hy + dy * 2.5 - dx * 3,
         1,
         'metalShade',
@@ -597,8 +627,9 @@ function weapon(
     case 'hero_mace': {
       const e = along(15);
       cap(b, hx - dx * 3, hy - dy * 3, e.x, e.y, 1.6, 'wood');
-      box(b, e.x + dx * 3, e.y + dy * 3, 8, 8, ang, 'metalShade');
-      box(b, e.x + dx * 3, e.y + dy * 3, 6, 6, ang, 'metal');
+      const head = Math.atan2(dy, dx);
+      box(b, e.x + dx * 3, e.y + dy * 3, 8, 8, head, 'metalShade');
+      box(b, e.x + dx * 3, e.y + dy * 3, 6, 6, head, 'metal');
       break;
     }
     case 'mage':
@@ -612,14 +643,14 @@ function weapon(
     case 'archer':
     case 'hero_bow': {
       // The bow: a limb arc held at (hx, hy), string drawn back by `charge`.
-      const top = { x: hx + 2, y: hy - 12 };
-      const bot = { x: hx + 2, y: hy + 12 };
-      cap(b, top.x, top.y, hx + 6, hy, 1.4, 'wood');
-      cap(b, hx + 6, hy, bot.x, bot.y, 1.4, 'wood');
-      const pull = bx + (hx - bx) * 0 - charge * 8;
+      const top = { x: hx + 2 * turn.s, y: hy - 12 };
+      const bot = { x: hx + 2 * turn.s, y: hy + 12 };
+      cap(b, top.x, top.y, hx + 6 * turn.s, hy, 1.4, 'wood');
+      cap(b, hx + 6 * turn.s, hy, bot.x, bot.y, 1.4, 'wood');
+      const pull = bx - charge * 8 * turn.s;
       cap(b, top.x, top.y, pull, hy, 0.4, 'dark');
       cap(b, pull, hy, bot.x, bot.y, 0.4, 'dark');
-      if (charge > 0.1) cap(b, pull, hy, hx + 10, hy, 0.6, 'wood');
+      if (charge > 0.1) cap(b, pull, hy, hx + 10 * turn.s, hy, 0.6, 'wood');
       void by;
       break;
     }
@@ -1666,23 +1697,27 @@ function buildCreature(kind: FigureKind, pose: Pose, type?: MonsterTypeId): Prim
  * Build the primitives of a figure in a pose (back to front). A monster type adds its kit to the humanoid body
  * (docs/ENEMIES.md 6.1); `t` is the time through a looping animation, for things that swing.
  */
-export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, t = 0): Prim[] {
+export function buildFigure(
+  kind: FigureKind,
+  pose: Pose,
+  type?: MonsterTypeId,
+  t = 0,
+  view: number = HERO_SIDE,
+): Prim[] {
   if (CREATURES.has(kind))
     return finish(
       buildCreature(kind, pose, type),
       BUILDS[kind].scale * (type ? (kitAdjust(type).scale ?? 1) : 1),
       pose,
     );
+  if (isHero(kind)) return finish(buildHero(kind, pose, view), BUILDS[kind].scale, pose);
   const style = styleFor(type, kind);
   if (style !== 'bone') return buildLiving(kind, pose, type, t, style);
   const B_ = BUILDS[kind];
   const b: B = { prims: [] };
-  const hero = isHero(kind);
-  const boneRole: Role = hero ? 'cloth' : 'bone';
-  const shadeRole: Role = hero ? 'clothShade' : 'boneShade';
   const hipY = -B_.legLen * 2 + pose.bob;
   const hipX = 0;
-  const adj = type && !hero ? kitAdjust(type) : {};
+  const adj = type ? kitAdjust(type) : {};
   const shY = hipY - B_.torsoH + (adj.hunch ?? 0);
   const shX = pose.lean + (adj.hunch ?? 0) * 0.5;
   // Far arm and far leg first (behind the torso).
@@ -1697,10 +1732,10 @@ export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, 
     B_.legLen,
     B_.legLen,
     1.7,
-    hero ? 'clothShade' : 'boneShade',
-    hero ? 'dark' : 'boneShade',
+    'boneShade',
+    'boneShade',
   );
-  circ(b, footB.x + 1.5, footB.y, 1.8, hero ? 'dark' : 'boneShade');
+  circ(b, footB.x + 1.5, footB.y, 1.8, 'boneShade');
   const farHand = limb(
     b,
     shX - B_.shoulder * 0.55,
@@ -1710,34 +1745,20 @@ export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, 
     7,
     7,
     1.5,
-    hero ? 'clothShade' : 'boneShade',
-    hero ? 'skin' : 'boneShade',
+    'boneShade',
+    'boneShade',
   );
   void farHand;
   // Pelvis and spine.
-  box(b, hipX, hipY + 1, B_.ribW * 1.5, 4, 0, shadeRole);
-  cap(b, hipX, hipY, shX, shY, 1.8, shadeRole);
-  // Torso: ribcage (undead) or armoured chest (hero).
-  if (hero) {
-    box(
-      b,
-      (hipX + shX) / 2,
-      (hipY + shY) / 2 - 1,
-      B_.ribW * 2.1,
-      B_.torsoH + 2,
-      (shX - hipX) * 0.04,
-      'cloth',
-    );
-    box(b, (hipX + shX) / 2, (hipY + shY) / 2 + 3, B_.ribW * 2.1, 3, 0, 'accent');
-    box(b, shX, shY + 1, B_.ribW * 2.6, 3.5, 0, 'metal');
-  } else {
-    for (let i = 0; i < 3; i++) {
-      const y = shY + 3 + i * 3.4;
-      const x = shX + (hipX - shX) * ((y - shY) / (hipY - shY));
-      box(b, x, y, B_.ribW * 2 - i * 1.2, 2, 0, i % 2 ? 'bone' : 'boneShade');
-    }
-    box(b, shX, shY + 1, B_.ribW * 2.3, 2.5, 0, 'bone');
+  box(b, hipX, hipY + 1, B_.ribW * 1.5, 4, 0, 'boneShade');
+  cap(b, hipX, hipY, shX, shY, 1.8, 'boneShade');
+  // Torso: the ribcage.
+  for (let i = 0; i < 3; i++) {
+    const y = shY + 3 + i * 3.4;
+    const x = shX + (hipX - shX) * ((y - shY) / (hipY - shY));
+    box(b, x, y, B_.ribW * 2 - i * 1.2, 2, 0, i % 2 ? 'bone' : 'boneShade');
   }
+  box(b, shX, shY + 1, B_.ribW * 2.3, 2.5, 0, 'bone');
   // Near leg.
   const footA = limb(
     b,
@@ -1748,42 +1769,34 @@ export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, 
     B_.legLen,
     B_.legLen,
     1.9,
-    boneRole,
-    hero ? 'dark' : shadeRole,
+    'bone',
+    'boneShade',
   );
-  circ(b, footA.x + 1.8, footA.y, 2.1, hero ? 'dark' : boneRole);
+  circ(b, footA.x + 1.8, footA.y, 2.1, 'bone');
   // Head.
   const hx = shX + pose.head * 6 + 1;
-  const hy = shY - B_.skull - 1.5 + (pose.bob > 0 ? 0 : 0);
-  if (hero) {
-    circ(b, hx, hy, B_.skull, 'skin');
-    circ(b, hx, hy - 1.5, B_.skull * 1.02, 'metalShade');
-    box(b, hx + 1, hy + 0.5, B_.skull * 1.3, 2.4, 0, 'dark');
-    circ(b, hx + 3, hy + 0.3, 0.8, 'eye');
-    box(b, hx - B_.skull * 0.9, hy + 2, 3, 8, pose.lean * 0.05, 'accent');
-  } else {
-    circ(b, hx, hy, B_.skull, 'bone');
-    box(b, hx + 1, hy + B_.skull * 0.75, B_.skull * 1.1, 3, 0, 'boneShade');
-    circ(b, hx - 1.8, hy - 0.5, 1.9, 'dark');
-    circ(b, hx + 3.2, hy - 0.5, 1.9, 'dark');
-    circ(b, hx - 1.8, hy - 0.5, 0.8, 'eye');
-    circ(b, hx + 3.2, hy - 0.5, 0.8, 'eye');
-    if (kind === 'boss') {
-      box(b, hx, hy - B_.skull * 0.9, B_.skull * 2, 3, 0, 'accent');
-      for (let i = -1; i <= 1; i++)
-        b.prims.push({
-          k: 'tri',
-          pts: [
-            hx + i * 4 - 2,
-            hy - B_.skull * 0.9,
-            hx + i * 4,
-            hy - B_.skull * 0.9 - 6,
-            hx + i * 4 + 2,
-            hy - B_.skull * 0.9,
-          ],
-          role: 'accent',
-        });
-    }
+  const hy = shY - B_.skull - 1.5;
+  circ(b, hx, hy, B_.skull, 'bone');
+  box(b, hx + 1, hy + B_.skull * 0.75, B_.skull * 1.1, 3, 0, 'boneShade');
+  circ(b, hx - 1.8, hy - 0.5, 1.9, 'dark');
+  circ(b, hx + 3.2, hy - 0.5, 1.9, 'dark');
+  circ(b, hx - 1.8, hy - 0.5, 0.8, 'eye');
+  circ(b, hx + 3.2, hy - 0.5, 0.8, 'eye');
+  if (kind === 'boss') {
+    box(b, hx, hy - B_.skull * 0.9, B_.skull * 2, 3, 0, 'accent');
+    for (let i = -1; i <= 1; i++)
+      b.prims.push({
+        k: 'tri',
+        pts: [
+          hx + i * 4 - 2,
+          hy - B_.skull * 0.9,
+          hx + i * 4,
+          hy - B_.skull * 0.9 - 6,
+          hx + i * 4 + 2,
+          hy - B_.skull * 0.9,
+        ],
+        role: 'accent',
+      });
   }
   // Near arm and weapon.
   const hand = limb(
@@ -1795,18 +1808,12 @@ export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, 
     7,
     7,
     1.6,
-    boneRole,
-    hero ? 'skin' : shadeRole,
+    'bone',
+    'boneShade',
   );
   const wAng = pose.armA + pose.weapon - Math.PI / 2 + 0.3;
   weapon(b, kind, hand.x, hand.y, isRanged(kind) ? 0 : wAng, pose.charge, shX - B_.shoulder, shY);
-  // Shield for the sword hero (off hand).
-  if (kind === 'hero_sword') {
-    circ(b, shX - 4, shY + 8, 6, 'metalShade');
-    circ(b, shX - 4, shY + 8, 4.2, 'metal');
-    circ(b, shX - 4, shY + 8, 1.4, 'accent');
-  }
-  if (type && !hero) {
+  if (type) {
     const a: Anchors = {
       hx,
       hy,
@@ -1825,6 +1832,146 @@ export function buildFigure(kind: FigureKind, pose: Pose, type?: MonsterTypeId, 
     b.prims.push(...kitFront(type, a));
   }
   return finish(b.prims, B_.scale * (adj.scale ?? 1), pose);
+}
+
+/**
+ * A hero seen from `view` (a `HERO_VIEWS` index). The body is laid out along the character's own directions (forward, right
+ * and up) and projected on a screen the view turns by 45 degrees a step, so the limbs swing in the plane the hero walks in
+ * exactly as they do side on and every pose works from every side. At the side view the figure is the one the game always
+ * drew. The parts are painted far to near.
+ */
+function buildHero(kind: FigureKind, pose: Pose, view: number): Prim[] {
+  const B_ = BUILDS[kind];
+  const yaw = (view * Math.PI) / 4;
+  const S = Math.sin(yaw);
+  const C = Math.cos(yaw);
+  const turn: Turn = { s: S, c: Math.abs(C) };
+  /** Where a point lies across the screen, from how far forward and how far to the hero's right it is. */
+  const X = (f: number, r: number) => f * S - r * C;
+  /** How near the camera it is, which orders the parts. */
+  const depth = (f: number, r: number) => f * C + r * S;
+  /** The width on screen of a box that is `lat` wide each way across the hero and `dep` each way along it. */
+  const wide = (lat: number, dep: number) => 2 * Math.hypot(lat * C, dep * S);
+  const parts: { z: number; b: B }[] = [];
+  const part = (z: number): { z: number; b: B } => {
+    const p = { z, b: { prims: [] } as B };
+    parts.push(p);
+    return p;
+  };
+  /** A limb of two parts from (forward f, right r, height y), swinging in the forward plane; returns where it ends. */
+  const limb3 = (
+    b: B,
+    f: number,
+    r: number,
+    y: number,
+    a1: number,
+    a2: number,
+    len: number,
+    rad: number,
+    role: Role,
+    shade: Role,
+  ) => {
+    const kf = f + Math.sin(a1) * len;
+    const ky = y + Math.cos(a1) * len;
+    const ef = kf + Math.sin(a2) * len;
+    const ey = ky + Math.cos(a2) * len;
+    cap(b, X(f, r), y, X(kf, r), ky, rad, role);
+    cap(b, X(kf, r), ky, X(ef, r), ey, rad * 0.9, shade);
+    return { f: ef, y: ey };
+  };
+
+  const hipY = -B_.legLen * 2 + pose.bob;
+  const shY = hipY - B_.torsoH;
+  const shX = pose.lean;
+  const legR = B_.ribW * 0.5;
+  const armR = B_.ribW * 1.25 + 0.7;
+  const armF = B_.shoulder * 0.55;
+
+  // Legs: the far one is behind the body, the near one in front of it.
+  for (const side of [-1, 1]) {
+    const near = side > 0;
+    const ang = near ? pose.legA : pose.legB;
+    const leg = part(depth(2 * side, legR * side));
+    const foot = limb3(
+      leg.b,
+      2 * side,
+      legR * side,
+      hipY,
+      ang,
+      ang * 0.4 - 0.1,
+      B_.legLen,
+      near ? 1.9 : 1.7,
+      near ? 'cloth' : 'clothShade',
+      'dark',
+    );
+    circ(leg.b, X(foot.f + (near ? 1.8 : 1.5), legR * side), foot.y, near ? 2.1 : 1.8, 'dark');
+  }
+
+  // The body: pelvis, spine, the armoured chest with its belt and pauldrons.
+  const body = part(0);
+  const mid = (shX + 0) / 2;
+  box(body.b, 0, hipY + 1, wide(B_.ribW * 0.8, B_.ribW * 0.75), 4, 0, 'clothShade');
+  cap(body.b, 0, hipY, X(shX, 0), shY, 1.8, 'clothShade');
+  const chestW = wide(B_.ribW * 1.15, B_.ribW * 1.05);
+  box(body.b, X(mid, 0), (hipY + shY) / 2 - 1, chestW, B_.torsoH + 2, shX * 0.04 * S, 'cloth');
+  box(body.b, X(mid, 0), (hipY + shY) / 2 + 3, chestW, 3, 0, 'accent');
+  box(body.b, X(shX, 0), shY + 1, wide(B_.ribW * 1.25, B_.ribW * 1.3), 3.5, 0, 'metal');
+  if (C < -0.2) box(body.b, X(-B_.ribW * 1.05, 0), shY + 8, 2, B_.torsoH - 5, 0, 'clothShade');
+
+  // The head: a face under a helmet, a plume behind.
+  const head = part(0.4);
+  const hf = shX + pose.head * 6 + 1;
+  const hy = shY - B_.skull - 1.5;
+  const hxs = X(hf, 0);
+  circ(head.b, hxs, hy, B_.skull, C < -0.3 ? 'metalShade' : 'skin');
+  circ(head.b, hxs, hy - 1.5, B_.skull * 1.02, 'metalShade');
+  if (C > -0.3) {
+    const fv = 1 + 4 * Math.max(0, C);
+    box(head.b, X(hf + fv, 0), hy + 0.5, wide(B_.skull * 0.75, B_.skull * 0.65), 2.4, 0, 'dark');
+    for (const side of [-1, 1])
+      if (depth(fv + 2, 1.7 * side) > 0.8)
+        circ(head.b, X(hf + fv + 2, 1.7 * side), hy + 0.3, 0.8, 'eye');
+  }
+  const plume = part(depth(hf - B_.skull * 0.9, 0) + 0.5);
+  box(plume.b, X(hf - B_.skull * 0.9, 0), hy + 2, 3, 8, pose.lean * 0.05 * S, 'accent');
+
+  // Arms: the far one behind the body, the near one holding the weapon in front of it.
+  for (const side of [-1, 1]) {
+    const near = side > 0;
+    const ang = near ? pose.armA : pose.armB;
+    const arm = part(0);
+    const hand = limb3(
+      arm.b,
+      shX + armF * side,
+      armR * side,
+      shY + 2,
+      ang,
+      ang + (near ? 0.4 : 0.5),
+      7,
+      near ? 1.6 : 1.5,
+      near ? 'cloth' : 'clothShade',
+      'skin',
+    );
+    arm.z = depth(hand.f, armR * side) + (near ? 0.1 : 0);
+    if (!near) continue;
+    const hxw = X(hand.f, armR);
+    const wAng = pose.armA + pose.weapon - Math.PI / 2 + 0.3;
+    const back = hxw + (shX - B_.shoulder - hand.f) * S;
+    weapon(arm.b, kind, hxw, hand.y, isRanged(kind) ? 0 : wAng, pose.charge, back, shY, turn);
+  }
+
+  // The sword hero's shield: on the left arm from the front, strapped to the back otherwise.
+  if (kind === 'hero_sword') {
+    const front = C >= 0.3;
+    const shield = part(front ? 3 : 100);
+    const sx = front ? X(shX + 2, -armR * 0.8) : X(shX - 4, 0);
+    circ(shield.b, sx, shY + 8, 6, 'metalShade');
+    circ(shield.b, sx, shY + 8, 4.2, 'metal');
+    circ(shield.b, sx, shY + 8, 1.4, 'accent');
+  }
+
+  parts.sort((p, q) => p.z - q.z);
+  return parts.flatMap((p) => p.b.prims);
 }
 
 /**

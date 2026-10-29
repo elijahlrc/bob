@@ -9,6 +9,7 @@ import {
 } from '../../../data/monsters';
 import {
   buildFigure,
+  HERO_SIDE,
   isHero,
   poseFor,
   stanceFor,
@@ -363,6 +364,7 @@ export function rasterFigure(
   accent: number,
   px = FIG_PX,
   look?: MonsterLook,
+  view: number = HERO_SIDE,
 ): HTMLCanvasElement {
   const S = frameSize(kind, px);
   const pal = isHero(kind) ? heroPalette(accent) : look ? monsterPalette(look) : UNDEAD;
@@ -371,6 +373,7 @@ export function rasterFigure(
     poseFor(kind, anim, t, look?.stance ?? stanceFor(look?.type, kind), styleFor(look?.type, kind)),
     look?.type,
     t,
+    view,
   );
   const scratch = document.createElement('canvas');
   scratch.width = scratch.height = S;

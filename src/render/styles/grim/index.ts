@@ -20,7 +20,7 @@ import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../..
 import { holdsWand, isViewer } from '../../style/who';
 import type { Side } from '../../../sim/side';
 import type { MarkTheme } from '../../style/marks';
-import { isHero, type AnimName, type FigureKind } from '../../style/figure';
+import { HERO_SIDE, isHero, type AnimName, type FigureKind } from '../../style/figure';
 import { buildProps, FIG_PX, FRAMES, rasterFigure, type MonsterLook } from './paint';
 import { MAP_RARITY, tone } from '../../../data/palette';
 import { DROP_COLOR, dropLabel, dropRarity } from '../../dropLabel';
@@ -238,12 +238,14 @@ export class GrimStyle extends StyleBase {
     anim: AnimName,
     i: number,
     look?: MonsterLook,
+    view: number = HERO_SIDE,
   ): string {
-    const acc = isHero(kind) ? accent : 0;
+    const hero = isHero(kind);
+    const acc = hero ? accent : 0;
     const who = look ? `${look.type}_${look.variant}${look.stance ? `_${look.stance}` : ''}` : '';
-    const key = `gf_${kind}_${who}_${acc}_${anim}_${i}`;
+    const key = `gf_${kind}_${who}_${acc}_${anim}_${i}${hero ? `_v${view}` : ''}`;
     if (!this.scene.textures.exists(key))
-      this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc, FIG_PX, look));
+      this.addTex(key, rasterFigure(kind, anim, i / FRAMES[anim], acc, FIG_PX, look, view));
     return key;
   }
 
@@ -842,7 +844,7 @@ export class GrimStyle extends StyleBase {
     const s = this.scene;
     const accent = a.isPlayer ? heroColor(this.world, a) : 0;
     const sprite = s.add
-      .image(0, 0, this.figKey(kind, accent, 'idle', 0, lookOf(a)))
+      .image(0, 0, this.figKey(kind, accent, 'idle', 0, lookOf(a), HERO_SIDE))
       .setOrigin(0.5, 0.84)
       .setLighting(true);
     const shadow = s.add.image(0, 0, 'g_shadow').setOrigin(0.5, 0.5);
@@ -910,7 +912,7 @@ export class GrimStyle extends StyleBase {
     const st = t.state(a);
     const n = FRAMES[st.anim];
     const idx = Math.min(n - 1, Math.floor(st.t * n));
-    const key = this.figKey(v.kind, d.accent, st.anim, idx, lookOf(a));
+    const key = this.figKey(v.kind, d.accent, st.anim, idx, lookOf(a), t.view);
     if (key !== d.last) {
       d.sprite.setTexture(key);
       d.last = key;
@@ -932,7 +934,8 @@ export class GrimStyle extends StyleBase {
     else if (!a.isPlayer && a.alive)
       oy -= this.flight.leapLift(a, (a.mon?.range ?? 1) + a.r + this.world.sides[0].player.r);
     d.sprite.setPosition(Math.round(px + ox), Math.round(py + oy));
-    d.sprite.setFlipX(t.face < 0);
+    // Left and right on screen are the world's x - y on this camera: `faceIso`, not `face` (world x).
+    d.sprite.setFlipX(t.faceIso < 0);
     d.sprite.setDepth(1000 + py);
     // Tinting: white flash on hit, icy when chilled, element colour otherwise.
     if (t.hitT < 0.07 && a.alive) d.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
