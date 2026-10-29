@@ -35,7 +35,8 @@ export function addCurse(run: RunState, id: CurseId): void {
 /** The hidden affixes of the standing effects: the curses carried, and the Shrine's blessing held (docs/WAYSIDE.md 5.2). */
 export function standingAffixes(run: RunState): string[] {
   const w = waysideOf(run);
-  return [...curseAffixes(run), ...(w.blessing ? [blessingAffixId(w.blessing)] : [])];
+  const blessed = w.blessing && (w.blessingUntil === null || w.blessingUntil >= run.map);
+  return [...curseAffixes(run), ...(blessed ? [blessingAffixId(w.blessing!)] : [])];
 }
 
 /** The hidden affixes of the curses the character carries on the level about to be played. */

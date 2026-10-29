@@ -26,21 +26,22 @@ export const STOPS: StopDef[] = [
     name: 'The Awlsmith',
     text: 'A free socket in one item.',
     how: 'Choose an item. More sockets cost Bone Dust.',
-    weight: 30,
+    // Its sockets are a Respite craft since 2026-10-29 (docs/ATTRITION.md): no longer scheduled; a save that holds one still works.
+    weight: 0,
     from: 6,
   },
   {
     id: 'gemHoard',
     name: 'The Gem Hoard',
-    text: 'Choose a kind, take 3 of 8 gems.',
-    how: 'Choose a kind of gem, then take three.',
+    text: 'Choose a kind, take 4 of 10 gems.',
+    how: 'Choose a kind of gem, then take four.',
     weight: 30,
     from: 6,
   },
   {
     id: 'shrine',
     name: 'The Shrine',
-    text: 'A blessing until your next stop.',
+    text: 'A blessing for five levels.',
     how: 'Choose a blessing.',
     flavour: 'Someone still prays down here. Not for you, but it will do.',
     weight: 25,
@@ -49,15 +50,15 @@ export const STOPS: StopDef[] = [
   {
     id: 'quartermaster',
     name: 'The Quartermaster',
-    text: 'Eight wares for Bone Dust.',
-    how: 'Buy what you want with Bone Dust.',
+    text: 'Wares and a flask refill, for Bone Dust.',
+    how: 'Buy what you want with Bone Dust. A restock lays out new wares.',
     weight: 25,
     from: 6,
   },
   {
     id: 'ferryman',
     name: 'The Ferryman',
-    text: 'A reprieve, at a price.',
+    text: 'A reprieve and full flasks, at a price.',
     how: 'Choose a reprieve.',
     flavour: "He doesn't ask where you're going. Only what you'll give.",
     weight: 20,
@@ -67,8 +68,7 @@ export const STOPS: StopDef[] = [
 
 export const stopDef = (id: StopId): StopDef => STOPS.find((s) => s.id === id)!;
 
-/** Stops are scheduled in windows of this many levels, starting at `STOP_FROM`: `STOPS_PER_WINDOW` (offers.ts) stops to a window. */
-export const STOP_WINDOW = 5;
+/** The first level a stop can be on (the schedule is `stopSchedule`, run/offers.ts). */
 export const STOP_FROM = 6;
 
 /** What the Awlsmith charges, in Bone Dust, for the nth socket of an item beyond the free one (the first three sockets of an item cost nothing). */
@@ -93,7 +93,7 @@ export const HOARD_TAGS: { tag: string; name: string }[] = [
 ];
 
 /** How many gems the Hoard lays out and how many may be taken. */
-export const HOARD_LAID = 8;
-export const HOARD_TAKE = 3;
+export const HOARD_LAID = 10;
+export const HOARD_TAKE = 4;
 /** How many kinds the Hoard asks the player to choose between. */
 export const HOARD_KINDS = 4;

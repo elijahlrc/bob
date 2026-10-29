@@ -3,7 +3,7 @@ import type { MapAffixDef } from './mapAffixes';
 
 /**
  * The Shrine's blessings (docs/WAYSIDE.md 5.2): a real standing edge (the size of a node or two of the passive tree, so that the
- * Shrine is worth a level) that lasts until the next stop is taken. One at a time; a
+ * Shrine is worth a level) that lasts `BLESSING_LEVELS` levels. One at a time; a
  * Shrine's blessing replaces the one held. Each is a hidden map affix, like a provision (data/provisions.ts). Every name and text
  * here is ours.
  */
@@ -84,3 +84,5 @@ export const BLESSING_AFFIXES: MapAffixDef[] = BLESSINGS.map((b) => ({
 
 /** How many blessings a Shrine offers. */
 export const SHRINE_CHOICES = 3;
+/** A blessing holds for this many levels after its Shrine (docs/ATTRITION.md, 2026-10-29; it held until the next stop). */
+export const BLESSING_LEVELS = 5;

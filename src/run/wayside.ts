@@ -33,8 +33,9 @@ export type Wayside = {
   armed: string[];
   /** The provisions burning on the map being played (set when it starts, cleared when it ends). */
   active: string[];
-  /** The Shrine's blessing, until the next stop replaces it. */
+  /** The Shrine's blessing, and the last level it holds on (null: an older save's, held until the next Shrine). */
   blessing: string | null;
+  blessingUntil: number | null;
   /** Bargains still running (the Ferryman's and the Bargain Coin's). */
   curses: Curse[];
   /** The stops taken so far. */
@@ -45,6 +46,8 @@ export type Wayside = {
   found: string | null;
   /** A Respite where the player is crafting (docs/ATTRITION.md): its slot and the crafts made; the level passes on leaving. */
   respite: { slot: number; crafts: number } | null;
+  /** Restocks bought at a Quartermaster this level, by offer id. */
+  restocks: Record<string, number>;
 };
 
 export const newWayside = (): Wayside => ({
@@ -52,11 +55,13 @@ export const newWayside = (): Wayside => ({
   armed: [],
   active: [],
   blessing: null,
+  blessingUntil: null,
   curses: [],
   stops: 0,
   seen: {},
   found: null,
   respite: null,
+  restocks: {},
 });
 
 /** The run's Wayside state, filled in with defaults the first time it is asked for (an older save has none). */

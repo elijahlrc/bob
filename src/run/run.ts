@@ -221,6 +221,7 @@ export function advanceLevel(run: RunState): void {
   run.offers = rollOffers(run.seed, run.map);
   waysideOf(run).found = null;
   waysideOf(run).respite = null;
+  waysideOf(run).restocks = {};
 }
 
 /**

@@ -176,3 +176,10 @@ The order will change as we learn.
     visit is the level's: Leave passes it with camp's usual rest and no refill. The old "Rest at the Respite?" prompt
     is gone; the screen is the step.
   - **Bone Dust** shows at camp, beside the map number.
+  - **Stops.** A random schedule from the seed (`stopSchedule`, `STOP_CHANCE` 0.32): about one level in five (19.6 a run
+    over 400 seeds), from level 6, never on a fifth or tenth level, never two in a row, never the kind of the one
+    before. The Awlsmith is no longer scheduled (weight 0; a save that holds one still works). The Shrine's blessing
+    lasts five levels (`BLESSING_LEVELS`), no longer ends at the next stop, and a new Shrine replaces it; its numbers
+    are unchanged, since lasting about twice as long is already the strengthening. The Gem Hoard lays out 10 gems and
+    lets you take 4 (was 3 of 8). The Ferryman also refills every flask. The Quartermaster sells a refill of every flask
+    (12 Bone Dust at the base, priced by level as wares are) and restocks (8 at the base, paid at once, new wares).

@@ -22,6 +22,9 @@ export function priceAt(base: number, level: number): number {
 
 /** How many wares the Quartermaster lays out. */
 export const QUARTERMASTER_SIZE = 8;
+/** The Quartermaster's services (docs/ATTRITION.md), base prices before the level factor: every flask refilled, new wares laid out. */
+export const REFILL_BASE = 12;
+export const RESTOCK_BASE = 8;
 
 /**
  * The gear it sells is as good as what a map could drop (docs/WAYSIDE.md 3): the best of this many rares, rolled at the item level of

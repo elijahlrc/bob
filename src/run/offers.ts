@@ -10,7 +10,7 @@ import {
 } from '../data/themes';
 import { rollMapAffixes } from '../gen/mapPlan';
 import { BOSS_MAP_NO_AFFIX, bossForMap } from '../data/bosses';
-import { STOP_FROM, STOP_WINDOW, STOPS, type StopId } from '../data/stops';
+import { STOP_FROM, STOPS, type StopId } from '../data/stops';
 
 /**
  * What the camp offers for the next level (docs/MAPS.md section 4): a map, or a Respite, which is no map at all but
@@ -131,50 +131,41 @@ export function makeStop(map: number, slot: number, stop: StopId): MapOffer {
   };
 }
 
-/** How many stops each window of levels holds. */
-export const STOPS_PER_WINDOW = 2;
+/**
+ * The chance that a level that may hold a stop does (docs/ATTRITION.md, 2026-10-29): about four levels in five may, so stops
+ * come about one level in five, at random rather than two to every window of five as before.
+ */
+export const STOP_CHANCE = 0.32;
+
+const schedules = new Map<number, (StopId | null)[]>();
 
 /**
- * The levels of window `w` that hold its stops, in order: drawn from the run seed alone. Never a fifth or tenth level (a reward
- * pick or a gate is due there), never past level 99, and never two levels in a row.
+ * Every level's stop for a run (indexed by level), drawn from the seed alone: from `STOP_FROM`, never on a fifth or tenth level
+ * (a reward pick or a gate is due there), never past level 99, never two levels in a row, and never the kind of the stop before.
  */
-export function stopLevels(seed: number, w: number): number[] {
-  const first = STOP_FROM + w * STOP_WINDOW;
-  const levels: number[] = [];
-  for (let l = first; l < first + STOP_WINDOW; l++) if (l % 5 !== 0 && l < 100) levels.push(l);
-  const rng = new Rng(seed).fork(`stopat${w}`);
-  const pairs: number[][] = [];
-  for (let i = 0; i < levels.length; i++)
-    for (let j = i + 1; j < levels.length; j++)
-      if (levels[j] - levels[i] > 1) pairs.push([levels[i], levels[j]]);
-  if (pairs.length) return rng.pick(pairs);
-  return levels.length ? [rng.pick(levels)] : [];
-}
-
-/** Which stop the run's `n`th is: drawn by weight among the stops open at its level, never the kind of the one before. */
-export function stopKind(seed: number, n: number): StopId | null {
+export function stopSchedule(seed: number): (StopId | null)[] {
+  const known = schedules.get(seed);
+  if (known) return known;
+  const out: (StopId | null)[] = Array.from({ length: 101 }, () => null);
   let prev: StopId | null = null;
-  let kind: StopId | null = null;
-  for (let j = 0; j <= n; j++) {
-    const at = stopLevels(seed, Math.floor(j / STOPS_PER_WINDOW))[j % STOPS_PER_WINDOW];
-    if (at === undefined) return null;
-    const open = STOPS.filter((s) => s.from <= at);
+  for (let l = STOP_FROM; l < 100; l++) {
+    if (l % 5 === 0 || out[l - 1]) continue;
+    const rng = new Rng(seed).fork(`stop${l}`);
+    if (!rng.chance(STOP_CHANCE)) continue;
+    const open = STOPS.filter((s) => s.weight > 0 && s.from <= l);
     const pool = open.filter((s) => s.id !== prev);
     const from = pool.length ? pool : open;
-    kind = from.length
-      ? new Rng(seed).fork(`stopkind${j}`).weighted(from, (s) => s.weight).id
-      : null;
-    prev = kind;
+    if (!from.length) continue;
+    prev = out[l] = rng.weighted(from, (s) => s.weight).id;
   }
-  return kind;
+  if (schedules.size > 16) schedules.clear();
+  schedules.set(seed, out);
+  return out;
 }
 
-/** The stop on offer at a level, if the schedule puts one there (two in every five levels from level 6). */
+/** The stop on offer at a level, if the schedule puts one there. */
 export function stopAt(seed: number, map: number): StopId | null {
-  if (map < STOP_FROM || map % 5 === 0) return null;
-  const w = Math.floor((map - STOP_FROM) / STOP_WINDOW);
-  const k = stopLevels(seed, w).indexOf(map);
-  return k < 0 ? null : stopKind(seed, w * STOPS_PER_WINDOW + k);
+  return map >= 0 && map <= 100 ? stopSchedule(seed)[map] : null;
 }
 
 /**

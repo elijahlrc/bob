@@ -17,7 +17,8 @@ import { noteFound } from './found';
 import type { MapOffer } from './offers';
 import { advanceLevel, TOTAL_MAPS, uidSource, type RunState } from './run';
 import { waysideOf, type Ware } from './wayside';
-import { BLESSINGS, SHRINE_CHOICES, type BlessingId } from '../data/blessings';
+import { BLESSING_LEVELS, BLESSINGS, SHRINE_CHOICES, type BlessingId } from '../data/blessings';
+import { priceAt, REFILL_BASE, RESTOCK_BASE } from '../data/sale';
 import { REPRIEVES, type ReprieveId } from '../data/reprieves';
 import { grantWare, rollSale } from './sale';
 import { pouchRoom } from './provisions';
@@ -28,7 +29,7 @@ export type StopChoice =
   | { stop: 'awlsmith'; itemUid: number; extra?: number }
   | { stop: 'gemHoard'; tag: string; picks: string[] }
   | { stop: 'shrine'; blessing: string }
-  | { stop: 'quartermaster'; buy: string[] }
+  | { stop: 'quartermaster'; buy: string[]; refill?: boolean }
   | { stop: 'ferryman'; reprieve: string };
 
 const fail = (reason: string): CraftResult => ({ ok: false, reason });
@@ -97,13 +98,39 @@ export function shrineBlessings(run: RunState, offer: MapOffer): BlessingId[] {
 
 // ---- The Quartermaster -----------------------------------------------------------------------------
 
-/** The Quartermaster's wares for an offer: eight, the same every time they are looked at (run/sale.ts). */
+/**
+ * The Quartermaster's wares for an offer: eight, the same every time they are looked at (run/sale.ts), and new ones after each
+ * restock bought there.
+ */
 export function saleStock(run: RunState, offer: MapOffer): Ware[] {
-  return rollSale(run, offer.id);
+  const n = waysideOf(run).restocks[offer.id] ?? 0;
+  return rollSale(run, n ? `${offer.id}#${n}` : offer.id);
 }
 
-/** Why a cart of the Quartermaster's wares cannot be bought (null: it can). */
-export function cartProblem(run: RunState, stock: Ware[], ids: string[]): string | null {
+/** What the Quartermaster's services cost at this level (docs/ATTRITION.md): every flask refilled, and new wares. */
+export const refillPrice = (run: RunState): number => priceAt(REFILL_BASE, run.map);
+export const restockPrice = (run: RunState): number => priceAt(RESTOCK_BASE, run.map);
+
+/** Buy a restock at the Quartermaster in a slot: paid at once, and the stock is new (what was in the cart goes back). */
+export function restockQuartermaster(run: RunState, slot: number): CraftResult {
+  const offer = run.offers[slot];
+  if (run.phase !== 'camp' || offer?.kind !== 'stop' || offer.stop !== 'quartermaster')
+    return fail('No Quartermaster here');
+  const price = restockPrice(run);
+  if (run.dust < price) return fail(`A restock costs ${price} Bone Dust`);
+  run.dust -= price;
+  const way = waysideOf(run);
+  way.restocks[offer.id] = (way.restocks[offer.id] ?? 0) + 1;
+  return { ok: true };
+}
+
+/** Why a cart of the Quartermaster's wares cannot be bought (null: it can), with the refill if it is asked for. */
+export function cartProblem(
+  run: RunState,
+  stock: Ware[],
+  ids: string[],
+  refill = false,
+): string | null {
   if (new Set(ids).size !== ids.length) return 'Take each ware once';
   const picked: Ware[] = [];
   for (const id of ids) {
@@ -111,7 +138,7 @@ export function cartProblem(run: RunState, stock: Ware[], ids: string[]): string
     if (!w) return 'No such ware';
     picked.push(w);
   }
-  const total = picked.reduce((n, w) => n + w.price, 0);
+  const total = picked.reduce((n, w) => n + w.price, 0) + (refill ? refillPrice(run) : 0);
   if (total > run.dust) return `That costs ${total} Bone Dust`;
   // Provisions and reprieves share the pouch of three.
   const carried = picked.filter((w) => w.kind === 'provision' || w.kind === 'reprieve').length;
@@ -155,7 +182,7 @@ export function stopProblem(run: RunState, slot: number, choice: StopChoice): st
         ? null
         : 'Choose one of the three blessings';
     case 'quartermaster':
-      return cartProblem(run, saleStock(run, offer), choice.buy);
+      return cartProblem(run, saleStock(run, offer), choice.buy, choice.refill);
     case 'ferryman': {
       if (!REPRIEVES.some((r) => r.id === choice.reprieve)) return 'Choose one of the reprieves';
       return reprieveBlocker(run);
@@ -166,8 +193,8 @@ export function stopProblem(run: RunState, slot: number, choice: StopChoice): st
 /**
  * Take the stop in a slot with the choice made there. The level passes exactly as a Respite's does (the counter advances, no XP,
  * no clear rewards, no reward pick, no refund point), the character gets the usual few seconds of rest, and the next level's
- * offers are rolled. Nothing is applied unless the whole choice is valid. Any stop ends the blessing held (a Shrine then gives
- * its own).
+ * offers are rolled. Nothing is applied unless the whole choice is valid. A Shrine replaces the blessing held; the Quartermaster
+ * (if asked) and the Ferryman refill the flasks.
  */
 export function takeStop(run: RunState, slot: number, choice: StopChoice): CraftResult {
   const why = stopProblem(run, slot, choice);
@@ -175,7 +202,7 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
   if (run.map >= TOTAL_MAPS) return fail('The last level has no stop');
   const offer = run.offers[slot];
   const way = waysideOf(run);
-  way.blessing = null;
+  let refill = false;
   switch (choice.stop) {
     case 'awlsmith': {
       const res = awlsmithSockets(run, choice.itemUid, choice.extra ?? 0);
@@ -193,10 +220,12 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
     }
     case 'shrine':
       way.blessing = choice.blessing;
+      way.blessingUntil = run.map + BLESSING_LEVELS;
       break;
     case 'quartermaster': {
       const stock = saleStock(run, offer);
-      run.dust -= cartCost(stock, choice.buy);
+      run.dust -= cartCost(stock, choice.buy) + (choice.refill ? refillPrice(run) : 0);
+      refill = !!choice.refill;
       for (const id of choice.buy)
         grantWare(
           run,
@@ -207,6 +236,8 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
     case 'ferryman':
       acquireReprieve(run, choice.reprieve as ReprieveId);
       addCurse(run, 'bargain');
+      // He fills the flasks from the river (docs/ATTRITION.md).
+      refill = true;
       break;
   }
   run.history.push({
@@ -221,6 +252,7 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
   });
   way.stops++;
   run.vitals = restAtCamp(run.build, run.map, run.vitals);
+  if (refill) run.vitals = { ...run.vitals, flasks: {} };
   advanceLevel(run);
   return { ok: true };
 }

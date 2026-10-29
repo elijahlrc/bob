@@ -15,7 +15,15 @@ import {
 import { GemCard } from './GemCard';
 import { blessingDef } from '../data/blessings';
 import { REPRIEVES } from '../data/reprieves';
-import { cartCost, cartProblem, saleStock, shrineBlessings } from '../run/stops';
+import {
+  cartCost,
+  cartProblem,
+  refillPrice,
+  restockPrice,
+  restockQuartermaster,
+  saleStock,
+  shrineBlessings,
+} from '../run/stops';
 import { reprieveBlocker } from '../run/reprieves';
 import { searchText } from '../run/inventoryOps';
 import { waysideOf } from '../run/wayside';
@@ -130,6 +138,7 @@ export function StopScreen({
   const [picks, setPicks] = useState<string[]>([]);
   const [blessing, setBlessing] = useState<string | null>(null);
   const [cart, setCart] = useState<string[]>([]);
+  const [refill, setRefill] = useState(false);
   const [reprieve, setReprieve] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -137,7 +146,7 @@ export function StopScreen({
   if (offer.stop === 'awlsmith' && itemUid !== null) choice = { stop: 'awlsmith', itemUid, extra };
   if (offer.stop === 'gemHoard' && tag) choice = { stop: 'gemHoard', tag, picks };
   if (offer.stop === 'shrine' && blessing) choice = { stop: 'shrine', blessing };
-  if (offer.stop === 'quartermaster') choice = { stop: 'quartermaster', buy: cart };
+  if (offer.stop === 'quartermaster') choice = { stop: 'quartermaster', buy: cart, refill };
   if (offer.stop === 'ferryman' && reprieve) choice = { stop: 'ferryman', reprieve };
   const problem = choice ? stopProblem(run, slot, choice) : 'Choose first';
 
@@ -189,7 +198,14 @@ export function StopScreen({
         <Shrine run={run} slot={slot} blessing={blessing} onPick={setBlessing} />
       )}
       {offer.stop === 'quartermaster' && (
-        <Quartermaster run={run} slot={slot} cart={cart} onCart={setCart} />
+        <Quartermaster
+          c={c}
+          slot={slot}
+          cart={cart}
+          onCart={setCart}
+          refill={refill}
+          onRefill={setRefill}
+        />
       )}
       {offer.stop === 'ferryman' && <Ferryman run={run} reprieve={reprieve} onPick={setReprieve} />}
       {error && (
@@ -381,12 +397,13 @@ function Shrine({
   onPick: (id: string) => void;
 }) {
   const ids = shrineBlessings(run, run.offers[slot]);
-  const held = waysideOf(run).blessing;
+  const way = waysideOf(run);
+  const held = way.blessing && (way.blessingUntil ?? Infinity) >= run.map ? way.blessing : null;
   return (
     <div class="stop-body">
       {held && (
         <div class="muted">
-          Current: {blessingDef(held).name} ({blessingDef(held).text})
+          Current: {blessingDef(held).name} ({blessingDef(held).text}). A new one replaces it.
         </div>
       )}
       <div class="stop-list">
@@ -407,21 +424,35 @@ function Shrine({
 }
 
 function Quartermaster({
-  run,
+  c,
   slot,
   cart,
   onCart,
+  refill,
+  onRefill,
 }: {
-  run: NonNullable<Controller['run']>;
+  c: Controller;
   slot: number;
   cart: string[];
   onCart: (change: (ids: string[]) => string[]) => void;
+  refill: boolean;
+  onRefill: (on: boolean) => void;
 }) {
+  const run = c.run!;
   const stock = saleStock(run, run.offers[slot]);
-  const cost = cartCost(stock, cart);
-  const why = cartProblem(run, stock, cart);
+  const refillCost = refillPrice(run);
+  const restockCost = restockPrice(run);
+  const cost = cartCost(stock, cart) + (refill ? refillCost : 0);
+  const why = cartProblem(run, stock, cart, refill);
   const toggle = (id: string) =>
     onCart((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+  const restock = () => {
+    const res = c.craft((r) => restockQuartermaster(r, slot));
+    if (res?.ok) {
+      sfx('dust');
+      onCart(() => []);
+    } else sfx('denied');
+  };
   return (
     <div class="stop-body">
       <div class="wares-head">
@@ -430,7 +461,15 @@ function Quartermaster({
           <strong>{run.dust.toLocaleString()}</strong> Bone Dust
         </span>
       </div>
-      {why && cart.length > 0 && (
+      <div class="stop-kinds">
+        <button class={'btn small' + (refill ? ' on' : '')} onClick={() => onRefill(!refill)}>
+          {refill ? 'Flask refill in the cart' : `Refill every flask: ${refillCost} Bone Dust`}
+        </button>
+        <button class="btn small" disabled={run.dust < restockCost} onClick={restock}>
+          Restock: {restockCost} Bone Dust
+        </button>
+      </div>
+      {why && (cart.length > 0 || refill) && (
         <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
           {why}
         </div>
@@ -472,7 +511,7 @@ function Ferryman({
   return (
     <div class="stop-body">
       <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
-        Price: 15% less maximum life for five levels.
+        Price: 15% less maximum life for five levels. Your flasks are refilled.
       </div>
       {blocked && (
         <div class="stop-warn" data-paint="panel" data-thin data-field="vermilion">
