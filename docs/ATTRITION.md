@@ -159,3 +159,12 @@ The order will change as we learn.
     Hollow Oak Draught, Stonebrew Flask, Bellowing Draught, Hexfire Brew, Last Light Flask. The Brimming Cup's +100%
     charges gained is now +1 charge a kill while it runs, which suits it. Not yet re-thought one by one: the rest of
     the uniques' identities.
+  - **Energy shield.** 25% less on every item base (`ENERGY_SHIELD_SCALE` in `data/bases.ts`, beside the weapon damage
+    lever), so cards, the sheet and saved items agree. Affixes and the tree are untouched. Hollow Vessel and Living
+    Ward are still in: removing them changes tree nodes, so they wait for the tree session with the owner.
+  - **Emergencies, first pass.** Four map affixes, each on one way of lasting: Parched (50% less life regeneration),
+    Smothering (energy shield recharges 50% slower and starts later), Souring (35% less from flasks), Taxing (skills
+    cost 30% more mana); Draining, the broad one, never shares a map with them. Two monster mods: Withering (its hits
+    stop life regeneration for 3 s) and Shield-breaking (its hits hold the recharge off 4 s longer); Bloodless (cannot be
+    leeched from) already existed, and chaos damage already goes past energy shield. Not done yet: monster types and
+    bosses built around these.

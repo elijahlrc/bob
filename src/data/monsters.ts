@@ -1579,6 +1579,9 @@ export type MonsterModId =
   // New counterplay mods (docs/ENEMIES.md 7.2)
   | 'charging'
   | 'flaskTaker'
+  // Emergencies for builds that sustain themselves (docs/ATTRITION.md).
+  | 'withering'
+  | 'shieldbreaking'
   | 'hobbling'
   | 'brood'
   | 'wardingPulse'
@@ -1774,6 +1777,9 @@ MONSTER_MODS.push(
   { id: 'charging', name: 'Charging', magic: true, minLevel: 12, mods: [] },
   { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 20, mods: [] },
   { id: 'hobbling', name: 'Hobbling', magic: true, minLevel: 15, mods: [] },
+  // Emergencies for builds that sustain themselves (docs/ATTRITION.md): regeneration and the shield's recharge (leech has Bloodless).
+  { id: 'withering', name: 'Withering', magic: true, minLevel: 12, mods: [] },
+  { id: 'shieldbreaking', name: 'Shield-breaking', magic: true, minLevel: 15, mods: [] },
 );
 // Mods that apply to every faction: a pulse that throws the character back, and a twin that must fall with it (docs/ROSTER.md 7.5).
 MONSTER_MODS.push(

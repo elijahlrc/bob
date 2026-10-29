@@ -13,6 +13,11 @@ import type { ArmourSlot, Attrs, DefenceType, ItemBase, ItemClass, WeaponClass }
 export const WEAPON_DAMAGE_SCALE = 1;
 /** Every base's attribute requirements, as a multiple of the reference numbers. */
 export const REQUIREMENT_SCALE = 1;
+/**
+ * Every base's energy shield, as a multiple of the reference numbers. A moderate cut since 2026-10-29 (the owner, docs/ATTRITION.md):
+ * with kills no longer refilling flasks, a shield that recharges in full between fights was the strongest way to last a run.
+ */
+export const ENERGY_SHIELD_SCALE = 0.75;
 
 type WeaponFamilyDef = {
   /** The key of its rows in `BASE_ROWS`, and the prefix of its ids. */
@@ -98,7 +103,7 @@ function defenceOf(d: [number, number, number, number]): ItemBase['defence'] {
   const out: NonNullable<ItemBase['defence']> = {};
   if (d[0]) out.armour = d[0];
   if (d[1]) out.evasion = d[1];
-  if (d[2]) out.es = d[2];
+  if (d[2]) out.es = Math.round(d[2] * ENERGY_SHIELD_SCALE);
   if (d[3]) out.block = d[3];
   return out;
 }

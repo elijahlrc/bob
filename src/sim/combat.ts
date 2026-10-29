@@ -102,6 +102,8 @@ const CHAOS = 4;
 const DAMAGE_LOG_TIME = 10;
 /** Share of a melee hit that a Thorned monster reflects as physical damage. */
 const THORNS_SHARE = 0.02;
+/** Seconds a Shield-breaking monster's hit adds before the energy shield may start to recharge. */
+const SHIELDBREAK_SECONDS = 4;
 const OVERLOAD_TIME = 8;
 
 export function lifeCap(a: Actor): number {
@@ -973,6 +975,11 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
   // A hobble is a chill: whatever keeps a chill off keeps it off (docs/BOSSES.md 11.2).
   if (hobbles) afflictPlayer(w, dst.side!, 'chill', 0.3, 2);
+  // Emergencies for builds that sustain themselves (docs/ATTRITION.md): a withering hit stops life regeneration, a
+  // shield-breaking one holds the energy shield recharge off longer (the recharge waits on the time since a hit).
+  if (src.modIds.includes('withering')) applyStatus(w, dst, 'regenLess', { seconds: 3, v: 100 });
+  if (src.modIds.includes('shieldbreaking'))
+    dst.since.damaged = Math.min(dst.since.damaged, -SHIELDBREAK_SECONDS);
   if (src.mon?.kind.bossOnly) bossHitPlayer(w, dst.side!, src);
   // A sidearm that blinds (docs/ENCOUNTERS.md 7): the character's attacks miss more for a while.
   if (debuff === 'blind') blindPlayer(dst.side!, BLIND_SECONDS);

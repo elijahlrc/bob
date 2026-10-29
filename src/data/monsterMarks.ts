@@ -295,6 +295,18 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     aura: false,
     desc: 'Its hits slow you by 30% for 2 seconds.',
   },
+  withering: {
+    color: 0x98a870,
+    shape: 'triDown',
+    aura: false,
+    desc: 'Its hits stop your life regeneration for 3 seconds.',
+  },
+  shieldbreaking: {
+    color: 0x80b8e0,
+    shape: 'diamond',
+    aura: false,
+    desc: 'Its hits keep your energy shield from recharging for 4 more seconds.',
+  },
   boneWarden: {
     color: 0xe8e0c8,
     shape: 'ring',
