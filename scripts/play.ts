@@ -6,19 +6,23 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { Character } from '../src/calc/character';
-import { bossAhead } from '../src/data/bosses';
+import { bossAhead, BOSSES, bossForMap } from '../src/data/bosses';
 import { blessingDef } from '../src/data/blessings';
 import { flaskBase } from '../src/data/flasks';
 import { gemDef } from '../src/data/gems';
 import { affixText, mapAffixDef } from '../src/data/mapAffixes';
 import { provisionDef } from '../src/data/provisions';
-import { REPRIEVES } from '../src/data/reprieves';
+import { curseDef, REPRIEVES } from '../src/data/reprieves';
 import { runRewardDef } from '../src/data/runRewards';
 import { flaskRules, type UtilityFlaskUse } from '../src/data/strategy';
 import { themeDef } from '../src/data/themes';
 import { getTree } from '../src/data/tree';
 import { EQUIP_SLOTS, type AnyItem, type EquipSlot, type Item } from '../src/data/types';
 import { modText } from '../src/mods/text';
+import { ModDB } from '../src/mods/modDb';
+import { flaskSpec } from '../src/calc/flasks';
+import { itemLines } from '../src/ui/ItemCard';
+import { affixLabel } from '../src/run/affixText';
 import {
   botAllocate,
   botArm,
@@ -30,7 +34,7 @@ import {
 } from '../src/run/bot';
 import { nextTier, salvage } from '../src/run/craft';
 import { markSeen } from '../src/run/found';
-import { equip, equipFlask, socketGem, unsocketGem } from '../src/run/inventory';
+import { equip, equipFlask, slotsFor, socketGem, unsocketGem } from '../src/run/inventory';
 import { itemInfos, isUpgrade } from '../src/run/inventoryOps';
 import { nextRespite, type MapOffer } from '../src/run/offers';
 import { playOffer } from '../src/run/play';
@@ -103,11 +107,15 @@ function load(): RunState {
 const save = (run: RunState) => writeFileSync(file, JSON.stringify(run));
 const pct = (v: number) => `${Math.round(v * 100)}%`;
 
+/** An item's lines as the game's item card shows them (uniques' mods and flat damage included). */
 function lines(it: Item): string {
-  return it.affixes.flatMap((a) => a.mods.map((m) => modText(m))).join('; ');
+  return itemLines(it).join('; ');
 }
 
-function desc(it: AnyItem | { kind: 'pouch'; id: string }): string {
+/** Rounded the way a player reads it: whole charges, a drink to one decimal. */
+const one = (v: number) => String(Math.round(v * 10) / 10);
+
+function desc(it: AnyItem | { kind: 'pouch'; id: string }, db?: ModDB): string {
   if (it.kind === 'pouch')
     return `${provisionDef(it.id as never).name} (provision: ${provisionDef(it.id as never).text})`;
   if (it.kind === 'gem') {
@@ -116,13 +124,17 @@ function desc(it: AnyItem | { kind: 'pouch'; id: string }): string {
   }
   if (it.kind === 'flask') {
     const b = flaskBase(it.baseId);
+    // With the flask's own affixes (Deep, Thrifty) and the character's flask mods, as it would be worn.
+    const s = flaskSpec(it, db ?? new ModDB([]));
     const aff = it.affixes.flatMap((a) => a.mods.map((m) => modText(m))).join('; ');
-    return `${it.name} (${b.kind} flask, ${b.maxCharges} charges, ${b.perUse} a drink${aff ? '; ' + aff : ''})`;
+    return `${it.name} (${b.kind} flask, needs level ${b.level}, ${s.maxCharges} charges, ${one(s.perUse)} a drink${aff ? '; ' + aff : ''})`;
   }
   if (it.kind === 'item')
     return `${it.name} [${it.rarity}] ilvl ${it.ilvl}: ${lines(it) || 'no affixes'}`;
   return `${it.count} × ${it.id}`;
 }
+
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 function flaskLine(run: RunState): string {
   const specs = new Character(run.build).flasks;
@@ -142,7 +154,7 @@ function flaskLine(run: RunState): string {
         : r.life !== undefined
           ? `below ${pct(r.life)} life`
           : `below ${pct(r.mana!)} mana`;
-      return `${i + 1}: ${f.name} ${have}/${max} (${s?.perUse ?? '?'} a drink, ${when})`;
+      return `${i + 1}: ${f.name} ${have}/${max} (${s ? one(s.perUse) : '?'} a drink, ${when})`;
     })
     .join('\n       ');
 }
@@ -182,13 +194,22 @@ function status(run: RunState): void {
   const eff = standingEffects(run);
   if (eff.length)
     console.log(
-      `Effects: ${eff.map((e) => `${e.name} (${e.text}; ${e.left === null ? 'for the run' : `${e.left} levels left`})`).join(' · ')}`,
+      `Effects: ${eff.map((e) => `${e.name} (${e.text}; ${e.left === null ? 'for the run' : `${plural(e.left, 'level')} left`})`).join(' · ')}`,
     );
   const boss = bossAhead(run.map);
   if (boss && boss.maps > 0)
-    console.log(`Boss ahead: ${boss.boss.name} in ${boss.maps} maps (map ${boss.boss.map})`);
+    console.log(
+      `Boss ahead: ${boss.boss.name} in ${plural(boss.maps, 'map')} (map ${boss.boss.map})`,
+    );
+  // As camp says it: the Respite on offer counts first.
   const nr = nextRespite(run.seed, run.map);
-  if (nr) console.log(`Next Respite in ${nr - run.map} levels (map ${nr})`);
+  if (run.offers.some((o) => o.kind === 'respite'))
+    console.log(
+      bossForMap(run.map + 1)
+        ? `The last rest before ${BOSSES[bossForMap(run.map + 1)!].name}: a Respite is on offer.`
+        : 'A Respite is on offer.',
+    );
+  else if (nr) console.log(`Next Respite in ${plural(nr - run.map, 'level')} (map ${nr})`);
   if (run.reward) {
     console.log('REWARD PICK waiting (pick <n> / skip):');
     run.reward.forEach((c, i) => console.log(`  ${i + 1}) ${desc(c as never)}`));
@@ -204,8 +225,16 @@ function status(run: RunState): void {
 
 function char(run: RunState): void {
   const s = sheetOf(run);
-  const res = ['fire', 'cold', 'lightning', 'chaos']
-    .map((n, i) => `${n} ${s.res[i]}/${s.maxRes[i]}`)
+  // Resistances are kept by damage type: 1 lightning, 2 cold, 3 fire, 4 chaos (0 is physical).
+  const res = (
+    [
+      ['fire', 3],
+      ['cold', 2],
+      ['lightning', 1],
+      ['chaos', 4],
+    ] as const
+  )
+    .map(([n, i]) => `${n} ${s.res[i]}/${s.maxRes[i]}`)
     .join(', ');
   console.log(
     `Level ${s.level} · life ${Math.round(s.life)} · energy shield ${Math.round(s.es)} · mana ${Math.round(s.mana)}`,
@@ -240,14 +269,18 @@ function gems(run: RunState): void {
 
 function bag(run: RunState): void {
   const infos = itemInfos(run);
+  const db = new Character(run.build).db;
   for (const it of run.inventory) {
     if (it.kind === 'gem') continue;
-    const info = infos.get(it.uid);
+    // An upgrade is judged for gear only (a flask has no slot of its own in that comparison).
+    const info = it.kind === 'item' ? infos.get(it.uid) : undefined;
     const up =
-      info && isUpgrade(info)
+      info && info.slot && isUpgrade(info)
         ? ` · UPGRADE for ${info.slot} (dps ${info.dpsPct.toFixed(0)}%, ehp ${info.ehpPct.toFixed(0)}%)`
-        : '';
-    console.log(`[uid ${it.uid}] ${desc(it)}${up}`);
+        : info && !info.equippable && info.reason
+          ? ` · can't wear: ${info.reason}`
+          : '';
+    console.log(`[uid ${it.uid}] ${desc(it, db)}${up}`);
   }
 }
 
@@ -294,7 +327,7 @@ function look(run: RunState, i: number): void {
           console.log(
             `    ${it.name}: ${it.affixes
               .filter((a) => nextTier(it, a.family, run.map))
-              .map((a) => `${a.family} (tier ${a.tier})`)
+              .map((a) => `${affixLabel(a.family)} [family ${a.family}] (tier ${a.tier})`)
               .join(', ')}`,
           );
     }
@@ -330,6 +363,9 @@ function look(run: RunState, i: number): void {
       }
       break;
     case 'ferryman':
+      console.log(
+        `  Price: ${curseDef('bargain').text} for five levels. Your flasks are refilled.`,
+      );
       for (const r of REPRIEVES.filter((x) => x.from <= run.map))
         console.log(`  ${r.id}: ${r.name}, ${r.text}`);
       break;
@@ -441,7 +477,12 @@ function run(): void {
       ) as RespiteCraft;
       const res = craftAtRespite(r, n(0), craft);
       console.log(res.ok ? 'Crafted.' : `Not possible: ${res.reason}`);
-      if (res.ok) gear(r);
+      if (res.ok) {
+        const it = [...Object.values(r.build.equipment), ...r.inventory].find(
+          (x): x is Item => x?.kind === 'item' && x.uid === craft.itemUid,
+        );
+        if (it) console.log(`Now: ${desc(it)}`);
+      }
       break;
     }
     case 'leave':
@@ -457,23 +498,50 @@ function run(): void {
       break;
     case 'equip': {
       const it = r.inventory.find((x) => x.uid === n(0));
-      if (!it || it.kind !== 'item') {
-        console.log('No such carried item');
+      if (it?.kind === 'flask') {
+        console.log('That is a flask: use "flask <uid> <1-5>".');
         break;
       }
-      const slot = (args[1] as EquipSlot) ?? itemInfos(r).get(it.uid)?.slot;
-      const res = slot ? equip(r, it.uid, slot) : { ok: false, reason: 'no slot' };
+      if (!it || it.kind !== 'item') {
+        console.log('No such carried item (a gem goes in with "socket")');
+        break;
+      }
+      const info = itemInfos(r).get(it.uid);
+      const slot = (args[1] as EquipSlot) ?? info?.slot ?? slotsFor(it)[0];
+      if (!slot) {
+        console.log(`Not possible: ${info?.reason ?? 'no slot takes it'}`);
+        break;
+      }
+      const res = equip(r, it.uid, slot);
       console.log(
-        res.ok ? `Equipped in ${slot}` : `Not possible: ${'reason' in res ? res.reason : ''}`,
+        res.ok ? `Equipped in ${slot}` : `Not possible: ${res.reason ?? info?.reason ?? ''}`,
       );
       break;
     }
-    case 'flask':
-      console.log(equipFlask(r, n(0), n(1) - 1) ? 'Done' : 'Not possible');
+    case 'flask': {
+      const f = r.inventory.find((x) => x.uid === n(0));
+      const need = f?.kind === 'flask' ? flaskBase(f.baseId).level : 0;
+      const why =
+        f?.kind !== 'flask'
+          ? 'no such carried flask'
+          : !(n(1) >= 1 && n(1) <= 5)
+            ? 'the belt has slots 1 to 5'
+            : need > r.build.level
+              ? `it needs character level ${need}`
+              : null;
+      if (why) console.log(`Not possible: ${why}`);
+      else console.log(equipFlask(r, n(0), n(1) - 1) ? 'Done' : 'Not possible');
       break;
-    case 'socket':
-      console.log(socketGem(r, args[0] as EquipSlot, n(1) - 1, n(2)) ? 'Done' : 'Not possible');
+    }
+    case 'socket': {
+      const ok = socketGem(r, args[0] as EquipSlot, n(1) - 1, n(2));
+      console.log(
+        ok
+          ? 'Done'
+          : 'Not possible: check the slot name (see "gear"), the socket number (1-based, empty or not) and that the gem is carried (see "gems")',
+      );
       break;
+    }
     case 'unsocket':
       unsocketGem(r, args[0] as EquipSlot, n(1) - 1);
       break;
