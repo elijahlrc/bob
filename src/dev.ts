@@ -233,7 +233,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
       const run = controller.run;
       if (!run) return 0;
       run.map = map;
-      run.offers = rollOffers(run.seed, map, run.vitals);
+      run.offers = rollOffers(run.seed, map);
       controller.goTo('camp');
       controller.bus.emit('state', null);
       return run.offers.length;

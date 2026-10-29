@@ -10,7 +10,6 @@ import {
 } from '../data/themes';
 import { rollMapAffixes } from '../gen/mapPlan';
 import { BOSS_MAP_NO_AFFIX, bossForMap } from '../data/bosses';
-import { fullVitals, type Vitals } from '../sim/types';
 import { STOP_FROM, STOP_WINDOW, STOPS, type StopId } from '../data/stops';
 
 /**
@@ -66,15 +65,11 @@ export function rollThemes(seed: number, map: number): string[] {
 export const OFFSETS = [0, -2, 2] as const;
 /** Level offsets start here; the first four maps (and the early skill picks) are all at the map's own level. */
 export const OFFSETS_FROM_MAP = 5;
-/** Weights of the offsets [0, −2, +2] for a non-anchor offer; the −2 weight doubles when the character is hurt. */
+/**
+ * Weights of the offsets [0, −2, +2] for a non-anchor offer. Until 2026-10-28 the −2 weight doubled when life or a flask
+ * was below 60%; the offers no longer look at the character (the owner).
+ */
 const OFFSET_WEIGHTS = [60, 20, 20];
-/** Below this fraction of life, or of any flask's charges, the character counts as hurt. */
-export const HURT_BELOW = 0.6;
-
-/** Whether the character is low enough on life or flask charges that a recovery offer should show up more often. */
-export function isHurt(v: Vitals): boolean {
-  return v.life < HURT_BELOW || Object.values(v.flasks).some((f) => f < HURT_BELOW);
-}
 
 /** The offer in a slot: its theme, level, type and the affixes the map rolls (docs/MAPS.md 4.1). */
 export function makeOffer(
@@ -102,16 +97,12 @@ export const TYPE_CHANCE = 0.35;
 /** One typed offer per set before this map, two from it. */
 export const TWO_TYPES_FROM = 40;
 
-/** A Respite is offered only when life, mana or a flask is below this fraction. */
-export const RESPITE_BELOW = 0.9;
-/** ... and is always offered when life is below this fraction. */
-export const RESPITE_ALWAYS_BELOW = 0.4;
-/** The chance that each of the other two slots is a Respite, when one is allowed. */
-export const RESPITE_CHANCE = 0.1;
-
-function anyBelow(v: Vitals, f: number): boolean {
-  return v.life < f || v.mana < f || Object.values(v.flasks).some((c) => c < f);
-}
+/**
+ * The chance that a set holds a Respite, in one of the two slots after the anchor. Since 2026-10-28 (flask scarcity, the
+ * owner) the Respite does not look at the character: it was offered only below 90% life, mana or flask (10% a slot) and
+ * always below 40% life; now the seed alone decides, and the level before a boss always has one.
+ */
+export const RESPITE_CHANCE = 0.3;
 
 /** A Respite takes the place of a map in a slot. */
 export function makeRespite(map: number, slot: number): MapOffer {
@@ -189,28 +180,31 @@ export function stopAt(seed: number, map: number): StopId | null {
 /**
  * The set of offers for a level. Rolled once when the previous level ends, then stored in the save. A boss map has one.
  * The first offer (the anchor) is always a map at the map's own level; the others may sit two levels above or
- * below it, and one of them may be a Respite when the character is worn down (docs/MAPS.md 4.2).
+ * below it, and one of them may be a Respite (docs/MAPS.md 4.2). The seed and the level alone decide it, never the
+ * character's state (the owner, 2026-10-28).
  */
-export function rollOffers(seed: number, map: number, vitals: Vitals = fullVitals()): MapOffer[] {
+export function rollOffers(seed: number, map: number): MapOffer[] {
   // A boss map is the one way on (docs/BOSSES.md 10): a single map at its own level, its theme the first drawn.
   if (bossForMap(map)) return [makeOffer(seed, map, 0, rollThemes(seed, map)[0])];
   const rng = new Rng(seed).fork(`offsets${map}`);
-  const weights = isHurt(vitals) ? [60, 40, 20] : OFFSET_WEIGHTS;
   const typeRng = new Rng(seed).fork(`types${map}`);
   const restRng = new Rng(seed).fork(`rest${map}`);
   const unlocked = typesFor(map);
   // A Respite needs a map after the first four and not a mini-boss or boss map (every tenth).
-  const mayRest = map >= OFFSETS_FROM_MAP && map % 10 !== 0 && anyBelow(vitals, RESPITE_BELOW);
-  const r1 = restRng.chance(RESPITE_CHANCE);
-  const r2 = restRng.chance(RESPITE_CHANCE);
-  const restSlot = !mayRest ? -1 : vitals.life < RESPITE_ALWAYS_BELOW ? 2 : r1 ? 1 : r2 ? 2 : -1;
+  const mayRest = map >= OFFSETS_FROM_MAP && map % 10 !== 0;
+  const rest = restRng.chance(RESPITE_CHANCE);
+  const restAt = restRng.chance(0.5) ? 1 : 2;
+  // The level before a boss always offers one (2026-10-28): kills no longer refill the flasks a boss fight needs.
+  const beforeBoss = bossForMap(map + 1) !== null;
+  const restSlot = !mayRest ? -1 : beforeBoss ? 2 : rest ? restAt : -1;
   // A stop takes a slot that is neither the anchor nor the Respite's; its streams are its own, so the maps are the same with or without it.
   const stop = stopAt(seed, map);
   const free = [1, 2].filter((s) => s !== restSlot);
   const stopSlot = stop && free.length ? new Rng(seed).fork(`stopslot${map}`).pick(free) : -1;
   let typed = 0;
   return rollThemes(seed, map).map((themeId, slot) => {
-    const offset = slot === 0 || map < OFFSETS_FROM_MAP ? 0 : rng.weighted([...OFFSETS], weights);
+    const offset =
+      slot === 0 || map < OFFSETS_FROM_MAP ? 0 : rng.weighted([...OFFSETS], OFFSET_WEIGHTS);
     // The type roll is made for every slot, so the sets do not shift when a cap is reached.
     const hit = typeRng.chance(TYPE_CHANCE);
     const pick = unlocked.length ? typeRng.pick(unlocked).id : 'plain';

@@ -211,13 +211,13 @@ export function mapSeed(run: RunState, offer: MapOffer): number {
 /** Go to a given map number and roll its offers (a new level, and tests and demos that jump ahead). */
 export function setMap(run: RunState, map: number): void {
   run.map = map;
-  run.offers = rollOffers(run.seed, map, run.vitals);
+  run.offers = rollOffers(run.seed, map);
 }
 
 /** The level is over: the counter advances by one and the next level's offers are rolled (every way out of a level ends here). */
 export function advanceLevel(run: RunState): void {
   run.map += 1;
-  run.offers = rollOffers(run.seed, run.map, run.vitals);
+  run.offers = rollOffers(run.seed, run.map);
   waysideOf(run).found = null;
 }
 
@@ -378,7 +378,10 @@ export function finishMap(run: RunState, res: MapResult): void {
   collectPicked(run, res);
   let found: ProvisionId | null = null;
   // Camp restores part of what the map cost (10 s of sitting still).
-  run.vitals = restAtCamp(run.build, run.map, res.vitals);
+  run.vitals = restAtCamp(run.build, run.map, {
+    ...res.vitals,
+    flasks: keptFlasks(run, res.vitals),
+  });
   if (res.status === 'cleared') {
     run.refundPoints += 1;
     // A cleared map may leave a provision in the pouch (docs/WAYSIDE.md 6.1); camp says so after the level advances.
@@ -397,6 +400,20 @@ export function finishMap(run: RunState, res: MapResult): void {
   advanceLevel(run);
   waysideOf(run).found = found;
   run.phase = 'camp';
+}
+
+/**
+ * The charges of every flask still owned, worn or not. Kills give no charges (FLASK_CHARGES_ON_KILL), so a flask taken
+ * off and put back on keeps what it had; a flask never worn starts full.
+ */
+function keptFlasks(run: RunState, now: Vitals): Vitals['flasks'] {
+  const owned = new Set<number>();
+  for (const it of [...run.build.flasks, ...run.inventory])
+    if (it?.kind === 'flask') owned.add(it.uid);
+  const out: Vitals['flasks'] = {};
+  for (const [uid, c] of Object.entries({ ...run.vitals.flasks, ...now.flasks }))
+    if (owned.has(Number(uid))) out[Number(uid)] = c;
+  return out;
 }
 
 /**

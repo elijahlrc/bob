@@ -1,6 +1,7 @@
 import { mod, type Mod } from '../mods/types';
 import { BASE_ROWS } from './baseTables';
 import type { BuffId } from './buffs';
+import { FLASK_CAPACITY_SCALE } from './constants';
 
 /**
  * DESIGN.md §11.6. The flask bases are the reference game's (reference/docs/AUDIT-ITEM-BASES.md): twelve life and twelve mana
@@ -66,7 +67,7 @@ function flasksOf(kind: FlaskKind): FlaskBase[] {
       level: r.level,
       life,
       mana,
-      maxCharges,
+      maxCharges: Math.round(maxCharges * FLASK_CAPACITY_SCALE),
       perUse,
       duration,
       buff: u?.buff ?? [],
@@ -83,7 +84,7 @@ const util = (id: string, name: string, level: number): FlaskBase => ({
   level,
   life: 0,
   mana: 0,
-  maxCharges: 50,
+  maxCharges: Math.round(50 * FLASK_CAPACITY_SCALE),
   perUse: 25,
   duration: 6,
   buff: [],

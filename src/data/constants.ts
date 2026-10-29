@@ -113,8 +113,15 @@ export const PROJECTILE_SPEED = 12;
 export const RECENT = 4;
 
 // §6.9 Flasks.
-/** Charges a kill grants each flask, by the monster's rarity (as in the reference game; fractions are kept). */
-export const FLASK_CHARGES_ON_KILL = { normal: 1, magic: 3.5, rare: 6, unique: 11 } as const;
+/**
+ * Charges a kill grants each flask, by the monster's rarity (fractions are kept). None since 2026-10-28 (the owner, flask
+ * scarcity): flask charges are a run's lasting resource, refilled by a Respite or a reprieve, not by killing. The
+ * reference game's table was { normal: 1, magic: 3.5, rare: 6, unique: 11 }; "increased flask charges gained" multiplies
+ * this, so it does nothing until a flat source exists.
+ */
+export const FLASK_CHARGES_ON_KILL = { normal: 0, magic: 0, rare: 0, unique: 0 } as const;
+/** Every flask base holds this many times the reference game's charges (2026-10-28: five drinks of the first life flask, not three). */
+export const FLASK_CAPACITY_SCALE = 1.75;
 
 // Duels (docs/DUEL.md 4.4).
 /**

@@ -1,6 +1,7 @@
 import type { World } from '../sim/types';
 import { Character, sheetDps, type CharacterSheet } from '../calc/character';
 import { itemBase } from '../data/bases';
+import { bossForMap } from '../data/bosses';
 import { flaskBase } from '../data/flasks';
 import { gemDef, type ActiveGemDef, type SupportGemDef } from '../data/gems';
 import { resolveActive } from '../calc/gems';
@@ -165,6 +166,8 @@ export function offerCharacter(run: RunState, offer: MapOffer): Character {
 
 /** The bot rests (takes a Respite) when its life is below this fraction. */
 const REST_BELOW = 0.35;
+/** ... or on the level before a boss, when its emptiest flask is below this fraction. */
+const REST_FLASKS_BEFORE_BOSS = 0.6;
 
 /** Which of the offered maps the bot takes. */
 export type ThemeRule = 'first' | 'best' | 'random' | 'lowball' | 'resting' | 'stopper';
@@ -207,9 +210,13 @@ export function chooseOffer(run: RunState, rule: ThemeRule = 'best', rng?: Rng):
       bestValue = v;
     }
   }
-  // Worn down, the bot takes a Respite if one is offered: it costs the level, but it is the only full recovery.
+  // Worn down, the bot takes a Respite if one is offered: it costs the level, but it is the only full recovery. Before a
+  // boss it also rests for its flasks, which kills no longer refill.
   const respite = run.offers.find((o) => o.kind === 'respite');
-  if (respite && run.vitals.life < REST_BELOW) return respite;
+  const flasks = Math.min(1, ...Object.values(run.vitals.flasks));
+  const bossNext = bossForMap(run.map + 1) !== null;
+  if (respite && (run.vitals.life < REST_BELOW || (bossNext && flasks < REST_FLASKS_BEFORE_BOSS)))
+    return respite;
   if (stopSlot >= 0 && botWantsStop(run, stopSlot)) return run.offers[stopSlot];
   return best;
 }
