@@ -2,7 +2,14 @@ import { TOLL_TELL, TOLL_WARN } from '../../data/bosses';
 import { ECHO_GAP, HIT_AT } from '../../data/constants';
 import { bossState } from '../../sim/bosses';
 import type { Action, Actor } from '../../sim/types';
-import { RELEASE_LANDS, type AnimName } from './figure';
+import {
+  HERO_THREE_QUARTER,
+  RELEASE_LANDS,
+  VIEW_HOLD,
+  viewAngle,
+  viewFor,
+  type AnimName,
+} from './figure';
 
 /** How long a boss's blow plays. */
 const RELEASE_SECONDS = 0.7;
@@ -63,9 +70,12 @@ export class AnimTrack {
   face = 1;
   /** Same for the isometric camera (screen-x direction). */
   faceIso = 1;
+  /** Which way a figure with a front and a back (a hero) is seen: a `HeroView`, set by `turnView` from where it looks on screen. */
+  view: number = HERO_THREE_QUARTER;
   /** Low-passed velocity (tiles/s) and seconds until the figure may turn around again. */
   private vx = 0;
   private vsx = 0;
+  private vsy = 0;
   private turnCd = 0;
   speed = 0;
   /** Seconds since the figure started its current attack. */
@@ -80,6 +90,18 @@ export class AnimTrack {
   private moves = -1;
   /** Seconds left of the slide after a knockback (see `knocked`). */
   slideT = 0;
+
+  /**
+   * Look toward the screen direction (sx right, sy down): the view whose angle is nearest, kept until the heading is well past
+   * the edge between two, so a path along a boundary does not flicker. Returns whether the view changed.
+   */
+  private turnView(sx: number, sy: number): boolean {
+    const deg = (Math.atan2(sy, Math.abs(sx)) * 180) / Math.PI;
+    const now = viewAngle(this.view);
+    if (Math.abs(deg - now) < 45 / 2 + VIEW_HOLD) return false;
+    this.view = viewFor(deg);
+    return true;
+  }
 
   /** The sim threw this actor back: it moves at once, so the picture eases there over a moment instead of snapping. */
   knocked(): void {
@@ -147,6 +169,7 @@ export class AnimTrack {
     if (dt > 0) {
       this.vx += (dx / dt - this.vx) * k2;
       this.vsx += ((dx - dy) / dt - this.vsx) * k2;
+      this.vsy += ((dx + dy) / 2 / dt - this.vsy) * k2;
     }
     this.turnCd -= dt;
     if (a.action) {
@@ -154,14 +177,16 @@ export class AnimTrack {
       const fs = fx - Math.sin(a.facing);
       const nf = Math.abs(fx) > 0.2 ? (fx > 0 ? 1 : -1) : this.face;
       const ns = Math.abs(fs) > 0.2 ? (fs > 0 ? 1 : -1) : this.faceIso;
-      if (nf !== this.face || ns !== this.faceIso) this.turnCd = 0.15;
+      const nv = this.turnView(fs, (fx + Math.sin(a.facing)) / 2);
+      if (nf !== this.face || ns !== this.faceIso || nv) this.turnCd = 0.15;
       this.face = nf;
       this.faceIso = ns;
     } else if (this.turnCd <= 0) {
       // Turn only on sustained motion and not more than ~6 times a second, so noise can't flicker the flip.
       const nf = Math.abs(this.vx) > 0.5 ? (this.vx > 0 ? 1 : -1) : this.face;
       const ns = Math.abs(this.vsx) > 0.5 ? (this.vsx > 0 ? 1 : -1) : this.faceIso;
-      if (nf !== this.face || ns !== this.faceIso) this.turnCd = 0.15;
+      const nv = Math.hypot(this.vsx, this.vsy) > 0.5 && this.turnView(this.vsx, this.vsy);
+      if (nf !== this.face || ns !== this.faceIso || nv) this.turnCd = 0.15;
       this.face = nf;
       this.faceIso = ns;
     }

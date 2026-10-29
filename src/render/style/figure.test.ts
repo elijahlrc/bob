@@ -8,6 +8,8 @@ import { createDuelWorld } from '../../sim/duel';
 import { AnimTrack } from './anim';
 import {
   buildFigure,
+  HERO_SIDE,
+  HERO_VIEWS,
   heroFigure,
   poseFor,
   poseForType,
@@ -66,6 +68,38 @@ describe('figure rig (shared by all visual styles)', () => {
   });
 });
 
+describe('a hero seen from every side', () => {
+  const HEROES = KINDS.filter((k) => k.startsWith('hero_'));
+  const eyes = (view: number) =>
+    buildFigure('hero_sword', poseFor('hero_sword', 'idle', 0), undefined, 0, view).filter(
+      (p) => p.k === 'circ' && p.role === 'eye',
+    ).length;
+
+  it('builds finite primitives in every view, pose and time', () => {
+    for (const kind of HEROES)
+      for (let view = 0; view < HERO_VIEWS; view++)
+        for (const anim of ANIMS)
+          for (const t of [0, 0.4, 0.8]) {
+            const prims = buildFigure(kind, poseFor(kind, anim, t), undefined, t, view);
+            expect(prims.length).toBeGreaterThan(12);
+            expect(JSON.stringify(prims)).not.toMatch(/null|NaN/);
+          }
+  });
+
+  it('shows two eyes from the front, one from the side and none from behind', () => {
+    expect([0, 1, 2, 3, 4].map(eyes)).toEqual([2, 2, 1, 0, 0]);
+  });
+
+  it('draws every view differently, and the side view by default', () => {
+    const pose = poseFor('hero_mace', 'walk', 0.2);
+    const looks = Array.from({ length: HERO_VIEWS }, (_, v) =>
+      JSON.stringify(buildFigure('hero_mace', pose, undefined, 0, v)),
+    );
+    expect(new Set(looks).size).toBe(HERO_VIEWS);
+    expect(JSON.stringify(buildFigure('hero_mace', pose))).toBe(looks[HERO_SIDE]);
+  });
+});
+
 describe('animation tracking', () => {
   const actor = (over: Partial<Actor> = {}): Actor =>
     ({
@@ -78,6 +112,41 @@ describe('animation tracking', () => {
       ail: { freezeT: 0 },
       ...over,
     }) as unknown as Actor;
+
+  /** Walk a figure a few steps one way in the world and return the view it settles on, and the way it faces on screen. */
+  const walked = (dx: number, dy: number, from = new AnimTrack()) => {
+    const a = actor();
+    for (let i = 0; i < 30; i++) {
+      a.x += dx;
+      a.y += dy;
+      from.update(a, 1 / 60);
+    }
+    return [from.view, from.faceIso, from] as const;
+  };
+
+  it('turns a hero to the camera, away from it or side on by where it walks on screen', () => {
+    // On the isometric camera the world diagonal (1, 1) runs straight down the screen and (1, -1) straight across it.
+    expect(walked(0.05, 0.05).slice(0, 2)).toEqual([0, 1]);
+    expect(walked(-0.05, -0.05).slice(0, 2)).toEqual([4, 1]);
+    expect(walked(0.05, -0.05).slice(0, 2)).toEqual([2, 1]);
+    expect(walked(-0.05, 0.05).slice(0, 2)).toEqual([2, -1]);
+    // A walk along a world axis is three-quarters on.
+    expect(walked(0.07, 0).slice(0, 2)).toEqual([1, 1]);
+    expect(walked(0, -0.07).slice(0, 2)).toEqual([3, 1]);
+  });
+
+  it('keeps the view while the heading wanders along the edge between two', () => {
+    const [view, , t] = walked(0.05, -0.05);
+    expect(view).toBe(2);
+    // A little down the screen from side on is still side on.
+    const a = actor({ x: 5, y: 5 });
+    for (let i = 0; i < 30; i++) {
+      a.x += 0.06;
+      a.y -= 0.03;
+      t.update(a, 1 / 60);
+    }
+    expect(t.view).toBe(2);
+  });
 
   it('derives idle, walk, attack, stun and death states', () => {
     const t = new AnimTrack();
