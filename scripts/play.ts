@@ -42,7 +42,6 @@ import { armProvision, pouchLimit } from '../src/run/provisions';
 import { standingEffects } from '../src/run/reprieves';
 import {
   craftAtRespite,
-  leaveRespite,
   respiteCraftCost,
   respiteItems,
   respiteVisit,
@@ -81,14 +80,13 @@ const HELP = `Commands (the run is saved in ${file} after each):
   tree [all]                  passive points and the nodes you can reach next (all: notables within 6 steps)
   strategy                    the flask belt's settings
   look <offer>                what an offer holds (a map's affixes, a stop's choices, the Respite's crafts)
-  go <offer>                  play the map offer (or rest, for a Respite offer)
+  go <offer>                  play the map offer (or rest and leave, for a Respite offer)
   stop <offer> <json>         take a stop with a choice, e.g. stop 1 '{"stop":"shrine","blessing":"vigour"}'
                                 gemHoard: {"stop":"gemHoard","tag":"fire","picks":["gemId",...]}
                                 quartermaster: {"stop":"quartermaster","buy":["0","4"],"refill":true}
                                 ferryman: {"stop":"ferryman","reprieve":"<id>"}
   restock <offer>             buy new wares at the Quartermaster (paid at once)
-  craft <offer> <affix|tier|socket> <itemUid> [affixFamily]   craft at the Respite (first free, then Bone Dust)
-  leave                       leave a Respite after crafting (the level passes, no refill)
+  craft <offer> <affix|tier|socket> <itemUid> [affixFamily]   craft at the Respite (first free, then Bone Dust by item level)
   pick <n> | skip             take reward card n (from status), or none
   equip <uid> [slot]          wear an item (best slot if none given)
   flask <uid> <1-5>           put a flask in a belt slot
@@ -161,7 +159,7 @@ function flaskLine(run: RunState): string {
 
 function offerLine(o: MapOffer, i: number): string {
   if (o.kind === 'respite')
-    return `${i}) Respite (level ${o.areaLevel}): rest and refill everything, or craft on an item`;
+    return `${i}) Respite (level ${o.areaLevel}): craft on items, then rest and refill everything`;
   if (o.kind === 'stop')
     return `${i}) Stop: ${stopName(o.stop!)} (level ${o.areaLevel}): ${stopDef(o.stop!).text}`;
   const aff = o.affixes.map((id) => affixText(mapAffixDef(id), o.areaLevel)).join('; ');
@@ -217,7 +215,7 @@ function status(run: RunState): void {
   const visit = respiteVisit(run);
   if (visit)
     console.log(
-      `At a Respite (offer ${visit.slot}): ${visit.crafts} crafts made; craft more or "leave".`,
+      `At a Respite (offer ${visit.slot}): ${visit.crafts} crafts made; craft more or "go" to rest and leave.`,
     );
   console.log('Offers:');
   run.offers.forEach((o, i) => console.log('  ' + offerLine(o, i)));
@@ -315,12 +313,12 @@ function look(run: RunState, i: number): void {
   console.log(offerLine(o, i));
   if (o.kind === 'respite') {
     console.log(
-      `Rest: "go ${i}". Craft: the next costs ${respiteCraftCost(run)} Bone Dust (you have ${run.dust}).`,
+      `Rest and leave: "go ${i}". Crafts made: ${respiteVisit(run)?.crafts ?? 0}; you have ${run.dust} Bone Dust.`,
     );
     for (const k of ['affix', 'tier', 'socket'] as const) {
       const items = respiteItems(run, k);
       console.log(
-        `  ${k}: ${items.map((it) => `${it.name} [uid ${it.uid}]`).join(', ') || 'nothing'}`,
+        `  ${k}: ${items.map((it) => `${it.name} [uid ${it.uid}] (${respiteCraftCost(run, it)} Dust)`).join(', ') || 'nothing'}`,
       );
       if (k === 'tier')
         for (const it of items)
@@ -379,11 +377,8 @@ function play(run: RunState, i: number): void {
   if (!o) return void console.log('No such offer');
   if (o.kind === 'stop') return void console.log('That is a stop: use "look" and "stop".');
   if (o.kind === 'respite') {
-    console.log(
-      restAtRespite(run)
-        ? 'Rested: everything refilled, the level passes.'
-        : 'You crafted here: "leave" instead.',
-    );
+    restAtRespite(run);
+    console.log('Rested: everything refilled, the level passes.');
     return;
   }
   const before = run.map;
@@ -485,9 +480,6 @@ function run(): void {
       }
       break;
     }
-    case 'leave':
-      leaveRespite(r);
-      break;
     case 'pick': {
       const card = r.reward?.[n(0) - 1];
       console.log(card && takeReward(r, card.uid) ? `Took ${desc(card as never)}` : 'No such card');

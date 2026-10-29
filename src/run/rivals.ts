@@ -671,10 +671,11 @@ function strategyOk(s: unknown): boolean {
   if (!oneOf(s.utilityFlask, UTILITY_FLASK_NAMES)) return false;
   if (s.flasks !== undefined) {
     if (!isObj(s.flasks)) return false;
-    const { at, use } = s.flasks;
+    const { at, manaAt, use } = s.flasks;
     const list = (v: unknown, ok: (x: unknown) => boolean) =>
       v === undefined || (Array.isArray(v) && v.length <= 5 && v.every((x) => x === null || ok(x)));
-    if (!list(at, (x) => typeof x === 'number' && x >= 0 && x <= 1)) return false;
+    const share = (x: unknown) => typeof x === 'number' && x >= 0 && x <= 1;
+    if (!list(at, share) || !list(manaAt, share)) return false;
     if (!list(use, (x) => isStr(x, 32) && x in UTILITY_FLASK_NAMES)) return false;
   }
   if (

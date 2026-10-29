@@ -35,7 +35,8 @@ that later design work starts from it.
 **Flask controls**
 
 - Flasks drink in belt order, with thresholds set by position (for example the first at 80%, the second at 60%), each
-  editable. Life and mana flasks have separate orders. Each utility flask has a condition.
+  editable. Life and mana flasks have separate orders. Each utility flask has a condition. A hybrid flask has both a life
+  and a mana threshold (2026-10-29).
 - No look-ahead rules in the default AI. The two automatic rules that exist (drink before an unavoidable lethal blow,
   drink a cleansing flask when it would clear something) are re-evaluated at the end.
 
@@ -44,7 +45,8 @@ that later design work starts from it.
 - Self-sustaining builds meet emergencies: frequent, slightly different challenges to regeneration, leech and energy
   shield (less regeneration, chaos through the shield, monsters that can't be leeched...), from map affixes, monster
   affixes, monster types, bosses and maybe more, so builds have to be robust to all of them.
-- Energy shield gets a moderate cut. The two keystones that set maximum life to 1 (Hollow Vessel and Living Ward) go.
+- Energy shield gets a moderate cut, the same share on item bases and on affixes, set by one constant that will be tuned
+  again (2026-10-29). The two keystones that set maximum life to 1 (Hollow Vessel and Living Ward) go.
 - The passive tree is rebuilt: not from scratch, but with substantial changes in every region. Where the flask-charge
   nodes go is decided in that pass. The Shade's start (the TODO item) is reworked in the same pass.
 
@@ -52,15 +54,17 @@ that later design work starts from it.
 
 - About a quarter to a third of the sets hold one, and the level before every boss always does.
 - Level generation never depends on the character's state.
-- It is rest or craft. Rest refills everything. Craft adds a random affix to a worn item or raises one of its affixes a
-  tier; the first craft of a visit is free and more cost Bone Dust.
+- It heals and offers crafts (2026-10-29; it was rest or craft). Rest refills everything. Craft adds a random affix to a
+  worn item or raises one of its affixes a tier; the first craft of a visit is free and more cost Bone Dust, scaling with
+  the item's level. Some other choice may be offered there too; what it is, is open.
 - The Awlsmith folds into the Respite. The Workbench stays closed.
 
 **Stops**
 
 - A stop keeps costing the whole level.
 - Stops come somewhat at random, about one in five levels, not counting Respites.
-- The Shrine, the Gem Hoard and the Ferryman stay and get stronger. The Quartermaster is rebuilt, with a flask refill
+- The Shrine, the Gem Hoard and the Ferryman stay and get stronger. The Shrine needs a rework; until then its blessing
+  lasts ten levels, and the Shrine says so (2026-10-29). The Quartermaster is rebuilt, with a flask refill
   and a restock, both for Bone Dust.
 - Rewards may be temporary or permanent, and temporary debuffs are possible too.
 - An effects bar near the top of the Character tab, on its own purple ground, shows the character's buffs and debuffs and
@@ -87,7 +91,8 @@ that later design work starts from it.
 - What the emergencies are, one by one.
 - Telling the player about upcoming Respites ("Respite in 2 levels"): the owner is interested; whether, and how far
   ahead, is open.
-- How long a Shrine blessing lasts, now that stops come at random.
+- The Shrine's rework.
+- A further choice at the Respite, beside healing and crafting.
 - What makes the Gem Hoard and the Ferryman stronger.
 - The run rewards, where they come from, and whether a new stop is built around them.
 - The two automatic flask rules: decided 2026-10-29 (bracing with instant flasks only, cleansing kept; section 6); open to change.
@@ -120,7 +125,7 @@ the changes after three playtests.
 
 **Levels without a fight**
 
-- The Respite: rest or craft; Bone Dust at camp. Built.
+- The Respite: crafts, then rest (rest or craft until the owner's review); Bone Dust at camp. Built.
 - Stops: the new schedule, the stronger Shrine, Gem Hoard and Ferryman, the rebuilt Quartermaster, the Awlsmith gone.
   Built.
 - The effects bar. Built.
@@ -236,3 +241,16 @@ the changes after three playtests.
 - **2026-10-29, the two automatic flask rules.** Bracing before an unavoidable blow now drinks only an instant life
   flask (Bursting): one that heals over seconds came too late and spent scarce charges. Cleansing is kept: a flask
   with a cleansing suffix exists to be drunk for its ailment.
+- **2026-10-29, the owner's review of the log.** Five answers, built the same day:
+  - **Hybrid flasks** have both thresholds on the Strategy tab and drink below either (`flasks.manaAt` beside `at`). The
+    mana one defaults by position in the mana order, as before.
+  - **Respite craft costs** scale with the item's level as the Quartermaster's wares do (`priceAt`): the bases come down to
+    20, 60 and 180 (about 22/66/198 Bone Dust at item level 5, 44/132/396 at 60). The first craft stays free. Each item in
+    the list shows its price.
+  - **The Shrine** blessing lasts ten levels (`BLESSING_LEVELS`), and its card and screen say so. Its rework is open.
+  - **The Respite heals and crafts.** Craft as often as the Dust allows, then "Rest and leave" refills everything and
+    passes the level; Back is there only until a craft is made. The other choice it may offer is open.
+  - **Energy shield affixes** take the same cut as the bases: one constant, `ENERGY_SHIELD_SCALE` in `data/constants.ts`
+    (moved from `data/bases.ts`), scales the bases and the flat energy shield of every affix tier when the families are
+    built. Percent increases are untouched (cutting them too would cut twice). Rolls are stored, so items found before a
+    change to the constant keep theirs; the bases follow it at once. Unique items' energy shield is untouched.

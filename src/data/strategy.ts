@@ -65,10 +65,12 @@ export type UtilityFlaskUse = 'bosses' | 'rares' | 'packs' | 'always';
 
 /**
  * The flask belt's own settings, by belt slot (docs/ATTRITION.md): a life or hybrid flask's share of life below which it is
- * drunk, a mana flask's share of mana, a utility flask's condition. Unset slots take the defaults by position.
+ * drunk, a mana flask's share of mana, a hybrid flask's share of mana (`manaAt`), a utility flask's condition. Unset slots
+ * take the defaults by position.
  */
 export type FlaskRules = {
   at?: (number | null)[];
+  manaAt?: (number | null)[];
   use?: (UtilityFlaskUse | null)[];
 };
 
@@ -143,7 +145,7 @@ export type FlaskRule = { life?: number; mana?: number; use?: UtilityFlaskUse };
 
 /**
  * What each belt slot's flask is drunk for, from the kinds in the belt and the strategy: a life threshold for a life or hybrid
- * flask, a mana threshold for a mana or hybrid flask (a hybrid's own setting is its life threshold), a condition for a utility
+ * flask, a mana threshold for a mana or hybrid flask (a hybrid has both and is drunk below either), a condition for a utility
  * flask. Defaults go by position in the life and mana orders.
  */
 export function flaskRules(
@@ -161,7 +163,7 @@ export function flaskRules(
       lifePos++;
     }
     if (k === 'mana' || k === 'hybrid') {
-      const own = k === 'mana' ? set : undefined;
+      const own = k === 'mana' ? set : (s?.flasks?.manaAt?.[slot] ?? undefined);
       rule.mana = own ?? MANA_FLASK_AT[Math.min(manaPos, MANA_FLASK_AT.length - 1)];
       manaPos++;
     }

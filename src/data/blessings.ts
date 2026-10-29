@@ -85,4 +85,4 @@ export const BLESSING_AFFIXES: MapAffixDef[] = BLESSINGS.map((b) => ({
 /** How many blessings a Shrine offers. */
 export const SHRINE_CHOICES = 3;
 /** A blessing holds for this many levels after its Shrine (docs/ATTRITION.md, 2026-10-29; it held until the next stop). */
-export const BLESSING_LEVELS = 5;
+export const BLESSING_LEVELS = 10;

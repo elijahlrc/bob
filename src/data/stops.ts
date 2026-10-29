@@ -41,8 +41,8 @@ export const STOPS: StopDef[] = [
   {
     id: 'shrine',
     name: 'The Shrine',
-    text: 'A blessing for five levels.',
-    how: 'Choose a blessing.',
+    text: 'A blessing for ten levels.',
+    how: 'Choose a blessing for the next ten levels.',
     flavour: 'Someone still prays down here. Not for you, but it will do.',
     weight: 25,
     from: 6,

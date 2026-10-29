@@ -327,7 +327,7 @@ export function Camp({ c }: { c: Controller }) {
   }, [tab]);
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
-  // The Respite's screen (docs/ATTRITION.md) shares the slot; a visit with crafts made keeps it open until the player leaves.
+  // The Respite's screen (docs/ATTRITION.md) shares the slot; a visit with crafts made keeps it open until the player rests.
   const visit = run ? waysideOf(run).respite : null;
   const respiteSlot = visit ? visit.slot : stopSlot;
   useEffect(() => {
@@ -461,7 +461,7 @@ export function Camp({ c }: { c: Controller }) {
                   >
                     <div class="theme-name">Respite</div>
                     <div class="muted">Level {o.areaLevel}</div>
-                    <div class="affix">Rest and refill everything, or craft on an item.</div>
+                    <div class="affix">Craft on your items, then rest and refill everything.</div>
                   </button>
                 </div>
               );

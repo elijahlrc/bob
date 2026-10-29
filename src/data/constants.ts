@@ -128,6 +128,12 @@ export const FLASK_CAPACITY_SCALE = 1.75;
 export const FLASK_MANA_CAPACITY_SCALE = 2.75;
 /** A utility flask's effect lasts this many times the reference game's (2026-10-29: each drink is scarcer, so worth more). */
 export const FLASK_UTILITY_DURATION_SCALE = 1.5;
+/**
+ * Energy shield, as a multiple of the reference numbers: every item base's, and every affix's flat energy shield (its rolls,
+ * so items found before a change keep theirs). A moderate cut since 2026-10-29 (the owner, docs/ATTRITION.md): with kills no
+ * longer refilling flasks, a shield that recharges in full between fights was the strongest way to last a run.
+ */
+export const ENERGY_SHIELD_SCALE = 0.75;
 
 // Duels (docs/DUEL.md 4.4).
 /**

@@ -24,7 +24,7 @@ import { CLASSES, classDef } from '../data/classes';
 import { botCamp } from './bot';
 import { settlePrimary } from './primary';
 import { takeStop, type StopChoice } from './stops';
-import { craftAtRespite, leaveRespite, restAtRespite, type RespiteCraft } from './respite';
+import { craftAtRespite, restAtRespite, type RespiteCraft } from './respite';
 import { waysideOf } from './wayside';
 import {
   addProvision,
@@ -657,7 +657,7 @@ export class Controller {
     const run = this.run;
     if (!run) return;
     const offer = run.offers[offerIdx] ?? run.offers[0];
-    // A Respite is no map: resting passes the level and makes the character whole again (crafting there is `craftAtRespite`).
+    // A Respite is no map: resting passes the level and makes the character whole again, after any crafts (`craftAtRespite`).
     if (offer.kind === 'respite') {
       this.undoStack = [];
       this.lastResult = null;
@@ -712,16 +712,6 @@ export class Controller {
     if (res.ok) this.undoStack = [];
     this.changed();
     return res;
-  }
-
-  /** Leave a Respite where crafts were made: the level passes, with no refill. */
-  leaveRespite(): void {
-    const run = this.run;
-    if (!run) return;
-    this.undoStack = [];
-    this.lastResult = null;
-    leaveRespite(run);
-    this.changed();
   }
 
   /** The player has read a first-use explainer (docs/WAYSIDE.md 9.1): it is not shown again in this run. Not an undoable change. */

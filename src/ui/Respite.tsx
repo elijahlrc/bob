@@ -42,8 +42,9 @@ const plaque = (on: boolean) => ({
 });
 
 /**
- * The Respite (docs/ATTRITION.md): rest, or craft on an item. Resting passes the level at once. A craft is made and shown at
- * once; the first of a visit is free, the next cost Bone Dust, and once one is made the player leaves through "Leave".
+ * The Respite (docs/ATTRITION.md): craft on items, then rest. A craft is made and shown at once; the first of a visit is free,
+ * the next cost Bone Dust by the item's level. Resting refills everything and passes the level; before any craft, Back
+ * returns to camp.
  */
 export function RespiteScreen({
   c,
@@ -73,7 +74,7 @@ export function RespiteScreen({
   if (kind && itemUid !== null)
     craft = kind === 'tier' ? (family ? { kind, itemUid, family } : null) : { kind, itemUid };
   const problem = craft ? respiteProblem(run, slot, craft) : 'Choose first';
-  const cost = respiteCraftCost(run);
+  const cost = chosen ? respiteCraftCost(run, chosen) : 0;
 
   const make = () => {
     if (!craft) return;
@@ -94,17 +95,10 @@ export function RespiteScreen({
       <div class="muted stop-level">Level {offer.areaLevel}</div>
       <p class="stop-how">
         {visit
-          ? `Crafts made: ${visit.crafts}. The next costs ${cost ? `${cost} Bone Dust` : 'nothing'}; you have ${run.dust}.`
-          : 'Rest, or craft on one of your items. The first craft is free; more cost Bone Dust.'}
+          ? `Crafts made: ${visit.crafts}. You have ${run.dust} Bone Dust.`
+          : "Craft on your items, then rest. The first craft is free; more cost Bone Dust by the item's level."}
       </p>
       <p class="muted stop-how">{carried(run)}</p>
-      {!visit && (
-        <div class="stop-buttons">
-          <button class="btn primary" onClick={() => c.startMap(slot)}>
-            Rest: refill life, mana, shield and flasks
-          </button>
-        </div>
-      )}
       <div class="stop-body">
         <div class="stop-kinds">
           {KINDS.map(([id, name]) => (
@@ -148,6 +142,7 @@ export function RespiteScreen({
                   {kind === 'socket'
                     ? `${it.sockets.length} → ${it.sockets.length + 1} sockets`
                     : `${it.affixes.length} affix${it.affixes.length === 1 ? '' : 'es'}`}
+                  {respiteCraftCost(run, it) ? ` · ${respiteCraftCost(run, it)} Bone Dust` : ''}
                 </span>
               </button>
             ))}
@@ -185,20 +180,14 @@ export function RespiteScreen({
       )}
       <div class="stop-buttons">
         {kind && (
-          <button
-            class="btn primary"
-            disabled={problem !== null}
-            onClick={make}
-            title={problem ?? ''}
-          >
-            {cost ? `Craft for ${cost} Bone Dust` : 'Craft (free)'}
+          <button class="btn" disabled={problem !== null} onClick={make} title={problem ?? ''}>
+            {!chosen ? 'Craft' : cost ? `Craft for ${cost} Bone Dust` : 'Craft (free)'}
           </button>
         )}
-        {visit ? (
-          <button class="btn" onClick={() => c.leaveRespite()}>
-            Leave
-          </button>
-        ) : (
+        <button class="btn primary" onClick={() => c.startMap(slot)}>
+          Rest and leave
+        </button>
+        {!visit && (
           <button class="btn" onClick={onBack}>
             Back
           </button>

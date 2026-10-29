@@ -1,5 +1,6 @@
 import type { DamageType, Mod, ModKind, SkillTag } from '../mods/types';
 import { ARMOUR_FAMILY_DEFS } from './armourAffixes';
+import { ENERGY_SHIELD_SCALE } from './constants';
 import { tabled } from './tierTables';
 import type { TierTable } from './tierTables';
 import * as W from './weaponTables';
@@ -1157,6 +1158,12 @@ export function expandFamily(def: FamilyDef): Family {
           if (hi < lo) [lo, hi] = [hi, lo];
           return [lo, hi];
         });
+    // Flat energy shield follows the bases' cut (`ENERGY_SHIELD_SCALE`, docs/ATTRITION.md).
+    for (const [j, m] of def.mods.entries())
+      if (m.stat === 'es' && m.kind === 'base' && !m.same && ranges[j]) {
+        const cut = (v: number) => Math.max(1, Math.round(v * ENERGY_SHIELD_SCALE));
+        ranges[j] = [cut(ranges[j][0]), cut(ranges[j][1])];
+      }
     // Higher tiers are rarer: the top tier weighs TOP_TIER_WEIGHT of the lowest, the others fall evenly between.
     const weight = Math.round(
       1000 * (def.weight ?? 1) * (n > 1 ? 1 - (1 - TOP_TIER_WEIGHT) * (i / (n - 1)) : 1),

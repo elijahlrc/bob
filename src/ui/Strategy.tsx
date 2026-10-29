@@ -471,21 +471,31 @@ function FlaskBelt({ c, ch }: { c: Controller; ch: Character }) {
                 onChange={(v) => c.act((r) => setFlaskRule(r, slot, { use: v }))}
               />
             );
-          const mana = kinds[slot] === 'mana';
-          const at = (mana ? rule.mana : rule.life)!;
-          const choices = [...new Set([...FLASK_AT_CHOICES, at])].sort((a, b) => a - b);
-          return (
+          const threshold = (
+            pool: 'life' | 'mana',
+            at: number,
+            key: 'at' | 'manaAt',
+            lbl: string,
+          ) => (
             <Pick<number>
-              key={slot}
-              label={label}
+              key={`${slot}${key}`}
+              label={lbl}
               value={at}
-              options={choices.map((v): [number, string] => [
-                v,
-                `Below ${pct(v)} ${mana ? 'mana' : 'life'}`,
-              ])}
-              onChange={(v) => c.act((r) => setFlaskRule(r, slot, { at: v }))}
+              options={[...new Set([...FLASK_AT_CHOICES, at])]
+                .sort((a, b) => a - b)
+                .map((v): [number, string] => [v, `Below ${pct(v)} ${pool}`])}
+              onChange={(v) => c.act((r) => setFlaskRule(r, slot, { [key]: v }))}
             />
           );
+          // A hybrid flask is drunk below either of its thresholds.
+          if (kinds[slot] === 'hybrid')
+            return [
+              threshold('life', rule.life!, 'at', label),
+              threshold('mana', rule.mana!, 'manaAt', `${slot + 1}. ${f.name}, for mana`),
+            ];
+          return kinds[slot] === 'mana'
+            ? threshold('mana', rule.mana!, 'at', label)
+            : threshold('life', rule.life!, 'at', label);
         })}
       </div>
       <ul class="st-says">

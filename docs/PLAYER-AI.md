@@ -280,7 +280,7 @@ tab:
   put a slow flask first and an instant one last. A flask that is already working isn't drunk again, but the next one
   can be. Only one life flask per tick.
 - **Mana** (or hybrid): mana flasks drink in their own belt order, below their threshold (by default 25%, then 15%,
-  10%...). A hybrid's setting is its life threshold; for mana it takes the default of its position.
+  10%...). A hybrid flask has both thresholds and drinks below either.
 - **Utility:** each utility flask has a condition: **bosses only** (the default), **rares and bosses** (a rare,
   champion or boss within 8 tiles), **packs and rares** (also 5+ enemies within 8 tiles) or **any fight**.
 - **Life-to-energy-shield flask** (one that leaves you at 1 life for two seconds): only at **90%+ life**, with
