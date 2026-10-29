@@ -168,3 +168,11 @@ The order will change as we learn.
     stop life regeneration for 3 s) and Shield-breaking (its hits hold the recharge off 4 s longer); Bloodless (cannot be
     leeched from) already existed, and chaos damage already goes past energy shield. Not done yet: monster types and
     bosses built around these.
+  - **The Respite: rest or craft.** Its card opens a screen like a stop's: Rest (refill everything, the level passes), or
+    a craft. Crafts: add a random affix to a worn item; raise one of a worn item's affixes a tier, up to what the item's
+    level or the level being played allows (an item's own level alone would leave early items nothing to raise); add a
+    socket to a worn or carried item (the Awlsmith's rule). A craft is applied and shown at once, since its result is
+    random. The first craft of a visit is free, the next cost 30, 90, then 270 Bone Dust. Once a craft is made, the
+    visit is the level's: Leave passes it with camp's usual rest and no refill. The old "Rest at the Respite?" prompt
+    is gone; the screen is the step.
+  - **Bone Dust** shows at camp, beside the map number.

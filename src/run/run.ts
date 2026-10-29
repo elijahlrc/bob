@@ -220,6 +220,7 @@ export function advanceLevel(run: RunState): void {
   run.map += 1;
   run.offers = rollOffers(run.seed, run.map);
   waysideOf(run).found = null;
+  waysideOf(run).respite = null;
 }
 
 /**

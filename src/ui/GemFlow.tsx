@@ -121,17 +121,3 @@ export async function startGuarded(c: Controller, i: number): Promise<void> {
   if (!ok || c.run !== run) return;
   c.startMap(i);
 }
-
-/** Take the Respite of offer `i` once the player has confirmed it. */
-export async function restGuarded(c: Controller, i: number): Promise<void> {
-  const run = c.run;
-  if (!run) return;
-  const ok = await ask({
-    title: 'Rest at the Respite?',
-    body: 'Refills life, mana, shield and flasks. The level passes.',
-    confirm: 'Rest',
-    skipKey: MAP_CONFIRM,
-  });
-  if (!ok || c.run !== run) return;
-  c.startMap(i);
-}

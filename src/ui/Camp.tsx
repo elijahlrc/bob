@@ -22,7 +22,7 @@ import { Items } from './Items';
 import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
 import { Rehearsal } from './rehearsal';
-import { CampGems, restGuarded, startGuarded } from './GemFlow';
+import { CampGems, startGuarded } from './GemFlow';
 import { introSeen } from './intro';
 import { RunIntro } from './RunIntro';
 import { BossAhead, BossCard } from './BossCard';
@@ -35,6 +35,8 @@ import { Workbench } from './Workbench';
 import { Skills } from './Skills';
 import { Strategy } from './Strategy';
 import { StopEmblem, StopScreen } from './Stop';
+import { RespiteScreen } from './Respite';
+import { waysideOf } from '../run/wayside';
 import { reprieveDef } from '../data/reprieves';
 import { Satchel } from './Satchel';
 import { Tip } from './Tip';
@@ -285,6 +287,9 @@ export function Camp({ c }: { c: Controller }) {
   }, [tab]);
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
+  // The Respite's screen (docs/ATTRITION.md) shares the slot; a visit with crafts made keeps it open until the player leaves.
+  const visit = run ? waysideOf(run).respite : null;
+  const respiteSlot = visit ? visit.slot : stopSlot;
   useEffect(() => {
     if (ahead) return;
     const order: Tab[] = ['items', 'skills', 'sheet', 'strategy', 'next', 'report'];
@@ -364,7 +369,7 @@ export function Camp({ c }: { c: Controller }) {
           />
         </div>
         <div class="nextmap" data-paint="panel" data-thin>
-          Next: map {run.map} of 100
+          Next: map {run.map} of 100 · {run.dust} Bone Dust
         </div>
       </div>
       <Arriving run={run} />
@@ -411,11 +416,11 @@ export function Camp({ c }: { c: Controller }) {
                     data-arch
                     data-pearls
                     data-foot
-                    onClick={() => void restGuarded(c, i)}
+                    onClick={() => setStopSlot(i)}
                   >
                     <div class="theme-name">Respite</div>
                     <div class="muted">Level {o.areaLevel}</div>
-                    <div class="affix">Life, mana, shield and flasks refilled.</div>
+                    <div class="affix">Rest and refill everything, or craft on an item.</div>
                   </button>
                 </div>
               );
@@ -575,6 +580,8 @@ export function Camp({ c }: { c: Controller }) {
         <div class="camp-next camp-side-body">
           {stopSlot !== null && run.offers[stopSlot]?.kind === 'stop' ? (
             <StopScreen c={c} slot={stopSlot} onBack={() => setStopSlot(null)} />
+          ) : respiteSlot !== null && run.offers[respiteSlot]?.kind === 'respite' ? (
+            <RespiteScreen c={c} slot={respiteSlot} onBack={() => setStopSlot(null)} />
           ) : (
             side
           )}

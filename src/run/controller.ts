@@ -24,6 +24,7 @@ import { CLASSES, classDef } from '../data/classes';
 import { botCamp } from './bot';
 import { settlePrimary } from './primary';
 import { takeStop, type StopChoice } from './stops';
+import { craftAtRespite, leaveRespite, restAtRespite, type RespiteCraft } from './respite';
 import { waysideOf } from './wayside';
 import {
   addProvision,
@@ -39,15 +40,7 @@ import { combineCrawl } from './play';
 import { galleryEntries, galleryRun, galleryWorld, type GalleryEntry } from './gallery';
 import { pruneFound } from './found';
 import { loadFound, recordFound } from './codex';
-import {
-  finishMap,
-  newRun,
-  planFor,
-  setMap,
-  takeRespite,
-  worldOptsFor,
-  type RunState,
-} from './run';
+import { finishMap, newRun, planFor, setMap, worldOptsFor, type RunState } from './run';
 import {
   deleteSlot,
   listSlots,
@@ -664,11 +657,11 @@ export class Controller {
     const run = this.run;
     if (!run) return;
     const offer = run.offers[offerIdx] ?? run.offers[0];
-    // A Respite is no map: the level passes and the character is whole again.
+    // A Respite is no map: resting passes the level and makes the character whole again (crafting there is `craftAtRespite`).
     if (offer.kind === 'respite') {
       this.undoStack = [];
       this.lastResult = null;
-      takeRespite(run);
+      restAtRespite(run);
       this.changed();
       return;
     }
@@ -709,6 +702,26 @@ export class Controller {
     if (res.ok) this.undoStack = [];
     this.changed();
     return res;
+  }
+
+  /** A craft at the Respite (docs/ATTRITION.md): final, as any craft is, so the undo history goes. */
+  craftAtRespite(slot: number, craft: RespiteCraft): CraftResult {
+    const run = this.run;
+    if (!run) return { ok: false, reason: 'no run' };
+    const res = craftAtRespite(run, slot, craft);
+    if (res.ok) this.undoStack = [];
+    this.changed();
+    return res;
+  }
+
+  /** Leave a Respite where crafts were made: the level passes, with no refill. */
+  leaveRespite(): void {
+    const run = this.run;
+    if (!run) return;
+    this.undoStack = [];
+    this.lastResult = null;
+    leaveRespite(run);
+    this.changed();
   }
 
   /** The player has read a first-use explainer (docs/WAYSIDE.md 9.1): it is not shown again in this run. Not an undoable change. */

@@ -77,7 +77,7 @@ export function eligible(f: Family, tags: Set<SlotTag>, rarity: Rarity): boolean
   return true;
 }
 
-function rollValue(rng: Rng, lo: number, hi: number, dec = 0): number {
+export function rollValue(rng: Rng, lo: number, hi: number, dec = 0): number {
   if (dec === 0) return rng.int(Math.round(lo), Math.round(hi));
   const f = Math.pow(10, dec);
   return rng.int(Math.round(lo * f), Math.round(hi * f)) / f;

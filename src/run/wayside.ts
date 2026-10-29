@@ -43,6 +43,8 @@ export type Wayside = {
   seen: Record<string, boolean>;
   /** The provision the last cleared map left in the pouch (shown in camp), if any. */
   found: string | null;
+  /** A Respite where the player is crafting (docs/ATTRITION.md): its slot and the crafts made; the level passes on leaving. */
+  respite: { slot: number; crafts: number } | null;
 };
 
 export const newWayside = (): Wayside => ({
@@ -54,6 +56,7 @@ export const newWayside = (): Wayside => ({
   stops: 0,
   seen: {},
   found: null,
+  respite: null,
 });
 
 /** The run's Wayside state, filled in with defaults the first time it is asked for (an older save has none). */

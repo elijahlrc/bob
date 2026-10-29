@@ -32,6 +32,7 @@ import {
   rollSockets,
   rollUnique,
   rollUniqueFlask,
+  rollValue,
   socketLimit,
 } from '../gen/loot';
 import { uidSource, type RunState } from './run';
@@ -184,6 +185,56 @@ export function previewPolish(it: Item, familyId: string): Item {
     affixes: it.affixes.map((a) => (a.family === familyId ? polishedRoll(a) : a)),
     polished: [...(it.polished ?? []), familyId],
   };
+}
+
+// ---- The Respite's crafts (docs/ATTRITION.md) -----------------------------------------------------
+
+/** Add a random affix to an item: one of the families it can take, weighed as the drops are. */
+export function addRandomAffix(run: RunState, itemUid: number): CraftResult {
+  const loc = locate(run, itemUid);
+  if (!loc) return fail('No such item');
+  const it = loc.item;
+  const fams = addableFamilies(it);
+  if (!fams.length) return fail('This item cannot take another affix');
+  const rng = craftRng(run);
+  run.craftSeq++;
+  const weights = fams.map((f) =>
+    f.tiers.filter((t) => t.minIlvl <= it.ilvl).reduce((s, t) => s + t.weight, 0),
+  );
+  const f = fams[rng.weightedIndex(weights)];
+  replace(run, loc, withAffix(it, rollAffixOfFamily(rng, f, it.ilvl)!, rng));
+  return OK;
+}
+
+/** The tier above an affix's that the item's level, or the level being played, allows, if any. */
+export function nextTier(it: Item, familyId: string, level = 0): Family['tiers'][number] | null {
+  const a = it.affixes.find((x) => x.family === familyId);
+  if (!a || it.sealed) return null;
+  const f = family(familyId);
+  const up = f.tiers[f.tiers.findIndex((t) => t.tier === a.tier) + 1];
+  return up && up.minIlvl <= Math.max(it.ilvl, level) ? up : null;
+}
+
+/** Raise one affix a tier, rolled afresh within the new tier (a polished affix loses its polish). */
+export function raiseTier(run: RunState, itemUid: number, familyId: string): CraftResult {
+  const loc = locate(run, itemUid);
+  if (!loc) return fail('No such item');
+  const it = loc.item;
+  const up = nextTier(it, familyId, run.map);
+  if (!up) return fail('That affix is at the best tier this level allows');
+  const f = family(familyId);
+  const rng = craftRng(run);
+  run.craftSeq++;
+  const values = up.ranges.map(([lo, hi], i) => rollValue(rng, lo, hi, f.mods[i].dec));
+  const polished = (it.polished ?? []).filter((x) => x !== familyId);
+  replace(run, loc, {
+    ...it,
+    affixes: it.affixes.map((a) =>
+      a.family === familyId ? { family: f.id, tier: up.tier, mods: familyMods(f, values) } : a,
+    ),
+    polished: polished.length ? polished : undefined,
+  });
+  return OK;
 }
 
 // ---- The currencies ------------------------------------------------------------------------------
