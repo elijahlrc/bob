@@ -191,3 +191,6 @@ The order will change as we learn.
     to buy). Considered and left for later: a fourth offer in every set (it changes the layout of every set and the
     offer code), foresight of upcoming Respites as a reward rather than for everyone. Where else run rewards come
     from (a stop of their own, bosses) is still open.
+  - **Foresight.** Camp says when the next Respite comes ("Next Respite in 2 levels (map 23)"), looking up to twenty
+    levels ahead; the sets follow from the seed alone, so it is exact. Upcoming stops are not shown (still open).
+  - **Saves.** `SAVE_VERSION` 24; a version-23 run switches to the new rules on load with its passives handed back.

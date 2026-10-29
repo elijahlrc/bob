@@ -10,6 +10,7 @@ import { densityDef, densityFor, type DensityId } from '../data/density';
 import { mapTypeDef } from '../data/mapTypes';
 import { themeDef } from '../data/themes';
 import { offersFor } from '../run/preview';
+import { nextRespite } from '../run/offers';
 import { xpToNext } from '../data/xpTable';
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import type { Controller } from '../run/controller';
@@ -142,6 +143,18 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
             − {mapAffixDef(id).name}
           </button>
         ))}
+    </div>
+  );
+}
+
+/** When the next Respite comes (docs/ATTRITION.md): the sets follow from the seed alone, so camp can say. */
+function RespiteAhead({ run }: { run: RunState }) {
+  const at = nextRespite(run.seed, run.map);
+  if (!at) return null;
+  const n = at - run.map;
+  return (
+    <div class="camp-last" data-paint="panel" data-thin>
+      Next Respite in {n} level{n > 1 ? 's' : ''} (map {at})
     </div>
   );
 }
@@ -377,6 +390,7 @@ export function Camp({ c }: { c: Controller }) {
       {run.offers.some((o) => o.kind === 'stop') && <Tip c={c} id="stop" />}
       <Satchel c={c} />
       <BossAhead map={run.map} />
+      <RespiteAhead run={run} />
       {last && (last.status === 'cleared' || last.status === 'abandoned') && (
         <div class="camp-last" data-paint="panel" data-thin>
           Last map{last.status === 'abandoned' ? ' (abandoned)' : ''}: {last.time.toFixed(0)} s ·{' '}

@@ -169,6 +169,24 @@ export function stopAt(seed: number, map: number): StopId | null {
 }
 
 /**
+ * The slot of a level's Respite (1 or 2), or -1 when its set has none, from the seed and the level alone. Never on the first
+ * four levels or a boss level; always on the level before a boss (2026-10-28: kills no longer refill the flasks a boss fight
+ * needs).
+ */
+export function respiteSlot(seed: number, map: number): number {
+  if (map < OFFSETS_FROM_MAP || map % 10 === 0 || bossForMap(map)) return -1;
+  if (bossForMap(map + 1) !== null) return 2;
+  const restRng = new Rng(seed).fork(`rest${map}`);
+  return restRng.chance(RESPITE_CHANCE) ? (restRng.chance(0.5) ? 1 : 2) : -1;
+}
+
+/** The next level after this one whose set holds a Respite, within the next twenty (docs/ATTRITION.md: camp says so). */
+export function nextRespite(seed: number, map: number): number | null {
+  for (let l = map + 1; l <= Math.min(99, map + 20); l++) if (respiteSlot(seed, l) >= 0) return l;
+  return null;
+}
+
+/**
  * The set of offers for a level. Rolled once when the previous level ends, then stored in the save. A boss map has one.
  * The first offer (the anchor) is always a map at the map's own level; the others may sit two levels above or
  * below it, and one of them may be a Respite (docs/MAPS.md 4.2). The seed and the level alone decide it, never the
@@ -179,15 +197,8 @@ export function rollOffers(seed: number, map: number): MapOffer[] {
   if (bossForMap(map)) return [makeOffer(seed, map, 0, rollThemes(seed, map)[0])];
   const rng = new Rng(seed).fork(`offsets${map}`);
   const typeRng = new Rng(seed).fork(`types${map}`);
-  const restRng = new Rng(seed).fork(`rest${map}`);
   const unlocked = typesFor(map);
-  // A Respite needs a map after the first four and not a mini-boss or boss map (every tenth).
-  const mayRest = map >= OFFSETS_FROM_MAP && map % 10 !== 0;
-  const rest = restRng.chance(RESPITE_CHANCE);
-  const restAt = restRng.chance(0.5) ? 1 : 2;
-  // The level before a boss always offers one (2026-10-28): kills no longer refill the flasks a boss fight needs.
-  const beforeBoss = bossForMap(map + 1) !== null;
-  const restSlot = !mayRest ? -1 : beforeBoss ? 2 : rest ? restAt : -1;
+  const restSlot = respiteSlot(seed, map);
   // A stop takes a slot that is neither the anchor nor the Respite's; its streams are its own, so the maps are the same with or without it.
   const stop = stopAt(seed, map);
   const free = [1, 2].filter((s) => s !== restSlot);
