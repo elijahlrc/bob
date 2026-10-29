@@ -1,7 +1,28 @@
 import { useState } from 'preact/hooks';
+import { askAgain, asksSkipped, MAP_CONFIRM } from './Confirm';
 import { useViewport } from './device';
 import { SoundSettings } from './SoundSettings';
 import { offeredScales, setUiScale, uiScale } from './uiScale';
+
+/** Shown only after "Don't ask me again" on the map question: the way to be asked again. */
+function MapConfirmSetting() {
+  const [skipped, setSkipped] = useState(() => asksSkipped(MAP_CONFIRM));
+  if (!skipped) return null;
+  return (
+    <div class="ui-scale">
+      <span class="muted">Maps start without asking</span>
+      <button
+        class="btn small"
+        onClick={() => {
+          askAgain(MAP_CONFIRM);
+          setSkipped(false);
+        }}
+      >
+        Ask first
+      </button>
+    </div>
+  );
+}
 
 /** The interface size (uiScale.ts), and the sound volume beside it wherever it is offered. */
 export function UiScalePicker() {
@@ -27,6 +48,7 @@ export function UiScalePicker() {
         ))}
       </div>
       <SoundSettings />
+      <MapConfirmSetting />
     </>
   );
 }

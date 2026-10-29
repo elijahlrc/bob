@@ -645,6 +645,14 @@ html.leaf .confirm-facts li {
   background-position: left top;
   background-repeat: repeat-x;
 }
+html.leaf .confirm-skip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  cursor: pointer;
+}
 html.leaf .confirm-card .item-actions {
   justify-content: center;
   gap: 12px;

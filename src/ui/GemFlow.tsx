@@ -7,7 +7,7 @@ import { mapTypeDef } from '../data/mapTypes';
 import { themeDef } from '../data/themes';
 import type { Controller } from '../run/controller';
 import { offersFor } from '../run/preview';
-import { ask } from './Confirm';
+import { ask, MAP_CONFIRM } from './Confirm';
 import { canQuickSocket, gemWhere, quickSocket, skillToSocket } from '../run/inventoryOps';
 import { sfx } from './sound/engine';
 
@@ -115,6 +115,7 @@ export async function startGuarded(c: Controller, i: number): Promise<void> {
             ...o.affixes.map((id) => affixText(mapAffixDef(id), o.areaLevel)),
           ],
           confirm: boss ? 'Face the boss' : 'Begin map',
+          skipKey: MAP_CONFIRM,
         },
   );
   if (!ok || c.run !== run) return;
@@ -129,6 +130,7 @@ export async function restGuarded(c: Controller, i: number): Promise<void> {
     title: 'Rest at the Respite?',
     body: 'Refills life, mana, shield and flasks. The level passes.',
     confirm: 'Rest',
+    skipKey: MAP_CONFIRM,
   });
   if (!ok || c.run !== run) return;
   c.startMap(i);

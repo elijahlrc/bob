@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { loadPref, savePref } from './prefs';
 
 /**
  * One confirmation for everything that cannot be taken back (docs/ITEMS.md 3.6), in place of the browser's own
@@ -14,7 +15,21 @@ export type ConfirmOptions = {
   confirm: string;
   /** Styled as a loss; Cancel has the focus. */
   danger?: boolean;
+  /**
+   * The preference that lets the player stop being asked: the dialog offers "Don't ask me again", a yes with it ticked
+   * saves it, and while it is saved `ask` answers yes without showing anything.
+   */
+  skipKey?: string;
 };
+
+/** The preference of the questions at camp that begin a map or a Respite (`skipKey`). */
+export const MAP_CONFIRM = 'confirm.map';
+
+/** Whether the player has asked not to be asked this (`skipKey`). */
+export const asksSkipped = (key: string): boolean => loadPref<boolean>(key, false) === true;
+
+/** Ask again: undoes "Don't ask me again". */
+export const askAgain = (key: string): void => savePref(key, false);
 
 type Open = ConfirmOptions & { resolve: (ok: boolean) => void };
 
@@ -37,6 +52,7 @@ export function dismissAsk(): void {
 }
 
 export function ask(options: ConfirmOptions): Promise<boolean> {
+  if (options.skipKey && asksSkipped(options.skipKey)) return Promise.resolve(true);
   // A second question while one is open answers the first with no.
   current?.resolve(false);
   return new Promise((resolve) => set({ ...options, resolve }));
@@ -50,8 +66,11 @@ export function ConfirmHost() {
     listeners.add(setO);
     return () => void listeners.delete(setO);
   }, []);
+  const [skip, setSkip] = useState(false);
   const answer = (v: boolean) => {
     const r = o;
+    if (v && skip && r?.skipKey) savePref(r.skipKey, true);
+    setSkip(false);
     set(null);
     r?.resolve(v);
   };
@@ -84,6 +103,16 @@ export function ConfirmHost() {
               <li key={i}>{f}</li>
             ))}
           </ul>
+        )}
+        {o.skipKey && (
+          <label class="confirm-skip">
+            <input
+              type="checkbox"
+              checked={skip}
+              onChange={(e) => setSkip(e.currentTarget.checked)}
+            />
+            Don't ask me again
+          </label>
         )}
         <div class="item-actions">
           <button
