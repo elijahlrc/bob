@@ -252,9 +252,6 @@ html.leaf .tv-zoom .btn.small {
   gap: 8px;
   margin-top: 14px;
 }
-.tv-way {
-  color: var(--pearl);
-}
 .tv-why {
   margin: 0;
   color: var(--muted);
@@ -327,8 +324,9 @@ html.leaf .tv-zoom .btn.small {
   }
 }
 @media (max-width: 600px) {
-  /* The totals open above their button, so it can close them. */
-  .tv-ledger.sum {
+  /* The totals open above their button, so it can close them; the first-tree cue sits there too. */
+  .tv-ledger.sum,
+  .tv > .tv-cue {
     bottom: 66px;
   }
 }

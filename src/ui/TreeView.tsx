@@ -95,7 +95,7 @@ function totals(nodes: TreeNode[]): string[] {
 
 /**
  * The passive tree as a starry vault (docs/mockups/style/STYLE-GUIDE.md sections 8 and 10). Tap a node to look at it
- * (the panel shows it, the path to it and what is on the way), tap it again or press Take to take it, on a desktop too;
+ * (the panel shows it and the points its path costs), tap it again or press Take to take it, on a desktop too;
  * a taken one is refunded the same way. The panel also keeps what the passives give in all; the search lights what
  * matches, a colour group's name included.
  */
@@ -673,14 +673,8 @@ export function TreeView({ c }: { c: Controller }) {
       const p = pathTo(alloc, run.classId, n.id);
       if (!p) act = <p class="tv-why">Not connected to your passives yet.</p>;
       else {
-        const way = totals(p.slice(0, -1).map((id) => tree.nodes[id]));
         act = (
           <>
-            {way.length > 0 && (
-              <div class="tv-way">
-                <span class="muted">On the way ({p.length - 1}):</span> {way.join(', ')}
-              </div>
-            )}
             <button class="btn primary" disabled={p.length > points} onClick={() => commit(n.id)}>
               Take · {p.length} point{p.length === 1 ? '' : 's'}
             </button>
@@ -736,7 +730,8 @@ export function TreeView({ c }: { c: Controller }) {
       <div class="tv-labels" data-nopaint aria-hidden="true">
         <div class="tv-words" ref={labelsRef} />
       </div>
-      {cue && (
+      {/* On a phone the panel at the foot covers where the cue sits: the cue waits while it is open. */}
+      {cue && !(phone && (picked !== null || sumOpen)) && (
         <div class="tv-cue" data-paint="panel" data-thin>
           Take one of the ringed nodes to start
         </div>
@@ -807,7 +802,8 @@ export function TreeView({ c }: { c: Controller }) {
             <span class="tv-home" />
           </button>
         </div>
-        {phone && (
+        {/* Not while a node's panel is open: that panel sits where the button does. */}
+        {phone && picked === null && (
           <button class="btn small tv-sumbtn" onClick={() => setSumOpen(!sumOpen)}>
             {sumOpen ? 'Hide totals' : 'Your passives'}
           </button>
