@@ -8,6 +8,8 @@ change, and our own names only. Dash bullets under plain headings.
 
 - Your character now turns to face toward or away from the camera as it walks, not only left and right.
 - Starting a map or resting at the Respite now asks first; tick "Don't ask me again" to skip it, and the "Ask first" button in camp settings brings it back.
+- A support gem linked twice to the same skill now says "Duplicate" on the Skills tab.
+- The passive tree's node panel no longer lists what is on the way, and on phones the tree's buttons and hints no longer cover it.
 
 ## 2026-10-28
 
