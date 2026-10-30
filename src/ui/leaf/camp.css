@@ -254,6 +254,15 @@ html.leaf .camp-foot .ui-scale {
   color: #2e2010;
   font-weight: 600;
 }
+html.leaf .camp-foot .ui-scale > .muted,
+html.leaf .camp-foot .ui-scale .btn.on {
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+}
+html.leaf .camp-foot .ui-scale > .muted {
+  padding: 8px 14px 9px;
+  font-size: var(--size);
+}
 html.leaf .camp-foot .warn {
   color: var(--madder);
 }

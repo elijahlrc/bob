@@ -42,6 +42,13 @@ const JOBS: Job[] = [
   ],
   ['.btn.primary', 'panel', { field: 'vermilion', thin: true, loss: 0.05, cracks: 1 }],
   ['.btn.danger', 'panel', { field: 'bitumen', thin: true, loss: 0.03, cracks: 1 }],
+  // The settings at the camp's foot: each row's name on green, the picked choice on porphyry.
+  ['.camp-foot .ui-scale > .muted', 'panel', { field: 'green', thin: true, loss: 0.03, cracks: 0 }],
+  [
+    '.camp-foot .ui-scale .btn.on',
+    'panel',
+    { field: 'porphyry', thin: true, loss: 0, cracks: 0, texture: 0.45, goldLoss: 0 },
+  ],
   [
     '.btn.on',
     'panel',
