@@ -235,8 +235,11 @@ export type SkillChoice = {
   gemUid: number | null;
   skill: SkillDef;
   supports: SocketedGem[];
-  /** Linked supports that could do nothing to this skill, and why: they are not in effect and cost nothing. */
-  inert?: { gem: SocketedGem; why: string }[];
+  /**
+   * Linked supports that could do nothing to this skill, and why: they are not in effect and cost nothing. `dup` marks a
+   * second copy of a support already linked here.
+   */
+  inert?: { gem: SocketedGem; why: string; dup?: boolean }[];
   /** Skill tags the supports add (a totem support adds `totem`). */
   addedTags: SkillTag[];
   costMult: number;
@@ -841,12 +844,13 @@ export class Character {
       if (skill.behaviour.kind === 'melee' && skill.behaviour.range2h && weaponTags.has('twoHand'))
         skill = { ...skill, behaviour: { ...skill.behaviour, range: skill.behaviour.range2h } };
       // A support that can do nothing to this skill (no projectiles to add to, no area to widen) is not in effect and costs nothing.
-      const inert: { gem: SocketedGem; why: string }[] = [];
+      const inert: { gem: SocketedGem; why: string; dup?: boolean }[] = [];
       for (const o of linkedAll)
         if (keep.get(o.def.id) !== o)
           inert.push({
             gem: o,
             why: `${o.def.name} is already linked here, and only one of each support works`,
+            dup: true,
           });
       // A support the skill fits but is barred from (a melee support that does not take a channelled skill) says so, rather than
       // looking as if the item had no skill for it.

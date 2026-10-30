@@ -651,7 +651,9 @@ export function Skills({
                           active && !active.usable
                             ? 'Unusable'
                             : status && !status.ok
-                              ? 'Idle'
+                              ? status.dup
+                                ? 'Duplicate'
+                                : 'Idle'
                               : null;
                         return (
                           <div key={i} class="sk-link">
