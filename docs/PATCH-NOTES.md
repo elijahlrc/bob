@@ -4,6 +4,11 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-30
+
+- Your character now turns to face toward or away from the camera as it walks, not only left and right.
+- Starting a map or resting at the Respite now asks first; tick "Don't ask me again" to skip it, and the "Ask first" button in camp settings brings it back.
+
 ## 2026-10-28
 
 - Crushing Blow hits about 17% harder.
