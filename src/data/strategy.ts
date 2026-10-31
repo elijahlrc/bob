@@ -101,6 +101,8 @@ export const KITE_RANGE = 3;
 /** How long a kiting step lasts and how long before the next, in seconds. */
 export const KITE_TIME = 0.6;
 export const KITE_COOLDOWN = 1.5;
+/** A kiting character whose skill reaches this far (tiles) blinks in place of the step when a blink is ready (the owner, 2026-10-30). */
+export const BLINK_KITE_REACH = 6.5;
 /**
  * The most a character dodges before it holds its ground, in seconds, and how long it then stands in the warnings and fights
  * on (so a room full of blasts cannot keep it from ever attacking). Dodging time is a budget: it drains by this share of a

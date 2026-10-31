@@ -188,7 +188,10 @@ damage does not move the figure. It counts one target, with free mana (docs/SHEE
   - **Kite:** when an enemy that can move comes within **3 tiles**, the character steps back 2.5 to 3.5 tiles for
     up to 0.6 s, then fights on. It waits 1.5 s before stepping back again. It only steps to a spot outside every
     warning, not through a monster, from which its target is still in reach and in sight, and only if the step gains
-    at least 1.5 tiles. Skills with less than 5 tiles of reach don't kite.
+    at least 1.5 tiles. Skills with less than 5 tiles of reach don't kite. With a skill of **6.5 tiles** of reach or
+    more, a blink on Auto that is ready goes instead of the step: to the spot within the blink's distance that is
+    furthest from the enemies, outside every warning, from which the target is still in reach and in sight (Smoke
+    Charge and Shadow Swap keep their own rules).
 - **Burning aura or circling blades** (Searing Mantle and Orbiting Blades): the character walks in until the aura
   or the ring reaches (about **2.2 tiles** for the aura; the ring widens with every blade), whatever its attack's range.
 - **Orbiting Blades** is cast on the move: the character keeps walking while it casts (at 90% of its speed) but starts
@@ -244,6 +247,7 @@ your build. With the role **Auto**, the default, each follows these rules:
 | **Minions**                                   | In the first fight, and again whenever you have fewer than your maximum. Spectres need a corpse within 9 tiles.                                                                                                                              |
 | **Lure totem**                                | 3+ enemies within 7 tiles, a rare, champion or boss target, or life below 70%.                                                                                                                                                               |
 | **Gap-closer blink**                          | The target is more than 2 tiles beyond your primary's reach, but within blink distance and in sight.                                                                                                                                         |
+| **Kiting blink**                              | With the Kite spacing and a primary of 6.5+ tiles of reach: in place of a kiting step (section 4.3), away from the enemies with the target still in reach.                                                                                   |
 | **Blink with a blast where it leaves**        | 3+ enemies around you.                                                                                                                                                                                                                       |
 | **Blink with a blast where it lands**         | Closing a gap to a target with 2+ enemies near it.                                                                                                                                                                                           |
 | **Escape blink**                              | Life below 70% with an enemy within 5 tiles, or 3+ enemies within 4 tiles.                                                                                                                                                                   |

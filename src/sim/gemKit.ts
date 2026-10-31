@@ -86,18 +86,26 @@ export function buildFor(
   return b;
 }
 
+/**
+ * The damage skill a utility gem or a counter-attack is used beside, and the weapon for the two: Crushing Blow in a sword,
+ * unless the gem names its weapon (a bow's blink stands beside a bow's volley).
+ */
+export function companionFor(def: ActiveGemDef): { skill: string; weapon: string } {
+  if (!def.requiresWeapon && !def.needsTwoHand)
+    return { skill: 'crushingBlow', weapon: WEAPON_FOR.sword };
+  const weapon = weaponFor(def);
+  return { skill: weapon === WEAPON_FOR.bow ? 'splitVolley' : 'crushingBlow', weapon };
+}
+
 /** The build the smoke test uses for an active (or item-granted) gem. */
 export function buildForActive(def: ActiveGemDef): Build {
   const granted = GRANTED_GEMS.includes(def);
+  const beside = (granted ? def.utility : def.utility || def.selfTrigger)
+    ? companionFor(def)
+    : null;
   const b = buildFor(
-    granted
-      ? def.utility
-        ? ['crushingBlow']
-        : []
-      : def.utility || def.selfTrigger
-        ? ['crushingBlow', def.id]
-        : [def.id],
-    weaponFor(def),
+    beside ? (granted ? [beside.skill] : [beside.skill, def.id]) : granted ? [] : [def.id],
+    beside?.weapon ?? weaponFor(def),
     classFor(def.attr),
     def.needsShield ? 'shield' : def.needsDualWield || def.bothWeapons ? 'dual' : 'none',
   );

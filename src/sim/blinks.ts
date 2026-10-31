@@ -120,9 +120,13 @@ export function blinkCast(
   }
   // An escape skill (the Strategy tab) takes the character away from the enemies, with the skill's own effects at both ends.
   const away = a.side!.char.rotation.some((e) => e.choice === c && e.role === 'escape');
+  // A blink the kite spacing cast in place of a step lands where the step was chosen (`kiteStep`, ai.ts).
+  const ai = a.side!.ai;
+  const kite = ai.kiteBlink?.key === c.key ? ai.kiteBlink : null;
+  ai.kiteBlink = null;
   // A blink that prefers a corpse goes to the one with the most enemies about it, if there is one within reach.
   let corpse: Corpse | null = null;
-  if (u.corpse && !away) {
+  if (u.corpse && !away && !kite) {
     let best = 0;
     for (const c0 of w.corpses) {
       if (Math.hypot(c0.x - a.x, c0.y - a.y) > u.distance + 1) continue;
@@ -138,13 +142,15 @@ export function blinkCast(
   const step = corpse
     ? Math.min(u.distance, d)
     : Math.max(0, Math.min(u.distance, d - (target.r + a.r + 1)));
-  const spot = away
-    ? safestSpot(w, a, u.distance)
-    : w.grid.collide(
-        a.x + ((goal.x - a.x) / Math.max(d, 1e-6)) * step,
-        a.y + ((goal.y - a.y) / Math.max(d, 1e-6)) * step,
-        a.r,
-      );
+  const spot = kite
+    ? w.grid.collide(kite.x, kite.y, a.r)
+    : away
+      ? safestSpot(w, a, u.distance)
+      : w.grid.collide(
+          a.x + ((goal.x - a.x) / Math.max(d, 1e-6)) * step,
+          a.y + ((goal.y - a.y) / Math.max(d, 1e-6)) * step,
+          a.r,
+        );
   if (!spot) return;
   if (corpse && u.corpse) {
     // The corpse bursts for a share of its life, and the bursts are larger.

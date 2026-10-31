@@ -777,6 +777,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         },
       },
     ],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'staff', 'dagger', 'claw'],
     description: 'Two fast strikes in the time of one.',
   },
   {
@@ -823,6 +824,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: -30,
       },
     ],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'dagger', 'claw'],
     description: 'Strikes with both weapons at once. Needs two weapons.',
   },
   {
@@ -2037,6 +2039,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         damageTypes: ['fire'],
       },
     ],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'staff', 'unarmed'],
     description: 'A fiery strike that primes the enemy to burst.',
     charge: {
       max: 6,
@@ -5407,6 +5410,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 1.5,
       },
     ],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'staff'],
     description: 'Leap to a target and slam down on it.',
     addedAttackTime: 0.55,
   },
@@ -5635,6 +5639,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
         value: 100,
       },
     ],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'staff', 'dagger', 'claw'],
     description:
       'Vanish and strike. It waits two seconds between uses, unless you spend a Fervour charge; each charge quickens it, and each use speeds you for three seconds.',
   },

@@ -820,11 +820,16 @@ export type PlayerAI = {
   /** The fights so far (an opener is used once a fight), and when the character last had a target. */
   fight: number;
   lastEngaged: number;
-  /** A kiting step (the `kite` spacing): seconds left, where to, and seconds before the next. */
+  /**
+   * A kiting step (the `kite` spacing): seconds left, where to, and the time from which the next may be taken (a time, not a
+   * countdown: the character decides nothing while it attacks, so a countdown would barely run).
+   */
   kiteT: number;
   kiteX: number;
   kiteY: number;
-  kiteCd: number;
+  kiteAt: number;
+  /** A blink the kite spacing cast in place of a step (its skill's key), and where it lands. */
+  kiteBlink: { key: string; x: number; y: number } | null;
   /** Dodging spent (seconds, drained while the character does not dodge), and the seconds left of the rest it then takes from dodging. */
   dodgeT: number;
   dodgeRest: number;

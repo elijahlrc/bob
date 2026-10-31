@@ -36,6 +36,10 @@ const WEAPON_FOR: Partial<Record<SkillTag, string>> = {
   oneHand: 'sword_4',
 };
 
+/** A blink that only a bow can use (Shadow Quiver). */
+const bowBlink = (entry: GalleryEntry): boolean =>
+  entry.look.delivery === 'blink' && entry.weapon === WEAPON_FOR.bow;
+
 /** Every skill gem a character can use, in the order the language lists them: by delivery, then by name. */
 export function galleryEntries(): GalleryEntry[] {
   const out: GalleryEntry[] = [];
@@ -43,9 +47,10 @@ export function galleryEntries(): GalleryEntry[] {
     const look = activeLook(g);
     const need = g.requiresWeapon ?? [];
     const tag = need.find((t) => WEAPON_FOR[t]);
+    // A blink stands beside a melee strike (galleryRun), so one that names no weapon is held with a sword.
     let weapon = tag
       ? (WEAPON_FOR[tag] as string)
-      : g.skillType === 'attack'
+      : g.skillType === 'attack' || look.delivery === 'blink'
         ? 'sword_4'
         : 'wand_4';
     let offHand: string | undefined;
@@ -74,14 +79,20 @@ export function galleryRun(entry: GalleryEntry, seed: number): RunState {
   else delete b.equipment.offHand;
   const body = makeItem(uid, 'body_ar_1', 60, 2);
   const utility = entry.look.element < 0;
-  // A utility skill needs a damaging skill beside it; any other skill stands alone in the first socket.
-  body.sockets = (
-    utility
-      ? [entry.look.delivery === 'blink' ? 'crushingBlow' : 'flameBolt', entry.id]
-      : [entry.id]
-  ).map((g) => makeGem(uid, g));
+  // A utility skill needs a damaging skill beside it (a blink a strike, or a bow's volley; any other a spell); any other
+  // skill stands alone in the first socket.
+  const beside =
+    entry.look.delivery !== 'blink'
+      ? 'flameBolt'
+      : bowBlink(entry)
+        ? 'splitVolley'
+        : 'crushingBlow';
+  body.sockets = (utility ? [beside, entry.id] : [entry.id]).map((g) => makeGem(uid, g));
   b.equipment.body = body;
   b.primaryGem = body.sockets[0]?.uid;
+  // A bow's volley reaches as far as the character engages, so a bow's blink never closes a gap: it is shown getting away.
+  if (utility && bowBlink(entry))
+    b.strategy = { skills: { [body.sockets[1]!.uid]: { role: 'escape' } } };
   b.flasks = [null, null, null, null, null];
   return run;
 }
@@ -89,7 +100,7 @@ export function galleryRun(entry: GalleryEntry, seed: number): RunState {
 /** The arena: the character and three dummies spread out in front of it, and the player cannot die. */
 export function galleryWorld(run: RunState, entry?: GalleryEntry): World {
   // A blink is cast to close a gap the main skill cannot, so its dummies stand as far as the player will go for them.
-  const far = entry?.look.delivery === 'blink';
+  const far = entry?.look.delivery === 'blink' && !bowBlink(entry);
   const { world } = createDummyWorld(run.build, { distance: far ? 8 : 4, maxTime: 3600 });
   world.sides[0].opts.godMode = true;
   world.sides[0].opts.freeResources = true;
@@ -98,6 +109,9 @@ export function galleryWorld(run: RunState, entry?: GalleryEntry): World {
     world.sides[0].opts.freeResources = false;
     world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.3;
   }
+  // An escape is used when hurt with an enemy near.
+  if (entry && bowBlink(entry))
+    world.sides[0].player.life = world.sides[0].player.def.maxLife * 0.5;
   const start = world.plan.lab.start;
   for (const [dx, dy] of [
     [far ? 9.5 : 5.5, -2],

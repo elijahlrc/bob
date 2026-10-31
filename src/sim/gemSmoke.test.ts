@@ -10,7 +10,14 @@ import {
 } from '../data/gems';
 import { typesAllow } from '../data/skillTypes';
 import { createDummyWorld } from './dummy';
-import { buildFor, buildForActive, classFor as ATTR_CLASS, seedFor, weaponFor } from './gemKit';
+import {
+  buildFor,
+  buildForActive,
+  classFor as ATTR_CLASS,
+  companionFor,
+  seedFor,
+  weaponFor,
+} from './gemKit';
 import { stepWorld } from './world';
 
 /**
@@ -30,7 +37,7 @@ describe('every active gem', () => {
       const sheet = c.sheet();
       if (def.selfTrigger) {
         // A counter-attack: a trigger of its own casts it, and it is never the primary skill.
-        expect(c.primary.skill.id).toBe('crushingBlow');
+        expect(c.primary.skill.id).toBe(companionFor(def).skill);
         expect(c.triggers.some((t) => t.skills.some((x) => x.skill.id === def.id))).toBe(true);
         expect(finite(sheet.life)).toBe(true);
         return;
@@ -38,7 +45,7 @@ describe('every active gem', () => {
       if (def.utility) {
         // A utility skill is cast by policy next to a damage skill: it never becomes the primary, and its effect shows up.
         expect(c.utilities.map((u) => u.skill.id)).toContain(def.id);
-        expect(c.primary.skill.id).toBe('crushingBlow');
+        expect(c.primary.skill.id).toBe(companionFor(def).skill);
         const { world, dummy } = createDummyWorld(b, { distance: 2 });
         world.sides[0].opts.freeResources = true;
         world.sides[0].opts.godMode = true;

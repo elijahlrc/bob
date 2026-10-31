@@ -842,6 +842,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       { stat: 'doubleDamage', kind: 'base', value: 20 },
       { stat: 'attackSpeed', kind: 'more', value: -15 },
     ],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'staff'],
     description:
       'A single heavy blow that staggers its target, throws it back, and sometimes hits twice as hard.',
   },
@@ -881,6 +882,7 @@ export const ACTIVE_GEMS: ActiveGemDef[] = [
       { stat: 'attackSpeed', kind: 'more', value: -20 },
       { stat: 'damage', kind: 'more', value: -40, condition: { id: 'dualWielding' } },
     ],
+    requiresWeapon: ['sword', 'axe'],
     bothWeapons: true,
     description: 'A wide arc that strikes every enemy in front of you.',
   },

@@ -46,7 +46,7 @@ import {
   whileStunned,
   withdrawing,
 } from './movement';
-import { running } from './blinks';
+import { blinkGroupBusy, running } from './blinks';
 import { stepping } from './steps';
 import {
   contactRange,
@@ -58,6 +58,7 @@ import {
 } from './utility';
 import type { RotationEntry } from '../calc/strategy';
 import {
+  BLINK_KITE_REACH,
   CLOSE_RANGE,
   FIGHT_GAP,
   DODGE_DRAIN,
@@ -519,7 +520,6 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
 function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
   const p = s.player;
   const ai = s.ai;
-  ai.kiteCd -= dt;
   if (ai.kiteT > 0) {
     ai.kiteT -= dt;
     if (Math.hypot(ai.kiteX - p.x, ai.kiteY - p.y) > 0.2) {
@@ -528,7 +528,7 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
     }
     ai.kiteT = 0;
   }
-  if (s.char.build.strategy?.spacing !== 'kite' || ai.kiteCd > 0) return false;
+  if (s.char.build.strategy?.spacing !== 'kite' || w.t < ai.kiteAt) return false;
   const prof = s.char.profile(s.primary, 0);
   if (prof.skill.behaviour.kind === 'melee') return false;
   const range = skillRange(prof) + target.r;
@@ -545,6 +545,9 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
     }
   }
   if (!near) return false;
+  // With a skill of long reach, a blink that is ready goes in place of the step.
+  if (!p.action && skillRange(prof) >= BLINK_KITE_REACH && kiteBlink(w, s, target, range, nd))
+    return true;
   let best: { x: number; y: number; score: number } | null = null;
   for (let k = 0; k < 16; k++) {
     const ang = (k / 16) * Math.PI * 2;
@@ -562,12 +565,57 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
   // Only a step that gains real distance is worth taking.
   if (!best || best.score < nd + 1.5) return false;
   ai.kiteT = KITE_TIME;
-  ai.kiteCd = KITE_COOLDOWN;
+  ai.kiteAt = w.t + KITE_COOLDOWN;
   ai.kiteX = best.x;
   ai.kiteY = best.y;
   s.stats.kites++;
   moveTo(w, s, p, best.x, best.y, dt);
   return true;
+}
+
+/**
+ * The kite spacing's step taken by a blink (the owner, 2026-10-30): a blink on Auto that is ready carries the character to the
+ * spot within its distance furthest from the enemies, from which the target is still in reach (`range`) and in sight, when that
+ * gains real distance on the nearest enemy (`nd` tiles off). Smoke Charge (an escape of its own) and Shadow Swap (to a corpse)
+ * keep their own rules. Returns whether one was cast.
+ */
+function kiteBlink(w: World, s: Side, target: Actor, range: number, nd: number): boolean {
+  const p = s.player;
+  const foes = livingEnemiesOf(w, s.team).filter((m) => m.phaseT <= 0 && !m.stationary);
+  for (const e of s.char.rotation) {
+    const c = e.choice;
+    const u = c.skill.utility;
+    if (u?.kind !== 'blink' || u.escape || u.corpse || e.role !== 'auto') continue;
+    if (!whenHolds(w, s, e.when, target) || (s.utilityReady[c.key] ?? 0) > w.t) continue;
+    if (blinkGroupBusy(w, s, c) || (c.skill.cooldown !== undefined && !skillReady(s, c))) continue;
+    const prof = s.char.profile(c, playerConds(w, s, target), flaskMask(s));
+    if (!canPay(s, c.costsLife, prof.cost)) continue;
+    let best: { x: number; y: number; score: number } | null = null;
+    for (let k = 0; k < 16; k++) {
+      const ang = (k / 16) * Math.PI * 2;
+      for (const len of [2.5, (2.5 + u.distance) / 2, u.distance]) {
+        const c0 = w.grid.collide(p.x + Math.cos(ang) * len, p.y + Math.sin(ang) * len, p.r);
+        if (Math.hypot(c0.x - p.x, c0.y - p.y) < 2.5) continue;
+        if (hazardAt(w, s.team, c0.x, c0.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c0.x, c0.y))
+          continue;
+        if (Math.hypot(target.x - c0.x, target.y - c0.y) > range) continue;
+        if (!w.grid.los(c0.x, c0.y, target.x, target.y)) continue;
+        let score = Infinity;
+        for (const m of foes) score = Math.min(score, Math.hypot(m.x - c0.x, m.y - c0.y));
+        if (!best || score > best.score) best = { x: c0.x, y: c0.y, score };
+      }
+    }
+    if (!best || best.score < nd + 1.5) continue;
+    payCost(s, c.costsLife, prof.cost);
+    s.utilityReady[c.key] = w.t + u.cooldown;
+    useSkill(w, s, c);
+    s.ai.kiteBlink = { key: c.key, x: best.x, y: best.y };
+    s.ai.kiteAt = w.t + KITE_COOLDOWN;
+    s.stats.kites++;
+    startAction(w, p, 'utility', prof, target);
+    return true;
+  }
+  return false;
 }
 
 export function playerAI(w: World, s: Side, dt: number): void {

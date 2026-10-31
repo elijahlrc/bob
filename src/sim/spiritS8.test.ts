@@ -3,6 +3,7 @@ import { distanceMult } from '../calc/skill';
 import { buildFor, classFor } from './gemKit';
 import { releaseCaught } from './shots';
 import { createDummyWorld, dummyDefence } from './dummy';
+import type { Build } from '../data/types';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
 
@@ -27,8 +28,17 @@ function neighbour(w: World, x: number, y: number, rarity: 'normal' | 'rare' = '
   return m;
 }
 
-function blinkWorld(gems: string[], distance = 6.5, main = 'sword_3', cls = STR) {
-  const run = createDummyWorld(buildFor(['crushingBlow', ...gems], main, cls), {
+function blinkWorld(
+  gems: string[],
+  distance = 6.5,
+  main = 'sword_3',
+  cls = STR,
+  companion = 'crushingBlow',
+  prep?: (b: Build) => void,
+) {
+  const b = buildFor([companion, ...gems], main, cls);
+  prep?.(b);
+  const run = createDummyWorld(b, {
     distance,
     maxTime: 120,
   });
@@ -124,7 +134,7 @@ describe('Rime Step (rimeStep)', () => {
 
 describe('Bolt Step (boltStep)', () => {
   it('the teleport waits for the run, the character can act meanwhile, and lightning bursts at both ends', () => {
-    const { world: w, dummy } = blinkWorld(['boltStep'], 7.5, 'wand_3', INT);
+    const { world: w, dummy } = blinkWorld(['boltStep'], 7.5, 'sword_3', INT);
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     let waiting = false;
     let arrivedAt = -1;
@@ -234,7 +244,13 @@ describe('Rotting Stride (rotStride)', () => {
 
 describe('Shadow Quiver (shadowQuiver)', () => {
   it('the arrow flies first, then the character is carried to it and a clone is left where it stood', () => {
-    const { world: w } = blinkWorld(['shadowQuiver'], 7, 'bow_3', DEX);
+    // A bow's volley reaches as far as the character engages, so beside it the blink never closes a gap: here it gets a hurt
+    // character away from the dummy.
+    const { world: w } = blinkWorld(['shadowQuiver'], 4, 'bow_3', DEX, 'splitVolley', (b) => {
+      const quiver = b.equipment.body!.sockets[1]!.uid;
+      b.strategy = { skills: { [quiver]: { role: 'escape' } } };
+    });
+    w.sides[0].player.life = w.sides[0].player.def.maxLife * 0.5;
     const start = { x: w.sides[0].player.x, y: w.sides[0].player.y };
     let waiting = false;
     let clone: { x: number; y: number } | undefined;

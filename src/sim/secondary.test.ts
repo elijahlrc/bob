@@ -44,26 +44,26 @@ describe('secondary casts (EXPANSION 5.5a)', () => {
   });
 
   it('a periodic skill that cannot reach as far as the main skill is not credited, and fires only in reach', () => {
-    // A bow primary stands off; a melee skill is in reach only when an enemy comes close, so the sheet credits it nothing.
-    const run = newRun('strider', 1);
+    // A thrown primary stands off; a melee skill is in reach only when an enemy comes close, so the sheet credits it nothing.
+    const run = newRun('reaver', 1);
     const uid = () => run.nextUid++;
-    const bow = run.build;
-    bow.level = 30;
-    bow.equipment.mainHand = makeItem(uid, 'bow_3', 30, 1);
-    delete bow.equipment.offHand;
+    const thrower = run.build;
+    thrower.level = 30;
+    thrower.equipment.mainHand = makeItem(uid, 'sword_3', 30, 1);
+    delete thrower.equipment.offHand;
     const body = makeItem(uid, 'body_ar_1', 30, 1);
-    body.sockets = [makeGem(uid, 'splitVolley')];
-    bow.equipment.body = body;
+    body.sockets = [makeGem(uid, 'phantomToss')];
+    thrower.equipment.body = body;
     const boots = makeItem(uid, 'boots_ar_1', 30, 1);
     boots.sockets = [makeGem(uid, 'crushingBlow')];
-    bow.equipment.boots = boots;
-    bow.primaryGem = body.sockets[0]!.uid;
-    bow.flasks = [null, null, null, null, null];
-    const c = new Character(bow, { targetDistance: 4 });
-    expect(c.primary.skill.id).toBe('splitVolley');
+    thrower.equipment.boots = boots;
+    thrower.primaryGem = body.sockets[0]!.uid;
+    thrower.flasks = [null, null, null, null, null];
+    const c = new Character(thrower, { targetDistance: 4 });
+    expect(c.primary.skill.id).toBe('phantomToss');
     expect(c.secondaries.map((x) => x.skill.id)).toEqual(['crushingBlow']);
     expect(c.sheet().secondaryDps).toBe(0);
-    const { world } = createDummyWorld(bow, { distance: 4, maxTime: 60, seed: 1 });
+    const { world } = createDummyWorld(thrower, { distance: 4, maxTime: 60, seed: 1 });
     let melee = 0;
     while (world.status === 'running') {
       stepWorld(world);

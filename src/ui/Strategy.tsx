@@ -461,7 +461,7 @@ const SPACING_TEXT: Record<Spacing, string> = {
   hold: 'A ranged character stands at the full range of its skill.',
   close:
     'A ranged character closes to 3.5 tiles: more hits for skills that fan out or burst near it.',
-  kite: 'A ranged character stands at full range and steps back when an enemy comes within 3 tiles, if its target stays in reach.',
+  kite: 'A ranged character stands at full range and steps back when an enemy comes within 3 tiles, if its target stays in reach. With a long-range skill, a ready blink goes instead.',
 };
 
 /**
