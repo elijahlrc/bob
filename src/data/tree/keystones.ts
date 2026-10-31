@@ -57,7 +57,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'crimsonPact',
-    name: 'Crimson Pact',
+    name: 'Blood Bargain',
     mods: [mod('instantLeechNoRegen', 'flag', 1)],
     description: 'Leech is instant. You have no life regeneration.',
   },
@@ -115,7 +115,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'woundDance',
-    name: 'Wound Dance',
+    name: 'Hundred Cuts',
     mods: [mod('woundDance', 'flag', 1), mod('damage', 'more', -50, { tags: ['bleed'] })],
     description: 'Bleeds stack up to 8 times. Bleeding deals 50% less damage.',
   },

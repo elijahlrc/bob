@@ -140,3 +140,67 @@ life on block (Shield Bash), regeneration (Stout Heart, Mended Mail), and the fl
 
 - The start's sides (physical attack damage with life, armour with life) are a proposal.
 - Ceaseless Blades and Marked Prey: second homes or cuts, decided in the notables pass.
+
+## 10. Revision 1 of the plan (after the reviewer's plan round 1)
+
+The direction, the frame, the home and the keystones stand; the table changes as below (rows above are superseded where
+they differ).
+
+- **The Bow border, swept against real positions** (the reviewer placed every Bow and Yard notable in one frame):
+  - Darting Steel (sword speed, a copy of the Bow's Fleet Blade nearby) becomes **impale's first home**: the swordsman
+    who skewers, on the east spoke past step 8.
+  - Red Harvest (attack leech, two steps from the Bow's Thirsty Quiver) moves to the axis, in from the mid ring.
+  - Stormstruck is cut (it sat beside the Bow's Live Wire on purpose). Elemental Edge stays only with a melee hook the
+    Bow cannot have (decided in the notables pass; cut otherwise).
+  - Sidestep loses its life on hit (the Bow's Thirsty Quiver has it); Weaving must not be another flat evasion notable
+    (both re-hooked in the notables pass).
+- **Hot Blood** is the third fervour home (one more maximum charge) for the dual-wielding Reaver: out from the mid
+  ring's east stretch (`yard.dual.ring.a`), not from the Bow's crowded border junction.
+- **Festering is cut** (a lone poison node; the Knife does not border the Yard).
+- **One-stop shops split:**
+  - Bleed: Wound Dance (the east spoke's mid ring spur, 10) and Open Veins (east spoke past the mid ring, 11) east;
+    Lasting Wounds with Finishing Cut and Hewing (axes with bleed) on the west spoke past the mid ring (11-12).
+  - Shields: Buckler (west border road, 9), the Steel Rim wheel (west border road, 10), Shieldwall (spur where it meets
+    the mid ring, 11); Sword and Board moves to the west spoke past the mid ring (11) and Shield Bash to the rim ring at
+    the axis (13).
+- **Two-handed:** the Paired Steel / Full Swing wheel stays on the axis (the choice) and two-handed gets a second home
+  with a different partner, a stun payoff (damage against stunned enemies, which the fight tracks), at the west rim.
+- **Ceaseless Blades and Marked Prey are cut** (channelling attacks and curses with one home each; prefer a cut to
+  padding).
+- **The count:** today 42 notables. Cut: Iron Draw, Spellsword, Stormstruck, Festering, Ceaseless Blades, Marked Prey
+  (36 left). New hooked homes, as ideas:
+  1. impale's payoff at the rim (impale with a rule);
+  2. fortify: gained in melee, paid off while fortified (west rim);
+  3. an armour rule (west, the mid ring);
+  4. the two-handed stun payoff (west rim);
+  5. a riposte: damage after a block (`blockedRecently`), for shield and dual-wield blockers (west, the mid ring);
+  6. mana on block (utility, by the shields);
+  7. the dual-wield rule in plain words: a block while dual wielding gives Quickened (speed), so the off hand defends
+     and quickens the next blows (east, the mid ring);
+  8. damage while leeching, beside Red Harvest and Crimson Pact (the axis).
+  With about 12 second notables, each with a hook, about 56 notables.
+- **Utility rows** (aim 17-20%): Footwork (reach), Drill Call (warcries), Standard Bearer (auras), Fighting Breath
+  (mana), Field Dressing (flasks), mana on block (new), and utility lines on the second notables (durations, cost,
+  reservation, flask charges).
+- **The west start node** becomes defences every Reaver uses: `10% global defences, 5% life` (armour, evasion and energy
+  shield alike); the west path nodes stay armour. (The skeleton gave this side armour; logged for the owner.)
+- **Steps:** Buckler and Light Blades hang so their notables sit at step 9.
+- **Names:** the two keystones borrow a word each from reference keystones of the same mechanic: renamed at the build
+  (Wound Dance → Hundred Cuts, Crimson Pact → Blood Bargain); Quickened Steel → Honed Steel (it gives no Quickened).
+- Shield Bash's life on block repeats the Bow's Braced Guard: re-hooked in the notables pass.
+
+## 11. Structure (built 2026-10-31, before the notables pass)
+
+Written by `scripts/passives/rework/yard-gen.ts` into `src/data/passives/yard/`; the render is `R-yard-structure.png`.
+
+- As §5 and §10, with these choices while laying out: the east path runs through Killing Pace to the Bow's seam (the
+  Bow's path runs straight to it, so the two starts were 8 steps apart; now 10); Crossed Blades in from the mid ring's
+  east stretch (step 10) and the dual-wield rule (Off-Hand Parry) off the east spoke; Thirsting Blade is folded into a new
+  leech home (Red Thirst) at the east rim beside Bloodied Edge, far from Red Harvest on the axis; Shieldwall a spur in
+  from the mid ring's west stretch; mana on block (Steady Guard) off the west border road's first node.
+- The Shieldwall cluster's keystone spur was cut off from it in the old files: a link now joins it (`reach.ts`: no
+  unreachable nodes). Temporary Wall links into removed Yard nodes were retargeted (`wall/grit.ts`, `wall/slams.ts`).
+- Keystones renamed (they borrowed words from reference keystones of the same mechanic): Wound Dance → Hundred Cuts,
+  Crimson Pact → Blood Bargain (in `src/data/tree/keystones.ts` as well, where the mechanics bind by name).
+- Measured: 10 of the Yard's own notables within 8 steps; within 14, 18 behind the east exit and 21 behind the west. Six
+  links between neighbouring clusters (three others dropped for crossing roads). No internal crossings.

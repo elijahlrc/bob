@@ -72,8 +72,12 @@ rework's decisions), `R-reviewer.md` (the reviewer agent's brief), `R-skeleton.m
 - More tools: `reach.ts <region>` (unreachable nodes, road dead ends), `ref-names.ts` (every tree name against the
   reference's notable and keystone names; the repo's `ip.test.ts` covers gems and uniques only: run both before a
   region's commit), `chart.ts <folder> <region> <out.md>` (the notables chart for review: step, before, now, units, why).
-- **The Bow:** plan and structure approved (R-bow.md); notables under review (R-bow-chart.md), built by `bow-gen.ts`.
-  Engine additions so far: `farShot` (skill.ts), lines in lines.ts under "The Bow's rule benders".
+- **The Bow: done** (`ed542d7`): R-bow.md, R-bow-chart.md, built by `bow-gen.ts`.
+- **The Yard:** plan written (R-yard.md), under review. Next the Wall, then the Cathedral, the centre, the joins, the
+  final report. Lessons the reviewers enforce (R-report.md has the rounds): one mana notable near home; ~11 own
+  notables within 8; no copies across borders (check the neighbour's notables at the shared seam); no flat second
+  notables; ~4-6 units per notable; utility ~20%; names checked with `ref-names.ts` and `ip.test.ts`; every new stat has
+  player text and string-argument lines a `vocab.ts` entry; `reach.ts` for cut-off wheel halves.
 - The report is written as it goes in `R-report.md`.
 
 ## How the Knife was built (the pattern for the rest)

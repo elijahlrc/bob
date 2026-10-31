@@ -1158,6 +1158,70 @@ export const attackSpeedPerFervour = def('attackSpeedPerFervour', (v: number): L
 export const buffDuration = def('buffDuration', (v: number): Line =>
   line(`${v}% buff duration`, v / 8, mod('buffDuration', 'inc', v)),
 );
+// The Yard's rule benders (docs/tree/design/R-yard.md): conditions and stats the fight already reads.
+/** A block while dual wielding may give Quickened (event gains are asked under the conditions that hold, src/sim/buffs.ts). */
+export const quickenedOnDualBlock = def('quickenedOnDualBlock', (v: number): Line =>
+  line(
+    `${v}% chance to gain Quickened when you block while dual wielding`,
+    (v / 100) * 5,
+    mod('buffOn.block.onslaught', 'base', v, { condition: { id: 'dualWielding' } }),
+  ),
+);
+export const damageAfterBlock = def('damageAfterBlock', (v: number): Line =>
+  line(`${v}% damage if you blocked recently`, v / 10, mod('damage', 'inc', v, { condition: { id: 'blockedRecently' } })),
+);
+export const damageVsStunned = def('damageVsStunned', (v: number): Line =>
+  line(`${v}% damage against stunned enemies`, v / 8, mod('damage', 'inc', v, { condition: { id: 'targetStunned' } })),
+);
+export const damageWhileLeeching = def('damageWhileLeeching', (v: number): Line =>
+  line(`${v}% damage while leeching`, v / 10, mod('damage', 'inc', v, { condition: { id: 'leeching' } })),
+);
+export const fortifyOnMeleeHit = def('fortifyOnMeleeHit', (v: number): Line =>
+  line(`${v}% chance to gain Fortified on melee hit`, (v / 100) * 8, mod('buffOn.meleeHit.fortify', 'base', v)),
+);
+/** Fortified earned in the duel: when you stun an enemy (the `stun` event, src/sim/buffs.ts). */
+export const fortifyOnStun = def('fortifyOnStun', (v: number): Line =>
+  line(`${v}% chance to gain Fortified when you stun an enemy`, (v / 100) * 4, mod('buffOn.stun.fortify', 'base', v)),
+);
+export const fervourOnBlock = def('fervourOnBlock', (v: number): Line =>
+  line(`${v}% chance to gain a fervour charge when you block`, v / 8, mod('chargeOn.block.fervour', 'base', v)),
+);
+/** Damage per fervour charge held, while dual wielding (the calc's charges.fervour per stat). */
+export const dualDamagePerFervour = def('dualDamagePerFervour', (v: number): Line =>
+  line(
+    `${v}% damage per fervour charge while dual wielding`,
+    v * 0.8,
+    mod('damage', 'inc', v, { condition: { id: 'dualWielding' }, per: { stat: 'charges.fervour', div: 1 } }),
+  ),
+);
+export const critVsBleeding = def('critVsBleeding', (v: number): Line =>
+  line(`${v}% crit chance against bleeding enemies`, v / (UNIT.critChance * 1.5), mod('critChance', 'inc', v, { condition: { id: 'targetBleeding' } })),
+);
+export const critVsStunned = def('critVsStunned', (v: number): Line =>
+  line(`${v}% crit chance against stunned enemies`, v / (UNIT.critChance * 1.5), mod('critChance', 'inc', v, { condition: { id: 'targetStunned' } })),
+);
+export const meleeAreaOnKill = def('meleeAreaOnKill', (v: number): Line =>
+  line(`${v}% melee area if you killed recently`, v / 12, mod('aoe', 'inc', v, { tags: ['melee'], condition: { id: 'killedRecently' } })),
+);
+export const damageWhileFortified = def('damageWhileFortified', (v: number): Line =>
+  line(`${v}% damage while Fortified`, v / 10, mod('damage', 'inc', v, { condition: { id: 'fortified' } })),
+);
+export const impaleChance = def('impaleChance', (v: number): Line =>
+  line(`${v}% chance to impale with attacks`, v / 6, mod('chance.impale', 'base', v, { tags: ['attack'] })),
+);
+export const impaleEffect = def('impaleEffect', (v: number): Line =>
+  line(`${v}% impale effect`, v / 8, mod('impaleEffect', 'inc', v)),
+);
+export const maxImpaleLine = def('maxImpaleLine', (v: number): Line =>
+  line(`+${v} impale on an enemy at a time`, v * 4, mod('maxImpale', 'base', v)),
+);
+/** A share of armour meets elemental hits before the resistance does (src/sim/combat.ts, as The Mountain's Hide). */
+export const armourVsEle = def('armourVsEle', (v: number): Line =>
+  line(`${v}% of armour also applies to elemental hits`, v / 4, mod('armourVsEle', 'base', v)),
+);
+export const meleeGainFire = def('meleeGainFire', (v: number): Line =>
+  line(`melee attacks gain ${v}% of physical damage as extra fire`, v / 4, mod('gain.physical.fire', 'base', v, { tags: ['melee'] })),
+);
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(
     `${v}% crit chance while on full life`,

@@ -680,7 +680,7 @@ export const grit: AreaSpec = {
     },
     {
       from: 'cleaver.c',
-      to: 'yard.fosse.road.f7',
+      to: 'yard.fosse.ring.s0',
       why: "Axes by the Fosse (a near crossing; G1-brief.md §2.4, laid in the G2 border pass): Cleaver's far small onto the Yard's outer road, in the chain's own line, so Cleaver is a bridge between the Barrows road and the Fosse. The Reaver's axe and bleed build reaches Cleaver by the rim (Hewing to Cleaver about 10 steps), and the Vanguard reaches the Fosse's lightning and curses. Far from both starts (22 from the Vanguard, 17 from the Reaver).",
     },
     {
@@ -740,7 +740,7 @@ export const grit: AreaSpec = {
     { from: 'heavyHands.b', to: 'east.e1', why: 'Heavy Hands onto the Barrows road.' },
     {
       from: 'east.e8',
-      to: 'yard.blood.toWall.a',
+      to: 'yard.home.seams.s',
       why: 'The Barrows road lands on the west junction of the Pits.',
     },
     { from: 'east.e3', to: 'headsman.a', why: 'The road onto the big axe.' },

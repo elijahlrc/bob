@@ -14,7 +14,7 @@ import {
 import { reservedMana } from './reserve';
 import type { Mod } from '../mods/types';
 import { sumOf } from './charges';
-import { lifeCap } from './combat';
+import { lifeCap, playerCtx } from './combat';
 import { noteRecover } from './recovery';
 import { startShell } from './skillFx';
 import type { World } from './types';
@@ -50,7 +50,8 @@ export function rollGains(w: World, s: Side, event: BuffEvent, extra: readonly M
   if (!ch.anyGain) return;
   for (const id of BUFF_IDS) {
     if (!ch.buffSource[id]) continue;
-    const chance = ch.db.sum('base', buffStat(event, id)) + sumOf(extra, buffStat(event, id));
+    // Asked under the conditions that hold now, as charges are (a gain may be conditional: the Yard's Off-Hand Parry).
+    const chance = ch.db.sum('base', buffStat(event, id), playerCtx(w, s)) + sumOf(extra, buffStat(event, id));
     if (chance > 0 && w.rngTrig.chance(Math.min(1, chance / 100))) {
       gainBuff(w, s, id);
       // A guard's buff gained this way (Stoneward Gauntlets' Steel Hide) brings its shell, if the guard is socketed.

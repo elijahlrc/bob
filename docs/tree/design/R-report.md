@@ -9,6 +9,12 @@ report for the owner is the last section (and its Artifact page).
   Spire's notables pass). Minions stay in the Spire only at the west, two homes, facing the Cathedral's. Insight stays one
   Spire home beside the Knife's two; growing it toward charge play with engine work was not done unless noted below.
 
+- The Bow: cold arrows in the Bow (the reviewer asked for them; cold attacks otherwise exist only in the Cathedral).
+- The Yard: whether two-handed weapons have a real home in the Yard (carried on: the Paired Steel / Full Swing choice wheel
+  plus a two-handed stun payoff) or are left to the Wall; whether the Yard's west start node should be "global defences
+  with life" instead of the skeleton's armour (carried on: global defences, §16.8); whether the Yard should hold elemental
+  melee at all, given the Bow and the Cathedral (carried on: Elemental Edge only with a melee hook).
+
 ## Engine additions
 
 - The Spire: maximum mana as a `per` stat (`src/calc/character.ts` statValue `maxMana`), for spell damage per 100 mana
@@ -71,3 +77,33 @@ report for the owner is the last section (and its Artifact page).
   Close Quarters), Quickened and Elusive with a payoff, flask charges as the attrition lever, cold and fire arrows.
   For the tidy pass: crowding and label collisions round the Yard seam's mid ring junction; Lingering Momentum could
   sit nearer Pursuit's End. Owner question: cold arrows in the Bow (carried on).
+
+### The Yard
+
+- Stage 1 (plan): R-yard.md. Round 1 REVISE (copies at the Bow border checked against real positions: Darting Steel,
+  Red Harvest, Stormstruck; false placement reasons; bleed and shield one-stop shops; strays; the count; the west start
+  node a defence only some take). Round 2 approved.
+- Stage 2 (structure): round 1 REVISE (armour piled on the west first ring; the dual-wield corner crowded; shields
+  regrouped on one road; collisions with the unrebuilt Wall). Fixed. The Strider and Reaver starts were 8 steps apart
+  (both paths straight to the shared seam); the Yard's east path now runs through Killing Pace (10). **For the joins
+  pass:** bring the Bow side's path to the Yard seam through a cluster too (~12), and check every neighbouring pair's
+  start distance. **For the Wall and centre passes:** through the old west seam the Reaver reaches centre notables at
+  step 7 and the Wall's Second Wind (7), Greatblade (9) and Cleaver (10), weapon picks near the start.
+- Keystones renamed (borrowed words from reference keystones of the same mechanic): Wound Dance → Hundred Cuts, Crimson
+  Pact → Blood Bargain, in `src/data/tree/keystones.ts` too (mechanics bind by name).
+- Stage 3 (notables): round 1 REVISE (Fortified on every melee hit underpriced; copies inside the region; Hot Blood's
+  trigger was the Bow's; sustain lines lost; east bleed thin; flat swords; 49 too few). Round 2 approved with four fixes
+  (two copies; leech as padding; utility; prices).
+- Stage 4 (final review): approved. **The Yard is done** (2026-10-31): 52 notables, 3 keystones (reference 57);
+  notables 50/35/15 against the reference's 56/27/17: **a reviewer-accepted deviation**, the surplus being the block,
+  stun and leech lines that are the region's identity (candidates to shave if wanted: Four Winds, Scarred Hide). Its
+  identity: the duel up close (block → Quickened and fervour for the dual wielder; the parrying swordsman; the stun loop
+  for two-handers and shields; impale; bleed split east and west). Sustain leans leech and block, kill recovery left to
+  the Bow and the Knife (owner question). For the tidy pass: melee physical damage repeats as a second line near the
+  start; about 13 kept notables are two flat lines.
+- Engine additions for the Yard: event gains asked under the fight's conditions (`src/sim/buffs.ts` rollGains: before,
+  a conditional gain never applied); lines on existing events and conditions: Fortified on stun, fervour on block,
+  Elusive on evade, Quickened on block while dual wielding, damage per fervour charge while dual wielding, damage after
+  a block / against stunned / while leeching / while Fortified, crit against bleeding or stunned enemies, melee area on
+  kill, impale chance and effect, armour against elemental hits (`armourVsEle`), melee physical gained as extra fire.
+  Condition texts added for Elusive and leeching energy shield (the Bow's Pursuit's End had shown a raw id).

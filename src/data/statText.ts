@@ -419,6 +419,8 @@ Object.assign(STAT_TEXT, {
   chilledLessDamage: { base: 'Chilled Enemies deal {v}% less Damage to you' },
   // The Bow's.
   farShot: { base: 'Projectile Attacks deal up to {v}% more Damage far away, and 20% less up close' },
+  // The Yard's.
+  armourVsEle: { base: '{v}% of Armour also applies to Elemental Hits' },
 } satisfies Record<string, StatText>);
 for (const id of BUFF_IDS) {
   const name = BUFFS[id].name;
@@ -516,6 +518,8 @@ Object.assign(TAG_TEXT, {
 Object.assign(CONDITION_TEXT, {
   fortified: 'while Fortified',
   onslaught: 'while Quickened',
+  elusive: 'while Elusive',
+  leechingEs: 'while Leeching Energy Shield',
   unholyMight: 'while you have Dread Might',
   arcaneSurge: 'while you have Arcane Tide',
   golemStone: 'while your Stone Colossus stands',
