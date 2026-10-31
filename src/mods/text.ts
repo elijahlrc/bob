@@ -28,7 +28,14 @@ function suffix(m: Mod): string {
     const c = CONDITION_TEXT[m.condition.id] ?? m.condition.id;
     parts.push(m.condition.not ? `unless ${c.replace(/^(while|if you have|against) /, '')}` : c);
   }
-  if (m.per) parts.push(`per ${m.per.div} ${PER_TEXT[m.per.stat] ?? m.per.stat}`);
+  if (m.per) {
+    // A cap of more than one step is the player's to see ("up to 40%"); a cap of one is a threshold.
+    const cap =
+      m.per.max && m.per.max > 1 && Number.isFinite(m.per.max)
+        ? `, up to ${m.value * m.per.max}${m.kind === 'inc' || m.kind === 'more' ? '%' : ''}`
+        : '';
+    parts.push(`per ${m.per.div} ${PER_TEXT[m.per.stat] ?? m.per.stat}${cap}`);
+  }
   return parts.length ? ' ' + parts.join(' ') : '';
 }
 

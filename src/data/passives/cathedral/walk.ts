@@ -224,7 +224,7 @@ export const lychway: AreaSpec = {
     },
     {
       from: 'road.n6',
-      to: 'spire.fire.rim.c',
+      to: 'spire.rim.ring.w0',
       why: "The far loop (a dear crossing; G1-brief.md §2.2, laid in the G2 border pass): the north walk runs on in its own line (a turn of about 10°) to the corner of the Mystic's north-west rim road, so the two rim roads read as one road over the top of the map. The casters' far loop: Tomb Dust, Shattering Rite and the Zealot's far casters with Cinder, Steady Stream and the Mystic's far shield. 19 steps from the Zealot start and 23 from the Mystic's, so it is a late build's road.",
     },
   ],

@@ -482,6 +482,7 @@ export const BUFF_EVENTS = [
   'cast',
   'kill',
   'killShocked',
+  'killIgnited',
   'surge',
   'hit',
   'meleeHit',

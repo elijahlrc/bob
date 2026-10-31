@@ -749,6 +749,10 @@ export class Character {
                 ? attrs.int
                 : s === 'level'
                   ? level
+                  : // Maximum mana before anything scales with it (the tree's mana-scaled lines: spell damage per
+                    // 100 mana, mana as extra energy shield); no mana mod may itself be per maxMana.
+                    s === 'maxMana'
+                    ? Math.max(0, Math.round(db0.calc('mana', { ...ctx0, statValue: this.statValue })))
                   : s === 'minAttr'
                     ? Math.min(attrs.str, attrs.dex, attrs.int)
                     : // Accuracy and increased armour as gear, tree and attributes give them (for The Marksman's Pulse and
@@ -1066,7 +1070,8 @@ export class Character {
     for (const sg of this.gems) {
       if (sg.def.kind !== 'aura') continue;
       const def = sg.def;
-      const life = usesLife(sg.slot);
+      // The tree's Kept Vows: every aura reserves life instead of mana.
+      const life = usesLife(sg.slot) || db0.flag('auraReserveLife', ctx0);
       const pool = life ? pre.maxLife : pre.maxMana;
       const base = def.reservePct
         ? (def.reservePct / 100) * pool

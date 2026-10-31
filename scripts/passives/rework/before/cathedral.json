@@ -1,0 +1,4499 @@
+[
+ {
+  "file": "ambulatory",
+  "export": "ambulatory",
+  "id": "cathedral.ambulatory",
+  "name": "The Ambulatory",
+  "why": "The walk round the back of the Cathedral: a road joining the Bell Tower to the Undercroft, a second road out from the Vestry, and the clusters along them.",
+  "start": null,
+  "clusters": [
+   {
+    "id": "walk",
+    "name": "The walk",
+    "why": "Seven attribute nodes from the tower junction to the shrine: the long road round the back, with a cluster coming off every second node.",
+    "nodes": [
+     {
+      "id": "w1",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3350,
+       -1518
+      ]
+     },
+     {
+      "id": "w2",
+      "kind": "attribute",
+      "why": "Where the road from the Vestry arrives, and the staff caster leaves.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3279,
+       -1720
+      ]
+     },
+     {
+      "id": "w3",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3192,
+       -1912
+      ]
+     },
+     {
+      "id": "w4",
+      "kind": "attribute",
+      "why": "Where the armour bridge leaves inward.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3087,
+       -2094
+      ]
+     },
+     {
+      "id": "w5",
+      "kind": "attribute",
+      "why": "Where the brand pocket leaves inward.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2964,
+       -2266
+      ]
+     },
+     {
+      "id": "w6",
+      "kind": "attribute",
+      "why": "Where the cold strikes leave outward.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2837,
+       -2446
+      ]
+     },
+     {
+      "id": "w7",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2710,
+       -2627
+      ]
+     }
+    ],
+    "links": [
+     [
+      "w1",
+      "w2"
+     ],
+     [
+      "w2",
+      "w3"
+     ],
+     [
+      "w3",
+      "w4"
+     ],
+     [
+      "w4",
+      "w5"
+     ],
+     [
+      "w5",
+      "w6"
+     ],
+     [
+      "w6",
+      "w7"
+     ]
+    ]
+   },
+   {
+    "id": "nave",
+    "name": "The back road",
+    "why": "Two attribute nodes from the Vestry's junction straight out to the walk, above the tower's wheel: the tower and Searing Avatar can be reached without passing either of the wheel's notables.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2870,
+       -1484
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3074,
+       -1602
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "crozier",
+    "name": "Crozier",
+    "why": "A pocket outward off the walk: spell damage with a staff twice, then the notable with spell damage with a staff and cast speed: the staff in a caster's hand. G4 fix 2 (2026-10-23, audit D1): it was staff damage, which reaches only attacks, beside spell damage, so the staff attacker and the staff caster each got half; now the whole cluster is the caster's. The staff attacker's homes are Quarterstaff (staff damage with attack block, at the Vestry) and Warding Staff (staff damage with spell block with a staff, by the dear road).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "staffSpellDamage(8)"
+      ],
+      "at": [
+       -3564,
+       -2091
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "staffSpellDamage(8)"
+      ],
+      "at": [
+       -3616,
+       -2117
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Crozier",
+      "why": "Spell damage with a staff and cast speed: 2.5 + 1.5 units.",
+      "lines": [
+       "staffSpellDamage(20)",
+       "castSpeed(6)"
+      ],
+      "at": [
+       -3679,
+       -2147
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "plate",
+    "name": "Consecrated Plate",
+    "why": "A bridge inward from the walk to the back road: armour twice and the notable with armour and stun recovery (energy shield until G3). Its armour was thin before. Since G2 the aisle arrives too, so it is a crossroads.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -2841,
+       -1960
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Consecrated Plate",
+      "why": "Armour, and stuns shaken off sooner: 2 + 2 units. G3 (2026-10-22, G1-brief.md §4.3): its energy shield went, because with Lectern four steps away on the aisle every Zealot caster took both (the allocator's plans for five casters), spell damage and energy shield in one stop. Ox Hide, in the Wall, is armour with stun threshold.",
+      "lines": [
+       "armour(24)",
+       "stunRecovery(30)"
+      ],
+      "at": [
+       -2778,
+       -1927
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -2825,
+       -1876
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "brand",
+    "name": "Brandwright",
+    "why": "A bridge inward from the walk to Lectern: brand damage twice either side of the notable with brand damage and brand crit. The second brand cluster; Runecarver, at the shrine, sells brands with duration and area. G3 round 2 (2026-10-22, the user's decision): it sold elemental damage and cast speed, so every Zealot caster that took Lectern took it one step on, for those and not its brands; now it is the brand cluster only, and the two smalls between it and Lectern (spell damage, Lectern's until then) carry brand damage, so the bridge reads spell, Lectern, brand, Brandwright, brand.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "brandDamage(12)"
+      ],
+      "at": [
+       -2603,
+       -2211
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "brandDamage(12)"
+      ],
+      "at": [
+       -2545,
+       -2202
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Brandwright",
+      "why": "Brand damage and crit chance with brands: 2 + 2 units (G3 round 2; it was brand damage, elemental damage and cast speed, which drew every caster).",
+      "lines": [
+       "brandDamage(24)",
+       "critChance(30, [\"brand\"])"
+      ],
+      "at": [
+       -2476,
+       -2192
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "Toward Lectern (was `cathedral.nave.lectern.d`, spell damage, until G3 round 2).",
+      "lines": [
+       "brandDamage(12)"
+      ],
+      "at": [
+       -2487,
+       -2115
+      ]
+     },
+     {
+      "id": "d",
+      "kind": "small",
+      "why": "The far node, onto Lectern (was `cathedral.nave.lectern.c`, spell damage, until G3 round 2).",
+      "lines": [
+       "brandDamage(12)"
+      ],
+      "at": [
+       -2495,
+       -2060
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ],
+     [
+      "c",
+      "d"
+     ]
+    ]
+   },
+   {
+    "id": "kindled",
+    "name": "Kindled Steel",
+    "why": "A pocket outward off the walk: fire with attacks twice, then fire strikes that ignite. Here since round 3 (2026-10-20); it was on the tower wheel, in one corridor with Gilded Rod and Searing Avatar. Now the fire sceptre has three destinations a dozen steps apart: the Vestry's sceptre, this pocket, and the keystone at the tower's tip.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "eleAttackOne(\"fire\", 12)"
+      ],
+      "at": [
+       -3194,
+       -2671
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "eleAttackOne(\"fire\", 12)"
+      ],
+      "at": [
+       -3244,
+       -2702
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Kindled Steel",
+      "why": "Fire with attacks and the ignite a fire strike leaves: 2 + 1 + 1 units.",
+      "lines": [
+       "eleAttackOne(\"fire\", 24)",
+       "igniteChance(10)",
+       "igniteDuration(15)"
+      ],
+      "at": [
+       -3303,
+       -2739
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "tithe",
+    "name": "Tithe",
+    "why": "A bridge on the Wall side from the Vestry's crossing road to the tower junction: life leech with attacks twice, then the notable with leech and life on hit, for the melee Zealot, who had no leech. It is the tower's third way in.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       -3443,
+       -737
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Tithe",
+      "why": "2 + 1 units.",
+      "lines": [
+       "leechLife(0.8, [\"attack\"])",
+       "lifeOnHit(4, [\"attack\"])"
+      ],
+      "at": [
+       -3437,
+       -807
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       -3432,
+       -876
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "attribute",
+      "why": "A road node onto the tower junction.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3411,
+       -1106
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "toWall",
+    "name": "To the Rampart",
+    "why": "A road of two attribute nodes from the leech bridge toward the Wall, its end turning into Battle Hymn, whose far small lands on the Wall's Hymn road: the Wall and the Cathedral meet on their outer sides as well as at home. G4 fix 1 (2026-10-22, audit N6, fix brief §1.2 item 4): it ran on by two strength nodes (`c`, `d`, retired) to the Wall's Stagger, a second bare crossing 300 units from Battle Hymn's for the same warcry corner, walked by no build; the corner's one crossing is now Battle Hymn, a bridge, and seam 5 (Twofold Guard, `rods.ts`) joins the two regions farther in.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3240,
+       -508
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "why": "The end of the road, on the straight line on into the warcry bridge (moved in G4 fix 1, when its leg to Stagger went).",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3304,
+       -420
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "hymn",
+    "name": "Battle Hymn",
+    "why": "A bridge from the end of the Rampart road to the Wall's Hymn road: warcry effect, the notable with warcries and aura effect (the Zealot's shout among its auras), warcry effect. The second warcry cluster; War Drums, in the Wall's Barrows, sells louder and longer shouts. G4 fix 1 (2026-10-22, audit N6, fix brief §1.2 item 4): it was a pocket whose second small the Wall's road also reached, the notable a dead end beyond it; now the notable sits between its two smalls on one straight line from the Rampart road's junction to the Wall's Hymn road, so it is the corner's one crossing and a bridge.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the Rampart road, on the line to the notable.",
+      "lines": [
+       "warcryEffect(10)"
+      ],
+      "at": [
+       -3356,
+       -347
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The far node, on the line to the Wall's Hymn road, which lands here.",
+      "lines": [
+       "warcryEffect(10)"
+      ],
+      "at": [
+       -3438,
+       -233
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Battle Hymn",
+      "why": "1.5 + 1.7 units.",
+      "lines": [
+       "warcryEffect(15)",
+       "auraEffect(10)"
+      ],
+      "at": [
+       -3397,
+       -290
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "ossuary",
+    "name": "Ossuary",
+    "why": "A pocket outward off the walk's middle: minion damage twice, then minions with energy shield, for the summoner who stands behind a shield. The third minion cluster, far from the other two; Familiars, in the Spire, sells minions with spells, and Shepherd, at the Choir, minions that last.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "minionDamage(12)"
+      ],
+      "at": [
+       -3357,
+       -2364
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "minionDamage(12)"
+      ],
+      "at": [
+       -3399,
+       -2406
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Ossuary",
+      "why": "1.7 + 2 units.",
+      "lines": [
+       "minionDamage(20)",
+       "es(10)"
+      ],
+      "at": [
+       -3448,
+       -2455
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "peal",
+    "name": "Thunder Peal",
+    "why": "A pocket west off the walk's first node, under the Bell Tower: lightning twice, then lightning with mana and long shocks. The lightning caster's late cluster, far from the Spire's two (Thunderhead sells lightning with cast speed, Live Current with shock effect) and the Knife's Static Edge (with crit). Round 3 (2026-10-20).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "eleDamage(\"lightning\", 10)"
+      ],
+      "at": [
+       -3703,
+       -1664
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "eleDamage(\"lightning\", 10)"
+      ],
+      "at": [
+       -3756,
+       -1686
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Thunder Peal",
+      "why": "1.6 + 1.5 + 1 units.",
+      "lines": [
+       "eleDamage(\"lightning\", 16)",
+       "manaRegen(15)",
+       "shockDuration(15)"
+      ],
+      "at": [
+       -3821,
+       -1713
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "censer",
+    "name": "Censer",
+    "why": "A pocket south-west off the Rampart road, between Tithe and Battle Hymn: burning damage twice, then burning with area and long ignites. The second ignite cluster and the first outside the Spire (Cinder, in the Lantern, sells ignite chance and faster burning). Kindled Steel, out on the walk, ignites with fire strikes. Round 3 (2026-10-20). Since G2 the outer walk leaves it, and since G3 round 3 Procession (auras with movement, `rim.ts`) hangs off it, so it is a junction of three (Procession's crossing on to the Vanguard's Grim Oath was cut in G4 fix 2); Brazier, off the far end of the outer walk, is burning with the sceptre.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "burnDamage(12)"
+      ],
+      "at": [
+       -3613,
+       -590
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "burnDamage(12)"
+      ],
+      "at": [
+       -3669,
+       -602
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Censer",
+      "why": "2 + 1 + 1 units.",
+      "lines": [
+       "burnDamage(24)",
+       "areaDamage(10)",
+       "igniteDuration(15)"
+      ],
+      "at": [
+       -3738,
+       -618
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "walk.w1",
+    "to": "peal.a",
+    "why": "The walk onto the lightning pocket."
+   },
+   {
+    "from": "toWall.a",
+    "to": "censer.a",
+    "why": "The Rampart road onto the burning pocket."
+   },
+   {
+    "from": "walk.w4",
+    "to": "ossuary.a",
+    "why": "The walk onto the minion pocket."
+   },
+   {
+    "from": "tithe.a",
+    "to": "toWall.a",
+    "why": "The leech bridge onto the Rampart road."
+   },
+   {
+    "from": "toWall.b",
+    "to": "hymn.a",
+    "why": "The Rampart road onto the warcry bridge: Battle Hymn's first small, on the line to the notable."
+   },
+   {
+    "from": "cathedral.pyre.jF.a",
+    "to": "walk.w1",
+    "why": "The tower junction onto the walk."
+   },
+   {
+    "from": "walk.w7",
+    "to": "cathedral.crypt.shrine.e",
+    "why": "The walk lands on the shrine's far node: the Undercroft has a second way in."
+   },
+   {
+    "from": "cathedral.rods.jR.a",
+    "to": "nave.a",
+    "why": "The Vestry's junction onto the back road."
+   },
+   {
+    "from": "nave.b",
+    "to": "walk.w2",
+    "why": "The back road meets the walk."
+   },
+   {
+    "from": "walk.w3",
+    "to": "crozier.a",
+    "why": "The walk onto the staff caster's pocket."
+   },
+   {
+    "from": "walk.w4",
+    "to": "plate.a",
+    "why": "The walk onto the armour bridge."
+   },
+   {
+    "from": "plate.b",
+    "to": "nave.b",
+    "why": "The armour bridge onto the back road."
+   },
+   {
+    "from": "walk.w5",
+    "to": "brand.a",
+    "why": "The walk onto the brand pocket."
+   },
+   {
+    "from": "walk.w6",
+    "to": "kindled.a",
+    "why": "The walk onto the fire-strike pocket."
+   },
+   {
+    "from": "cathedral.rods.toWall.c",
+    "to": "tithe.a",
+    "why": "The Vestry's crossing road onto the leech bridge."
+   },
+   {
+    "from": "tithe.c",
+    "to": "cathedral.pyre.jF.a",
+    "why": "The leech bridge onto the tower junction."
+   }
+  ]
+ },
+ {
+  "file": "choir",
+  "export": "choir",
+  "id": "cathedral.choir",
+  "name": "The Choir",
+  "why": "Off the transept toward the Spire: auras or minions on one wheel, Lone Vow and Living Ward.",
+  "start": null,
+  "clusters": [
+   {
+    "id": "wheel",
+    "name": "Choirmaster",
+    "why": "The wheel of eight off the transept: auras on the north side (Choirmaster), minions on the south (Shepherd, minions that last), mana at the ends. The other aura is at the tower; the other minion cluster is across the Spire border (Familiars).",
+    "nodes": [
+     {
+      "id": "c1",
+      "kind": "small",
+      "why": "The west entrance, from the transept.",
+      "lines": [
+       "mana(8)"
+      ],
+      "at": [
+       -1475,
+       -1545
+      ]
+     },
+     {
+      "id": "c2",
+      "kind": "small",
+      "why": "The reservation side; the Vigil chain arrives.",
+      "lines": [
+       "reducedReservation(3)"
+      ],
+      "at": [
+       -1536,
+       -1498
+      ]
+     },
+     {
+      "id": "c3",
+      "kind": "notable",
+      "name": "Choirmaster",
+      "why": "Less reserved, more effect, more mana: 1.7 + 1.7 + 1 units. The star's chaos spoke lands here.",
+      "lines": [
+       "reducedReservation(5)",
+       "auraEffect(10)",
+       "mana(8)"
+      ],
+      "at": [
+       -1612,
+       -1508
+      ]
+     },
+     {
+      "id": "c4",
+      "kind": "small",
+      "why": "The east exit, to the choir junction.",
+      "lines": [
+       "mana(8)"
+      ],
+      "at": [
+       -1649,
+       -1645
+      ]
+     },
+     {
+      "id": "c5",
+      "kind": "notable",
+      "name": "Shepherd",
+      "why": "Minions that last: 2 + 1 + 1 units. The near crossing to the Spire's flasks leaves here.",
+      "lines": [
+       "minionLife(24)",
+       "minionDamage(12)",
+       "minionSpeed(5)"
+      ],
+      "at": [
+       -1512,
+       -1681
+      ]
+     },
+     {
+      "id": "c6",
+      "kind": "small",
+      "why": "The minion side.",
+      "lines": [
+       "minionLife(12)"
+      ],
+      "at": [
+       -1465,
+       -1621
+      ]
+     },
+     {
+      "id": "c7",
+      "kind": "small",
+      "lines": [
+       "reducedReservation(3)"
+      ],
+      "at": [
+       -1659,
+       -1569
+      ]
+     },
+     {
+      "id": "c8",
+      "kind": "small",
+      "lines": [
+       "minionLife(12)"
+      ],
+      "at": [
+       -1588,
+       -1692
+      ]
+     }
+    ],
+    "links": [
+     [
+      "c1",
+      "c2"
+     ],
+     [
+      "c2",
+      "c3"
+     ],
+     [
+      "c3",
+      "c7"
+     ],
+     [
+      "c7",
+      "c4"
+     ],
+     [
+      "c4",
+      "c8"
+     ],
+     [
+      "c8",
+      "c5"
+     ],
+     [
+      "c5",
+      "c6"
+     ],
+     [
+      "c6",
+      "c1"
+     ]
+    ]
+   },
+   {
+    "id": "jC",
+    "name": "Choir junction",
+    "why": "East of the wheel: the minions ahead and the Living Ward spur toward the Spire. (The Lone Vow spur left here until G2, 2026-10-22; it hangs off the aisle now.)",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1723,
+       -1976
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "loneVow",
+    "name": "Lone Vow",
+    "why": "Two nodes of aura effect, then the trade: only the first aura is active, and it reserves nothing. The one-aura build with every point of mana free; the approach says what the keystone asks. Since G2 (2026-10-22) the spur leaves the aisle's middle node, on a straight line from it to the keystone, which did not move.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -2279,
+       -1733
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -2271,
+       -1794
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Lone Vow",
+      "lines": [],
+      "at": [
+       -2261,
+       -1883
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "livingWard",
+    "name": "Living Ward",
+    "why": "Two nodes of life regeneration, then the trade: regeneration fills energy shield instead, and life is one. On the Spire side of the tower, a few steps from Mind Bulwark across the border: the two shield keystones face each other.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -1432,
+       -2372
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -1397,
+       -2418
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Living Ward",
+      "lines": [],
+      "at": [
+       -1347,
+       -2487
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "toSpire",
+    "name": "A road node",
+    "why": "A road node on the near crossing from Shepherd to the Spire's Draught: two notables were joined directly across the border.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1373,
+       -1830
+      ]
+     }
+    ],
+    "links": []
+   }
+  ],
+  "links": [
+   {
+    "from": "wheel.c4",
+    "to": "jC.a",
+    "why": "Through the wheel to the choir junction."
+   },
+   {
+    "from": "cathedral.choir.wheel.c5",
+    "to": "cathedral.choir.toSpire.a",
+    "why": "A road node on the near crossing from Shepherd to the Spire's Draught: two notables were joined directly across the border."
+   },
+   {
+    "from": "cathedral.nave.aisle.a2",
+    "to": "loneVow.a",
+    "why": "G2 (2026-10-22): the Lone Vow spur hangs off the aisle's middle node (it left the choir junction before), so the keystone that makes reservation moot and the reservation cluster Lectern (G3, one node on) are a fork off one road."
+   },
+   {
+    "from": "jC.a",
+    "to": "livingWard.a",
+    "why": "Junction to the Living Ward spur."
+   },
+   {
+    "from": "jC.a",
+    "to": "cathedral.crypt.wheel.m1",
+    "why": "The choir junction to the minion wheel: the tower's spine."
+   }
+  ]
+ },
+ {
+  "file": "crypt",
+  "export": "crypt",
+  "id": "cathedral.crypt",
+  "name": "The Undercroft",
+  "why": "The deep end toward the Spire: minion damage or spell block on one wheel, the totem and brand shrine, Volatile Servants and Sigil Warden, and the dear road to the Spire with Tomb Dust and Shattering Rite off it. The north walk round its back (G2) is its own place since G3 round 2, the Lychway (`walk.ts`).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "wheel",
+    "name": "Homily",
+    "why": "The wheel of eight in the crypt: spell damage on the north side (Homily, the Zealot's caster notable past the nave), spell block behind a shield on the south (Glass Wall, with its flat energy shield), spell block at the ends. The summoner on the way to Volatile Servants passes one of them; its minions are at the choir and across the Spire border. G4 fix 1 (2026-10-22, audit T6.2 and T11): the ends were energy shield, so every caster who took the detour to Homily got spell damage and energy shield in one cluster; now the wheel reads spell damage one way, spell block with energy shield the other, and Glass Wall's side is the Zealot's own energy shield direction, away from the Mystic's Cloister.",
+    "nodes": [
+     {
+      "id": "m1",
+      "kind": "small",
+      "why": "The west entrance: spell block (energy shield until G4 fix 1).",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -1807,
+       -2371
+      ]
+     },
+     {
+      "id": "m2",
+      "kind": "small",
+      "why": "The spell side.",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -1867,
+       -2324
+      ]
+     },
+     {
+      "id": "m3",
+      "kind": "notable",
+      "name": "Homily",
+      "why": "2 + 1 + 1 units.",
+      "lines": [
+       "spellDamage(16)",
+       "eleDamageAll(10)",
+       "castSpeed(4)"
+      ],
+      "at": [
+       -1943,
+       -2334
+      ]
+     },
+     {
+      "id": "m4",
+      "kind": "small",
+      "why": "The east exit, to the crypt junction: spell block (energy shield until G4 fix 1).",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -1980,
+       -2471
+      ]
+     },
+     {
+      "id": "m5",
+      "kind": "notable",
+      "name": "Glass Wall",
+      "why": "Spell block behind a shield, shield defences and flat shield: 2 + 1 + 1 units. The flat shield was 15 before the energy shield cut of docs/ATTRITION.md.",
+      "lines": [
+       "shieldSpellBlock(4)",
+       "shieldDef(15)",
+       "esFlat(11)"
+      ],
+      "at": [
+       -1843,
+       -2508
+      ]
+     },
+     {
+      "id": "m6",
+      "kind": "small",
+      "why": "The spell-block side.",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -1796,
+       -2447
+      ]
+     },
+     {
+      "id": "m7",
+      "kind": "small",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -1990,
+       -2395
+      ]
+     },
+     {
+      "id": "m8",
+      "kind": "small",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -1919,
+       -2518
+      ]
+     }
+    ],
+    "links": [
+     [
+      "m1",
+      "m2"
+     ],
+     [
+      "m2",
+      "m3"
+     ],
+     [
+      "m3",
+      "m7"
+     ],
+     [
+      "m7",
+      "m4"
+     ],
+     [
+      "m4",
+      "m8"
+     ],
+     [
+      "m8",
+      "m5"
+     ],
+     [
+      "m5",
+      "m6"
+     ],
+     [
+      "m6",
+      "m1"
+     ]
+    ]
+   },
+   {
+    "id": "jV",
+    "name": "Crypt junction",
+    "why": "East of the wheel: the shrine ahead, the Volatile Servants spur toward the Spire side.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2188,
+       -2591
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "volatile",
+    "name": "Volatile Servants",
+    "why": "Two nodes of minion life, then the keystone: minions burst when they fall to low life, dealing a third of their life as fire around them. The approach says what the keystone asks (more life is a bigger burst).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "minionLife(12)"
+      ],
+      "at": [
+       -2018,
+       -3141
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "minionLife(12)"
+      ],
+      "at": [
+       -2001,
+       -3196
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Volatile Servants",
+      "lines": [],
+      "at": [
+       -1976,
+       -3277
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "shrine",
+    "name": "Reliquary",
+    "why": "A diamond of four: totems on the north notable, brands on the south, the entrance a totem small and the far node a brand small where Sigil Warden leaves. The things that fight for you other than minions, grouped so that Idle Hands and Sigil Warden both have something to point at.",
+    "nodes": [
+     {
+      "id": "w",
+      "kind": "small",
+      "why": "The west entrance, from the crypt junction: duration, which both sides use.",
+      "lines": [
+       "skillDuration(10)"
+      ],
+      "at": [
+       -2391,
+       -2708
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Reliquary",
+      "why": "The casting totem: 2 + 1 + 1 units.",
+      "lines": [
+       "totemDamage(24)",
+       "spellDamage(8)",
+       "totemDuration(15)"
+      ],
+      "at": [
+       -2494,
+       -2681
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "small",
+      "why": "The far node; the Sigil Warden spur leaves here.",
+      "lines": [
+       "skillDuration(10)"
+      ],
+      "at": [
+       -2521,
+       -2783
+      ]
+     },
+     {
+      "id": "s",
+      "kind": "notable",
+      "name": "Runecarver",
+      "why": "Brands: damage, duration and area. 2 + 1 + 1 units.",
+      "lines": [
+       "brandDamage(24)",
+       "skillDuration(10)",
+       "areaDamage(10)"
+      ],
+      "at": [
+       -2419,
+       -2811
+      ]
+     }
+    ],
+    "links": [
+     [
+      "w",
+      "n"
+     ],
+     [
+      "n",
+      "e"
+     ],
+     [
+      "e",
+      "s"
+     ],
+     [
+      "s",
+      "w"
+     ]
+    ]
+   },
+   {
+    "id": "sigilWarden",
+    "name": "Sigil Warden",
+    "why": "Two nodes of brand damage, then the trade: one more brand at a time, and totems deal 40% less. Off the shrine's brand side, which is the decision the keystone is.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "brandDamage(12)"
+      ],
+      "at": [
+       -2927,
+       -2968
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "brandDamage(12)"
+      ],
+      "at": [
+       -2980,
+       -2990
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Sigil Warden",
+      "lines": [],
+      "at": [
+       -3058,
+       -3024
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "toSpire",
+    "name": "To the Spire",
+    "why": "The dear crossing to the Spire's west arm: two attribute nodes from Glass Wall to Familiars, the Spire's minion notable, which the arm's junction is one step past. For the minion Mystic and the fire-caster Zealot.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1736,
+       -2954
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "why": "Where Familiars lands.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1478,
+       -3140
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "stair",
+    "name": "The crypt stair",
+    "why": "One attribute node from the Spire crossing down to the crypt junction (2026-10-20): the junction, the shrine and Volatile Servants had one way in, through the wheel.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1962,
+       -2772
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "tomb",
+    "name": "Tomb Dust",
+    "why": "A pocket north off the crossing road to the Spire, between Volatile Servants and Familiars: chaos with spells twice, then chaos spells with energy shield and area. One of the tree's two chaos-spell clusters (round 3, 2026-10-20; there were none): the other is Rotting Word on the Knife's Stair, with damage over time and cast speed, and the Spire's Withering sells the damage-over-time multiplier.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "chaosSpell(12)"
+      ],
+      "at": [
+       -1736,
+       -3336
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "chaosSpell(12)"
+      ],
+      "at": [
+       -1736,
+       -3394
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Tomb Dust",
+      "why": "1.3 + 1.6 + 1 units.",
+      "lines": [
+       "chaosSpell(16)",
+       "es(8)",
+       "spellArea(8)"
+      ],
+      "at": [
+       -1736,
+       -3464
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "rite",
+    "name": "Shattering Rite",
+    "why": "A pocket north off the crossing road to the Spire, beside Tomb Dust: physical damage with spells twice, then physical spells with the elements. For the spells that turn part of their physical damage into an element (physical increases follow the part that turns), and the earthen spells. The Rooftops' Whetted Will sells physical spells with duration. Round 4 (2026-10-20). Since G3 round 3 (2026-10-22) a bridge: Plainsong (channelling, `walk.ts`) carries its chain on to the north walk.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "physSpell(12)"
+      ],
+      "at": [
+       -1511,
+       -3443
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "physSpell(12)"
+      ],
+      "at": [
+       -1517,
+       -3500
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Shattering Rite",
+      "why": "1.7 + 1.6 units (G3, 2026-10-22: physical spells raised from 16%, so the notable is worth 3 units; ledger ZE-p1).",
+      "lines": [
+       "physSpell(20)",
+       "eleDamageAll(16)"
+      ],
+      "at": [
+       -1525,
+       -3570
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "omen",
+    "name": "Bright Omen",
+    "why": "G4 fix 1 (2026-10-22), seam 2 of the fix brief (§1.1, the Mystic–Zealot seam cluster): a straight bridge from Shattering Rite across the border to the Mystic's Cinder, mana regeneration, the notable with spell crit chance and mana regeneration, mana regeneration again. The casters' crossroads at the far loop already sells spell damage, energy shield, minions and channelling (Shattering Rite, Tomb Dust, Plainsong, Familiars, Cinder), so this is neither: spell crit, which casters on both sides weigh and the life caster leaves unfinished at 120 points, with the mana to keep casting. A pairing the tree did not have: spell crit's other notables pair it with damage (Cold Light), crit multiplier (Keen Verse), penetration, insight or generic damage. Mana regeneration's others pair it with spell damage (Long Chant), lightning (Thunder Peal) or curses (Hexwright). Shattering Rite becomes a junction of three and Cinder a bridge.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from Shattering Rite, on the straight line to Cinder.",
+      "lines": [
+       "manaRegen(10)"
+      ],
+      "at": [
+       -1417,
+       -3653
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Bright Omen",
+      "why": "Spell crit chance and mana regeneration: 2 + 1.5 units.",
+      "lines": [
+       "spellCrit(30)",
+       "manaRegen(15)"
+      ],
+      "at": [
+       -1361,
+       -3696
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The far node, onto the Mystic's Cinder.",
+      "lines": [
+       "manaRegen(10)"
+      ],
+      "at": [
+       -1306,
+       -3739
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "toSpire.b",
+    "to": "rite.a",
+    "why": "The crossing road onto the physical spells."
+   },
+   {
+    "from": "rite.n",
+    "to": "omen.a",
+    "why": "Shattering Rite onto the spell crit bridge (G4 fix 1, seam 2)."
+   },
+   {
+    "from": "omen.b",
+    "to": "spire.fire.cinder.n",
+    "why": "Seam 2 (G4 fix 1; fix brief §1.1): Bright Omen's far small lands on the Mystic's Cinder, the one border link this seam lays. A far crossing, 21 steps from the Zealot start and 23 from the Mystic's: the casters of both sides find spell crit with mana here, between the Zealot's physical spells and the Mystic's burning, and Cinder becomes a bridge."
+   },
+   {
+    "from": "toSpire.a",
+    "to": "tomb.a",
+    "why": "The crossing road onto the chaos pocket."
+   },
+   {
+    "from": "toSpire.a",
+    "to": "stair.a",
+    "why": "The Spire crossing onto the crypt stair."
+   },
+   {
+    "from": "stair.a",
+    "to": "jV.a",
+    "why": "The stair onto the crypt junction."
+   },
+   {
+    "from": "wheel.m4",
+    "to": "jV.a",
+    "why": "Through the wheel to the crypt junction."
+   },
+   {
+    "from": "jV.a",
+    "to": "volatile.a",
+    "why": "Junction to the Volatile Servants spur."
+   },
+   {
+    "from": "jV.a",
+    "to": "shrine.w",
+    "why": "Junction to the shrine."
+   },
+   {
+    "from": "shrine.e",
+    "to": "sigilWarden.a",
+    "why": "The shrine's brand side to the keystone spur."
+   },
+   {
+    "from": "wheel.m5",
+    "to": "toSpire.a",
+    "why": "Glass Wall onto the dear road."
+   },
+   {
+    "from": "toSpire.b",
+    "to": "spire.fire.familiars.n",
+    "why": "The dear road lands on Familiars."
+   }
+  ]
+ },
+ {
+  "file": "home",
+  "export": "home",
+  "id": "cathedral.home",
+  "name": "The Narthex",
+  "why": "Two stat nodes off the start (armour west, elemental damage east), the signature between them, two hubs one step out, and three roads: a highway to the west, life straight out, a highway to the east. The west hub's pocket is the Wall's Banner; the east hub's is Hymn, spell damage with lightning.",
+  "start": {
+   "classId": "zealot",
+   "region": "zealot",
+   "id": "start.zealot",
+   "at": [
+    -866,
+    -500
+   ]
+  },
+  "clusters": [
+   {
+    "id": "sig",
+    "name": "Zeal",
+    "why": "The loop the start opens onto: armour on the west side, elemental damage on the east, the signature at the tip. Point one is a side; point two is the signature, a hub, or a road.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The west side: defence.",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -1045,
+       -430
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Zeal",
+      "why": "The signature: elemental damage for either future, global defences (armour and shield at once: the Zealot's hybrid defence in one line), life and both attributes. 4.3 units. The middle road leaves from here.",
+      "lines": [
+       "eleDamageAll(10)",
+       "globalDefences(8)",
+       "life(5)",
+       "str(10)",
+       "int(10)"
+      ],
+      "at": [
+       -1074,
+       -620
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The east side: offence.",
+      "lines": [
+       "eleDamageAll(10)"
+      ],
+      "at": [
+       -895,
+       -690
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "hubs",
+    "name": "The hubs",
+    "why": "Both attributes, one step past each side node: the west hub joins the ring toward the Vanguard, starts the west road and touches the Wall's Banner; the east hub joins the ring toward the Mystic and starts the east road.",
+    "nodes": [
+     {
+      "id": "w",
+      "kind": "attribute",
+      "lines": [
+       "str(15)",
+       "int(15)"
+      ],
+      "at": [
+       -1223,
+       -383
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "attribute",
+      "lines": [
+       "str(15)",
+       "int(15)"
+      ],
+      "at": [
+       -943,
+       -867
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "hymn",
+    "name": "Hymn",
+    "why": "The east hub's pocket, a bridge from the east hub onto the east road: a lightning small on either side of the notable with spell damage and lightning, the casting Zealot's first spell notable and the storm caster's own line. G4 fix 1 (2026-10-22, audit S1, fix brief §1.2 item 5): it was mana, regeneration and a little shield, in no plan at any budget, and every Zealot caster opened the same way (Zeal, Hearthfire, Vigil, Choirmaster) because the first spell line was the fire wheel's at 7 steps. Now points 3 to 5 fork for a caster: Hymn east (spell and lightning), the fire wheel through the transept (fire with cast speed), Ardour west for the striker. The Zealot's mana stays on Choirmaster and the Banner. Twins: Hearthfire (fire with cast speed) 6 steps away, First Light (spell damage with mana and shield) 10, Thunder Peal (lightning with regeneration and shocks) far. G4 fix 2 (2026-10-23): the Mystic's crossing left its far small for the east road's second node (fix brief M-1), so the pocket no longer points at the Spire; it is laid as a right-angled triangle on the east road's first leg (the hub and the road's first node at the base corners, the notable at the apex, a small halfway along each side), which leaves the far small straight between the notable and the road instead of doubling back.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, facing the hub.",
+      "lines": [
+       "eleDamage(\"lightning\", 10)"
+      ],
+      "at": [
+       -956,
+       -941
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Hymn",
+      "why": "Spell damage and lightning: 2 + 1.6 units.",
+      "lines": [
+       "spellDamage(16)",
+       "eleDamage(\"lightning\", 16)"
+      ],
+      "at": [
+       -970,
+       -1015
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The far node, onto the east road.",
+      "lines": [
+       "eleDamage(\"lightning\", 10)"
+      ],
+      "at": [
+       -1043,
+       -1000
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "ardour",
+    "name": "Ardour",
+    "why": "Elemental damage with attacks, then the notable with elemental attacks, attack speed and accuracy: the striking Zealot's first offence, off the west road's first node and back onto its second. The west hub's pocket, one step removed. G3 round 2 (2026-10-22, CONSTRAINTS §4.8): it was Alms (flask effect, duration and regeneration), and the west of the home read as one kind: armour, flasks, block, then Verger's armour, with the first offence notable seven steps out (Hearthfire). Now point four or five may be a strike: the east has the elements for any build and Hearthfire's fire spell, the west the attack. No weapon is named. The home's flasks are now the ring's Provisions, six steps from the start by the west hub's ring road.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the west road.",
+      "lines": [
+       "eleAttack(10)"
+      ],
+      "at": [
+       -1630,
+       -387
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Ardour",
+      "why": "2 + 1 + 1 units. The exit, back onto the west road.",
+      "lines": [
+       "eleAttack(20)",
+       "attackSpeed(5)",
+       "accuracy(10)"
+      ],
+      "at": [
+       -1690,
+       -352
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "roadM",
+    "name": "The middle road",
+    "why": "Life three times: the road straight out from the signature to the block wheel, which every Zealot walks whichever future it picks.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -1141,
+       -640
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -1196,
+       -658
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -1251,
+       -675
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "roadW",
+    "name": "The west road",
+    "why": "Strength and intelligence twice: the highway from the west hub to the nave wheel's block side, with Ardour off its foot.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1409,
+       -513
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1595,
+       -643
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "roadE",
+    "name": "The east road",
+    "why": "Strength and intelligence twice: the highway from the east hub to the transept junction.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1116,
+       -987
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1290,
+       -1106
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "jT",
+    "name": "The transept",
+    "why": "Where the east road meets the nave wheel's fire side and the choir begins; since G4 fix 1 Vigil's recovery chain leaves here too, beside the aura wheel's entrance.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1463,
+       -1226
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "toRingW",
+    "name": "To the ring",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -973,
+       -288
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "toRingE",
+    "name": "To the ring",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -736,
+       -698
+      ]
+     }
+    ],
+    "links": []
+   }
+  ],
+  "links": [
+   {
+    "from": "start.zealot",
+    "to": "sig.a",
+    "why": "Point one, the west side."
+   },
+   {
+    "from": "start.zealot",
+    "to": "sig.b",
+    "why": "Point one, the east side."
+   },
+   {
+    "from": "sig.a",
+    "to": "hubs.w",
+    "why": "The west side to the west hub."
+   },
+   {
+    "from": "sig.b",
+    "to": "hubs.e",
+    "why": "The east side to the east hub."
+   },
+   {
+    "from": "hubs.e",
+    "to": "hymn.a",
+    "why": "The east hub's pocket."
+   },
+   {
+    "from": "hubs.w",
+    "to": "wall.resists.banner.n",
+    "why": "The west hub's pocket is the Wall's Warlord's Banner, one step across the border: the aura class buys its first reservation from the neighbour, and the Vanguard's standards are a Zealot's road in. One of the two near crossings of the pair (brief §4)."
+   },
+   {
+    "from": "cathedral.home.hubs.w",
+    "to": "cathedral.home.toRingW.a",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute."
+   },
+   {
+    "from": "cathedral.home.toRingW.a",
+    "to": "centre.ring.road.r19",
+    "why": "The far end of the road."
+   },
+   {
+    "from": "cathedral.home.hubs.e",
+    "to": "cathedral.home.toRingE.a",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute."
+   },
+   {
+    "from": "cathedral.home.toRingE.a",
+    "to": "centre.ring.road.r21",
+    "why": "The far end of the road."
+   },
+   {
+    "from": "hubs.w",
+    "to": "roadW.a",
+    "why": "The west road."
+   },
+   {
+    "from": "hubs.e",
+    "to": "roadE.a",
+    "why": "The east road."
+   },
+   {
+    "from": "sig.n",
+    "to": "roadM.a",
+    "why": "The middle road."
+   },
+   {
+    "from": "hymn.b",
+    "to": "roadE.a",
+    "why": "The spell pocket is also a way onto the east road: a pocket as a bridge."
+   },
+   {
+    "from": "roadW.a",
+    "to": "ardour.a",
+    "why": "The west road's first node onto the attack pocket."
+   },
+   {
+    "from": "ardour.n",
+    "to": "roadW.b",
+    "why": "The attack pocket back onto the west road: a loop."
+   },
+   {
+    "from": "roadM.c",
+    "to": "cathedral.nave.wheel.n1",
+    "why": "The middle road reaches the block wheel."
+   },
+   {
+    "from": "roadW.b",
+    "to": "cathedral.nave.wheel.n2",
+    "why": "The west road reaches the wheel's block side."
+   },
+   {
+    "from": "roadE.b",
+    "to": "jT.a",
+    "why": "The east road reaches the transept."
+   },
+   {
+    "from": "jT.a",
+    "to": "cathedral.nave.wheel.n6",
+    "why": "The transept to the wheel's fire side: the home is a loop through the wheel."
+   },
+   {
+    "from": "jT.a",
+    "to": "cathedral.choir.wheel.c1",
+    "why": "The transept to the aura wheel."
+   }
+  ]
+ },
+ {
+  "file": "nave",
+  "export": "nave",
+  "id": "cathedral.nave",
+  "name": "The Nave",
+  "why": "Where the gate's roads meet: block or the fire spell on one wheel, Vigil, the resist star Litany, and the aisle out to the Ambulatory (G2).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "wheel",
+    "name": "Iron Faith",
+    "why": "The wheel of eight where the gate's roads meet: block with a shield on the north side (Iron Faith), the fire spell on the south (Hearthfire), life at the ends. The fire caster and the shield Zealot pass the same wheel and pick a side; the other fire cluster (Kindled Steel, on the Ambulatory) is for attacks.",
+    "nodes": [
+     {
+      "id": "n1",
+      "kind": "small",
+      "why": "The west entrance, from the middle road.",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -1720,
+       -820
+      ]
+     },
+     {
+      "id": "n2",
+      "kind": "small",
+      "why": "The block side; the west road and the Wall's crossing arrive.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -1781,
+       -773
+      ]
+     },
+     {
+      "id": "n3",
+      "kind": "notable",
+      "name": "Iron Faith",
+      "why": "A shield notable and nothing else: block, the shield's own defences, and the footing it gives: 2 + 1 + 1 units. G3 (2026-10-22, G1/zealot.md §4): it lost its energy shield and armour, which made every Zealot take it whatever it held, so the wheel's two sides are a real choice now (a shield or the fire spell). Bracing, in the Wall, is block with recovery and stun threshold.",
+      "lines": [
+       "shieldBlock(4)",
+       "shieldDef(15)",
+       "shieldStunAvoid(20)"
+      ],
+      "at": [
+       -1857,
+       -783
+      ]
+     },
+     {
+      "id": "n4",
+      "kind": "small",
+      "why": "The east exit, to the nave junction.",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -1894,
+       -920
+      ]
+     },
+     {
+      "id": "n5",
+      "kind": "notable",
+      "name": "Hearthfire",
+      "why": "Fire damage, cast speed and a point of maximum fire resistance: 2 + 1 + 1.5 units.",
+      "lines": [
+       "eleDamage(\"fire\", 20)",
+       "castSpeed(4)",
+       "maxResOne(\"fire\", 1)"
+      ],
+      "at": [
+       -1757,
+       -957
+      ]
+     },
+     {
+      "id": "n6",
+      "kind": "small",
+      "why": "The fire side; the transept arrives.",
+      "lines": [
+       "eleDamage(\"fire\", 10)"
+      ],
+      "at": [
+       -1710,
+       -896
+      ]
+     },
+     {
+      "id": "n7",
+      "kind": "small",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -1904,
+       -844
+      ]
+     },
+     {
+      "id": "n8",
+      "kind": "small",
+      "lines": [
+       "eleDamage(\"fire\", 10)"
+      ],
+      "at": [
+       -1833,
+       -967
+      ]
+     }
+    ],
+    "links": [
+     [
+      "n1",
+      "n2"
+     ],
+     [
+      "n2",
+      "n3"
+     ],
+     [
+      "n3",
+      "n7"
+     ],
+     [
+      "n7",
+      "n4"
+     ],
+     [
+      "n4",
+      "n8"
+     ],
+     [
+      "n8",
+      "n5"
+     ],
+     [
+      "n5",
+      "n6"
+     ],
+     [
+      "n6",
+      "n1"
+     ]
+    ]
+   },
+   {
+    "id": "toWall",
+    "name": "To the Wall",
+    "why": "The near crossing from the Wall's resistances (brief §4: resistances ↔ block and shields): one attribute node between the Wall's crossing junction and the wheel's block side, for the shield Vanguard and the life Zealot.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1891,
+       -551
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "verger",
+    "name": "Verger",
+    "why": "G3 round 1 (2026-10-22; ledger ZE-5, G1/zealot.md §2, G1-brief.md §2.3): armour twice off the Nave's crossing node, then the notable with armour and sceptre damage, then a third armour node onto the Wall's Battlements junction. The armoured sceptre fighter's armour at home (the Zealot sold 6.7 units of armour, so the sceptre build got all of it from the Vanguard), and a crossing of its own: the mace player walks past it too. It carries no life (the convergence rule). Sceptre twins: Hallowed Hammer (elemental attacks) and Gilded Rod (crit), each a different partner.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the crossing node, which it leaves at about a right angle to the road.",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -2060,
+       -597
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -2113,
+       -612
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Verger",
+      "why": "Armour and sceptre damage: 2 + 2 units.",
+      "lines": [
+       "armour(24)",
+       "weaponDamage(\"sceptre\", 20)"
+      ],
+      "at": [
+       -2180,
+       -630
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, onto the Wall's Battlements junction.",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -2144,
+       -570
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "vigil",
+    "name": "Vigil",
+    "why": "Life regeneration, then the notable with regeneration, shield recharge and shield: the recovery of a class with two pools, as a bridge from the transept to the aura wheel's north side. The approach to Living Ward's idea, two areas before the keystone. G4 fix 1 (2026-10-22, audit T7): it hung off Hearthfire, whose four links (its wheel, Vigil, Litany's cold spoke) made every Zealot caster's first fifteen points the same four notables; now it leaves the transept junction beside the aura wheel's entrance, and Hearthfire is only the fire side of its wheel.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the transept, on the line to the notable.",
+      "lines": [
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -1566,
+       -1243
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Vigil",
+      "why": "2 + 1 + 1 units. The exit, to the aura wheel.",
+      "lines": [
+       "lifeRegen(0.8)",
+       "esRecharge(15)",
+       "es(5)"
+      ],
+      "at": [
+       -1635,
+       -1254
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "jN",
+    "name": "Nave junction",
+    "why": "East of the wheel: the sceptres and staves ahead, the star's fire spoke arriving from the south-east.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2101,
+       -1040
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "star",
+    "name": "Litany",
+    "why": "The resist star: all resistances and a little shield in the notable, one single-node spoke per element, three landing somewhere else: fire on the nave junction, lightning on the road to the Vestry wheel's staff side, chaos on the road to Choirmaster; the cold spoke toward the home is a point of the star only (since G4 fix 1). The crossroads between the nave, the rods and the choir.",
+    "nodes": [
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Litany",
+      "why": "2.5 + 1 units.",
+      "lines": [
+       "resAll(10)",
+       "es(5)"
+      ],
+      "at": [
+       -2016,
+       -1187
+      ]
+     },
+     {
+      "id": "f",
+      "kind": "small",
+      "why": "The fire spoke, to the nave junction.",
+      "lines": [
+       "resOne(\"fire\", 10)"
+      ],
+      "at": [
+       -2051,
+       -1127
+      ]
+     },
+     {
+      "id": "w",
+      "kind": "small",
+      "why": "The cold spoke, the star's one point that lands nowhere: it ran to Hearthfire until G4 fix 1 (audit T7). The road junction the audit named for it already takes the fire spoke, and a second spoke there would close a triangle of the star on one node; the star keeps three ways in (the nave junction, the road to the Vestry, the road to Choirmaster).",
+      "lines": [
+       "resOne(\"cold\", 10)"
+      ],
+      "at": [
+       -1956,
+       -1152
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "small",
+      "why": "The lightning spoke, to the staff side of the rods wheel.",
+      "lines": [
+       "resOne(\"lightning\", 10)"
+      ],
+      "at": [
+       -2077,
+       -1222
+      ]
+     },
+     {
+      "id": "s",
+      "kind": "small",
+      "why": "The chaos spoke, to the aura wheel.",
+      "lines": [
+       "resOne(\"chaos\", 10)"
+      ],
+      "at": [
+       -1981,
+       -1248
+      ]
+     }
+    ],
+    "links": [
+     [
+      "n",
+      "f"
+     ],
+     [
+      "n",
+      "w"
+     ],
+     [
+      "n",
+      "e"
+     ],
+     [
+      "n",
+      "s"
+     ]
+    ]
+   },
+   {
+    "id": "toRods",
+    "name": "A road node",
+    "why": "A road node between the resist star and the staff side of the Vestry wheel.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2197,
+       -1234
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "toChoir",
+    "name": "A road node",
+    "why": "A road node between the resist star and Choirmaster.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1797,
+       -1378
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "aisle",
+    "name": "The aisle",
+    "why": "G2 (2026-10-22, G1/zealot.md §3): three attribute nodes in a straight line from the road node under Choirmaster through the empty inside to Consecrated Plate, and on through it to the Ambulatory's walk: the Nave joined to the Ambulatory's middle, where before the only ways out were the two ends of the walk. Lone Vow's spur leaves its middle node northward; Sexton (G3 round 2) leaves it southward; Lectern (G3 round 1) leaves north of the last.",
+    "nodes": [
+     {
+      "id": "a1",
+      "kind": "attribute",
+      "why": "The first step in from the Nave.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2042,
+       -1515
+      ]
+     },
+     {
+      "id": "a2",
+      "kind": "attribute",
+      "why": "The aisle's crossing: Lone Vow's spur north; Sexton (minions with life, G3 round 2) south, as a bridge to the Vestry's junction.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2288,
+       -1653
+      ]
+     },
+     {
+      "id": "a3",
+      "kind": "attribute",
+      "why": "Where Lectern (spell damage and reservation, G3) leaves north as a bridge to Brandwright.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2533,
+       -1790
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a1",
+      "a2"
+     ],
+     [
+      "a2",
+      "a3"
+     ]
+    ]
+   },
+   {
+    "id": "sexton",
+    "name": "Sexton",
+    "why": "G3 round 2 (2026-10-22; ledger ZE-2, G1/zealot.md §2): a straight bridge south from the aisle's middle node to the Vestry's junction, minion damage twice, the notable with minion damage and the summoner's own life, minion damage once more. The summoner on life (Ossuary, far out on the walk, is the summoner on energy shield; Shepherd, at the Choir, minions that last): the aisle's cross is Lone Vow north and this south, and the caster's Lectern one node on, so each pays for the other's in passing. Life is on the notable only, so the aisle does not become a life stop for every build. The bridge runs on in the line of the tower wheel's link through the junction, a straight cross there.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the aisle, on the straight line to the Vestry junction.",
+      "lines": [
+       "minionDamage(12)"
+      ],
+      "at": [
+       -2395,
+       -1571
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "minionDamage(12)"
+      ],
+      "at": [
+       -2439,
+       -1537
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Sexton",
+      "why": "Minion damage and the summoner's life: 2 + 2 units.",
+      "lines": [
+       "minionDamage(24)",
+       "life(10)"
+      ],
+      "at": [
+       -2494,
+       -1496
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, onto the Vestry junction.",
+      "lines": [
+       "minionDamage(12)"
+      ],
+      "at": [
+       -2550,
+       -1453
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "lectern",
+    "name": "Lectern",
+    "why": "G3 round 1 (2026-10-22; ledger ZE-1, folding ZE-s3): a straight bridge north from the aisle's last node to Brandwright, spell damage twice, then the notable with spell damage and less reservation (G3 round 2: the two smalls on to Brandwright carry brand damage and are Brandwright's now, so this stop holds 4 units of spell damage, not 6). The aura caster's spell damage, and the Zealot casters' spell damage at home instead of in the Mystic. It and Lone Vow leave the aisle side by side, one node apart: take the reservation, or the keystone that makes reservation moot. Brandwright stops being a dead end. Spell damage's other Zealot homes face other ways with other partners (Homily north-east with the elements and cast speed, Crozier west with a staff).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the aisle, on the straight line to Brandwright, parallel to Lone Vow's spur.",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -2522,
+       -1867
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -2514,
+       -1921
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Lectern",
+      "why": "Spell damage and less reservation: 2 + 2 units.",
+      "lines": [
+       "spellDamage(16)",
+       "reducedReservation(6)"
+      ],
+      "at": [
+       -2504,
+       -1991
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "toChoir.a",
+    "to": "aisle.a1",
+    "why": "The aisle leaves the road node under Choirmaster."
+   },
+   {
+    "from": "aisle.a3",
+    "to": "cathedral.ambulatory.plate.n",
+    "why": "The aisle lands on Consecrated Plate, in line with its chain to the walk: the armour bridge becomes a crossroads."
+   },
+   {
+    "from": "aisle.a2",
+    "to": "sexton.a",
+    "why": "The aisle's middle node onto the summoner's life (G3 round 2): Lone Vow north, Sexton south."
+   },
+   {
+    "from": "sexton.c",
+    "to": "cathedral.rods.jR.a",
+    "why": "Sexton lands on the Vestry junction, in line with the tower wheel's link: the aisle and the Vestry are joined, and the summoner has a way in from either."
+   },
+   {
+    "from": "aisle.a3",
+    "to": "lectern.a",
+    "why": "The aisle onto the spell-and-reservation bridge (G3)."
+   },
+   {
+    "from": "lectern.n",
+    "to": "cathedral.ambulatory.brand.d",
+    "why": "Lectern onto Brandwright's inner brand smalls: the brand pocket is a bridge, and the brand caster has a way in from the Nave. Since G3 round 2 the two smalls between the notables are Brandwright's (brand damage), not Lectern's."
+   },
+   {
+    "from": "wall.resists.j.a",
+    "to": "toWall.a",
+    "why": "The Wall's crossing junction onto the Cathedral's crossing node."
+   },
+   {
+    "from": "toWall.a",
+    "to": "wheel.n2",
+    "why": "The crossing node lands on the wheel's block side."
+   },
+   {
+    "from": "toWall.a",
+    "to": "verger.a",
+    "why": "The crossing node onto the armoured sceptre (G3)."
+   },
+   {
+    "from": "verger.c",
+    "to": "wall.resists.j.a",
+    "why": "The armoured sceptre (a near crossing; G1-brief.md §2.3, deferred to G3 by G2/borders.md §4): Verger's far armour node lands on the Wall's Battlements junction, so the cluster is a crossing of its own beside the Nave road. The Vanguard's mace player reaches Verger's armour and sceptre; the Zealot reaches the Battlements. Verger is 7 steps from Hallowed Hammer."
+   },
+   {
+    "from": "cathedral.home.jT.a",
+    "to": "vigil.a",
+    "why": "The transept onto the recovery chain (G4 fix 1, audit T7): Vigil hangs off the road junction, not off Hearthfire, so the fire notable is only its wheel's fire side and the defences are a direction of their own."
+   },
+   {
+    "from": "vigil.n",
+    "to": "cathedral.choir.wheel.c2",
+    "why": "The recovery chain lands on the aura wheel's north side."
+   },
+   {
+    "from": "wheel.n4",
+    "to": "jN.a",
+    "why": "Through the wheel to the nave junction."
+   },
+   {
+    "from": "jN.a",
+    "to": "cathedral.rods.wheel.r1",
+    "why": "The nave junction to the rods wheel."
+   },
+   {
+    "from": "star.f",
+    "to": "jN.a",
+    "why": "The fire spoke lands on the nave junction."
+   },
+   {
+    "from": "cathedral.nave.star.e",
+    "to": "cathedral.nave.toRods.a",
+    "why": "A road node between the resist star and the staff side of the Vestry wheel."
+   },
+   {
+    "from": "cathedral.nave.toRods.a",
+    "to": "cathedral.rods.wheel.r6",
+    "why": "The far end of the road."
+   },
+   {
+    "from": "cathedral.nave.star.s",
+    "to": "cathedral.nave.toChoir.a",
+    "why": "A road node between the resist star and Choirmaster."
+   },
+   {
+    "from": "cathedral.nave.toChoir.a",
+    "to": "cathedral.choir.wheel.c3",
+    "why": "The far end of the road."
+   }
+  ]
+ },
+ {
+  "file": "pyre",
+  "export": "pyre",
+  "id": "cathedral.pyre",
+  "name": "The Bell Tower",
+  "why": "The tip toward the Wall: cold attacks or an aura on one wheel, and Searing Avatar.",
+  "start": null,
+  "clusters": [
+   {
+    "id": "wheel",
+    "name": "Rimed Steel",
+    "why": "The wheel of eight at the tower: cold with attacks on the north side (Rimed Steel), an aura on the south (Benediction, the Zealot's second aura; Choirmaster is the first). The ends carry the two sides' lines, cold strikes at the west entrance and aura effect at the east exit (G4 fix 1, audit D8: they were generic elemental damage, which neither side's build wants most), so a walk through the wheel pays one small of the other side. The fire sceptre walks through on its way to Searing Avatar and finds cold strikes here, which the keystone half undoes: its fire strike (Kindled Steel) is out on the Ambulatory, a separate trip. The fire spell is back at the nave.",
+    "nodes": [
+     {
+      "id": "f1",
+      "kind": "small",
+      "why": "The west entrance; the dear road from the Wall also arrives. Cold with attacks, Rimed Steel's line (elemental damage until G4 fix 1, audit D8).",
+      "lines": [
+       "eleAttackOne(\"cold\", 12)"
+      ],
+      "at": [
+       -3003,
+       -1099
+      ]
+     },
+     {
+      "id": "f2",
+      "kind": "small",
+      "why": "The attack side.",
+      "lines": [
+       "eleAttackOne(\"cold\", 12)"
+      ],
+      "at": [
+       -3064,
+       -1052
+      ]
+     },
+     {
+      "id": "f3",
+      "kind": "notable",
+      "name": "Rimed Steel",
+      "why": "Cold strikes that chill: 2 + 1.5 units. The first cold home outside the Spire, whose cold is all spells.",
+      "lines": [
+       "eleAttackOne(\"cold\", 24)",
+       "chillEffect(15)"
+      ],
+      "at": [
+       -3140,
+       -1062
+      ]
+     },
+     {
+      "id": "f4",
+      "kind": "small",
+      "why": "The east exit, to the tower junction. Aura effect, Benediction's line (elemental damage until G4 fix 1, audit D8).",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -3176,
+       -1199
+      ]
+     },
+     {
+      "id": "f5",
+      "kind": "notable",
+      "name": "Benediction",
+      "why": "Aura effect with shield and regeneration: 2 + 1.6 + 1 units.",
+      "lines": [
+       "auraEffect(12)",
+       "es(8)",
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -3040,
+       -1235
+      ]
+     },
+     {
+      "id": "f6",
+      "kind": "small",
+      "why": "The aura side.",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -2993,
+       -1175
+      ]
+     },
+     {
+      "id": "f7",
+      "kind": "small",
+      "lines": [
+       "eleAttackOne(\"cold\", 12)"
+      ],
+      "at": [
+       -3187,
+       -1123
+      ]
+     },
+     {
+      "id": "f8",
+      "kind": "small",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -3116,
+       -1246
+      ]
+     }
+    ],
+    "links": [
+     [
+      "f1",
+      "f2"
+     ],
+     [
+      "f2",
+      "f3"
+     ],
+     [
+      "f3",
+      "f7"
+     ],
+     [
+      "f7",
+      "f4"
+     ],
+     [
+      "f4",
+      "f8"
+     ],
+     [
+      "f8",
+      "f5"
+     ],
+     [
+      "f5",
+      "f6"
+     ],
+     [
+      "f6",
+      "f1"
+     ]
+    ]
+   },
+   {
+    "id": "jF",
+    "name": "Tower junction",
+    "why": "The tip of the tower: the Searing Avatar spur.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3393,
+       -1324
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "searingAvatar",
+    "name": "Searing Avatar",
+    "why": "Two nodes of fire damage, then the trade: half of physical, cold and lightning damage becomes fire, and nothing else is dealt. The tip of the bell tower, the farthest keystone of the region, on the Wall side where the fire two-hander reaches it (brief §6 puts it at the tower's tip; the cost table agrees).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "eleDamage(\"fire\", 10)"
+      ],
+      "at": [
+       -3815,
+       -1309
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "eleDamage(\"fire\", 10)"
+      ],
+      "at": [
+       -3874,
+       -1307
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Searing Avatar",
+      "lines": [],
+      "at": [
+       -3958,
+       -1304
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "wheel.f4",
+    "to": "jF.a",
+    "why": "Through the wheel to the tower junction."
+   },
+   {
+    "from": "jF.a",
+    "to": "searingAvatar.a",
+    "why": "Junction to the keystone spur."
+   }
+  ]
+ },
+ {
+  "file": "rim",
+  "export": "outerWalk",
+  "id": "cathedral.rim",
+  "name": "The Churchyard",
+  "why": "The ground outside the Bell Tower: the outer walk from Censer to Thunder Peal and the clusters that hang inward off it (the fire caster's two pools, the sceptre's burning beside Searing Avatar), spell block out on the rim, and the pocket off Censer at the far south-west (auras with movement).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "walk",
+    "name": "The outer walk",
+    "why": "Four attribute nodes: out from Censer along the rim, a corner, along the rim past the keystone, a corner, and in to Thunder Peal on its own line.",
+    "nodes": [
+     {
+      "id": "o1",
+      "kind": "attribute",
+      "why": "The first leg, out from Censer.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -4043,
+       -843
+      ]
+     },
+     {
+      "id": "o2",
+      "kind": "attribute",
+      "why": "The outer corner, where two arcs meet: Wake (energy shield with life) inward of the first leg, Buttress (spell block) outward of the second.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -4349,
+       -1067
+      ]
+     },
+     {
+      "id": "o3",
+      "kind": "attribute",
+      "why": "The leg along the rim, outside the Searing Avatar keystone (which keeps its one link); Buttress (spell block, G3 round 3) leaves outward from here as an arc back to the corner.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -4224,
+       -1448
+      ]
+     },
+     {
+      "id": "o4",
+      "kind": "attribute",
+      "why": "The far corner, on Thunder Peal's line: Brazier (burning with the sceptre, G3 round 3) hangs inward from here.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -4098,
+       -1829
+      ]
+     }
+    ],
+    "links": [
+     [
+      "o1",
+      "o2"
+     ],
+     [
+      "o2",
+      "o3"
+     ],
+     [
+      "o3",
+      "o4"
+     ]
+    ]
+   },
+   {
+    "id": "wake",
+    "name": "Wake",
+    "why": "G3 round 2 (2026-10-22; ledger ZE-10, folding ZE-s2): energy shield three times and the notable with energy shield and life, inward of the walk's first leg, between Censer and the Searing Avatar spur. The hybrid caster's defence where the fire caster goes (Censer's burning, Searing Avatar): a fire caster who comes west for its burning finds its two pools here, and gives up the Mystic's east, where its spell damage is. ES-led because the inside's energy shield is spread thin and far (Vigil, Litany, Tomb Dust, Rood Screen); Warm Blood, in the Spire, is the life-led twin. No spell damage here (the convergence rule). G4 fix 1 (2026-10-22, audit N3): it was a dead end off the outer corner, and `o1` had nothing off it; now it is an arc between `o2` and `o1`, a tent bowed inward, two smalls on the corner's side and one on `o1`'s, so it is a bridge and the first leg has a branch.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the outer corner, on the line to the notable.",
+      "lines": [
+       "es(5)"
+      ],
+      "at": [
+       -4227,
+       -1075
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "es(5)"
+      ],
+      "at": [
+       -4171,
+       -1079
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Wake",
+      "why": "Energy shield and life: 2 + 2 units.",
+      "lines": [
+       "es(10)",
+       "life(10)"
+      ],
+      "at": [
+       -4101,
+       -1084
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, on the line to the walk's first node.",
+      "lines": [
+       "es(5)"
+      ],
+      "at": [
+       -4085,
+       -1016
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "brazier",
+    "name": "Brazier",
+    "why": "G3 round 3 (2026-10-22; ledger ZE-6): a pocket inward off the far corner, on the corner's bisector, into the ground between Thunder Peal's chain and the Searing Avatar spur: burning damage three times, then the notable with sceptre damage, the chance to ignite and burning. The fire sceptre's burn, beside the keystone that makes everything fire, and the sceptre's fourth place (Verger with armour at the Wall border, Gilded Rod with crit on the Vestry wheel, Hallowed Hammer with elemental strikes across the border), each with a different partner. The smalls carry the burning, not the sceptre: the fire caster's fire stood flat from 120 to 160 points, and the burning serves the caster and the striker alike, while the sceptre on the notable is the striker's alone. The fire caster who comes west now finds burning twice (Censer, eight steps back, with area and long ignites; this, with the sceptre it does not hold), its two pools (Wake) and the keystone, all against the Mystic's east. A dead-end tip: the Churchyard has two ways in.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the far corner.",
+      "lines": [
+       "burnDamage(12)"
+      ],
+      "at": [
+       -4056,
+       -1738
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "burnDamage(12)"
+      ],
+      "at": [
+       -4034,
+       -1688
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "burnDamage(12)"
+      ],
+      "at": [
+       -4011,
+       -1638
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Brazier",
+      "why": "Sceptre damage, the chance to ignite and burning: 2 + 1 + 1 units.",
+      "lines": [
+       "weaponDamage(\"sceptre\", 20)",
+       "igniteChance(10)",
+       "burnDamage(12)"
+      ],
+      "at": [
+       -3982,
+       -1574
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ],
+     [
+      "c",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "procession",
+    "name": "Procession",
+    "why": "G3 round 3 (2026-10-22; ledger ZE-8): a pocket off Censer, aura effect three times, then the notable with aura effect and movement speed. The support build's auras on the move, at the far south-west where Battle Hymn's shouts are (the support corner). Aura-led, not life-led as the brief had it: the aura build's auras stood flat from 120 to 160 points (its other aura notables, Choirmaster, Benediction, Lone Vow's spur and the Banner, are all taken by 120), while its life still climbed, and life is spread over every region. Aura twins: Choirmaster (reservation, mana) north-east, Benediction (shield, regeneration) on the tower wheel, Battle Hymn (warcries) seven steps away by the Rampart road. G4 fix 1 (2026-10-22, audit S4): its life became movement speed, the Zealot's one movement line (a procession walks); life is spread over every region, and the Zealot had no movement at all (§4.6). The Zealot's flasks are the centre's Provisions, six steps from its start by the west hub's ring road. G4 fix 2 (2026-10-23, audit N4): its far node's crossing to the Vanguard's Grim Oath was cut (the corner had two crossings for one combination and no build walked either; Battle Hymn stays the corner's crossing), so Procession is Censer's far tip, laid as a straight pocket with the notable at the end.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from Censer, on the straight line to the notable.",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -3978,
+       -344
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -4014,
+       -303
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The last small before the notable (G4 fix 2: it was the far node onto Grim Oath).",
+      "lines": [
+       "auraEffect(6)"
+      ],
+      "at": [
+       -4050,
+       -261
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Procession",
+      "why": "Aura effect and movement speed: 2 + 2 units.",
+      "lines": [
+       "auraEffect(12)",
+       "moveSpeed(8)"
+      ],
+      "at": [
+       -4096,
+       -208
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ],
+     [
+      "c",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "buttress",
+    "name": "Buttress",
+    "why": "G3 round 3 (2026-10-22), beyond the brief (CONSTRAINTS §1.1, what more points would still buy; the round's instructions on far supply for flat specializations): a pocket outward off the outer walk's middle node, square to the walk, out on the rim: spell block three times, then the notable with spell block and all resistances. Block without a shield, for the staff blocker, whose block stood flat from 60 points on (Quarterstaff and Warding Staff, both by the Vestry, were all it had). Spell block's third direction from the Zealot start (Warding Staff with a staff south-west, Glass Wall behind a shield and Rood Screen with energy shield north-east and north), with a partner none of them has; Stone Ward, in the Wall, is spell block with life on block. Going here costs the staff blocker the Mystic's east, where its spell damage is. Inward is the Searing Avatar spur, so it hangs outward and the region grows by a step at the rim. G4 fix 1 (2026-10-22, audit N3): it was a dead end off the walk's middle node; now it is an arc between `o3` and the outer corner `o2`, a tent bowed outward, two smalls on `o3`'s side and one on the corner's, so it is a bridge.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the walk's middle node, on the line to the notable.",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -4333,
+       -1376
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -4380,
+       -1345
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Buttress",
+      "why": "Spell block and all resistances: 2 + 2.5 units.",
+      "lines": [
+       "spellBlock(4)",
+       "resAll(10)"
+      ],
+      "at": [
+       -4439,
+       -1308
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, on the line to the outer corner.",
+      "lines": [
+       "spellBlock(2)"
+      ],
+      "at": [
+       -4415,
+       -1242
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "walk.o3",
+    "to": "buttress.a",
+    "why": "The outer walk's middle node onto spell block (G3 round 3), outward of the second leg."
+   },
+   {
+    "from": "buttress.c",
+    "to": "walk.o2",
+    "why": "Buttress's far small onto the outer corner (G4 fix 1, audit N3): the pocket is an arc between the second leg's two nodes, a bridge."
+   },
+   {
+    "from": "cathedral.ambulatory.censer.n",
+    "to": "walk.o1",
+    "why": "Censer onto the outer walk: the burning pocket becomes a bridge."
+   },
+   {
+    "from": "walk.o2",
+    "to": "wake.a",
+    "why": "The outer corner onto the fire caster's two pools (G3 round 2), inward of the first leg."
+   },
+   {
+    "from": "wake.c",
+    "to": "walk.o1",
+    "why": "Wake's far small onto the walk's first node (G4 fix 1, audit N3): the pocket is an arc between the leg's two nodes, a bridge, and `o1` has a branch."
+   },
+   {
+    "from": "walk.o4",
+    "to": "cathedral.ambulatory.peal.n",
+    "why": "The outer walk lands on Thunder Peal, straight through its chain: the lightning pocket becomes a bridge."
+   },
+   {
+    "from": "walk.o4",
+    "to": "brazier.a",
+    "why": "The far corner onto the sceptre's burning (G3 round 3), on the corner's bisector."
+   },
+   {
+    "from": "cathedral.ambulatory.censer.n",
+    "to": "procession.a",
+    "why": "Censer onto the auras with movement (G3 round 3): Censer is a junction of three, its links about evenly spread (its own chain east, the outer walk north-west, this south-west)."
+   }
+  ]
+ },
+ {
+  "file": "rods",
+  "export": "rods",
+  "id": "cathedral.rods",
+  "name": "The Vestry",
+  "why": "Past the nave toward the Wall: the sceptre and staff wheel, the dear road from the Wall, and Idle Hands.",
+  "start": null,
+  "clusters": [
+   {
+    "id": "wheel",
+    "name": "Gilded Rod",
+    "why": "The wheel of eight: entered from the nave junction on the west, left to the rods junction on the east. Sceptres on the north side, staves on the south (where the star's lightning spoke arrives), elemental damage with attacks at the ends, which both want.",
+    "nodes": [
+     {
+      "id": "r1",
+      "kind": "small",
+      "why": "The west entrance.",
+      "lines": [
+       "eleDamageAll(10)"
+      ],
+      "at": [
+       -2327,
+       -1170
+      ]
+     },
+     {
+      "id": "r2",
+      "kind": "small",
+      "why": "The sceptre side.",
+      "lines": [
+       "weaponDamage(\"sceptre\", 10)"
+      ],
+      "at": [
+       -2387,
+       -1123
+      ]
+     },
+     {
+      "id": "r3",
+      "kind": "notable",
+      "name": "Gilded Rod",
+      "why": "Sceptre damage, sceptre crit, and elemental damage for the spells a sceptre also casts: 2 + 1 + 1 units.",
+      "lines": [
+       "weaponDamage(\"sceptre\", 20)",
+       "weaponCrit(\"sceptre\", 15)",
+       "eleDamageAll(10)"
+      ],
+      "at": [
+       -2463,
+       -1133
+      ]
+     },
+     {
+      "id": "r4",
+      "kind": "small",
+      "why": "The east exit, to the rods junction.",
+      "lines": [
+       "eleDamageAll(10)"
+      ],
+      "at": [
+       -2500,
+       -1270
+      ]
+     },
+     {
+      "id": "r5",
+      "kind": "notable",
+      "name": "Quarterstaff",
+      "why": "Staff damage, the block a staff gives, and area for the sweeps: 2 + 1.5 + 1 units.",
+      "lines": [
+       "staffDamage(24)",
+       "blockAttack(3)",
+       "areaDamage(10)"
+      ],
+      "at": [
+       -2363,
+       -1307
+      ]
+     },
+     {
+      "id": "r6",
+      "kind": "small",
+      "why": "The staff side; the star's lightning spoke arrives.",
+      "lines": [
+       "staffDamage(12)"
+      ],
+      "at": [
+       -2316,
+       -1246
+      ]
+     },
+     {
+      "id": "r7",
+      "kind": "small",
+      "lines": [
+       "weaponDamage(\"sceptre\", 10)"
+      ],
+      "at": [
+       -2510,
+       -1194
+      ]
+     },
+     {
+      "id": "r8",
+      "kind": "small",
+      "lines": [
+       "staffDamage(12)"
+      ],
+      "at": [
+       -2439,
+       -1317
+      ]
+     }
+    ],
+    "links": [
+     [
+      "r1",
+      "r2"
+     ],
+     [
+      "r2",
+      "r3"
+     ],
+     [
+      "r3",
+      "r7"
+     ],
+     [
+      "r7",
+      "r4"
+     ],
+     [
+      "r4",
+      "r8"
+     ],
+     [
+      "r8",
+      "r5"
+     ],
+     [
+      "r5",
+      "r6"
+     ],
+     [
+      "r6",
+      "r1"
+     ]
+    ]
+   },
+   {
+    "id": "jR",
+    "name": "Rods junction",
+    "why": "East of the wheel: the bell tower ahead.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2664,
+       -1365
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "toWall",
+    "name": "To the Wall",
+    "why": "The dear crossing from the Wall's battlements to the bell tower: three attribute nodes from the Wall's Scar Tissue to the fire wheel's entrance, deliberately long, for the fire two-hander and the Vanguard who casts fire. Idle Hands hangs off the middle node, on the crossing.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "why": "Where the Wall's Scar Tissue lands.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2580,
+       -413
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "why": "The Idle Hands spur leaves here.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2840,
+       -601
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "attribute",
+      "why": "Onto the tower's wheel.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2999,
+       -785
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "warding",
+    "name": "Warding Staff",
+    "why": "G3 round 1 (2026-10-22; ledger ZE-7): a pocket loop south of the dear road, between its first two nodes, toward Idle Hands: spell block with a staff on every small, then the notable with staff damage and spell block with a staff. The staff blocker's block (it had a few points of it, all from Quarterstaff, and nowhere to climb). G4 fix 2 (2026-10-23, audit T3): the spell block became a staff's (`staffSpellBlock`), so the fork at seam 5 is a real one: a staff here, two steps north of Twofold Guard's shield, and no shield build buys this cluster for its block any more (mace-shield and block-caster had taken both). Staff damage's other homes are Quarterstaff (with attack block) and Crozier (a caster's staff, spell damage with a staff). Spell block's other homes need a shield (Glass Wall), sit far north with energy shield (Rood Screen) or out on the rim with resistances (Buttress).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the road's first node.",
+      "lines": [
+       "staffSpellBlock(2)"
+      ],
+      "at": [
+       -2700,
+       -343
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Warding Staff",
+      "why": "Staff damage and spell block with a staff: 2 + 2 units. A staff blocks spells without a shield.",
+      "lines": [
+       "staffDamage(24)",
+       "staffSpellBlock(4)"
+      ],
+      "at": [
+       -2761,
+       -308
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "staffSpellBlock(2)"
+      ],
+      "at": [
+       -2779,
+       -376
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, onto the road's middle node.",
+      "lines": [
+       "staffSpellBlock(2)"
+      ],
+      "at": [
+       -2794,
+       -429
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "font",
+    "name": "Frozen Font",
+    "why": "G3 round 2 (2026-10-22; ledger ZE-4, G1/zealot.md §2): a straight bridge across the Vestry's inside, from the nave junction to the dear road's last node: block with a shield twice, the notable with cold damage, block with a shield and chill, block once more. The shield's third direction (Iron Faith south of the Nave wheel, six steps back; Glass Wall in the Undercroft, north-east), and the first cold outside the Spire and the Knife that is not an attack (Rimed Steel, on the tower wheel, is cold strikes that chill). The smalls carry the block, not the cold, because block is the flat want (the shield caster's block stood at 5 units from 60 to 120 points) and cold has one taker in the Zealot; the cold shield caster gets its element on the notable. It costs the shield caster the north (Lectern, Homily), where its spell damage is.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the nave junction, on the straight line to the dear road.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -2433,
+       -945
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -2487,
+       -931
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Frozen Font",
+      "why": "Cold damage, block with a shield and chill: 2 + 1 + 1 units.",
+      "lines": [
+       "eleDamage(\"cold\", 20)",
+       "shieldBlock(2)",
+       "chillEffect(10)"
+      ],
+      "at": [
+       -2555,
+       -911
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, onto the dear road's last node.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -2621,
+       -892
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "idleHands",
+    "name": "Idle Hands",
+    "why": "Two nodes of totem damage, then the trade: your own skills deal no damage, but totems, traps, mines, brands and minions still do, and one more totem. On the Wall crossing (brief §6), for the totem Vanguard and the summoner Zealot alike.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "totemDamage(12)"
+      ],
+      "at": [
+       -3009,
+       -204
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "totemDamage(12)"
+      ],
+      "at": [
+       -3032,
+       -150
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Idle Hands",
+      "lines": [],
+      "at": [
+       -3065,
+       -72
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "guard",
+    "name": "Twofold Guard",
+    "why": "G4 fix 1 (2026-10-22), seam 5 of the fix brief (§1.1, the Zealot–Vanguard seam cluster; audit B2): a straight bridge south from Warding Staff across the border to the Vanguard's Graven Posts, block with a shield, the notable with block and spell block with a shield, block with a shield again. The shield caster's block (it stood flat from 100 to 140 points) and the mace-and-shield Vanguard's (flat from 80), both sides' want, on the line the G3 border pass tested. A pairing the tree did not have: shield block's other notables pair it with armour, the shield's defences, stun, evasion, life, cold or a weapon (Locked Shields about 7 steps away, Frozen Font 8, Iron Faith 10), spell block's with energy shield, mana on block, resistances, life on block or a staff. Warding Staff, one step back, is the staff's spell block: a staff or a shield, never both, since a staff takes two hands. Idle Hands' spur is untouched; Warding Staff and Graven Posts become junctions of three.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from Warding Staff, on the straight line to Graven Posts.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -2752,
+       -182
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Twofold Guard",
+      "why": "Block and spell block with a shield: 2 + 2 units.",
+      "lines": [
+       "shieldBlock(4)",
+       "shieldSpellBlock(4)"
+      ],
+      "at": [
+       -2747,
+       -112
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The far node, onto the Vanguard's Graven Posts.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -2742,
+       -43
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "wheel.r4",
+    "to": "jR.a",
+    "why": "Through the wheel to the rods junction."
+   },
+   {
+    "from": "warding.n",
+    "to": "guard.a",
+    "why": "Warding Staff onto the shield-block bridge (G4 fix 1, seam 5), straight south."
+   },
+   {
+    "from": "guard.b",
+    "to": "wall.resists.posts.n",
+    "why": "Seam 5 (G4 fix 1; fix brief §1.1): Twofold Guard's far small lands on the Vanguard's Graven Posts, the one border link this seam lays. The shield caster and the mace-and-shield Vanguard meet on block; Graven Posts stays 16 steps from the Zealot start, so the seam is no near-home shortcut."
+   },
+   {
+    "from": "jR.a",
+    "to": "cathedral.pyre.wheel.f1",
+    "why": "The vestry junction to the tower's wheel."
+   },
+   {
+    "from": "wall.resists.scarTissue.n",
+    "to": "toWall.a",
+    "why": "The Wall's Scar Tissue (grit) onto the dear road."
+   },
+   {
+    "from": "toWall.c",
+    "to": "cathedral.pyre.wheel.f1",
+    "why": "The dear road lands on the tower wheel's entrance."
+   },
+   {
+    "from": "toWall.a",
+    "to": "warding.a",
+    "why": "The dear road's first node onto the staff's spell block (G3)."
+   },
+   {
+    "from": "warding.c",
+    "to": "toWall.b",
+    "why": "Warding Staff back onto the road's middle node: a loop beside the road, reached from either of its first two nodes."
+   },
+   {
+    "from": "cathedral.nave.jN.a",
+    "to": "font.a",
+    "why": "The nave junction onto the cold shield bridge (G3 round 2). It leaves on the straight line to the dear road, between the junction's road east and the empty south: a corner there instead (straight south, then a turn at the notable) would put the notable a short step from Verger and bend it by 60°."
+   },
+   {
+    "from": "font.c",
+    "to": "toWall.c",
+    "why": "Frozen Font lands on the dear road's last node: the Vestry's inside is crossed, and the shield caster reaches the tower and Tithe without the wheel."
+   },
+   {
+    "from": "toWall.b",
+    "to": "idleHands.a",
+    "why": "The dear road's middle node to the keystone spur."
+   }
+  ]
+ },
+ {
+  "file": "walk",
+  "export": "lychway",
+  "id": "cathedral.walk",
+  "name": "The Lychway",
+  "why": "The north walk over the Undercroft: the casters' far loop between the Zealot's north rim and the Mystic's, and the clusters off it (Rood Screen, Vespers, Plainsong).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "road",
+    "name": "The north walk",
+    "why": "G2 (2026-10-22, G1/zealot.md §3 and G1-brief.md §2.2): a rim road of six attribute nodes from Kindled Steel round the back of the Undercroft to Tomb Dust, the casters' far loop. Kindled Steel's chain runs straight out to the corner; then the walk follows the rim, outside Sigil Warden and Volatile Servants, to its east end, where Tomb Dust arrives and the far loop to the Mystic's north-west rim road leaves (the border pass). Kindled Steel and Tomb Dust become bridges. Rood Screen (G3 round 1) hangs inward between the second and third nodes (an arc since G4 fix 1), Vespers (round 3) off the fourth, and Plainsong (round 3) bridges Shattering Rite to the east end.",
+    "nodes": [
+     {
+      "id": "n1",
+      "kind": "attribute",
+      "why": "The corner where Kindled Steel's line meets the rim.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3542,
+       -2885
+      ]
+     },
+     {
+      "id": "n2",
+      "kind": "attribute",
+      "why": "Outside the Sigil Warden keystone; Rood Screen's arc lands here (G4 fix 1).",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -3237,
+       -3185
+      ]
+     },
+     {
+      "id": "n3",
+      "kind": "attribute",
+      "why": "Where Rood Screen (energy shield with spell block) leaves inward, as an arc back to the second node.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2907,
+       -3453
+      ]
+     },
+     {
+      "id": "n4",
+      "kind": "attribute",
+      "why": "Where Vespers (spell damage with duration, G3 round 3) hangs inward.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2555,
+       -3688
+      ]
+     },
+     {
+      "id": "n5",
+      "kind": "attribute",
+      "why": "Outside the Volatile Servants keystone, toward the east end.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -2185,
+       -3887
+      ]
+     },
+     {
+      "id": "n6",
+      "kind": "attribute",
+      "why": "The east end: Tomb Dust arrives, Plainsong bridges in from Shattering Rite (G3 round 3), and the far loop runs on in the same line to the Mystic's north-west rim road.",
+      "lines": [
+       "str(6)",
+       "int(6)"
+      ],
+      "at": [
+       -1800,
+       -4050
+      ]
+     }
+    ],
+    "links": [
+     [
+      "n1",
+      "n2"
+     ],
+     [
+      "n2",
+      "n3"
+     ],
+     [
+      "n3",
+      "n4"
+     ],
+     [
+      "n4",
+      "n5"
+     ],
+     [
+      "n5",
+      "n6"
+     ]
+    ]
+   },
+   {
+    "id": "rood",
+    "name": "Rood Screen",
+    "why": "G3 round 1 (2026-10-22; ledger ZE-11): energy shield three times inward of the north walk between its second and third nodes, then the notable with energy shield and spell block. The block caster's shield without a shield (Glass Wall needs one), and the energy shield a Zealot or Mystic caster finds far out on the casters' loop, in a different direction from the Cloister's. G4 fix 1 (2026-10-22, audit N3): it was a dead end off the third node and the run `n1`–`n2` had nothing off it; now it is an arc between `n3` and `n2`, a tent bowed inward (clear of the Sigil Warden keystone below it), two smalls on `n3`'s side and one on `n2`'s, so it is a bridge and `n2` has a branch. Vespers stays the walk's far tip.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the walk's third node, on the line to the notable.",
+      "lines": [
+       "es(5)"
+      ],
+      "at": [
+       -2941,
+       -3316
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "es(5)"
+      ],
+      "at": [
+       -2955,
+       -3262
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Rood Screen",
+      "why": "Energy shield and spell block: 2 + 2 units.",
+      "lines": [
+       "es(10)",
+       "spellBlock(4)"
+      ],
+      "at": [
+       -2971,
+       -3194
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, on the line to the walk's second node.",
+      "lines": [
+       "es(5)"
+      ],
+      "at": [
+       -3041,
+       -3192
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "vespers",
+    "name": "Vespers",
+    "why": "G3 round 3 (2026-10-22; ledger ZE-9): a pocket inward off the north walk's fourth node, on the bisector of the walk, into the empty ground between Rood Screen and Volatile Servants: spell damage three times, then the notable with spell damage and skill duration. The Zealot's far spell cluster, for the spells, brands and totems that last; its other spell homes face other ways with other partners (Lectern with reservation on the aisle, Homily with the elements and cast speed in the Undercroft, Crozier with a staff on the Ambulatory). A caster who comes this far gives up the Mystic's east for it. Rood Screen's energy shield is one road node back: spell damage and energy shield near each other, which the convergence rule allows only far out, as a destination (25 steps from the Zealot start). A dead-end tip: the walk has three ways in.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from the walk.",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -2505,
+       -3602
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -2475,
+       -3555
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "spellDamage(8)"
+      ],
+      "at": [
+       -2447,
+       -3508
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Vespers",
+      "why": "Spell damage and skill duration: 2 + 2 units.",
+      "lines": [
+       "spellDamage(16)",
+       "skillDuration(20)"
+      ],
+      "at": [
+       -2411,
+       -3448
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ],
+     [
+      "c",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "plainsong",
+    "name": "Plainsong",
+    "why": "G3 round 3 (2026-10-22; ledger ZE-3): a bridge from Shattering Rite to the north walk's east end, channelling twice in the line of Shattering Rite's chain, the notable with channelling and the elements, channelling once more onto the walk. Channelling's third home and the one between the other two (Steady Stream with cheaper mana in the Mystic's far north, Ceaseless Blades with attacks in the Yard's Fosse), on the Mystic border where the far loop crosses. Channelled spells are mostly elemental. Shattering Rite stops being a dead end. The chain runs straight on from Shattering Rite and turns at the notable, so it reaches the walk's east end between the far loop and Tomb Dust at an even fan, not a few degrees off Tomb Dust's link.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance from Shattering Rite, in the line of its chain.",
+      "lines": [
+       "channelDamage(10)"
+      ],
+      "at": [
+       -1547,
+       -3756
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "channelDamage(10)"
+      ],
+      "at": [
+       -1553,
+       -3810
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Plainsong",
+      "why": "Channelling and elemental damage: 2 + 2 units.",
+      "lines": [
+       "channelDamage(20)",
+       "eleDamageAll(20)"
+      ],
+      "at": [
+       -1561,
+       -3880
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The far node, onto the walk's east end.",
+      "lines": [
+       "channelDamage(10)"
+      ],
+      "at": [
+       -1618,
+       -3921
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "cathedral.ambulatory.kindled.n",
+    "to": "road.n1",
+    "why": "Kindled Steel's chain carried straight on to the rim: the fire-strike pocket becomes a bridge onto the north walk."
+   },
+   {
+    "from": "cathedral.crypt.tomb.n",
+    "to": "road.n6",
+    "why": "Tomb Dust's chain carried on to the north walk's east end: the chaos pocket becomes a bridge, and the walk's second way in."
+   },
+   {
+    "from": "road.n3",
+    "to": "rood.a",
+    "why": "The north walk's third node onto Rood Screen."
+   },
+   {
+    "from": "rood.c",
+    "to": "road.n2",
+    "why": "Rood Screen's far small onto the walk's second node (G4 fix 1, audit N3): the pocket is an arc between the two nodes, a bridge."
+   },
+   {
+    "from": "road.n4",
+    "to": "vespers.a",
+    "why": "The north walk's fourth node onto the far spell cluster (G3 round 3)."
+   },
+   {
+    "from": "cathedral.crypt.rite.n",
+    "to": "plainsong.a",
+    "why": "Shattering Rite onto channelling (G3 round 3), straight on from its chain: the physical-spell pocket becomes a bridge."
+   },
+   {
+    "from": "plainsong.c",
+    "to": "road.n6",
+    "why": "Channelling lands on the north walk's east end, between the far loop and Tomb Dust's link."
+   },
+   {
+    "from": "road.n6",
+    "to": "spire.fire.rim.c",
+    "why": "The far loop (a dear crossing; G1-brief.md §2.2, laid in the G2 border pass): the north walk runs on in its own line (a turn of about 10°) to the corner of the Mystic's north-west rim road, so the two rim roads read as one road over the top of the map. The casters' far loop: Tomb Dust, Shattering Rite and the Zealot's far casters with Cinder, Steady Stream and the Mystic's far shield. 19 steps from the Zealot start and 23 from the Mystic's, so it is a late build's road."
+   }
+  ]
+ }
+]

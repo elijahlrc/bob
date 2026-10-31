@@ -1,133 +1,137 @@
 /**
- * The east arm of the Spire (north-east, toward the Knife): Flashpoint (fire as the crit hit), Live Current (lightning as
- * shock), and Pain Conduit at the tip (30% more spell damage on low life). Joined to the middle arm by the inter-arm
- * junction. Since 2026-10-20 the arm is a place, not the lightning arm (see `fire.ts`); the id `spire.storm` is kept.
+ * The Gallery: The east toward the rim.
+ * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { damageOnLowLife, eleDamage, int, penetration, shockEffect, spellCrit } from '../lines';
+import { castSpeed, costReduction, critChance, critVsShocked, damageVsRare, dodgeAttack, dodgeSpell, eleDamage, es, esOnHit, penetration, reducedReservation, shockDuration, shockEffect, spellExtraProjectile, spellProjectile, wandAttack, wandChain, wandPhysAsLightning, weaponCrit, weaponCritMulti, weaponSpeed } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const storm: AreaSpec = {
-  id: 'spire.storm',
-  region: 'mystic',
-  name: 'The Gallery',
-  why:
-    'The arm toward the Knife, the sharp end of the Spire: fire for the crit caster, lightning for the shocker, and Pain Conduit for the ' +
-    "caster who lives on low life. The Shade borrows its root; the dear crossing from the Knife's curses lands on the keystone spur.",
-  at: [820, -3740], // Where the area's name is drawn: clear of every other area's name (label pass, round 4); nudged in G3 round 1 off Pain Conduit.
+  id: "spire.storm",
+  region: "mystic",
+  name: "The Gallery",
+  why: "The east toward the rim.",
+  at: [1424, -3523],
   clusters: [
     {
-      id: 'flashpoint',
-      name: 'Flashpoint',
-      why: "Fire with spell crit and fire penetration: fire as the big crit hit, the first cluster of the east arm, beside the Spire's other crit (Sharp Mind below, Fever Pitch above). The other fire cluster (Cinder, west) sells the burn; a fire build picks the hit here or the burn there. Passed through from the fork to the arm's junction; its west side takes the join from the middle arm.",
-      at: [650, -3420],
-      shape: { kind: 'ring', r: 56, a0: 150 },
-      nodes: [
-        {
-          id: 'a',
-          kind: 'small',
-          lines: [eleDamage('fire', 10)],
-          why: 'The entrance, from the fork.',
-        },
-        {
-          id: 'c',
-          kind: 'small',
-          lines: [eleDamage('fire', 10)],
-          why: 'The north-west side, to the east join.',
-        },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Flashpoint',
-          lines: [eleDamage('fire', 14), spellCrit(25), penetration('fire', 3)],
-          why: '1.4 + 1.7 + 1.5 units.',
-        },
-        {
-          id: 'b',
-          kind: 'small',
-          lines: [eleDamage('fire', 10)],
-          why: "The east exit, to the arm's junction.",
-        },
-      ],
-      links: [
-        ['a', 'c'],
-        ['c', 'n'],
-        ['n', 'b'],
-        ['b', 'a'],
-      ],
-    },
-    {
-      id: 'jArm',
-      name: 'Junction',
-      why: "The arm's junction: the shock room north, the Pain Conduit spur east, the craft's east road arriving from the south, and the dear crossing to the Knife's curses south-east.",
-      at: [950, -3600],
+      id: "overcharge",
+      name: "Live Current",
+      why: "Lightning's second rung (shock), off the east spoke past the mid ring.",
+      at: [1188, -3451],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [950, -3600] }],
-      links: [],
-    },
-    {
-      id: 'overcharge',
-      name: 'Live Current',
-      why: "Lightning damage, the effect of shock and lightning penetration: lightning as the shock that makes every later hit bigger, beside the low-life keystone. The other lightning cluster (Thunderhead, the middle arm) sells speed. The middle arm's ailment bridge arrives at its notable.",
-      at: [960, -3900],
-      shape: { kind: 'ring', r: 56, a0: 90 },
       nodes: [
-        {
-          id: 'a',
-          kind: 'small',
-          lines: [shockEffect(10)],
-          why: 'The entrance, south, facing the junction.',
-        },
-        {
-          id: 'n',
-          kind: 'notable',
-          name: 'Live Current',
-          lines: [eleDamage('lightning', 12), shockEffect(20), penetration('lightning', 3)],
-          why: '1.2 + 2 + 1.5 units. The west side, where the ailment bridge arrives.',
-        },
-        { id: 'b', kind: 'small', lines: [shockEffect(10)] },
-        {
-          id: 'c',
-          kind: 'small',
-          lines: [shockEffect(10)],
-          why: 'The east side, to the keystone spur.',
-        },
+        { id: "a", kind: "small", lines: [shockEffect(10)], at: [1133, -3459] },
+        { id: "n", kind: "notable", name: "Live Current", lines: [eleDamage('lightning', 12), shockEffect(25), shockDuration(20)], at: [1196, -3506] },
+        { id: "b", kind: "small", lines: [shockEffect(10)], at: [1243, -3443] },
+        { id: "c", kind: "small", lines: [shockEffect(10)], at: [1180, -3396] },
+        { id: "n2", kind: 'notable', name: "Conductor", lines: [shockEffect(15), reducedReservation(4), esOnHit(4)], at: [1208, -3590], why: "The shocker’s sustain." },
       ],
-      links: [
-        ['a', 'n'],
-        ['n', 'b'],
-        ['b', 'c'],
-        ['c', 'a'],
-      ],
+      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["n", "n2"]],
     },
     {
-      id: 'painConduit',
-      name: 'Pain Conduit',
-      why: 'Two nodes of damage on low life, then the keystone: 30% more spell damage on low life. The tip of the lightning arm; the approach says what the keystone asks (they were spell damage until 2026-10-19).',
-      at: [1100, -3560],
-      shape: { kind: 'line', heading: -15, gap: 150 },
-      nodes: [
-        { id: 'a', kind: 'small', lines: [damageOnLowLife(6)], at: [1248, -3626] },
-        { id: 'b', kind: 'small', lines: [damageOnLowLife(6)], at: [1305, -3631] },
-        { id: 'k', kind: 'keystone', name: 'Pain Conduit', lines: [] },
-      ],
-      links: [
-        ['a', 'b'],
-        ['b', 'k'],
-      ],
-    },
-    {
-      id: 'roadS',
-      name: 'The gallery stair',
-      why: 'Intelligence once, between the Gallery junction and Mist Walk.',
-      at: [1070, -3410],
+      id: "wandVolley",
+      name: "Wand Volley",
+      why: "Wand attack speed, off the east spoke past the mid ring toward the axis.",
+      at: [439, -3573],
       shape: { kind: 'hand' },
-      nodes: [{ id: 'a', kind: 'attribute', lines: [int(7)], at: [1070, -3410] }],
-      links: [],
+      nodes: [
+        { id: "a", kind: "small", lines: [wandAttack(12)], at: [507, -3561] },
+        { id: "n", kind: "notable", name: "Wand Volley", lines: [wandAttack(24), weaponSpeed("wand", 12)], at: [437, -3566], why: "2 + 2.4 units." },
+        { id: "b", kind: "small", lines: [wandAttack(12)], at: [372, -3592] },
+        { id: "n2", kind: 'notable', name: "Hail of Sparks", lines: [wandAttack(16), wandChain(1)], at: [417, -3483], why: "Wand attacks spray from target to target." },
+      ],
+      links: [["a", "n"], ["n", "b"], ["n", "n2"]],
+    },
+    {
+      id: "mistWalk",
+      name: "Mist Walk",
+      why: "Dodge, in from the rim ring beside the Knife's.",
+      at: [1611, -3618],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [dodgeSpell(3)], at: [1641, -3672] },
+        { id: "b", kind: "small", lines: [dodgeSpell(3)], at: [1613, -3622] },
+        { id: "n", kind: "notable", name: "Mist Walk", lines: [dodgeSpell(6), dodgeAttack(3), es(6)], at: [1579, -3560] },
+      ],
+      links: [["a", "b"], ["b", "n"]],
+    },
+    {
+      id: "needlework",
+      name: "Needlework",
+      why: "Crit with attacks, in from the rim ring.",
+      at: [1387, -3709],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [critChance(15)], at: [1380, -3802] },
+        { id: "b", kind: "small", lines: [critChance(15)], at: [1384, -3747] },
+        { id: "n", kind: "notable", name: "Needlework", lines: [wandAttack(16), wandPhysAsLightning(15), critChance(15)], at: [1389, -3678] },
+        { id: "c", kind: "small", lines: [critChance(15)], at: [1395, -3608] },
+      ],
+      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+    },
+    {
+      id: "longChant",
+      name: "Recital",
+      why: "Spells with mana regeneration, in from the rim ring at the east spoke.",
+      at: [1086, -3839],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [castSpeed(4)], at: [1064, -3904] },
+        { id: "b", kind: "small", lines: [castSpeed(4)], at: [1092, -3858] },
+        { id: "n", kind: "notable", name: "Recital", lines: [costReduction(8), damageVsRare(20)], at: [1129, -3797] },
+        { id: "c", kind: "small", lines: [castSpeed(4)], at: [1059, -3797] },
+      ],
+      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+    },
+    {
+      id: "pinpoint",
+      name: "Pinpoint",
+      why: "Wand crit, out from the rim ring at the east spoke.",
+      at: [1103, -4425],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [wandAttack(12)], at: [1058, -4346] },
+        { id: "b", kind: "small", lines: [wandAttack(12)], at: [1091, -4391] },
+        { id: "n", kind: "notable", name: "Pinpoint", lines: [wandAttack(20), weaponCrit("wand", 20), weaponCritMulti("wand", 12)], at: [1132, -4447], why: "1.67 + 1.33 + 1 units." },
+        { id: "c", kind: "small", lines: [wandAttack(12)], at: [1131, -4516] },
+      ],
+      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+    },
+    {
+      id: "arc",
+      name: "Arc",
+      why: "Lightning's payoff, out from the rim ring.",
+      at: [1499, -4260],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "s1", kind: "small", lines: [eleDamage('lightning', 10)], at: [1407, -4110] },
+        { id: "s2", kind: "small", lines: [eleDamage('lightning', 10)], at: [1453, -4185] },
+        { id: "n", kind: "notable", name: "Arc", lines: [eleDamage('lightning', 16), penetration('lightning', 5), critVsShocked(30)], at: [1499, -4260] },
+      ],
+      links: [["s1", "s2"], ["s2", "n"]],
+    },
+    {
+      id: "volley",
+      name: "Volley",
+      why: "Projectiles' second home, with Darting Bolts.",
+      at: [1903, -4098],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "s1", kind: "small", lines: [spellProjectile(10)], at: [1805, -3952] },
+        { id: "s2", kind: "small", lines: [spellProjectile(10)], at: [1854, -4025] },
+        { id: "n", kind: "notable", name: "Volley", lines: [spellProjectile(15), spellExtraProjectile(1)], at: [1903, -4098] },
+      ],
+      links: [["s1", "s2"], ["s2", "n"]],
     },
   ],
   links: [
-    { from: 'flashpoint.b', to: 'jArm.a', why: "Through the first cluster to the arm's junction." },
-    { from: 'jArm.a', to: 'overcharge.a', why: 'Junction to the shock room.' },
-    { from: 'jArm.a', to: 'painConduit.a', why: 'Junction to the keystone spur.' },
+    { from: "spire.storm.overcharge.a", to: "spire.craft.spE.c", why: "The way in." },
+    { from: "spire.storm.wandVolley.a", to: "spire.craft.spE.c", why: "The way in." },
+    { from: "spire.storm.mistWalk.a", to: "spire.rim.ring.q8", why: "The way in." },
+    { from: "spire.storm.needlework.a", to: "spire.rim.ring.q7", why: "The way in." },
+    { from: "spire.storm.longChant.a", to: "spire.rim.ring.e1", why: "The way in." },
+    { from: "spire.storm.pinpoint.a", to: "spire.rim.ring.e1", why: "The way in." },
+    { from: "spire.storm.arc.s1", to: "spire.rim.ring.q7", why: "The way in." },
+    { from: "spire.storm.volley.s1", to: "spire.rim.ring.q8", why: "The way in." },
+    { from: "spire.storm.needlework.c", to: "spire.storm.mistWalk.n", why: "A way across between neighbouring clusters, dearer than the roads." },
   ],
 };

@@ -307,7 +307,7 @@ export const crypt: AreaSpec = {
     },
     {
       from: 'omen.b',
-      to: 'spire.fire.cinder.n',
+      to: 'spire.well.radW.m',
       why: "Seam 2 (G4 fix 1; fix brief §1.1): Bright Omen's far small lands on the Mystic's Cinder, the one border link this seam lays. A far crossing, 21 steps from the Zealot start and 23 from the Mystic's: the casters of both sides find spell crit with mana here, between the Zealot's physical spells and the Mystic's burning, and Cinder becomes a bridge.",
     },
     { from: 'toSpire.a', to: 'tomb.a', why: 'The crossing road onto the chaos pocket.' },
@@ -318,6 +318,6 @@ export const crypt: AreaSpec = {
     { from: 'jV.a', to: 'shrine.w', why: 'Junction to the shrine.' },
     { from: 'shrine.e', to: 'sigilWarden.a', why: "The shrine's brand side to the keystone spur." },
     { from: 'wheel.m5', to: 'toSpire.a', why: 'Glass Wall onto the dear road.' },
-    { from: 'toSpire.b', to: 'spire.fire.familiars.n', why: 'The dear road lands on Familiars.' },
+    { from: 'toSpire.b', to: 'spire.well.familiars.n', why: 'The dear road lands on Familiars.' },
   ],
 };

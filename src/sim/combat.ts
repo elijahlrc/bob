@@ -550,7 +550,12 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     return;
   }
   // Feeble Grip makes a hexed attacker deal less; the auras and Fervour of the Choir make its monsters deal more.
-  const dealt = damageMult(src);
+  // A chilled enemy deals less to a character with the tree's chill line (the Spire's Rime).
+  const weak =
+    dst.isPlayer && !src.isPlayer && src.ail.chill > 0
+      ? Math.min(50, dst.side!.char.db.sum('base', 'chilledLessDamage'))
+      : 0;
+  const dealt = damageMult(src) * (1 - weak / 100);
   if (dealt !== 1 && res.outcome !== 'block') {
     for (let i = 0; i < res.dmg.length; i++) res.dmg[i] *= dealt;
     res.total *= dealt;
@@ -1475,9 +1480,12 @@ export function killActor(w: World, a: Actor): void {
     rollCharges(w, fs, 'kill', gains);
     if (a.ail.freezeT > 0) rollCharges(w, fs, 'killFrozen', gains);
     if (a.ail.shock > 0) rollGains(w, fs, 'killShocked', gains);
+    if (a.ail.ignites.length > 0) rollGains(w, fs, 'killIgnited', gains);
     rollGains(w, fs, 'kill', gains);
     bannerStage(w, fs, 'kill');
     refreshOnKill(fs);
+    // The tree's recharge-on-kill line (the Spire's Ward Renewed): energy shield starts recharging at once.
+    if (fs.char.db.flag('esRechargeOnKill')) fs.esNow = true;
   }
   if (!a.isPlayer && a.rarity === 'rare') gainTrophy(w, fs, a.modIds);
   if (a.isPlayer) {

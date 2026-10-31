@@ -10,14 +10,17 @@ const b = buildAll({ allowNew: true });
 const { nodes } = b.tree;
 const name = new Map<number, string>();
 for (const [k, v] of Object.entries(ids)) name.set(v, k);
-const [sx, sy] = [866, -500];
-const C = Math.cos(-Math.PI / 6), S = Math.sin(-Math.PI / 6);
+const REG = process.argv[2] ?? 'shade';
+const si = nodes.findIndex((n: any) => n.classStart === REG);
+const [sx, sy] = [nodes[si].x, nodes[si].y];
+const TH = Math.atan2(sy, sx);
+const C = Math.cos(TH), S = Math.sin(TH);
 const frame = (x: number, y: number) => {
   const dx = x - sx, dy = y - sy;
   return [Math.round(C * dx + S * dy), Math.round(-S * dx + C * dy)];
 };
 const label = (i: number) => (b.lines[i] ?? []).map((s: any) => makeLine(s).label).join('; ');
-const knife = nodes.map((_: any, i: number) => i).filter((i: number) => b.place[i]?.region === 'shade' && nodes[i].kind);
+const knife = nodes.map((_: any, i: number) => i).filter((i: number) => b.place[i]?.region === REG && nodes[i].kind);
 const byCluster = new Map<string, number[]>();
 for (const i of knife) {
   const k = `${b.place[i].area}.${b.place[i].cluster}`;

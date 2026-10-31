@@ -7,13 +7,16 @@ import * as L from './lines';
 import type { Line, LineSpec } from './types';
 
 /** What one argument is: a number, an element, an element or chaos, a damage type, or an optional list of skill tags. */
-export type ParamKind = 'n' | 'ele' | 'ele4' | 'dmg' | 'weapon' | 'tags?';
+export type ParamKind = 'n' | 'ele' | 'ele4' | 'dmg' | 'weapon' | 'recoverEvent' | 'pool' | 'tideEvent' | 'tags?';
 
 export const CHOICES: Record<Exclude<ParamKind, 'n' | 'tags?'>, readonly string[]> = {
   ele: ['fire', 'cold', 'lightning'],
   ele4: ['fire', 'cold', 'lightning', 'chaos'],
   dmg: ['physical', 'fire', 'cold', 'lightning', 'chaos'],
   weapon: ['sword', 'axe', 'mace', 'sceptre', 'dagger', 'claw', 'wand', 'staff', 'bow'],
+  recoverEvent: ['kill', 'killIgnited', 'crit', 'hitTaken'],
+  pool: ['life', 'mana', 'es'],
+  tideEvent: ['flask', 'crit', 'kill'],
 };
 
 const SPECIAL: Record<string, ParamKind[]> = {
@@ -37,6 +40,11 @@ const SPECIAL: Record<string, ParamKind[]> = {
   weaponSpeed: ['weapon', 'n'],
   weaponAccuracy: ['weapon', 'n'],
   cullingStrike: [],
+  auraReserveLife: [],
+  esRechargeOnKill: [],
+  recoverOn: ['recoverEvent', 'pool', 'n'],
+  arcaneTideOn: ['tideEvent', 'n'],
+  spellDamagePerMana: ['n', 'n'],
 };
 const LEFT_OUT = new Set(['damage', 'flag', 'UNIT']);
 

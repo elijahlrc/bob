@@ -276,6 +276,7 @@ export const PER_TEXT: Record<string, string> = {
   int: 'Intelligence',
   level: 'Level',
   minAttr: 'of your lowest Attribute',
+  maxMana: 'maximum Mana',
   accuracy: 'Accuracy',
   incArmour: '% increased Armour',
   'inc:moveSpeed': '% increased Movement Speed',
@@ -412,6 +413,10 @@ Object.assign(STAT_TEXT, {
   maxRage: { base: '{v} to maximum Rage' },
   gemLevel: { base: '{v} to Level of all Skill Gems' },
   buffDuration: { name: 'Buff Duration' },
+  // The Spire's rule benders (src/data/passives/lines.ts).
+  auraReserveLife: { flag: 'Auras reserve Life instead of Mana' },
+  esRechargeOnKill: { flag: 'Energy Shield starts recharging when you Kill an Enemy' },
+  chilledLessDamage: { base: 'Chilled Enemies deal {v}% less Damage to you' },
 } satisfies Record<string, StatText>);
 for (const id of BUFF_IDS) {
   const name = BUFFS[id].name;
@@ -652,6 +657,7 @@ const MORE_EVENTS: Record<string, string> = {
   use: 'when you use this Skill',
   killFrozen: 'when you Kill a Frozen Enemy',
   killShocked: 'when you Kill a Shocked Enemy',
+  killIgnited: 'when you Kill an Ignited Enemy',
   surge: 'when you have spent enough mana',
   stun: 'when you Stun an Enemy',
   cast: 'when you Cast a Spell',

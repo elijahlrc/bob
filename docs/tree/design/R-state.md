@@ -52,6 +52,22 @@ rework's decisions), `R-reviewer.md` (the reviewer agent's brief), `R-skeleton.m
   a good notable may be added freely (list each addition in the report). The report is an Artifact page plus a markdown
   copy in `docs/tree/design/`.
 
+## Progress of the unattended run (keep current)
+
+- The Knife committed as `e8b4939`. Reference sectors by class: vanguard 0, strider 1, mystic 2, reaver 3, zealot 4, shade 5.
+- **Tools since:** `snapshot.ts` (each region's old files in `before/<region>.json`, taken for all five and the centre
+  before any change), `region-gen-lib.ts` (the Knife's generator made general; each region's table is `<region>-gen.ts`),
+  `ref-sector.mjs` (a reference sector's notables, written to the scratchpad), `offdef.ts <region>` and
+  `region-map.ts <region>` take the region.
+- **Border convention:** a region builds the seam and border radial on a border whose neighbour is not yet rebuilt, and links
+  into the existing nodes where it is (positions of those nodes go in the table's `external`). The Spire's east path,
+  mid ring and rim ring end at `knife.home.seams.n`, `knife.hex.radN.m`, `knife.rim.ring.n0`; it built the west seam
+  `spire.home.seams.w`, the radial `spire.well.radW.*` and the rim vertex `spire.rim.ring.w0` for the Cathedral.
+  Temporary Cathedral links into the Spire were retargeted (`cathedral/crypt.ts`, `cathedral/walk.ts`).
+- **The Spire:** plan approved (R-spire.md), structure approved, notables revision 2 under review (R-spire-notables.md);
+  built in `src/data/passives/spire/`. One reviewer agent per region, continued across stages with SendMessage.
+- The report is written as it goes in `R-report.md`.
+
 ## How the Knife was built (the pattern for the rest)
 
 `scripts/passives/rework/` holds the tools (one-off, absolute paths, run with `npx tsx`):

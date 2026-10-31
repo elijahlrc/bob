@@ -1,0 +1,4238 @@
+[
+ {
+  "file": "blades",
+  "export": "blades",
+  "id": "yard.blades",
+  "name": "The Practice Ground",
+  "why": "The Yard's west, on the Wall border: a sword diamond, an axe room, the one-handed diamond, the elemental pocket, the Finishing Cut chain, Killing Pace, armour on the Wall side (Guarded) and a second armour notable between the one-handed diamond and the elements (Mended Mail, G3, on regeneration smalls since G4 fix 1), hung from the west road and the crossroad (G2); past the west road, the sword with a shield (Sword and Board, G3 round 2) on the way to the Wall. The sword's crit and the second axe are elsewhere (Fencer's Eye in the south, Cleaver in the Wall).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "keenEdge",
+    "name": "Keen Edge",
+    "why": "Swords: a diamond of damage, damage, speed and the notable, entered from the home road, left south to the crossroad: a bridge between the two roads, beside the west road rather than on it (G2: it sat on the straight line from the home road to the junction, so every build going west paid for it).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the home road.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       -484,
+       1687
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       -567,
+       1702
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Keen Edge",
+      "why": "Sword damage and the accuracy a sword is for: 2.4 + 1.5 units. The exit, to the crossroad.",
+      "lines": [
+       "swordDamage(24)",
+       "accuracy(15)"
+      ],
+      "at": [
+       -552,
+       1786
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       -469,
+       1770
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ],
+     [
+      "c",
+      "a"
+     ]
+    ]
+   },
+   {
+    "id": "j1",
+    "name": "Junction",
+    "why": "The corner where the west road turns south and the crossroad leaves east, and the near crossing west to the Wall's stun and slams.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -880,
+       1990
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "west",
+    "name": "The west road",
+    "why": "The home's blades highway carried on (G2, 2026-10-22): from the home road to the junction, south past the axes to the road to Headsman, and on to the Pits' west junction. Strength and dexterity on every node; each node has a cluster off it except the third, beside the axes' chain.",
+    "nodes": [
+     {
+      "id": "w1",
+      "kind": "attribute",
+      "why": "The armour pocket leaves north.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -740,
+       1770
+      ]
+     },
+     {
+      "id": "w2",
+      "kind": "attribute",
+      "why": "The axes leave east.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -950,
+       2230
+      ]
+     },
+     {
+      "id": "w3",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -960,
+       2460
+      ]
+     },
+     {
+      "id": "w4",
+      "kind": "attribute",
+      "why": "The Shieldwall spur leaves west, the block run and Finishing Cut east.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -925,
+       2940
+      ]
+     }
+    ],
+    "links": [
+     [
+      "w2",
+      "w3"
+     ]
+    ]
+   },
+   {
+    "id": "crossroad",
+    "name": "The crossroad",
+    "why": "The west half of the road across the Yard (G2, 2026-10-22), from the junction to the Muster's hub: the sword diamond comes down onto its first node, Killing Pace and the one-handed diamond onto its second. It replaces the hub's direct links into those clusters.",
+    "nodes": [
+     {
+      "id": "c1",
+      "kind": "attribute",
+      "why": "The sword diamond lands here.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -570,
+       1993
+      ]
+     },
+     {
+      "id": "c2",
+      "kind": "attribute",
+      "why": "Killing Pace lands here from above, the one-handed diamond from below.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -320,
+       1997
+      ]
+     }
+    ],
+    "links": [
+     [
+      "c1",
+      "c2"
+     ]
+    ]
+   },
+   {
+    "id": "guarded",
+    "name": "Guarded",
+    "why": "Armour three times, then the notable with armour and evasion: the Reaver who holds the line, a short chain north off the west road's first node, on the border with the Wall's slams. It sat in the shield area until 2026-10-20 and hung off the sword diamond until G2. Since G3 (2026-10-22) it has no life and a third armour small: life with armour 8 steps from the start handed a strength build two of its main wants at once (the ledger's convergence rule), and the Yard's other armour (Mended Mail, with regeneration) is a few steps further south.",
+    "nodes": [
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The entrance, facing the west road (G3: the third armour small).",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -756,
+       1644
+      ]
+     },
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -761,
+       1586
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "armour(12)"
+      ],
+      "at": [
+       -767,
+       1528
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Guarded",
+      "why": "Both of the Reaver's defences, the two-defence notable only a strength-dexterity region sells: 1.7 + 2 units. The Wall's armour-and-stun is Ox Hide, off the tower road.",
+      "lines": [
+       "armour(20)",
+       "evasion(20)"
+      ],
+      "at": [
+       -775,
+       1458
+      ]
+     }
+    ],
+    "links": [
+     [
+      "c",
+      "a"
+     ],
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "hewing",
+    "name": "Hewing",
+    "why": "Axes, with the bleed an axe is for: the fork inside the area (sword or axe), a chain from the west road's second node down to the elements.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the west road.",
+      "lines": [
+       "axeDamage(12)"
+      ],
+      "at": [
+       -901,
+       2293
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Hewing",
+      "why": "Axes that open wounds: 1.7 + 1.5 + 1 units. The two-hander is Headsman, on the Barrows road.",
+      "lines": [
+       "axeDamage(20)",
+       "bleedChance(15)",
+       "attackSpeed(5, [\"axe\"])"
+      ],
+      "at": [
+       -858,
+       2349
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the elements.",
+      "lines": [
+       "axeDamage(12)"
+      ],
+      "at": [
+       -816,
+       2404
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "elementalEdge",
+    "name": "Elemental Edge",
+    "why": "Elemental damage with attacks, below the axes: the Yard's one elemental cluster (C-brief §11), so that a Reaver with a fire or cold sword is near its element without a walk to the Spire. Reached through the axes and from the road to Headsman; no longer joined to the Shieldwall spur (G2: the road from the elements to Finishing Cut ran through the keystone's spur).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the axes.",
+      "lines": [
+       "eleAttack(10)"
+      ],
+      "at": [
+       -697,
+       2558
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "eleAttack(10)"
+      ],
+      "at": [
+       -637,
+       2619
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Elemental Edge",
+      "why": "2.4 + 1 units; three elements at once, which is why it is smaller than a one-element notable would be.",
+      "lines": [
+       "eleAttack(24)",
+       "accuracy(10)"
+      ],
+      "at": [
+       -720,
+       2640
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "a"
+     ]
+    ]
+   },
+   {
+    "id": "mail",
+    "name": "Mended Mail",
+    "why": "Life regeneration twice, then the notable with armour and life regeneration, then regeneration once more (RE-4, G3 2026-10-22; the smalls were armour until G4 fix 1, when they went to the notable's partner: with four and three armour smalls, Iron Voice and Mended Mail were in six of the seven armour builds' plans, builds audit B1): the Yard's second armour, a straight chain across the open cell between the one-handed diamond and the elements, so the Practice Ground holds armour in two places with two partners (evasion at Guarded, regeneration here) and a strength build takes one, the other, or walks on to the Wall's Rampart for the rest. Regeneration is recovery, not maximum life, so it is not the life-with-armour pairing the ledger keeps away from the homes. A bridge: from Light Blades' south small down to Elemental Edge, a new loop between the crossroad and the west road.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "Regeneration, the entrance from the one-handed diamond.",
+      "lines": [
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -561,
+       2318
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -575,
+       2374
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Mended Mail",
+      "why": "Armour that is patched between fights: 2 + 2 units.",
+      "lines": [
+       "armour(24)",
+       "lifeRegen(0.8)"
+      ],
+      "at": [
+       -589,
+       2430
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "Regeneration, the exit to Elemental Edge.",
+      "lines": [
+       "lifeRegen(0.4)"
+      ],
+      "at": [
+       -603,
+       2486
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "lightBlades",
+    "name": "Light Blades",
+    "why": "One-handed melee: a diamond of damage, speed and the notable, for a sword or an axe in either hand. Below the crossroad's second node, left toward the resist star.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "oneHandMelee(10)"
+      ],
+      "at": [
+       -579,
+       2124
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Light Blades",
+      "why": "2 + 1.7 + 1 units.",
+      "lines": [
+       "oneHandMelee(20)",
+       "attackSpeed(8, [\"oneHand\"])",
+       "accuracy(10)"
+      ],
+      "at": [
+       -500,
+       2110
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The entrance, from the crossroad.",
+      "lines": [
+       "oneHandMelee(10)"
+      ],
+      "at": [
+       -441,
+       2073
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exits to the resist star's cold spoke and, since G3, down to Mended Mail's chain.",
+      "lines": [
+       "oneHandMelee(10)"
+      ],
+      "at": [
+       -527,
+       2185
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "a",
+      "c"
+     ],
+     [
+      "c",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "executioner",
+    "name": "Finishing Cut",
+    "why": "Damage against bleeding enemies, then the notable that finishes them (culling strike, double damage): what an axe Reaver who bleeds wants after Hewing. Since G2 a chain east from the west road's last node to the reservation chain's first small, in the wedge between the block run and the road down to the Pits; it hung off the Shieldwall spur before.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the west road.",
+      "lines": [
+       "damageVsBleeding(8)"
+      ],
+      "at": [
+       -855,
+       2938
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Finishing Cut",
+      "why": "2 + 3 units. The exit, to the reservation chain.",
+      "lines": [
+       "damageVsBleeding(16)",
+       "cullingStrike()"
+      ],
+      "at": [
+       -775,
+       2935
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "killingPace",
+    "name": "Killing Pace",
+    "why": "Attack speed after a kill once, then the notable with speed after a kill, life on kill and movement: the Reaver who clears a pack and runs to the next, which is most of a map. A straight chain from the home road's first node down to the crossroad's second (G2; it ran from the home road's second node to the hub before), so the way from the home to the one-handed diamond stays as short as it was.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the home road.",
+      "lines": [
+       "attackSpeedOnKill(7)"
+      ],
+      "at": [
+       -349,
+       1786
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Killing Pace",
+      "why": "2 + 1 + 1 units. The exit, to the crossroad.",
+      "lines": [
+       "attackSpeedOnKill(13)",
+       "lifeOnKill(10)",
+       "moveSpeed(4)"
+      ],
+      "at": [
+       -340,
+       1856
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "toHeadsman",
+    "name": "To Headsman",
+    "why": "Three attribute nodes from Elemental Edge to Headsman: the Practice Ground and the big axe on the Barrows road are joined, so the axe build crosses the border at its axes. The first is also a node of the west road (G2).",
+    "nodes": [
+     {
+      "id": "r1",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -935,
+       2655
+      ]
+     },
+     {
+      "id": "r2",
+      "kind": "attribute",
+      "why": "Sword and Board leaves south (G3 round 2).",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -1150,
+       2670
+      ]
+     },
+     {
+      "id": "r3",
+      "kind": "attribute",
+      "why": "Thirsting Blade leaves north.",
+      "lines": [
+       "str(7)"
+      ],
+      "at": [
+       -1365,
+       2685
+      ]
+     }
+    ],
+    "links": [
+     [
+      "r1",
+      "r2"
+     ],
+     [
+      "r2",
+      "r3"
+     ]
+    ]
+   },
+   {
+    "id": "board",
+    "name": "Sword and Board",
+    "why": "Sword damage twice, then the notable with sword damage and block with a shield, then sword damage once more (RE-2, G3 round 2, 2026-10-22): the sword for the Reaver who holds a shield, the Yard's fourth sword direction and its farthest from home. A straight bridge south from the road to Headsman's second node to the Wall's east road (a near crossing): the Wall's shield builds reach a sword here, and the Reaver's walk on to the Wall's shields and the Barrows. It sits past the west road, away from the armour (Guarded, Mended Mail, the Rampart), the speed (the east) and the leech (the Pits): a sword build that wants it walks the far side of the Practice Ground for it. Seven and more steps from Keen Edge and from the Muster's shields (Steel Rim, Buckler); beside the Shieldwall keystone, whose block cap is its pull.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the road to Headsman.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       -1157,
+       2740
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       -1163,
+       2796
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Sword and Board",
+      "why": "A sword behind a shield: 2 + 2 units.",
+      "lines": [
+       "swordDamage(20)",
+       "shieldBlock(4)"
+      ],
+      "at": [
+       -1169,
+       2853
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exit, to the Wall's east road.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       -1174,
+       2910
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "thirst",
+    "name": "Thirsting Blade",
+    "why": "A pocket north off the road to Headsman: leech with attacks twice, then leech with attack speed. The Yard's second leech, far from the first: Red Harvest and Crimson Pact are in the Pits, a dozen steps south-east, so the leech Reaver chooses a direction. Here since round 3 (2026-10-20); it was mana leech and mana on hit in the Pits, a copy of Fighting Breath's pairing, off the same junction as Red Harvest and the keystone.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       -1365,
+       2303
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       -1365,
+       2245
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Thirsting Blade",
+      "why": "2 + 1.7 units: leech that comes faster with faster hits.",
+      "lines": [
+       "leechLife(0.8, [\"attack\"])",
+       "attackSpeed(8)"
+      ],
+      "at": [
+       -1365,
+       2175
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "toHeadsman.r3",
+    "to": "thirst.a",
+    "why": "The road onto the leech pocket."
+   },
+   {
+    "from": "toHeadsman.r2",
+    "to": "board.a",
+    "why": "The road to Headsman's second node onto the sword and shield (G3 round 2, RE-2), south."
+   },
+   {
+    "from": "board.c",
+    "to": "wall.grit.east.e6",
+    "why": "Sword and board (a near crossing; G1-brief.md §2.4, deferred to G3 by the G2 border pass): Sword and Board lands on the Wall's east road, so the Wall's shield builds reach a sword cluster and the Reaver's reach the Wall's shields and the Barrows."
+   },
+   {
+    "from": "toHeadsman.r3",
+    "to": "wall.grit.headsman.b",
+    "why": "The road from Elemental Edge lands on the Headsman pocket's small, so Headsman hangs as a leaf."
+   },
+   {
+    "from": "yard.blades.elementalEdge.n",
+    "to": "yard.blades.toHeadsman.r1",
+    "why": "Three attribute nodes from Elemental Edge to Headsman: the Practice Ground and the big axe on the Barrows road are joined, so the axe build crosses the border at its axes."
+   },
+   {
+    "from": "yard.home.roadW.b",
+    "to": "west.w1",
+    "why": "The west road's first node past the home road: the highway goes on to the junction without passing through the sword diamond (G2)."
+   },
+   {
+    "from": "west.w1",
+    "to": "j1.a",
+    "why": "The west road reaches the junction."
+   },
+   {
+    "from": "j1.a",
+    "to": "west.w2",
+    "why": "The west road turns south at the junction."
+   },
+   {
+    "from": "west.w3",
+    "to": "toHeadsman.r1",
+    "why": "The west road meets the road to Headsman."
+   },
+   {
+    "from": "toHeadsman.r1",
+    "to": "west.w4",
+    "why": "The west road goes on south."
+   },
+   {
+    "from": "west.w4",
+    "to": "yard.blood.toWall.a",
+    "why": "The west road's last leg, to the Pits' west junction: the Fosse leg and the Pits rim road go on from there."
+   },
+   {
+    "from": "west.w1",
+    "to": "guarded.c",
+    "why": "The west road's first node onto the armour pocket."
+   },
+   {
+    "from": "west.w2",
+    "to": "hewing.a",
+    "why": "The west road's second node onto the axes."
+   },
+   {
+    "from": "west.w4",
+    "to": "executioner.a",
+    "why": "The west road's last node onto Finishing Cut."
+   },
+   {
+    "from": "executioner.n",
+    "to": "yard.shield.standard.a",
+    "why": "Finishing Cut on to the reservation chain: a second way in for each, and a way from the west road up to the crit pocket without the hub (G2; it replaced the road node that joined Finishing Cut to Standard Bearer)."
+   },
+   {
+    "from": "j1.a",
+    "to": "crossroad.c1",
+    "why": "The crossroad leaves the junction east."
+   },
+   {
+    "from": "crossroad.c2",
+    "to": "yard.shield.hub.a",
+    "why": "The crossroad's west half reaches the Muster's hub."
+   },
+   {
+    "from": "yard.home.roadW.a",
+    "to": "killingPace.a",
+    "why": "The home road's first node onto the kill chain."
+   },
+   {
+    "from": "killingPace.n",
+    "to": "crossroad.c2",
+    "why": "The kill chain lands on the crossroad."
+   },
+   {
+    "from": "keenEdge.n",
+    "to": "crossroad.c1",
+    "why": "Through the swords down to the crossroad: the sword diamond bridges the home road and the crossroad."
+   },
+   {
+    "from": "j1.a",
+    "to": "wall.slams.j2.a",
+    "why": "The near crossing to the Wall's stun and slams: an axe Vanguard or a two-hand Reaver walks it (C-brief §4)."
+   },
+   {
+    "from": "hewing.b",
+    "to": "elementalEdge.a",
+    "why": "Beyond the axes, the elements."
+   },
+   {
+    "from": "lightBlades.c",
+    "to": "mail.a",
+    "why": "The one-handed diamond's south small onto Mended Mail's chain (G3, RE-4): the crossroad reaches the Yard's second armour through a one-handed notable's nodes, a fair price for a sword-and-armour build."
+   },
+   {
+    "from": "mail.c",
+    "to": "elementalEdge.b",
+    "why": "Mended Mail's chain lands on the elements: it is a bridge, so the crossroad and the west road meet a second time below the axes."
+   },
+   {
+    "from": "lightBlades.b",
+    "to": "crossroad.c2",
+    "why": "The one-handed diamond hangs below the crossroad, where Killing Pace lands from above."
+   },
+   {
+    "from": "lightBlades.c",
+    "to": "yard.shield.star.w",
+    "why": "The one-handed diamond's south side to the resist star's cold spoke."
+   },
+   {
+    "from": "wall.slams.thunderstep.b",
+    "to": "wall.slams.toYard.a",
+    "why": "Strength and dexterity once on the near crossing to the Yard's Guarded."
+   },
+   {
+    "from": "wall.slams.toYard.a",
+    "to": "yard.blades.guarded.b",
+    "why": "The far end of the road."
+   }
+  ]
+ },
+ {
+  "file": "blood",
+  "export": "blood",
+  "id": "yard.blood",
+  "name": "The Pits",
+  "why": "The Yard's south rim: bleed, leech, poison, Spellsword, Wound Dance and Crimson Pact, the dear crossings to the Wall and the Bow, since G2 three roads south to the Fosse (the spine, the leg, and the east junction's road), and on the leg the wheel of the fighter without a shield (G3 round 2), below Wound Dance the lasting bleed (G3 round 3). The leg's wheel and the lasting bleed have no area name of their own over them; they are the Pits' (the nearest name, below the rim road).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "openVeins",
+    "name": "Open Veins",
+    "why": "Bleed: a diamond of damage, chance and the notable, passed through from the junction above to the west rim junction. Drawn tight (G4 fix 1: scaled to 0.7 about its centre).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the junction above.",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -250,
+       2920
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Open Veins",
+      "why": "1.5 + 2.5 units.",
+      "lines": [
+       "bleedChance(15)",
+       "bleedDamage(30)"
+      ],
+      "at": [
+       -299,
+       2980
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the west rim junction.",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -250,
+       3040
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -201,
+       2980
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "a",
+      "c"
+     ],
+     [
+      "c",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "redHarvest",
+    "name": "Red Harvest",
+    "why": "Leech: a diamond of leech, life on hit and the notable, passed through from the junction above to the east rim junction. The Yard's other leech, Thirsting Blade (leech with attack speed), is on the west road toward Headsman since round 3: Red Harvest, Crimson Pact and Thirsting Blade had hung off one junction. Drawn tight (G4 fix 1: scaled to 0.7 about its centre).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the junction above.",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       250,
+       2920
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Red Harvest",
+      "why": "3 + 1 units.",
+      "lines": [
+       "leechLife(1.2, [\"attack\"])",
+       "leechRate(10)"
+      ],
+      "at": [
+       299,
+       2980
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the east rim junction.",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       250,
+       3040
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       201,
+       2980
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "a",
+      "c"
+     ],
+     [
+      "c",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "festering",
+    "name": "Festering",
+    "why": "Poison twice, then the notable with poison and bleeding: wounds that fester, for the Reaver who poisons with a sword or a dagger and the Strider who poisons with a bow. A straight chain east from the Fosse's first node, under the Crimson Pact spur; its first small also takes Bloodied Edge's chain up from the Fosse (G3; it landed on the second small until round 3, and the first lies on that chain's straight line), so it is reached two ways, not a dead end. It left the east rim junction in G3 round 3: its link and the Crimson Pact spur's left that junction 17 degrees apart, and from the Fosse's first node it makes that node a clean cross (the junction north, the Fosse south, Spellsword west, Festering east). Here since round 3 (2026-10-20): it was on the Knife's Stair, where the poison claw found every claw and poison notable within six steps. The other poison notables are Barbed Point (with crit) in the Knife and Venom Fletching (with chaos attacks) in the Strider.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "poisonDamage(12)"
+      ],
+      "at": [
+       755,
+       3420
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "poisonDamage(12)"
+      ],
+      "at": [
+       810,
+       3420
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Festering",
+      "why": "1 + 1.3 + 1.3 units.",
+      "lines": [
+       "poisonChance(10)",
+       "poisonDamage(16)",
+       "bleedDamage(16)"
+      ],
+      "at": [
+       880,
+       3420
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "j3",
+    "name": "Junction",
+    "why": "The west rim junction: the bleed diamond above, the Wound Dance spur below, the Pits' west junction west, and Shield Bash's road.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -420,
+       3100
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "woundDance",
+    "name": "Wound Dance",
+    "why": "Two nodes of bleed, then the trade: bleeds stack up to eight times, bleeding deals 50% less damage. The rim, straight down from the west junction. A spur of two since G2 (§9.1: one or two smalls off a junction); it had three.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -440,
+       3489
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -443,
+       3547
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Wound Dance",
+      "lines": [],
+      "at": [
+       -450,
+       3632
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "j2",
+    "name": "Junction",
+    "why": "The east rim junction, where the Yard's east meets its south: the east road and the leech diamond come down onto it, the Bow's dear road from the east; the Crimson Pact spur and the Fosse leave it (Festering left it for the Fosse's first node in G3 round 3).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       420,
+       3100
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "crimsonPact",
+    "name": "Crimson Pact",
+    "why": "Two nodes of leech, then the trade: leech is instant, you have no life regeneration. The rim, east from the east junction. A spur of two since G2 (§9.1); it had three. Pulled 100 units back along its own line toward the junction in G4 fix 1 (2026-10-22), so the Reaver–Strider seam cluster (Clean Break) passes clear of the keystone; still a dead end.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       694,
+       3187
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "leechLife(0.4, [\"attack\"])"
+      ],
+      "at": [
+       749,
+       3205
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Crimson Pact",
+      "lines": [],
+      "at": [
+       830,
+       3231
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "cleanBreak",
+    "name": "Clean Break",
+    "why": "The Reaver–Strider seam cluster (G4 fix 1, 2026-10-22; seam 1 of the fix brief): crit multiplier, then the notable with physical attack damage and crit multiplier, then crit multiplier, a straight bridge from Festering to the Strider's Pitch Arrows across the far south-east, where the border had no crossing. Wanted from both sides: the Reaver's sword, axe and dual-wield builds and the Strider's physical crit bow all weigh physical attacks and crit multiplier. The pairing is new: physical attack damage sits with life (Deep Pull) and bleed (Deep Cuts), crit multiplier with crit chance (Vital Aim, Crossed Blades), weapon crit (Fencer's Eye) and low life (Killing Eye). Not the rejected Festering–Pitch Arrows link: a notable of a third kind (neither poison nor fire) sits between them, so Festering and Fouled Tips, the two poison notables, stay six steps apart. The notable sits on the straight line between the two ends, its smalls beside it; the border link is the east small to Pitch Arrows.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "From Festering, on the straight line to the notable.",
+      "lines": [
+       "critMulti(12)"
+      ],
+      "at": [
+       973,
+       3289
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Clean Break",
+      "why": "A hard blow that lands true and splits the bone: 2 + 1.5 units.",
+      "lines": [
+       "physAttack(20)",
+       "critMulti(18)"
+      ],
+      "at": [
+       1014,
+       3232
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "To Pitch Arrows, on the straight line from the notable.",
+      "lines": [
+       "critMulti(12)"
+      ],
+      "at": [
+       1055,
+       3175
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "spellsword",
+    "name": "Spellsword",
+    "why": "Cast speed twice, then the notable with spell damage, cast speed and mana regeneration: a Reaver picks a spell as often as anyone (56 of the 174 skills are spells) and the Yard sold nothing for one. At the rim, as the brief's grid says (spells are far for a Reaver). Since G2 a straight chain under the diamonds from the spine to the Fosse's first node, which had nothing coming off it; it joined the two rim junctions before.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the spine.",
+      "lines": [
+       "castSpeed(4)"
+      ],
+      "at": [
+       112,
+       3485
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Spellsword",
+      "why": "2 + 1.5 + 1 units.",
+      "lines": [
+       "spellDamage(16)",
+       "castSpeed(6)",
+       "manaRegen(10)"
+      ],
+      "at": [
+       181,
+       3470
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the Fosse's first node.",
+      "lines": [
+       "castSpeed(4)"
+      ],
+      "at": [
+       249,
+       3456
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "toWall",
+    "name": "The Pits junction",
+    "why": "A strength junction on the west side of the Pits, where the west road comes down from the Practice Ground and the leg leaves for the Fosse (G2); the Standard Bearer chain and the Wall's road land on it, and the west rim junction is one node east. The Yard reaches the Wall by its near crossings.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(7)"
+      ],
+      "at": [
+       -660,
+       3140
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "toHarvest",
+    "name": "A road",
+    "why": "A node of the spine (G2) between the bleed and the leech diamonds, which each come onto it from the side.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       0,
+       2980
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "rim",
+    "name": "A spine node",
+    "why": "One node of the spine between the diamonds' road node and Spellsword's (G2, 2026-10-22). Until G4 fix 2 (2026-10-23) it was the middle of a rim road from the west rim junction to the east one, 90 to 240 units under the diamonds' own row between the same two junctions: a second road beside the first with nothing coming off its two outer nodes, in no build's plan (network audit N2). Those two nodes are gone (ids retired); the diamonds are still a loop by road through the spine's top node.",
+    "nodes": [
+     {
+      "id": "p2",
+      "kind": "attribute",
+      "why": "The spine, on the straight line from the diamonds' road node down to Spellsword's.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -24,
+       3220
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "spine",
+    "name": "The spine",
+    "why": "The middle road's last stretch (G2, 2026-10-22): from Spellsword's node straight down to the Fosse's fourth node, which had nothing coming off it. Spellsword leaves at the first node; the second is where the lasting bleed (Lasting Wounds, RE-8, G3 round 3) leaves west for the Fosse's fifth node.",
+    "nodes": [
+     {
+      "id": "s1",
+      "kind": "attribute",
+      "why": "Spellsword leaves east.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -54,
+       3520
+      ]
+     },
+     {
+      "id": "s2",
+      "kind": "attribute",
+      "why": "The lasting bleed (Lasting Wounds) leaves west.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -104,
+       3800
+      ]
+     }
+    ],
+    "links": [
+     [
+      "s1",
+      "s2"
+     ]
+    ]
+   },
+   {
+    "id": "lasting",
+    "name": "Lasting Wounds",
+    "why": "Bleed damage twice, then the notable with bleed damage and bleed duration, then bleed damage once more (RE-8, G3 round 3, 2026-10-22): wounds that stay open, below Wound Dance, whose eight stacks are worth more the longer each bleed lasts. A bridge from the spine's last node to the Fosse's fifth node, so the spine, the Fosse and this chain make a loop. Open Veins (bleed with bleed chance, the Pits above) is its twin, 9 steps away by the spine; Hewing (axes with bleed chance) and Finishing Cut (against the bleeding) are farther west, and the Strider's bow bleeds farther east. Laid as an L with the notable at the corner: the straight line from the spine would reach the Fosse's fifth node 29 degrees from the road east to the fourth, so the last small comes down onto it from above.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the spine.",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -356,
+       3924
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -407,
+       3949
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Lasting Wounds",
+      "why": "A cut that will not close: 2 + 2 units.",
+      "lines": [
+       "bleedDamage(24)",
+       "bleedDuration(30)"
+      ],
+      "at": [
+       -470,
+       3980
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exit, straight down onto the Fosse's fifth node, between its road east and west.",
+      "lines": [
+       "bleedDamage(12)"
+      ],
+      "at": [
+       -475,
+       4050
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "leg",
+    "name": "The leg to the Fosse",
+    "why": "The west road carried on south (G2, 2026-10-22), from the Pits' west junction down to the Fosse's sixth node, which had nothing coming off it: the Fosse's third way in. Shield Bash leaves at the first node. Since G3 round 2 the fighter-without-a-shield wheel (Full Swing, Paired Steel) stands between the two nodes, so the route down the leg takes one of its sides.",
+    "nodes": [
+     {
+      "id": "l1",
+      "kind": "attribute",
+      "why": "Shield Bash leaves east; the wheel hangs below.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -745,
+       3450
+      ]
+     },
+     {
+      "id": "l2",
+      "kind": "attribute",
+      "why": "Below the wheel, on the way to the Fosse. Strength only, as the Fosse's nodes on the Wall's side are.",
+      "lines": [
+       "str(7)"
+      ],
+      "at": [
+       -765,
+       3850
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "swing",
+    "name": "Full Swing",
+    "why": "The fighter without a shield (RE-7 and RE-9, G3 round 2, 2026-10-22): a wheel on the leg, two-handed with life on the west side (toward the Wall's two-handers, Greatblade and Headsman, 9 and 10 steps away), two weapons with leech on the east side. Two variants of one theme a build rarely takes both of (§8.3): the route down the leg takes one side, and each way in pays one small of the other side, as the Steel Rim wheel does. Far from the Lists' dual wield (Twin Fangs, Crossed Blades) and from every other two-handed cluster, so the third dual-wield direction and the Yard's first two-handed one are both a walk south-west.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The top, from the leg: the two-handed side begins here.",
+      "lines": [
+       "twoHandDamage(12)"
+      ],
+      "at": [
+       -745,
+       3540
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "twoHandDamage(12)"
+      ],
+      "at": [
+       -832,
+       3590
+      ]
+     },
+     {
+      "id": "n1",
+      "kind": "notable",
+      "name": "Full Swing",
+      "why": "A big weapon swung from the shoulders, by a body that can take the hits back: 2 + 2 units.",
+      "lines": [
+       "twoHandDamage(24)",
+       "life(10)"
+      ],
+      "at": [
+       -832,
+       3690
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The bottom, to the leg below: the dual side begins here.",
+      "lines": [
+       "dualDamage(10)"
+      ],
+      "at": [
+       -745,
+       3740
+      ]
+     },
+     {
+      "id": "d",
+      "kind": "small",
+      "lines": [
+       "dualDamage(10)"
+      ],
+      "at": [
+       -658,
+       3690
+      ]
+     },
+     {
+      "id": "n2",
+      "kind": "notable",
+      "name": "Paired Steel",
+      "why": "A blade in each hand, and twice the hits to drink from: 2 + 2 units. Leech, not life as the brief had it: with life on both sides, the allocator's axe, mace and two-handed fire builds took both notables for their life alone (§8.3: a build should rarely want both sides). The Yard's other leech notables are a walk away: Thirsting Blade (the far west, with attack speed), Red Harvest (the Pits, with leech rate), Bloodied Edge (the Fosse, with swords).",
+      "lines": [
+       "dualDamage(20)",
+       "leechLife(0.8, [\"attack\"])"
+      ],
+      "at": [
+       -658,
+       3590
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n1"
+     ],
+     [
+      "n1",
+      "c"
+     ],
+     [
+      "c",
+      "d"
+     ],
+     [
+      "d",
+      "n2"
+     ],
+     [
+      "n2",
+      "a"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "j3.a",
+    "to": "toWall.a",
+    "why": "The junction onto the west side of the Pits."
+   },
+   {
+    "from": "yard.shield.j1.a",
+    "to": "openVeins.a",
+    "why": "The junction below the shield wheel to the bleed."
+   },
+   {
+    "from": "yard.shield.j1.a",
+    "to": "redHarvest.a",
+    "why": "The same junction to the leech."
+   },
+   {
+    "from": "openVeins.b",
+    "to": "j3.a",
+    "why": "Through the bleed to the west rim junction."
+   },
+   {
+    "from": "j3.a",
+    "to": "woundDance.a",
+    "why": "Junction to the keystone spur."
+   },
+   {
+    "from": "redHarvest.b",
+    "to": "j2.a",
+    "why": "Through the leech to the east rim junction."
+   },
+   {
+    "from": "yard.fosse.road.f1",
+    "to": "festering.a",
+    "why": "The Fosse's first node east onto the poison chain (G3 round 3; it left the east rim junction, where it ran 17 degrees from the Crimson Pact spur)."
+   },
+   {
+    "from": "yard.blood.openVeins.c",
+    "to": "yard.blood.toHarvest.a",
+    "why": "The bleed diamond's east side onto the spine."
+   },
+   {
+    "from": "yard.blood.toHarvest.a",
+    "to": "yard.blood.redHarvest.c",
+    "why": "The spine onto the leech diamond's west side."
+   },
+   {
+    "from": "j2.a",
+    "to": "crimsonPact.a",
+    "why": "Junction to the keystone spur."
+   },
+   {
+    "from": "festering.n",
+    "to": "cleanBreak.a",
+    "why": "Festering on to the seam cluster (G4 fix 1): Festering stops being a dead end, and the poison Reaver meets a crit notable on its way east."
+   },
+   {
+    "from": "cleanBreak.b",
+    "to": "bow.steel.pitch.n",
+    "why": "Physical attacks with crit multiplier (a dear crossing, seam 1 of the G4 fix brief): the seam cluster lands on the Strider's Pitch Arrows, so the Reaver's melee walks on to the Strider's south and the physical crit bow comes west for it. The border's one link in the far south-east between the Fosse and the Quiver."
+   },
+   {
+    "from": "yard.shield.j1.a",
+    "to": "toHarvest.a",
+    "why": "The spine goes on down between the two diamonds (G2)."
+   },
+   {
+    "from": "toHarvest.a",
+    "to": "rim.p2",
+    "why": "The spine goes on south."
+   },
+   {
+    "from": "rim.p2",
+    "to": "spine.s1",
+    "why": "The spine goes on south to Spellsword's node."
+   },
+   {
+    "from": "spine.s2",
+    "to": "yard.fosse.road.f4",
+    "why": "The spine lands on the Fosse's fourth node: the Fosse's way in from the Yard's middle."
+   },
+   {
+    "from": "spine.s1",
+    "to": "spellsword.a",
+    "why": "The spine's first node onto the spell chain."
+   },
+   {
+    "from": "spellsword.b",
+    "to": "yard.fosse.road.f1",
+    "why": "The spell chain lands on the Fosse's first node."
+   },
+   {
+    "from": "toWall.a",
+    "to": "leg.l1",
+    "why": "The leg leaves the Pits junction south."
+   },
+   {
+    "from": "leg.l1",
+    "to": "swing.a",
+    "why": "The leg onto the wheel's top (G3 round 2; it replaced the plain link from l1 to l2)."
+   },
+   {
+    "from": "swing.c",
+    "to": "leg.l2",
+    "why": "The wheel's bottom back onto the leg, on to the Fosse."
+   },
+   {
+    "from": "leg.l2",
+    "to": "yard.fosse.road.f6",
+    "why": "The leg lands on the Fosse's sixth node."
+   },
+   {
+    "from": "spine.s2",
+    "to": "lasting.a",
+    "why": "The spine's last node onto the lasting bleed (G3 round 3, RE-8), west, below Wound Dance."
+   },
+   {
+    "from": "lasting.c",
+    "to": "yard.fosse.road.f5",
+    "why": "The lasting bleed lands on the Fosse's fifth node: a loop with the spine and the Fosse, and a way from the leg's end (the sixth node) up to the bleed."
+   }
+  ]
+ },
+ {
+  "file": "dual",
+  "export": "dual",
+  "id": "yard.dual",
+  "name": "The Lists",
+  "why": "The Yard's east, on the Bow border: the dual-wield wheel with evasion on its other side, dodge, footwork from the gate to the Ford, the fervour charges, the heavy bow, the dual crit chain and the fast sword, hung from the crossroad and the east road (G2).",
+  "start": null,
+  "clusters": [
+   {
+    "id": "twinFangs",
+    "name": "Twin Fangs",
+    "why": "The wheel off the second-hand road: attack speed at the entrance, then dual wield on the top side (Twin Fangs: damage, speed and the second blade's block) or evasion on the bottom side (Weaving: evasion with avoid elemental ailments since G4 fix 1), the Reaver's dexterity defence. Passed through to the gate on the east and the junction below, so the route takes one side.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, west.",
+      "lines": [
+       "attackSpeed(5)"
+      ],
+      "at": [
+       455,
+       1800
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "dualDamage(10)"
+      ],
+      "at": [
+       507,
+       1709
+      ]
+     },
+     {
+      "id": "n1",
+      "kind": "notable",
+      "name": "Twin Fangs",
+      "why": "2 + 1 + 1.5 units: the dual-wield notable.",
+      "lines": [
+       "dualDamage(20)",
+       "dualSpeed(5)",
+       "dualBlock(3)"
+      ],
+      "at": [
+       613,
+       1709
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The evasion side: the east exit, to the gate.",
+      "lines": [
+       "evasion(10)"
+      ],
+      "at": [
+       665,
+       1800
+      ]
+     },
+     {
+      "id": "d",
+      "kind": "small",
+      "why": "The south exit, to the junction.",
+      "lines": [
+       "evasion(10)"
+      ],
+      "at": [
+       613,
+       1891
+      ]
+     },
+     {
+      "id": "n2",
+      "kind": "notable",
+      "name": "Weaving",
+      "why": "Evasion with avoid elemental ailments: 2 + 2 units. Life out since G4 fix 1 (2026-10-22): evasion with life was the pairing of Hard Target and Wanderer too, three of them about 7 steps from the Strider start in three directions, so the evasion choice there was which copy first (trade-offs audit F2). Slipping the blow and shaking off the burn and the chill is the Reaver's own evasion.",
+      "lines": [
+       "evasion(20)",
+       "avoidAilments(20)"
+      ],
+      "at": [
+       507,
+       1891
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n1"
+     ],
+     [
+      "n1",
+      "c"
+     ],
+     [
+      "c",
+      "d"
+     ],
+     [
+      "d",
+      "n2"
+     ],
+     [
+      "n2",
+      "a"
+     ]
+    ]
+   },
+   {
+    "id": "j2",
+    "name": "The east gate",
+    "why": "The junction the Bow's builds come through: the Strider's physical road, physical corner, evasion chain and crit chain all land here. Inside the Yard it opens the wheel.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "why": "Where the user moved it (2026-10-19), around which their four Strider chains were placed.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       690,
+       1490
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "j1",
+    "name": "Junction",
+    "why": "The east junction, a crossing of four (G2): the wheel above, the dodge chain east, the crossroad west, the east road south.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       640,
+       2080
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "crossroad",
+    "name": "The crossroad",
+    "why": "The east half of the road across the Yard (G2, 2026-10-22), from the Muster's hub to the east junction: the heavy bow hangs below it between its two nodes. It replaces the hub's and the junction's direct links into that cluster.",
+    "nodes": [
+     {
+      "id": "c3",
+      "kind": "attribute",
+      "why": "The heavy bow leaves here.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       180,
+       2029
+      ]
+     },
+     {
+      "id": "c4",
+      "kind": "attribute",
+      "why": "The heavy bow lands here.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       420,
+       2056
+      ]
+     }
+    ],
+    "links": [
+     [
+      "c3",
+      "c4"
+     ]
+    ]
+   },
+   {
+    "id": "east",
+    "name": "The east road",
+    "why": "The second-hand highway carried on south (G2, 2026-10-22): from the east junction down the Lists to the Pits' east junction, strength and dexterity on every node. The fervour charges leave east at the first node, the dual crit west at the second and third; the fast sword (Darting Steel, G3) leaves the second east, toward the Strider's road.",
+    "nodes": [
+     {
+      "id": "e1",
+      "kind": "attribute",
+      "why": "The fervour charges leave east.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       640,
+       2330
+      ]
+     },
+     {
+      "id": "e2",
+      "kind": "attribute",
+      "why": "The dual crit leaves west, the fast sword (Darting Steel) east.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       620,
+       2580
+      ]
+     },
+     {
+      "id": "e3",
+      "kind": "attribute",
+      "why": "The dual crit lands here.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       540,
+       2850
+      ]
+     }
+    ],
+    "links": [
+     [
+      "e1",
+      "e2"
+     ],
+     [
+      "e2",
+      "e3"
+     ]
+    ]
+   },
+   {
+    "id": "sidestep",
+    "name": "Sidestep",
+    "why": "Dodge: a node, then the notable with dodge and life on hit, between the wheel's east side and the east junction: the Lists' dodge, the riposte of a fighter who slips the blow and cuts back. It sold dodge, movement and evasion until G4 fix 1 (2026-10-22), the same lines as the Shade home's Soft Step (trade-offs audit F5), then dodge with dual-wield block until G4 fix 2 (2026-10-23), the pairing of Feint and Cut on the Knife's Seawall (dual wield with dodge, trade-offs audit T5). Its partner is now recovery, which no other dodge notable sells.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "dodgeAttack(3)"
+      ],
+      "at": [
+       849,
+       1972
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Sidestep",
+      "why": "Step aside and cut back: dodge with life on attack hit, 1.7 + 1.5 units (G4 fix 2, 2026-10-23). It was dodge with block while dual wielding, the pairing of the Knife's Feint and Cut (dual wield with dodge, trade-offs audit T5); the second blade's block stays on Twin Fangs. Not avoid stun (Footwork's, six steps away), accuracy, evasion (Weaving), dual damage, speed or crit; life on hit is on no other dodge notable, and a blade in each hand hits often.",
+      "lines": [
+       "dodgeAttack(5)",
+       "lifeOnHit(6, [\"attack\"])"
+      ],
+      "at": [
+       900,
+       2020
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "crossedBlades",
+    "name": "Crossed Blades",
+    "why": "Crit while dual wielding twice, then the notable with dual crit, dual accuracy and crit multiplier: the two-sword Reaver's crit, which Fencer's Eye in the south does not sell. A tight orbit west of the east road, entered from its second node and left from its third (G2; road nodes from the charges and the leech joined it before).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the east road's second node.",
+      "lines": [
+       "dualCrit(15)"
+      ],
+      "at": [
+       532,
+       2643
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Crossed Blades",
+      "why": "1.5 + 1.5 + 1 units. The tip of the pocket, west of the road.",
+      "lines": [
+       "dualCrit(22)",
+       "dualAccuracy(15)",
+       "critMulti(12)"
+      ],
+      "at": [
+       475,
+       2684
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the east road's third node.",
+      "lines": [
+       "dualCrit(15)"
+      ],
+      "at": [
+       501,
+       2749
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "darting",
+    "name": "Darting Steel",
+    "why": "Sword damage twice, then the notable with sword damage and attack speed with swords, then sword damage once more (RE-1, G3 2026-10-22): the fast sword, east where the Strider's speed is, and the Yard's third sword cluster with its own partner (Keen Edge is sword with accuracy in the west, Bloodied Edge sword with leech in the south). A straight bridge from the east road's second node to the Strider's road into the Pits: a near crossing, so the Reaver walks on to the Ford's speed and a Strider with a sword comes in for it.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the east road.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       675,
+       2604
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       728,
+       2628
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Darting Steel",
+      "why": "A light blade that never stops moving: 2.4 + 1.6 units.",
+      "lines": [
+       "swordDamage(24)",
+       "weaponSpeed(\"sword\", 8)"
+      ],
+      "at": [
+       783,
+       2652
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exit, to the Strider's road.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       837,
+       2676
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "footwork",
+    "name": "Footwork",
+    "why": "Accuracy twice, then the notable with accuracy and melee reach, then accuracy once more (RE-6, G3 round 2, 2026-10-22; re-partnered in G4 fix 2, 2026-10-23): the duellist's footing, the Lists' outer side between the east gate and the Strider's Ford hub (a near crossing). No evasion at all since fix 2: the gate is 4 steps from the Strider start, and evasion here made it every dexterity build's first stop; the Reaver's evasion is Weaving's (the wheel) and the Muster's. Reach, not dodge or the second blade: Sidestep (dodge, six steps), Twin Fangs (dual wield) and Crossed Blades (dual crit with accuracy) keep their own partners. Laid as an L with the notable at the corner: the straight line from the gate would reach the hub 18 degrees from the Strider's own link into it.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the east gate.",
+      "lines": [
+       "accuracy(10)"
+      ],
+      "at": [
+       825,
+       1654
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "accuracy(10)"
+      ],
+      "at": [
+       862,
+       1698
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Footwork",
+      "why": "Step in and land the blow: accuracy with melee reach, 2 + 2 units (G4 fix 2, 2026-10-23). It was evasion with accuracy, and every dexterity build from three starts made it a first stop for the evasion (trade-offs audit T1, starts audit F4, the U4 condition). Reach is a melee want the archers do not chase: measured, the dual wielder and the lightning striker take it by 120 and the sword and shield by 160, no bow or Shade build. Not movement and not avoid stun: each trialled, and nobody took it.",
+      "lines": [
+       "accuracy(20)",
+       "meleeRange(1)"
+      ],
+      "at": [
+       898,
+       1742
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exit, east to the Ford hub, arriving in the open angle between the hub's road down to the Pits and the Strider's link from the gate's chain.",
+      "lines": [
+       "accuracy(10)"
+      ],
+      "at": [
+       965,
+       1751
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "hotBlood",
+    "name": "Hot Blood",
+    "why": "Fervour charges: a charge more, charges on kill, longer charges. The Reaver's commitment, a room east of the east road's first node, between it and the Strider's road (moved 100 east in G2, where the east road runs). A square, drawn tight since G4 fix 1 (scaled to 0.7 about its centre).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the east road.",
+      "lines": [
+       "fervourDuration(15)"
+      ],
+      "at": [
+       795,
+       2305
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Hot Blood",
+      "why": "A fourth fervour charge (3 units by the table) and a way to gain them: 4.",
+      "lines": [
+       "maxFervour(1)",
+       "fervourOnKill(10)"
+      ],
+      "at": [
+       865,
+       2305
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "fervourDuration(15)"
+      ],
+      "at": [
+       865,
+       2375
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "fervourDuration(15)"
+      ],
+      "at": [
+       795,
+       2375
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ],
+     [
+      "c",
+      "a"
+     ]
+    ]
+   },
+   {
+    "id": "ironDraw",
+    "name": "Iron Draw",
+    "why": "Bow damage three times, then the notable with bow damage, physical attack damage and life: the heavy bow, for the Reaver who draws one and the Strider who comes for the strength side. Hung below the crossroad's east half, between its two nodes (G2; it joined the hub and the east junction before). The Strider's own bow wheel sells speed and crit instead; the Knife's bow sells crit multiplier. (It was Quickstep, generic speed, until 2026-10-20.)",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The exit, to the crossroad's east node.",
+      "lines": [
+       "bowDamage(10)"
+      ],
+      "at": [
+       355,
+       2225
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Iron Draw",
+      "why": "1.6 + 1.2 + 1 units. The bottom of the U below the crossroad.",
+      "lines": [
+       "bowDamage(16)",
+       "physAttack(12)",
+       "life(5)"
+      ],
+      "at": [
+       330,
+       2290
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "bowDamage(10)"
+      ],
+      "at": [
+       295,
+       2229
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The entrance, from the crossroad's west node.",
+      "lines": [
+       "bowDamage(10)"
+      ],
+      "at": [
+       266,
+       2179
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "hotBlood.b",
+    "to": "bow.steel.toBlood.b",
+    "why": "A near bridge to the Strider road into the Yard: Hot Blood has a second way in, and the dual-wield Strider reaches fervour without crossing the Lists."
+   },
+   {
+    "from": "twinFangs.c",
+    "to": "j2.a",
+    "why": "The wheel's east side to the gate."
+   },
+   {
+    "from": "j2.a",
+    "to": "footwork.a",
+    "why": "The east gate onto the footwork chain (G3 round 2, RE-6), south-east."
+   },
+   {
+    "from": "footwork.c",
+    "to": "bow.steel.hub.t",
+    "why": "Accuracy and footing (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Footwork lands on the Strider's Ford hub, re-aimed from the gate's old direct link, so the Reaver walks on into the Ford and a Strider who wants accuracy comes in for it."
+   },
+   {
+    "from": "twinFangs.d",
+    "to": "j1.a",
+    "why": "The wheel's south side to the junction."
+   },
+   {
+    "from": "twinFangs.c",
+    "to": "sidestep.a",
+    "why": "The wheel's east side onto the dodge chain."
+   },
+   {
+    "from": "sidestep.n",
+    "to": "j1.a",
+    "why": "The dodge chain to the junction: a loop with the wheel."
+   },
+   {
+    "from": "yard.shield.hub.a",
+    "to": "crossroad.c3",
+    "why": "The crossroad's east half leaves the Muster's hub."
+   },
+   {
+    "from": "crossroad.c4",
+    "to": "j1.a",
+    "why": "The crossroad reaches the east junction."
+   },
+   {
+    "from": "crossroad.c3",
+    "to": "ironDraw.c",
+    "why": "The crossroad's west node onto the heavy bow."
+   },
+   {
+    "from": "ironDraw.a",
+    "to": "crossroad.c4",
+    "why": "The heavy bow back onto the crossroad."
+   },
+   {
+    "from": "j1.a",
+    "to": "east.e1",
+    "why": "The east road leaves the east junction south."
+   },
+   {
+    "from": "east.e3",
+    "to": "yard.blood.j2.a",
+    "why": "The east road reaches the Pits' east junction, where the Fosse also meets it. The Strider's road lands one node up, on the east road's last node (the G2 border pass)."
+   },
+   {
+    "from": "east.e1",
+    "to": "hotBlood.a",
+    "why": "The east road's first node onto the charges."
+   },
+   {
+    "from": "east.e2",
+    "to": "crossedBlades.a",
+    "why": "The east road's second node onto the dual crit."
+   },
+   {
+    "from": "crossedBlades.b",
+    "to": "east.e3",
+    "why": "The dual crit back onto the east road's third node: a pocket that bridges two road nodes."
+   },
+   {
+    "from": "east.e2",
+    "to": "darting.a",
+    "why": "The east road's second node onto the fast sword (G3, RE-1), east, opposite the dual crit's pocket."
+   },
+   {
+    "from": "darting.c",
+    "to": "bow.steel.toBlood.c",
+    "why": "The fast sword (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Darting Steel lands on the Strider's road into the Pits, so the Reaver's sword meets the Ford's speed (Thirsty Quiver, Hatchet Work, Sentry Post) and a Strider with a sword reaches it from its own road."
+   }
+  ]
+ },
+ {
+  "file": "fosse",
+  "export": "fosse",
+  "id": "yard.fosse",
+  "name": "The Fosse",
+  "why": "An outer road round the Yard's south rim, from the Pits to the Barrows: lightning strikes and the leeching sword (Bloodied Edge, G3) near the Strider's side, the hunter's curse at the bottom.",
+  "start": null,
+  "clusters": [
+   {
+    "id": "road",
+    "name": "The fosse road",
+    "why": "Seven attribute nodes from the Pits' east junction south and west under Wound Dance to Barrow Ward. Spellsword lands on the first node and Festering leaves it east (G3 round 3), the lightning pocket leaves east at the second, the channelling arc hangs between the second and the third, the spine lands on the fourth, the curse arc hangs between the fourth and the fifth (and the lasting bleed comes down onto the fifth from the spine, G3 round 3) and the leg from the Pits' west junction lands on the sixth (G2); the far end joins the Barrows, so the road is a way between the Yard and the Wall with four ways in from the Yard, not a path to leaves.",
+    "nodes": [
+     {
+      "id": "f1",
+      "kind": "attribute",
+      "why": "A cross: the Pits' east junction north, the road on south, Spellsword west, Festering east.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       415,
+       3421
+      ]
+     },
+     {
+      "id": "f2",
+      "kind": "attribute",
+      "why": "The lightning strikes leave east, the leeching sword (Bloodied Edge, G3) north-east, the channelling arc comes up from the south.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       410,
+       3750
+      ]
+     },
+     {
+      "id": "f3",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       180,
+       3990
+      ]
+     },
+     {
+      "id": "f4",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -150,
+       4060
+      ]
+     },
+     {
+      "id": "f5",
+      "kind": "attribute",
+      "why": "The curse arc leaves south-east; the lasting bleed (Lasting Wounds) lands from above.",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -480,
+       4130
+      ]
+     },
+     {
+      "id": "f6",
+      "kind": "attribute",
+      "lines": [
+       "str(7)"
+      ],
+      "at": [
+       -785,
+       4005
+      ]
+     },
+     {
+      "id": "f7",
+      "kind": "attribute",
+      "why": "Strength only from here: the Wall's side.",
+      "lines": [
+       "str(7)"
+      ],
+      "at": [
+       -1090,
+       3880
+      ]
+     }
+    ],
+    "links": [
+     [
+      "f1",
+      "f2"
+     ],
+     [
+      "f2",
+      "f3"
+     ],
+     [
+      "f3",
+      "f4"
+     ],
+     [
+      "f4",
+      "f5"
+     ],
+     [
+      "f5",
+      "f6"
+     ],
+     [
+      "f6",
+      "f7"
+     ]
+    ]
+   },
+   {
+    "id": "storm",
+    "name": "Stormstruck",
+    "why": "A pocket east off the fosse road: lightning with attacks twice, then lightning strikes with attack speed. The tree had no lightning-attack cluster; this one is near the Strider and the Reaver, the dexterity side where most elemental attacks are. The Cathedral's two sell fire strikes with ignite (Kindled Steel) and cold strikes with chill (Rimed Steel); the lightning notables for casters and attackers alike (Static Edge, Live Current, Thunder Peal) sell crit and shock.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "eleAttackOne(\"lightning\", 12)"
+      ],
+      "at": [
+       709,
+       3853
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "eleAttackOne(\"lightning\", 12)"
+      ],
+      "at": [
+       764,
+       3872
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Stormstruck",
+      "why": "2 + 1.3 units.",
+      "lines": [
+       "eleAttackOne(\"lightning\", 24)",
+       "attackSpeed(7)"
+      ],
+      "at": [
+       830,
+       3895
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "bloodied",
+    "name": "Bloodied Edge",
+    "why": "Sword damage twice, then the notable with sword damage and life leech, then sword damage once more (RE-3, G3 2026-10-22): the sword that drinks, in the band between the Pits and the Fosse, beside Crimson Pact. A straight bridge from the fosse road's second node up to Festering's chain, which stops being a dead end. The Yard's sword sits in four directions with four partners (accuracy at Keen Edge in the west, speed at Darting Steel in the east, block at Sword and Board in the south-west, leech here); the Yard's other leech notables, Red Harvest (the Pits) and Thirsting Blade (the far west), do not sell sword damage.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the fosse road.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       551,
+       3624
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       594,
+       3585
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Bloodied Edge",
+      "why": "2 + 2 units.",
+      "lines": [
+       "swordDamage(20)",
+       "leechLife(0.8, [\"attack\"])"
+      ],
+      "at": [
+       637,
+       3546
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exit, to Festering's chain.",
+      "lines": [
+       "swordDamage(10)"
+      ],
+      "at": [
+       680,
+       3508
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "marked",
+    "name": "Marked Prey",
+    "why": "An arc south of the fosse road between its fourth and fifth nodes: curse effect, then curse effect with damage against the cursed, then curse effect. The attacker's curse, for the dexterity and strength curses and a curse on hit; Hexwright, in the Spire, sells curse effect with area and duration, and the Wall's Grim Oath sells it with armour. A V with the notable at the tip since G4 fix 1 (2026-10-22): it hung as a dead end off the fifth node, one of the rim road's combs (network audit N3); now it is a bridge, and walking the road costs none of it.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "From the road's fifth node, on the straight line to the notable.",
+      "lines": [
+       "curseEffect(8)"
+      ],
+      "at": [
+       -329,
+       4248
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Marked Prey",
+      "why": "1.5 + 2.5 units. The tip of the V.",
+      "lines": [
+       "curseEffect(12)",
+       "damageVsCursed(20)"
+      ],
+      "at": [
+       -274,
+       4291
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "To the road's fourth node, on the straight line from the notable.",
+      "lines": [
+       "curseEffect(8)"
+      ],
+      "at": [
+       -241,
+       4229
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "flurry",
+    "name": "Ceaseless Blades",
+    "why": "An arc south-east of the fosse road between its second and third nodes, between the lightning strikes and the hunter's curse: damage with channelling skills, then channelled attacks with speed and stun avoidance, then channelling damage again, for the attacker who stands and keeps swinging. The Spire's Steady Stream sells channelling to casters, with mana. Round 4 (2026-10-20). A V with the notable at the tip since G4 fix 1 (2026-10-22): it hung as a dead end off the third node (network audit N1, N3); now it is a bridge, and walking the road costs none of it.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "From the road's third node, on the straight line to the notable.",
+      "lines": [
+       "channelDamage(10)"
+      ],
+      "at": [
+       369,
+       4003
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Ceaseless Blades",
+      "why": "2 + 1.3 + 0.8 units. The tip of the V.",
+      "lines": [
+       "channelDamage(20)",
+       "attackSpeed(7, [\"channelling\"])",
+       "stunAvoid(15)"
+      ],
+      "at": [
+       439,
+       4008
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "To the road's second node, on the straight line from the notable.",
+      "lines": [
+       "channelDamage(10)"
+      ],
+      "at": [
+       431,
+       3938
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   }
+  ],
+  "links": [
+   {
+    "from": "road.f3",
+    "to": "flurry.a",
+    "why": "The road onto the channelled attacks."
+   },
+   {
+    "from": "flurry.b",
+    "to": "road.f2",
+    "why": "The channelled attacks back onto the road one node up (G4 fix 1): the pocket is an arc, a bridge between two road nodes."
+   },
+   {
+    "from": "marked.b",
+    "to": "road.f4",
+    "why": "The hunter's curse back onto the road one node east (G4 fix 1): the pocket is an arc, a bridge between two road nodes."
+   },
+   {
+    "from": "yard.blood.j2.a",
+    "to": "road.f1",
+    "why": "The Pits' east junction onto the fosse road, between the rim road and the Crimson Pact spur."
+   },
+   {
+    "from": "road.f7",
+    "to": "wall.grit.barrowWard.n",
+    "why": "The fosse road's west end lands on Barrow Ward, which becomes a way through rather than a leaf."
+   },
+   {
+    "from": "road.f2",
+    "to": "storm.a",
+    "why": "The road onto the lightning strikes."
+   },
+   {
+    "from": "storm.n",
+    "to": "bow.rim.road.j8",
+    "why": "Lightning strikes (a dear crossing; G1-brief.md §2.5, laid in the G2 border pass): Stormstruck onto the south end of the Strider's outer road, so the east of the map's outer ring closes from the Seawall to the Fosse. The Strider's shock cluster (G3, on the outer road) and Stormstruck's attack speed are about 6 steps apart, a pairing either side can buy late; Stormstruck stops being a dead end."
+   },
+   {
+    "from": "road.f5",
+    "to": "marked.a",
+    "why": "The road onto the hunter's curse."
+   },
+   {
+    "from": "road.f2",
+    "to": "bloodied.a",
+    "why": "The road's second node onto the leeching sword (G3, RE-3), north-east, between the road up to the Pits and the lightning pocket."
+   },
+   {
+    "from": "bloodied.c",
+    "to": "yard.blood.festering.a",
+    "why": "The leeching sword lands on Festering's chain: Festering gets a second way in, and a sword-and-poison or sword-and-bleed build finds both in one walk from the Fosse."
+   }
+  ]
+ },
+ {
+  "file": "home",
+  "export": "home",
+  "id": "yard.home",
+  "name": "The Yard Gate",
+  "why": "Two stat nodes off the start (melee damage west, attack speed east), the signature between them, two hubs one step out with a pocket each, and three roads: the blades highway west, the second-hand highway east, the middle road (life) straight down; and between the middle road and the second-hand road the warcry chain (Drill Call, G3 round 2) and the mana pocket.",
+  "start": {
+   "classId": "reaver",
+   "region": "reaver",
+   "id": "start.reaver",
+   "at": [
+    0,
+    1000
+   ]
+  },
+  "clusters": [
+   {
+    "id": "sig",
+    "name": "Quickened Steel",
+    "why": "The loop the start opens onto: melee physical damage on the west side, attack speed on the east, the signature at the tip. Point one is a side; point two is the signature, a hub, or a road.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The west side: damage.",
+      "lines": [
+       "meleePhys(10)"
+      ],
+      "at": [
+       -70,
+       1242
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Quickened Steel",
+      "why": "The signature: the Reaver is the fast melee class. Speed, melee damage and both attributes: 3.7 units. Its 6% life went in G4 fix 1 (2026-10-22): at 4.9 units it was among the richest generic notables, one ring step from two other homes, and late builds of other classes walked over to collect it (starts audit F6); the middle road below it sells life. The middle road leaves from here.",
+      "lines": [
+       "attackSpeed(7)",
+       "meleePhys(10)",
+       "str(10)",
+       "dex(10)"
+      ],
+      "at": [
+       0,
+       1240
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The east side: speed, one unit (5% since G4 fix 1; it was 8%).",
+      "lines": [
+       "attackSpeed(5)"
+      ],
+      "at": [
+       70,
+       1242
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "hubs",
+    "name": "The hubs",
+    "why": "Both attributes, one step past each side node: the west hub joins the ring toward the Vanguard and starts the west road; the east hub joins the ring toward the Strider and starts the second-hand road.",
+    "nodes": [
+     {
+      "id": "w",
+      "kind": "attribute",
+      "lines": [
+       "str(15)",
+       "dex(15)"
+      ],
+      "at": [
+       -300,
+       1250
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "attribute",
+      "lines": [
+       "str(15)",
+       "dex(15)"
+      ],
+      "at": [
+       300,
+       1250
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "life",
+    "name": "Stout Heart",
+    "why": "The west hub's pocket, a tight orbit pointing at the Wall: two life nodes and a life-and-regeneration notable with a little strength. The first life a Reaver can buy, three points after the hub.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, facing the hub.",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -411,
+       1221
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Stout Heart",
+      "why": "2 + 1.5 + 0.7 units.",
+      "lines": [
+       "life(10)",
+       "lifeRegen(0.6)",
+       "str(10)"
+      ],
+      "at": [
+       -535,
+       1188
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -467,
+       1206
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "block",
+    "name": "Buckler",
+    "why": "The east hub's pocket, a tight orbit pointing at the Bow: two block nodes and a notable of block and evasion. Optional: the dual-wield Reaver walks past it.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, facing the hub.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       365,
+       1347
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       397,
+       1396
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Buckler",
+      "why": "The light shield: 2.5 + 1.3 units. Its 5% life went in G4 fix 1 (2026-10-22): a start notable at 4.8 units was a late stop for other classes' builds (starts audit F6).",
+      "lines": [
+       "shieldBlock(5)",
+       "evasion(13)"
+      ],
+      "at": [
+       436,
+       1454
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "fightingBreath",
+    "name": "Fighting Breath",
+    "why": "Mana on hit with attacks twice, then the notable with mana on hit, mana leech and life: the Yard's only mana notable, for a Reaver with three gems who runs dry by map five. A tight orbit between the middle road's third node and the second-hand road's second node: a bridge, so the two roads are a loop before the hub.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the middle road.",
+      "lines": [
+       "manaOnHit(4, [\"attack\"])"
+      ],
+      "at": [
+       209,
+       1641
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "manaOnHit(4, [\"attack\"])"
+      ],
+      "at": [
+       246,
+       1686
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Fighting Breath",
+      "why": "2 + 1 + 1 units. The exit, to the second-hand road.",
+      "lines": [
+       "manaOnHit(8, [\"attack\"])",
+       "manaLeech(0.4)",
+       "life(5)"
+      ],
+      "at": [
+       290,
+       1740
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "drill",
+    "name": "Drill Call",
+    "why": "Warcry effect twice, then the notable with warcry effect and attack speed, then warcry effect once more (RE-5, G3 round 2, 2026-10-22): the shout on the training ground, a bridge from the middle road's first node to the second-hand road's first, so the home's middle is not a corridor of life alone (CONSTRAINTS §4.8: the signature, three life smalls and the shield wheel ran straight down from the start). Warcry-led, not attack-speed-led as the brief had it: stop 2 (question B) said to flip it back if the sword build's attack speed stopped climbing, and at 120 points it was near flat (21 to 22 units); attack speed is the notable's partner, so the Reaver's speed stays a direction (the Strider's Meadow, Darting Steel) and not a pocket five steps from the start. Warcries' third home, with its own partner: War Drums (the Wall) sells duration, the Wall's armoured shout armour, Battle Hymn (the Cathedral) auras.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the middle road.",
+      "lines": [
+       "warcryEffect(10)"
+      ],
+      "at": [
+       70,
+       1345
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "warcryEffect(10)"
+      ],
+      "at": [
+       122,
+       1369
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Drill Call",
+      "why": "The shout that sets the pace: 2 + 1.6 units.",
+      "lines": [
+       "warcryEffect(20)",
+       "attackSpeed(8)"
+      ],
+      "at": [
+       174,
+       1393
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The exit, to the second-hand road.",
+      "lines": [
+       "warcryEffect(10)"
+      ],
+      "at": [
+       226,
+       1416
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ],
+     [
+      "n",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "fieldDressing",
+    "name": "Field Dressing",
+    "why": "Flask recovery twice, then the notable with recovery, duration and movement: the Yard sold no flask lines, and the early game is life flasks. A pocket west of Stout Heart, its smalls on the way to the Wall: a bridge from Stout Heart to the Wall's Bracing (a near crossing), with the notable at the tip off the second small. Movement, not life, since G4 fix 1 (2026-10-22): flasks with life was Quartermaster's pairing five steps away in the Vanguard home (trade-offs audit F10), and the band between the two strength starts was all defence and flasks (starts audit F2); a flask that keeps you moving is the Reaver's.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, facing Stout Heart.",
+      "lines": [
+       "flaskRecovery(10)"
+      ],
+      "at": [
+       -676,
+       1251
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Field Dressing",
+      "why": "Drink on the run: 1.5 + 1 + 1 units. The pocket's tip, off its west small.",
+      "lines": [
+       "flaskRecovery(15)",
+       "flaskDuration(10)",
+       "moveSpeed(4)"
+      ],
+      "at": [
+       -693,
+       1340
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The west side, where the Wall's Bracing is one step away.",
+      "lines": [
+       "flaskRecovery(10)"
+      ],
+      "at": [
+       -731,
+       1275
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "roadW",
+    "name": "The west road",
+    "why": "Strength and dexterity twice: the highway from the west hub to the sword diamond.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -400,
+       1420
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -510,
+       1580
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "roadE",
+    "name": "The second-hand road",
+    "why": "Strength and dexterity twice: the highway from the east hub to the Twin Fangs wheel.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       300,
+       1450
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       380,
+       1620
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "roadS",
+    "name": "The middle road",
+    "why": "Life three times: the road straight down from the signature to the hub, where the crossroad and the spine meet it (G2). It was block, and a two-sword Reaver paid three block nodes for the generic way down; life is what every Reaver wants on the way.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -7,
+       1310
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -13,
+       1367
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -19,
+       1425
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ]
+    ]
+   },
+   {
+    "id": "toRingW",
+    "name": "To the ring",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -247,
+       987
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "toRingE",
+    "name": "To the ring",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       247,
+       987
+      ]
+     }
+    ],
+    "links": []
+   }
+  ],
+  "links": [
+   {
+    "from": "start.reaver",
+    "to": "sig.a",
+    "why": "Point one, the west side."
+   },
+   {
+    "from": "start.reaver",
+    "to": "sig.b",
+    "why": "Point one, the east side."
+   },
+   {
+    "from": "sig.a",
+    "to": "hubs.w",
+    "why": "The west side to the west hub."
+   },
+   {
+    "from": "sig.b",
+    "to": "hubs.e",
+    "why": "The east side to the east hub."
+   },
+   {
+    "from": "hubs.w",
+    "to": "life.a",
+    "why": "The west hub's pocket."
+   },
+   {
+    "from": "hubs.e",
+    "to": "block.a",
+    "why": "The east hub's pocket."
+   },
+   {
+    "from": "yard.home.hubs.w",
+    "to": "yard.home.toRingW.a",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute."
+   },
+   {
+    "from": "yard.home.toRingW.a",
+    "to": "centre.ring.road.r13",
+    "why": "The far end of the road."
+   },
+   {
+    "from": "yard.home.hubs.e",
+    "to": "yard.home.toRingE.a",
+    "why": "One attribute node between the hub and the centre ring: the highway home, and a step further to the first other attribute."
+   },
+   {
+    "from": "yard.home.toRingE.a",
+    "to": "centre.ring.road.r11",
+    "why": "The far end of the road."
+   },
+   {
+    "from": "hubs.w",
+    "to": "roadW.a",
+    "why": "The west road."
+   },
+   {
+    "from": "hubs.e",
+    "to": "roadE.a",
+    "why": "The second-hand road."
+   },
+   {
+    "from": "sig.n",
+    "to": "roadS.a",
+    "why": "The middle road."
+   },
+   {
+    "from": "roadW.b",
+    "to": "yard.blades.keenEdge.a",
+    "why": "The west road reaches the swords."
+   },
+   {
+    "from": "roadE.b",
+    "to": "yard.dual.twinFangs.a",
+    "why": "The second-hand road reaches the dual-wield wheel."
+   },
+   {
+    "from": "roadS.c",
+    "to": "yard.shield.hub.a",
+    "why": "The middle road lands on the hub."
+   },
+   {
+    "from": "life.n",
+    "to": "roadW.a",
+    "why": "The life pocket is also a way onto the west road: a pocket as a bridge, as the user drew them."
+   },
+   {
+    "from": "block.n",
+    "to": "roadE.a",
+    "why": "The block pocket is also a way onto the second-hand road."
+   },
+   {
+    "from": "roadS.c",
+    "to": "fightingBreath.a",
+    "why": "The middle road's third node onto the mana pocket (G2, 2026-10-22; it was the second): the first node is left free for the warcry chain that bridges the middle road and the second-hand road (Drill Call, G3 round 2), whose link would otherwise cross this one."
+   },
+   {
+    "from": "life.n",
+    "to": "fieldDressing.a",
+    "why": "Stout Heart onto the flask pocket."
+   },
+   {
+    "from": "roadS.a",
+    "to": "drill.a",
+    "why": "The middle road's first node onto the warcry chain (G3 round 2, RE-5): the home's middle offers a shout beside the life."
+   },
+   {
+    "from": "drill.c",
+    "to": "roadE.a",
+    "why": "The warcry chain lands on the second-hand road: the middle and east roads are a loop at the home, above the mana pocket."
+   },
+   {
+    "from": "fieldDressing.b",
+    "to": "wall.slams.bracing.b",
+    "why": "A near crossing to the Wall: the Yard's flask pocket and the Wall's block pocket (Bracing since round 3) sit a step apart on the border, so a Reaver buys block and a Vanguard buys flasks without walking round the ring."
+   },
+   {
+    "from": "fightingBreath.n",
+    "to": "roadE.b",
+    "why": "The mana pocket lands on the second-hand road: the middle and east roads are a loop above the wheel."
+   }
+  ]
+ },
+ {
+  "file": "shield",
+  "export": "shield",
+  "id": "yard.shield",
+  "name": "The Muster",
+  "why": "The Yard's south-centre: the hub, the resist star, the shield wheel, the crit pocket (Fencer's Eye, 2026-10-20), Standard Bearer, Shield Bash and the Shieldwall spur.",
+  "start": null,
+  "clusters": [
+   {
+    "id": "hub",
+    "name": "The hub",
+    "why": "The Yard's crossing of roads (G2, 2026-10-22): the middle road from the home above, the crossroad west and east, the spine down through the shield wheel, and the star's fire spoke. It joined four clusters' chains directly before.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -80,
+       2000
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "star",
+    "name": "Four Winds",
+    "why": "The resist star: a notable of all resistances and maximum resistances, with four single-node spokes, one per element (chaos included), each landing somewhere else: fire at the hub, cold at the one-handed diamond, lightning at the shield wheel, chaos at the west junction. A connector you pay in resistances, which every build wants by map ten.",
+    "nodes": [
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Four Winds",
+      "why": "2 + 2 units.",
+      "lines": [
+       "resAll(8)",
+       "maxResAll(1)"
+      ],
+      "at": [
+       -240,
+       2290
+      ]
+     },
+     {
+      "id": "f",
+      "kind": "small",
+      "why": "The fire spoke, to the hub.",
+      "lines": [
+       "resOne(\"fire\", 10)"
+      ],
+      "at": [
+       -206,
+       2229
+      ]
+     },
+     {
+      "id": "w",
+      "kind": "small",
+      "why": "The cold spoke, to the one-handed diamond.",
+      "lines": [
+       "resOne(\"cold\", 10)"
+      ],
+      "at": [
+       -306,
+       2266
+      ]
+     },
+     {
+      "id": "e",
+      "kind": "small",
+      "why": "The lightning spoke, to the shield wheel.",
+      "lines": [
+       "resOne(\"lightning\", 10)"
+      ],
+      "at": [
+       -174,
+       2313
+      ]
+     },
+     {
+      "id": "s",
+      "kind": "small",
+      "why": "The chaos spoke, to the west junction.",
+      "lines": [
+       "resOne(\"chaos\", 10)"
+      ],
+      "at": [
+       -261,
+       2357
+      ]
+     }
+    ],
+    "links": [
+     [
+      "n",
+      "f"
+     ],
+     [
+      "n",
+      "w"
+     ],
+     [
+      "n",
+      "e"
+     ],
+     [
+      "n",
+      "s"
+     ]
+    ]
+   },
+   {
+    "id": "steelRim",
+    "name": "Steel Rim",
+    "why": "The wheel below the hub: the shield on one side (Steel Rim: block and shield defences), the hide on the other (Scarred Hide: life and stun threshold, since G3). Life smalls on the hide side, so the road from the hub down to the Pits does not sell spell block to everyone who passes (build audit 2026-10-20: the sword-and-shield Reaver found both shield notables on one wheel).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, top.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       0,
+       2375
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       91,
+       2428
+      ]
+     },
+     {
+      "id": "n1",
+      "kind": "notable",
+      "name": "Steel Rim",
+      "why": "Block and shield defences: 2.5 + 2 units.",
+      "lines": [
+       "shieldBlock(5)",
+       "shieldDef(30)"
+      ],
+      "at": [
+       91,
+       2533
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The bottom exit, to the bleed and the leech.",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       0,
+       2585
+      ]
+     },
+     {
+      "id": "d",
+      "kind": "small",
+      "why": "The west exit, to the crit pocket and Shieldwall.",
+      "lines": [
+       "life(5)"
+      ],
+      "at": [
+       -91,
+       2533
+      ]
+     },
+     {
+      "id": "n2",
+      "kind": "notable",
+      "name": "Scarred Hide",
+      "why": "2 + 2 units: what a fighter without a shield wears. Life with stun threshold since G3 (2026-10-22): it was life with armour and less physical damage taken, 8 steps from the start, which handed a strength build two of its main wants on one node (the ledger's convergence rule); the armour went to the Practice Ground's Mended Mail and to Guarded.",
+      "lines": [
+       "life(10)",
+       "stunThreshold(16)"
+      ],
+      "at": [
+       -91,
+       2428
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "n1"
+     ],
+     [
+      "n1",
+      "c"
+     ],
+     [
+      "c",
+      "d"
+     ],
+     [
+      "d",
+      "n2"
+     ],
+     [
+      "n2",
+      "a"
+     ]
+    ]
+   },
+   {
+    "id": "j2",
+    "name": "Junction",
+    "why": "The fork west of the wheel: the crit pocket south, the Shieldwall spur west, the star's chaos spoke north.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -320,
+       2540
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "fencer",
+    "name": "Fencer's Eye",
+    "why": "Melee crit twice round the notable with crit multiplier, sword crit and axe crit: the crit Reaver's pocket, four or five steps from the sword and axe damage (it sat a step off the sword diamond until 2026-10-20). Reached from the junction, and on to the Standard Bearer chain below, which Finishing Cut joins from the west road.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the junction.",
+      "lines": [
+       "critChance(15, [\"melee\"])"
+      ],
+      "at": [
+       -449,
+       2721
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Fencer's Eye",
+      "why": "2.1 + 1 + 1 units.",
+      "lines": [
+       "critMulti(25)",
+       "weaponCrit(\"sword\", 15)",
+       "weaponCrit(\"axe\", 15)"
+      ],
+      "at": [
+       -489,
+       2778
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the Standard Bearer chain.",
+      "lines": [
+       "critChance(15, [\"melee\"])"
+      ],
+      "at": [
+       -530,
+       2835
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "standard",
+    "name": "Standard Bearer",
+    "why": "Reduced mana reservation, then the notable with aura effect: for the Reaver who runs a standard or a herald, between the crit pocket and the Pits' west junction, with Finishing Cut joining its small from the west road (G2). The Yard's only reservation lines; a Vanguard crossing from the grit comes for them.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "reducedReservation(3)"
+      ],
+      "at": [
+       -599,
+       2933
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Standard Bearer",
+      "why": "A banner carried into the fight: 2 + 1 units.",
+      "lines": [
+       "reducedReservation(6)",
+       "attackSpeed(5)"
+      ],
+      "at": [
+       -640,
+       2990
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ]
+    ]
+   },
+   {
+    "id": "shieldwall",
+    "name": "Shieldwall",
+    "why": "Three nodes of shield block from the west junction to the west road's last node, a bridge between the Muster and the west road; and off that road node, a spur of one small to the trade: block cap +10%, 30% less evasion. G2 (2026-10-22) unhooked the spur from the run, so no road passes through it (§9.1): the keystone is a dead end one small off a junction, and the run is a uniform block bridge with no notable of its own.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -460,
+       2620
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -600,
+       2700
+      ]
+     },
+     {
+      "id": "c",
+      "kind": "small",
+      "why": "The run lands on the west road.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -740,
+       2780
+      ]
+     },
+     {
+      "id": "d",
+      "kind": "small",
+      "why": "The spur: one small off the west road's last node, a dead end.",
+      "lines": [
+       "shieldBlock(2)"
+      ],
+      "at": [
+       -1010,
+       2970
+      ]
+     },
+     {
+      "id": "k",
+      "kind": "keystone",
+      "name": "Shieldwall",
+      "lines": [],
+      "at": [
+       -1095,
+       3000
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "b"
+     ],
+     [
+      "b",
+      "c"
+     ],
+     [
+      "d",
+      "k"
+     ]
+    ]
+   },
+   {
+    "id": "j1",
+    "name": "Junction",
+    "why": "Below the wheel, on the spine: the fork between the bleed (west) and the leech (east), and the spine on down between them.",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       0,
+       2720
+      ]
+     }
+    ],
+    "links": []
+   },
+   {
+    "id": "shieldBash",
+    "name": "Shield Bash",
+    "why": "The shield as a weapon: attack damage and attack speed with a shield, and life on block. Three gems need a shield to attack with and the Reaver starts with one; the Yard sold only the block. A straight chain from the Fosse leg's first node up to the road node above the Pits' west junction, at the rim below Standard Bearer, where the shield build already is (G2: it hung off the Pits' west junction, which the west road and the leg now meet at).",
+    "nodes": [
+     {
+      "id": "a",
+      "kind": "small",
+      "why": "The entrance, from the Fosse leg.",
+      "lines": [
+       "shieldAttack(10)"
+      ],
+      "at": [
+       -668,
+       3376
+      ]
+     },
+     {
+      "id": "n",
+      "kind": "notable",
+      "name": "Shield Bash",
+      "why": "2 + 1.7 + 1 units.",
+      "lines": [
+       "shieldAttack(20)",
+       "shieldSpeed(8)",
+       "lifeOnBlock(15)"
+      ],
+      "at": [
+       -618,
+       3327
+      ]
+     },
+     {
+      "id": "b",
+      "kind": "small",
+      "why": "The exit, to the Pits.",
+      "lines": [
+       "shieldAttack(10)"
+      ],
+      "at": [
+       -568,
+       3278
+      ]
+     }
+    ],
+    "links": [
+     [
+      "a",
+      "n"
+     ],
+     [
+      "n",
+      "b"
+     ]
+    ]
+   },
+   {
+    "id": "toPits",
+    "name": "To the Pits",
+    "why": "One attribute node from Shield Bash to the Pits junction: its far small led nowhere (build audit 2026-10-20).",
+    "nodes": [
+     {
+      "id": "r1",
+      "kind": "attribute",
+      "lines": [
+       "str(6)",
+       "dex(6)"
+      ],
+      "at": [
+       -492,
+       3204
+      ]
+     }
+    ],
+    "links": []
+   }
+  ],
+  "links": [
+   {
+    "from": "yard.shield.shieldBash.b",
+    "to": "yard.shield.toPits.r1",
+    "why": "One attribute node from Shield Bash to the Pits junction: its far small led nowhere (build audit 2026-10-20)."
+   },
+   {
+    "from": "yard.shield.toPits.r1",
+    "to": "yard.blood.j3.a",
+    "why": "The far end of the road."
+   },
+   {
+    "from": "yard.blood.leg.l1",
+    "to": "shieldBash.a",
+    "why": "The Fosse leg's first node onto the shield attack chain (G2; it was the Pits' west junction, which now carries the west road and the leg)."
+   },
+   {
+    "from": "yard.blades.west.w4",
+    "to": "shieldwall.c",
+    "why": "The block run lands on the west road's last node: a bridge between the Muster's west junction and the west road."
+   },
+   {
+    "from": "yard.blades.west.w4",
+    "to": "shieldwall.d",
+    "why": "The keystone spur, one small off the west road's last node, a dead end (§9.1)."
+   },
+   {
+    "from": "hub.a",
+    "to": "star.f",
+    "why": "The hub to the star's fire spoke."
+   },
+   {
+    "from": "star.e",
+    "to": "steelRim.a",
+    "why": "The star's lightning spoke to the shield wheel: a second way onto it."
+   },
+   {
+    "from": "star.s",
+    "to": "j2.a",
+    "why": "The star's chaos spoke to the west junction."
+   },
+   {
+    "from": "hub.a",
+    "to": "steelRim.a",
+    "why": "The spine leaves the hub straight into the shield wheel, which it passes through (one side: shield or hide). G2 kept this a direct link rather than a road node, which would have put Scarred Hide, a home build's first defence, a step further out with nothing coming off the node."
+   },
+   {
+    "from": "steelRim.d",
+    "to": "j2.a",
+    "why": "The wheel's west side to the west junction."
+   },
+   {
+    "from": "j2.a",
+    "to": "fencer.a",
+    "why": "Junction to the crit pocket."
+   },
+   {
+    "from": "j2.a",
+    "to": "shieldwall.a",
+    "why": "Junction to the keystone spur."
+   },
+   {
+    "from": "fencer.b",
+    "to": "standard.a",
+    "why": "The crit pocket on to the reservation chain."
+   },
+   {
+    "from": "standard.n",
+    "to": "yard.blood.toWall.a",
+    "why": "The reservation chain lands on the dear crossing's first node: a second way to the west rim and the Wall."
+   },
+   {
+    "from": "steelRim.c",
+    "to": "j1.a",
+    "why": "The wheel's bottom to the junction below."
+   }
+  ]
+ }
+]

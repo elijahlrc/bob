@@ -947,6 +947,131 @@ export const trapLimit = def('trapLimit', (v: number): Line =>
 export const mineLimit = def('mineLimit', (v: number): Line =>
   line(`+${v} mine out at a time`, v * 4, mod('deployCount', 'base', v, { tags: ['mine'] })),
 );
+// The Spire's rule benders (docs/tree/design/R-spire-notables.md): conditions the fight tracks (src/sim/combat.ts), and
+// maximum mana read as a `per` stat (src/calc/character.ts statValue 'maxMana').
+export const damageWhileEsFull = def('damageWhileEsFull', (v: number): Line =>
+  line(
+    `${v}% damage while energy shield is full`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'esFull' } }),
+  ),
+);
+export const damageVsIgnited = def('damageVsIgnited', (v: number): Line =>
+  line(
+    `${v}% damage against ignited enemies`,
+    v / 8,
+    mod('damage', 'inc', v, { condition: { id: 'targetIgnited' } }),
+  ),
+);
+export const critVsShocked = def('critVsShocked', (v: number): Line =>
+  line(
+    `${v}% crit chance against shocked enemies`,
+    v / (UNIT.critChance * 1.5),
+    mod('critChance', 'inc', v, { condition: { id: 'targetShocked' } }),
+  ),
+);
+export const castSpeedOnCrit = def('castSpeedOnCrit', (v: number): Line =>
+  line(
+    `${v}% cast speed if you crit recently`,
+    v / 6,
+    mod('castSpeed', 'inc', v, { condition: { id: 'critRecently' } }),
+  ),
+);
+export const damageStationary = def('damageStationary', (v: number): Line =>
+  line(
+    `${v}% damage while standing still`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'stationary' } }),
+  ),
+);
+export const spellAreaOnKill = def('spellAreaOnKill', (v: number): Line =>
+  line(
+    `${v}% spell area if you killed recently`,
+    v / 12,
+    mod('aoe', 'inc', v, { tags: ['spell'], condition: { id: 'killedRecently' } }),
+  ),
+);
+export const spellDamageWhileLeechingEs = def('spellDamageWhileLeechingEs', (v: number): Line =>
+  line(
+    `${v}% spell damage while leeching energy shield`,
+    v / 12,
+    mod('damage', 'inc', v, { tags: ['spell'], condition: { id: 'leechingEs' } }),
+  ),
+);
+/** Spell damage per 100 maximum mana, at most `max` times (the reference's mana-scaled spell notable). */
+export const spellDamagePerMana = def('spellDamagePerMana', (v: number, max: number): Line =>
+  line(
+    `${v}% spell damage per 100 maximum mana, up to ${v * max}%`,
+    (v * Math.min(max, 6)) / 8,
+    mod('damage', 'inc', v, { tags: ['spell'], per: { stat: 'maxMana', div: 100, max } }),
+  ),
+);
+/** Extra energy shield of v per 100 maximum mana (v% of maximum mana, counted in hundreds). */
+export const manaAsEs = def('manaAsEs', (v: number): Line =>
+  line(`gain ${v}% of maximum mana as extra energy shield`, v / 2, mod('es', 'base', v, { per: { stat: 'maxMana', div: 100 } })),
+);
+/** Auras reserve life instead of mana (src/calc/character.ts, the aura loop): the low-life build's notable. */
+export const auraReserveLife = def('auraReserveLife', (): Line =>
+  line('Auras reserve life instead of mana', 4, mod('auraReserveLife', 'flag', 1)),
+);
+/** Energy shield starts recharging at once on a kill (src/sim/combat.ts `killActor`). */
+export const esRechargeOnKill = def('esRechargeOnKill', (): Line =>
+  line('Energy shield starts recharging when you kill', 3, mod('esRechargeOnKill', 'flag', 1)),
+);
+/** A share of a pool's maximum recovered on an event (src/data/buffs.ts `recoverPctStat`, src/sim/buffs.ts). */
+export const recoverOn = def(
+  'recoverOn',
+  (event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken', pool: 'life' | 'mana' | 'es', v: number): Line =>
+    line(
+      `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit' }[event]}`,
+      v * (event === 'kill' || event === 'killIgnited' ? 0.8 : 1.2),
+      mod(`recoverPct.${event}.${pool}`, 'base', v),
+    ),
+);
+/** A chance to gain Arcane Tide (the arcaneSurge buff: more spell damage, cast speed, mana) on an event. */
+export const arcaneTideOn = def('arcaneTideOn', (event: 'flask' | 'crit' | 'kill', v: number): Line =>
+  line(
+    `${v === 100 ? 'gain' : `${v}% chance to gain`} Arcane Tide ${{ flask: 'when you use a flask', crit: 'on crit', kill: 'on kill' }[event]}`,
+    (v / 100) * (event === 'flask' ? 2 : 4),
+    mod(`buffOn.${event}.arcaneSurge`, 'base', v),
+  ),
+);
+/** Chilled enemies deal less damage to you (src/sim/combat.ts, before a hit lands; at most 50%). */
+export const chilledLessDamage = def('chilledLessDamage', (v: number): Line =>
+  line(`chilled enemies deal ${v}% less damage to you`, v / 2, mod('chilledLessDamage', 'base', v)),
+);
+/** The two-element rule: fire hits harder against the chilled, cold against the ignited. */
+export const crossElement = def('crossElement', (v: number): Line => ({
+  label: `${v}% fire damage against chilled enemies; ${v}% cold damage against ignited enemies`,
+  units: v / 8,
+  mods: [
+    mod('damage', 'inc', v, { damageTypes: ['fire'], condition: { id: 'targetChilled' } }),
+    mod('damage', 'inc', v, { damageTypes: ['cold'], condition: { id: 'targetIgnited' } }),
+  ],
+}));
+export const spellDamageWhenHit = def('spellDamageWhenHit', (v: number): Line =>
+  line(
+    `${v}% spell damage if you were hit recently`,
+    v / 12,
+    mod('damage', 'inc', v, { tags: ['spell'], condition: { id: 'beenHitRecently' } }),
+  ),
+);
+export const critMultiVsFrozen = def('critMultiVsFrozen', (v: number): Line =>
+  line(
+    `+${v}% crit multiplier against frozen enemies`,
+    v / (UNIT.critMulti * 1.5),
+    mod('critMulti', 'base', v, { condition: { id: 'targetFrozen' } }),
+  ),
+);
+export const wandPhysAsLightning = def('wandPhysAsLightning', (v: number): Line =>
+  line(`gain ${v}% of wand physical damage as extra lightning`, v / 4, mod('gain.physical.lightning', 'base', v, { tags: ['wand'] })),
+);
+export const wandChain = def('wandChain', (v: number): Line =>
+  line(`wand attacks chain ${v} more`, v * 3, mod('chains', 'base', v, { tags: ['attack', 'wand'] })),
+);
+export const spellExtraProjectile = def('spellExtraProjectile', (v: number): Line =>
+  line(`+${v} projectile with spells`, v * 3, mod('projectiles', 'base', v, { tags: ['spell'] })),
+);
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(
     `${v}% crit chance while on full life`,
