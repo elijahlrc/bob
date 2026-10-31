@@ -73,7 +73,11 @@ rework's decisions), `R-reviewer.md` (the reviewer agent's brief), `R-skeleton.m
   reference's notable and keystone names; the repo's `ip.test.ts` covers gems and uniques only: run both before a
   region's commit), `chart.ts <folder> <region> <out.md>` (the notables chart for review: step, before, now, units, why).
 - **The Bow: done** (`ed542d7`): R-bow.md, R-bow-chart.md, built by `bow-gen.ts`.
-- **The Yard:** plan written (R-yard.md), under review. Next the Wall, then the Cathedral, the centre, the joins, the
+- **The Yard: done** (`b52303a`): R-yard.md, R-yard-chart.md, built by `yard-gen.ts`. `sustain.ts <folder> <region>`
+  tallies sustain lines before and after.
+- **The Wall:** next. Musts from the Yard rounds: place around the Yard's finished nodes (Shieldwall, Iron Skin, Sword
+  and Board sit where Strongarm, Greatblade, Cleaver are now); no weapon picks within 8 of the Reaver or the Vanguard;
+  rename Strongarm (a reference keystone name) and the Wall's Second Wind (the Bow has one). Then the Cathedral, then the Cathedral, the centre, the joins, the
   final report. Lessons the reviewers enforce (R-report.md has the rounds): one mana notable near home; ~11 own
   notables within 8; no copies across borders (check the neighbour's notables at the shared seam); no flat second
   notables; ~4-6 units per notable; utility ~20%; names checked with `ref-names.ts` and `ip.test.ts`; every new stat has

@@ -15,6 +15,15 @@ report for the owner is the last section (and its Artifact page).
   with life" instead of the skeleton's armour (carried on: global defences, §16.8); whether the Yard should hold elemental
   melee at all, given the Bow and the Cathedral (carried on: Elemental Edge only with a melee hook).
 
+- The Yard: sustain leans leech and block, kill recovery left to the Bow and the Knife (for the flask-stats pass).
+- The Wall: Grave Host was kept under the owner's ruling of 2026-10-20 ("Grave Host stays every summoner's farthest
+  minion notable") although minions now have deliberate homes in the Spire's west and the Cathedral: does the ruling
+  hold? Strongarm (strength's melee bonus applies to projectile attacks; dexterity gives no evasion): does any Vanguard
+  take it, or should it be rethought with its rename? The reference's strength sector has five keystones and the Wall
+  four: does the Wall want a fifth? Rooted Stance and Blood Rite each share a word with a reference keystone of the
+  same mechanic (the Yard renamed its two on that ground): rename them too (left for the naming pass)? The Wall's
+  45/35/20 split against the reference's 53/33/14 was accepted as identity (grit lines): agree?
+
 ## Engine additions
 
 - The Spire: maximum mana as a `per` stat (`src/calc/character.ts` statValue `maxMana`), for spell damage per 100 mana
@@ -107,3 +116,30 @@ report for the owner is the last section (and its Artifact page).
   a block / against stunned / while leeching / while Fortified, crit against bleeding or stunned enemies, melee area on
   kill, impale chance and effect, armour against elemental hits (`armourVsEle`), melee physical gained as extra fire.
   Condition texts added for Elusive and leeching energy shield (the Bow's Pursuit's End had shown a raw id).
+
+### The Wall
+
+- Stage 1 (plan): R-wall.md. Round 1 REVISE (shields copying the Yard's ideas; axes beside the Yard's; the south rim a
+  dumping ground facing the Yard's payoffs; two area notables in one pocket; the grit diagnosis wrong: grit pays off by
+  itself, what lacked was ways to gain it; stun piled; the north exit all defence; nine own notables within 8). Round 2
+  approved. Grave Host kept under the owner's ruling of 2026-10-20.
+- Stage 2 (structure): round 1 REVISE (the near ground lopsided north; look-alike pairs side by side; one southern
+  junction crowded; overlaps). Round 2 approved (11 within 8: 5/5/1; maces all 6+ steps apart).
+- Stage 3 (notables): round 1 REVISE (45 too few; sustain fell a third; three internal copies). Round 2 approved with
+  three fixes (grit sliding into every second line: Heavy Hands copied Plunder of Iron; regeneration per grit on three
+  notables; a price).
+- Stage 4 (final review): approved. **The Wall is done** (2026-10-31): 49 notables, 4 keystones (reference 49 and 5);
+  notables 45/35/20 against the reference's 53/33/14: **a reviewer-accepted deviation** (the grit lines, counted as
+  utility, are the region's identity). Identity: standing ground. The grit loop: gained on block, stun (twice), kill
+  (Plunder of Iron), mace hits, warcries, hits taken; spent on block per charge (Shield Ram), melee damage per charge
+  (Grit and Gravel), two-handed speed per charge (Heavy Hands), regeneration per charge (Scar Tissue, Bulwark Spirit).
+  Estimated fill: 1-2 charges with grit on stun and block, full only in pack fights with the kill and warcry sources.
+  Standing Iron's armour while standing still: a melee character stands for every swing, so most of a pack fight
+  (estimate; the joins pass or play should confirm). Renamed: Strongarm → Unbowed Arm (keystones.ts too), Quartermaster →
+  Camp Stores, Second Wind → Old Wounds. Cut: Grim Oath, Iron Liturgy, Two Fists, Stone Ward, Unhurried, Bracing,
+  Cleaver, Unbloodied, War Drums. For the tidy pass: label overlaps listed in the final review; Grave Host's long spur.
+- Engine additions for the Wall: a `warcry` charge event rolled when a warcry is used (`src/calc/charges.ts`,
+  `src/sim/utility.ts`, player text); lines on existing machinery: grit on stun, block, kill, warcry and mace hits
+  (charges are rolled under the fight's conditions), block per grit charge with a shield, melee damage per grit, two-handed
+  attack speed per grit, armour and stun avoidance while standing still, melee physical per 10 strength (`str` per stat),
+  one more totem (the deploy count), strikes hit one more enemy (`extraTargets`).

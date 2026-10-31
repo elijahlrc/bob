@@ -10,7 +10,7 @@ import { skillReady } from './cooldowns';
 import { levelValue } from '../calc/gems';
 import { gainBuff } from './buffs';
 import { applyStatus } from './statuses';
-import { gainCharge, spendCharges } from './charges';
+import { gainCharge, rollCharges, spendCharges } from './charges';
 import { flaskMask, playerConds, playerCtx, rawHit } from './combat';
 import { canPay } from './cost';
 import { applyHex } from './hexes';
@@ -375,7 +375,11 @@ export function applyUtility(w: World, a: Actor, act: Action): void {
     : ch.utilities.find((x) => x.skill.id === id);
   const u = c?.skill.utility;
   if (!c || !u) return;
-  if (c.skill.tags.includes('warcry')) a.side!.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
+  if (c.skill.tags.includes('warcry')) {
+    a.side!.utilityReady[WARCRIES] = w.t + WARCRY_SECONDS;
+    // The tree's charges on a warcry (the Wall's Iron Voice: a shout gives grit).
+    rollCharges(w, a.side!, 'warcry');
+  }
   if (u.kind === 'shout') {
     w.events.push({ t: 'cry', x: a.x, y: a.y, r: u.radius });
     const near = enemiesNear(w, a.team, a.x, a.y, u.radius);

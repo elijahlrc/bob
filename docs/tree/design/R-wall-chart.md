@@ -1,0 +1,57 @@
+# wall: notables as built (49 notables, 4 keystones)
+
+| Step | Area | Notable | Before | Now | Units | Hook (why) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 5 | home | Elemental Ward | resAll(10), life(5) | +12% all resistances; 6% life | 4.2 |  |
+| 5 | home | Oathbound | life(8), meleePhys(10), str(20) | 8% life; 14% melee physical damage; +15 strength | 4.0 | The home generalist, passed through between the two hubs (step 5): life and steel every Vanguard uses. |
+| 6 | home | Camp Stores | new | 20% flask recovery; 12% flask effect | 4.4 | The flask layer near home (renamed: Quartermaster is a stop). |
+| 6 | home | Ringing Blows | meleeDamage(16), enemyStunThreshold(12) | 19% melee damage; 14% reduced enemy stun threshold | 4.1 |  |
+| 6 | home | Old Wounds | new | 1% life regenerated; 8% life | 4.1 | Life and regeneration near home (renamed: the Bow has a Second Wind). |
+| 7 | rampart | Steady Hands | accuracy(20), attackSpeed(8) | 23% accuracy; 9% attack speed | 4.1 |  |
+| 7 | slams | Stagger | stunDuration(30), enemyStunThreshold(12), stunDamage(15) | 30% stun duration; 12% reduced enemy stun threshold; 15% stun damage | 4.5 | 2 + 1.5 + 1 units. |
+| 7 | home | Ox Hide | armour(20), stunThreshold(16) | 23% armour; 18% stun threshold | 4.2 |  |
+| 7 | home | Weak Spot | meleePhys(20), critChance(22, ["melee"]) | 24% melee physical damage; 27% melee crit chance | 4.2 |  |
+| 7 | resists | Iron Lungs | manaOnHit(8, ["melee"]), manaLeech(0.4), mana(8) | +8 mana on hit; 8% reduced mana cost | 4.0 | Mana from melee and cheaper blows (unlike the Yard’s mana on hit with leech). |
+| 8 | slams | Barrow Ward | lifeRegen(0.8), physReduction(2) | 0.8% life regenerated; 2% physical damage reduction | 4.0 | 2 + 2 units. |
+| 9 | slams | Thunderstep | twoHandDamage(16), meleeArea(12), aoe(8, ["melee"]) | 26% two-handed melee damage; 18% melee area damage | 4.4 | Two-handed slams. |
+| 9 | resists | Warlord's Banner | reducedReservation(5), auraEffect(8), manaFlat(30) | 5% reduced mana reservation; 8% aura effect; +30 maximum mana | 4.5 | 1.7 + 1.3 + 1.5 units: what an aura carrier wants from a banner, reserving less and the aura stronger. |
+| 9 | resists | Unbroken | maxGrit(1), gritDuration(20) | +1 maximum grit charges; 25% grit charge duration | 4.7 | One more grit charge, and the charges last longer. |
+| 9 | slams | Sweeping Blow | new | strike skills hit 1 more nearby enemy; 10% melee physical damage | 4.5 | The strike rule: strikes hit one more nearby enemy, off the south spoke toward the axis. |
+| 10 | rampart | Mortar and Stone | armour(30), physReduction(2) | 30% armour; 2% physical damage reduction | 4.5 | The armour notable: a flat 2% physical reduction on top, which armour alone never gives against a big hit. 4.5 units. The road to the tower leaves from it. |
+| 10 | rampart | K Unerring Discipline | same |  | 0.0 |  |
+| 10 | maces | Broad Back | life(12), stunRecovery(15) | 15% life; 19% reduced stun duration on you | 4.3 |  |
+| 10 | slams | K Unbowed Arm | new |  | 0.0 | The strength keystone (renamed: its old name was a reference keystone’s). |
+| 10 | slams | Vampiric Strikes | leechLife(0.8, ["melee"]), lifeOnHit(6, ["melee"]), manaLeech(0.4) | 0.8% melee life leech; +6 life on melee hit; 0.4% mana leech | 4.5 | 2 + 1.5 + 1 units. |
+| 10 | resists | Tempered | maxResAll(1), resAll(4), armour(16) | +1% maximum resistances; +4% all resistances; 16% armour | 4.3 | +1% to maximum resistances (2 units by the table, more in play), 1 unit of resistance and 1.3 of armour: 4.3. The armour is Elemental Ward's, which stop 3 (2026 |
+| 10 | slams | Aftershock | new | 19% melee area damage; 15% reduced enemy stun threshold | 4.3 | Slams that shake the enemy loose: wider, and stuns land easier (feeding grit on stun). |
+| 10 | resists | Bulwark Spirit | new | 0.4% life regenerated per grit charge; 30% avoid stun | 4.5 | Grit-shaped sustain at the Cathedral border: every charge mends. |
+| 11 | maces | Greatweight | twoHandDamage(30), stunDuration(15) | 34% two-handed melee damage; 20% stun duration | 4.2 | The two-handed blow that holds the enemy down (one side of the swing-or-life choice). |
+| 11 | slams | Standing Cairns | totemDamage(24), areaDamage(10) | 34% totem damage; 14% area damage | 4.2 |  |
+| 11 | resists | Hallowed Hammer | maceDamage(20), eleAttack(20) | 24% mace and sceptre damage; 24% elemental damage with attacks | 4.1 |  |
+| 11 | slams | Sledge and Sinew | weaponDamage("mace", 20), life(8) | 22% mace damage; +8 life on melee hit | 4.2 | Maces that heal on the hit. |
+| 11 | resists | Graven Posts | totemDamage(24), resAll(6) | 29% totem damage; +7% all resistances | 4.2 |  |
+| 11 | rampart | Standing Iron | new | 45% armour while standing still; 35% avoid stun while standing still | 4.2 | The armour rule: armour that grows while the Vanguard holds still. |
+| 11 | maces | Shield Ram | shieldAttack(20), stunDuration(25) | 24% attack damage with a shield; +1% block per grit charge while holding a shield | 5.4 | The shield grows with the grit: block for every charge held. |
+| 11 | maces | Broken Guard | new | 30% chance to gain a grit charge when you stun an enemy; 10% reduced enemy stun threshold | 5.0 | Stunning an enemy gives grit, by the shields on the axis: the grit walk runs from here north. |
+| 11 | slams | Weight of Iron | maceDamage(24), stunDuration(20), enemyStunThreshold(8) | 24% mace and sceptre damage; 20% stun duration; 8% reduced enemy stun threshold | 4.0 | Mace damage with the stun a mace is for: 1.7 + 1.3 + 1 units. |
+| 11 | grit | Crushing Blow | weaponCrit("mace", 15), weaponCritMulti("mace", 20), doubleDamage(5) | 17% crit chance with maces; +23% crit multiplier with maces; 6% chance to deal double damage | 4.3 |  |
+| 11 | slams | Brute Force | new | 2% melee physical damage per 10 strength, up to 30%; 10% melee physical damage | 4.0 | The strength rule: melee physical damage for every 10 strength. |
+| 12 | maces | Locked Shields | armour(24), shieldBlock(5) | 16% armour; 15% chance to gain a grit charge when you block; +20 life on block | 4.5 | The Wall’s shield: a block builds grit and closes a wound. |
+| 12 | grit | Hammer Rhythm | weaponDamage("mace", 20), weaponSpeed("mace", 8) | 20% mace damage; 5% chance to gain a grit charge on melee hit with a mace | 4.5 | The mace rule: hammer blows build grit. |
+| 12 | grit | Ground Shaker | areaDamage(10), knockback(1), meleeRange(1) | 10% area damage; knockback 1; +1 melee range | 5.0 | 1 + 2 + 2 units: knockback and reach are lines no small node gives. |
+| 12 | grit | Hot Iron | eleAttackOne("fire", 24), stunDuration(25) | 29% fire damage with attacks; 18% chance to ignite | 4.2 | Fire attacks that ignite (its stun line went). |
+| 12 | maces | Skull Crack | new | 16% mace damage; 25% damage against stunned enemies | 4.7 | A second mace rule: the stunned enemy’s skull cracks. |
+| 12 | grit | Plunder of Iron | new | 25% chance to gain a grit charge on kill; 15% melee physical damage | 4.6 | Kills build grit: the south’s way into the grit loop. |
+| 13 | grit | Heavy Hands | attackSpeed(13, ["twoHand","melee"]), accuracy(15) | 12% two-handed melee attack speed; 3% two-handed attack speed per grit charge | 5.1 | Grit spent as momentum: the two-hander swings faster for every charge held. |
+| 13 | grit | Long Watch | totemSpeed(8), totemDuration(20) | 9% totem attack and cast speed; 23% totem duration | 4.1 |  |
+| 13 | grit | Bellows | eleAttackOne("fire", 24), meleeArea(16) | 24% fire damage with attacks; 16% melee area damage | 4.0 | 2 + 2 units: 4. Fire with the swing's reach, for the slam and the cleave alike (Hot Iron's partner is stun, Kindled Steel's ignite, Elemental Edge's accuracy).  |
+| 13 | maces | Headsman | twoHandDamage(20), enemyStunThreshold(8), stunDuration(15) | 20% two-handed melee damage; 30% chance to gain a grit charge when you stun an enemy | 5.4 | The two-hander’s grit: each stun builds it (its lines copied the Yard’s Momentum Swing). |
+| 13 | maces | Scar Tissue | gritOnHitTaken(20), lifeRegenPerGrit(0.2) | 24% grit charge when hit; 0.4% life regenerated per grit charge | 5.4 | Grit when hit, and the grit heals: the walk’s far end. |
+| 14 | maces | K Rooted Stance | same |  | 0.0 |  |
+| 14 | grit | K Blood Rite | same |  | 0.0 |  |
+| 14 | grit | Long Reach | meleeRange(1), aoe(10, ["melee"]) | +1 melee range; 18% melee area | 4.3 | Reach and a wider swing. |
+| 14 | grit | Greatblade | swordDamage(16), twoHandDamage(16), critMulti(12) | 18% sword damage; 18% two-handed melee damage; +16% crit multiplier | 4.6 | Two-handed swords. |
+| 14 | grit | Iron Voice | armour(24), warcryEffect(20) | 16% armour; 15% warcry buff effect; 25% chance to gain a grit charge when you use a warcry | 4.9 | The warcry hook: a shout gives grit. |
+| 15 | maces | Grave Host | minionLife(24), armour(20) | 27% minion life; 23% armour | 4.2 |  |
+| 15 | slams | Twin Cairns | new | +1 totem out at a time; 10% totem damage | 4.8 | One more totem (the deploy count totems already use), in from the rim by Long Watch: a totem build walks from its damage notables to its rule. |
+| 16 | maces | Grit and Gravel | new | 4% melee damage per grit charge; 10% melee physical damage | 4.2 | Grit’s second payoff, offensive: damage for every charge held. |

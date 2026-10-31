@@ -145,7 +145,6 @@ const links: [string, string, string][] = [
   ['yard.blades.spS.m', 'yard.blades.ring.a', 'The mid ring on toward the south border.'],
   ['yard.blades.ring.a', 'yard.shield.radW.m', 'The mid ring meets the south border road.'],
   ['yard.fosse.ring.q1', 'bow.rim.ring.s0', "The rim ring meets the Bow's."],
-  ['yard.home.seams.s', 'wall.slams.toYard.a', 'Temporary: the old Wall road toward the Yard, until the Wall pass.'],
   ['yard.shield.shieldwall.a', 'yard.shield.shieldwall.d', 'The spur to the keystone (the old file left it cut off).'],
 ];
 

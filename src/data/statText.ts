@@ -664,6 +664,7 @@ const MORE_EVENTS: Record<string, string> = {
   killFrozen: 'when you Kill a Frozen Enemy',
   killShocked: 'when you Kill a Shocked Enemy',
   killIgnited: 'when you Kill an Ignited Enemy',
+  warcry: 'when you use a Warcry',
   evade: 'when you Evade an Attack',
   blink: 'when you Blink',
   surge: 'when you have spent enough mana',

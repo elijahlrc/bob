@@ -108,7 +108,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'strongarm',
-    name: 'Strongarm',
+    name: 'Unbowed Arm',
     mods: [mod('strongarm', 'flag', 1), mod('dexNoEvasion', 'flag', 1)],
     description:
       "Strength's melee damage bonus also applies to projectile attacks. Dexterity gives no evasion bonus.",

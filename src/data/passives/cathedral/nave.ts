@@ -381,7 +381,7 @@ export const nave: AreaSpec = {
       why: "Lectern onto Brandwright's inner brand smalls: the brand pocket is a bridge, and the brand caster has a way in from the Nave. Since G3 round 2 the two smalls between the notables are Brandwright's (brand damage), not Lectern's.",
     },
     {
-      from: 'wall.resists.j.a',
+      from: 'wall.home.seams.s',
       to: 'toWall.a',
       why: "The Wall's crossing junction onto the Cathedral's crossing node.",
     },
@@ -393,7 +393,7 @@ export const nave: AreaSpec = {
     },
     {
       from: 'verger.c',
-      to: 'wall.resists.j.a',
+      to: 'wall.home.seams.s',
       why: "The armoured sceptre (a near crossing; G1-brief.md §2.3, deferred to G3 by G2/borders.md §4): Verger's far armour node lands on the Wall's Battlements junction, so the cluster is a crossing of its own beside the Nave road. The Vanguard's mace player reaches Verger's armour and sceptre; the Zealot reaches the Battlements. Verger is 7 steps from Hallowed Hammer.",
     },
     {

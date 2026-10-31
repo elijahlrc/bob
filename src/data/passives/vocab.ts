@@ -47,6 +47,7 @@ const SPECIAL: Record<string, ParamKind[]> = {
   arcaneTideOn: ['tideEvent', 'n'],
   spellDamagePerMana: ['n', 'n'],
   attackDamagePerAccuracy: ['n', 'n'],
+  meleePerStr: ['n', 'n'],
   quickenedOn: ['buffEvent', 'n'],
   elusiveOn: ['buffEvent', 'n'],
 };

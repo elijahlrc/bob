@@ -1222,6 +1222,58 @@ export const armourVsEle = def('armourVsEle', (v: number): Line =>
 export const meleeGainFire = def('meleeGainFire', (v: number): Line =>
   line(`melee attacks gain ${v}% of physical damage as extra fire`, v / 4, mod('gain.physical.fire', 'base', v, { tags: ['melee'] })),
 );
+// The Wall's rule benders (docs/tree/design/R-wall.md): grit gained on events the fight rolls charges for (block, stun),
+// grit as a per stat, totems on the deploy count, strikes on the calc's extra targets.
+export const gritOnStun = def('gritOnStun', (v: number): Line =>
+  line(`${v}% chance to gain a grit charge when you stun an enemy`, v / 8, mod('chargeOn.stun.grit', 'base', v)),
+);
+export const gritOnBlock = def('gritOnBlock', (v: number): Line =>
+  line(`${v}% chance to gain a grit charge when you block`, v / 8, mod('chargeOn.block.grit', 'base', v)),
+);
+export const gritOnKill = def('gritOnKill', (v: number): Line =>
+  line(`${v}% chance to gain a grit charge on kill`, v / 8, mod('chargeOn.kill.grit', 'base', v)),
+);
+/** A warcry may give grit (the `warcry` charge event, rolled when a warcry is used: src/sim/utility.ts). */
+export const gritOnWarcry = def('gritOnWarcry', (v: number): Line =>
+  line(`${v}% chance to gain a grit charge when you use a warcry`, v / 12, mod('chargeOn.warcry.grit', 'base', v)),
+);
+/** Mace hits may give grit (charges are rolled under the fight's conditions: wielding a mace). */
+export const gritOnMaceHit = def('gritOnMaceHit', (v: number): Line =>
+  line(`${v}% chance to gain a grit charge on melee hit with a mace`, v / 2, mod('chargeOn.meleeHit.grit', 'base', v, { condition: { id: 'wieldingMace' } })),
+);
+/** Block chance per grit charge while holding a shield. */
+export const blockPerGrit = def('blockPerGrit', (v: number): Line =>
+  line(`+${v}% block per grit charge while holding a shield`, v * 3, mod('blockAttack', 'base', v, { condition: { id: 'holdingShield' }, per: { stat: 'charges.grit', div: 1 } })),
+);
+/** Melee physical damage per 10 strength, at most `max` times. */
+export const meleePerStr = def('meleePerStr', (v: number, max: number): Line =>
+  line(
+    `${v}% melee physical damage per 10 strength, up to ${v * max}%`,
+    (v * Math.min(max, 25)) / 10,
+    mod('damage', 'inc', v, { tags: ['melee'], damageTypes: ['physical'], per: { stat: 'str', div: 10, max } }),
+  ),
+);
+/** Two-handed attack speed per grit charge held: grit spent as momentum. */
+export const twoHandSpeedPerGrit = def('twoHandSpeedPerGrit', (v: number): Line =>
+  line(`${v}% two-handed attack speed per grit charge`, v * 0.9, mod('attackSpeed', 'inc', v, { tags: ['twoHand', 'melee'], per: { stat: 'charges.grit', div: 1 } })),
+);
+export const damagePerGrit = def('damagePerGrit', (v: number): Line =>
+  line(`${v}% melee damage per grit charge`, v * 0.8, mod('damage', 'inc', v, { tags: ['melee'], per: { stat: 'charges.grit', div: 1 } })),
+);
+export const armourWhileStationary = def('armourWhileStationary', (v: number): Line =>
+  line(`${v}% armour while standing still`, v / ((UNIT.armour * 4) / 3), mod('armour', 'inc', v, { condition: { id: 'stationary' } })),
+);
+export const stunAvoidStationary = def('stunAvoidStationary', (v: number): Line =>
+  line(`${v}% avoid stun while standing still`, v / 25, mod('stunAvoid', 'base', v, { condition: { id: 'stationary' } })),
+);
+/** One more totem out at a time: the deploy count totems are placed by (src/calc/skill.ts `deployCount`). */
+export const totemLimit = def('totemLimit', (v: number): Line =>
+  line(`+${v} totem out at a time`, v * 4, mod('deployCount', 'base', v, { tags: ['totem'] })),
+);
+/** Strike skills hit one more nearby enemy (the calc's `extraTargets`). */
+export const strikeTargets = def('strikeTargets', (v: number): Line =>
+  line(`strike skills hit ${v} more nearby enemy`, v * 3.5, mod('extraTargets', 'base', v, { tags: ['strike'] })),
+);
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(
     `${v}% crit chance while on full life`,

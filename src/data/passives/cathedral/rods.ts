@@ -280,7 +280,7 @@ export const rods: AreaSpec = {
       why: "The vestry junction to the tower's wheel.",
     },
     {
-      from: 'wall.resists.scarTissue.n',
+      from: 'wall.maces.scarTissue.n',
       to: 'toWall.a',
       why: "The Wall's Scar Tissue (grit) onto the dear road.",
     },

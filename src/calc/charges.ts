@@ -38,6 +38,7 @@ export const CHARGE_EVENTS = [
   'stun',
   'cast',
   'hitTaken',
+  'warcry',
 ] as const;
 export type ChargeEvent = (typeof CHARGE_EVENTS)[number];
 export const chargeStat = (event: ChargeEvent, kind: ChargeKind): string =>
