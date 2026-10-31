@@ -536,6 +536,20 @@ decisions are in the sections above (§3 item 6, §6 items 5 to 8, §9 item 0) a
     reviews of the Knife. [user, 10-31]
 13. **The Knife is done** (the owner, 10-31): 65 notables and 4 keystones, its offence, defence and utility in the
     reference sector's proportions, no low-value stat piled near its start. `R-knife.md` and its review page record it.
+14. **No notable reachable only through another notable, in a dead end** (taking the first forced a point into the
+    second). The 40 seconds stay, each in a new cluster or an existing cluster grown to
+    make room for it; folding, moving or cutting them was rejected. (`R-feedback.md` item 1.) [user, 10-31]
+15. **No generalist V in front of the starts.** A node nearly everyone wants must lead somewhere. (`R-feedback.md`
+    item 2.) [user, 10-31]
+16. **Regions differ in their small-scale structure**, at least somewhat. (`R-feedback.md` item 3.) [user, 10-31]
+17. **Clusters connect to clusters:** more clusters grow off related clusters and more links join existing ones, so
+    routes through clusters stand beside the roads, slower but richer. This settles the final report's question 1
+    (loops or side rooms) and reopens its question 15 (links across borders). (`R-feedback.md` item 4.) [user, 10-31]
+18. **The revision's budget:** the node count may rise, with roads thinned a little where a cluster route now does a
+    road's work; the notable count may grow a little where a new cluster is better with its own notable. [user, 10-31]
+19. **Starts may differ in shape** (three exits, a fork at another step), keeping about six directions by the third
+    point and the strong first small (items 8 and 9). [user, 10-31]
+20. **Cluster-to-cluster links may cross region borders.** [user, 10-31]
 
 ## 17. Open, not yet decided
 

@@ -157,7 +157,7 @@ export const hex: AreaSpec = {
     {
       id: 'wiry',
       name: 'Wiry Frame',
-      why: 'Life and evasion, a chain out from where the border road meets the mid ring.',
+      why: "Life and evasion, a chain out from where the border road meets the mid ring. Since the revision (2026-10-31) its evasion run goes on west across the border, outside the mid ring where no road runs, into the Spire's Sharp Tongue (dagger spells): a way between the two regions through clusters, slower than the border road.",
       at: [1835, -2826],
       shape: { kind: 'hand' },
       nodes: [
@@ -171,11 +171,15 @@ export const hex: AreaSpec = {
           at: [1884, -2824],
         },
         { id: 'e1', kind: 'small', lines: [evasion(10)], at: [1897, -2893] },
+        { id: 'e2', kind: 'small', lines: [evasion(10)], at: [1724, -2884] },
+        { id: 'e3', kind: 'small', lines: [evasion(10)], at: [1552, -2875] },
       ],
       links: [
         ['l1', 'n'],
         ['n', 'e1'],
         ['l3', 'l1'],
+        ['e1', 'e2'],
+        ['e2', 'e3'],
       ],
     },
     {
@@ -260,6 +264,11 @@ export const hex: AreaSpec = {
       from: 'knife.hex.wheel.n2',
       to: 'knife.hex.ward.s1',
       why: 'A way across between neighbouring clusters, dearer than the roads.',
+    },
+    {
+      from: 'knife.hex.wiry.e3',
+      to: 'spire.craft.sharpTongue.c',
+      why: "Across the border into the Spire's Sharp Tongue (the revision, 2026-10-31): the evasive dagger caster's way between Wiry Frame and the Spire's dagger spells, outside the mid ring.",
     },
     {
       from: 'knife.hex.bloodletter.n',

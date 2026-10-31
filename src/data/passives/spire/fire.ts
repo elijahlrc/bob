@@ -2,7 +2,7 @@
  * The Lantern: The west toward the rim.
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { burnDamage, curseArea, curseEffect, damageVsIgnited, eleDamage, eleDamageAll, es, esFlat, esLeech, igniteChance, manaAsEs, manaLeech, manaOnHit, manaRegen, minionDamage, minionLife, minionSpeed, penetration, recoverOn, resAll, wandAttack, wandSpellDamage } from '../lines';
+import { burnDamage, curseArea, curseEffect, damageVsIgnited, eleDamage, eleDamageAll, es, esFlat, esLeech, igniteChance, manaAsEs, manaLeech, manaOnHit, manaRegen, minionDamage, minionLife, minionSpeed, penetration, recoverOn, resAll, spellBlock, wandAttack, wandSpellDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const fire: AreaSpec = {
@@ -15,7 +15,7 @@ export const fire: AreaSpec = {
     {
       id: "highVeil",
       name: "High Veil",
-      why: "Energy shield and resistances, in from the rim ring at the border.",
+      why: "Energy shield and resistances, in from the rim ring at the border: the top of the west border's climb (the revision, 2026-10-31), Moonward standing on the climb below it.",
       at: [-1816, -3564],
       shape: { kind: 'hand' },
       nodes: [
@@ -23,9 +23,10 @@ export const fire: AreaSpec = {
         { id: "n", kind: "notable", name: "High Veil", lines: [es(15), resAll(6)], at: [-1841, -3514], why: "3 + 1.5 units. The outer side of the ring." },
         { id: "b", kind: "small", lines: [es(5)], at: [-1766, -3539] },
         { id: "c", kind: "small", lines: [es(5)], at: [-1791, -3615] },
-        { id: "n2", kind: 'notable', name: "Moonward", lines: [esFlat(30), recoverOn('crit', 'es', 2)], at: [-1879, -3438], why: "Crits restore the shield." },
+        { id: "n2", kind: 'notable', name: "Moonward", lines: [esFlat(30), recoverOn('crit', 'es', 2)], at: [-1790, -3410], why: "Crits restore the shield. Since the revision (2026-10-31) a crossroads of the climb: in from High Veil's ring by a small (not through High Veil), down the border by mana to Bound Host, and across the border by a spell block small to the Cathedral's Twofold Guard." },
+        { id: "x", kind: "small", lines: [spellBlock(2)], at: [-2025, -3290], why: "Across the border: spell block, the warded caster's half of a shield, toward Twofold Guard's block with one." },
       ],
-      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["n", "n2"]],
+      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["b", "n2"], ["n2", "x"]],
     },
     {
       id: "manaTap",
@@ -57,7 +58,7 @@ export const fire: AreaSpec = {
     {
       id: "cinder",
       name: "Cinder",
-      why: "Fire's ignite payoff, out from the rim ring where the west spoke meets it.",
+      why: "Fire's ignite payoff, out from the rim ring where the west spoke meets it. Since the revision (2026-10-31) fire's ladder's top rung: Warm Hearth joins it to Kiln Heart, so the two fire rooms past the rim are one way across, slower than the rim ring.",
       at: [-1065, -4434],
       shape: { kind: 'hand' },
       nodes: [
@@ -65,14 +66,15 @@ export const fire: AreaSpec = {
         { id: "n", kind: "notable", name: "Cinder", lines: [igniteChance(15), burnDamage(25), damageVsIgnited(20)], at: [-1117, -4413] },
         { id: "b", kind: "small", lines: [burnDamage(12)], at: [-1086, -4486] },
         { id: "c", kind: "small", lines: [burnDamage(12)], at: [-1013, -4455] },
-        { id: "n2", kind: 'notable', name: "Warm Hearth", lines: [recoverOn('killIgnited', 'life', 3), recoverOn('killIgnited', 'es', 3), eleDamage('fire', 10)], at: [-1196, -4381], why: "The burning dead feed the caster: fire’s own defence." },
+        { id: "n2", kind: 'notable', name: "Warm Hearth", lines: [recoverOn('killIgnited', 'life', 3), recoverOn('killIgnited', 'es', 3), eleDamage('fire', 10)], at: [-1230, -4505], why: "The burning dead feed the caster: fire’s own defence. Between the two fire rooms, reached round Cinder's ring without taking Cinder." },
+        { id: "h", kind: "small", lines: [burnDamage(12)], at: [-1335, -4395], why: "Burning, the thread between ignite (Cinder) and the fire payoff (Kiln Heart)." },
       ],
-      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["n", "n2"]],
+      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["b", "n2"], ["n2", "h"]],
     },
     {
       id: "badCompany",
       name: "Bad Company",
-      why: "Minions with curses, out from the rim ring at the border.",
+      why: "Minions with curses, out from the rim ring at the border: past the rim, the west border's climb goes on through it (the revision, 2026-10-31), by Hexed Pack and a mana small into Overflow.",
       at: [-2141, -4026],
       shape: { kind: 'hand' },
       nodes: [
@@ -80,14 +82,15 @@ export const fire: AreaSpec = {
         { id: "b", kind: "small", lines: [minionDamage(12)], at: [-2197, -4028] },
         { id: "n", kind: "notable", name: "Bad Company", lines: [minionDamage(24), curseEffect(16)], at: [-2139, -4082], why: "2 + 2 units. The far side of the ring." },
         { id: "c", kind: "small", lines: [minionDamage(12)], at: [-2085, -4024] },
-        { id: "n2", kind: 'notable', name: "Hexed Pack", lines: [curseArea(20), minionLife(15), minionSpeed(5)], at: [-2136, -4167], why: "The cursing minion master’s reach." },
+        { id: "n2", kind: 'notable', name: "Hexed Pack", lines: [curseArea(20), minionLife(15), minionSpeed(5)], at: [-2230, -4150], why: "The cursing minion master’s reach. Off the ring's small, not its notable, and on toward Overflow: the summoner who wants the reach need not take Bad Company." },
+        { id: "o", kind: "small", lines: [manaRegen(10)], at: [-2045, -4180], why: "Mana regeneration, Overflow's stat, leading in to it." },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"], ["n", "n2"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"], ["b", "n2"], ["n2", "o"]],
     },
     {
       id: "spiritWard",
       name: "Overflow",
-      why: "Spell block with a shield, out from the rim ring.",
+      why: "Mana as energy shield, out from the rim ring: the top of the west border's climb, where the mana that fed the minions at its foot becomes shield.",
       at: [-1818, -4182],
       shape: { kind: 'hand' },
       nodes: [
@@ -119,5 +122,8 @@ export const fire: AreaSpec = {
     { from: "spire.fire.badCompany.a", to: "spire.rim.ring.w0", why: "The way in." },
     { from: "spire.fire.spiritWard.a", to: "spire.rim.ring.q1", why: "The way in." },
     { from: "spire.fire.pyre.s1", to: "spire.rim.ring.q2", why: "The way in." },
+    { from: "spire.fire.cinder.h", to: "spire.fire.pyre.n", why: "Fire's ladder's top rung (the revision, 2026-10-31): Warm Hearth's burning small into Kiln Heart, so ignite and the fire payoff are one room-to-room way past the rim." },
+    { from: "spire.fire.badCompany.o", to: "spire.fire.spiritWard.b", why: "The border climb past the rim (the revision, 2026-10-31): Hexed Pack on into Overflow, the cursing summoner's mana turned to shield." },
+    { from: "spire.fire.highVeil.x", to: "cathedral.walk.guard.b", why: "Across the border into the Cathedral's Twofold Guard (the revision, 2026-10-31), outside the mid ring where no road runs: the warded caster who carries a shield, from Moonward's shield to block and spell block, a slower way between the regions than the rim ring." },
   ],
 };

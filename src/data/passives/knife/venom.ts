@@ -148,7 +148,7 @@ export const venom: AreaSpec = {
     {
       id: 'secondCurse',
       name: 'Second Curse',
-      why: 'A second curse, a side room in from the mid ring at the axis.',
+      why: "A second curse, in from the mid ring at the axis. Since the revision (2026-10-31) its small is where the blade (the route out from Keen Instinct) meets the mid ring; the notable moved off the blade's line so the route passes beside it, not through it.",
       at: [2229, -1339],
       shape: { kind: 'hand' },
       nodes: [
@@ -158,7 +158,7 @@ export const venom: AreaSpec = {
           kind: 'notable',
           name: 'Second Curse',
           lines: [hexLimit(1)],
-          at: [2196, -1328],
+          at: [2300, -1440],
           why: 'One more curse at a time: 5 units by the table. The tip of the chain.',
         },
       ],
@@ -238,6 +238,11 @@ export const venom: AreaSpec = {
     { from: 'knife.venom.shadeLeech.a', to: 'knife.venom.spN.c', why: 'The way in.' },
     { from: 'knife.venom.cruelAgony.a', to: 'knife.venom.ring.b', why: 'The way in.' },
     { from: 'knife.venom.static.a', to: 'knife.venom.spN.c', why: 'The way in.' },
+    {
+      from: 'knife.venom.quietKnife.n',
+      to: 'knife.home.quick.d',
+      why: "The dagger spells lead on to the blade's tip (the revision, 2026-10-31): Quiet Knife is no longer the end of its room, and the dagger caster reaches Quick Wrists' cast speed and Second Curse from the north spoke by clusters.",
+    },
     {
       from: 'knife.venom.secondCurse.a',
       to: 'knife.edge.wheel.w4',

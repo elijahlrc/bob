@@ -42,16 +42,18 @@ export const ambulatory: AreaSpec = {
     {
       id: "kindled",
       name: "Kindled Steel",
-      why: "Fire attacks, off the south-west spoke past the mid ring.",
+      why: "Fire attacks, off the south-west spoke past the mid ring. Since the revision (2026-10-31) a way from the spoke's junction to the rim: Ember Litany has its own two fire-attack smalls in from the rim node, so the fire striker walks Kindled Steel, Ember Litany and on to the rim's fire (Brazier, Censer), slower than the spoke between the two.",
       at: [-3557, -1020],
       shape: { kind: 'hand' },
       nodes: [
+        { id: "e1", kind: "small", lines: [eleAttackOne("fire", 12)], at: [-4029, -1102], why: "Ember Litany's way in from the rim (2026-10-31)." },
+        { id: "e2", kind: "small", lines: [eleAttackOne("fire", 12)], at: [-3877, -1026], why: "Ember Litany's way in from the rim (2026-10-31)." },
         { id: "a", kind: "small", lines: [eleAttackOne("fire", 12)], at: [-3497, -1037] },
         { id: "b", kind: "small", lines: [eleAttackOne("fire", 12)], at: [-3553, -1021] },
         { id: "n", kind: "notable", name: "Kindled Steel", lines: [eleAttackOne("fire", 24), igniteChance(10), igniteDuration(15)], at: [-3621, -1002], why: "Fire with attacks and the ignite a fire strike leaves: 2 + 1 + 1 units." },
         { id: "ember", kind: 'notable', name: "Ember Litany", lines: [recoverOn('killIgnited', 'life', 4), eleAttackOne('fire', 12)], at: [-3703, -979], why: "The fire striker feeds on the burning: killing an ignited enemy mends 4% of life: 3.2 + 1 units." },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "ember"]],
+      links: [["a", "b"], ["b", "n"], ["n", "ember"], ["e1", "e2"], ["e2", "ember"]],
     },
     {
       id: "brand",
@@ -87,6 +89,7 @@ export const ambulatory: AreaSpec = {
     { from: "cathedral.ambulatory.tithe.a", to: "wall.resists.radW.a", why: "The way in." },
     { from: "cathedral.ambulatory.plate.a", to: "wall.resists.radW.b", why: "The way in." },
     { from: "cathedral.ambulatory.kindled.a", to: "cathedral.rods.spN.c", why: "The way in." },
+    { from: "cathedral.ambulatory.kindled.e1", to: "cathedral.walk.ring.n1", why: "Ember Litany's door on the rim (2026-10-31), where Brazier's sceptre fire goes out." },
     { from: "cathedral.ambulatory.brand.a", to: "cathedral.rods.spN.c", why: "The way in." },
     { from: "cathedral.ambulatory.verger.a", to: "wall.resists.radW.m", why: "The way in." },
   ],

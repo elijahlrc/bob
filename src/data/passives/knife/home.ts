@@ -1,5 +1,5 @@
 /**
- * The Knife Gate: The Shade's first points (R-knife.md): two sides off the start, two hubs that fork at once, the roads bowing out to the seams, the two spokes and the cross-link through Keen Instinct, and the home's side rooms at steps 5 to 8. No weapon.
+ * The Knife Gate: The Shade's first points (R-knife.md): two sides off the start, two hubs that fork at once, the roads bowing out to the seams, the two spokes and the cross-link through Keen Instinct, and the home's side rooms at steps 5 to 8. No weapon. Revised 2026-10-31 (R-revise.md §7): Keen Instinct is the hilt of the blade, a route on out along the axis, and the home's rooms near each seam are two doors, not dead ends.
  * Written for the attrition rework from docs/tree/design/R-knife.md (2026-10-30).
  */
 import {
@@ -43,7 +43,7 @@ export const home: AreaSpec = {
   id: 'knife.home',
   region: 'shade',
   name: 'The Knife Gate',
-  why: "The Shade's first points (R-knife.md): two sides off the start, two hubs that fork at once, the roads bowing out to the seams, the two spokes and the cross-link through Keen Instinct, and the home's side rooms at steps 5 to 8. No weapon.",
+  why: "The Shade's first points (R-knife.md): two sides off the start, two hubs that fork at once, the roads bowing out to the seams, the two spokes and the cross-link through Keen Instinct, and the home's side rooms at steps 5 to 8. No weapon. Revised 2026-10-31 (R-revise.md §7): Keen Instinct is the hilt of the blade, a route on out along the axis, and the home's rooms near each seam are two doors, not dead ends.",
   at: [1722, -803],
   clusters: [
     {
@@ -162,7 +162,7 @@ export const home: AreaSpec = {
     {
       id: 'keen',
       name: 'Keen Instinct',
-      why: 'The home generalist, passed through between the two hubs (step 5): offence every Shade uses, both attributes.',
+      why: 'The home generalist, passed through between the two hubs (step 5): offence every Shade uses, both attributes. Since the revision (2026-10-31) the hilt of the blade: from it the route runs on out along the axis, so the points spent reaching it lead somewhere.',
       at: [1775, -1025],
       shape: { kind: 'hand' },
       nodes: [
@@ -179,7 +179,7 @@ export const home: AreaSpec = {
     {
       id: 'spoils',
       name: 'Spoils',
-      why: 'Mana regeneration, mana on kill and flask recovery, on the north path to the Spire seam (step 5): the path runs through it.',
+      why: "Mana regeneration, mana on kill and flask recovery, on the north path to the Spire seam (step 5): the path runs through it. Grown in the revision (2026-10-31, R-revise.md): a run of mana regeneration goes on from Spoils to Low Tide and out to the north border road, so Low Tide stands where three ways meet (the border road, Spoils, Thick Blood) instead of hanging one step past Spoils.",
       at: [1071, -1422],
       shape: { kind: 'hand' },
       nodes: [
@@ -192,17 +192,33 @@ export const home: AreaSpec = {
           at: [1089, -1446],
         },
         {
+          id: 't1',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          at: [1115, -1525],
+          why: 'The mana run from Spoils to Low Tide: a point of its own between them, so taking Spoils buys nothing of Low Tide.',
+        },
+        {
           id: 'n2',
           kind: 'notable',
           name: 'Low Tide',
           lines: [manaRegen(20), castSpeedOnLowMana(15)],
-          at: [1144, -1510],
-          why: 'Rewards running dry instead of punishing it.',
+          at: [1150, -1610],
+          why: 'Rewards running dry instead of punishing it. Since the revision a crossroads: in from the north border road, from Spoils and from Thick Blood.',
+        },
+        {
+          id: 't2',
+          kind: 'small',
+          lines: [manaRegen(10)],
+          at: [1080, -1690],
+          why: 'The mana run on from Low Tide to the north border road: the way in that passes no other notable.',
         },
       ],
       links: [
         ['a', 'n'],
-        ['n', 'n2'],
+        ['n', 't1'],
+        ['t1', 'n2'],
+        ['n2', 't2'],
       ],
     },
     {
@@ -226,7 +242,7 @@ export const home: AreaSpec = {
     {
       id: 'quick',
       name: 'The blade road',
-      why: 'Attack speed: a side room off Keen Instinct, straight out along the axis.',
+      why: "The blade (the revision, 2026-10-31): the Knife's own route straight out along its radial, between the two spokes, from Keen Instinct through Quick Wrists to the mid ring at the axis (by Second Curse's small). Keen Instinct is the hilt where the two roads from the hubs meet, and it leads on instead of ending the start's V; the blade is two steps slower than either spoke to the mid ring, and richer.",
       at: [1962, -1132],
       shape: { kind: 'hand' },
       nodes: [
@@ -239,10 +255,18 @@ export const home: AreaSpec = {
           at: [1962, -1132],
         },
         { id: 'c', kind: 'small', lines: [attackSpeed(5)], at: [2022, -1167] },
+        {
+          id: 'd',
+          kind: 'small',
+          lines: [damageOnKill(10)],
+          at: [2142, -1258],
+          why: "The blade's tip, where the dagger spells join it: damage after a kill, the opportunist's tempo, for attacker and caster alike.",
+        },
       ],
       links: [
         ['a', 'b'],
         ['b', 'c'],
+        ['c', 'd'],
       ],
     },
     {
@@ -298,7 +322,7 @@ export const home: AreaSpec = {
     {
       id: 'breath',
       name: 'Hoarded Breath',
-      why: 'Energy shield and mana on the seam with the Spire, for the Shade and the Mystic alike: a side room toward the centre.',
+      why: "Energy shield and mana on the seam with the Spire, for the Shade and the Mystic alike, toward the centre. Since the revision (2026-10-31) the far side of the north's two doors: from the small before Smuggler's Flasks the way parts, through Smuggler's Flasks and a mana small, or through Deep Reserves, and both doors open into Hoarded Breath and on to the seam.",
       at: [792, -1130],
       shape: { kind: 'hand' },
       nodes: [
@@ -311,14 +335,20 @@ export const home: AreaSpec = {
           lines: [es(12), esLeech(0.4), mana(16)],
           at: [819, -1085],
         },
-        { id: 'm', kind: 'small', lines: [mana(8)], at: [749, -1075] },
+        {
+          id: 'm',
+          kind: 'small',
+          lines: [mana(8)],
+          at: [760, -1010],
+          why: "Between Smuggler's Flasks and Hoarded Breath: the flask door's step into the seam's room.",
+        },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Deep Reserves',
           lines: [mana(20), costReduction(10), manaFlat(20)],
-          at: [901, -1109],
-          why: 'The big mana pool for expensive spells.',
+          at: [935, -1140],
+          why: "The big mana pool for expensive spells. Since the revision the mana door: in from the small before Smuggler's Flasks, on into Hoarded Breath.",
         },
       ],
       links: [
@@ -331,7 +361,7 @@ export const home: AreaSpec = {
     {
       id: 'cloak',
       name: 'Grey Cloak',
-      why: 'Evasion and energy shield on the seam with the Bow, for the Shade and the Strider alike.',
+      why: "Evasion and energy shield on the seam with the Bow, for the Shade and the Strider alike. Since the revision (2026-10-31) the far side of the south's two doors: from the small before Deft Guard the way parts, through Deft Guard and the evasion run, or through Ward of Smoke, and both doors open into Grey Cloak and on to the seam.",
       at: [1375, -120],
       shape: { kind: 'hand' },
       nodes: [
@@ -350,21 +380,21 @@ export const home: AreaSpec = {
           kind: 'notable',
           name: 'Ward of Smoke',
           lines: [resOne('chaos', 15), resAll(8), life(5)],
-          at: [1365, -30],
-          why: 'Resistances shared with the Strider.',
+          at: [1450, -230],
+          why: 'Resistances shared with the Strider. Since the revision the resistance door: in from the small before Deft Guard, on into Grey Cloak.',
         },
       ],
       links: [
         ['e', 'n'],
         ['n', 'v1'],
         ['v1', 'v2'],
-        ['n', 'n2'],
+        ['n2', 'n'],
       ],
     },
     {
       id: 'flasks',
       name: "Smuggler's Flasks",
-      why: 'The flask layer near home, for any build: a side room off the north path toward the centre.',
+      why: "The flask layer near home, for any build, off the north path toward the centre. Since the revision (2026-10-31) the north's two doors part at its second small: Smuggler's Flasks or Deep Reserves, each leading on into Hoarded Breath, so neither is the end of a path.",
       at: [915, -994],
       shape: { kind: 'hand' },
       nodes: [
@@ -386,7 +416,7 @@ export const home: AreaSpec = {
     {
       id: 'pace',
       name: 'Deft Guard',
-      why: 'A defensive generalist near home (it was movement speed, too much of it near the start: the owner, 2026-10-31): a side room off the south path toward the centre.',
+      why: "A defensive generalist near home (it was movement speed, too much of it near the start: the owner, 2026-10-31), off the south path toward the centre. Since the revision (2026-10-31) the south's two doors part at its second small: Deft Guard or Ward of Smoke, each leading on into Grey Cloak, so the generalist everyone wants is a way to the seam, not the end of a path.",
       at: [1319, -295],
       shape: { kind: 'hand' },
       nodes: [
@@ -478,8 +508,38 @@ export const home: AreaSpec = {
     { from: 'knife.home.pace.s1', to: 'knife.home.pathS.a', why: 'The way in.' },
     {
       from: 'knife.home.thickBlood.c',
-      to: 'knife.home.spoils.n',
-      why: 'A way across between neighbouring clusters, dearer than the roads.',
+      to: 'knife.home.spoils.n2',
+      why: 'A way across between neighbouring clusters, dearer than the roads: Thick Blood into Low Tide (it went to Spoils before the revision, past where Low Tide now stands).',
+    },
+    {
+      from: 'knife.home.spoils.t2',
+      to: 'knife.hex.radN.a',
+      why: "The mana run reaches the north border road: Low Tide's own way in, passing no other notable (the revision, 2026-10-31).",
+    },
+    {
+      from: 'knife.home.quick.d',
+      to: 'knife.venom.secondCurse.a',
+      why: "The blade reaches the mid ring at the axis through Second Curse's small (the revision, 2026-10-31): Keen Instinct and Quick Wrists lead on, and Quick Wrists has a way in from the far end.",
+    },
+    {
+      from: 'knife.home.flasks.s2',
+      to: 'knife.home.breath.n2',
+      why: "The north's two doors part here: the mana door, Deep Reserves, beside the flask door (the revision, 2026-10-31).",
+    },
+    {
+      from: 'knife.home.flasks.n',
+      to: 'knife.home.breath.m',
+      why: "The flask door leads on: Smuggler's Flasks into Hoarded Breath's room by a mana small (the revision, 2026-10-31).",
+    },
+    {
+      from: 'knife.home.pace.s2',
+      to: 'knife.home.cloak.n2',
+      why: "The south's two doors part here: the resistance door, Ward of Smoke, beside Deft Guard (the revision, 2026-10-31).",
+    },
+    {
+      from: 'knife.home.pace.n',
+      to: 'knife.home.cloak.v2',
+      why: "Deft Guard leads on: into Grey Cloak's evasion run and so to the Bow seam (the revision, 2026-10-31).",
     },
     {
       from: 'knife.home.star.s',

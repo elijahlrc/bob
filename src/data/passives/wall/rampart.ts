@@ -40,21 +40,21 @@ export const rampart: AreaSpec = {
     {
       id: "steadyHands",
       name: "Steady Hands",
-      why: "Accuracy and speed, off the north spoke toward the axis.",
-      at: [-2193, 976],
+      why: "Accuracy and speed, off the north spoke toward the axis (drawn in toward the spoke in the revision, 2026-10-31, to make room for Ox Hide's way out).",
+      at: [-2225, 846],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [accuracy(10)], at: [-2199, 921] },
-        { id: "n", kind: "notable", name: "Steady Hands", lines: [accuracy(23), attackSpeed(9)], at: [-2138, 970] },
-        { id: "b", kind: "small", lines: [accuracy(10)], at: [-2187, 1031] },
-        { id: "c", kind: "small", lines: [accuracy(10)], at: [-2248, 982] },
+        { id: "a", kind: "small", lines: [accuracy(10)], at: [-2178, 819] },
+        { id: "n", kind: "notable", name: "Steady Hands", lines: [accuracy(23), attackSpeed(9)], at: [-2262, 800] },
+        { id: "b", kind: "small", lines: [accuracy(10)], at: [-2290, 875] },
+        { id: "c", kind: "small", lines: [accuracy(10)], at: [-2205, 892] },
       ],
       links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"]],
     },
     {
       id: "bulwark",
       name: "The Bulwark",
-      why: "Armour, off the north spoke toward the axis.",
+      why: "Armour, off the north spoke toward the axis. Since the revision (2026-10-31) Ox Hide's armour joins its smalls (at d), so the defender's tower runs on from Ox Hide through this room to the spoke, or through Mortar and Stone to Locked Shields and the mid ring.",
       at: [-2439, 1035],
       shape: { kind: 'hand' },
       nodes: [

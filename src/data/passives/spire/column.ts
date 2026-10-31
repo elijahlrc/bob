@@ -51,9 +51,9 @@ export const column: AreaSpec = {
         { id: "n", kind: "notable", name: "Hoarfrost", lines: [eleDamage("cold", 16), chillEffect(15), es(8)], at: [-136, -3135], why: "1.6 + 1.5 + 1.6 units." },
         { id: "b", kind: "small", lines: [eleDamage("cold", 10)], at: [-96, -3203] },
         { id: "c", kind: "small", lines: [eleDamage("cold", 10)], at: [-28, -3163] },
-        { id: "n2", kind: 'notable', name: "Rime", lines: [chillEffect(15), chilledLessDamage(10)], at: [-218, -3114], why: "The chill as a defence: chilled enemies hit softer." },
+        { id: "n2", kind: 'notable', name: "Rime", lines: [chillEffect(15), chilledLessDamage(10)], at: [-290, -3190], why: "The chill as a defence: chilled enemies hit softer. Since the revision (2026-10-31) off the ring's far small, not Hoarfrost, and on into Broad Weave: the cold area caster's way between the two rooms, slower than the mid ring." },
       ],
-      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["n", "n2"]],
+      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["b", "n2"]],
     },
     {
       id: "broadWeave",
@@ -86,12 +86,12 @@ export const column: AreaSpec = {
     {
       id: "lingering",
       name: "Slow Burn",
-      why: "Elemental damage over time, out from the mid ring along the axis; a dearer link across to Hoarfrost.",
+      why: "Elemental damage over time, out from the mid ring along the axis; a dearer link across to Hoarfrost. Since the revision (2026-10-31) its small is the mid floor's crossroads: the floor from Composure and Iron Litany comes in from the west and goes on east to Hail of Sparks and Wand Volley.",
       at: [150, -3427],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [skillDuration(10)], at: [160, -3393] },
-        { id: "n", kind: "notable", name: "Slow Burn", lines: [burnDamage(20), coldDot(10), skillDuration(10)], at: [140, -3461] },
+        { id: "n", kind: "notable", name: "Slow Burn", lines: [burnDamage(20), coldDot(10), skillDuration(10)], at: [160, -3510] },
       ],
       links: [["a", "n"]],
     },
@@ -118,5 +118,6 @@ export const column: AreaSpec = {
     { from: "spire.column.lingering.a", to: "spire.column.ring.c", why: "The way in." },
     { from: "spire.column.meet.s1", to: "spire.well.spW.m", why: "The way in." },
     { from: "spire.column.lingering.a", to: "spire.column.hoarfrost.c", why: "A way across between neighbouring clusters, dearer than the roads." },
+    { from: "spire.column.hoarfrost.n2", to: "spire.column.broadWeave.c", why: "Rime between the cold room and the area room (the revision, 2026-10-31): the cold caster who wants a wide spell walks through the chill's defence." },
   ],
 };

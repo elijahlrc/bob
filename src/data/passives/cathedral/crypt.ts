@@ -29,17 +29,20 @@ export const crypt: AreaSpec = {
     {
       id: "shrine",
       name: "Reliquary",
-      why: "Totems or brands, out from where the Spire's border road meets the mid ring (past the Mystic's near ground).",
+      why: "Totems or brands, out from where the Spire's border road meets the mid ring (past the Mystic's near ground). Since the revision (2026-10-31) a crossroads of the planted things: its door small runs straight through to the far small (past Reliquary), and from there Hallowed Ground's totem small leads to Hallowed Ground and on into Hymn (the totem-planting caster's lightning); from Runecarver two duration smalls cross the Spire border into Bound Host, the Mystic's spell servants (what is planted lasts).",
       at: [-1884, -2411],
       shape: { kind: 'hand' },
       nodes: [
+        { id: "h", kind: "small", lines: [totemDamage(12)], at: [-2025, -2393], why: "Hallowed Ground's own way in (2026-10-31), by the totem's line." },
+        { id: "r1", kind: "small", lines: [skillDuration(10)], at: [-1793, -2675], why: "Runecarver on toward the Spire's spell servants (2026-10-31), by the room's duration line." },
+        { id: "r2", kind: "small", lines: [skillDuration(10)], at: [-1684, -2843], why: "The duration run's second small, just inside the Spire border (2026-10-31)." },
         { id: "w", kind: "small", lines: [skillDuration(10)], at: [-1811, -2428] },
         { id: "n", kind: "notable", name: "Reliquary", lines: [totemDamage(24), regenWithTotem(0.8), totemDuration(10)], at: [-1867, -2338], why: "The casting totem that lasts, and the Zealot mends while one stands on the consecrated ground: 2 + 1.6 + 0.7 units." },
         { id: "e", kind: "small", lines: [skillDuration(10)], at: [-1957, -2394] },
         { id: "s", kind: "notable", name: "Runecarver", lines: [brandDamage(24), skillDuration(10), areaDamage(10)], at: [-1901, -2484], why: "Brands: damage, duration and area. 2 + 1 + 1 units." },
-        { id: "hallowed", kind: 'notable', name: "Hallowed Ground", lines: [damageWithTotem(25), globalDefences(12)], at: [-1892, -2257], why: "What the Zealot plants works for it: while a totem stands, it hits harder and holds firmer: 2.5 + 1.5 units." },
+        { id: "hallowed", kind: 'notable', name: "Hallowed Ground", lines: [damageWithTotem(25), globalDefences(12)], at: [-2115, -2387], why: "What the Zealot plants works for it: while a totem stands, it hits harder and holds firmer: 2.5 + 1.5 units." },
       ],
-      links: [["w", "n"], ["n", "e"], ["e", "s"], ["s", "w"], ["n", "hallowed"]],
+      links: [["w", "n"], ["n", "e"], ["e", "s"], ["s", "w"], ["w", "e"], ["e", "h"], ["h", "hallowed"], ["s", "r1"], ["r1", "r2"]],
     },
     {
       id: "sigilWarden",
@@ -59,5 +62,7 @@ export const crypt: AreaSpec = {
     { from: "cathedral.crypt.rood.a", to: "spire.well.radW.a", why: "The way in." },
     { from: "cathedral.crypt.shrine.w", to: "spire.well.radW.m", why: "The way in." },
     { from: "cathedral.crypt.sigilWarden.a", to: "cathedral.choir.spS.c", why: "The way in." },
+    { from: "cathedral.crypt.shrine.hallowed", to: "cathedral.choir.hymn.n", why: "Hallowed Ground joins Hymn (2026-10-31), lightning's first home, so it stands on a way between the shrine and Hymn, entered from either end: the caster who plants a totem and calls lightning beside it. With the shrine, a way from the mid ring at the border out to the spoke's rim junction, slower than the road." },
+    { from: "cathedral.crypt.shrine.r2", to: "spire.well.familiars.n2", why: "Across the Spire border, outside the mid ring where no road runs (2026-10-31): the brands' duration smalls into Bound Host, the Mystic's spell servants on the border climb. The planted thing and the bound servant both last a duration." },
   ],
 };

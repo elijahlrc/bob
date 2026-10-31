@@ -101,7 +101,7 @@ export const edge: AreaSpec = {
     {
       id: 'quietShot',
       name: 'Quiet Shot',
-      why: "The Knife's bows, facing the Bow: out from where the south spoke meets the mid ring.",
+      why: "The Knife's bows, facing the Bow: out from where the south spoke meets the mid ring. Since the revision (2026-10-31) a fork at its first small: the bow notable one way, Fan of Blades the other, and Fan of Blades runs on by a projectile small into Cutpurse's Luck's chain at the mid ring.",
       at: [3069, -709],
       shape: { kind: 'hand' },
       nodes: [
@@ -111,7 +111,7 @@ export const edge: AreaSpec = {
           kind: 'notable',
           name: 'Quiet Shot',
           lines: [bowDamage(20), critMulti(20), damageVsRare(25)],
-          at: [3100, -694],
+          at: [3090, -790],
         },
         {
           id: 'n2',
@@ -119,18 +119,26 @@ export const edge: AreaSpec = {
           name: 'Fan of Blades',
           lines: [pierce(1), projectileDamage(20)],
           at: [3177, -657],
-          why: 'Thrown blades and arrows that go through.',
+          why: 'Thrown blades and arrows that go through. Since the revision a sibling of Quiet Shot off the bow small, not a step past it, and a way on to the crit of Cutpurse\'s Luck.',
+        },
+        {
+          id: 'f',
+          kind: 'small',
+          lines: [projectileDamage(10)],
+          at: [3285, -640],
+          why: "Fan of Blades' way on to Cutpurse's Luck: thrown blades want the crit multiplier there.",
         },
       ],
       links: [
         ['a', 'n'],
-        ['n', 'n2'],
+        ['a', 'n2'],
+        ['n2', 'f'],
       ],
     },
     {
       id: 'smear',
       name: 'Smeared Edge',
-      why: "Daggers with poison, on from the Docks wheel's far side.",
+      why: "Daggers with poison, on from the Docks wheel's far side. Since the revision (2026-10-31) on the Gutter too: an alley of poison smalls from Ill Wish's curse run, past Smeared Edge, to Rust and Ruin and Carrion Claws, so the poison and chaos notables open off one lane between the Rookery wheel and the rim instead of hanging behind each other.",
       at: [3281, -1600],
       shape: { kind: 'hand' },
       nodes: [
@@ -143,10 +151,28 @@ export const edge: AreaSpec = {
           at: [3281, -1600],
         },
         { id: 'p', kind: 'small', lines: [poisonDamage(12)], at: [3307, -1665] },
+        {
+          id: 'g1',
+          kind: 'small',
+          lines: [poisonDamage(12)],
+          at: [3010, -1800],
+          why: "The Gutter's first step, off Ill Wish's curse run: poison, the lane's one stat.",
+        },
+        { id: 'g2', kind: 'small', lines: [poisonDamage(12)], at: [3160, -1735] },
+        {
+          id: 'g3',
+          kind: 'small',
+          lines: [poisonDamage(12)],
+          at: [3437, -1608],
+          why: "The Gutter's last step, into Rust and Ruin: its way in that passes no other notable.",
+        },
       ],
       links: [
         ['d', 'n'],
         ['n', 'p'],
+        ['g1', 'g2'],
+        ['g2', 'p'],
+        ['p', 'g3'],
       ],
     },
     {
@@ -176,7 +202,7 @@ export const edge: AreaSpec = {
     {
       id: 'steadyEye',
       name: 'Steady Eye',
-      why: 'The early answer to missing, off the south spoke.',
+      why: "The early answer to missing, off the south spoke. Since the revision (2026-10-31) the start of an alley: a run of crit smalls goes on from it to the mid ring's south stretch, where Cold Read and Cutpurse's Luck sell crit, so the precise attacker walks on through clusters instead of stopping here.",
       at: [2337, -578],
       shape: { kind: 'hand' },
       nodes: [
@@ -188,8 +214,14 @@ export const edge: AreaSpec = {
           lines: [accuracyFlat(150), critChance(15), dex(10)],
           at: [2337, -578],
         },
+        { id: 'x1', kind: 'small', lines: [critChance(10)], at: [2503, -527] },
+        { id: 'x2', kind: 'small', lines: [critChance(10)], at: [2670, -475] },
       ],
-      links: [['s1', 'n']],
+      links: [
+        ['s1', 'n'],
+        ['n', 'x1'],
+        ['x1', 'x2'],
+      ],
     },
   ],
   links: [
@@ -217,6 +249,31 @@ export const edge: AreaSpec = {
       from: 'knife.edge.frost.c1',
       to: 'knife.roofs.ribs.m',
       why: 'A way across between neighbouring clusters, dearer than the roads.',
+    },
+    {
+      from: 'knife.edge.smear.g1',
+      to: 'knife.roofs.wish.u1',
+      why: "The Gutter opens off Ill Wish's curse run, before the notable (the revision, 2026-10-31): the curser walks on to the poison without buying Ill Wish, and the lane has a way in from the Rookery wheel by smalls alone.",
+    },
+    {
+      from: 'knife.edge.smear.g3',
+      to: 'knife.roofs.carrion.n2',
+      why: 'The Gutter reaches Rust and Ruin, which leads on into Carrion Claws and the rim ring (the revision, 2026-10-31).',
+    },
+    {
+      from: 'knife.edge.steadyEye.x2',
+      to: 'knife.snares.ring.a',
+      why: "The crit alley from Steady Eye reaches the mid ring by Cold Read (the revision, 2026-10-31): slower than the spoke, with crit on every step.",
+    },
+    {
+      from: 'knife.edge.quietShot.f',
+      to: 'knife.snares.mercy.a',
+      why: "Fan of Blades leads on into Cutpurse's Luck's chain (the revision, 2026-10-31): its own way in that passes no other notable.",
+    },
+    {
+      from: 'knife.edge.frost.k2',
+      to: 'knife.snares.wheel.t8',
+      why: "Trap to trap: Frost Snare's first small into the far side of the Trapper wheel (the revision, 2026-10-31), so the wheel is a way through from the axis to the south spoke past the mid ring, and Smeared Edge beyond it is reached without passing a notable.",
     },
   ],
 };

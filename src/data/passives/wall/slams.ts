@@ -40,7 +40,7 @@ export const slams: AreaSpec = {
     {
       id: "barrowWard",
       name: "Barrow Ward",
-      why: "Regeneration and reduction, off the south spoke toward the axis.",
+      why: "Regeneration and reduction, off the south spoke toward the axis. Since the revision (2026-10-31) Oathbound's small joins its notable, so the striker's tower runs Oathbound → Barrow Ward → Sweeping Blow → the spoke, and Barrow Ward is a way on, not a tip.",
       at: [-1842, 1491],
       shape: { kind: 'hand' },
       nodes: [
@@ -53,14 +53,15 @@ export const slams: AreaSpec = {
     {
       id: "stagger",
       name: "Stagger",
-      why: "Stun, off the south spoke (the near ground evened out between the exits).",
+      why: "Stun, off the south spoke (the near ground evened out between the exits). Since the revision (2026-10-31) the head of the stun run: Stagger → a stun small → Aftershock → the mid ring, a way from the spoke to the ring beside the spoke, slower and richer.",
       at: [-1588, 1826],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [stunDuration(15)], at: [-1605, 1795] },
         { id: "n", kind: "notable", name: "Stagger", lines: [stunDuration(30), enemyStunThreshold(12), stunDamage(15)], at: [-1571, 1857], why: "2 + 1.5 + 1 units." },
+        { id: "b", kind: "small", lines: [stunDuration(15)], at: [-1625, 2010], why: "Stagger on into Aftershock (2026-10-31), by the room's stun: the stun that holds them, then the slam that shakes them loose." },
       ],
-      links: [["a", "n"]],
+      links: [["a", "n"], ["n", "b"]],
     },
     {
       id: "weight",
@@ -87,9 +88,9 @@ export const slams: AreaSpec = {
         { id: "b", kind: "small", lines: [meleeArea(8)], at: [-1735, 2028] },
         { id: "n", kind: "notable", name: "Thunderstep", lines: [twoHandDamage(26), meleeArea(18)], at: [-1759, 2102], why: "Two-handed slams." },
         { id: "c", kind: "small", lines: [meleeArea(8)], at: [-1833, 2078] },
-        { id: "n2", kind: 'notable', name: "Aftershock", lines: [meleeArea(19), enemyStunThreshold(15)], at: [-1702, 2165], why: "Slams that shake the enemy loose: wider, and stuns land easier (feeding grit on stun)." },
+        { id: "n2", kind: 'notable', name: "Aftershock", lines: [meleeArea(19), enemyStunThreshold(15)], at: [-1702, 2165], why: "Slams that shake the enemy loose: wider, and stuns land easier (feeding grit on stun). Since the revision (2026-10-31) a crossroads of the stun run, not a second behind Thunderstep: in from Stagger's stun small or Thunderstep's area small (b), out to the mid ring." },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"], ["n", "n2"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"], ["b", "n2"]],
     },
     {
       id: "vampiric",
@@ -141,8 +142,9 @@ export const slams: AreaSpec = {
         { id: "b", kind: "small", lines: [weaponDamage("mace", 10)], at: [-1929, 2530] },
         { id: "n", kind: "notable", name: "Sledge and Sinew", lines: [weaponDamage('mace', 22), lifeOnHit(8, ['melee'])], at: [-2002, 2548], why: "Maces that heal on the hit." },
         { id: "c", kind: "small", lines: [weaponDamage("mace", 10)], at: [-1949, 2602] },
+        { id: "s", kind: "small", lines: [str(10)], at: [-2235, 2610], why: "Sledge and Sinew on into Brute Force (2026-10-31), by Brute Force's own stat: the brawler who comes in from the Yard's Scarred Hide walks on from the mace to the strength rule." },
       ],
-      links: [["a", "b"], ["b", "c"], ["b", "n"], ["n", "c"]],
+      links: [["a", "b"], ["b", "c"], ["b", "n"], ["n", "c"], ["n", "s"]],
     },
     {
       id: "totems",
@@ -200,6 +202,9 @@ export const slams: AreaSpec = {
     { from: "wall.slams.totems.s1", to: "yard.fosse.ring.s0", why: "The way in." },
     { from: "wall.slams.strike.s1", to: "wall.slams.spN.b", why: "The way in." },
     { from: "wall.slams.brute.s1", to: "wall.slams.spN.c", why: "The way in." },
-    { from: "wall.slams.strike.s2", to: "wall.slams.barrowWard.n", why: "A way across between neighbouring clusters, dearer than the roads." },
+    { from: "wall.slams.strike.s2", to: "wall.slams.barrowWard.n", why: "A way across between neighbouring clusters, dearer than the roads. Since the revision (2026-10-31) the striker's tower's way on from Oathbound and Barrow Ward to the spoke." },
+    { from: "wall.slams.sledge.s", to: "wall.slams.brute.n", why: "A way across beyond the mid ring (2026-10-31): Sledge and Sinew to Brute Force, slower than the spoke between their doors." },
+    { from: "wall.slams.stagger.b", to: "wall.slams.thunderstep.n2", why: "The stun run (2026-10-31): Stagger on into Aftershock, so Aftershock has a way in of its own, not only through Thunderstep." },
+    { from: "wall.slams.thunderstep.n2", to: "wall.slams.ring.a", why: "The stun run reaches the mid ring (2026-10-31): Aftershock leads on, two steps slower than the spoke from the same junction." },
   ],
 };

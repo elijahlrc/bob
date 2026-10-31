@@ -40,13 +40,13 @@ export const choir: AreaSpec = {
     {
       id: "rite",
       name: "Shattering Rite",
-      why: "Physical and elemental spells, off the north-east spoke toward the axis.",
+      why: "Physical and elemental spells, off the north-east spoke toward the axis. Since the revision (2026-10-31) it runs out beside the spoke instead of back toward the start, and Shattering Rite leads on into the last small of the nave's shield aisle: the warded priest, spells behind a shield.",
       at: [-1683, -1463],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [physSpell(12)], at: [-1707, -1520] },
-        { id: "b", kind: "small", lines: [physSpell(12)], at: [-1685, -1467] },
-        { id: "n", kind: "notable", name: "Shattering Rite", lines: [physSpell(24), eleDamageAll(16), int(10)], at: [-1657, -1402], why: "Physical spells with elemental damage, and the intelligence a caster’s gear asks: the first step toward Faith Unleashed, which turns those spells to lightning: 2 + 1.6 + 1 units." },
+        { id: "a", kind: "small", lines: [physSpell(12)], at: [-1804, -1515] },
+        { id: "b", kind: "small", lines: [physSpell(12)], at: [-1894, -1520] },
+        { id: "n", kind: "notable", name: "Shattering Rite", lines: [physSpell(24), eleDamageAll(16), int(10)], at: [-1978, -1534], why: "Physical spells with elemental damage, and the intelligence a caster’s gear asks: the first step toward Faith Unleashed, which turns those spells to lightning: 2 + 1.6 + 1 units." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },
@@ -71,16 +71,16 @@ export const choir: AreaSpec = {
     {
       id: "font",
       name: "Frozen Font",
-      why: "Cold's first rung, off the north-east spoke toward the axis (cold apart from its payoff at the rim).",
+      why: "Cold's first rung, off the north-east spoke toward the axis (cold apart from its payoff at the rim). Since the revision (2026-10-31) its three shield-block smalls (left from when the notable carried a shield line) are the head of the nave's shield aisle: they run straight on past Frozen Font (beside them) to Steadfast Faith and the Iron Faith wheel. Kept, not re-lined: the cold caster with a shield takes the font on the way.",
       at: [-2116, -1595],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [shieldBlock(2)], at: [-2047, -1659] },
-        { id: "b", kind: "small", lines: [shieldBlock(2)], at: [-2088, -1622] },
-        { id: "n", kind: "notable", name: "Frozen Font", lines: [eleDamage('cold', 20), chillEffect(15), freezeChance(8)], at: [-2140, -1573], why: "Cold's first rung, spell and attack alike, chill and freeze (its shield line went: shields have their own homes): 2 + 1.5 + 1 units." },
-        { id: "c", kind: "small", lines: [shieldBlock(2)], at: [-2189, -1526] },
+        { id: "b", kind: "small", lines: [shieldBlock(2)], at: [-2100, -1593] },
+        { id: "n", kind: "notable", name: "Frozen Font", lines: [eleDamage('cold', 20), chillEffect(15), freezeChance(8)], at: [-2192, -1635], why: "Cold's first rung, spell and attack alike, chill and freeze (its shield line went: shields have their own homes): 2 + 1.5 + 1 units." },
+        { id: "c", kind: "small", lines: [shieldBlock(2)], at: [-2153, -1532] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["b", "c"]],
     },
     {
       id: "loneVow",
@@ -133,6 +133,7 @@ export const choir: AreaSpec = {
     { from: "cathedral.choir.hymn.a", to: "cathedral.choir.spS.c", why: "The way in." },
     { from: "cathedral.choir.minionSustain.s1", to: "cathedral.choir.ring.a", why: "The way in." },
     { from: "cathedral.choir.wheel.c4", to: "cathedral.choir.minionSustain.s1", why: "A way across between neighbouring clusters, dearer than the roads." },
-    { from: "cathedral.choir.font.c", to: "cathedral.nave.wheel.n3", why: "A way across between neighbouring clusters, dearer than the roads." },
+    { from: "cathedral.choir.font.c", to: "cathedral.nave.wheel.steadfast", why: "The shield aisle (2026-10-31): the font's shield-block smalls into Steadfast Faith, and on into the Iron Faith wheel's shield side (it replaces the font's old link straight to Iron Faith)." },
+    { from: "cathedral.choir.rite.n", to: "cathedral.choir.font.c", why: "Shattering Rite leads on (2026-10-31) into the shield aisle's last small: spells behind a shield. Into the last small, not the first, so the rite stays a way on and not a meeting point." },
   ],
 };

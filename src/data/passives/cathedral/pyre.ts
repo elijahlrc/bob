@@ -61,7 +61,7 @@ export const pyre: AreaSpec = {
     {
       id: "procession",
       name: "Procession",
-      why: "Auras, in from the rim ring (its movement line goes).",
+      why: "Auras, in from the rim ring (its movement line goes). Since the revision (2026-10-31) its second aura small also opens to Choir of Wrath.",
       at: [-3672, -1483],
       shape: { kind: 'hand' },
       nodes: [
@@ -91,6 +91,7 @@ export const pyre: AreaSpec = {
     { from: "cathedral.pyre.sexton.a", to: "cathedral.walk.ring.q5", why: "The way in." },
     { from: "cathedral.pyre.searingAvatar.a", to: "cathedral.walk.ring.q4", why: "The way in." },
     { from: "cathedral.pyre.procession.a", to: "cathedral.walk.ring.q3", why: "The way in." },
+    { from: "cathedral.pyre.procession.b", to: "cathedral.pyre.wheel.ire", why: "Choir of Wrath's own way in (2026-10-31): the procession's aura smalls lead to the damage every standing aura gives, and on into Benediction and the Rimed Steel wheel. It is no longer one step past Benediction." },
     { from: "cathedral.pyre.fireRule.s1", to: "cathedral.walk.ring.q3", why: "The way in." },
   ],
 };

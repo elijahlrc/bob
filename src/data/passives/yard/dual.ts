@@ -2,7 +2,7 @@
  * The Lists: The east spoke: dual wielding, evasion, speed, the Bow seam.
  * Written for the attrition rework from docs/tree/design/R-yard.md (2026-10-31).
  */
-import { accuracy, attackSpeed, bleedChance, bleedDamage, bleedFaster, critMulti, damageVsBleeding, dex, dodgeAttack, dualAccuracy, dualBlock, dualCrit, dualDamage, dualDamagePerFervour, dualSpeed, elusiveOn, evasion, fervourDuration, fervourOnBlock, impaleChance, maxFervour, meleePhys, meleeRange, quickenedOnDualBlock, str, swordDamage } from '../lines';
+import { accuracy, attackSpeed, bleedChance, bleedDamage, bleedFaster, critMulti, damageVsBleeding, dex, dodgeAttack, dualAccuracy, dualBlock, dualCrit, dualDamage, dualDamagePerFervour, dualSpeed, elusiveOn, evasion, fervourDuration, fervourOnBlock, impaleChance, leechLife, maxFervour, meleePhys, meleeRange, quickenedOnDualBlock, str, swordDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const dual: AreaSpec = {
@@ -70,19 +70,20 @@ export const dual: AreaSpec = {
     {
       id: "sidestep",
       name: "Sidestep",
-      why: "Dodge, off the east spoke toward the axis.",
-      at: [251, 2387],
+      why: "Dodge, off the east spoke toward the axis; since the revision (2026-10-31) the court's second room on the striker's side, between Fighting Breath and Four Winds.",
+      at: [240, 2420],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [dodgeAttack(3)], at: [283, 2373] },
-        { id: "n", kind: "notable", name: "Sidestep", lines: [dodgeAttack(6), meleePhys(20)], at: [219, 2401], why: "The duellist who slips a blow and strikes: dodge with melee damage (its life on hit, at the Bow border, went)." },
+        { id: "a", kind: "small", lines: [dodgeAttack(3)], at: [330, 2395] },
+        { id: "n", kind: "notable", name: "Sidestep", lines: [dodgeAttack(6), meleePhys(20)], at: [200, 2455], why: "The duellist who slips a blow and strikes: dodge with melee damage (its life on hit, at the Bow border, went)." },
+        { id: "b", kind: "small", lines: [dodgeAttack(3)], at: [200, 2350], why: "The court from Fighting Breath to Sidestep (2026-10-31): breath, then the slip." },
       ],
-      links: [["a", "n"]],
+      links: [["a", "n"], ["b", "n"]],
     },
     {
       id: "crossedBlades",
       name: "Crossed Blades",
-      why: "Dual-wield crit, in from the mid ring2019s east stretch (step 10).",
+      why: "Dual-wield crit, in from the rim ring by the Bow's border; the end of the fervour run from Hot Blood (2026-10-31), and the Bow's way in from Killing Eye. Its entrance small reaches both of its smalls, so the run's small is not behind the notable.",
       at: [1547, 3645],
       shape: { kind: 'hand' },
       nodes: [
@@ -90,7 +91,7 @@ export const dual: AreaSpec = {
         { id: "n", kind: "notable", name: "Crossed Blades", lines: [dualCrit(22), dualAccuracy(15), critMulti(12)], at: [1563, 3621], why: "1.5 + 1.5 + 1 units. The tip of the pocket, west of the road." },
         { id: "b", kind: "small", lines: [dualCrit(15)], at: [1493, 3626] },
       ],
-      links: [["a", "n"], ["n", "b"]],
+      links: [["a", "n"], ["n", "b"], ["a", "b"]],
     },
     {
       id: "impale",
@@ -117,9 +118,12 @@ export const dual: AreaSpec = {
         { id: "n", kind: "notable", name: "Hot Blood", lines: [maxFervour(1), fervourOnBlock(20)], at: [1267, 2930], why: "Fervour from the parry (a block), not from kills as the Bow’s is: one charge more." },
         { id: "b", kind: "small", lines: [fervourDuration(15)], at: [1251, 2998] },
         { id: "c", kind: "small", lines: [fervourDuration(15)], at: [1183, 2982] },
-        { id: "n2", kind: 'notable', name: "Duellist's Fervour", lines: [dualDamagePerFervour(4), fervourDuration(25)], at: [1339, 2885], why: "Fervour paid off in the duellist’s terms: damage for every charge held while dual wielding." },
+        { id: "n2", kind: 'notable', name: "Duellist's Fervour", lines: [dualDamagePerFervour(4), fervourDuration(25)], at: [1405, 3135], why: "Fervour paid off in the duellist’s terms: damage for every charge held while dual wielding. Since the revision (2026-10-31) on the fervour run, between Hot Blood, where the charges are earned by blocking, and Crossed Blades, where the paired blades crit." },
+        { id: "f1", kind: "small", lines: [fervourDuration(15)], at: [1335, 3035], why: "Hot Blood's fervour on toward its payoff (2026-10-31)." },
+        { id: "f2", kind: "small", lines: [dualDamage(10)], at: [1440, 3290], why: "The fervour run on down to Crossed Blades: the paired blades' damage (2026-10-31)." },
+        { id: "f3", kind: "small", lines: [dualDamage(10)], at: [1470, 3460], why: "The fervour run's last step into Crossed Blades (2026-10-31)." },
       ],
-      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["n", "n2"]],
+      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["n", "f1"], ["f1", "n2"], ["n2", "f2"], ["f2", "f3"]],
     },
     {
       id: "woundDance",
@@ -145,9 +149,11 @@ export const dual: AreaSpec = {
         { id: "n", kind: "notable", name: "Open Veins", lines: [bleedChance(15), bleedDamage(30)], at: [1216, 3441], why: "1.5 + 2.5 units." },
         { id: "b", kind: "small", lines: [bleedDamage(12)], at: [1260, 3377] },
         { id: "c", kind: "small", lines: [bleedDamage(12)], at: [1188, 3347] },
-        { id: "n2", kind: 'notable', name: "Bloodied Pursuit", lines: [damageVsBleeding(20), bleedFaster(15)], at: [1240, 3522], why: "The east bleed’s payoff beside Hundred Cuts: bleeds that tick faster, and more damage against the bleeding." },
+        { id: "n2", kind: 'notable', name: "Bloodied Pursuit", lines: [damageVsBleeding(20), bleedFaster(15)], at: [1150, 3725], why: "The east bleed’s payoff beside Hundred Cuts: bleeds that tick faster, and more damage against the bleeding. Since the revision (2026-10-31) a room's way on, not its tip: off Open Veins' entrance and on into Red Thirst, the bleed fed into the leech." },
+        { id: "p1", kind: "small", lines: [bleedDamage(12)], at: [1147, 3572], why: "From Open Veins' entrance to Bloodied Pursuit (2026-10-31), so the payoff is not behind the notable." },
+        { id: "p2", kind: "small", lines: [leechLife(0.4, ["attack"])], at: [1040, 3830], why: "Bloodied Pursuit on into Red Thirst (2026-10-31): the bleeder's damage, then the leech that keeps the duellist up." },
       ],
-      links: [["a", "n"], ["n", "b"], ["a", "c"], ["c", "b"], ["n", "n2"]],
+      links: [["a", "n"], ["n", "b"], ["a", "c"], ["c", "b"], ["a", "p1"], ["p1", "n2"], ["n2", "p2"]],
     },
     {
       id: "parry",
@@ -179,5 +185,9 @@ export const dual: AreaSpec = {
     { from: "yard.dual.parry.s1", to: "yard.dual.spN.b", why: "The way in." },
     { from: "yard.dual.parry.n", to: "yard.dual.twinFangs.c", why: "A way across between neighbouring clusters, dearer than the roads." },
     { from: "yard.dual.hotBlood.b", to: "yard.dual.openVeins.c", why: "A way across between neighbouring clusters, dearer than the roads." },
+    { from: "yard.dual.sidestep.b", to: "yard.home.fightingBreath.n", why: "The court (2026-10-31): Fighting Breath on to Sidestep." },
+    { from: "yard.dual.sidestep.n", to: "yard.blood.star.e", why: "The court (2026-10-31): the striker's side closes at Four Winds, by the mid ring." },
+    { from: "yard.dual.hotBlood.f3", to: "yard.dual.crossedBlades.b", why: "The fervour run (2026-10-31) into Crossed Blades: from the mid ring to the rim through the block that earns fervour, the payoff for holding it and the paired blades' crit; slower than the spoke and the rim ring." },
+    { from: "yard.dual.openVeins.p2", to: "yard.fosse.thirst.n", why: "Bloodied Pursuit into Red Thirst (2026-10-31): the bleeder's way from the spoke to the rim, slower than the spoke." },
   ],
 };

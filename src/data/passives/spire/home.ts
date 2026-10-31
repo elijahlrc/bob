@@ -2,7 +2,7 @@
  * The Spire Gate: The Mystic's first points (R-spire.md).
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { allDamage, arcaneTideOn, castSpeed, es, esFlat, flaskEffect, flaskRecovery, int, life, lifeOnHit, mana, manaFlat, manaRegen, recoverOn, resAll, resOne, spellCrit, spellCritMulti, spellDamage } from '../lines';
+import { allDamage, arcaneTideOn, castSpeed, critChance, es, esFlat, flaskEffect, flaskRecovery, int, life, lifeOnHit, mana, manaFlat, manaRegen, recoverOn, resAll, resOne, spellCrit, spellCritMulti, spellDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -105,7 +105,7 @@ export const home: AreaSpec = {
     {
       id: "cross",
       name: "The roads to First Light",
-      why: "From each hub two stat nodes in to First Light on the axis (step 5): resistances on the west road, life on the east, defences every Mystic takes.",
+      why: "From each hub two stat nodes in to First Light on the axis (step 5): resistances on the west road, life on the east, defences every Mystic takes. Since the revision (2026-10-31) the two roads cross at First Light and run on straight to the far side (the crossing): the west road on to Sharp Mind and the east spoke's wands, the east road on to Still Mind and the west spoke's wands.",
       at: [-107, -1797],
       shape: { kind: 'hand' },
       nodes: [
@@ -148,28 +148,32 @@ export const home: AreaSpec = {
     {
       id: "stillMind",
       name: "Still Mind",
-      why: "The one mana notable near home, off the west spoke junction (step 6).",
-      at: [-643, -2104],
+      why: "The one mana notable near home. Since the revision (2026-10-31) it stands on the east road's arm past First Light (the crossing, step 8), and the arm goes on by mana smalls to Wandwork's smalls on the west spoke: the caster who took First Light walks on through mana into wand spells, and Still Mind is a way onward, not a tip off a junction.",
+      at: [-146, -2412],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [manaRegen(10)], at: [-584, -2079] },
-        { id: "b", kind: "small", lines: [manaRegen(10)], at: [-652, -2089] },
-        { id: "n", kind: "notable", name: "Still Mind", lines: [manaRegen(20), manaFlat(30), arcaneTideOn('kill', 10)], at: [-693, -2144] },
+        { id: "a", kind: "small", lines: [manaRegen(10)], at: [-48, -2171] },
+        { id: "b", kind: "small", lines: [manaRegen(10)], at: [-97, -2291] },
+        { id: "n", kind: "notable", name: "Still Mind", lines: [manaRegen(20), manaFlat(30), arcaneTideOn('kill', 10)], at: [-146, -2412] },
+        { id: "c", kind: "small", lines: [manaRegen(10)], at: [-215, -2495], why: "The arm on toward Wandwork's small: mana for the wand caster's casting." },
+        { id: "d", kind: "small", lines: [manaRegen(10)], at: [-305, -2518], why: "A second step, so the arm from the east hub to the west spoke is slower than the roads round (the mid ring)." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "d"]],
     },
     {
       id: "sharpMind",
       name: "Sharp Mind",
-      why: "Spell crit, off the east spoke junction (step 6).",
-      at: [625, -2109],
+      why: "Spell crit. Since the revision (2026-10-31) it stands on the west road's arm past First Light (the crossing, step 8), and the arm goes on by crit smalls to Deft Wand's smalls on the east spoke: crit for the spell caster here, and for the wand attacker who walks on.",
+      at: [146, -2412],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [spellCrit(15)], at: [567, -2081] },
-        { id: "n", kind: "notable", name: "Sharp Mind", lines: [spellCrit(30), spellCritMulti(15)], at: [673, -2152], why: "2 + 1.25 units." },
-        { id: "b", kind: "small", lines: [spellCrit(15)], at: [635, -2094] },
+        { id: "a", kind: "small", lines: [spellCrit(15)], at: [48, -2171] },
+        { id: "n", kind: "notable", name: "Sharp Mind", lines: [spellCrit(30), spellCritMulti(15)], at: [146, -2412], why: "2 + 1.25 units." },
+        { id: "b", kind: "small", lines: [spellCrit(15)], at: [97, -2291] },
+        { id: "c", kind: "small", lines: [critChance(15)], at: [215, -2495], why: "Crit of every kind, not spell crit: the steps toward Deft Wand serve the wand attacker as well as the caster." },
+        { id: "d", kind: "small", lines: [critChance(15)], at: [310, -2520], why: "A second step, so the arm from the west hub to the east spoke is slower than the roads round (the mid ring)." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "d"]],
     },
     {
       id: "draught",
@@ -198,11 +202,11 @@ export const home: AreaSpec = {
     {
       id: "first",
       name: "First Light",
-      why: "The home generalist, passed through between the two hubs (step 5).",
+      why: "The home generalist (step 5), where the two roads from the hubs cross (the revision, 2026-10-31): each road runs on through it to the far side, so First Light is a crossroads with four ways, not the bottom of a V.",
       at: [0, -2050],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "n", kind: "notable", name: "First Light", lines: [allDamage(14), es(6), life(5), int(15)], at: [0, -2050], why: "The home generalist, passed through between the two hubs (step 5)." },
+        { id: "n", kind: "notable", name: "First Light", lines: [allDamage(14), es(6), life(5), int(15)], at: [0, -2050], why: "The home generalist (step 5), the crossing of the two roads from the hubs." },
       ],
       links: [],
     },
@@ -226,8 +230,10 @@ export const home: AreaSpec = {
     { from: "spire.home.cross.e2", to: "spire.home.first.n", why: "To the home notable." },
     { from: "spire.home.focus.a", to: "spire.home.pathW.b", why: "The way in." },
     { from: "spire.home.warmBlood.a", to: "spire.home.pathE.b", why: "The way in." },
-    { from: "spire.home.stillMind.a", to: "spire.home.spW.x", why: "The way in." },
-    { from: "spire.home.sharpMind.a", to: "spire.home.spE.x", why: "The way in." },
+    { from: "spire.home.first.n", to: "spire.home.stillMind.a", why: "The crossing: the east road runs on straight through First Light toward the west spoke, into mana." },
+    { from: "spire.home.first.n", to: "spire.home.sharpMind.a", why: "The crossing: the west road runs on straight through First Light toward the east spoke, into spell crit." },
+    { from: "spire.home.stillMind.d", to: "spire.well.wandwork.b", why: "The east road's arm ends among Wandwork's smalls, on the west spoke: the wand caster's way out from First Light, a step slower than the roads and richer (Still Mind on it); and Still Mind's way in from the spoke that does not pass First Light." },
+    { from: "spire.home.sharpMind.d", to: "spire.craft.deftWand.b", why: "The west road's arm ends among Deft Wand's smalls, on the east spoke: the wand attacker's way out from First Light, a step slower than the roads and richer (Sharp Mind on it); and Sharp Mind's way in from the spoke that does not pass First Light." },
     { from: "spire.home.draught.a", to: "spire.home.pathW.b", why: "The way in." },
     { from: "spire.home.draught.n", to: "spire.home.seams.w", why: "The way in." },
     { from: "spire.home.haleScribe.b", to: "spire.home.pathE.b", why: "The way in." },

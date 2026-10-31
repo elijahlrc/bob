@@ -2,7 +2,7 @@
  * The Wall Gate: The Vanguard's first points (R-wall.md).
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { armour, critChance, enemyStunThreshold, flaskEffect, flaskRecovery, life, lifeRegen, meleeDamage, meleePhys, resAll, resOne, str, stunThreshold } from '../lines';
+import { armour, critChance, enemyStunThreshold, flaskEffect, flaskRecovery, life, lifeRegen, manaOnHit, meleeDamage, meleePhys, resAll, resOne, str, stunThreshold } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -34,7 +34,7 @@ export const home: AreaSpec = {
     {
       id: "hubs",
       name: "The hubs",
-      why: "Strength a step past each side: each forks into the spoke out into the region and the road in to Oathbound.",
+      why: "Strength a step past each side: each forks into the spoke out into the region and its own tower's way out beside the axis (to Oathbound from the melee hub, to Ox Hide from the armour hub).",
       at: [-1384, 969],
       shape: { kind: 'hand' },
       nodes: [
@@ -104,15 +104,15 @@ export const home: AreaSpec = {
     },
     {
       id: "cross",
-      name: "The roads to Oathbound",
-      why: "From each hub two stat nodes in to Oathbound on the axis (step 5): life on the south road, resistances on the north, defences every Vanguard takes.",
-      at: [-1503, 991],
+      name: "The two towers' first steps",
+      why: "The revision (2026-10-31): the two towers. Each hub's third way runs straight out beside the axis to a generalist of its own side, and the two never meet (they met at Oathbound, the V). The striker's tower, from the melee side: life to Oathbound. The defender's tower, from the armour side: resistances to Ox Hide. Defences every Vanguard takes, on both.",
+      at: [-1493, 1035],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "n1", kind: "small", lines: [life(5)], at: [-1503, 991] },
-        { id: "n2", kind: "small", lines: [life(5)], at: [-1638, 1012] },
-        { id: "s1", kind: "small", lines: [resAll(4)], at: [-1609, 806] },
-        { id: "s2", kind: "small", lines: [resAll(4)], at: [-1695, 913] },
+        { id: "n1", kind: "small", lines: [life(5)], at: [-1493, 1035] },
+        { id: "n2", kind: "small", lines: [life(5)], at: [-1605, 1100] },
+        { id: "s1", kind: "small", lines: [resAll(4)], at: [-1643, 775] },
+        { id: "s2", kind: "small", lines: [resAll(4)], at: [-1755, 840] },
       ],
       links: [["n1", "n2"], ["s1", "s2"]],
     },
@@ -131,7 +131,7 @@ export const home: AreaSpec = {
     {
       id: "secondWind",
       name: "Old Wounds",
-      why: "Life and regeneration, a side room off the south path toward the centre.",
+      why: "Life and regeneration, off the path to the Yard's seam toward the centre. Since the revision (2026-10-31) its notable opens on the centre's inner road (i3), so the room is a way from the seam path onto the generic ground, no shorter than the seam road beside it, not a tip.",
       at: [-913, 1127],
       shape: { kind: 'hand' },
       nodes: [
@@ -144,13 +144,13 @@ export const home: AreaSpec = {
     {
       id: "thickSkin",
       name: "Ox Hide",
-      why: "Armour and stun threshold, off the south spoke junction: the south half’s defence.",
-      at: [-1570, 1626],
+      why: "The defender's tower (the revision, 2026-10-31): moved from a tip off the melee spoke to the head of the armour side's own way out (step 5), the defence generalist every Vanguard who stands and takes the hit wants. It leads on by its armour smalls into Mortar and Stone's armour, so the armour stacks room on room out to the mid ring.",
+      at: [-2011, 976],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [armour(12)], at: [-1561, 1567] },
-        { id: "b", kind: "small", lines: [armour(12)], at: [-1570, 1621] },
-        { id: "n", kind: "notable", name: "Ox Hide", lines: [armour(23), stunThreshold(18)], at: [-1579, 1690] },
+        { id: "a", kind: "small", lines: [armour(12)], at: [-2146, 1043], why: "Ox Hide's way on into Mortar and Stone's armour smalls." },
+        { id: "b", kind: "small", lines: [armour(12)], at: [-2011, 976] },
+        { id: "n", kind: "notable", name: "Ox Hide", lines: [armour(23), stunThreshold(18)], at: [-1877, 910], why: "The defence generalist of the armour side (step 5), at the end of the resistance smalls from the hub." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },
@@ -184,26 +184,28 @@ export const home: AreaSpec = {
     {
       id: "stoneHeart",
       name: "Weak Spot",
-      why: "Melee crit, off the north spoke junction: offence on the north exit too.",
+      why: "Melee crit, off the armour spoke's first junction: offence on the armour exit too. Since the revision (2026-10-31) it leads on by a mana-on-hit small into Iron Lungs: the striker who finds the gap and lives off his hits, a way from the spoke to the border road slower than the road round.",
       at: [-2202, 408],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [critChance(15, ["melee"])], at: [-2158, 449] },
         { id: "b", kind: "small", lines: [critChance(15, ["melee"])], at: [-2199, 411] },
         { id: "n", kind: "notable", name: "Weak Spot", lines: [meleePhys(24), critChance(27, ['melee'])], at: [-2250, 364] },
+        { id: "m", kind: "small", lines: [manaOnHit(4, ["melee"])], at: [-2160, 300], why: "Weak Spot on into Iron Lungs (2026-10-31), by Iron Lungs' own small stat: one step dearer than the road from the spoke to the border road." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["n", "m"]],
     },
     {
       id: "oath",
       name: "Oathbound",
-      why: "The home generalist, passed through between the two hubs (step 5): life and steel every Vanguard uses.",
-      at: [-1775, 1025],
+      why: "The striker's tower (the revision, 2026-10-31): the generalist at the head of the melee side's own way out (step 5), no longer the bottom of a V between the hubs. It leads on by a regeneration small into Barrow Ward and on through Sweeping Blow to the melee spoke: a way beside the spoke, slower and richer.",
+      at: [-1727, 1170],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "n", kind: "notable", name: "Oathbound", lines: [life(8), meleePhys(14), str(15)], at: [-1775, 1025], why: "The home generalist, passed through between the two hubs (step 5): life and steel every Vanguard uses." },
+        { id: "n", kind: "notable", name: "Oathbound", lines: [life(8), meleePhys(14), str(15)], at: [-1727, 1170], why: "The striker's generalist (step 5): life and steel every Vanguard uses, reached from the melee hub, and a way on." },
+        { id: "o", kind: "small", lines: [lifeRegen(0.4)], at: [-1814, 1319], why: "Oathbound on into Barrow Ward (2026-10-31), by Barrow Ward's small stat." },
       ],
-      links: [],
+      links: [["n", "o"]],
     },
   ],
   links: [
@@ -217,8 +219,12 @@ export const home: AreaSpec = {
     { from: "wall.home.hubs.n", to: "wall.home.spN.a", why: "The north hub out along the spoke." },
     { from: "wall.home.hubs.s", to: "wall.home.cross.s1", why: "The south hub in toward Oathbound." },
     { from: "wall.home.hubs.s", to: "wall.home.spS.a", why: "The south hub out along the spoke." },
-    { from: "wall.home.cross.n2", to: "wall.home.oath.n", why: "To the home notable." },
-    { from: "wall.home.cross.s2", to: "wall.home.oath.n", why: "To the home notable." },
+    { from: "wall.home.cross.n2", to: "wall.home.oath.n", why: "The striker's tower: the melee hub's life smalls end at Oathbound." },
+    { from: "wall.home.cross.s2", to: "wall.home.thickSkin.n", why: "The defender's tower (2026-10-31): the armour hub's resistance smalls end at Ox Hide, not at Oathbound, so the two hubs' ways no longer meet in a V." },
+    { from: "wall.home.oath.o", to: "wall.slams.barrowWard.n", why: "Oathbound leads on into Barrow Ward (2026-10-31), then by Sweeping Blow's link to the melee spoke: life and steel, then regeneration and the strike, beside the spoke." },
+    { from: "wall.home.thickSkin.a", to: "wall.rampart.bulwark.d", why: "Ox Hide leads on by its armour into Mortar and Stone's armour smalls (2026-10-31), and through them to the spoke or to Mortar and Stone and Locked Shields: the armour side's way out, beside the spoke." },
+    { from: "wall.home.secondWind.n", to: "centre.ring.road.i3", why: "Old Wounds opens on the centre's inner road (2026-10-31): regeneration is generic sustain, and the centre is the generic ground; the way is no shorter than the seam road beside it." },
+    { from: "wall.home.stoneHeart.m", to: "wall.resists.ironLungs.b", why: "Weak Spot on into Iron Lungs (2026-10-31)." },
     { from: "wall.home.seams.s", to: "centre.ring.road.i4", why: "Along the border into the centre." },
     { from: "wall.home.seams.s", to: "wall.resists.radW.a", why: "Along the border out to the mid ring." },
     { from: "wall.home.spN.x", to: "wall.slams.spN.a", why: "The north spoke goes on." },
@@ -226,7 +232,6 @@ export const home: AreaSpec = {
     { from: "wall.home.ringing.b", to: "wall.home.pathN.b", why: "The way in." },
     { from: "wall.home.ringing.n", to: "yard.home.seams.s", why: "The way in." },
     { from: "wall.home.secondWind.a", to: "wall.home.pathN.b", why: "The way in." },
-    { from: "wall.home.thickSkin.a", to: "wall.home.spN.x", why: "The way in." },
     { from: "wall.home.star.f", to: "wall.home.pathS.b", why: "The way in." },
     { from: "wall.home.quartermaster.b", to: "wall.home.pathS.b", why: "The way in." },
     { from: "wall.home.quartermaster.n", to: "wall.home.seams.s", why: "The way in." },

@@ -15,16 +15,18 @@ export const outerWalk: AreaSpec = {
     {
       id: "hymn",
       name: "Battle Hymn",
-      why: "Warcries and auras, in from the rim ring.",
+      why: "Warcries and auras, in from the rim ring. Since the revision (2026-10-31) the entrance small parts two ways: to Battle Hymn (and on to Ossuary), or to Hymn of War, which leads on by two warcry smalls across the Wall border into the grit run, the war chant's insight beside the Wall's grit (its counterpart: the Wall's warcries give grit).",
       at: [-3938, -414],
       shape: { kind: 'hand' },
       nodes: [
+        { id: "w1", kind: "small", lines: [warcryEffect(10)], at: [-3889, -144], why: "Hymn of War's way on toward the Wall (2026-10-31)." },
+        { id: "w2", kind: "small", lines: [warcryEffect(10)], at: [-3822, 80], why: "Hymn of War's way on, just across the angle of the Wall border (2026-10-31)." },
         { id: "a", kind: "small", lines: [warcryEffect(10)], at: [-4008, -415] },
         { id: "b", kind: "small", lines: [warcryEffect(10)], at: [-3868, -413] },
         { id: "n", kind: "notable", name: "Battle Hymn", lines: [warcryEffect(20), auraEffect(12)], at: [-3938, -414], why: "The war chant: warcries and auras both stronger, the holy warrior who shouts and the priest who sings: 2 + 2 units." },
         { id: "warHymn", kind: 'notable', name: "Hymn of War", lines: [insightOnWarcry(36), critMulti(12)], at: [-3938, -329], why: "The war chant kindles insight: a warcry may give an insight charge (the Wall's warcries give grit), and crits strike deeper: 3 + 1 units." },
       ],
-      links: [["a", "n"], ["n", "b"], ["n", "warHymn"]],
+      links: [["a", "n"], ["n", "b"], ["a", "warHymn"], ["warHymn", "w1"], ["w1", "w2"]],
     },
     {
       id: "ossuary",
@@ -87,5 +89,6 @@ export const outerWalk: AreaSpec = {
     { from: "cathedral.rim.brazier.a", to: "cathedral.walk.ring.n1", why: "The way in." },
     { from: "cathedral.rim.volatile.a", to: "cathedral.walk.ring.q1", why: "The way in." },
     { from: "cathedral.rim.ossuary.n", to: "cathedral.rim.hymn.b", why: "A way across between neighbouring clusters, dearer than the roads." },
+    { from: "cathedral.rim.hymn.w2", to: "wall.maces.gritPay.s1", why: "Across the Wall border, outside the mid ring where no road runs (2026-10-31): Hymn of War's warcry smalls into the Grit and Gravel run between its two payoffs, the shouting holy warrior's way into grit; no shorter than the rim road round by q1, s0 and Scar Tissue (five steps either way)." },
   ],
 };

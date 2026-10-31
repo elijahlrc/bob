@@ -16,6 +16,7 @@ import {
   dodgeAttack,
   dodgeSpell,
   dualCrit,
+  dualDamage,
   dualSpeed,
   evasion,
   insightOnCrit,
@@ -142,7 +143,7 @@ export const snares: AreaSpec = {
     {
       id: 'tumble',
       name: 'Tumble',
-      why: 'Dodge, out from the mid ring near the border.',
+      why: "Dodge, out from the mid ring near the border. Since the revision (2026-10-31) an alley runs on from Tumble through a dual-wield small and Twin Shadows into Veiled Herald's evasion run, so Twin Shadows stands between two clusters, reached from the border road without Tumble.",
       at: [3142, -220],
       shape: { kind: 'hand' },
       nodes: [
@@ -156,24 +157,32 @@ export const snares: AreaSpec = {
           at: [3197, -184],
         },
         {
+          id: 'd',
+          kind: 'small',
+          lines: [dualDamage(10)],
+          at: [3270, -195],
+          why: 'Between Tumble and Twin Shadows: a point of its own, so taking Tumble buys nothing of Twin Shadows.',
+        },
+        {
           id: 'n2',
           kind: 'notable',
           name: 'Twin Shadows',
           lines: [dualCrit(20), dualSpeed(8), critMulti(12)],
-          at: [3268, -138],
-          why: "Dual wielding's second home (with Feint and Cut), its partner crit.",
+          at: [3345, -200],
+          why: "Dual wielding's second home (with Feint and Cut), its partner crit. Since the revision between Tumble and Veiled Herald.",
         },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
-        ['n', 'n2'],
+        ['n', 'd'],
+        ['d', 'n2'],
       ],
     },
     {
       id: 'herald',
       name: 'Veiled Herald',
-      why: 'Reservation and evasion, out from where the border road meets the mid ring.',
+      why: "Reservation and evasion, out from where the border road meets the mid ring. Since the revision (2026-10-31) its evasion run goes on past the notable and across the border, outside the mid ring where no road runs, into the Bow's Hare's Pace (evasion and attack speed): a way between the two regions through clusters, slower than the roads.",
       at: [3547, -155],
       shape: { kind: 'hand' },
       nodes: [
@@ -186,10 +195,16 @@ export const snares: AreaSpec = {
           lines: [auraEffect(12), reducedReservation(8), mana(16)],
           at: [3611, -170],
         },
+        { id: 'p1', kind: 'small', lines: [evasion(10)], at: [3674, -3] },
+        { id: 'p2', kind: 'small', lines: [evasion(10)], at: [3737, 164] },
+        { id: 'p3', kind: 'small', lines: [evasion(10)], at: [3799, 330] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
+        ['n', 'p1'],
+        ['p1', 'p2'],
+        ['p2', 'p3'],
       ],
     },
     {
@@ -330,6 +345,16 @@ export const snares: AreaSpec = {
       from: 'knife.snares.mercy.a',
       to: 'knife.snares.tumble.b',
       why: 'A way across between neighbouring clusters, dearer than the roads.',
+    },
+    {
+      from: 'knife.snares.tumble.n2',
+      to: 'knife.snares.herald.a',
+      why: "Twin Shadows leads on into Veiled Herald's evasion run, and has its own way in from the border road (the revision, 2026-10-31).",
+    },
+    {
+      from: 'knife.snares.herald.p3',
+      to: 'bow.rim.haresPace.s',
+      why: "Across the border into the Bow's Hare's Pace (the revision, 2026-10-31): the evader's way from the Knife's border ground to the Strider's, outside the mid ring.",
     },
     {
       from: 'knife.snares.rake.a',

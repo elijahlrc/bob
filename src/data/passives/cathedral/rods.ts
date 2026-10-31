@@ -40,16 +40,16 @@ export const rods: AreaSpec = {
     {
       id: "buttress",
       name: "Buttress",
-      why: "Spell block and resistances, off the south-west spoke toward the axis.",
+      why: "Spell block and resistances, off the south-west spoke toward the axis. Since the revision (2026-10-31) the head of the nave's staff aisle: its spell-block smalls run straight on past the notable (Buttress beside them, Zeal coming in to it) into the staff smalls toward Whirling Ward and Warding Staff.",
       at: [-2121, -836],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [spellBlock(2)], at: [-2173, -772] },
-        { id: "b", kind: "small", lines: [spellBlock(2)], at: [-2130, -808] },
-        { id: "n", kind: "notable", name: "Buttress", lines: [spellBlock(4), resAll(10)], at: [-2075, -851], why: "Spell block and all resistances: 2 + 2.5 units." },
-        { id: "c", kind: "small", lines: [spellBlock(2)], at: [-2106, -914] },
+        { id: "a", kind: "small", lines: [spellBlock(2)], at: [-2193, -781] },
+        { id: "b", kind: "small", lines: [spellBlock(2)], at: [-2171, -861] },
+        { id: "n", kind: "notable", name: "Buttress", lines: [spellBlock(4), resAll(10)], at: [-2068, -859], why: "Spell block and all resistances: 2 + 2.5 units." },
+        { id: "c", kind: "small", lines: [spellBlock(2)], at: [-2148, -940] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["b", "c"]],
     },
     {
       id: "wheel",

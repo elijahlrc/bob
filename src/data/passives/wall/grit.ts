@@ -63,7 +63,7 @@ export const grit: AreaSpec = {
     {
       id: "ironVoice",
       name: "Iron Voice",
-      why: "Warcries with armour, in from the rim ring at the axis.",
+      why: "Warcries with armour, in from the rim ring at the axis. Since the revision (2026-10-31) one of the keep's earning rooms: its far small (d) leads on into the keep's west gate.",
       at: [-3516, 1822],
       shape: { kind: 'hand' },
       nodes: [
@@ -78,21 +78,21 @@ export const grit: AreaSpec = {
     {
       id: "heavyHands",
       name: "Heavy Hands",
-      why: "Two-handed speed, in from the rim ring.",
-      at: [-3121, 2438],
+      why: "Two-handed speed, in from the rim ring. Since the revision (2026-10-31) one of the keep's spending rooms: drawn in toward the keep, its far small (b) joins the keep's east gate by a grit-duration small.",
+      at: [-3128, 2334],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [attackSpeed(5, ["twoHand"])], at: [-3165, 2471] },
-        { id: "b", kind: "small", lines: [attackSpeed(5, ["twoHand"])], at: [-3154, 2394] },
-        { id: "n", kind: "notable", name: "Heavy Hands", lines: [attackSpeed(12, ['twoHand', 'melee']), twoHandSpeedPerGrit(3)], at: [-3077, 2405], why: "Grit spent as momentum: the two-hander swings faster for every charge held." },
-        { id: "c", kind: "small", lines: [attackSpeed(5, ["twoHand"])], at: [-3088, 2482] },
+        { id: "a", kind: "small", lines: [attackSpeed(5, ["twoHand"])], at: [-3170, 2368] },
+        { id: "b", kind: "small", lines: [attackSpeed(5, ["twoHand"])], at: [-3160, 2290] },
+        { id: "n", kind: "notable", name: "Heavy Hands", lines: [attackSpeed(12, ['twoHand', 'melee']), twoHandSpeedPerGrit(3)], at: [-3085, 2300], why: "Grit spent as momentum: the two-hander swings faster for every charge held." },
+        { id: "c", kind: "small", lines: [attackSpeed(5, ["twoHand"])], at: [-3095, 2378] },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"]],
     },
     {
       id: "rhythm",
       name: "Hammer Rhythm",
-      why: "Mace speed, in from the rim ring.",
+      why: "Mace speed, in from the rim ring. Since the revision (2026-10-31) one of the keep's earning rooms: its far small (c) leads on into the keep's west gate.",
       at: [-3672, 1483],
       shape: { kind: 'hand' },
       nodes: [
@@ -113,8 +113,9 @@ export const grit: AreaSpec = {
         { id: "a", kind: "small", lines: [twoHandDamage(12)], at: [-3789, 2424] },
         { id: "b", kind: "small", lines: [twoHandDamage(12)], at: [-3839, 2455] },
         { id: "n", kind: "notable", name: "Greatblade", lines: [swordDamage(18), twoHandDamage(18), critMulti(16)], at: [-3898, 2492], why: "Two-handed swords." },
+        { id: "r", kind: "small", lines: [meleeArea(8)], at: [-3985, 2300], why: "Greatblade on into Long Reach (2026-10-31), by Long Reach's own stat: the long blade wants the reach and the wider swing." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["n", "r"]],
     },
     {
       id: "reach",
@@ -211,5 +212,5 @@ export const grit: AreaSpec = {
     { from: "wall.grit.watch.a", to: "wall.grit.ring.q1", why: "The way in." },
     { from: "wall.grit.bloodrite.a", to: "wall.grit.ring.q1", why: "The way in." },
     { from: "wall.grit.plunder.s1", to: "wall.grit.ring.n1", why: "The way in." },
-  ],
+    { from: "wall.grit.greatblade.r", to: "wall.grit.reach.b", why: "A way across outside the rim (2026-10-31): Greatblade into Long Reach's smalls, slower than the rim road between their doors." },  ],
 };

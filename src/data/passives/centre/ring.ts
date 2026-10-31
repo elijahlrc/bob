@@ -1,5 +1,6 @@
 /**
- * The centre's roads (docs/tree/design/R-centre.md, written by scripts/passives/rework/centre-gen.ts): six inner roads,
+ * The centre's roads (docs/tree/design/R-centre.md; first written by scripts/passives/rework/centre-gen.ts, which is
+ * retired: edit by hand since 2026-10-31): six inner roads,
  * one along each border from the pair's seam to a junction at radius 950, an inner ring (a hexagon) joining the
  * junctions, and three spokes from every other junction to the middle. Attribute nodes carry the attributes of the
  * classes either side. The generic notables are in `clusters.ts`.

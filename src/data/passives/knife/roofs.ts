@@ -46,7 +46,7 @@ export const roofs: AreaSpec = {
     {
       id: 'wish',
       name: 'Ill Wish',
-      why: "Curses and chaos over time, on from the Rookery wheel's far side.",
+      why: "Curses and chaos over time, on from the Rookery wheel's far side. Since the revision (2026-10-31) the Gutter, a lane of poison smalls, opens off its second curse small toward Smeared Edge.",
       at: [2977, -1933],
       shape: { kind: 'hand' },
       nodes: [
@@ -175,7 +175,7 @@ export const roofs: AreaSpec = {
     {
       id: 'carrion',
       name: 'Carrion Claws',
-      why: 'Claws with chaos, in from the rim ring.',
+      why: "Claws with chaos, in from the rim ring. Since the revision (2026-10-31) Rust and Ruin is the Gutter's end (the poison alley from Ill Wish past Smeared Edge) as well as Carrion Claws' neighbour, so it is no longer reached only through Carrion Claws.",
       at: [3625, -1690],
       shape: { kind: 'hand' },
       nodes: [
@@ -194,7 +194,7 @@ export const roofs: AreaSpec = {
           name: 'Rust and Ruin',
           lines: [physAttack(16), chaosAttack(16), moveSpeed(5)],
           at: [3566, -1551],
-          why: 'Physical and chaos together, for any weapon.',
+          why: 'Physical and chaos together, for any weapon. Between the Gutter and Carrion Claws since the revision.',
         },
       ],
       links: [

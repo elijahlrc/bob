@@ -2,7 +2,7 @@
  * The Lychway: North-east toward the rim: lightning, minions, chaos, channelling.
  * Written for the attrition rework from docs/tree/design/R-cathedral.md (2026-10-31).
  */
-import { attackSpeed, castSpeed, channelDamage, channelGuard, chaosSpell, costReduction, damageVsShocked, eleAttackOne, eleDamage, int, mana, shieldBlock, shieldSpellBlock, shockChance, skillDuration, spellArea, spellDamage, spellPhysToLightning, staffSpellDamage, str, weaponCrit, weaponCritMulti } from '../lines';
+import { attackSpeed, castSpeed, channelDamage, channelGuard, chaosSpell, costReduction, damageVsShocked, eleAttackOne, eleDamage, int, mana, shieldBlock, shieldSpellBlock, shockChance, skillDuration, spellArea, spellDamage, spellPhysToLightning, staffDamage, staffSpellDamage, str, weaponCrit, weaponCritMulti } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const lychway: AreaSpec = {
@@ -88,16 +88,18 @@ export const lychway: AreaSpec = {
     {
       id: "crozier",
       name: "Crozier",
-      why: "Staff spells, out from the rim ring (staves spread).",
+      why: "Staff spells, out from the rim ring (staves spread). Since the revision (2026-10-31) the far corner beyond the rim is a way through: from Crozier's second small a staff small to Staff of Judgement, and on by a lightning small into Faith Unleashed, so the staff-bearing priest walks staff spells, staff crit and lightning's rule between the two rim nodes, slower than the rim road.",
       at: [-2616, -3735],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [staffSpellDamage(8)], at: [-2589, -3679] },
         { id: "b", kind: "small", lines: [staffSpellDamage(8)], at: [-2614, -3732] },
         { id: "n", kind: "notable", name: "Crozier", lines: [staffSpellDamage(20), castSpeed(4), mana(10)], at: [-2645, -3794], why: "Spells cast through a staff: damage, speed and the mana to keep going: 2.5 + 1 + 1.3 units." },
-        { id: "judge", kind: 'notable', name: "Staff of Judgement", lines: [weaponCrit('staff', 40), weaponCritMulti('staff', 20)], at: [-2682, -3870], why: "Staff crit with a payoff, hooked on Crozier at the rim: the staff fighter’s far home, apart from Quarterstaff and Warding Staff." },
+        { id: "judge", kind: 'notable', name: "Staff of Judgement", lines: [weaponCrit('staff', 40), weaponCritMulti('staff', 20)], at: [-2827, -3664], why: "Staff crit with a payoff, the staff fighter’s far home, apart from Quarterstaff and Warding Staff. Since the revision (2026-10-31) no longer reached only through Crozier: it has a staff small of its own off Crozier's second small and leads on to Faith Unleashed; the link to Crozier stays, so Crozier leads on too." },
+        { id: "j1", kind: "small", lines: [staffDamage(12)], at: [-2721, -3707], why: "Staff of Judgement's own way in (2026-10-31), by the staff's damage line." },
+        { id: "j2", kind: "small", lines: [eleDamage('lightning', 8)], at: [-2906, -3548], why: "Staff of Judgement on toward lightning's rule (2026-10-31), by Faith Unleashed's own small line." },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "judge"]],
+      links: [["a", "b"], ["b", "n"], ["n", "judge"], ["b", "j1"], ["j1", "judge"], ["judge", "j2"]],
     },
     {
       id: "vespers",
@@ -138,5 +140,6 @@ export const lychway: AreaSpec = {
     { from: "cathedral.walk.vespers.a", to: "cathedral.walk.ring.s1", why: "The way in." },
     { from: "cathedral.walk.lightRule.s1", to: "cathedral.walk.ring.q7", why: "The way in." },
     { from: "cathedral.walk.tomb.n", to: "cathedral.walk.plainsong.c", why: "A way across between neighbouring clusters, dearer than the roads." },
+    { from: "cathedral.walk.crozier.j2", to: "cathedral.walk.lightRule.n", why: "Staff of Judgement leads on (2026-10-31) into Faith Unleashed: the staff-bearing priest's crit, then lightning's rule. Beyond the rim, slower than the rim road from q8 to q7." },
   ],
 };
