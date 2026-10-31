@@ -50,7 +50,6 @@ export const roofs: AreaSpec = {
       at: [2977, -1933],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'k1', kind: 'small', lines: [chaosDot(6)], at: [3047, -1939] },
         {
           id: 'n',
           kind: 'notable',
@@ -62,7 +61,6 @@ export const roofs: AreaSpec = {
         { id: 'u2', kind: 'small', lines: [curseEffect(8)], at: [2853, -1922] },
       ],
       links: [
-        ['k1', 'n'],
         ['n', 'u1'],
         ['u1', 'u2'],
       ],
@@ -70,7 +68,7 @@ export const roofs: AreaSpec = {
     {
       id: 'athame',
       name: 'Athame',
-      why: 'The dagger wheel: spells one side, attacks the other, in from the rim ring.',
+      why: "The dagger wheel: spells one side, attacks the other, in from the rim ring. Thinned in the second thinning (2026-10-31): Long Knives stands next to the door, Athame one dagger spell small past it.",
       at: [3236, -2266],
       shape: { kind: 'hand' },
       nodes: [
@@ -91,15 +89,13 @@ export const roofs: AreaSpec = {
           lines: [daggerDamage(24), weaponSpeed('dagger', 12), meleeRange(1)],
           at: [3193, -2192],
         },
-        { id: 'e1', kind: 'small', lines: [daggerDamage(10)], at: [3278, -2192] },
       ],
       links: [
         ['t', 'w1'],
         ['w1', 'wN'],
         ['wN', 'b'],
         ['b', 'eN'],
-        ['eN', 'e1'],
-        ['e1', 't'],
+        ['eN', 't'],
       ],
     },
     {
@@ -109,7 +105,6 @@ export const roofs: AreaSpec = {
       at: [3042, -2598],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'c1', kind: 'small', lines: [damageVsCursed(8)], at: [2972, -2598] },
         {
           id: 'n',
           kind: 'notable',
@@ -121,7 +116,6 @@ export const roofs: AreaSpec = {
         { id: 'p2', kind: 'small', lines: [spellDamage(8)], at: [3167, -2598] },
       ],
       links: [
-        ['c1', 'n'],
         ['n', 'p1'],
         ['p1', 'p2'],
       ],
@@ -134,8 +128,7 @@ export const roofs: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'small', lines: [eleDamageAll(8)], at: [3462, -2028] },
-        { id: 'b', kind: 'small', lines: [eleDamageAll(8)], at: [3447, -1975] },
-        { id: 'c', kind: 'small', lines: [eleDamageAll(8)], at: [3431, -1922] },
+        { id: 'c', kind: 'small', lines: [eleDamageAll(8)], at: [3436, -1940] },
         {
           id: 'n',
           kind: 'notable',
@@ -145,8 +138,7 @@ export const roofs: AreaSpec = {
         },
       ],
       links: [
-        ['a', 'b'],
-        ['b', 'c'],
+        ['a', 'c'],
         ['c', 'n'],
       ],
     },
@@ -210,8 +202,7 @@ export const roofs: AreaSpec = {
       at: [3759, -1368],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'd2', kind: 'small', lines: [daggerDamage(10)], at: [3800, -1425] },
-        { id: 'd1', kind: 'small', lines: [daggerDamage(10)], at: [3778, -1374] },
+        { id: 'd2', kind: 'small', lines: [daggerDamage(10)], at: [3790, -1400] },
         {
           id: 'n',
           kind: 'notable',
@@ -222,8 +213,7 @@ export const roofs: AreaSpec = {
         { id: 'm', kind: 'small', lines: [weaponCritMulti('dagger', 12)], at: [3707, -1363] },
       ],
       links: [
-        ['d2', 'd1'],
-        ['d1', 'n'],
+        ['d2', 'n'],
         ['n', 'm'],
       ],
     },
@@ -234,7 +224,6 @@ export const roofs: AreaSpec = {
       at: [3841, -922],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'w1', kind: 'small', lines: [dualDamage(10)], at: [3781, -945] },
         {
           id: 'n',
           kind: 'notable',
@@ -246,7 +235,6 @@ export const roofs: AreaSpec = {
         { id: 'g2', kind: 'small', lines: [dodgeAttack(3)], at: [3954, -894] },
       ],
       links: [
-        ['w1', 'n'],
         ['n', 'g1'],
         ['g1', 'g2'],
       ],
@@ -277,7 +265,11 @@ export const roofs: AreaSpec = {
     { from: 'knife.roofs.hasty.a', to: 'knife.rim.ring.q4', why: 'The way in.' },
     { from: 'knife.roofs.ritual.a', to: 'knife.rim.ring.q2', why: 'The way in.' },
     { from: 'knife.roofs.carrion.a', to: 'knife.rim.ring.q5', why: 'The way in.' },
-    { from: 'knife.roofs.ribs.d2', to: 'knife.rim.ring.q6', why: 'The way in.' },
+    {
+      from: 'knife.roofs.ribs.d2',
+      to: 'knife.rim.ring.s1',
+      why: "The way in, off the rim ring's south corner (it was off the node before it, thinned in the finalization).",
+    },
     { from: 'knife.roofs.feint.g2', to: 'knife.rim.ring.q7', why: 'The way in.' },
     { from: 'knife.roofs.mercy.s1', to: 'knife.rim.ring.q8', why: 'The way in.' },
     {

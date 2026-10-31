@@ -104,9 +104,8 @@ export const choir: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [eleDamage("lightning", 10)], at: [-2218, -2523] },
         { id: "n", kind: "notable", name: "Hymn", lines: [eleDamage('lightning', 20), shockEffect(15), castSpeed(4)], at: [-2146, -2501], why: "Lightning's first home, the caster's: damage, a deeper shock and faster casting: 2 + 1.5 + 1 units." },
-        { id: "b", kind: "small", lines: [eleDamage("lightning", 10)], at: [-2125, -2572] },
       ],
-      links: [["a", "n"], ["n", "b"]],
+      links: [["a", "n"]],
     },
     {
       id: "minionSustain",
@@ -116,10 +115,9 @@ export const choir: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [minionRes(8)], at: [-1666, -2251] },
-        { id: "s2", kind: "small", lines: [minionLife(8)], at: [-1549, -2212] },
         { id: "n", kind: "notable", name: "Shepherd’s Crook", lines: [minionRegen(1), minionRes(15)], at: [-1435, -2168], why: "Servants that recover: they regenerate and resist the elements (Shepherd and the Spire’s Familiars sell their life): 2 + 1.9 units." },
       ],
-      links: [["s1", "s2"], ["s2", "n"]],
+      links: [["s1", "n"]],
     },
   ],
   links: [
@@ -133,7 +131,8 @@ export const choir: AreaSpec = {
     { from: "cathedral.choir.hymn.a", to: "cathedral.choir.spS.c", why: "The way in." },
     { from: "cathedral.choir.minionSustain.s1", to: "cathedral.choir.ring.a", why: "The way in." },
     { from: "cathedral.choir.wheel.c4", to: "cathedral.choir.minionSustain.s1", why: "A way across between neighbouring clusters, dearer than the roads." },
-    { from: "cathedral.choir.font.c", to: "cathedral.nave.wheel.steadfast", why: "The shield aisle (2026-10-31): the font's shield-block smalls into Steadfast Faith, and on into the Iron Faith wheel's shield side (it replaces the font's old link straight to Iron Faith)." },
-    { from: "cathedral.choir.rite.n", to: "cathedral.choir.font.c", why: "Shattering Rite leads on (2026-10-31) into the shield aisle's last small: spells behind a shield. Into the last small, not the first, so the rite stays a way on and not a meeting point." },
+    { from: "cathedral.choir.font.c", to: "cathedral.nave.wheel.steadfast", why: "The shield aisle (2026-10-31): the Zealot who carries a shield walks the font's shield-block smalls into Steadfast Faith's block recovery, and on into the Iron Faith wheel's shield side (it replaces the font's old link straight to Iron Faith)." },
+    { from: "cathedral.choir.rite.n", to: "cathedral.choir.font.c", why: "Shattering Rite leads on (2026-10-31) into the shield aisle's last small: the priest who casts behind a shield takes the rite's spells and walks on to Steadfast Faith's block recovery. Into the last small, not the first, so the rite stays a way on and not a meeting point." },
+    { from: "cathedral.choir.font.n", to: "cathedral.nave.wheel.n1", why: "Frozen Font leads on (finalization, 2026-10-31) into the Iron Faith wheel's door small, two steps from Hearthfire: the elemental caster who casts cold and fire takes the font's chill and freeze and walks on to Hearthfire's fire and cast speed. From the spoke to the mid ring it is five steps against the road's three." },
   ],
 };

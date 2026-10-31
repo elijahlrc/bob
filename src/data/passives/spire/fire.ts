@@ -74,7 +74,7 @@ export const fire: AreaSpec = {
     {
       id: "badCompany",
       name: "Bad Company",
-      why: "Minions with curses, out from the rim ring at the border: past the rim, the west border's climb goes on through it (the revision, 2026-10-31), by Hexed Pack and a mana small into Overflow.",
+      why: "Minions with curses, out from the rim ring at the border: past the rim, the west border's climb goes on through it (the revision, 2026-10-31), by Hexed Pack into Overflow.",
       at: [-2141, -4026],
       shape: { kind: 'hand' },
       nodes: [
@@ -83,9 +83,8 @@ export const fire: AreaSpec = {
         { id: "n", kind: "notable", name: "Bad Company", lines: [minionDamage(24), curseEffect(16)], at: [-2139, -4082], why: "2 + 2 units. The far side of the ring." },
         { id: "c", kind: "small", lines: [minionDamage(12)], at: [-2085, -4024] },
         { id: "n2", kind: 'notable', name: "Hexed Pack", lines: [curseArea(20), minionLife(15), minionSpeed(5)], at: [-2230, -4150], why: "The cursing minion master’s reach. Off the ring's small, not its notable, and on toward Overflow: the summoner who wants the reach need not take Bad Company." },
-        { id: "o", kind: "small", lines: [manaRegen(10)], at: [-2045, -4180], why: "Mana regeneration, Overflow's stat, leading in to it." },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"], ["b", "n2"], ["n2", "o"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"], ["b", "n2"]],
     },
     {
       id: "spiritWard",
@@ -117,13 +116,13 @@ export const fire: AreaSpec = {
   links: [
     { from: "spire.fire.highVeil.a", to: "spire.rim.ring.w0", why: "The way in." },
     { from: "spire.fire.manaTap.a", to: "spire.rim.ring.q1", why: "The way in." },
-    { from: "spire.fire.brightWand.a", to: "spire.rim.ring.q2", why: "The way in." },
+    { from: "spire.fire.brightWand.a", to: "spire.rim.ring.w1", why: "The way in (finalization, 2026-10-31: the rim's straight run from the border to the west spoke went from two nodes to one; Bright Wand now opens where the spoke meets the rim)." },
     { from: "spire.fire.cinder.a", to: "spire.rim.ring.w1", why: "The way in." },
     { from: "spire.fire.badCompany.a", to: "spire.rim.ring.w0", why: "The way in." },
     { from: "spire.fire.spiritWard.a", to: "spire.rim.ring.q1", why: "The way in." },
-    { from: "spire.fire.pyre.s1", to: "spire.rim.ring.q2", why: "The way in." },
-    { from: "spire.fire.cinder.h", to: "spire.fire.pyre.n", why: "Fire's ladder's top rung (the revision, 2026-10-31): Warm Hearth's burning small into Kiln Heart, so ignite and the fire payoff are one room-to-room way past the rim." },
-    { from: "spire.fire.badCompany.o", to: "spire.fire.spiritWard.b", why: "The border climb past the rim (the revision, 2026-10-31): Hexed Pack on into Overflow, the cursing summoner's mana turned to shield." },
-    { from: "spire.fire.highVeil.x", to: "cathedral.walk.guard.b", why: "Across the border into the Cathedral's Twofold Guard (the revision, 2026-10-31), outside the mid ring where no road runs: the warded caster who carries a shield, from Moonward's shield to block and spell block, a slower way between the regions than the rim ring." },
+    { from: "spire.fire.pyre.s1", to: "spire.rim.ring.q1", why: "The way in (finalization, 2026-10-31: q1 moved to the middle of the straight run)." },
+    { from: "spire.fire.cinder.h", to: "spire.fire.pyre.n", why: "Fire's ladder's top rung (the revision, 2026-10-31): Warm Hearth's burning small into Kiln Heart. Walked by the igniter, who wants Cinder's ignites, Warm Hearth's recovery from the burning dead and Kiln Heart's penetration, in one walk past the rim." },
+    { from: "spire.fire.badCompany.n2", to: "spire.fire.spiritWard.b", why: "The border climb past the rim (the revision, 2026-10-31): Hexed Pack on into Overflow. Walked by the cursing summoner who stacks mana for his minions (Familiars) and turns it to shield at the top. Since finalization Hexed Pack meets Overflow's small itself (the mana small between them went)." },
+    { from: "spire.fire.highVeil.x", to: "cathedral.walk.guard.b", why: "Across the border into the Cathedral's Twofold Guard (the revision, 2026-10-31), outside the mid ring where no road runs. Walked by the warded caster who carries a shield, Mystic or Zealot: Moonward's shield, then block and spell block, a slower way between the regions than the rim ring." },
   ],
 };

@@ -123,11 +123,11 @@ export const frost: AreaSpec = {
   links: [
     { from: "spire.frost.stream.a", to: "spire.rim.ring.q3", why: "The way in." },
     { from: "spire.frost.shatter.a", to: "spire.rim.ring.q4", why: "The way in." },
-    { from: "spire.frost.piercing.a", to: "spire.rim.ring.q5", why: "The way in." },
+    { from: "spire.frost.piercing.a", to: "spire.rim.ring.q4", why: "The way in (finalization, 2026-10-31: the rim between the spokes went from four nodes to three, q4 on the axis)." },
     { from: "spire.frost.harshWeather.a", to: "spire.rim.ring.q6", why: "The way in." },
     { from: "spire.frost.coldLight.a", to: "spire.rim.ring.q4", why: "The way in." },
     { from: "spire.frost.prismatic.a", to: "spire.rim.ring.q3", why: "The way in." },
     { from: "spire.frost.feverPitch.a", to: "spire.rim.ring.q6", why: "The way in." },
-    { from: "spire.frost.blast.s1", to: "spire.rim.ring.q5", why: "The way in." },
+    { from: "spire.frost.blast.s1", to: "spire.rim.ring.q4", why: "The way in (finalization, 2026-10-31: q4 on the axis)." },
   ],
 };

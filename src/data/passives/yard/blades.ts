@@ -61,9 +61,8 @@ export const blades: AreaSpec = {
         { id: "a", kind: "small", lines: [swordDamage(10)], at: [-826, 2568] },
         { id: "b", kind: "small", lines: [swordDamage(10)], at: [-889, 2512] },
         { id: "n", kind: "notable", name: "Keen Edge", lines: [swordDamage(24), damageAfterBlock(16)], at: [-946, 2576], why: "The parrying swordsman: a block opens the guard." },
-        { id: "c", kind: "small", lines: [swordDamage(10)], at: [-882, 2631] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"], ["c", "a"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "lightBlades",
@@ -75,9 +74,8 @@ export const blades: AreaSpec = {
         { id: "a", kind: "small", lines: [oneHandMelee(10)], at: [-1095, 2968] },
         { id: "n", kind: "notable", name: "Light Blades", lines: [oneHandMelee(24), impaleChance(12)], at: [-1094, 3049], why: "One-handed blades that skewer: impale’s second carrier, unlike the Bow’s Light Hand." },
         { id: "b", kind: "small", lines: [oneHandMelee(10)], at: [-1067, 3113] },
-        { id: "c", kind: "small", lines: [oneHandMelee(10)], at: [-1164, 3010] },
       ],
-      links: [["a", "n"], ["n", "b"], ["a", "c"], ["c", "n"]],
+      links: [["a", "n"], ["n", "b"]],
     },
     {
       id: "crimsonPact",
@@ -116,9 +114,8 @@ export const blades: AreaSpec = {
         { id: "a", kind: "small", lines: [bleedDamage(12)], at: [-526, 3558] },
         { id: "b", kind: "small", lines: [bleedDamage(12)], at: [-472, 3577] },
         { id: "n", kind: "notable", name: "Lasting Wounds", lines: [bleedDamage(24), bleedDuration(30)], at: [-406, 3601], why: "A cut that will not close: 2 + 2 units." },
-        { id: "c", kind: "small", lines: [bleedDamage(12)], at: [-352, 3556] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "armour",
@@ -145,5 +142,8 @@ export const blades: AreaSpec = {
     { from: "yard.blades.board.a", to: "yard.blades.spS.c", why: "The way in." },
     { from: "yard.blades.lasting.a", to: "yard.blades.spS.c", why: "The way in." },
     { from: "yard.blades.armour.s1", to: "yard.blades.spS.c", why: "The way in." },
+    { from: "yard.blades.keenEdge.n", to: "yard.shield.block.b", why: "Keen Edge to Buckler by its block small (finalization, 2026-10-31). The build: the sword-and-buckler duellist, whose damage after a block wants the light shield's block and speed; Keen Edge led nowhere, and the thinned spoke brought it within eight steps of the start." },
+    { from: "yard.blades.lightBlades.b", to: "yard.blades.board.c", why: "Light Blades to Sword and Board (finalization, 2026-10-31). The build: the one-handed sword with a shield, one-hand damage and then the sword that blocks; Sword and Board's far small ended the room." },
+    { from: "yard.blades.armour.n", to: "yard.fosse.fortify.s1", why: "Iron Skin to Hold the Line (finalization, 2026-10-31). The build: the armoured stunner, armour against every kind of hit and then fortify earned by the stun, by Hold the Line's armour small." },
   ],
 };

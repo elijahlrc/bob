@@ -2,6 +2,7 @@
 // The revision's measures, from the area files (unbaked): notables hung behind another notable, dead-end notables near
 // the starts, the first notable down each direction out of a start, cluster routes that cut under a road, links across
 // borders, counts. `--list` names the nodes behind each count.
+import fs from 'fs';
 import { buildAll } from '../../../src/data/passives';
 
 const list = process.argv.includes('--list');
@@ -83,23 +84,42 @@ for (const a of starts) {
 }
 say('steps to the other starts: ' + ss.join('; '));
 
-// 4. Cluster routes that cut under a road: pairs of road nodes (attribute kind) up to 10 road steps apart where the
-// whole tree's way is shorter than the roads' own.
+// 4. Cluster routes that cut under a road: pairs of road nodes up to 10 road steps apart where the whole tree's way is
+// shorter than the roads' own. Many such pairs are by design (a start's seam paths run through its home clusters), so the
+// count alone says little. `--save <file>` writes every road pair's distances; `--base <file>` then names only the pairs
+// whose way through clusters got shorter than it was in the saved tree and is now shorter than the road: a new shortcut.
 const road = (i: number) => live[i] && (kind[i] === 'travel' || kind[i] === 'hub' || kind[i] === 'start');
+const arg = (k: string) => (process.argv.indexOf(k) >= 0 ? process.argv[process.argv.indexOf(k) + 1] : null);
+const saveTo = arg('--save');
+const basePath = arg('--base');
+const base: Record<string, number> = basePath ? JSON.parse(fs.readFileSync(basePath, 'utf8')) : {};
+const save: Record<string, number> = {};
 let pairs = 0;
 const cuts: string[] = [];
+const fresh: string[] = [];
 for (let a = 0; a < N; a++) {
   if (!road(a) || kind[a] === 'start') continue;
   const dr = bfs([a], () => false, road);
   const df = bfs([a], (i) => kind[i] === 'start');
-  for (let b = a + 1; b < N; b++) {
-    if (!road(b) || kind[b] === 'start' || dr[b] < 1 || dr[b] > 10) continue;
+  for (let b = 0; b < N; b++) {
+    if (b === a || !road(b) || kind[b] === 'start' || dr[b] < 1) continue;
+    const key = [built.ids[a], built.ids[b]].sort().join(' ');
+    if (df[b] >= 0) save[key] = df[b];
+    if (b < a || dr[b] > 10) continue;
     pairs++;
-    if (df[b] >= 0 && df[b] < dr[b]) cuts.push(`${built.ids[a]} – ${built.ids[b]}: road ${dr[b]}, through clusters ${df[b]}`);
+    if (df[b] >= 0 && df[b] < dr[b]) {
+      const line = `${built.ids[a]} – ${built.ids[b]}: road ${dr[b]}, through clusters ${df[b]}`;
+      cuts.push(line);
+      if (basePath && key in base && df[b] < base[key]) fresh.push(`${line} (was ${base[key]})`);
+    }
   }
 }
 say(`road pairs within 10 road steps: ${pairs}; shorter through clusters: ${cuts.length}`);
-if (list) for (const c of cuts.slice(0, 60)) say('  ' + c);
+if (basePath) {
+  say(`new shortcuts against ${basePath}: ${fresh.length}`);
+  for (const c of fresh) say('  ' + c);
+}
+if (saveTo) fs.writeFileSync(saveTo, JSON.stringify(save));
 
 // 5. Links across borders, by pair of regions, and how many join two non-road nodes.
 const cross = new Map<string, [number, number]>();

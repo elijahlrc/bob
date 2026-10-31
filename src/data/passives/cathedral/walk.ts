@@ -15,22 +15,20 @@ export const lychway: AreaSpec = {
     {
       id: "ring",
       name: "The rim ring",
-      why: "The rim ring across the Cathedral, from the Wall's border to the Spire's.",
+      why: "The rim ring across the Cathedral, from the Wall's border to the Spire's. Thinned at finalization (2026-10-31): the bare node between q5 and the north-east spoke went; every node left is a junction. At the second thinning (2026-10-31) q3 went too: between the south-west spoke (n1) and the north-east spoke (s1) the rim has two nodes, at the thirds of the stretch (q4, q5), where it had three.",
       at: [-4237, -419],
       shape: { kind: 'hand' },
       nodes: [
         { id: "q1", kind: "attribute", lines: [str(6), int(6)], at: [-4237, -419] },
         { id: "q2", kind: "attribute", lines: [str(6), int(6)], at: [-4175, -838] },
         { id: "n1", kind: "attribute", lines: [str(6), int(6)], at: [-4112, -1257] },
-        { id: "q3", kind: "attribute", lines: [str(6), int(6)], at: [-3919, -1592] },
-        { id: "q4", kind: "attribute", lines: [str(6), int(6)], at: [-3725, -1927] },
-        { id: "q5", kind: "attribute", lines: [str(6), int(6)], at: [-3532, -2263] },
-        { id: "q6", kind: "attribute", lines: [str(6), int(6)], at: [-3338, -2598] },
+        { id: "q4", kind: "attribute", lines: [str(6), int(6)], at: [-3790, -1816] },
+        { id: "q5", kind: "attribute", lines: [str(6), int(6)], at: [-3467, -2375] },
         { id: "s1", kind: "attribute", lines: [str(6), int(6)], at: [-3145, -2933] },
         { id: "q7", kind: "attribute", lines: [str(6), int(6)], at: [-2813, -3197] },
         { id: "q8", kind: "attribute", lines: [str(6), int(6)], at: [-2482, -3460] },
       ],
-      links: [["q1", "q2"], ["q2", "n1"], ["n1", "q3"], ["q3", "q4"], ["q4", "q5"], ["q5", "q6"], ["q6", "s1"], ["s1", "q7"], ["q7", "q8"]],
+      links: [["q1", "q2"], ["q2", "n1"], ["n1", "q4"], ["q4", "q5"], ["q5", "s1"], ["s1", "q7"], ["q7", "q8"]],
     },
     {
       id: "peal",
@@ -40,10 +38,9 @@ export const lychway: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [eleDamage("lightning", 10)], at: [-2383, -2694] },
-        { id: "b", kind: "small", lines: [eleDamage("lightning", 10)], at: [-2341, -2734] },
         { id: "n", kind: "notable", name: "Thunder Peal", lines: [eleAttackOne('lightning', 24), shockChance(15), attackSpeed(4)], at: [-2290, -2783], why: "Lightning's second home is the holy warrior's: lightning attacks that shock (Hymn is the caster's): 2 + 1.5 + 0.8 units." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "n"]],
     },
     {
       id: "plainsong",
@@ -53,11 +50,10 @@ export const lychway: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [channelDamage(10)], at: [-2925, -2797] },
-        { id: "b", kind: "small", lines: [channelDamage(10)], at: [-2883, -2762] },
         { id: "n", kind: "notable", name: "Plainsong", lines: [channelDamage(20), channelGuard(4), castSpeed(4)], at: [-2829, -2717], why: "Channelling as a line, not a section: damage, and the channeller holds against blows while it sings: 2 + 3 + 1 units." },
         { id: "c", kind: "small", lines: [channelDamage(10)], at: [-2759, -2727] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+      links: [["a", "n"], ["n", "c"]],
     },
     {
       id: "tomb",
@@ -67,10 +63,9 @@ export const lychway: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [chaosSpell(12)], at: [-2643, -3032] },
-        { id: "b", kind: "small", lines: [chaosSpell(12)], at: [-2601, -2992] },
         { id: "n", kind: "notable", name: "Tomb Dust", lines: [chaosSpell(24), skillDuration(10), spellArea(8)], at: [-2551, -2943], why: "Chaos spells that linger and spread: 2 + 1 + 1 units." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "n"]],
     },
     {
       id: "guard",
@@ -110,10 +105,9 @@ export const lychway: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [spellDamage(8)], at: [-3254, -3071] },
         { id: "b", kind: "small", lines: [spellDamage(8)], at: [-3289, -3114] },
-        { id: "c", kind: "small", lines: [spellDamage(8)], at: [-3323, -3158] },
         { id: "n", kind: "notable", name: "Vespers", lines: [mana(20), costReduction(6)], at: [-3366, -3213], why: "The evening office: more mana and cheaper skills (spells with duration moved to Lectern): 2.5 + 1.5 units." },
       ],
-      links: [["a", "b"], ["b", "c"], ["c", "n"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "lightRule",
@@ -123,10 +117,9 @@ export const lychway: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('lightning', 8)], at: [-2865, -3268] },
-        { id: "s2", kind: "small", lines: [eleDamage('lightning', 8)], at: [-2917, -3339] },
         { id: "n", kind: "notable", name: "Faith Unleashed", lines: [spellPhysToLightning(30), damageVsShocked(15)], at: [-2969, -3410], why: "Lightning's rule, for the priest: physical spells turned to lightning (Shattering Rite's road), and more damage on shocked enemies: 3 + 1.5 units." },
       ],
-      links: [["s1", "s2"], ["s2", "n"]],
+      links: [["s1", "n"]],
     },
   ],
   links: [

@@ -68,8 +68,7 @@ export const hex: AreaSpec = {
       at: [1342, -1990],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'e2', kind: 'small', lines: [es(5)], at: [1240, -1918] },
-        { id: 'e1', kind: 'small', lines: [es(5)], at: [1285, -1949] },
+        { id: 'e2', kind: 'small', lines: [es(5)], at: [1265, -1935] },
         {
           id: 'n',
           kind: 'notable',
@@ -80,8 +79,7 @@ export const hex: AreaSpec = {
         { id: 's1', kind: 'small', lines: [dodgeSpell(3)], at: [1399, -2030] },
       ],
       links: [
-        ['e2', 'e1'],
-        ['e1', 'n'],
+        ['e2', 'n'],
         ['n', 's1'],
       ],
     },
@@ -161,8 +159,7 @@ export const hex: AreaSpec = {
       at: [1835, -2826],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'l3', kind: 'small', lines: [life(5)], at: [1727, -2737] },
-        { id: 'l1', kind: 'small', lines: [life(5)], at: [1822, -2790] },
+        { id: 'l3', kind: 'small', lines: [life(5)], at: [1790, -2772] },
         {
           id: 'n',
           kind: 'notable',
@@ -175,9 +172,8 @@ export const hex: AreaSpec = {
         { id: 'e3', kind: 'small', lines: [evasion(10)], at: [1552, -2875] },
       ],
       links: [
-        ['l1', 'n'],
+        ['l3', 'n'],
         ['n', 'e1'],
-        ['l3', 'l1'],
         ['e1', 'e2'],
         ['e2', 'e3'],
       ],

@@ -22,9 +22,8 @@ export const crypt: AreaSpec = {
         { id: "a", kind: "small", lines: [es(5)], at: [-1130, -1721] },
         { id: "b", kind: "small", lines: [es(5)], at: [-1178, -1692] },
         { id: "n", kind: "notable", name: "Rood Screen", lines: [spellBlock(6), es(6)], at: [-1237, -1655], why: "Spell block first, a little energy shield (the Spire's Quickening sells recharge close by): 3 + 1.2 units." },
-        { id: "c", kind: "small", lines: [es(5)], at: [-1288, -1703] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "shrine",
@@ -63,6 +62,6 @@ export const crypt: AreaSpec = {
     { from: "cathedral.crypt.shrine.w", to: "spire.well.radW.m", why: "The way in." },
     { from: "cathedral.crypt.sigilWarden.a", to: "cathedral.choir.spS.c", why: "The way in." },
     { from: "cathedral.crypt.shrine.hallowed", to: "cathedral.choir.hymn.n", why: "Hallowed Ground joins Hymn (2026-10-31), lightning's first home, so it stands on a way between the shrine and Hymn, entered from either end: the caster who plants a totem and calls lightning beside it. With the shrine, a way from the mid ring at the border out to the spoke's rim junction, slower than the road." },
-    { from: "cathedral.crypt.shrine.r2", to: "spire.well.familiars.n2", why: "Across the Spire border, outside the mid ring where no road runs (2026-10-31): the brands' duration smalls into Bound Host, the Mystic's spell servants on the border climb. The planted thing and the bound servant both last a duration." },
+    { from: "cathedral.crypt.shrine.r2", to: "spire.well.familiars.n2", why: "Across the Spire border, outside the mid ring where no road runs (2026-10-31): the brands' duration smalls into Bound Host, the Mystic's spell servants on the border climb. The caster who lays brands and binds spell servants wants duration for both, and walks from Runecarver to Bound Host by it." },
   ],
 };

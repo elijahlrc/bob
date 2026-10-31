@@ -2,7 +2,7 @@
  * The Wall Gate: The Vanguard's first points (R-wall.md).
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { armour, critChance, enemyStunThreshold, flaskEffect, flaskRecovery, life, lifeRegen, manaOnHit, meleeDamage, meleePhys, resAll, resOne, str, stunThreshold } from '../lines';
+import { armour, critChance, enemyStunThreshold, flaskEffect, flaskRecovery, life, lifeRegen, manaOnHit, meleeArea, meleeDamage, meleePhys, resAll, resOne, str, stunThreshold } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -81,11 +81,11 @@ export const home: AreaSpec = {
     {
       id: "spN",
       name: "The north spoke",
-      why: "The north spoke from its hub to the junction with the cross roads.",
-      at: [-1457, 1167],
+      why: "The north spoke from its hub to its first rooms. Its bare first node became a small of the spoke's stat in the finalization (2026-10-31; CONSTRAINTS §16 item 9): melee area, what the slams and the two-handed rooms out along it want. The spoke keeps its length: one node shorter, Thunderstep, Barrow Ward, Sweeping Blow and Aftershock all became dead ends within 8 steps.",
+      at: [-1531, 1364],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "attribute", lines: [str(7)], at: [-1457, 1167] },
+        { id: "a", kind: "small", lines: [meleeArea(8)], at: [-1457, 1167], why: "The spoke's first point, a small of the spoke's stat (the finalization, 2026-10-31): it was a bare attribute node between the hub and x." },
         { id: "x", kind: "attribute", lines: [str(7)], at: [-1531, 1364] },
       ],
       links: [["a", "x"]],
@@ -93,14 +93,13 @@ export const home: AreaSpec = {
     {
       id: "spS",
       name: "The south spoke",
-      why: "The south spoke from its hub to the junction with the cross roads.",
-      at: [-1739, 679],
+      why: "The south spoke from its hub to its first junction (Weak Spot's door). Its bare first node went in the finalization (2026-10-31; CONSTRAINTS §16 item 9): the hub runs straight to x.",
+      at: [-1946, 644],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "attribute", lines: [str(7)], at: [-1739, 679] },
         { id: "x", kind: "attribute", lines: [str(7)], at: [-1946, 644] },
       ],
-      links: [["a", "x"]],
+      links: [],
     },
     {
       id: "cross",
@@ -131,15 +130,16 @@ export const home: AreaSpec = {
     {
       id: "secondWind",
       name: "Old Wounds",
-      why: "Life and regeneration, off the path to the Yard's seam toward the centre. Since the revision (2026-10-31) its notable opens on the centre's inner road (i3), so the room is a way from the seam path onto the generic ground, no shorter than the seam road beside it, not a tip.",
+      why: "Life and regeneration, off the path to the Yard's seam toward the centre. Since the revision (2026-10-31) its notable opens on the centre's inner road (i3), so the room is a way from the seam path onto the generic ground, a step slower than the seam road beside it (one small before the door since the finalization), not a tip.",
       at: [-913, 1127],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [lifeRegen(0.4)], at: [-968, 1152] },
         { id: "b", kind: "small", lines: [lifeRegen(0.4)], at: [-918, 1129] },
         { id: "n", kind: "notable", name: "Old Wounds", lines: [lifeRegen(1), life(8)], at: [-854, 1101], why: "Life and regeneration near home (renamed: the Bow has a Second Wind)." },
+        { id: "c", kind: "small", lines: [lifeRegen(0.4)], at: [-740, 1092], why: "Old Wounds' door onto the centre's inner road (the finalization, 2026-10-31): one small between the notable and i3, so the way through the room is a step slower than the seam road (8 against 7 from the start)." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["n", "c"]],
     },
     {
       id: "thickSkin",
@@ -218,13 +218,13 @@ export const home: AreaSpec = {
     { from: "wall.home.hubs.n", to: "wall.home.cross.n1", why: "The north hub in toward Oathbound." },
     { from: "wall.home.hubs.n", to: "wall.home.spN.a", why: "The north hub out along the spoke." },
     { from: "wall.home.hubs.s", to: "wall.home.cross.s1", why: "The south hub in toward Oathbound." },
-    { from: "wall.home.hubs.s", to: "wall.home.spS.a", why: "The south hub out along the spoke." },
-    { from: "wall.home.cross.n2", to: "wall.home.oath.n", why: "The striker's tower: the melee hub's life smalls end at Oathbound." },
-    { from: "wall.home.cross.s2", to: "wall.home.thickSkin.n", why: "The defender's tower (2026-10-31): the armour hub's resistance smalls end at Ox Hide, not at Oathbound, so the two hubs' ways no longer meet in a V." },
-    { from: "wall.home.oath.o", to: "wall.slams.barrowWard.n", why: "Oathbound leads on into Barrow Ward (2026-10-31), then by Sweeping Blow's link to the melee spoke: life and steel, then regeneration and the strike, beside the spoke." },
-    { from: "wall.home.thickSkin.a", to: "wall.rampart.bulwark.d", why: "Ox Hide leads on by its armour into Mortar and Stone's armour smalls (2026-10-31), and through them to the spoke or to Mortar and Stone and Locked Shields: the armour side's way out, beside the spoke." },
-    { from: "wall.home.secondWind.n", to: "centre.ring.road.i3", why: "Old Wounds opens on the centre's inner road (2026-10-31): regeneration is generic sustain, and the centre is the generic ground; the way is no shorter than the seam road beside it." },
-    { from: "wall.home.stoneHeart.m", to: "wall.resists.ironLungs.b", why: "Weak Spot on into Iron Lungs (2026-10-31)." },
+    { from: "wall.home.hubs.s", to: "wall.home.spS.x", why: "The south hub out along the spoke (straight to x since the finalization, 2026-10-31)." },
+    { from: "wall.home.cross.n2", to: "wall.home.oath.n", why: "The striker's tower: the melee hub's life smalls end at Oathbound. Who walks it: every Vanguard who fights in melee and wants life with his steel before he picks a weapon." },
+    { from: "wall.home.cross.s2", to: "wall.home.thickSkin.n", why: "The defender's tower (2026-10-31): the armour hub's resistance smalls end at Ox Hide, not at Oathbound, so the two hubs' ways no longer meet in a V. Who walks it: the Vanguard who stands and takes the hit, resistances and then armour with stun threshold." },
+    { from: "wall.home.oath.o", to: "wall.slams.barrowWard.n", why: "Oathbound leads on into Barrow Ward (2026-10-31), then by Sweeping Blow's link to the melee spoke: life and steel, then regeneration and the strike, beside the spoke. Who walks it: the melee striker who mends between blows and wants his strikes to hit one more enemy." },
+    { from: "wall.home.thickSkin.a", to: "wall.rampart.bulwark.d", why: "Ox Hide leads on by its armour into Mortar and Stone's armour smalls (2026-10-31), and through them to the spoke or to Mortar and Stone and Locked Shields: the armour side's way out, beside the spoke. Who walks it: the armour stacker, who takes armour room after room out to the shields." },
+    { from: "wall.home.secondWind.c", to: "centre.ring.road.i3", why: "Old Wounds opens on the centre's inner road (2026-10-31), by its regeneration small since the finalization: the Vanguard who lives on regeneration and wants the centre's flask and life ground walks from his near sustain into the generic sustain; 8 steps from the start against the seam road's 7." },
+    { from: "wall.home.stoneHeart.m", to: "wall.resists.ironLungs.b", why: "Weak Spot on into Iron Lungs (2026-10-31). Who walks it: the melee crit striker who finds the gap and runs on the mana his hits give back, with cheaper blows." },
     { from: "wall.home.seams.s", to: "centre.ring.road.i4", why: "Along the border into the centre." },
     { from: "wall.home.seams.s", to: "wall.resists.radW.a", why: "Along the border out to the mid ring." },
     { from: "wall.home.spN.x", to: "wall.slams.spN.a", why: "The north spoke goes on." },

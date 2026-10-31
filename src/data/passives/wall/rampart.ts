@@ -58,13 +58,11 @@ export const rampart: AreaSpec = {
       at: [-2439, 1035],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "attribute", lines: [str(7)], at: [-2464, 927] },
         { id: "c", kind: "small", lines: [armour(12)], at: [-2401, 971] },
         { id: "d", kind: "small", lines: [armour(12)], at: [-2389, 1047] },
         { id: "n2", kind: "notable", name: "Mortar and Stone", lines: [armour(30), physReduction(2)], at: [-2433, 1109], why: "The armour notable: a flat 2% physical reduction on top, which armour alone never gives against a big hit. 4.5 units. The road to the tower leaves from it." },
-        { id: "e", kind: "small", lines: [armour(12)], at: [-2509, 1122] },
       ],
-      links: [["a", "c"], ["c", "d"], ["d", "n2"], ["n2", "e"]],
+      links: [["c", "d"], ["d", "n2"]],
     },
     {
       id: "unerring",
@@ -98,7 +96,7 @@ export const rampart: AreaSpec = {
     { from: "wall.rampart.spS.m", to: "wall.rampart.ring.a", why: "The mid ring on toward the south border." },
     { from: "wall.rampart.ring.a", to: "wall.resists.radW.m", why: "The mid ring meets the south border road." },
     { from: "wall.rampart.steadyHands.a", to: "wall.rampart.spS.a", why: "The way in." },
-    { from: "wall.rampart.bulwark.a", to: "wall.rampart.spS.b", why: "The way in." },
+    { from: "wall.rampart.bulwark.c", to: "wall.rampart.spS.b", why: "The way in (by the armour small since the bare attribute door went, 2026-10-31)." },
     { from: "wall.rampart.unerring.a", to: "wall.rampart.spS.m", why: "The way in." },
     { from: "wall.rampart.stand.s1", to: "wall.rampart.spS.c", why: "The way in." },
   ],

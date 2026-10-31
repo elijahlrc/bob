@@ -39,7 +39,7 @@ export const seawall: AreaSpec = {
     {
       id: 'ring',
       name: 'The rim ring',
-      why: 'The rim ring across the Knife, from the Spire border to the Bow border.',
+      why: "The rim ring across the Knife, from the Spire border to the Bow border. Thinned in the finalization (2026-10-31, R-revise.md §10): the stretch from the north spoke's corner to the south's had four nodes, the last with one room; it has three, and that room (Between Ribs) opens off the south corner.",
       at: [2150, -3724],
       shape: { kind: 'hand' },
       nodes: [
@@ -50,7 +50,6 @@ export const seawall: AreaSpec = {
         { id: 'q3', kind: 'attribute', lines: [dex(6), int(6)], at: [3338, -2598] },
         { id: 'q4', kind: 'attribute', lines: [dex(6), int(6)], at: [3532, -2263] },
         { id: 'q5', kind: 'attribute', lines: [dex(6), int(6)], at: [3725, -1927] },
-        { id: 'q6', kind: 'attribute', lines: [dex(6), int(6)], at: [3919, -1592] },
         { id: 's1', kind: 'attribute', lines: [dex(6), int(6)], at: [4112, -1257] },
         { id: 'q7', kind: 'attribute', lines: [dex(6), int(6)], at: [4175, -838] },
         { id: 'q8', kind: 'attribute', lines: [dex(6), int(6)], at: [4237, -419] },
@@ -63,8 +62,7 @@ export const seawall: AreaSpec = {
         ['n1', 'q3'],
         ['q3', 'q4'],
         ['q4', 'q5'],
-        ['q5', 'q6'],
-        ['q6', 's1'],
+        ['q5', 's1'],
         ['s1', 'q7'],
         ['q7', 'q8'],
         ['q8', 's0'],
@@ -108,12 +106,10 @@ export const seawall: AreaSpec = {
           lines: [spellCrit(40), maxInsight(1), insightOnCrit(20)],
           at: [3984, -2248],
         },
-        { id: 'c', kind: 'small', lines: [spellCrit(15)], at: [3998, -2317] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
-        ['n', 'c'],
       ],
     },
     {
@@ -246,6 +242,11 @@ export const seawall: AreaSpec = {
     { from: 'knife.rim.whet.a', to: 'knife.rim.ring.q3', why: 'The way in.' },
     { from: 'knife.rim.glint.a', to: 'knife.rim.ring.q4', why: 'The way in.' },
     { from: 'knife.rim.sleet.a', to: 'knife.rim.ring.q5', why: 'The way in.' },
+    {
+      from: 'knife.rim.glint.n',
+      to: 'knife.rim.sleet.n',
+      why: "For the cold spell crit caster, who wants Glint's spell crit and Sleet's cold damage and freeze (the finalization, 2026-10-31): the two rooms outside the rim open into each other, dearer than the rim ring between their ways in.",
+    },
     { from: 'knife.rim.grudge.a', to: 'knife.rim.ring.q1', why: 'The way in.' },
     { from: 'knife.rim.grudge.b', to: 'knife.rim.ring.q2', why: 'The way in.' },
     { from: 'knife.rim.legs.l2', to: 'knife.rim.ring.q8', why: 'The way in.' },

@@ -36,10 +36,9 @@ export const outerWalk: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [minionDamage(12)], at: [-3947, -773] },
-        { id: "b", kind: "small", lines: [minionDamage(12)], at: [-3890, -757] },
         { id: "n", kind: "notable", name: "Ossuary", lines: [minionDamage(20), damageWithMinion(16), minionLife(10)], at: [-3824, -738], why: "The bone host at the rim: the servants hit harder, and so does the Zealot while one stands: 1.7 + 1.6 + 0.8 units." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "n"]],
     },
     {
       id: "censer",
@@ -49,10 +48,9 @@ export const outerWalk: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [burnDamage(12)], at: [-4415, -863] },
-        { id: "b", kind: "small", lines: [burnDamage(12)], at: [-4472, -869] },
         { id: "n", kind: "notable", name: "Censer", lines: [burnDamage(24), areaDamage(10), igniteDuration(15)], at: [-4542, -877], why: "2 + 1 + 1 units." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "n"]],
     },
     {
       id: "brazier",
@@ -63,10 +61,9 @@ export const outerWalk: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [burnDamage(12)], at: [-4287, -1283] },
         { id: "b", kind: "small", lines: [burnDamage(12)], at: [-4341, -1291] },
-        { id: "c", kind: "small", lines: [burnDamage(12)], at: [-4395, -1298] },
         { id: "n", kind: "notable", name: "Brazier", lines: [weaponDamage("sceptre", 20), igniteChance(10), burnDamage(12)], at: [-4465, -1308], why: "Sceptre damage, the chance to ignite and burning: 2 + 1 + 1 units." },
       ],
-      links: [["a", "b"], ["b", "c"], ["c", "n"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "volatile",

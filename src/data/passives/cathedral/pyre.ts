@@ -41,9 +41,8 @@ export const pyre: AreaSpec = {
         { id: "a", kind: "small", lines: [minionDamage(12)], at: [-3414, -2185] },
         { id: "b", kind: "small", lines: [minionDamage(12)], at: [-3368, -2155] },
         { id: "n", kind: "notable", name: "Sexton", lines: [minionDamage(20), regenWithMinion(0.8), life(5)], at: [-3311, -2117], why: "The gravedigger tends the summoner: minion damage, and the Zealot regenerates while a servant stands: 1.7 + 1.6 + 1 units." },
-        { id: "c", kind: "small", lines: [minionDamage(12)], at: [-3252, -2078] },
       ],
-      links: [["a", "b"], ["b", "n"], ["n", "c"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "searingAvatar",
@@ -67,10 +66,9 @@ export const pyre: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [auraEffect(6)], at: [-3751, -1518] },
         { id: "b", kind: "small", lines: [auraEffect(6)], at: [-3701, -1495] },
-        { id: "c", kind: "small", lines: [auraEffect(6)], at: [-3650, -1474] },
         { id: "n", kind: "notable", name: "Procession", lines: [buffDuration(20), skillDuration(10), int(10)], at: [-3586, -1445], why: "The procession carries its blessings further: buffs and skill effects last longer, with the intelligence a priest's gear asks (its movement and aura lines went): 2.5 + 1 + 0.7 units." },
       ],
-      links: [["a", "b"], ["b", "c"], ["c", "n"]],
+      links: [["a", "b"], ["b", "n"]],
     },
     {
       id: "fireRule",
@@ -80,18 +78,18 @@ export const pyre: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('fire', 8)], at: [-4001, -1623] },
-        { id: "s2", kind: "small", lines: [eleDamage('fire', 8)], at: [-4084, -1654] },
         { id: "n", kind: "notable", name: "Faith Aflame", lines: [physGainFire(8), eleDamage('fire', 12)], at: [-4166, -1685], why: "Fire's rule: every hit, spell or attack, gains part of its physical damage as fire; the holy warrior's road to Searing Avatar: 2.7 + 1.2 units." },
       ],
-      links: [["s1", "s2"], ["s2", "n"]],
+      links: [["s1", "n"]],
     },
   ],
   links: [
     { from: "cathedral.pyre.wheel.f1", to: "cathedral.walk.ring.q4", why: "The way in." },
     { from: "cathedral.pyre.sexton.a", to: "cathedral.walk.ring.q5", why: "The way in." },
-    { from: "cathedral.pyre.searingAvatar.a", to: "cathedral.walk.ring.q4", why: "The way in." },
-    { from: "cathedral.pyre.procession.a", to: "cathedral.walk.ring.q3", why: "The way in." },
-    { from: "cathedral.pyre.procession.b", to: "cathedral.pyre.wheel.ire", why: "Choir of Wrath's own way in (2026-10-31): the procession's aura smalls lead to the damage every standing aura gives, and on into Benediction and the Rimed Steel wheel. It is no longer one step past Benediction." },
-    { from: "cathedral.pyre.fireRule.s1", to: "cathedral.walk.ring.q3", why: "The way in." },
+    { from: "cathedral.pyre.searingAvatar.a", to: "cathedral.walk.ring.q5", why: "The way in (from q5 since the second thinning, 2026-10-31, when q3 went and q4 took the procession's and Faith Aflame's doors)." },
+    { from: "cathedral.pyre.procession.a", to: "cathedral.walk.ring.q4", why: "The way in." },
+    { from: "cathedral.pyre.procession.b", to: "cathedral.pyre.wheel.ire", why: "Choir of Wrath's own way in (2026-10-31): the aura-stacking Zealot walks the procession's aura smalls to the damage every standing aura gives, and on into Benediction's cheaper auras. It is no longer one step past Benediction." },
+    { from: "cathedral.pyre.fireRule.s1", to: "cathedral.walk.ring.q4", why: "The way in." },
+    { from: "cathedral.pyre.fireRule.n", to: "cathedral.pyre.searingAvatar.a", why: "Faith Aflame leads on into fire's keystone (finalization, 2026-10-31): the holy warrior who turns his hits to fire walks from the rule to Searing Avatar without stepping back to the rim; beyond the rim, four steps between q4 and q5 against the rim's one (since the second thinning)." },
   ],
 };

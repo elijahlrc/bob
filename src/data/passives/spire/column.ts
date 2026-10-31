@@ -15,20 +15,19 @@ export const column: AreaSpec = {
     {
       id: "ring",
       name: "The mid ring, centre",
-      why: "The mid ring's stretch across the axis between the two spokes.",
-      at: [-326, -2826],
+      why: "The mid ring's stretch across the axis between the two spokes: two nodes since finalization (2026-10-31; the node on the axis went, its two rooms shared out).",
+      at: [-217, -2826],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "attribute", lines: [int(7)], at: [-326, -2826] },
-        { id: "b", kind: "attribute", lines: [int(7)], at: [0, -2826] },
-        { id: "c", kind: "attribute", lines: [int(7)], at: [326, -2826] },
+        { id: "a", kind: "attribute", lines: [int(7)], at: [-217, -2826] },
+        { id: "c", kind: "attribute", lines: [int(7)], at: [217, -2826] },
       ],
-      links: [["a", "b"], ["b", "c"]],
+      links: [["a", "c"]],
     },
     {
       id: "star",
       name: "Prism Ward",
-      why: "Resistances, in from the mid ring at the axis.",
+      why: "Resistances, in from the mid ring at the axis: one small for each element (finalization, 2026-10-31: the chaos small that hung toward First Light went).",
       at: [0, -2610],
       shape: { kind: 'hand' },
       nodes: [
@@ -36,9 +35,8 @@ export const column: AreaSpec = {
         { id: "s", kind: "small", lines: [resOne("fire", 10)], at: [0, -2680] },
         { id: "w", kind: "small", lines: [resOne("cold", 10)], at: [70, -2610] },
         { id: "e", kind: "small", lines: [resOne("lightning", 10)], at: [-70, -2610] },
-        { id: "f", kind: "small", lines: [resOne("chaos", 10)], at: [0, -2540] },
       ],
-      links: [["n", "s"], ["n", "w"], ["n", "e"], ["n", "f"]],
+      links: [["n", "s"], ["n", "w"], ["n", "e"]],
     },
     {
       id: "hoarfrost",
@@ -98,7 +96,7 @@ export const column: AreaSpec = {
     {
       id: "meet",
       name: "Fire and Frost",
-      why: "The two-element path, between fire's road and cold's axis.",
+      why: "The two-element path, between fire's road and cold's axis: in from the west spoke, out to the mid ring node where Hoarfrost hangs (finalization, 2026-10-31).",
       at: [-404, -2735],
       shape: { kind: 'hand' },
       nodes: [
@@ -111,13 +109,14 @@ export const column: AreaSpec = {
   ],
   links: [
     { from: "spire.column.ring.c", to: "spire.craft.spE.m", why: "The mid ring meets the east spoke." },
-    { from: "spire.column.star.s", to: "spire.column.ring.b", why: "The way in." },
-    { from: "spire.column.hoarfrost.a", to: "spire.column.ring.b", why: "The way in." },
+    { from: "spire.column.star.s", to: "spire.column.ring.c", why: "The way in." },
+    { from: "spire.column.hoarfrost.a", to: "spire.column.ring.a", why: "The way in." },
     { from: "spire.column.broadWeave.a", to: "spire.column.ring.a", why: "The way in." },
     { from: "spire.column.dartingBolts.a", to: "spire.column.ring.c", why: "The way in." },
     { from: "spire.column.lingering.a", to: "spire.column.ring.c", why: "The way in." },
     { from: "spire.column.meet.s1", to: "spire.well.spW.m", why: "The way in." },
-    { from: "spire.column.lingering.a", to: "spire.column.hoarfrost.c", why: "A way across between neighbouring clusters, dearer than the roads." },
-    { from: "spire.column.hoarfrost.n2", to: "spire.column.broadWeave.c", why: "Rime between the cold room and the area room (the revision, 2026-10-31): the cold caster who wants a wide spell walks through the chill's defence." },
+    { from: "spire.column.meet.n", to: "spire.column.ring.a", why: "Fire and Frost on to the mid ring where Hoarfrost hangs (finalization, 2026-10-31; in place of the first pass's join from Wandwork). Walked by the caster of fire and cold, who comes up the west spoke from Kindling's fire and goes on to cold's first rung: spoke to ring node 4 steps against the ring's 1." },
+    { from: "spire.column.lingering.a", to: "spire.column.hoarfrost.c", why: "A way across between neighbouring clusters, dearer than the roads: the cold caster who chills and lets the cold linger (Hoarfrost, then Slow Burn's cold over time)." },
+    { from: "spire.column.hoarfrost.n2", to: "spire.column.broadWeave.c", why: "Rime between the cold room and the area room (the revision, 2026-10-31). Walked by the cold area caster, who chills whole packs with wide spells and takes the chill's defence on the way." },
   ],
 };

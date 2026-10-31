@@ -49,11 +49,10 @@ export const shield: AreaSpec = {
         { id: "b", kind: "small", lines: [shieldBlock(2)], at: [-1306, 2771] },
         { id: "n1", kind: "notable", name: "Steel Rim", lines: [shieldBlock(5), shieldDef(30)], at: [-1286, 2874], why: "Block and shield defences: 2.5 + 2 units." },
         { id: "c", kind: "small", lines: [life(5)], at: [-1365, 2943] },
-        { id: "d", kind: "small", lines: [life(5)], at: [-1464, 2909] },
         { id: "e", kind: "small", lines: [life(5)], at: [-1720, 2700], why: "Across the border (2026-10-31), outside the mid ring where no road runs: Scarred Hide's life on into the Wall's Sledge and Sinew, the shieldless brawler's way toward the mace and its life on hit. It sits just across the angle of the border." },
         { id: "n2", kind: "notable", name: "Scarred Hide", lines: [life(10), stunThreshold(16)], at: [-1484, 2806], why: "2 + 2 units: what a fighter without a shield wears. Life with stun threshold since G3 (2026-10-22): it was life with armour and less physical damage taken, 8 steps from the start, which handed a strength build two of its main wants on one node (the ledger's convergence rule); the armour went to the Practice Ground's Mended Mail and to Guarded." },
       ],
-      links: [["a", "b"], ["b", "n1"], ["n1", "c"], ["c", "d"], ["d", "n2"], ["n2", "a"], ["n2", "e"]],
+      links: [["a", "b"], ["b", "n1"], ["n1", "c"], ["c", "n2"], ["n2", "a"], ["n2", "e"]],
     },
     {
       id: "shieldwall",
@@ -76,10 +75,9 @@ export const shield: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [manaOnBlock(4)], at: [-1242, 2224] },
-        { id: "s2", kind: "small", lines: [manaOnBlock(4)], at: [-1251, 2311] },
         { id: "n", kind: "notable", name: "Steady Guard", lines: [manaOnBlock(15), shieldBlock(4)], at: [-1260, 2399], why: "Mana on block, by the shields (past step 8)." },
       ],
-      links: [["s1", "s2"], ["s2", "n"]],
+      links: [["s1", "n"]],
     },
     {
       id: "mending",
@@ -89,10 +87,9 @@ export const shield: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [lifeOnBlock(8)], at: [-1379, 2563] },
-        { id: "s2", kind: "small", lines: [lifeOnBlock(8)], at: [-1308, 2616] },
         { id: "n", kind: "notable", name: "Bulwark Mending", lines: [lifeOnBlock(35), costReduction(8)], at: [-1238, 2668], why: "Shield sustain: the block heals, and each blow costs less to answer." },
       ],
-      links: [["s1", "s2"], ["s2", "n"]],
+      links: [["s1", "n"]],
     },
   ],
   links: [
@@ -102,6 +99,5 @@ export const shield: AreaSpec = {
     { from: "yard.shield.shieldwall.a", to: "yard.blades.ring.a", why: "The way in." },
     { from: "yard.shield.blockMana.s1", to: "yard.shield.radW.b", why: "The way in." },
     { from: "yard.shield.mending.s1", to: "yard.shield.radW.m", why: "The way in." },
-    { from: "yard.shield.steelRim.e", to: "wall.slams.sledge.c", why: "Across the Wall border (2026-10-31), outside the mid ring: Scarred Hide into Sledge and Sinew, a Reaver's way toward the mace, slower than the mid ring round." },
-  ],
+    { from: "yard.shield.steelRim.e", to: "wall.slams.sledge.c", why: "Across the Wall border (2026-10-31), outside the mid ring: Scarred Hide into Sledge and Sinew. The build: the shieldless brawler who stacks life and stun threshold and swings a mace, walking from the Yard's life room into the Wall's mace and its life on hit." },  ],
 };

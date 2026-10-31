@@ -2,28 +2,27 @@
  * The Bulwark: The axis at the mid ring and the north toward the rim: shields, maces, the two-handed choice.
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { armour, axeDamage, blockPerGrit, damagePerGrit, damageVsStunned, enemyStunThreshold, gritOnBlock, gritOnHitTaken, gritOnStun, life, lifeOnBlock, lifeRegenPerGrit, meleePhys, minionLife, shieldAttack, shieldDef, str, stunDuration, stunRecovery, stunThreshold, twoHandDamage, weaponDamage } from '../lines';
+import { armour, axeDamage, blockPerGrit, damagePerGrit, damageVsStunned, enemyStunThreshold, gritDuration, gritOnBlock, gritOnHitTaken, gritOnStun, life, lifeOnBlock, lifeRegenPerGrit, maxGrit, maxResAll, meleePhys, minionLife, resAll, shieldAttack, shieldDef, str, stunDuration, stunRecovery, stunThreshold, twoHandDamage, weaponDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const maces: AreaSpec = {
   id: "wall.maces",
   region: "vanguard",
   name: "The Bulwark",
-  why: "The axis at the mid ring and the north toward the rim: shields, maces, the two-handed choice.",
+  why: "The axis at the mid ring and the north toward the rim: shields, maces, the two-handed choice, and the keep (the Unbroken and Tempered wheel) in the axis cell.",
   at: [-2685, 1550],
   clusters: [
     {
       id: "ring",
       name: "The mid ring, centre",
-      why: "The mid ring's stretch across the axis between the two spokes.",
+      why: "The mid ring's stretch across the axis between the two spokes. Its bare first node (a) went in the finalization (2026-10-31): the south spoke's junction runs straight to b, the shields' door.",
       at: [-2284, 1696],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "attribute", lines: [str(7)], at: [-2284, 1696] },
         { id: "b", kind: "attribute", lines: [str(7)], at: [-2447, 1413] },
         { id: "c", kind: "attribute", lines: [str(7)], at: [-2610, 1131] },
       ],
-      links: [["a", "b"], ["b", "c"]],
+      links: [["b", "c"]],
     },
     {
       id: "greatweight",
@@ -102,11 +101,10 @@ export const maces: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [shieldDef(15)], at: [-2317, 1338] },
         { id: "b", kind: "small", lines: [shieldDef(15)], at: [-2309, 1261] },
-        { id: "c", kind: "small", lines: [shieldDef(15)], at: [-2233, 1244] },
         { id: "n", kind: "notable", name: "Locked Shields", lines: [armour(16), gritOnBlock(15), lifeOnBlock(20)], at: [-2194, 1312], why: "The Wall’s shield: a block builds grit and closes a wound." },
         { id: "d", kind: "small", lines: [shieldDef(15)], at: [-2246, 1370] },
       ],
-      links: [["a", "b"], ["b", "c"], ["c", "n"], ["n", "d"], ["d", "a"]],
+      links: [["a", "b"], ["b", "n"], ["n", "d"], ["d", "a"]],
     },
     {
       id: "ram",
@@ -117,10 +115,9 @@ export const maces: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [shieldAttack(10)], at: [-2700, 1580] },
         { id: "b", kind: "small", lines: [shieldAttack(10)], at: [-2790, 1640] },
-        { id: "c", kind: "small", lines: [shieldAttack(10)], at: [-2840, 1540] },
         { id: "n", kind: "notable", name: "Shield Ram", lines: [shieldAttack(24), blockPerGrit(1)], at: [-2750, 1480], why: "The shield grows with the grit: block for every charge held." },
       ],
-      links: [["a", "b"], ["b", "c"], ["c", "n"], ["n", "a"]],
+      links: [["a", "b"], ["b", "n"], ["n", "a"]],
     },
     {
       id: "stunGrit",
@@ -143,11 +140,29 @@ export const maces: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [meleePhys(8)], at: [-3730, 295] },
-        { id: "s2", kind: "small", lines: [meleePhys(8)], at: [-3530, 210] },
         { id: "n", kind: "notable", name: "Grit and Gravel", lines: [damagePerGrit(4), meleePhys(10)], at: [-3330, 130], why: "Grit’s second payoff, offensive: damage for every charge held." },
         { id: "d", kind: "small", lines: [meleePhys(8)], at: [-3110, 70], why: "Grit and Gravel's own door from the mid ring (2026-10-31), by the room's stat." },
       ],
-      links: [["s1", "s2"], ["s2", "n"], ["n", "d"]],
+      links: [["s1", "n"], ["n", "d"]],
+    },
+    {
+      id: "unbroken",
+      name: "Unbroken",
+      why: "The keep (the revision, 2026-10-31): resistances or one more grit charge, the two sides of one wheel, in the empty middle of the axis cell between the mid ring and the rim (written in this area since the finalization, 2026-10-31: it stood in the Battlements' file while it stood on their road). It has no road door: it is entered through the rooms round it, the grit loop drawn in rooms. On its west pair of smalls (a, d) the rooms that earn grit from the rim (Hammer Rhythm's mace hits, Iron Voice's warcries); on its east pair (b, c) the rooms that spend it (Shield Ram's block per charge, Heavy Hands' speed per charge). Going from an earning room to a spending room crosses the wheel by one of its notables: Unbroken (hold more grit, longer) or Tempered (hold against the elements). Going between two earning rooms, or two spending rooms, takes neither.",
+      at: [-2990, 1800],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [life(5)], at: [-3064, 1757] },
+        { id: "n1", kind: "notable", name: "Unbroken", lines: [maxGrit(1), gritDuration(25)], at: [-2990, 1715], why: "One more grit charge, and the charges last longer: the keep's grit side." },
+        { id: "b", kind: "small", lines: [life(5)], at: [-2916, 1757] },
+        { id: "c", kind: "small", lines: [resAll(4)], at: [-2916, 1843] },
+        { id: "n2", kind: "notable", name: "Tempered", lines: [maxResAll(1), resAll(4), armour(16)], at: [-2990, 1885], why: "+1% to maximum resistances (2 units by the table, more in play), 1 unit of resistance and 1.3 of armour: 4.3. The keep's other side (2026-10-31): the grit build that crosses the keep this way holds against the elements instead of holding more. (Its armour came from Elemental Ward in G3: a strength build that comes here for it leaves the home's armour behind.)" },
+        { id: "d", kind: "small", lines: [resAll(4)], at: [-3064, 1843] },
+        { id: "g1", kind: "small", lines: [gritDuration(15)], at: [-3245, 1822], why: "The approach from Iron Voice (2026-10-31): the keep's approaches are grit held longer." },
+        { id: "g2", kind: "small", lines: [gritDuration(15)], at: [-3400, 1600], why: "The approach from Hammer Rhythm (2026-10-31; one small since the finalization, where it was two)." },
+        { id: "g4", kind: "small", lines: [gritDuration(15)], at: [-3040, 2068], why: "The approach to Heavy Hands (2026-10-31)." },
+      ],
+      links: [["a", "n1"], ["n1", "b"], ["b", "c"], ["c", "n2"], ["n2", "d"], ["d", "a"], ["d", "g1"], ["a", "g2"], ["c", "g4"]],
     },
     {
       id: "skull",
@@ -166,7 +181,7 @@ export const maces: AreaSpec = {
   links: [
     { from: "wall.maces.ring.c", to: "wall.rampart.spS.m", why: "The mid ring meets the south spoke." },
     { from: "wall.maces.greatweight.a", to: "wall.rampart.spS.c", why: "The way in." },
-    { from: "wall.maces.headsman.a", to: "wall.grit.ring.q7", why: "The way in." },
+    { from: "wall.maces.headsman.a", to: "wall.grit.ring.q8", why: "The way in (at q8 since q7 went, 2026-10-31)." },
     { from: "wall.maces.scarTissue.a", to: "wall.grit.ring.q8", why: "The way in." },
     { from: "wall.maces.rooted.a", to: "wall.grit.ring.q8", why: "The way in." },
     { from: "wall.maces.host.a", to: "wall.grit.ring.s0", why: "The way in." },
@@ -175,8 +190,13 @@ export const maces: AreaSpec = {
     { from: "wall.maces.stunGrit.s1", to: "wall.maces.ring.c", why: "The way in." },
     { from: "wall.maces.gritPay.s1", to: "wall.maces.scarTissue.n", why: "The way in." },
     { from: "wall.maces.skull.s1", to: "wall.grit.ring.s1", why: "The way in." },
-    { from: "wall.maces.locked.b", to: "wall.rampart.bulwark.n2", why: "A way across between neighbouring clusters, dearer than the roads. Since the revision (2026-10-31) the end of the defender's tower: Ox Hide → Mortar and Stone → Locked Shields → the mid ring." },
-    { from: "wall.maces.gritPay.d", to: "wall.resists.radW.m", why: "Grit and Gravel's own door (2026-10-31), on the mid ring junction the keep's wheel left." },
-    { from: "wall.maces.host.x", to: "cathedral.rim.volatile.a", why: "Across the Cathedral border (2026-10-31): Grave Host into Volatile Servants' minion-life smalls, the summoner's way along the outer corner, slower than the rim road from s0 to q1." },
+    { from: "wall.maces.locked.b", to: "wall.rampart.bulwark.n2", why: "A way across between neighbouring clusters, dearer than the roads. Since the revision (2026-10-31) the end of the defender's tower: Ox Hide → Mortar and Stone → Locked Shields → the mid ring. Who walks it: the armoured shield bearer, whose blocks then build grit and close wounds." },
+    { from: "wall.maces.gritPay.d", to: "wall.resists.radW.m", why: "Grit and Gravel's own door (2026-10-31), on the mid ring junction the keep's wheel left. Who walks it: the grit fighter who wants damage for every charge held without first going out to the rim for Scar Tissue." },
+    { from: "wall.maces.unbroken.g1", to: "wall.grit.ironVoice.d", why: "The keep's west gate: Iron Voice's warcries earn the grit (2026-10-31), its far small on into the keep. The warcrier who holds his grit: shouts build it, the keep keeps it." },
+    { from: "wall.maces.unbroken.g2", to: "wall.grit.rhythm.c", why: "The keep's west gate: Hammer Rhythm's mace hits earn the grit (2026-10-31), its far small on into the keep. The mace fighter who hoards the charges his blows build." },
+    { from: "wall.maces.unbroken.b", to: "wall.maces.ram.b", why: "The keep's east gate: Shield Ram spends the grit as block (2026-10-31), its far small straight onto the wheel. The shield bearer whose block grows with every charge held." },
+    { from: "wall.maces.unbroken.g4", to: "wall.grit.heavyHands.b", why: "The keep's east gate: Heavy Hands spends the grit as two-handed speed (2026-10-31). The two-hander who swings faster for every charge held." },
+    { from: "wall.maces.greatweight.n1", to: "wall.maces.skull.n", why: "The stun rooms joined (the finalization, 2026-10-31): the two-handed mace stunner, who holds them down with Greatweight's stun and cracks the stunned with Skull Crack, takes both in one walk beside the north spoke; 7 steps between their doors against the road's 1." },
+    { from: "wall.maces.host.x", to: "cathedral.rim.volatile.a", why: "Across the Cathedral border (2026-10-31): Grave Host into Volatile Servants' minion-life smalls, the summoner's way along the outer corner, slower than the rim road from s0 to q1. Who walks it: the summoner who wants both minion rooms of the corner, minion life and armour, then the minion keystone." },
   ],
 };

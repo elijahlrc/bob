@@ -104,14 +104,12 @@ export const snares: AreaSpec = {
           at: [3119, -1215],
         },
         { id: 't6', kind: 'small', lines: [mineDamage(12)], at: [3042, -1218] },
-        { id: 't7', kind: 'small', lines: [trapDamage(12)], at: [3125, -1400] },
         { id: 't8', kind: 'small', lines: [mineDamage(12)], at: [3175, -1267] },
       ],
       links: [
         ['t1', 't2'],
         ['t2', 't3'],
-        ['t3', 't7'],
-        ['t7', 't4'],
+        ['t3', 't4'],
         ['t4', 't8'],
         ['t8', 't5'],
         ['t5', 't6'],
@@ -147,7 +145,6 @@ export const snares: AreaSpec = {
       at: [3142, -220],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [dodgeAttack(3)], at: [3090, -254] },
         { id: 'b', kind: 'small', lines: [dodgeAttack(3)], at: [3138, -222] },
         {
           id: 'n',
@@ -173,7 +170,6 @@ export const snares: AreaSpec = {
         },
       ],
       links: [
-        ['a', 'b'],
         ['b', 'n'],
         ['n', 'd'],
         ['d', 'n2'],
@@ -195,16 +191,14 @@ export const snares: AreaSpec = {
           lines: [auraEffect(12), reducedReservation(8), mana(16)],
           at: [3611, -170],
         },
-        { id: 'p1', kind: 'small', lines: [evasion(10)], at: [3674, -3] },
-        { id: 'p2', kind: 'small', lines: [evasion(10)], at: [3737, 164] },
-        { id: 'p3', kind: 'small', lines: [evasion(10)], at: [3799, 330] },
+        { id: 'p1', kind: 'small', lines: [evasion(10)], at: [3695, 52] },
+        { id: 'p3', kind: 'small', lines: [evasion(10)], at: [3778, 275] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
         ['n', 'p1'],
-        ['p1', 'p2'],
-        ['p2', 'p3'],
+        ['p1', 'p3'],
       ],
     },
     {
@@ -239,12 +233,10 @@ export const snares: AreaSpec = {
           lines: [oneHandMelee(20), attackSpeed(8, ['oneHand']), bleedChance(15)],
           at: [3813, -646],
         },
-        { id: 'c', kind: 'small', lines: [attackSpeed(5, ['oneHand'])], at: [3861, -594] },
       ],
       links: [
         ['a', 'b'],
         ['b', 'n'],
-        ['n', 'c'],
       ],
     },
     {
@@ -333,7 +325,6 @@ export const snares: AreaSpec = {
     },
     { from: 'knife.snares.wheel.t1', to: 'knife.edge.ring.a', why: 'The way in.' },
     { from: 'knife.snares.mercy.a', to: 'knife.snares.ring.a', why: 'The way in.' },
-    { from: 'knife.snares.tumble.a', to: 'knife.snares.ring.a', why: 'The way in.' },
     { from: 'knife.snares.herald.a', to: 'knife.snares.radS.m', why: 'The way in.' },
     { from: 'knife.snares.nimble.a', to: 'knife.snares.radS.b', why: 'The way in.' },
     { from: 'knife.snares.rake.a', to: 'knife.snares.spS.c', why: 'The way in.' },
@@ -344,17 +335,17 @@ export const snares: AreaSpec = {
     {
       from: 'knife.snares.mercy.a',
       to: 'knife.snares.tumble.b',
-      why: 'A way across between neighbouring clusters, dearer than the roads.',
+      why: "Tumble's way in, through Cutpurse's Luck's first small (since the second thinning, 2026-10-31, when Tumble's own first small went: the two ways in from the mid ring were the same length).",
     },
     {
       from: 'knife.snares.tumble.n2',
       to: 'knife.snares.herald.a',
-      why: "Twin Shadows leads on into Veiled Herald's evasion run, and has its own way in from the border road (the revision, 2026-10-31).",
+      why: "For the dual-wielding evader: from Tumble's dodge and Twin Shadows' crit on into Veiled Herald's evasion and auras (the revision, 2026-10-31); Twin Shadows also has its own way in from the border road.",
     },
     {
       from: 'knife.snares.herald.p3',
       to: 'bow.rim.haresPace.s',
-      why: "Across the border into the Bow's Hare's Pace (the revision, 2026-10-31): the evader's way from the Knife's border ground to the Strider's, outside the mid ring.",
+      why: "For the evasive attacker, Shade or Strider, who wants Veiled Herald's evasion and Hare's Pace's evasion and attack speed: across the border, outside the mid ring (the revision, 2026-10-31).",
     },
     {
       from: 'knife.snares.rake.a',

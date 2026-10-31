@@ -32,7 +32,7 @@ export const quiver: AreaSpec = {
     {
       id: "hotPursuit",
       name: "Hot Pursuit",
-      why: "Fervour on kill, in from the rim ring, beside the Knife’s fervour. Split in two rooms (2026-10-31; Hunter's Fervour was hung one step past Hot Pursuit): Hunter's Fervour stands on its own crit smalls from the next rim node, where Steadfast Aim was, and leads on by a fervour-duration small into Hot Pursuit, so a crit build earns its fervour in one room and spends it in the other.",
+      why: "Fervour on kill, in from the rim ring, beside the Knife’s fervour. Split in two rooms (2026-10-31; Hunter's Fervour was hung one step past Hot Pursuit): Hunter's Fervour stands on its own crit small from the next rim node (since the finalization Hot Pursuit's door is on q4 and Hunter's Fervour's on q5), and leads on by a fervour-duration small into Hot Pursuit, so a crit build earns its fervour in one room and spends it in the other.",
       at: [3321, 2157],
       shape: { kind: 'hand' },
       nodes: [
@@ -41,10 +41,9 @@ export const quiver: AreaSpec = {
         { id: "n", kind: "notable", name: "Hot Pursuit", lines: [fervourOnKill(25), attackSpeedPerFervour(3)], at: [3237, 2115], why: "Fervour from kills, and speed for every charge held." },
         { id: "c", kind: "small", lines: [fervourDuration(15)], at: [3172, 2292], why: "Between earning fervour and spending it: the charges last longer (2026-10-31)." },
         { id: "n2", kind: 'notable', name: "Hunter's Fervour", lines: [fervourOnCrit(20), critMulti(15)], at: [3107, 2470], why: "Fervour from crits as well as kills, so a crit build feeds Hot Pursuit’s speed." },
-        { id: "f2", kind: "small", lines: [critMulti(12)], at: [3184, 2512], why: "Hunter's Fervour's own way in (2026-10-31): crit multiplier, for the crit build it serves." },
-        { id: "f1", kind: "small", lines: [critMulti(12)], at: [3261, 2555] },
+        { id: "f2", kind: "small", lines: [critMulti(12)], at: [3184, 2512], why: "Hunter's Fervour's own way in (2026-10-31; one small since the finalization): crit multiplier, for the crit build it serves." },
       ],
-      links: [["a2", "a3"], ["a3", "n"], ["n", "c"], ["c", "n2"], ["n2", "f2"], ["f2", "f1"]],
+      links: [["a2", "a3"], ["a3", "n"], ["n", "c"], ["c", "n2"], ["n2", "f2"]],
     },
     {
       id: "tellingShot",
@@ -89,10 +88,10 @@ export const quiver: AreaSpec = {
   links: [
     { from: "bow.quiver.wheel.e", to: "bow.quiver.wheel.a1", why: "The wheel's other side (the old file joined it from outside)." },
     { from: "bow.quiver.wheel.e", to: "bow.flight.ring.c", why: "The way in." },
-    { from: "bow.quiver.hotPursuit.a2", to: "bow.rim.ring.q5", why: "The way in." },
+    { from: "bow.quiver.hotPursuit.a2", to: "bow.rim.ring.q4", why: "The way in (on q4 since the finalization, when the rim's q6 went and Hunter's Fervour's door took q5)." },
     { from: "bow.quiver.tellingShot.s2", to: "bow.rim.ring.q4", why: "The way in." },
     { from: "bow.quiver.forces.s1", to: "bow.rim.ring.q5", why: "The way in." },
     { from: "bow.quiver.pursuit.s1", to: "bow.flight.ring.b", why: "The way in." },
-    { from: "bow.quiver.hotPursuit.f1", to: "bow.rim.ring.q6", why: "Hunter's Fervour's way in, from the rim ring (2026-10-31)." },
+    { from: "bow.quiver.hotPursuit.f2", to: "bow.rim.ring.q5", why: "Hunter's Fervour's way in, from the rim ring (2026-10-31; from q5 since the finalization): the crit archer who wants fervour comes in by crit multiplier, earns fervour on crits and walks on to Hot Pursuit to spend it as speed." },
   ],
 };

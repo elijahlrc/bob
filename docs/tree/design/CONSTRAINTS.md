@@ -550,6 +550,9 @@ decisions are in the sections above (§3 item 6, §6 items 5 to 8, §9 item 0) a
 19. **Starts may differ in shape** (three exits, a fork at another step), keeping about six directions by the third
     point and the strong first small (items 8 and 9). [user, 10-31]
 20. **Cluster-to-cluster links may cross region borders.** [user, 10-31]
+21. **A V whose notable leads on is acceptable** at a start. [user, 10-31]
+22. **The first pass grew too much** (1,383 to 1,487 nodes): roads are thinned to bring the count noticeably back down.
+    [user, 10-31]
 
 ## 17. Open, not yet decided
 

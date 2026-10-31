@@ -121,26 +121,20 @@ export const home: AreaSpec = {
     {
       id: 'spN',
       name: 'The north spoke',
-      why: 'The north spoke from its hub to the junction with the cross-link.',
-      at: [1458, -1166],
+      why: "The north spoke's first node past its hub, where Thick Blood hangs. Thinned in the finalization (2026-10-31, R-revise.md §10): the bare attribute node between the hub and here went (CONSTRAINTS §16 item 9, attribute nodes only as junctions), so the spoke reaches its first room a step sooner.",
+      at: [1531, -1364],
       shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: [1458, -1166] },
-        { id: 'x', kind: 'attribute', lines: [dex(6), int(6)], at: [1531, -1364] },
-      ],
-      links: [['a', 'x']],
+      nodes: [{ id: 'x', kind: 'attribute', lines: [dex(6), int(6)], at: [1531, -1364] }],
+      links: [],
     },
     {
       id: 'spS',
       name: 'The south spoke',
-      why: 'The south spoke from its hub to the junction with the cross-link.',
-      at: [1739, -679],
+      why: "The south spoke's first node past its hub, where Snakeskin hangs. Thinned in the finalization (2026-10-31, R-revise.md §10): the bare attribute node between the hub and here went (CONSTRAINTS §16 item 9), so the spoke reaches its first room a step sooner.",
+      at: [1946, -644],
       shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: [1739, -679] },
-        { id: 'x', kind: 'attribute', lines: [dex(6), int(6)], at: [1946, -644] },
-      ],
-      links: [['a', 'x']],
+      nodes: [{ id: 'x', kind: 'attribute', lines: [dex(6), int(6)], at: [1946, -644] }],
+      links: [],
     },
     {
       id: 'cross',
@@ -242,7 +236,7 @@ export const home: AreaSpec = {
     {
       id: 'quick',
       name: 'The blade road',
-      why: "The blade (the revision, 2026-10-31): the Knife's own route straight out along its radial, between the two spokes, from Keen Instinct through Quick Wrists to the mid ring at the axis (by Second Curse's small). Keen Instinct is the hilt where the two roads from the hubs meet, and it leads on instead of ending the start's V; the blade is two steps slower than either spoke to the mid ring, and richer.",
+      why: "The blade (the revision, 2026-10-31): the Knife's own route straight out along its radial, between the two spokes, from Keen Instinct through Quick Wrists to the mid ring at the axis (by Second Curse's small). Keen Instinct is the hilt where the two roads from the hubs meet, and it leads on instead of ending the start's V; the blade is slower than either spoke to the mid ring (four steps since the finalization thinned the spokes, 2026-10-31; its second attack speed small stays, or Quiet Knife would end a path at step 8), and richer.",
       at: [1962, -1132],
       shape: { kind: 'hand' },
       nodes: [
@@ -296,7 +290,7 @@ export const home: AreaSpec = {
     {
       id: 'star',
       name: 'Snakeskin',
-      why: 'The resist star, off the south spoke at its junction (step 5), linked across to Soft Step.',
+      why: "The resist star, off the south spoke at its junction (step 5). Its link across to Soft Step went in the second thinning (2026-10-31): with the spoke a node shorter it ran from the spoke to the Bow seam faster than the road, and no build walked it.",
       at: [2101, -352],
       shape: { kind: 'hand' },
       nodes: [
@@ -326,8 +320,7 @@ export const home: AreaSpec = {
       at: [792, -1130],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'e2', kind: 'small', lines: [es(5)], at: [794, -1207] },
-        { id: 'e1', kind: 'small', lines: [es(5)], at: [805, -1153] },
+        { id: 'e2', kind: 'small', lines: [es(5)], at: [800, -1170] },
         {
           id: 'n',
           kind: 'notable',
@@ -352,8 +345,7 @@ export const home: AreaSpec = {
         },
       ],
       links: [
-        ['e2', 'e1'],
-        ['e1', 'n'],
+        ['e2', 'n'],
         ['n', 'm'],
         ['n', 'n2'],
       ],
@@ -373,8 +365,7 @@ export const home: AreaSpec = {
           lines: [evasion(18), es(10), lifeRegen(0.5)],
           at: [1403, -106],
         },
-        { id: 'v1', kind: 'small', lines: [evasion(10)], at: [1341, -138] },
-        { id: 'v2', kind: 'small', lines: [evasion(10)], at: [1292, -164] },
+        { id: 'v2', kind: 'small', lines: [evasion(10)], at: [1330, -150] },
         {
           id: 'n2',
           kind: 'notable',
@@ -386,8 +377,7 @@ export const home: AreaSpec = {
       ],
       links: [
         ['e', 'n'],
-        ['n', 'v1'],
-        ['v1', 'v2'],
+        ['n', 'v2'],
         ['n2', 'n'],
       ],
     },
@@ -458,7 +448,7 @@ export const home: AreaSpec = {
     },
     {
       from: 'knife.home.hubs.n',
-      to: 'knife.home.spN.a',
+      to: 'knife.home.spN.x',
       why: 'The north hub out along the spoke.',
     },
     {
@@ -468,7 +458,7 @@ export const home: AreaSpec = {
     },
     {
       from: 'knife.home.hubs.s',
-      to: 'knife.home.spS.a',
+      to: 'knife.home.spS.x',
       why: 'The south hub out along the spoke.',
     },
     { from: 'knife.home.cross.n2', to: 'knife.home.keen.n', why: 'To the home notable.' },
@@ -509,42 +499,37 @@ export const home: AreaSpec = {
     {
       from: 'knife.home.thickBlood.c',
       to: 'knife.home.spoils.n2',
-      why: 'A way across between neighbouring clusters, dearer than the roads: Thick Blood into Low Tide (it went to Spoils before the revision, past where Low Tide now stands).',
+      why: "For the regenerating Shade, who wants Thick Blood's life regeneration and Low Tide's mana regeneration: Thick Blood into Low Tide, dearer than the roads (it went to Spoils before the revision, past where Low Tide now stands).",
     },
     {
       from: 'knife.home.spoils.t2',
       to: 'knife.hex.radN.a',
-      why: "The mana run reaches the north border road: Low Tide's own way in, passing no other notable (the revision, 2026-10-31).",
+      why: "For the caster coming along the north border road (Shifting Ward's energy shield, Spellslip), who runs low on mana: the mana run reaches the road, so Low Tide is taken without Spoils (the revision, 2026-10-31).",
     },
     {
       from: 'knife.home.quick.d',
       to: 'knife.venom.secondCurse.a',
-      why: "The blade reaches the mid ring at the axis through Second Curse's small (the revision, 2026-10-31): Keen Instinct and Quick Wrists lead on, and Quick Wrists has a way in from the far end.",
+      why: "For the curser who attacks or casts fast: from Quick Wrists' attack and cast speed the blade reaches Second Curse's small at the mid ring (the revision, 2026-10-31), so Keen Instinct and Quick Wrists lead on to the second curse.",
     },
     {
       from: 'knife.home.flasks.s2',
       to: 'knife.home.breath.n2',
-      why: "The north's two doors part here: the mana door, Deep Reserves, beside the flask door (the revision, 2026-10-31).",
+      why: "For the caster of costly spells, who wants a deep mana pool more than flasks: the mana door, Deep Reserves, beside the flask door, on to Hoarded Breath's energy shield and mana (the revision, 2026-10-31).",
     },
     {
       from: 'knife.home.flasks.n',
       to: 'knife.home.breath.m',
-      why: "The flask door leads on: Smuggler's Flasks into Hoarded Breath's room by a mana small (the revision, 2026-10-31).",
+      why: "For the flask user with energy shield, Shade or Mystic: Smuggler's Flasks leads on into Hoarded Breath's energy shield and mana by a mana small (the revision, 2026-10-31).",
     },
     {
       from: 'knife.home.pace.s2',
       to: 'knife.home.cloak.n2',
-      why: "The south's two doors part here: the resistance door, Ward of Smoke, beside Deft Guard (the revision, 2026-10-31).",
+      why: "For the build short of resistances: the resistance door, Ward of Smoke, beside Deft Guard, on to Grey Cloak's evasion and energy shield (the revision, 2026-10-31).",
     },
     {
       from: 'knife.home.pace.n',
       to: 'knife.home.cloak.v2',
-      why: "Deft Guard leads on: into Grey Cloak's evasion run and so to the Bow seam (the revision, 2026-10-31).",
-    },
-    {
-      from: 'knife.home.star.s',
-      to: 'knife.home.softStep.n',
-      why: 'A way across between neighbouring clusters, dearer than the roads.',
+      why: "For the evasion build: Deft Guard's evasion and dodge lead on into Grey Cloak's evasion run, and so to the Bow seam (the revision, 2026-10-31).",
     },
   ],
 };

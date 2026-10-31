@@ -57,14 +57,11 @@ export const venom: AreaSpec = {
     {
       id: 'ring',
       name: 'The mid ring, centre north',
-      why: "The mid ring's stretch from the north spoke toward the axis.",
-      at: [2284, -1695],
+      why: "The mid ring's stretch from the north spoke toward the axis. Thinned in the finalization (2026-10-31, R-revise.md §10): its first node went, a bare stretch whose one room, the Rookery wheel, now opens off the spoke's junction with the ring.",
+      at: [2447, -1413],
       shape: { kind: 'hand' },
-      nodes: [
-        { id: 'a', kind: 'attribute', lines: [dex(6), int(6)], at: [2284, -1695] },
-        { id: 'b', kind: 'attribute', lines: [dex(6), int(6)], at: [2447, -1413] },
-      ],
-      links: [['a', 'b']],
+      nodes: [{ id: 'b', kind: 'attribute', lines: [dex(6), int(6)], at: [2447, -1413] }],
+      links: [],
     },
     {
       id: 'quietKnife',
@@ -122,7 +119,6 @@ export const venom: AreaSpec = {
           at: [2599, -1766],
         },
         { id: 'v6', kind: 'small', lines: [es(5)], at: [2524, -1755] },
-        { id: 'v7', kind: 'small', lines: [poisonDamage(12)], at: [2573, -1949] },
         { id: 'v8', kind: 'small', lines: [es(5)], at: [2645, -1827] },
         {
           id: 'f',
@@ -136,8 +132,7 @@ export const venom: AreaSpec = {
       links: [
         ['v1', 'v2'],
         ['v2', 'v3'],
-        ['v3', 'v7'],
-        ['v7', 'v4'],
+        ['v3', 'v4'],
         ['v4', 'v8'],
         ['v8', 'v5'],
         ['v5', 'v6'],
@@ -227,12 +222,16 @@ export const venom: AreaSpec = {
     },
     {
       from: 'knife.venom.spN.m',
-      to: 'knife.venom.ring.a',
+      to: 'knife.venom.ring.b',
       why: 'The mid ring on toward the axis.',
     },
     { from: 'knife.venom.ring.b', to: 'knife.edge.ring.a', why: 'The mid ring across the axis.' },
     { from: 'knife.venom.quietKnife.a', to: 'knife.venom.spN.b', why: 'The way in.' },
-    { from: 'knife.venom.wheel.v1', to: 'knife.venom.ring.a', why: 'The way in.' },
+    {
+      from: 'knife.venom.wheel.v1',
+      to: 'knife.venom.spN.m',
+      why: "The way in, off the junction of the north spoke and the mid ring (it was off the ring's next node, thinned in the finalization).",
+    },
     { from: 'knife.venom.wheel.v4', to: 'knife.venom.spN.c', why: 'The way in.' },
     { from: 'knife.venom.secondCurse.a', to: 'knife.venom.ring.b', why: 'The way in.' },
     { from: 'knife.venom.shadeLeech.a', to: 'knife.venom.spN.c', why: 'The way in.' },
