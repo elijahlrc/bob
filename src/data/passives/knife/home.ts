@@ -451,12 +451,12 @@ export const home: AreaSpec = {
     { from: 'knife.home.cross.s2', to: 'knife.home.keen.n', why: 'To the home notable.' },
     {
       from: 'knife.home.seams.n',
-      to: 'centre.ring.road.r3',
+      to: 'centre.ring.road.i0',
       why: 'Along the border into the centre.',
     },
     {
       from: 'knife.home.seams.s',
-      to: 'centre.ring.road.r5',
+      to: 'centre.ring.road.i1',
       why: 'Along the border into the centre.',
     },
     {

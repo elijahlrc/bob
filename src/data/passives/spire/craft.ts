@@ -153,7 +153,7 @@ export const craft: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [channelDamage(10)], at: [886, -3464] },
         { id: "s2", kind: "small", lines: [channelDamage(10)], at: [962, -3420] },
-        { id: "n", kind: "notable", name: "Drone", lines: [channelDamage(20), damageStationary(15)], at: [1038, -3376] },
+        { id: "n", kind: "notable", name: "Drone", lines: [channelDamage(20), damageStationary(15)], at: [1038, -3376], why: "Channelling's second home, with Steady Stream on the axis." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

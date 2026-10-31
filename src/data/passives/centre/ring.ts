@@ -1,72 +1,55 @@
 /**
- * The centre ring (C-brief §2): a ring road of attribute nodes inside the six starts, the cheap crossing between
- * neighbouring homes. Twenty-four nodes at radius 750, one at each class's angle (that class's attribute) and three
- * between neighbours (the first neighbour's, a mix, the second neighbour's). Each home's attribute junction links to the
- * ring node at its class's angle (`centre.ring.road.r<k>`, k = (angle + 90) / 15). The generic clusters inside the ring are in
- * `clusters.ts`.
+ * The centre's roads (docs/tree/design/R-centre.md, written by scripts/passives/rework/centre-gen.ts): six inner roads,
+ * one along each border from the pair's seam to a junction at radius 950, an inner ring (a hexagon) joining the
+ * junctions, and three spokes from every other junction to the middle. Attribute nodes carry the attributes of the
+ * classes either side. The generic notables are in `clusters.ts`.
  */
-import { dex, int, str } from '../lines';
-import type { AreaSpec, Line, NodeSpec } from '../types';
-
-export const RING_R = 750;
-
-/** Class order round the ring, clockwise from the top, with its attributes. */
-export const RING_CLASSES: { classId: string; angle: number; attrs: ('str' | 'dex' | 'int')[] }[] =
-  [
-    { classId: 'mystic', angle: -90, attrs: ['int'] },
-    { classId: 'shade', angle: -30, attrs: ['dex', 'int'] },
-    { classId: 'strider', angle: 30, attrs: ['dex'] },
-    { classId: 'reaver', angle: 90, attrs: ['str', 'dex'] },
-    { classId: 'vanguard', angle: 150, attrs: ['str'] },
-    { classId: 'zealot', angle: 210, attrs: ['str', 'int'] },
-  ];
-
-const LINE = { str, dex, int };
-const own = (attrs: ('str' | 'dex' | 'int')[]): Line[] =>
-  attrs.length === 1 ? [LINE[attrs[0]](7)] : attrs.map((a) => LINE[a](6));
-
-const nodes: NodeSpec[] = [];
-for (let k = 0; k < 24; k++) {
-  const a = -90 + 15 * k;
-  const at: [number, number] = [
-    Math.round(RING_R * Math.cos((a * Math.PI) / 180)),
-    Math.round(RING_R * Math.sin((a * Math.PI) / 180)),
-  ];
-  const i = Math.floor(k / 4);
-  const from = RING_CLASSES[i],
-    to = RING_CLASSES[(i + 1) % 6];
-  const step = k % 4;
-  let lines: Line[];
-  if (step === 0) lines = own(from.attrs);
-  else if (step === 1) lines = own(from.attrs);
-  else if (step === 3) lines = own(to.attrs);
-  else {
-    // The middle node: +6 of each attribute either neighbour has, two at most (the first of each).
-    const both = [...new Set([from.attrs[0], to.attrs[0]])];
-    lines = both.length === 1 ? [LINE[both[0]](7)] : both.map((x) => LINE[x](6));
-  }
-  nodes.push({ id: `r${k}`, kind: 'attribute', lines, at });
-}
+import { allAttr, dex, int, str } from '../lines';
+import type { AreaSpec } from '../types';
 
 export const ring: AreaSpec = {
   id: 'centre.ring',
   region: 'centre',
-  name: 'The ring',
+  name: 'The crossroads',
   why:
-    'The cheap crossing between neighbouring homes: a road of attribute nodes, ' +
-    "nothing else, so that walking to a neighbour pays in the attribute the neighbour's gear will ask for. Four steps from one " +
-    "class's junction to the next, as in the reference (its centre crossing is about as long).",
-  at: [-440, 240], // Where the area's name is drawn: clear of every other area's name (label pass, round 4).
+    'Generic ground between all six starts, about as far from each: a pair of neighbours walks in from its seam to its ' +
+    'junction, and every class reaches the middle through the junction on one of its borders.',
+  at: [0, -620],
   clusters: [
     {
       id: 'road',
-      name: 'The ring road',
-      why: 'One cluster so that the ring is one place; its nodes are the only attribute road the centre has.',
+      name: 'The inner roads',
+      why: 'One cluster so that the centre is one place; its nodes are the centre\'s only roads.',
       at: [0, 0],
       shape: { kind: 'hand' },
-      nodes,
-      links: nodes.map((_, k) => [`r${k}`, `r${(k + 1) % 24}`] as [string, string]),
+      nodes: [
+        { id: 'i0', kind: 'attribute', lines: [int(6), dex(6)], at: [548,-1123], why: "The inner road along the border of the Mystic and the Shade, between their seam and the junction." },
+        { id: 'j0', kind: 'attribute', lines: [int(6), dex(6)], at: [475,-823], why: "The junction of the Mystic and the Shade: their generic notable hangs here." },
+        { id: 'h0', kind: 'attribute', lines: [dex(6), int(6)], at: [713,-411], why: "The inner ring under the Shade's start, between two junctions." },
+        { id: 'i1', kind: 'attribute', lines: [dex(6), int(6)], at: [1245,109], why: "The inner road along the border of the Shade and the Strider, between their seam and the junction." },
+        { id: 'j1', kind: 'attribute', lines: [dex(6), int(6)], at: [950,0], why: "The junction of the Shade and the Strider: their generic notable hangs here." },
+        { id: 'h1', kind: 'attribute', lines: [dex(7)], at: [713,411], why: "The inner ring under the Strider's start, between two junctions." },
+        { id: 'i2', kind: 'attribute', lines: [dex(6), str(6)], at: [567,1114], why: "The inner road along the border of the Strider and the Reaver, between their seam and the junction." },
+        { id: 'j2', kind: 'attribute', lines: [dex(6), str(6)], at: [475,823], why: "The junction of the Strider and the Reaver: their generic notable hangs here." },
+        { id: 'h2', kind: 'attribute', lines: [str(6), dex(6)], at: [0,823], why: "The inner ring under the Reaver's start, between two junctions." },
+        { id: 'i3', kind: 'attribute', lines: [str(6), dex(6)], at: [-625,1083], why: "The inner road along the border of the Reaver and the Vanguard, between their seam and the junction." },
+        { id: 'j3', kind: 'attribute', lines: [str(6), dex(6)], at: [-475,823], why: "The junction of the Reaver and the Vanguard: their generic notable hangs here." },
+        { id: 'h3', kind: 'attribute', lines: [str(7)], at: [-713,411], why: "The inner ring under the Vanguard's start, between two junctions." },
+        { id: 'i4', kind: 'attribute', lines: [str(6), int(6)], at: [-1250,0], why: "The inner road along the border of the Vanguard and the Zealot, between their seam and the junction." },
+        { id: 'j4', kind: 'attribute', lines: [str(6), int(6)], at: [-950,0], why: "The junction of the Vanguard and the Zealot: their generic notable hangs here." },
+        { id: 'h4', kind: 'attribute', lines: [str(6), int(6)], at: [-712,-411], why: "The inner ring under the Zealot's start, between two junctions." },
+        { id: 'i5', kind: 'attribute', lines: [int(6), str(6)], at: [-735,-1011], why: "The inner road along the border of the Zealot and the Mystic, between their seam and the junction." },
+        { id: 'j5', kind: 'attribute', lines: [int(6), str(6)], at: [-475,-823], why: "The junction of the Zealot and the Mystic: their generic notable hangs here." },
+        { id: 'h5', kind: 'attribute', lines: [int(7)], at: [0,-823], why: "The inner ring under the Mystic's start, between two junctions." },
+        { id: 's1', kind: 'attribute', lines: [allAttr(4)], at: [475,0], why: "An inner spoke to the middle, from every other junction: every start reaches the middle through the junction on one of its borders." },
+        { id: 's3', kind: 'attribute', lines: [allAttr(4)], at: [-237,411], why: "An inner spoke to the middle, from every other junction: every start reaches the middle through the junction on one of its borders." },
+        { id: 's5', kind: 'attribute', lines: [allAttr(4)], at: [-238,-411], why: "An inner spoke to the middle, from every other junction: every start reaches the middle through the junction on one of its borders." },
+        { id: 'm', kind: 'attribute', lines: [allAttr(5)], at: [0, 0], why: "The middle: the two notables every class shares hang from it." },
+      ],
+      links: [['i0', 'j0'], ['j0', 'h0'], ['h0', 'j1'], ['i1', 'j1'], ['j1', 'h1'], ['h1', 'j2'], ['i2', 'j2'], ['j2', 'h2'], ['h2', 'j3'], ['i3', 'j3'], ['j3', 'h3'], ['h3', 'j4'], ['i4', 'j4'], ['j4', 'h4'], ['h4', 'j5'], ['i5', 'j5'], ['j5', 'h5'], ['h5', 'j0'], ['j1', 's1'], ['s1', 'm'], ['j3', 's3'], ['s3', 'm'], ['j5', 's5'], ['s5', 'm']],
     },
   ],
-  links: [],
+  links: [
+    // The seams link here from their own regions (a link is written once): knife.home.seams.n, knife.home.seams.s, bow.home.seams.s, yard.home.seams.s, wall.home.seams.s, spire.home.seams.w.
+  ],
 };

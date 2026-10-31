@@ -125,15 +125,13 @@ const links: [string, string, string][] = [
   ['bow.home.sig.b', 'bow.home.hubs.s', 'Point two: the south hub.'],
   ['bow.home.sig.a', 'bow.home.pathN.a', "Point two: the north path toward the Knife's seam."],
   ['bow.home.sig.b', 'bow.home.pathS.a', 'Point two: the south path toward the Yard seam.'],
-  ['bow.home.pathN.b', 'knife.home.seams.s', "The north path reaches the Knife's seam."],
-  ['bow.home.pathS.b', 'bow.home.seams.s', 'The south path reaches the Yard seam.'],
   ['bow.home.hubs.n', 'bow.home.cross.n1', "The north hub in toward Hawk's Eye."],
   ['bow.home.hubs.n', 'bow.home.spN.a', 'The north hub out along the spoke.'],
   ['bow.home.hubs.s', 'bow.home.cross.s1', "The south hub in toward Hawk's Eye."],
   ['bow.home.hubs.s', 'bow.home.spS.a', 'The south hub out along the spoke.'],
   ['bow.home.cross.n2', 'bow.home.hawk.n', 'To the home notable.'],
   ['bow.home.cross.s2', 'bow.home.hawk.n', 'To the home notable.'],
-  ['bow.home.seams.s', 'centre.ring.road.r9', 'Along the border into the centre.'],
+  ['bow.home.seams.s', 'centre.ring.road.i2', 'Along the border into the centre.'],
   ['bow.home.seams.s', 'bow.steel.radS.a', 'Along the border out to the mid ring.'],
   ['bow.home.spN.x', 'bow.bows.spN.a', 'The north spoke goes on.'],
   ['bow.home.spS.x', 'bow.steel.spS.a', 'The south spoke goes on.'],
@@ -155,10 +153,10 @@ export const tables = { K, roads, links };
 const moves: Move[] = [
   // The Gate (home, steps 5 to 7): a damage and a defence home on each half.
   { from: 'home.crit', area: 'home', at: K(1890, -21.5), entry: [['a', 'bow.home.pathN.b']], why: 'Crit, a side room off the north path, outward: the north half’s damage near home (step 5).' },
-  { from: 'home.clearHead', area: 'home', at: K(1450, -21), entry: [['a', 'bow.home.pathN.b']], why: 'Mana and reservation, a side room off the north path toward the centre.' },
+  { from: 'home.clearHead', area: 'home', at: K(1710, -24), ats: { a: K(1735, -21.5), n: K(1680, -26.5), b: K(0, 0) }, entry: [['a', 'bow.home.pathN.b'], ['n', 'knife.home.seams.s']], why: "Mana and reservation, run through on the north path to the Knife's seam (the centre pass: every start about six steps from its seams)." },
   { from: 'home.life', area: 'home', at: K(2240, -19.5), entry: [['a', 'bow.home.spN.x']], why: 'Life and regeneration, off the north spoke junction: the north half’s defence.' },
   { from: 'steel.wayfarer', area: 'home', at: K(1890, 21.5), entry: [['a', 'bow.home.pathS.b']], why: 'Evasion and resistances, a side room off the south path, outward: the south half’s defence.' },
-  { from: 'quiver.quickSip', area: 'home', at: K(1460, 15.5), entry: [['a', 'bow.home.pathS.b']], why: 'The flask layer near home, a side room off the south path toward the centre.' },
+  { from: 'quiver.quickSip', area: 'home', at: K(1710, 24), ats: { b: K(1735, 21.5), n: K(1680, 26.5), a: K(0, 0) }, entry: [['b', 'bow.home.pathS.b'], ['n', 'bow.home.seams.s']], why: 'The flask layer near home, run through on the south path to the Yard seam (the centre pass: every start about six steps from its seams).' },
   { from: 'string.speed', area: 'home', id: 'speed', at: K(2240, 19.5), ats: { a: K(2140, 15.5), qh: K(2230, 18.5), m: K(2320, 21.5), ff: K(0, 0), b: K(0, 0), f1: K(0, 0), f2: K(0, 0) }, entry: [['a', 'bow.home.spS.x']], why: 'Attack speed, off the south spoke junction: the south half’s damage.' },
   { from: 'string.hardTarget', area: 'home', at: K(2320, 0), entry: [['a', 'bow.home.hawk.n']], why: "Evasion, life and stun, a side room on out from Hawk's Eye along the axis." },
   // The Hedgerows (north spoke): bows, cold arrows, the Knife seam's trap home.
@@ -220,6 +218,8 @@ const over: Over = {
   'bow.south.fieldKit.n': { lines: 'evasion(20), flaskRecovery(20)', why: 'Evasion with the flask layer.' },
 };
 const trim: Record<string, string[]> = {
+  'bow.home.quickSip': ['a'],
+  'bow.home.clearHead': ['b'],
   'bow.home.crit': ['c', 'd'],
   'bow.home.wayfarer': ['c', 'd'],
   'bow.home.speed': ['ff', 'b', 'f1', 'f2'],

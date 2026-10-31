@@ -125,14 +125,13 @@ const links: [string, string, string][] = [
   ['yard.home.sig.b', 'yard.home.hubs.s', 'Point two: the south hub.'],
   ['yard.home.sig.a', 'yard.home.pathN.a', "Point two: the north path toward the Bow's seam."],
   ['yard.home.sig.b', 'yard.home.pathS.a', 'Point two: the south path toward the Wall seam.'],
-  ['yard.home.pathS.b', 'yard.home.seams.s', 'The west path reaches the Wall seam.'],
   ['yard.home.hubs.n', 'yard.home.cross.n1', "The north hub in toward Quickened Steel."],
   ['yard.home.hubs.n', 'yard.home.spN.a', 'The north hub out along the spoke.'],
   ['yard.home.hubs.s', 'yard.home.cross.s1', "The south hub in toward Quickened Steel."],
   ['yard.home.hubs.s', 'yard.home.spS.a', 'The south hub out along the spoke.'],
   ['yard.home.cross.n2', 'yard.home.quick.n', 'To the home notable.'],
   ['yard.home.cross.s2', 'yard.home.quick.n', 'To the home notable.'],
-  ['yard.home.seams.s', 'centre.ring.road.r13', 'Along the border into the centre.'],
+  ['yard.home.seams.s', 'centre.ring.road.i3', 'Along the border into the centre.'],
   ['yard.home.seams.s', 'yard.shield.radW.a', 'Along the border out to the mid ring.'],
   ['yard.home.spN.x', 'yard.dual.spN.a', 'The north spoke goes on.'],
   ['yard.home.spS.x', 'yard.blades.spS.a', 'The south spoke goes on.'],
@@ -157,7 +156,7 @@ const moves: Move[] = [
   { from: 'home.fieldDressing', area: 'home', at: K(1450, -21), entry: [['a', 'yard.home.pathN.b']], why: 'The flask layer near home, a side room off the east path toward the centre.' },
   { from: 'home.fightingBreath', area: 'home', at: K(2160, -5.5), entry: [['a', 'yard.home.spN.x']], why: 'The one mana notable near home, off the east spoke junction.' },
   { from: 'home.life', area: 'home', at: K(1890, 21.5), entry: [['a', 'yard.home.pathS.b']], why: 'Life and regeneration, a side room off the west path, outward: the west half’s defence.' },
-  { from: 'blades.guarded', area: 'home', at: K(1450, 21), entry: [['c', 'yard.home.pathS.b']], why: 'Armour and evasion, a side room off the west path toward the centre.' },
+  { from: 'blades.guarded', area: 'home', at: K(1710, 24), ats: { b: K(1735, 21.5), n: K(1680, 26.5), a: K(0, 0), c: K(0, 0) }, entry: [['b', 'yard.home.pathS.b'], ['n', 'yard.home.seams.s']], why: 'Armour and evasion, run through on the west path to the Wall seam (the centre pass: every start about six steps from its seams).' },
   { from: 'blood.cleanBreak', area: 'home', at: K(2240, 19.5), entry: [['a', 'yard.home.spS.x']], why: 'Physical attack damage and crit, off the west spoke junction: the west half’s damage.' },
   // The Lists (east): dual wielding, evasion, impale, fervour, the Bow seam.
   { from: 'dual.footwork', area: 'dual', at: K(2080, -24.5), entry: [['a', 'bow.steel.radS.a']], why: "Accuracy and reach for the duellist, off the Bow's border road." },
@@ -223,6 +222,7 @@ const over: Over = {
   'yard.blades.crimsonPact.k': { name: 'Blood Bargain', lines: '' },
 };
 const trim: Record<string, string[]> = {
+  'yard.home.guarded': ['a','c'],
   'yard.shield.shieldwall': ['b', 'c'],
 };
 const newc: NewCluster[] = [

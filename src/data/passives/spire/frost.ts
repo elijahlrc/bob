@@ -115,7 +115,7 @@ export const frost: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [spellArea(8)], at: [200, -4278] },
         { id: "s2", kind: "small", lines: [spellArea(8)], at: [207, -4365] },
-        { id: "n", kind: "notable", name: "Blast", lines: [spellAreaDamage(20), spellAreaOnKill(15)], at: [215, -4453] },
+        { id: "n", kind: "notable", name: "Blast", lines: [spellAreaDamage(20), spellAreaOnKill(15)], at: [215, -4453], why: "Area's second home, with Broad Weave." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

@@ -125,14 +125,13 @@ const links: [string, string, string][] = [
   ['wall.home.sig.b', 'wall.home.hubs.s', 'Point two: the south hub.'],
   ['wall.home.sig.a', 'wall.home.pathN.a', "Point two: the north path toward the Yard's seam."],
   ['wall.home.sig.b', 'wall.home.pathS.a', 'Point two: the south path toward the Cathedral seam.'],
-  ['wall.home.pathS.b', 'wall.home.seams.s', 'The north path reaches the Cathedral seam.'],
   ['wall.home.hubs.n', 'wall.home.cross.n1', "The north hub in toward Oathbound."],
   ['wall.home.hubs.n', 'wall.home.spN.a', 'The north hub out along the spoke.'],
   ['wall.home.hubs.s', 'wall.home.cross.s1', "The south hub in toward Oathbound."],
   ['wall.home.hubs.s', 'wall.home.spS.a', 'The south hub out along the spoke.'],
   ['wall.home.cross.n2', 'wall.home.oath.n', 'To the home notable.'],
   ['wall.home.cross.s2', 'wall.home.oath.n', 'To the home notable.'],
-  ['wall.home.seams.s', 'centre.ring.road.r17', 'Along the border into the centre.'],
+  ['wall.home.seams.s', 'centre.ring.road.i4', 'Along the border into the centre.'],
   ['wall.home.seams.s', 'wall.resists.radW.a', 'Along the border out to the mid ring.'],
   ['wall.home.spN.x', 'wall.slams.spN.a', 'The north spoke goes on.'],
   ['wall.home.spS.x', 'wall.rampart.spS.a', 'The south spoke goes on.'],
@@ -157,7 +156,7 @@ const moves: Move[] = [
   { from: 'slams.secondWind', area: 'home', at: K(1450, -21), entry: [['a', 'wall.home.pathN.b']], why: 'Life and regeneration, a side room off the south path toward the centre.' },
   { from: 'maces.thickSkin', area: 'home', at: K(2260, -16), entry: [['a', 'wall.home.spN.x']], why: 'Armour and stun threshold, off the south spoke junction: the south half’s defence.' },
   { from: 'resists.star', area: 'home', at: K(1890, 21.5), entry: [['f', 'wall.home.pathS.b']], why: 'Resistances and life, a side room off the north path, outward: the north half’s second defence.' },
-  { from: 'home.quartermaster', area: 'home', at: K(1450, 21), entry: [['a', 'wall.home.pathS.b']], why: 'The flask layer near home, a side room off the north path toward the centre.' },
+  { from: 'home.quartermaster', area: 'home', at: K(1710, 24), ats: { b: K(1735, 21.5), n: K(1680, 26.5), a: K(0, 0) }, entry: [['b', 'wall.home.pathS.b'], ['n', 'wall.home.seams.s']], why: 'The flask layer near home, run through on the north path to the Cathedral seam (the centre pass: every start about six steps from its seams).' },
   { from: 'rampart.stoneHeart', area: 'home', at: K(2240, 19.5), entry: [['a', 'wall.home.spS.x']], why: 'Melee crit, off the north spoke junction: offence on the north exit too.' },
   { from: 'rampart.steadyHands', area: 'rampart', at: K(2400, 6), entry: [['a', 'wall.rampart.spS.a']], why: 'Accuracy and speed, off the north spoke toward the axis.' },
   { from: 'grit.barrowWard', area: 'slams', at: K(2370, -9), entry: [['a', 'wall.slams.spN.a']], why: 'Regeneration and reduction, off the south spoke toward the axis.' },
@@ -232,7 +231,9 @@ const over: Over = {
   'wall.grit.hotIron.n': { lines: "eleAttackOne('fire', 29), igniteChance(18)", why: 'Fire attacks that ignite (its stun line went).' },
   'wall.slams.strongarm.k': { name: 'Unbowed Arm', lines: '', why: 'The strength keystone (renamed: its old name was a reference keystone\u2019s).' },
 };
-const trim: Record<string, string[]> = {};
+const trim: Record<string, string[]> = {
+  'wall.home.quartermaster': ['a'],
+};
 const newc: NewCluster[] = [
   { area: 'rampart', id: 'stand', name: 'Standing Iron', lines: "armourWhileStationary(45), stunAvoidStationary(35)", smalls: ['armour(10)', 'armour(10)'], entry: 'wall.rampart.spS.c', toward: K(3600, 7), why: 'The armour rule: armour that grows while the Vanguard holds still.' },
   { area: 'maces', id: 'stunGrit', name: 'Broken Guard', lines: "gritOnStun(30), enemyStunThreshold(10)", smalls: ['stunDuration(8)', 'stunDuration(8)'], entry: 'wall.maces.ring.c', toward: K(2700, 9), why: 'Stunning an enemy gives grit, by the shields on the axis: the grit walk runs from here north.' },

@@ -106,7 +106,7 @@ export const fire: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('fire', 10)], at: [-1386, -4119] },
         { id: "s2", kind: "small", lines: [eleDamage('fire', 10)], at: [-1411, -4204] },
-        { id: "n", kind: "notable", name: "Kiln Heart", lines: [eleDamage('fire', 20), penetration('fire', 6), esLeech(0.3)], at: [-1436, -4288] },
+        { id: "n", kind: "notable", name: "Kiln Heart", lines: [eleDamage('fire', 20), penetration('fire', 6), esLeech(0.3)], at: [-1436, -4288], why: "Fire's payoff, out from the rim ring." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

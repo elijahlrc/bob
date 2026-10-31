@@ -105,7 +105,7 @@ export const storm: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('lightning', 10)], at: [1407, -4110] },
         { id: "s2", kind: "small", lines: [eleDamage('lightning', 10)], at: [1453, -4185] },
-        { id: "n", kind: "notable", name: "Thunder's Reach", lines: [eleDamage('lightning', 16), penetration('lightning', 5), critVsShocked(30)], at: [1499, -4260] },
+        { id: "n", kind: "notable", name: "Thunder's Reach", lines: [eleDamage('lightning', 16), penetration('lightning', 5), critVsShocked(30)], at: [1499, -4260], why: "Lightning's payoff, out from the rim ring." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },
@@ -118,7 +118,7 @@ export const storm: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [spellProjectile(10)], at: [1805, -3952] },
         { id: "s2", kind: "small", lines: [spellProjectile(10)], at: [1854, -4025] },
-        { id: "n", kind: "notable", name: "Spray of Bolts", lines: [spellProjectile(15), spellExtraProjectile(1)], at: [1903, -4098] },
+        { id: "n", kind: "notable", name: "Spray of Bolts", lines: [spellProjectile(15), spellExtraProjectile(1)], at: [1903, -4098], why: "Projectiles' second home, with Darting Bolts." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

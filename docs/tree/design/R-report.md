@@ -179,3 +179,30 @@ report for the owner is the last section (and its Artifact page).
 - Owner questions from the Cathedral: the start sides (mana regeneration with life, damage with life) differ from the
   approved skeleton's (elemental damage, armour); the Cathedral as one minion partner among three rather than "the main
   minion region"; insight charges now also in the Cathedral (staff block, warcry), not the Knife's alone.
+
+### The centre
+
+- Stage 1 (plan): R-centre.md. Round 1 REVISE: the plan's steps were wrong (start to seam was 4 on the side that built
+  the seam and 6-7 on the other, so the middle would have sat 8 from three classes and 11 from two); two placements
+  copied the neighbours (Shelter by the Knife's Ward of Smoke, Waste Not by the Wall's Iron Lungs); a false placement
+  reason; inner roads laid through region nodes.
+- Stage 2 (structure, with the revision): approved. **The six bare paths to a seam now run through a home cluster**
+  (CONSTRAINTS §16.9), in the regions: the Spire's Draught and Hale Scribe, the Bow's Clear Head and Quick Sip, the
+  Yard's Guarded, the Wall's Camp Stores, each a two-node run-through (a small or two trimmed). Every start is now 6 or 7
+  steps from both its seams. The frame: an inner road along each border from the seam to a junction at 950 (five bent a
+  few degrees clear of region nodes), a hexagon joining the junctions, three spokes to the middle. The old ring road (24
+  nodes, built for starts at 1,000) is gone.
+- Stage 3 (notables): round 1 REVISE (prices set for when they sat 7 steps from some starts; now 10 to 15 from every
+  start, so a home generalist at step 5 beat them). Repriced to 4.0-4.9 units. Approved.
+- Stage 4 (final review): approved. **The centre is done** (2026-10-31): eight generic notables, no keystones. Each pair
+  of neighbours has its junction notable, placed where neither home sells it by that seam: Firm Footing (-60, Mystic and
+  Shade), Hard Living (0, Shade and Strider), Waste Not (60, Strider and Reaver), Sound Body (120, Reaver and Vanguard),
+  Quick March (180, Vanguard and Zealot), Shelter (240, Zealot and Mystic); Well Rounded and Provisions at the middle.
+  Steps: every class reaches its two junction notables at 10-11, the middle's at 12-13, the others at 12-15 (the Shade
+  one step further throughout). Provisional until the flask stats: Hard Living, Provisions, Waste Not's mana on kill.
+  For the joins pass: Well Rounded is now stronger than the Bow's Wanderer, two steps from the 60 seam. For the tidy
+  pass: three side rooms run close beside a spoke or hexagon side.
+- Owner questions from the centre: notables per pair of classes (as built) or all eight equally far at the middle (a
+  literal reading of skeleton §8); keep the hexagon and the three spokes (beyond the skeleton's six inner roads); amend
+  CONSTRAINTS §3 item 8 ("the centre ring between neighbouring homes"), now that the ring is gone; more than eight
+  notables in the centre (more flask notables as the attrition lever).

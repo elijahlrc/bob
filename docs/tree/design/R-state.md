@@ -78,7 +78,8 @@ rework's decisions), `R-reviewer.md` (the reviewer agent's brief), `R-skeleton.m
 - **The Wall: done** (`70ae190`): R-wall.md, R-wall-chart.md, built by `wall-gen.ts`. More tools: `exits.mjs`
   (own notables per exit within 8/10/14), `steps.ts` (steps between named notables), `scale.ts` (scale a notable's lines
   to a target price, printing `over` entries).
-- **The Cathedral: done**: R-cathedral.md, R-cathedral-chart.md, built by `cathedral-gen.ts`. Next: the centre (R-centre.md, plan drafted, not reviewed).
+- **The Cathedral: done** (`d803ae3`): R-cathedral.md, R-cathedral-chart.md, built by `cathedral-gen.ts`.
+- **The centre: done**: R-centre.md, built by `centre-gen.ts` (ring.ts, clusters.ts); the six bare paths to a seam were rerouted through home clusters in the Spire, Bow, Yard and Wall tables. Next: the joins review, then the final report.
 - (Old note) **The Wall:** Musts from the Yard rounds: place around the Yard's finished nodes (Shieldwall, Iron Skin, Sword
   and Board sit where Strongarm, Greatblade, Cleaver are now); no weapon picks within 8 of the Reaver or the Vanguard;
   rename Strongarm (a reference keystone name) and the Wall's Second Wind (the Bow has one). Then the Cathedral, then the Cathedral, the centre, the joins, the

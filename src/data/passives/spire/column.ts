@@ -104,7 +104,7 @@ export const column: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamageAll(8)], at: [-569, -2796] },
         { id: "s2", kind: "small", lines: [eleDamageAll(8)], at: [-487, -2765] },
-        { id: "n", kind: "notable", name: "Fire and Frost", lines: [eleDamage('fire', 12), eleDamage('cold', 12), crossElement(20)], at: [-404, -2735] },
+        { id: "n", kind: "notable", name: "Fire and Frost", lines: [eleDamage('fire', 12), eleDamage('cold', 12), crossElement(20)], at: [-404, -2735], why: "The two-element path, between fire's road and cold's axis." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

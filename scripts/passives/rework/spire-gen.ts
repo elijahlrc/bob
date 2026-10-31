@@ -128,7 +128,7 @@ const links: [string, string, string][] = [
   ['spire.home.hubs.w', 'spire.home.spW.a', 'The west hub out along the spoke.'],
   ['spire.home.hubs.e', 'spire.home.cross.e1', 'The east hub in toward First Light.'],
   ['spire.home.hubs.e', 'spire.home.spE.a', 'The east hub out along the spoke.'],
-  ['spire.home.seams.w', 'centre.ring.road.r23', 'Along the border into the centre.'],
+  ['spire.home.seams.w', 'centre.ring.road.i5', 'Along the border into the centre.'],
   ['spire.home.seams.w', 'spire.well.radW.a', 'Along the border out to the mid ring.'],
   ['spire.home.spW.x', 'spire.well.spW.a', 'The west spoke goes on.'],
   ['spire.home.spE.x', 'spire.craft.spE.a', 'The east spoke goes on.'],
@@ -142,8 +142,6 @@ const links: [string, string, string][] = [
   ['spire.craft.ring.a', 'knife.hex.radN.m', "The mid ring meets the Knife's border road."],
   ['spire.rim.ring.q8', 'knife.rim.ring.n0', "The rim ring meets the Knife's."],
   ['spire.home.cross.w2', 'spire.home.first.n', 'To the home notable.'],
-  ['spire.home.pathW.b', 'spire.home.seams.w', 'The west path reaches the Cathedral seam.'],
-  ['spire.home.pathE.b', 'knife.home.seams.n', "The east path reaches the Knife's seam."],
   ['spire.home.cross.e2', 'spire.home.first.n', 'To the home notable.'],
 ];
 
@@ -157,8 +155,8 @@ const moves: Move[] = [
   { from: 'home.warmBlood', area: 'home', at: K(1870, 21.5), entry: [['a', 'spire.home.pathE.b']], why: "Life and energy shield, a side room off the east path, outward (step 5): the life caster's first notable." },
   { from: 'home.stillMind', area: 'home', at: K(2200, -17), entry: [['a', 'spire.home.spW.x']], why: 'The one mana notable near home, off the west spoke junction (step 6).' },
   { from: 'home.sharpMind', area: 'home', at: K(2200, 16.5), entry: [['a', 'spire.home.spE.x']], why: 'Spell crit, off the east spoke junction (step 6).' },
-  { from: 'well.draught', area: 'home', at: K(1450, -21), entry: [['a', 'spire.home.pathW.b']], why: 'The flask layer near home, a side room off the west path toward the centre.' },
-  { from: 'craft.haleScribe', area: 'home', at: K(1430, 16), entry: [['a', 'spire.home.pathE.a']], why: 'Life near home, a side room off the east path toward the centre.' },
+  { from: 'well.draught', area: 'home', at: K(1710, -24), ats: { a: K(1735, -21.5), n: K(1680, -26.5), b: K(0, 0) }, entry: [['a', 'spire.home.pathW.b'], ['n', 'spire.home.seams.w']], why: 'The flask layer near home, run through on the west path to the Cathedral seam (the centre pass: every start about six steps from its seams).' },
+  { from: 'craft.haleScribe', area: 'home', at: K(1710, 24), ats: { b: K(1735, 21.5), n: K(1680, 26.5), a: K(0, 0), c: K(0, 0), d: K(0, 0) }, entry: [['b', 'spire.home.pathE.b'], ['n', 'knife.home.seams.n']], why: "Life near home, run through on the east path to the Knife's seam (the centre pass: every start about six steps from its seams)." },
   // The Cloister (west): defence and mana, the Cathedral seam, fire's first rungs.
   { from: 'craft.devotion', area: 'well', at: K(1380, -27), entry: [['a', 'spire.home.seams.w']], why: 'Reservation and energy shield on the seam with the Cathedral, a side room toward the centre.' },
   { from: 'frost.quickening', area: 'well', at: K(2060, -26.5), entry: [['a', 'spire.well.radW.a']], why: 'Energy shield recharge, the seam theme, off the west border road.' },
@@ -249,7 +247,8 @@ const over: Over = {
   'spire.frost.coldLight.n': { lines: "eleDamage('cold', 16), spellCrit(30), critMultiVsFrozen(30)" },
 };
 const trim: Record<string, string[]> = {
-  'spire.home.haleScribe': ['c', 'd'],
+  'spire.home.draught': ['b'],
+  'spire.home.haleScribe': ['a', 'c', 'd'],
   'spire.craft.keenVerse': ['d'],
 };
 const newc: NewCluster[] = [

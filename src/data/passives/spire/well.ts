@@ -210,7 +210,7 @@ export const well: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('fire', 10)], at: [-656, -2583] },
         { id: "s2", kind: "small", lines: [eleDamage('fire', 10)], at: [-738, -2614] },
-        { id: "n", kind: "notable", name: "Kindling", lines: [eleDamage('fire', 20), castSpeed(5), resOne('fire', 15)], at: [-821, -2644] },
+        { id: "n", kind: "notable", name: "Kindling", lines: [eleDamage('fire', 20), castSpeed(5), resOne('fire', 15)], at: [-821, -2644], why: "Fire's first rung, off the west spoke: the west's damage before the rim." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },
