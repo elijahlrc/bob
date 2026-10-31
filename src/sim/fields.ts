@@ -12,6 +12,8 @@ import { hit, lifeCap, rawHit } from './combat';
 import { creepToward } from './skillFx';
 import { noteRecover } from './recovery';
 import { scaleProfile } from './shots';
+import { FLOOR } from '../gen/labyrinth';
+import { ICE } from './grid';
 import type { Action, Actor, World } from './types';
 import { enemiesWithin, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
@@ -818,7 +820,7 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     );
   const add = (tx: number, ty: number) => {
     const idx = ty * w.grid.w + tx;
-    if (!tiles.includes(idx) && w.grid.tiles[idx] === 1 && !fixedOn(tx, ty)) tiles.push(idx);
+    if (!tiles.includes(idx) && w.grid.tiles[idx] === FLOOR && !fixedOn(tx, ty)) tiles.push(idx);
   };
   let prevX = NaN;
   let prevY = NaN;
@@ -828,7 +830,7 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     const ty = Math.floor(act.aimY + Math.sin(ang) * off);
     // A line that steps across a corner would leave a gap between two tiles that only touch there: close it.
     if (tx !== prevX && ty !== prevY && !Number.isNaN(prevX)) {
-      if (w.grid.tiles[prevY * w.grid.w + tx] === 1) add(tx, prevY);
+      if (w.grid.tiles[prevY * w.grid.w + tx] === FLOOR) add(tx, prevY);
       else add(prevX, ty);
     }
     add(tx, ty);
@@ -837,7 +839,7 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
   }
   // Blocks rise where the ground is open (not where the last wall still stands); the rise hurts along the whole line either way.
   if (tiles.length > 0) {
-    for (const idx of tiles) w.grid.tiles[idx] = 0;
+    for (const idx of tiles) w.grid.tiles[idx] = ICE;
     w.grid.refreshOpen();
   }
   const f: Field = {
@@ -859,7 +861,6 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
     dtype: dominantType(p),
     tiles,
   };
-  if (tiles.length > 0) a.side!.fields.push(f);
   // The band the wall hurts, outlined (the renderer draws the wall itself, tile by tile, from the field).
   const ex = Math.cos(ang) * (len / 2);
   const ey = Math.sin(ang) * (len / 2);
@@ -879,63 +880,79 @@ export function raiseWall(w: World, a: Actor, act: Action): void {
   const onWall = enemiesIn(w, a.team, act.aimX, act.aimY, len / 2 + WALL_HALF + 1).filter(
     (e) => segmentDist(e.x, e.y, p1x, p1y, p2x, p2y) <= WALL_HALF + e.r,
   );
-  for (const e of onWall) {
-    hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
-    // A training dummy that is fixed (src/sim/dummy.ts) stands fast, as it does against a knockback.
-    if (e.dummy && e.stationary) continue;
-    const dx = e.x - act.aimX;
-    const dy = e.y - act.aimY;
-    const side =
-      Math.sign(dx * Math.cos(ang - Math.PI / 2) + dy * Math.sin(ang - Math.PI / 2)) || 1;
-    const spot = w.grid.collide(
-      e.x + Math.cos(ang - Math.PI / 2) * side * spec.push,
-      e.y + Math.sin(ang - Math.PI / 2) * side * spec.push,
-      e.r,
-    );
-    e.x = spot.x;
-    e.y = spot.y;
-  }
-  // The wall stands whole: whatever still touches its tiles (the character, a minion, an enemy that could not be thrown back) is moved
-  // sideways out of the ice, to the side it stood on, and never left in a gap.
+  for (const e of onWall) hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
+  // Every body the rise moves (an enemy thrown back from the line, and whatever still touches the ice: the character, a minion) is
+  // set down only where it stands whole on floor, reached in a straight line over floor or ice: never in rock, from where it would
+  // be rescued far off and put down (`tickStranded`). It goes to the side it stood on (on the line itself, the character's side),
+  // an enemy thrown back as near the full push as there is room for; the other side only when its own has none. One with no room
+  // on either side keeps its ground, and the ice under it gives way.
   const px = Math.cos(ang - Math.PI / 2);
   const py = Math.sin(ang - Math.PI / 2);
-  const inIce = (e: Actor): boolean => {
-    for (let ty = Math.floor(e.y - e.r); ty <= Math.floor(e.y + e.r); ty++)
-      for (let tx = Math.floor(e.x - e.r); tx <= Math.floor(e.x + e.r); tx++)
-        if (tiles.includes(ty * w.grid.w + tx)) return true;
+  const touches = (x: number, y: number, r: number, test: (tx: number, ty: number) => boolean) => {
+    for (let ty = Math.floor(y - r); ty <= Math.floor(y + r); ty++)
+      for (let tx = Math.floor(x - r); tx <= Math.floor(x + r); tx++) {
+        const cx = Math.max(tx, Math.min(x, tx + 1));
+        const cy = Math.max(ty, Math.min(y, ty + 1));
+        if ((x - cx) ** 2 + (y - cy) ** 2 < r * r && test(tx, ty)) return true;
+      }
     return false;
   };
+  const inIce = (e: Actor) =>
+    touches(e.x, e.y, e.r, (tx, ty) => tiles.includes(ty * w.grid.w + tx));
+  const fits = (x: number, y: number, r: number) =>
+    !touches(x, y, r, (tx, ty) => !w.grid.isFloor(tx, ty));
+  const overRock = (x0: number, y0: number, x1: number, y1: number) => {
+    const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 0.25);
+    for (let i = 1; i <= n; i++) {
+      const tx = Math.floor(x0 + ((x1 - x0) * i) / n);
+      const ty = Math.floor(y0 + ((y1 - y0) * i) / n);
+      if (!w.grid.seeThrough(tx, ty)) return true;
+    }
+    return false;
+  };
+  const thrown = new Set(onWall.map((e) => e.id));
   for (const e of w.actors) {
-    if (!e.alive || (e.dummy && e.stationary) || !inIce(e)) continue;
-    // The side it stands on; on the line itself, the character's side (a body that is behind the wall stays behind it).
+    // A training dummy that is fixed (src/sim/dummy.ts) stands fast, as it does against a knockback.
+    if (!e.alive || (e.dummy && e.stationary)) continue;
+    const push = thrown.has(e.id) ? spec.push : 0;
+    if (push === 0 && !inIce(e)) continue;
     const across = (e.x - act.aimX) * px + (e.y - act.aimY) * py;
     const toCaster = (a.x - act.aimX) * px + (a.y - act.aimY) * py;
     const side = Math.sign(across) || Math.sign(toCaster) || 1;
-    const x0 = e.x;
-    const y0 = e.y;
-    let cleared = false;
-    for (const dir of [side, -side]) {
-      for (let d = 0.6 + e.r; d <= 2.4 + e.r && !cleared; d += 0.3) {
-        const spot = w.grid.collide(
-          x0 + px * dir * (d - dir * across),
-          y0 + py * dir * (d - dir * across),
-          e.r,
-        );
-        e.x = spot.x;
-        e.y = spot.y;
-        cleared = !inIce(e);
+    // Where it would go on a side, as near `want` tiles from the line as fits.
+    const place = (dir: number, want: number): { x: number; y: number } | null => {
+      let best: { x: number; y: number; off: number } | null = null;
+      for (let d = 0; d <= want + 3; d += 0.25) {
+        const x = e.x + px * (dir * d - across);
+        const y = e.y + py * (dir * d - across);
+        if (!fits(x, y, e.r) || overRock(e.x, e.y, x, y)) continue;
+        const off = Math.abs(d - want);
+        if (!best || off < best.off) best = { x, y, off };
       }
-      if (cleared) break;
-    }
-    if (!cleared) {
-      e.x = x0;
-      e.y = y0;
+      return best;
+    };
+    const spot = place(side, Math.abs(across) + push) ?? place(-side, 0);
+    if (spot) {
+      e.x = spot.x;
+      e.y = spot.y;
+    } else {
+      for (let i = tiles.length - 1; i >= 0; i--) {
+        const tx = tiles[i] % w.grid.w;
+        const ty = (tiles[i] - tx) / w.grid.w;
+        if (touches(e.x, e.y, e.r, (x, y) => x === tx && y === ty)) {
+          w.grid.tiles[tiles[i]] = FLOOR;
+          tiles.splice(i, 1);
+        }
+      }
     }
   }
+  w.grid.refreshOpen();
+  if (tiles.length > 0) a.side!.fields.push(f);
 }
 
 function endWall(w: World, f: Field): void {
-  for (const idx of f.tiles ?? []) w.grid.tiles[idx] = 1;
+  // A tile goes back to floor only while it is still this wall's ice.
+  for (const idx of f.tiles ?? []) if (w.grid.tiles[idx] === ICE) w.grid.tiles[idx] = FLOOR;
   w.grid.refreshOpen();
 }
 

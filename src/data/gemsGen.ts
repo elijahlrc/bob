@@ -3336,7 +3336,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     cost: [9, 33],
     mods: [],
     description:
-      'Raises a wall of ice across the way: nothing crosses it, and what stood under it is hit and pushed back.',
+      'Raises a wall of ice that blocks the way but not shots; what stood under it is hit and pushed back.',
   },
   {
     kind: 'active',

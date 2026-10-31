@@ -218,8 +218,8 @@ function findTarget(w: World, s: Side): Actor | null {
     if (d > bd + 1e-9) continue;
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
     // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.
-    if (!support && !w.grid.los(p.x, p.y, m.x, m.y)) continue;
-    if (support && SUPPORT_NEEDS_SIGHT.has(m.mon!.spec.type) && !w.grid.los(p.x, p.y, m.x, m.y))
+    if (!support && !w.grid.sees(p.x, p.y, m.x, m.y)) continue;
+    if (support && SUPPORT_NEEDS_SIGHT.has(m.mon!.spec.type) && !w.grid.sees(p.x, p.y, m.x, m.y))
       continue;
     best = m;
     bd = d;
@@ -260,7 +260,7 @@ function inReach(w: World, s: Side, prof: SkillProfile, target: Actor): boolean 
   const melee = prof.skill.behaviour.kind === 'melee';
   const reach = Math.max(skillRange(prof), primeRange(s, prof)) + target.r + (melee ? p.r : 0);
   const d = Math.hypot(target.x - p.x, target.y - p.y);
-  return d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
+  return d <= reach && (melee || w.grid.sees(p.x, p.y, target.x, target.y));
 }
 
 type Pick = {
@@ -495,7 +495,7 @@ function avoidHazard(w: World, s: Side, dt: number): boolean {
       if (bodyOnWay(w, s.team, p.x, p.y, c.x, c.y, p.r)) continue;
       if (target && target.alive) {
         const d = Math.hypot(target.x - c.x, target.y - c.y);
-        if (d > reach || (!melee && !w.grid.los(c.x, c.y, target.x, target.y))) continue;
+        if (d > reach || (!melee && !w.grid.sees(c.x, c.y, target.x, target.y))) continue;
       }
       if (!best || len < best.d) best = { x: c.x, y: c.y, d: len };
       break;
@@ -557,7 +557,7 @@ function kiteStep(w: World, s: Side, target: Actor, dt: number): boolean {
       if (hazardAt(w, s.team, c.x, c.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c.x, c.y)) continue;
       if (bodyOnWay(w, s.team, p.x, p.y, c.x, c.y, p.r)) continue;
       if (Math.hypot(target.x - c.x, target.y - c.y) > range) continue;
-      if (!w.grid.los(c.x, c.y, target.x, target.y)) continue;
+      if (!w.grid.sees(c.x, c.y, target.x, target.y)) continue;
       const score = Math.hypot(near.x - c.x, near.y - c.y);
       if (!best || score > best.score) best = { x: c.x, y: c.y, score };
     }
@@ -599,7 +599,7 @@ function kiteBlink(w: World, s: Side, target: Actor, range: number, nd: number):
         if (hazardAt(w, s.team, c0.x, c0.y, p.r + 0.3) || !w.grid.los(p.x, p.y, c0.x, c0.y))
           continue;
         if (Math.hypot(target.x - c0.x, target.y - c0.y) > range) continue;
-        if (!w.grid.los(c0.x, c0.y, target.x, target.y)) continue;
+        if (!w.grid.sees(c0.x, c0.y, target.x, target.y)) continue;
         let score = Infinity;
         for (const m of foes) score = Math.min(score, Math.hypot(m.x - c0.x, m.y - c0.y));
         if (!best || score > best.score) best = { x: c0.x, y: c0.y, score };
@@ -715,7 +715,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
     const close = !melee && strategy?.spacing === 'close' ? CLOSE_RANGE + target.r : Infinity;
     const reach = Math.min(reach0, contact > 0 && !prime ? contact + target.r : Infinity, close);
     const d = Math.hypot(target.x - p.x, target.y - p.y);
-    const inRange = d <= reach && (melee || w.grid.los(p.x, p.y, target.x, target.y));
+    const inRange = d <= reach && (melee || w.grid.sees(p.x, p.y, target.x, target.y));
     // Arrows keep hitting walls (a wide fan in a narrow corridor): close in for a clearer shot.
     if (!melee && ai.repoT <= 0 && ai.blocked >= BLOCK_LIMIT && w.t - ai.blockedT <= BLOCK_WINDOW) {
       ai.repoT = REPOSITION_TIME;

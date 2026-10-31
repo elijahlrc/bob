@@ -224,7 +224,7 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
     );
   if (def.wall)
     out.push(
-      `Raises a wall ${num(def.wall.length)} long for ${num(def.wall.seconds)} s that holds the way shut and pushes back what stands there`,
+      `Raises a wall ${num(def.wall.length)} long for ${num(def.wall.seconds)} s that holds the way shut (shots fly over it) and pushes back what stands there`,
     );
   if (def.geyser)
     out.push(

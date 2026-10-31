@@ -7,6 +7,7 @@ import { flaskMask, killActor, playerConds } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
 import { bannerStage } from './banners';
 import { consecratedAt, raiseWall, WALL_HALF } from './fields';
+import { ICE } from './grid';
 import { reservedMana } from './reserve';
 import type { Actor, World } from './types';
 import { spawnMonster, stepWorld } from './world';
@@ -257,7 +258,7 @@ describe('Glacier Wall: the wall has no gaps', () => {
     });
     const closed: [number, number][] = [];
     for (let i = 0; i < was.length; i++)
-      if (was[i] === 1 && world.grid.tiles[i] === 0)
+      if (was[i] === 1 && world.grid.tiles[i] === ICE)
         closed.push([i % world.grid.w, Math.floor(i / world.grid.w)]);
     return { world, dummy, p, closed };
   };

@@ -191,7 +191,7 @@ function totemSpot(
       : TOTEM_OFFSET + (i === 0 ? 0 : w.rngTrig.float(0, 2));
     const spot = w.grid.collide(a.x + Math.cos(ang) * reach, a.y + Math.sin(ang) * reach, 0.3);
     let score = 0;
-    if (target && !w.grid.los(spot.x, spot.y, target.x, target.y)) score -= 5;
+    if (target && !w.grid.sees(spot.x, spot.y, target.x, target.y)) score -= 5;
     if (bond) {
       // The beams it would make: to the character and to the totems already standing.
       if (!w.grid.los(spot.x, spot.y, a.x, a.y)) score -= 20;
@@ -667,7 +667,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
     if (keep && c && d.kind === 'totem' && c.skill.ancestral) {
       // A war-cry totem is active while the character is near and in sight of it, and gives the character its buff.
       const an = c.skill.ancestral;
-      d.active = Math.hypot(d.x - p.x, d.y - p.y) <= an.range && w.grid.los(d.x, d.y, p.x, p.y);
+      d.active = Math.hypot(d.x - p.x, d.y - p.y) <= an.range && w.grid.sees(d.x, d.y, p.x, p.y);
       if (d.active) s.buffT[an.buff] = Math.max(s.buffT[an.buff], 0.3);
     }
     if (keep && c && d.kind === 'totem' && c.skill.bond) {
@@ -711,7 +711,7 @@ export function tickDeployables(w: World, s: Side, dt: number): void {
           let bd = Infinity;
           for (const e of foes) {
             const dist = Math.hypot(e.x - d.x, e.y - d.y);
-            if (dist <= reach + e.r && dist < bd && w.grid.los(d.x, d.y, e.x, e.y)) {
+            if (dist <= reach + e.r && dist < bd && w.grid.sees(d.x, d.y, e.x, e.y)) {
               best = e;
               bd = dist;
             }

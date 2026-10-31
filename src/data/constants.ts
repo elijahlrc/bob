@@ -214,9 +214,10 @@ export const MONSTER_ACCURACY_LINEAR = 0.385;
 export const MONSTER_ACCURACY_GROWTH = 1.0299;
 /**
  * Every monster's life and damage, the whole game, on top of the curves (the owner, 2026-10-30: fights were too long and
- * too safe before the early ease was cut back, and too hard after; quicker, deadlier fights instead). A lever.
+ * too safe before the early ease was cut back, and too hard after; quicker, deadlier fights instead). A lever. Life 0.5 → 0.45
+ * the same day: the early game was still too hard.
  */
-export const MONSTER_LIFE_MULT = 0.5;
+export const MONSTER_LIFE_MULT = 0.45;
 export const MONSTER_DAMAGE_MULT = 1.3;
 /** Early-map easing: monster life and damage ramp from these fractions to full by EASE_LEVEL. */
 export const EASE_LEVEL = 20;

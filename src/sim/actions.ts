@@ -705,7 +705,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
         for (const e of enemiesOf(w, a)) {
           if (hitIds.includes(e.id)) continue;
           const dd = Math.hypot(e.x - cur.x, e.y - cur.y);
-          if (dd <= sd && w.grid.los(cur.x, cur.y, e.x, e.y)) {
+          if (dd <= sd && w.grid.sees(cur.x, cur.y, e.x, e.y)) {
             sd = dd;
             second = e;
           }
@@ -727,7 +727,7 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       for (const e of enemiesOf(w, a)) {
         if (hitIds.includes(e.id)) continue;
         const dd = Math.hypot(e.x - cur.x, e.y - cur.y);
-        if (dd <= bd && w.grid.los(cur.x, cur.y, e.x, e.y)) {
+        if (dd <= bd && w.grid.sees(cur.x, cur.y, e.x, e.y)) {
           bd = dd;
           best = e;
         }
@@ -918,7 +918,7 @@ export function updateProjectiles(w: World, dt: number): void {
         projectileFx(w, owner.side!, pr, dt / steps);
       const aim = pr.aimId ? actorById(w, pr.aimId) : undefined;
       if (aim) pr.minDist = Math.min(pr.minDist, Math.hypot(aim.x - pr.x, aim.y - pr.y));
-      if (!w.grid.isFloor(Math.floor(pr.x), Math.floor(pr.y))) {
+      if (!w.grid.seeThrough(Math.floor(pr.x), Math.floor(pr.y))) {
         // A shot that struck something before it reached the wall was not blocked by it. (Nor is it the character's to fix when a
         // totem, trap or mine shot it: walking closer does not move where those shoot from.)
         const os = owner?.isPlayer ? owner.side! : null;

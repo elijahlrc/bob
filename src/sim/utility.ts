@@ -114,7 +114,7 @@ export function utilityPick(
     return { choice: c, prof, cd: u.cooldown };
   }
   if (u.kind === 'curse') {
-    if (d > CAST_RANGE || !w.grid.los(p.x, p.y, target.x, target.y)) return null;
+    if (d > CAST_RANGE || !w.grid.sees(p.x, p.y, target.x, target.y)) return null;
     const have = target.hexes.find((h) => h.id === u.hex);
     if (have && have.t > prof.useTime + 0.5) return null;
     if (!have && target.hexes.length >= Math.max(1, ch.hexLimit)) return null;
@@ -219,7 +219,7 @@ function autoPick(
     return { choice: c, prof, cd: u.cooldown };
   }
   if (u.kind === 'curse') {
-    if (d > CAST_RANGE || !w.grid.los(p.x, p.y, target.x, target.y)) return null;
+    if (d > CAST_RANGE || !w.grid.sees(p.x, p.y, target.x, target.y)) return null;
     const have = target.hexes.find((h) => h.id === u.hex);
     if (have && have.t > prof.useTime + 0.5) return null;
     if (!have && target.hexes.length >= Math.max(1, ch.hexLimit)) return null;

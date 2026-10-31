@@ -462,7 +462,7 @@ export function afterProjectileHit(w: World, pr: Projectile, owner: Actor | unde
     for (const e of enemiesOfOwner(w, owner)) {
       if (!e.alive || pr.hitIds.includes(e.id)) continue;
       const d = Math.hypot(e.x - pr.x, e.y - pr.y);
-      if (d < bd && w.grid.los(pr.x, pr.y, e.x, e.y)) {
+      if (d < bd && w.grid.sees(pr.x, pr.y, e.x, e.y)) {
         bd = d;
         best = e;
       }
@@ -566,7 +566,7 @@ export function afterStrike(w: World, a: Actor, act: Action, struck: Actor | nul
       for (const e of enemiesOfOwner(w, a)) {
         if (done.has(e.id)) continue;
         const d = Math.hypot(e.x - from.x, e.y - from.y);
-        if (d <= bd && w.grid.los(from.x, from.y, e.x, e.y)) {
+        if (d <= bd && w.grid.sees(from.x, from.y, e.x, e.y)) {
           bd = d;
           best = e;
         }

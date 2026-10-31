@@ -1,5 +1,8 @@
 import { FLOOR } from '../gen/labyrinth';
 
+/** A tile a skill froze (Glacier Wall): nothing walks it (it is not floor), but sight and shots cross it (`seeThrough`, `sees`). */
+export const ICE = 2;
+
 /** Tile grid queries: walls, line of sight, A*, flow fields and circle collision. */
 export class Grid {
   readonly w: number;
@@ -145,8 +148,24 @@ export class Grid {
     return this.tiles[y * this.w + x] === FLOOR;
   }
 
-  /** Line of sight between two points (tile DDA). */
+  /** Whether sight and shots cross the tile: floor, or ice a skill raised (`ICE`), which stops only what walks. */
+  seeThrough(x: number, y: number): boolean {
+    if (x < 0 || y < 0 || x >= this.w || y >= this.h) return false;
+    const t = this.tiles[y * this.w + x];
+    return t === FLOOR || t === ICE;
+  }
+
+  /** Line of sight between two points (tile DDA), as a walker has it: raised ice blocks it. */
   los(x0: number, y0: number, x1: number, y1: number): boolean {
+    return this.line(x0, y0, x1, y1, false);
+  }
+
+  /** Line of sight for aiming and for what flies: raised ice does not block it. */
+  sees(x0: number, y0: number, x1: number, y1: number): boolean {
+    return this.line(x0, y0, x1, y1, true);
+  }
+
+  private line(x0: number, y0: number, x1: number, y1: number, ice: boolean): boolean {
     let tx = Math.floor(x0);
     let ty = Math.floor(y0);
     const ex = Math.floor(x1);
@@ -160,7 +179,7 @@ export class Grid {
     let tMaxX = dx > 0 ? (tx + 1 - x0) * tDeltaX : dx < 0 ? (x0 - tx) * tDeltaX : Infinity;
     let tMaxY = dy > 0 ? (ty + 1 - y0) * tDeltaY : dy < 0 ? (y0 - ty) * tDeltaY : Infinity;
     for (let i = 0; i < 512; i++) {
-      if (!this.isFloor(tx, ty)) return false;
+      if (ice ? !this.seeThrough(tx, ty) : !this.isFloor(tx, ty)) return false;
       if (tx === ex && ty === ey) return true;
       if (tMaxX < tMaxY) {
         tMaxX += tDeltaX;

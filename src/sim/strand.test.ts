@@ -72,7 +72,7 @@ describe('a monster out of reach', () => {
     expect(off.y).toBeGreaterThanOrEqual(0);
   });
 
-  it('dies where the character can reach it, after a short grace, if it ends up in a wall anyway', () => {
+  it('is set down, alive, where the character can reach it, after a short grace, if it ends up in a wall anyway', () => {
     const w = mapWorld(5);
     const rock = deepRock(w);
     const m = spawnMonster(
@@ -90,9 +90,9 @@ describe('a monster out of reach', () => {
     m.y = rock.y;
     const ticks = Math.ceil(STRAND_GRACE * 60);
     for (let i = 0; i < ticks / 2; i++) stepWorld(w);
-    expect(m.alive).toBe(true);
+    expect(w.grid.reachable(m.x, m.y)).toBe(false);
     for (let i = 0; i < ticks; i++) stepWorld(w);
-    expect(m.alive).toBe(false);
+    expect(m.alive).toBe(true);
     expect(w.grid.reachable(m.x, m.y)).toBe(true);
   });
 

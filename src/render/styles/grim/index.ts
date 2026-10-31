@@ -347,14 +347,15 @@ export class GrimStyle extends StyleBase {
     this.portal = null;
     if (!world.opts.noExit) {
       const ex = this.project(lab.exit.x, lab.exit.y);
+      // Over the walls and everyone (1000 + y), under the shots (79998 and up): a wall in front never hides the way out.
       const pa = s.add
         .image(ex.x, ex.y, 'g_portal')
-        .setDepth(700)
+        .setDepth(79000)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setTint(0x66ccff);
       const pb = s.add
         .image(ex.x, ex.y, 'g_portal')
-        .setDepth(700)
+        .setDepth(79000)
         .setBlendMode(Phaser.BlendModes.ADD)
         .setTint(0xaa88ff)
         .setScale(0.7);
