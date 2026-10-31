@@ -441,6 +441,8 @@ export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void 
 /** An attack on the character missed: Blood of the Untouched stacks, The Unseen Ward starts the energy shield recharging. */
 function evaded(w: World, s: Side): void {
   gainUntouched(w, s);
+  // The tree's gains and recovery on an evaded attack (the Bow's Tall Grass).
+  rollGains(w, s, 'evade');
   if (hasRelic(s.build, 'unseenWard')) s.esNow = true;
 }
 

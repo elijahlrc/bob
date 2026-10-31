@@ -64,8 +64,16 @@ rework's decisions), `R-reviewer.md` (the reviewer agent's brief), `R-skeleton.m
   mid ring and rim ring end at `knife.home.seams.n`, `knife.hex.radN.m`, `knife.rim.ring.n0`; it built the west seam
   `spire.home.seams.w`, the radial `spire.well.radW.*` and the rim vertex `spire.rim.ring.w0` for the Cathedral.
   Temporary Cathedral links into the Spire were retargeted (`cathedral/crypt.ts`, `cathedral/walk.ts`).
-- **The Spire:** plan approved (R-spire.md), structure approved, notables revision 2 under review (R-spire-notables.md);
-  built in `src/data/passives/spire/`. One reviewer agent per region, continued across stages with SendMessage.
+- **The Spire: done** (`3835be3`): R-spire.md, R-spire-notables.md, built in `src/data/passives/spire/` by
+  `spire-gen.ts`. One reviewer agent per region, continued across stages with SendMessage.
+- New line kinds with string arguments need an entry in `vocab.ts` SPECIAL (and CHOICES), or the tools print undefined;
+  new stats need player text in `src/data/statText.ts` (another session also edits that file: commit only our hunks,
+  `scratchpad/stage-stattext.mjs` shows how).
+- More tools: `reach.ts <region>` (unreachable nodes, road dead ends), `ref-names.ts` (every tree name against the
+  reference's notable and keystone names; the repo's `ip.test.ts` covers gems and uniques only: run both before a
+  region's commit), `chart.ts <folder> <region> <out.md>` (the notables chart for review: step, before, now, units, why).
+- **The Bow:** plan and structure approved (R-bow.md); notables under review (R-bow-chart.md), built by `bow-gen.ts`.
+  Engine additions so far: `farShot` (skill.ts), lines in lines.ts under "The Bow's rule benders".
 - The report is written as it goes in `R-report.md`.
 
 ## How the Knife was built (the pattern for the rest)

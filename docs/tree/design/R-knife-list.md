@@ -296,7 +296,7 @@ The Rookery wheel: poison one side, energy shield the other, between the mid rin
 - `v6` 5% increased maximum Energy Shield (1.0 units)
 - `v7` 12% increased Damage with Poison (1.0 units)
 - `v8` 5% increased maximum Energy Shield (1.0 units)
-- `f` **notable Frostbite** 12% to the Cold Damage over Time Multiplier; 15% increased Effect of Chill; 10% increased Cold Damage (4.5 units) — Cold that eats away, beside the poison side.
+- `f` **notable Bitter Chill** 12% to the Cold Damage over Time Multiplier; 15% increased Effect of Chill; 10% increased Cold Damage (4.5 units) — Cold that eats away, beside the poison side.
 
 ### Second Curse (secondCurse)
 

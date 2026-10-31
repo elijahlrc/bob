@@ -43,3 +43,31 @@ report for the owner is the last section (and its Artifact page).
 - Owner questions from the Spire: shields with spell block (sent to the Cathedral's shields, Spirit Ward replaced);
   minions only at the west; insight left to the Knife (Flashes of Insight cut); flask charges on killing a rare (an idea
   for Draught, held for the flask stats).
+
+### The Bow
+
+- Stage 1 (plan): R-bow.md. Round 1 REVISE (trap copies of the Knife at the same border; a sweep of north-seam copies;
+  axes and a new dual-wield home were strays; cold arrows missing; Hedge Magic and Fleet Foot cut). Round 2 approved.
+- Stage 2 (structure): round 1 REVISE. **Names:** several new names were the reference game's own notable names
+  (exact or near). All renamed; `scripts/passives/rework/ref-names.ts` now checks every tree name against the reference
+  tree's notable and keystone names (the repo's `ip.test.ts` checks gems and uniques only). The same sweep renamed three
+  Spire names that `ip.test.ts` flagged as reference gem names (Pyre, Arc, Volley → Kiln Heart, Thunder's Reach, Spray of
+  Bolts) and the Knife's Frostbite (→ Bitter Chill). The Wall's old keystone Strongarm matches a reference name: renamed
+  in the Wall pass. Two defence homes moved out of the first ring (one folded into Hardy Stock); 11 own notables within 8.
+- Stage 3 (notables): round 1 REVISE (the first ring refilled with mana; copies across borders; flat second notables;
+  no flask charges; low prices; resistance padding). Round 2 REVISE (too few notables after the cuts: 51). Round 3 adds
+  eight hooked notables.
+- Engine additions for the Bow: the Long Shot distance rule (`farShot`, `src/calc/skill.ts` distanceMult: up to +30% at
+  eight tiles, 20% less point blank); `evade` and `blink` events for gains and recovery (`src/data/buffs.ts`; rolled in
+  `evaded()` in `combat.ts` and in `arrive()` in `src/sim/blinks.ts`); lines on existing machinery: flask charges gained
+  and used (`flaskCharges`, `flaskChargesUsed`: under attrition the only way a kill refills flasks), evasion and attack
+  speed while moving and crit while standing still (the `stationary` condition), attack damage per 200 accuracy,
+  Quickened and Elusive gained on events, payoffs while Quickened or Elusive, fervour on crit, attack speed per fervour
+  charge, buff duration, traps gaining cold, physical attack damage converted to cold, regeneration if hit recently.
+- Stage 4 (final review): approved after one fix (an escape blink now rolls the blink gains too, `escapeCast` in
+  `src/sim/blinks.ts`). **The Bow is done** (2026-10-31): 57 notables, 4 keystones (the reference 67: thirteen flat
+  notables were cut rather than kept to hold the count); notables 59/24/18 (reference 55/24/21); 11 own notables within 8.
+  Its identity: moving against standing still (Wayfarer, Wind Rider, Far Reach against Steadfast Aim, Telling Shot,
+  Close Quarters), Quickened and Elusive with a payoff, flask charges as the attrition lever, cold and fire arrows.
+  For the tidy pass: crowding and label collisions round the Yard seam's mid ring junction; Lingering Momentum could
+  sit nearer Pursuit's End. Owner question: cold arrows in the Bow (carried on).

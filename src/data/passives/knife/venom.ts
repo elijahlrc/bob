@@ -127,7 +127,7 @@ export const venom: AreaSpec = {
         {
           id: 'f',
           kind: 'notable',
-          name: 'Frostbite',
+          name: 'Bitter Chill',
           lines: [coldDot(12), chillEffect(15), eleDamage('cold', 10)],
           at: [2369, -1898],
           why: 'Cold that eats away, beside the poison side.',

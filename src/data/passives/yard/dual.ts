@@ -379,7 +379,7 @@ export const dual: AreaSpec = {
   links: [
     {
       from: 'hotBlood.b',
-      to: 'bow.steel.toBlood.b',
+      to: 'bow.steel.radS.a',
       why: 'A near bridge to the Strider road into the Yard: Hot Blood has a second way in, and the dual-wield Strider reaches fervour without crossing the Lists.',
     },
     { from: 'twinFangs.c', to: 'j2.a', why: "The wheel's east side to the gate." },
@@ -390,7 +390,7 @@ export const dual: AreaSpec = {
     },
     {
       from: 'footwork.c',
-      to: 'bow.steel.hub.t',
+      to: 'bow.home.seams.s',
       why: "Accuracy and footing (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Footwork lands on the Strider's Ford hub, re-aimed from the gate's old direct link, so the Reaver walks on into the Ford and a Strider who wants accuracy comes in for it.",
     },
     { from: 'twinFangs.d', to: 'j1.a', why: "The wheel's south side to the junction." },
@@ -436,7 +436,7 @@ export const dual: AreaSpec = {
     },
     {
       from: 'darting.c',
-      to: 'bow.steel.toBlood.c',
+      to: 'bow.steel.radS.b',
       why: "The fast sword (a near crossing; G1-brief.md §2.5, deferred to G3 by the G2 border pass): Darting Steel lands on the Strider's road into the Pits, so the Reaver's sword meets the Ford's speed (Thirsty Quiver, Hatchet Work, Sentry Post) and a Strider with a sword reaches it from its own road.",
     },
   ],

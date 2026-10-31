@@ -1021,9 +1021,9 @@ export const esRechargeOnKill = def('esRechargeOnKill', (): Line =>
 /** A share of a pool's maximum recovered on an event (src/data/buffs.ts `recoverPctStat`, src/sim/buffs.ts). */
 export const recoverOn = def(
   'recoverOn',
-  (event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken', pool: 'life' | 'mana' | 'es', v: number): Line =>
+  (event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken' | 'evade' | 'blink', pool: 'life' | 'mana' | 'es', v: number): Line =>
     line(
-      `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit' }[event]}`,
+      `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit', evade: 'when you evade an attack', blink: 'when you blink' }[event]}`,
       v * (event === 'kill' || event === 'killIgnited' ? 0.8 : 1.2),
       mod(`recoverPct.${event}.${pool}`, 'base', v),
     ),
@@ -1071,6 +1071,92 @@ export const wandChain = def('wandChain', (v: number): Line =>
 );
 export const spellExtraProjectile = def('spellExtraProjectile', (v: number): Line =>
   line(`+${v} projectile with spells`, v * 3, mod('projectiles', 'base', v, { tags: ['spell'] })),
+);
+// The Bow's rule benders (docs/tree/design/R-bow-notables.md).
+/** Projectile attacks hit harder the farther they fly (src/calc/skill.ts `distanceMult`): a fifth less point blank. */
+export const farShot = def('farShot', (v: number): Line =>
+  line(`projectile attacks deal up to ${v}% more damage far away, 20% less up close`, v / 8, mod('farShot', 'base', v)),
+);
+export const evasionWhileMoving = def('evasionWhileMoving', (v: number): Line =>
+  line(
+    `${v}% evasion while moving`,
+    v / ((UNIT.evasion * 4) / 3),
+    mod('evasion', 'inc', v, { condition: { id: 'stationary', not: true } }),
+  ),
+);
+/** Attack damage per 200 accuracy (the calc's `accuracy` per stat), at most `max` times. */
+export const attackDamagePerAccuracy = def('attackDamagePerAccuracy', (v: number, max: number): Line =>
+  line(
+    `${v}% attack damage per 200 accuracy, up to ${v * max}%`,
+    (v * Math.min(max, 8)) / 10,
+    mod('damage', 'inc', v, { tags: ['attack'], per: { stat: 'accuracy', div: 200, max } }),
+  ),
+);
+/** A chance to gain Quickened (the onslaught buff: attack, cast and movement speed) on an event. */
+export const quickenedOn = def('quickenedOn', (event: 'kill' | 'crit' | 'blink', v: number): Line =>
+  line(
+    `${v === 100 ? 'gain' : `${v}% chance to gain`} Quickened ${{ kill: 'on kill', crit: 'on crit', blink: 'when you blink' }[event]}`,
+    (v / 100) * 6,
+    mod(`buffOn.${event}.onslaught`, 'base', v),
+  ),
+);
+/** A chance to gain Elusive (dodge, fading) on an event. */
+export const elusiveOn = def('elusiveOn', (event: 'kill' | 'crit' | 'evade' | 'blink', v: number): Line =>
+  line(
+    `${v === 100 ? 'gain' : `${v}% chance to gain`} Elusive ${{ kill: 'on kill', crit: 'on crit', evade: 'when you evade an attack', blink: 'when you blink' }[event]}`,
+    (v / 100) * 8,
+    mod(`buffOn.${event}.elusive`, 'base', v),
+  ),
+);
+export const trapGainCold = def('trapGainCold', (v: number): Line =>
+  line(`traps gain ${v}% of physical damage as extra cold`, v / 5, mod('gain.physical.cold', 'base', v, { tags: ['trap'] })),
+);
+export const attackPhysToCold = def('attackPhysToCold', (v: number): Line =>
+  line(`${v}% of physical attack damage converted to cold`, v / 10, mod('convert.physical.cold', 'base', v, { tags: ['attack'] })),
+);
+export const lifeRegenWhenHit = def('lifeRegenWhenHit', (v: number): Line =>
+  line(
+    `${v}% life regenerated if you were hit recently`,
+    v / ((UNIT.lifeRegen * 3) / 2),
+    mod('lifeRegenPct', 'base', v, { condition: { id: 'beenHitRecently' } }),
+  ),
+);
+/** Flask charges gained: under attrition a kill gives charges only from this (src/sim/combat.ts `killGains`, +100% is one). */
+export const flaskCharges = def('flaskCharges', (v: number): Line =>
+  line(`${v}% increased flask charges gained`, v / 8, mod('flaskCharges', 'inc', v)),
+);
+export const flaskChargesUsed = def('flaskChargesUsed', (v: number): Line =>
+  line(`${v}% reduced flask charges used`, v / 4, mod('flaskChargesUsed', 'base', v)),
+);
+export const attackSpeedWhileMoving = def('attackSpeedWhileMoving', (v: number): Line =>
+  line(
+    `${v}% attack speed while moving`,
+    v / ((UNIT.attackSpeed * 4) / 3),
+    mod('attackSpeed', 'inc', v, { condition: { id: 'stationary', not: true } }),
+  ),
+);
+export const critWhileStationary = def('critWhileStationary', (v: number): Line =>
+  line(
+    `${v}% crit chance while standing still`,
+    v / ((UNIT.critChance * 4) / 3),
+    mod('critChance', 'inc', v, { condition: { id: 'stationary' } }),
+  ),
+);
+export const damageWhileQuickened = def('damageWhileQuickened', (v: number): Line =>
+  line(`${v}% damage while Quickened`, v / 10, mod('damage', 'inc', v, { condition: { id: 'onslaught' } })),
+);
+export const critMultiWhileElusive = def('critMultiWhileElusive', (v: number): Line =>
+  line(`+${v}% crit multiplier while Elusive`, v / (UNIT.critMulti * 1.5), mod('critMulti', 'base', v, { condition: { id: 'elusive' } })),
+);
+export const fervourOnCrit = def('fervourOnCrit', (v: number): Line =>
+  line(`${v}% chance to gain a fervour charge on crit`, v / 6, mod('chargeOn.crit.fervour', 'base', v)),
+);
+/** Attack speed per fervour charge held (the calc's charges.fervour per stat). */
+export const attackSpeedPerFervour = def('attackSpeedPerFervour', (v: number): Line =>
+  line(`${v}% attack speed per fervour charge`, v * 0.9, mod('attackSpeed', 'inc', v, { per: { stat: 'charges.fervour', div: 1 } })),
+);
+export const buffDuration = def('buffDuration', (v: number): Line =>
+  line(`${v}% buff duration`, v / 8, mod('buffDuration', 'inc', v)),
 );
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(

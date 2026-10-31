@@ -417,6 +417,8 @@ Object.assign(STAT_TEXT, {
   auraReserveLife: { flag: 'Auras reserve Life instead of Mana' },
   esRechargeOnKill: { flag: 'Energy Shield starts recharging when you Kill an Enemy' },
   chilledLessDamage: { base: 'Chilled Enemies deal {v}% less Damage to you' },
+  // The Bow's.
+  farShot: { base: 'Projectile Attacks deal up to {v}% more Damage far away, and 20% less up close' },
 } satisfies Record<string, StatText>);
 for (const id of BUFF_IDS) {
   const name = BUFFS[id].name;
@@ -658,6 +660,8 @@ const MORE_EVENTS: Record<string, string> = {
   killFrozen: 'when you Kill a Frozen Enemy',
   killShocked: 'when you Kill a Shocked Enemy',
   killIgnited: 'when you Kill an Ignited Enemy',
+  evade: 'when you Evade an Attack',
+  blink: 'when you Blink',
   surge: 'when you have spent enough mana',
   stun: 'when you Stun an Enemy',
   cast: 'when you Cast a Spell',

@@ -250,7 +250,7 @@ export function generate(cfg: Config) {
       const ids = [...c.smalls.map((_, i) => `s${i + 1}`), 'n'];
       const nodes = ids.map((id, i) => {
         const isN = id === 'n';
-        return `        { id: ${q(id)}, kind: ${q(isN ? c.kind ?? 'notable' : 'small')}${isN ? `, name: ${q(c.name)}` : ''}, lines: [${use(isN ? c.lines : c.smalls[i])}], at: [${pts[i][0]}, ${pts[i][1]}]${isN && c.nwhy ? `, why: ${q(c.nwhy)}` : ''} },`;
+        return `        { id: ${q(id)}, kind: ${q(isN ? c.kind ?? 'notable' : 'small')}${isN ? `, name: ${q(c.name)}` : ''}, lines: [${use(isN ? c.lines : c.smalls[i])}], at: [${pts[i][0]}, ${pts[i][1]}]${isN && (c.nwhy ?? c.why) ? `, why: ${q(c.nwhy ?? c.why)}` : ''} },`;
       });
       const links = ids.slice(1).map((id, i) => `[${q(ids[i])}, ${q(id)}]`);
       clusters.push(`    {\n      id: ${q(c.id)},\n      name: ${q(c.name)},\n      why: ${q(c.why)},\n      at: [${pts[pts.length - 1][0]}, ${pts[pts.length - 1][1]}],\n      shape: { kind: 'hand' },\n      nodes: [\n${nodes.join('\n')}\n      ],\n      links: [${links.join(', ')}],\n    },`);

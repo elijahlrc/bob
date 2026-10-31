@@ -99,14 +99,14 @@ export const fire: AreaSpec = {
     },
     {
       id: "pyre",
-      name: "Pyre",
+      name: "Kiln Heart",
       why: "Fire's payoff, out from the rim ring.",
       at: [-1436, -4288],
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('fire', 10)], at: [-1386, -4119] },
         { id: "s2", kind: "small", lines: [eleDamage('fire', 10)], at: [-1411, -4204] },
-        { id: "n", kind: "notable", name: "Pyre", lines: [eleDamage('fire', 20), penetration('fire', 6), esLeech(0.3)], at: [-1436, -4288] },
+        { id: "n", kind: "notable", name: "Kiln Heart", lines: [eleDamage('fire', 20), penetration('fire', 6), esLeech(0.3)], at: [-1436, -4288] },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

@@ -3,7 +3,7 @@ import { levelValue } from '../calc/gems';
 import type { SkillProfile } from '../calc/skill';
 import { PROJECTILE_SPEED } from '../data/constants';
 import type { UtilityDef } from '../data/gems';
-import { gainBuff } from './buffs';
+import { gainBuff, rollGains } from './buffs';
 import { cooldownSeconds } from './cooldowns';
 import { hit, rawHit } from './combat';
 import { takeCorpse, type Corpse } from './factions';
@@ -254,6 +254,8 @@ function escapeCast(w: World, a: Actor, p: SkillProfile, c: SkillChoice, u: Blin
   a.y = best.y;
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true, skill: c.skill.id });
   gainBuff(w, a.side!, esc.buff);
+  // The tree's gains on a blink (the Bow's Skirmisher's Leap), as for any other blink.
+  if (a.isPlayer) rollGains(w, a.side!, 'blink');
 }
 
 /** The character goes: the skill's burst and ground at the point left, the way across, the burst where it lands. */
@@ -276,6 +278,8 @@ function arrive(
   a.y = y;
   w.events.push({ t: 'blink', id: a.id, x: a.x, y: a.y, end: true, skill: c.skill.id });
   if (u.burst === 'arrive' || u.burst === 'both' || u.warp) burstAt(w, a, p, x, y, u);
+  // The tree's gains on a blink (the Bow's Skirmisher's Leap).
+  if (a.isPlayer) rollGains(w, a.side!, 'blink');
   if (u.clone)
     cloneOfPlayer(summonAt(w, a.side!, c, p, u.clone.minion, u.clone.seconds, fx, fy), 75);
   if (u.elusive) {

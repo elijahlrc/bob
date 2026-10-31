@@ -455,7 +455,7 @@ const SECOND: Second[] = [
   { cluster: 'knife.home.breath', attach: 'n', id: 'n2', name: 'Deep Reserves', lines: 'mana(20), costReduction(10), manaFlat(20)', why: 'The big mana pool for expensive spells.' },
   { cluster: 'knife.home.cloak', attach: 'n', id: 'n2', name: 'Ward of Smoke', lines: "resOne('chaos', 15), resAll(8), life(5)", why: 'Resistances shared with the Strider.' },
   { cluster: 'knife.venom.quietKnife', attach: 'a', id: 'n2', name: 'Swift Incantation', lines: 'castSpeed(8), spellDamage(15), manaRegen(15)', why: "The caster's speed, for any spell, on the way to the dagger spells." },
-  { cluster: 'knife.venom.wheel', attach: 'v2', id: 'f', name: 'Frostbite', lines: "coldDot(12), chillEffect(15), eleDamage('cold', 10)", why: 'Cold that eats away, beside the poison side.' },
+  { cluster: 'knife.venom.wheel', attach: 'v2', id: 'f', name: 'Bitter Chill', lines: "coldDot(12), chillEffect(15), eleDamage('cold', 10)", why: 'Cold that eats away, beside the poison side.' },
   { cluster: 'knife.snares.tumble', attach: 'n', id: 'n2', name: 'Twin Shadows', lines: 'dualCrit(20), dualSpeed(8), critMulti(12)', why: "Dual wielding's second home (with Feint and Cut), its partner crit." },
   { cluster: 'knife.roofs.carrion', attach: 'n', id: 'n2', name: 'Rust and Ruin', lines: 'physAttack(16), chaosAttack(16), moveSpeed(5)', why: 'Physical and chaos together, for any weapon.' },
   { cluster: 'knife.edge.quietShot', attach: 'n', id: 'n2', name: 'Fan of Blades', lines: 'pierce(1), projectileDamage(20)', why: 'Thrown blades and arrows that go through.' },
