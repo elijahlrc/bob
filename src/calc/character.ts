@@ -764,6 +764,9 @@ export class Character {
                         : // Searing Excess: an element's resistance above its cap.
                           s.startsWith('overcap.')
                           ? overcap(s.slice('overcap.'.length))
+                          : // The Cathedral's Chorus: auras standing now (each regenerates a little life).
+                            s === 'auras'
+                            ? this.auras.filter((a) => a.active).length
                           : s === 'charges.grit'
                       ? held.grit
                       : s === 'charges.fervour'

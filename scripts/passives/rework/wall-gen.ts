@@ -145,8 +145,6 @@ const links: [string, string, string][] = [
   ['wall.rampart.spS.m', 'wall.rampart.ring.a', 'The mid ring on toward the south border.'],
   ['wall.rampart.ring.a', 'wall.resists.radW.m', 'The mid ring meets the south border road.'],
   ['wall.grit.ring.q1', 'yard.fosse.ring.s0', "The rim ring meets the Yard's."],
-  ['wall.home.seams.s', 'wall.slams.toYard.a', 'Temporary: the old Wall road toward the Yard, until the Wall pass.'],
-  ['wall.resists.shieldwall.a', 'wall.resists.shieldwall.d', 'The spur to the keystone (the old file left it cut off).'],
 ];
 
 export const tables = { K, roads, links };

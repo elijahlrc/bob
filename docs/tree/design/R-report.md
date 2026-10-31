@@ -143,3 +143,39 @@ report for the owner is the last section (and its Artifact page).
   (charges are rolled under the fight's conditions), block per grit charge with a shield, melee damage per grit, two-handed
   attack speed per grit, armour and stun avoidance while standing still, melee physical per 10 strength (`str` per stat),
   one more totem (the deploy count), strikes hit one more enemy (`extraTargets`).
+
+### The Cathedral
+
+- Stage 1 (plan): R-cathedral.md. Round 1 REVISE (placements on both border roads inward of the mid ring, in the
+  neighbours' near ground; three look-alikes of the neighbours' seam notables: Litany, Homily, Vigil's recharge; archetypes
+  each in one place; cold with no early rung). Both borders were already built by the neighbours: the Cathedral built no
+  seam or border road and links into the Wall's and the Spire's.
+- Stage 2 (structure, with the plan's revision): approved with two layout fixes (six notables pressed within 300 units
+  of the neighbours' notables, moved inward; label overlaps). Two dead links in the Wall (into nodes its own rebuild
+  removed) were dropped. 9 own notables within 8 (accepted: the home also shares Vigil and Bright Omen with the
+  neighbours' players); start distances 10 (Vanguard) and 11 (Mystic).
+- Stage 3 (notables): round 1 REVISE (48 too few, about 20 flat; staves, block and totems with no rule; Kneeling Stone
+  copying the Wall's stun and regeneration; aura effect sliding onto five notables; mana piling near home; prices).
+  Round 2 approved with two fixes (reduced reservation had slid onto five notables instead; Hymn of War doubled Battle
+  Hymn's warcry line).
+- Stage 4 (final review): approved. **The Cathedral is done** (2026-10-31): 54 notables, 5 keystones (reference 57 and
+  7); notables 52/28/19 against the reference's 53/26/21. Its identity: **the consecrated ground**, what the Zealot plants
+  works for it: one more brand (Many Sigils), regeneration and damage per aura held (Chorus, Choir of Wrath; a fork
+  against Lone Vow), regeneration and damage while a servant stands (Sexton, Ossuary), servants that recover (Shepherd's
+  Crook), regeneration and damage while a totem stands (Reliquary, Hallowed Ground). Faith turned to an element: every hit
+  gains physical as fire (Faith Aflame, toward Searing Avatar), physical spells turned to lightning (Faith Unleashed, from
+  Shattering Rite). Staves gain insight on block (Whirling Ward), shields recover life on block (Steadfast Faith),
+  channelling is a line with its defence (Plainsong). Renamed: Tithe → Alms (a relic's name), Consecrated Plate →
+  Pilgrim's Mantle. Cut: Living Ward (the skeleton). For the tidy pass: label overlaps between the second notables and
+  their hosts (eight pairs listed in the final review). For the naming pass: Searing Avatar; three "Hymn" names; Litany
+  beside Ember Litany and the Spire's Iron Litany. Optional, not done: Ember Litany's hook (recover on killing an ignited
+  enemy) is also the Spire's Warm Hearth's, 18 steps apart.
+- Engine additions for the Cathedral: conditions `channelling`, `minionsOut` and `totemOut` (`src/sim/combat.ts`,
+  `src/mods/types.ts`, player text); the calc's `auras` per stat (auras active, `src/calc/character.ts`); `recoverOn`
+  takes `block`; lines `minionRegen`, `minionRes`, `brandLimit`, `physGainFire`, `spellPhysToLightning`,
+  `damageWithMinion`, `regenWithMinion`, `channelGuard`, `regenPerAura`, `damagePerAura`, `insightOnStaffBlock`,
+  `insightOnWarcry`, `regenWithTotem`, `damageWithTotem`. The sheet's handling of the three new conditions was not
+  audited against the sim.
+- Owner questions from the Cathedral: the start sides (mana regeneration with life, damage with life) differ from the
+  approved skeleton's (elemental damage, armour); the Cathedral as one minion partner among three rather than "the main
+  minion region"; insight charges now also in the Cathedral (staff block, warcry), not the Knife's alone.

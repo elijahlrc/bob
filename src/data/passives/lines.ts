@@ -1021,9 +1021,9 @@ export const esRechargeOnKill = def('esRechargeOnKill', (): Line =>
 /** A share of a pool's maximum recovered on an event (src/data/buffs.ts `recoverPctStat`, src/sim/buffs.ts). */
 export const recoverOn = def(
   'recoverOn',
-  (event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken' | 'evade' | 'blink', pool: 'life' | 'mana' | 'es', v: number): Line =>
+  (event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken' | 'evade' | 'blink' | 'block', pool: 'life' | 'mana' | 'es', v: number): Line =>
     line(
-      `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit', evade: 'when you evade an attack', blink: 'when you blink' }[event]}`,
+      `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
       v * (event === 'kill' || event === 'killIgnited' ? 0.8 : 1.2),
       mod(`recoverPct.${event}.${pool}`, 'base', v),
     ),
@@ -1103,7 +1103,7 @@ export const quickenedOn = def('quickenedOn', (event: 'kill' | 'crit' | 'blink',
 /** A chance to gain Elusive (dodge, fading) on an event. */
 export const elusiveOn = def('elusiveOn', (event: 'kill' | 'crit' | 'evade' | 'blink', v: number): Line =>
   line(
-    `${v === 100 ? 'gain' : `${v}% chance to gain`} Elusive ${{ kill: 'on kill', crit: 'on crit', evade: 'when you evade an attack', blink: 'when you blink' }[event]}`,
+    `${v === 100 ? 'gain' : `${v}% chance to gain`} Elusive ${{ kill: 'on kill', crit: 'on crit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
     (v / 100) * 8,
     mod(`buffOn.${event}.elusive`, 'base', v),
   ),
@@ -1341,4 +1341,76 @@ export const flaskRecovery = def('flaskRecovery', (v: number): Line =>
 );
 export const flaskDuration = def('flaskDuration', (v: number): Line =>
   line(`${v}% flask duration`, v / 10, mod('flaskDuration', 'inc', v)),
+);
+// The Cathedral's rule benders (docs/tree/design/R-cathedral.md): what the Zealot plants works for it (minions standing,
+// one more brand, auras held), faith turned to fire and lightning, a defence while channelling.
+export const minionRegen = def('minionRegen', (v: number): Line =>
+  line(`minions regenerate ${v}% of their life per second`, v / 0.5, mod('minionRegen', 'base', v)),
+);
+export const minionRes = def('minionRes', (v: number): Line =>
+  line(`minions have +${v}% elemental resistances`, v / 8, mod('minion.res', 'base', v)),
+);
+export const brandLimit = def('brandLimit', (v: number): Line =>
+  line(`+${v} brand out at a time`, v * 4, mod('deployCount', 'base', v, { tags: ['brand'] })),
+);
+/** Every hit, spell and attack alike, gains some of its physical damage as fire (the holy warrior's faith). */
+export const physGainFire = def('physGainFire', (v: number): Line =>
+  line(`gain ${v}% of physical damage as extra fire`, v / 3, mod('gain.physical.fire', 'base', v)),
+);
+export const spellPhysToLightning = def('spellPhysToLightning', (v: number): Line =>
+  line(
+    `${v}% of physical spell damage converted to lightning`,
+    v / 10,
+    mod('convert.physical.lightning', 'base', v, { tags: ['spell'] }),
+  ),
+);
+export const damageWithMinion = def('damageWithMinion', (v: number): Line =>
+  line(`${v}% damage while you have a minion`, v / 10, mod('damage', 'inc', v, { condition: { id: 'minionsOut' } })),
+);
+export const regenWithMinion = def('regenWithMinion', (v: number): Line =>
+  line(
+    `${v}% life regenerated while you have a minion`,
+    v / (UNIT.lifeRegen * 1.25),
+    mod('lifeRegenPct', 'base', v, { condition: { id: 'minionsOut' } }),
+  ),
+);
+export const channelGuard = def('channelGuard', (v: number): Line =>
+  line(
+    `${v}% physical damage reduction while channelling`,
+    v * 0.75,
+    mod('physReduction', 'base', v, { condition: { id: 'channelling' } }),
+  ),
+);
+/** A staff block may give insight (charges are rolled under the fight's conditions: wielding a staff). */
+export const insightOnStaffBlock = def('insightOnStaffBlock', (v: number): Line =>
+  line(
+    `${v}% chance to gain an insight charge when you block with a staff`,
+    v / 8,
+    mod('chargeOn.block.insight', 'base', v, { condition: { id: 'wieldingStaff' } }),
+  ),
+);
+export const insightOnWarcry = def('insightOnWarcry', (v: number): Line =>
+  line(`${v}% chance to gain an insight charge when you use a warcry`, v / 12, mod('chargeOn.warcry.insight', 'base', v)),
+);
+export const regenWithTotem = def('regenWithTotem', (v: number): Line =>
+  line(
+    `${v}% life regenerated while you have a totem`,
+    v / (UNIT.lifeRegen * 1.25),
+    mod('lifeRegenPct', 'base', v, { condition: { id: 'totemOut' } }),
+  ),
+);
+export const damageWithTotem = def('damageWithTotem', (v: number): Line =>
+  line(`${v}% damage while you have a totem`, v / 10, mod('damage', 'inc', v, { condition: { id: 'totemOut' } })),
+);
+/** Damage for every aura standing (the calc's `auras` per stat). */
+export const damagePerAura = def('damagePerAura', (v: number): Line =>
+  line(`${v}% damage for each aura you have`, (v * 2) / 10, mod('damage', 'inc', v, { per: { stat: 'auras', div: 1 } })),
+);
+/** Life regenerated for every aura standing (the calc's `auras` per stat). */
+export const regenPerAura = def('regenPerAura', (v: number): Line =>
+  line(
+    `${v}% life regenerated for each aura you have`,
+    (v * 2) / UNIT.lifeRegen,
+    mod('lifeRegenPct', 'base', v, { per: { stat: 'auras', div: 1 } }),
+  ),
 );

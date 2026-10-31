@@ -14,7 +14,7 @@ export const CHOICES: Record<Exclude<ParamKind, 'n' | 'tags?'>, readonly string[
   ele4: ['fire', 'cold', 'lightning', 'chaos'],
   dmg: ['physical', 'fire', 'cold', 'lightning', 'chaos'],
   weapon: ['sword', 'axe', 'mace', 'sceptre', 'dagger', 'claw', 'wand', 'staff', 'bow'],
-  recoverEvent: ['kill', 'killIgnited', 'crit', 'hitTaken', 'evade', 'blink'],
+  recoverEvent: ['kill', 'killIgnited', 'crit', 'hitTaken', 'evade', 'blink', 'block'],
   pool: ['life', 'mana', 'es'],
   tideEvent: ['flask', 'crit', 'kill'],
   buffEvent: ['kill', 'crit', 'evade', 'blink'],

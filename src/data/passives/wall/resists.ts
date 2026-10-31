@@ -109,7 +109,6 @@ export const resists: AreaSpec = {
     },
   ],
   links: [
-    { from: "wall.resists.shieldwall.a", to: "wall.resists.shieldwall.d", why: "The spur to the keystone (the old file left it cut off)." },
     { from: "wall.resists.ironLungs.a", to: "wall.resists.radW.a", why: "The way in." },
     { from: "wall.resists.banner.a", to: "wall.resists.radW.b", why: "The way in." },
     { from: "wall.resists.unbroken.a", to: "wall.resists.radW.m", why: "The way in." },

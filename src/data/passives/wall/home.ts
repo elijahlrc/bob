@@ -226,7 +226,6 @@ export const home: AreaSpec = {
     { from: "wall.home.seams.s", to: "wall.resists.radW.a", why: "Along the border out to the mid ring." },
     { from: "wall.home.spN.x", to: "wall.slams.spN.a", why: "The north spoke goes on." },
     { from: "wall.home.spS.x", to: "wall.rampart.spS.a", why: "The south spoke goes on." },
-    { from: "wall.home.seams.s", to: "wall.slams.toYard.a", why: "Temporary: the old Wall road toward the Yard, until the Wall pass." },
     { from: "wall.home.ringing.a", to: "wall.home.pathN.b", why: "The way in." },
     { from: "wall.home.ringing.n", to: "yard.home.seams.s", why: "The way in." },
     { from: "wall.home.secondWind.a", to: "wall.home.pathN.b", why: "The way in." },
