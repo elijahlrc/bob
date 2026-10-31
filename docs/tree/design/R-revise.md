@@ -1694,6 +1694,12 @@ registered or baked.
 - **The first pass grew too much** (1,383 to 1,487 nodes, no road thinned): finalization thins roads to bring the count
   noticeably back down. The owner gave no number.
 
+- **After the final review:** starts two apart and opposite stay at 18 and 20; the centre gets a third middle notable
+  (built: Common Ward, defences and mana, under the Mystic and the Shade; each middle notable now joins its cell's yoke by
+  one small, 4 steps from the middle against 3 by the spoke; every class reaches all three middle notables in 12, and
+  the junction notables at 10, 10, 11, 12, 12, 13); about 1,350 nodes is right, leaving room to add clusters later
+  (1,358 after the third notable).
+
 ## 9. Open, for the owner
 
 Nothing yet.

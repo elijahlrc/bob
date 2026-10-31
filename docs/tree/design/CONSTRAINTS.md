@@ -553,6 +553,9 @@ decisions are in the sections above (§3 item 6, §6 items 5 to 8, §9 item 0) a
 21. **A V whose notable leads on is acceptable** at a start. [user, 10-31]
 22. **The first pass grew too much** (1,383 to 1,487 nodes): roads are thinned to bring the count noticeably back down.
     [user, 10-31]
+23. **After the revision:** starts two apart and opposite stay 18 and 20 apart (the reference 22 and 26); the centre has a
+    third middle notable so each cell between the spokes joins one middle notable to its yoke; about 1,350 nodes is
+    right, leaving room to add clusters later. [user, 10-31]
 
 ## 17. Open, not yet decided
 
