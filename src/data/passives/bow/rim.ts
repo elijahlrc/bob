@@ -594,7 +594,7 @@ export const farPasture: AreaSpec = {
     },
     {
       from: 'hardyStock.a',
-      to: 'knife.snares.toRicochet.r4',
+      to: 'knife.snares.radS.m',
       why: "Life for the Shade's south (G2/borders.md §4, deferred to G3 and laid as listed): the Shade's road into Ricochet onto Hardy Stock, the Shade's way onto the outer road.",
     },
     {
@@ -622,7 +622,7 @@ export const farPasture: AreaSpec = {
     },
     {
       from: 'haresPace.s',
-      to: 'knife.rim.wall.s6',
+      to: 'knife.rim.ring.s0',
       why: "The seam's one border link, to the Shade's Seawall (G4 fix 1, seam 4): evasion with attack speed between the trap fork and the Shade's rim road.",
     },
     {

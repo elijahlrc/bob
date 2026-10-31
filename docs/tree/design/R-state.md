@@ -1,0 +1,85 @@
+# The attrition rework of the tree: where it stands (2026-10-31)
+
+The handoff for the session that rebuilds the remaining five regions. Read with `CONSTRAINTS.md` (§16 holds this
+rework's decisions), `R-reviewer.md` (the reviewer agent's brief), `R-skeleton.md` (the approved skeleton) and
+`R-knife.md` (the first region's plan).
+
+## Done
+
+- **The skeleton** is approved (`R-skeleton.md`, its sketch `R-skeleton.json` / `.png`; the review page below).
+- **The Knife is done** (the owner, 2026-10-31): `src/data/passives/knife/*.ts` rewritten on the skeleton.
+  - Start at radius 1,450 (`frame.ts` `START_AT`, `home.ts` `START`). Two strong two-stat exits (damage and life, crit and
+    life), hubs at step 2, stat paths through Spoils and Soft Step to the seams, Keen Instinct at step 5 between the hubs.
+  - 65 notables and 4 keystones (Hollow Vessel removed); offence, defence and utility in the reference sector's
+    proportions (notables 62/22/17%).
+  - Ten links between neighbouring clusters; seven rule-bender lines added to `lines.ts` (`damageOnKill`,
+    `critVsFullLife`, `critWhileEsFull`, `speedWhileLeeching`, `damageVsRare`, `castSpeedOnLowMana`, `trapLimit`,
+    `mineLimit`) and `allDamage`.
+  - Other regions' links into removed Knife nodes were retargeted to the Knife's new border nodes (`bow/rim.ts`,
+    `spire/craft.ts`, `spire/rim.ts`); they are temporary and are redone in those regions' passes.
+- **The reviewer's brief** (`R-reviewer.md`): the reviewer is invoked dialectically for each region; its approval finishes
+  a region.
+
+## Not done
+
+- **The other five regions** (Spire, Bow, Yard, Wall, Cathedral) and **the centre**, on the skeleton: each builder pass
+  moves its start to radius 1,450 (its `frame.ts`), builds its roads and seams, places its clusters, then redesigns its
+  notables against the reference sector, reviewed by the reviewer at each step (`R-reviewer.md` §6).
+- **The seams**: the Knife built both of its seams and border radials; each neighbour links to them. The Spire's east
+  seam is `knife.home.seams.n`, the Bow's north seam `knife.home.seams.s`.
+- **The centre** keeps today's eight generic notables at the old positions; the seams link to `centre.ring.road.r3` and
+  `r5` for now. It is redrawn last, between the moved starts.
+- **Not baked.** The game still loads the old tree (`baked.ts`); `npm run passives:bake` runs once the whole tree is done
+  (the bake test fails until then). Don't bake a half-moved tree: the owner plays in this worktree.
+- **When baked:** a save-version bump with a passive refund (`migrate` in `src/run/save.ts`, using `resetTree`, which also
+  clears the tree relics' records so their uses come back); the rivals pool empties for the new version.
+- **Numbers** for regeneration, leech and flask lines wait for the flask stats (CONSTRAINTS §16 item 2). Names wait for the
+  naming pass at the end (names clashing with stops and relics: Quartermaster, Bloodletter, Provisions, Tithe, Draught,
+  Siphon).
+- **Label collisions** in the Knife's render where clusters sit close (a tidy pass, not structural).
+- **Nothing committed** since `624ce92`: the Knife, `lines.ts`, these docs and the rework scripts are uncommitted.
+  `npm run check` is red on stale tests written for the old Respite and stop rules, by the owner's choice.
+
+## The owner's brief for the rest (2026-10-31, run unattended)
+
+- Order: the five regions one at a time (Spire, Bow, Yard, Wall, Cathedral), then the centre (no class start in it), then a
+  review-only pass on the joins (borders, archetypes shared across regions, connections), then one final review of the
+  whole tree that produces a report for the owner, not changes.
+- Per region, each step reviewed by a reviewer agent (`R-reviewer.md`) before the next: (1) evaluate the current region,
+  (2) a high-level plan, (3) roads and structure, (4) the notable list (the most important review), (5) build, (6) final
+  review. The region is done when the final review passes.
+- Commit locally after each region's final review (never push). Leave the tree unbaked at the end. New engine support for
+  a good notable may be added freely (list each addition in the report). The report is an Artifact page plus a markdown
+  copy in `docs/tree/design/`.
+
+## How the Knife was built (the pattern for the rest)
+
+`scripts/passives/rework/` holds the tools (one-off, absolute paths, run with `npx tsx`):
+
+- `region-map.ts`: a region's clusters, nodes, lines and links in compact form, positions in the region's frame.
+- `knife-gen.ts`: the generator that wrote the Knife. A hand-made table: the roads node by node (polar positions off the
+  region's angle), each moved cluster's area, place, entrance and road node, the redesigned lines (`OVER`), trims
+  (`TRIM`), new clusters (`NEWC`) and second notables (`SECOND`), cluster-to-cluster links (`PAIRS`). It reads the region's
+  old area files, so it runs from a copy of them (`knife-before/*.ts.txt` is the Knife's, renamed so the typecheck skips
+  them; restore as `.ts` into `src/data/passives/knife/` to rerun). Placement nudges a new cluster clear of existing
+  nodes; everything else is the table's choice.
+- `walks.ts` (notables and keystones by step from each start, per exit), `branching.ts` (nodes and notables per band of
+  steps, loops, dead ends, each exit's share, against the reference), `rails.ts` (gates near starts, niche notables
+  near starts), `offdef.ts` (offence, defence, utility against the reference sector), `ref-pic.ts` and `ref-starts.mjs`
+  (the reference's layout and first steps, local data, study only), `skeleton-sketch.ts` (the skeleton's sketch).
+- The repo's own: `npm run passives:register` (new ids), `npx tsx scripts/passives/geometry.ts --region <class>`
+  (crossings, overlaps), `npx tsx scripts/passives/pic.ts out.png --region <class> --no-areas [--text]`,
+  `npm run passives:list -- <class> out.md`, `scripts/passives/sketch.ts` (new: `--bare`, a node on every corner,
+  `ends` on a road).
+
+## Review page and charts
+
+- The skeleton and Knife review page: https://claude.ai/artifact/VgVncWxytRPAEwCwq25icm
+- The Knife's notable chart (now against proposed): https://claude.ai/artifact/TgVoXViYbS7eRCPk8AhhMJ
+
+## Shell notes for this worktree
+
+- The Bash tool runs in a guard that refuses commands with shell variables, `for` loops over computed values, heredocs
+  and long `&&` chains touching git or files outside the worktree. Write scripts with the Write tool and run them with
+  plain, literal commands; Node is at `/c/Program Files/nodejs`.
+- The session transcript is very large; extract the owner's messages by streaming it line by line.

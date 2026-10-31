@@ -60,6 +60,25 @@ that later design work starts from it.
 - The tree audit (2026-10-30, section 6): a design philosophy for the rework comes before any rebuilding. Percent energy
   shield nodes stay as they are; flat ones are cut by the same quarter as items. The other keystones stay. Names that
   clash with the stops and the relics are fixed in a naming pass at the end of the tree rework.
+- The tree rework's philosophy (2026-10-30): the existing one (docs/tree/design/PHILOSOPHY.md, CONSTRAINTS.md) stays, and
+  what attrition changes is added to it. The tree sells about as much sustain in total as now. Flasks are a generic
+  layer: buyable in many regions, like life or crit; flask clusters (Quartermaster, Provisions, Field Dressing, Draught)
+  are fine (the owner, the same day). What the rework must fix:
+  weapon picks forced early; nothing on the tree speaks to the new systems; some regions railroad most builds into one
+  path; some regions have too many niche clusters near the start. Life and mana regeneration, the flask lines and leech
+  are re-evaluated under attrition and probably come out somewhat weaker (energy shield has had its cut). Near a start,
+  general lines are preferred (not a hard rule), and many different paths out of it are critical. The work starts with
+  an audit by walks (PHILOSOPHY.md section 4), findings only. From the audit (the owner, the same day): weapon and
+  element clusters sit beyond a first ring of points around each start, and keystones stay at least 8 points out. Both
+  exits of a start fork again within a node or two into paths that lead to different places, which may rejoin further
+  out or keep branching; notables thin out near the start and gather further out (the reference: each exit forks at
+  once, 2-4-6 nodes over the first steps, 2 to 4 notables within 6 steps against our 8 to 12). Further out the rework
+  follows the reference in every case (the owner, the same day): the network opens wide and fast (notables gather at 9
+  to 20 steps), many clusters are side rooms off a road (this replaces "most pockets are bridges", PHILOSOPHY.md 3.4),
+  each exit of a start holds about half the region near it, and the starts sit further apart (about 12 steps to the
+  nearest). The layout is redrawn: the starts and the region skeletons first, then each region refilled, reusing its
+  clusters and lines where they still fit. Structure first; sustain is repriced once the flask stats are settled. The
+  owner reviews the skeleton, then each region; the Shade's region (the Knife) is the first.
 
 **The Respite**
 

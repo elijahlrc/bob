@@ -114,8 +114,10 @@ Each item states the rule or the workflow, not how it was learned. History lives
 5. **Every part of the network above a small scale has several ways in.** [user, 10-20] A long path with few connections
    to anywhere is basically always bad: an area, a wheel or a run of clusters should be reachable from at least a few
    directions. Only keystone spurs and single pockets are cul-de-sacs. Look at the reference for how. [user, 10-20]
-6. **Most pockets are bridges** between two places. Some dead ends are fine, just not too many. [user, 10-20] Keystone
-   spurs stay dead ends. [ref]
+6. **Many clusters are side rooms off a road,** walked into and back out of, as in the reference. [user, 10-30; ref:
+   54 to 90 dead ends within 15 steps of each start, against our 5 to 18, with about as many loops] Keystone spurs stay
+   dead ends. [ref] This replaces "most pockets are bridges" (10-20). The network keeps its loops: the side rooms hang
+   off roads that still have them.
 7. **Crossings: many more, each placed with intent for a plausibly desired cross-region combination,** never at random or
    by algorithm. [user, 10-19] More crossings make the tree more interesting because they enable more builds. But it must
    not be so connected that it looks messy or loses its trade-offs. Too few connections also remove trade-offs, because
@@ -209,8 +211,17 @@ The core of section 1, made concrete.
    - Nothing within about three steps names a weapon.
 4. **The home does not have to be generic.** [user, 10-19] Specific porches are fine as long as they are optional and
    another path serves the class's other builds.
-5. **The first notables are three or four points out,** and the start fans out into several directions before then:
-   highways and small-node paths, not a single chain. [ref; user, 10-20]
+5. **Notables thin out near the start and gather further out.** [user, 10-30; ref] The reference has no notable within
+   4 steps of a start and 2 to 4 within 6 (ours had 8 to 12), then 50 to 75 between steps 9 and 12; the network opens
+   wide and fast (400 to 520 nodes within 12 steps, against our 180 to 340 for a tree of the same size).
+6. **Each exit forks at once.** [user, 10-30; ref] Both exits of a start fork again within a node or two into paths
+   that lead to different places, which may rejoin further out or keep branching (the reference: 2, 4, 6 nodes over
+   the first three steps). Each exit holds about half of what lies near the start, so the first point is a real
+   choice; an exit that holds most of the region, or two exits that rejoin at once, is a fault.
+7. **Weapons and elements sit beyond a first ring of points** round each start. [user, 10-30] General lines are
+   preferred near a start (not a hard rule), and many different paths out of it are critical.
+8. **Starts sit about 12 steps from their nearest neighbours,** as in the reference (12, 12, then 21 to 26). [user,
+   10-30; ref] Ours were 8 to 10.
 
 ## 7. Roads, highways and attributes
 
@@ -271,6 +282,7 @@ The core of section 1, made concrete.
 
 ## 9. Keystones and the late game
 
+0. **A keystone sits at least 8 steps from the nearest start.** [user, 10-30; ref: the nearest are 7 to 8]
 1. **There are 27 keystones,** matching the names in `src/data/tree/keystones.ts`. Each sits at the end of a spur of one
    or two smalls off a junction, as a dead end. [ref; adopted]
 2. **A keystone is a trade the character sheet can show:** a stat goes down, or something can no longer be done.
@@ -390,8 +402,8 @@ These are the places where judgment does the work. Neither side may simply win.
    mix of clusters along a road, never into a section's smalls.
 4. **Highways against filler.** Roads must exist, read as roads and carry most clusters. A road earns its length by what
    branches off it, and a stretch with nothing branching off is filler.
-5. **Bridges against dead ends.** Most pockets connect two places, but a network made only of bridges loses the
-   commitment of a far tip. Some dead ends, and every keystone spur, stay.
+5. **Side rooms against loops.** Many clusters are side rooms off a road (§3 item 6), but the roads they hang from keep
+   the network's loops, so an area is still reached more than one way (§3 item 5).
 6. **Region identity against many builds.** A region has a vibe and attributes, and it must still support many builds.
    The identity comes from proportions and attributes, not from exclusion.
 7. **Shapes and names against the tree.** Keep them where a good tree fits inside them. They lose wherever they make a
@@ -404,7 +416,9 @@ These are the places where judgment does the work. Neither side may simply win.
 Each was tried or proposed and struck by the user. The date is when it was struck.
 
 - **Generating the tree programmatically** and tuning the generator to pass measurements. [10-18] Scripts that place,
-  move or check nodes are fine; the thought goes into what each node is and why it is there. [user, 10-20]
+  move or check nodes are fine; the thought goes into what each node is and why it is there. [user, 10-20] Limited
+  algorithmic work is fine: a first pass on the road network, straightening hand-placed lines and the like. What is
+  never algorithmic is the balance, the details or the overall structure; everything is done with intent. [user, 10-30]
 - **Enumerating the supported builds** as the basis of the design. [10-19]
 - **"A caster's build is one element taken deep"**, with arms that wall elements off. [10-19]
 - **"Everything in the home is generic for the class."** [10-19]
@@ -489,7 +503,41 @@ Each was tried or proposed and struck by the user. The date is when it was struc
 11. **Repository rules.** [user, earlier sessions] Commit locally only, and push only when asked. Never use `git stash`.
     Screenshots of the reference never go in the repo.
 
-## 16. Open, not yet decided
+## 16. The attrition rework (2026-10-30)
+
+The flask-scarcity branch (docs/ATTRITION.md) rebuilds the tree: the layout is redrawn (the starts and the region
+skeletons first, then each region refilled, reusing clusters and lines where they still fit), the Knife first. Its
+decisions are in the sections above (§3 item 6, §6 items 5 to 8, §9 item 0) and here:
+
+1. **The philosophy stands, and attrition is added to it.** [user, 10-30]
+2. **Sustain:** the tree sells about as much in total as now. Life and mana regeneration, the flask lines and leech
+   are repriced under attrition, probably somewhat weaker, once the flask stats are settled; energy shield has had its
+   cut (flat energy shield nodes 25% less, percent nodes unchanged). Structure first, numbers later. [user, 10-30]
+3. **Flasks are a generic layer:** buyable in many regions, like life or crit; flask clusters are fine. [user, 10-30]
+4. **What the rework fixes:** weapon picks forced early; nothing speaks to the new systems; regions that railroad most
+   builds into one path; too many niche clusters near some starts (the audit by walks, ATTRITION.md section 6).
+   [user, 10-30]
+5. **Points per map.** Stops and Respites give no experience, so §1 item 4's "level roughly equals map" no longer
+   holds: a character is about one point behind for each one taken.
+6. **The Shade's start is reworked** (too many weapon nodes near it). Hollow Vessel and Living Ward are removed. Names
+   that clash with stops and relics are fixed in a naming pass at the end. [user, 10-29/30]
+7. **Review:** the owner reviews the skeleton (a sketch, before any node is written), then each region. [user, 10-30]
+8. **The first node out of a start is pretty good and prescribes nothing** (the Knife's first build, 10-30): a strong
+   two-stat small every build of the class takes, as the reference's starts open (an offence or defence line with
+   life); never a defence only some builds use (the Knife opened on energy shield and was struck). [user, 10-30]
+9. **The first steps are stat paths, not bare roads:** smalls of useful stats leading into clusters, attribute nodes
+   only as junctions; about six directions by the third point, as the reference. A road to a seam passes a valuable
+   cluster on the way rather than running bare to it. [user, 10-30]
+10. **Clusters between two roads are linked to each other too:** a dearer way across than the roads, worth it for a
+    build that wants both clusters anyway. [user, 10-30]
+11. **Renders for review leave out the area names** (`--no-areas`): they cover the nodes and add nothing. [user, 10-30]
+12. **The remaining regions are built by the builder and reviewed dialectically by a reviewer agent** in the owner's seat,
+    region by region; the reviewer's approval finishes a region. Its brief is `R-reviewer.md`, drawn from the owner's
+    reviews of the Knife. [user, 10-31]
+13. **The Knife is done** (the owner, 10-31): 65 notables and 4 keystones, its offence, defence and utility in the
+    reference sector's proportions, no low-value stat piled near its start. `R-knife.md` and its review page record it.
+
+## 17. Open, not yet decided
 
 - **Exact numbers.** Attribute node size, twin distance, and keystone distances from the starts are working values, not
   decisions. After the growth (2026-10-23) the keystones sit 7 (Steady Draw) to 23 (Fever Pitch) steps from their

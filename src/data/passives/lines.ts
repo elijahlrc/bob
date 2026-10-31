@@ -421,6 +421,10 @@ export const eleAttackOne = def(
 );
 
 // ---- The Bow's lines: projectiles, bows, physical attacks ----
+/** Damage of every kind, attacks, spells and damage over time alike: the start line of a class that serves attackers and casters (the reference's dual-class starts open on it). Priced above a single kind's line. */
+export const allDamage = def('allDamage', (v: number): Line =>
+  damage(v, { unit: 12, label: `${v}% damage` }),
+);
 /** Attack damage of any kind: the generic attacker's line, for the home of a class whose skills are bows, blades and thrown steel alike. */
 export const attackDamage = def('attackDamage', (v: number): Line =>
   damage(v, { tags: ['attack'], unit: 10, label: `${v}% attack damage` }),
@@ -890,6 +894,58 @@ export const attackSpeedOnKill = def('attackSpeedOnKill', (v: number): Line =>
     v / ((UNIT.attackSpeed * 4) / 3),
     mod('attackSpeed', 'inc', v, { condition: { id: 'killedRecently' } }),
   ),
+);
+// ---- Rule benders of the attrition rework (docs/tree/design/R-knife.md): each a condition or a count the fight already
+// tracks (src/sim/combat.ts), priced a third to a half cheaper than the plain line for being conditional.
+export const damageOnKill = def('damageOnKill', (v: number): Line =>
+  line(
+    `${v}% damage if you killed recently`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'killedRecently' } }),
+  ),
+);
+export const critVsFullLife = def('critVsFullLife', (v: number): Line =>
+  line(
+    `${v}% crit chance against enemies on full life`,
+    v / (UNIT.critChance * 2),
+    mod('critChance', 'inc', v, { condition: { id: 'targetFullLife' } }),
+  ),
+);
+export const critWhileEsFull = def('critWhileEsFull', (v: number): Line =>
+  line(
+    `${v}% crit chance while energy shield is full`,
+    v / (UNIT.critChance * 1.5),
+    mod('critChance', 'inc', v, { condition: { id: 'esFull' } }),
+  ),
+);
+export const speedWhileLeeching = def('speedWhileLeeching', (v: number): Line => ({
+  label: `${v}% attack and cast speed while leeching`,
+  units: v / ((UNIT.attackSpeed * 3) / 2),
+  mods: [
+    mod('attackSpeed', 'inc', v, { condition: { id: 'leeching' } }),
+    mod('castSpeed', 'inc', v, { condition: { id: 'leeching' } }),
+  ],
+}));
+export const damageVsRare = def('damageVsRare', (v: number): Line =>
+  line(
+    `${v}% damage against rare and unique enemies`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'targetRareOrUnique' } }),
+  ),
+);
+export const castSpeedOnLowMana = def('castSpeedOnLowMana', (v: number): Line =>
+  line(
+    `${v}% cast speed while on low mana`,
+    v / 8,
+    mod('castSpeed', 'inc', v, { condition: { id: 'onLowMana' } }),
+  ),
+);
+/** One more trap (or mine) out at a time: the count deployables are placed by (src/calc/skill.ts `deployCount`). */
+export const trapLimit = def('trapLimit', (v: number): Line =>
+  line(`+${v} trap out at a time`, v * 4, mod('deployCount', 'base', v, { tags: ['trap'] })),
+);
+export const mineLimit = def('mineLimit', (v: number): Line =>
+  line(`+${v} mine out at a time`, v * 4, mod('deployCount', 'base', v, { tags: ['mine'] })),
 );
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(

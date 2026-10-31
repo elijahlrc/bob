@@ -59,7 +59,8 @@ between the two sides.
    (a road, a wheel's side, a pocket's smalls, a keystone spur) every small carries the same modifier. Mixes live on
    notables. The exceptions: the two sides of a start loop differ, and a cluster whose point is variety (a resist star
    with one element per spoke) mixes on purpose.
-4. **Most pockets are bridges.** A chain of two or three nodes between two places gives a notable cluster two ways in
+4. **Replaced 2026-10-30:** many clusters are side rooms off a road, as in the reference (CONSTRAINTS.md §3 item 6,
+   §16). What follows is the rule as it was. **Most pockets are bridges.** A chain of two or three nodes between two places gives a notable cluster two ways in
    and the region its loops. Some dead ends are fine (a pocket's tip, a keystone spur), just not many: a region where
    most clusters hang off one node is a tree again. Keystones stay dead ends, one or two smalls off a junction, 8 to
    18 steps out.

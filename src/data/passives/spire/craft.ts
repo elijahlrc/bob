@@ -493,7 +493,7 @@ export const craft: AreaSpec = {
     },
     {
       from: 'sharpTongue.c',
-      to: 'knife.hex.toSpire.a',
+      to: 'knife.hex.radN.b',
       why: "The dagger caster's bridge (G2/borders.md §4, laid in G3 round 2): Sharp Tongue onto the Shade's crossing road below the Stair's junction, so the Shade's dagger caster reaches the Mystic's dagger spells and Mist Walk, and the Mystic caster the Stair.",
     },
     {
@@ -543,7 +543,7 @@ export const craft: AreaSpec = {
     },
     {
       from: 'spire.craft.toAlleys.r2',
-      to: 'knife.edge.thickBlood.n',
+      to: 'knife.home.seams.n',
       why: 'The far end of the road.',
     },
     {
@@ -554,7 +554,7 @@ export const craft: AreaSpec = {
     { from: 'insight.c', to: 'toKnife.a', why: 'The insight pocket onto the crossing.' },
     {
       from: 'toKnife.b',
-      to: 'knife.home.spoils.b',
+      to: 'knife.hex.radN.a',
       why: 'The crossing lands on the Spoils pocket of the Knife Gate.',
     },
     { from: 'focus.n1', to: 'frugal.a', why: 'The cost room opens off the damage notable.' },
@@ -605,7 +605,7 @@ export const craft: AreaSpec = {
     },
     {
       from: 'toStair.a',
-      to: 'knife.hex.j4.a',
+      to: 'knife.hex.radN.m',
       why: "The curse crossing (a near crossing; G1-brief.md §2.1, laid in the G2 border pass): Hexwright through one node to the Stair's junction, so the curser from either start has the other's curses (Hexwright with Second Curse and the Shade's curse cluster). The Stair's west becomes a loop: the junction, Hexwright, Kept Vows, the hex wheel, the climb.",
     },
     {

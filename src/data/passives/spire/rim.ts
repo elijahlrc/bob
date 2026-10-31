@@ -298,7 +298,7 @@ export const parapet: AreaSpec = {
     },
     {
       from: 'road.r5',
-      to: 'knife.roofs.ridge.y1',
+      to: 'knife.rim.ring.n0',
       why: "The Rooftops road (a dear crossing; G1-brief.md §2.1, laid in the G2 border pass): the eaves road comes down onto the Shade's ridge road one step from Black Powder. Traps and mines (Snare Line, Black Powder), cold (Shatter, Sleet) and the crit wand for an intelligence-and-dexterity Shade; the Mystic's trapper and the far casters reach the Rooftops. Far from both starts (about 20 to 25 steps), so it is a late build's road, not a shortcut.",
     },
   ],

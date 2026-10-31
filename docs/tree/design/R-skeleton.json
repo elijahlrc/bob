@@ -1,0 +1,2061 @@
+{
+ "title": "Skeleton draft 2 (R-skeleton.md)",
+ "clusters": [
+  {
+   "id": "knife-start",
+   "label": "",
+   "at": [
+    1256,
+    -725
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Knife home",
+   "label": "Knife home",
+   "at": [
+    1775,
+    -1025
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Stair",
+   "label": "Stair",
+   "at": [
+    1478,
+    -1891
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Rookery",
+   "label": "Rookery",
+   "at": [
+    1935,
+    -2226
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Rooftops: spells",
+   "label": "Rooftops: spells",
+   "at": [
+    2410,
+    -2873
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Alleys",
+   "label": "Alleys",
+   "at": [
+    2321,
+    -368
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Docks",
+   "label": "Docks",
+   "at": [
+    2832,
+    -1261
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Rooftops: blades",
+   "label": "Rooftops: blades",
+   "at": [
+    3355,
+    -1784
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-Seawall",
+   "label": "Seawall",
+   "at": [
+    4239,
+    -979
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-K Nimble Gambit",
+   "label": "K Nimble Gambit",
+   "at": [
+    2540,
+    -222
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-K Shade Leech",
+   "label": "K Shade Leech",
+   "at": [
+    1789,
+    -2653
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-K Cruel Agony",
+   "label": "K Cruel Agony",
+   "at": [
+    2490,
+    -2242
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-K Spellslip",
+   "label": "K Spellslip",
+   "at": [
+    1443,
+    -2222
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "knife-seam",
+   "label": "seam",
+   "at": [
+    1600,
+    0
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-start",
+   "label": "",
+   "at": [
+    0,
+    -1450
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Spire home",
+   "label": "Spire home",
+   "at": [
+    0,
+    -2050
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Cloister",
+   "label": "Cloister",
+   "at": [
+    -860,
+    -2241
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Lantern",
+   "label": "Lantern",
+   "at": [
+    -1205,
+    -3709
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Scriptorium",
+   "label": "Scriptorium",
+   "at": [
+    860,
+    -2241
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Gallery",
+   "label": "Gallery",
+   "at": [
+    932,
+    -3477
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Eaves",
+   "label": "Eaves",
+   "at": [
+    1559,
+    -4061
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Column",
+   "label": "Column",
+   "at": [
+    0,
+    -2950
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-Belfry",
+   "label": "Belfry",
+   "at": [
+    0,
+    -4000
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-K Mind Bulwark",
+   "label": "K Mind Bulwark",
+   "at": [
+    -1220,
+    -2741
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-K Mana Bastion",
+   "label": "K Mana Bastion",
+   "at": [
+    1220,
+    -2741
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-K Pain Conduit",
+   "label": "K Pain Conduit",
+   "at": [
+    1564,
+    -3353
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-K Prismatic Balance",
+   "label": "K Prismatic Balance",
+   "at": [
+    -470,
+    -4475
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-K Fever Pitch",
+   "label": "K Fever Pitch",
+   "at": [
+    481,
+    -4575
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "spire-seam",
+   "label": "seam",
+   "at": [
+    800,
+    -1386
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-start",
+   "label": "",
+   "at": [
+    1256,
+    725
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Bow home",
+   "label": "Bow home",
+   "at": [
+    1775,
+    1025
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Hedgerows",
+   "label": "Hedgerows",
+   "at": [
+    2321,
+    368
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Far Pasture",
+   "label": "Far Pasture",
+   "at": [
+    3634,
+    1111
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Ford",
+   "label": "Ford",
+   "at": [
+    1479,
+    1826
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Water Meadows",
+   "label": "Water Meadows",
+   "at": [
+    2328,
+    2875
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Meadow",
+   "label": "Meadow",
+   "at": [
+    2139,
+    1389
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-High Moor",
+   "label": "High Moor",
+   "at": [
+    2674,
+    1247
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-Thicket",
+   "label": "Thicket",
+   "at": [
+    2451,
+    2057
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-K Steady Draw",
+   "label": "K Steady Draw",
+   "at": [
+    2594,
+    181
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-K Arrow Weave",
+   "label": "K Arrow Weave",
+   "at": [
+    2156,
+    1625
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-K Close Quarters",
+   "label": "K Close Quarters",
+   "at": [
+    2914,
+    1549
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-K Plated Hide",
+   "label": "K Plated Hide",
+   "at": [
+    1510,
+    2238
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "bow-seam",
+   "label": "seam",
+   "at": [
+    800,
+    1386
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-start",
+   "label": "",
+   "at": [
+    0,
+    1450
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Yard home",
+   "label": "Yard home",
+   "at": [
+    0,
+    2050
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Lists",
+   "label": "Lists",
+   "at": [
+    842,
+    2194
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Pits: blood",
+   "label": "Pits: blood",
+   "at": [
+    477,
+    3012
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Practice Ground",
+   "label": "Practice Ground",
+   "at": [
+    -842,
+    2194
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Muster",
+   "label": "Muster",
+   "at": [
+    -1105,
+    2735
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Pits: great",
+   "label": "Pits: great",
+   "at": [
+    -390,
+    3176
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-Fosse",
+   "label": "Fosse",
+   "at": [
+    0,
+    4000
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-K Wound Dance",
+   "label": "K Wound Dance",
+   "at": [
+    854,
+    3188
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-K Crimson Pact",
+   "label": "K Crimson Pact",
+   "at": [
+    181,
+    3445
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-K Shieldwall",
+   "label": "K Shieldwall",
+   "at": [
+    -1453,
+    2851
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "yard-seam",
+   "label": "seam",
+   "at": [
+    -800,
+    1386
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-start",
+   "label": "",
+   "at": [
+    -1256,
+    725
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Wall home",
+   "label": "Wall home",
+   "at": [
+    -1775,
+    1025
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Quarry",
+   "label": "Quarry",
+   "at": [
+    -1479,
+    1826
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Barrows",
+   "label": "Barrows",
+   "at": [
+    -2633,
+    2455
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Barrows: rim",
+   "label": "Barrows: rim",
+   "at": [
+    -2617,
+    3349
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Rampart",
+   "label": "Rampart",
+   "at": [
+    -2321,
+    368
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Barbican",
+   "label": "Barbican",
+   "at": [
+    -3188,
+    854
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-Battlements",
+   "label": "Battlements",
+   "at": [
+    -1694,
+    148
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-K Strongarm",
+   "label": "K Strongarm",
+   "at": [
+    -1443,
+    2222
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-K Unerring Discipline",
+   "label": "K Unerring Discipline",
+   "at": [
+    -2646,
+    139
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-K Rooted Stance",
+   "label": "K Rooted Stance",
+   "at": [
+    -4038,
+    712
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-K Blood Rite",
+   "label": "K Blood Rite",
+   "at": [
+    -3447,
+    2893
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "wall-seam",
+   "label": "seam",
+   "at": [
+    -1600,
+    0
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-start",
+   "label": "",
+   "at": [
+    -1256,
+    -725
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Cathedral home",
+   "label": "Cathedral home",
+   "at": [
+    -1775,
+    -1025
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Nave",
+   "label": "Nave",
+   "at": [
+    -2321,
+    -368
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Vestry",
+   "label": "Vestry",
+   "at": [
+    -2928,
+    -360
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Bell Tower",
+   "label": "Bell Tower",
+   "at": [
+    -3222,
+    -1368
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Ambulatory",
+   "label": "Ambulatory",
+   "at": [
+    -3654,
+    -844
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Churchyard",
+   "label": "Churchyard",
+   "at": [
+    -4202,
+    -1126
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Choir",
+   "label": "Choir",
+   "at": [
+    -1479,
+    -1826
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Undercroft",
+   "label": "Undercroft",
+   "at": [
+    -2223,
+    -2302
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-Lychway",
+   "label": "Lychway",
+   "at": [
+    -2678,
+    -3428
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-K Lone Vow",
+   "label": "K Lone Vow",
+   "at": [
+    -1471,
+    -2264
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-K Idle Hands",
+   "label": "K Idle Hands",
+   "at": [
+    -3098,
+    -108
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-K Searing Avatar",
+   "label": "K Searing Avatar",
+   "at": [
+    -3267,
+    -1737
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-K Volatile Servants",
+   "label": "K Volatile Servants",
+   "at": [
+    -1957,
+    -2902
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-K Sigil Warden",
+   "label": "K Sigil Warden",
+   "at": [
+    -3064,
+    -2571
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "cathedral-seam",
+   "label": "seam",
+   "at": [
+    -800,
+    -1386
+   ],
+   "nodes": 0
+  },
+  {
+   "id": "centre",
+   "label": "centre: the eight generic notables",
+   "at": [
+    0,
+    0
+   ],
+   "nodes": 0
+  }
+ ],
+ "roads": [
+  {
+   "label": "",
+   "points": [
+    [
+     1222,
+     -888
+    ],
+    [
+     1279,
+     -1073
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1256,
+     -725
+    ],
+    [
+     1222,
+     -888
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1279,
+     -1073
+    ],
+    [
+     2121,
+     -1978
+    ],
+    [
+     3145,
+     -2933
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1279,
+     -1073
+    ],
+    [
+     1168,
+     -1343
+    ],
+    [
+     800,
+     -1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1379,
+     -614
+    ],
+    [
+     1569,
+     -571
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1256,
+     -725
+    ],
+    [
+     1379,
+     -614
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1569,
+     -571
+    ],
+    [
+     2758,
+     -896
+    ],
+    [
+     4090,
+     -1329
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1569,
+     -571
+    ],
+    [
+     1747,
+     -340
+    ],
+    [
+     1600,
+     0
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1531,
+     -1364
+    ],
+    [
+     1775,
+     -1025
+    ],
+    [
+     1936,
+     -674
+    ]
+   ],
+   "nodes": 6
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1600,
+     0
+    ],
+    [
+     700,
+     0
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1600,
+     0
+    ],
+    [
+     2900,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -158,
+     -1502
+    ],
+    [
+     -290,
+     -1645
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     0,
+     -1450
+    ],
+    [
+     -158,
+     -1502
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -290,
+     -1645
+    ],
+    [
+     -603,
+     -2837
+    ],
+    [
+     -894,
+     -4206
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -290,
+     -1645
+    ],
+    [
+     -580,
+     -1683
+    ],
+    [
+     -800,
+     -1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     158,
+     -1502
+    ],
+    [
+     290,
+     -1645
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     0,
+     -1450
+    ],
+    [
+     158,
+     -1502
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     290,
+     -1645
+    ],
+    [
+     603,
+     -2837
+    ],
+    [
+     894,
+     -4206
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     290,
+     -1645
+    ],
+    [
+     580,
+     -1683
+    ],
+    [
+     800,
+     -1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -384,
+     -2014
+    ],
+    [
+     0,
+     -2050
+    ],
+    [
+     384,
+     -2014
+    ]
+   ],
+   "nodes": 6
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     800,
+     -1386
+    ],
+    [
+     350,
+     -606
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     800,
+     -1386
+    ],
+    [
+     1450,
+     -2511
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1379,
+     614
+    ],
+    [
+     1569,
+     571
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1256,
+     725
+    ],
+    [
+     1379,
+     614
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1569,
+     571
+    ],
+    [
+     2758,
+     896
+    ],
+    [
+     4090,
+     1329
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1569,
+     571
+    ],
+    [
+     1747,
+     340
+    ],
+    [
+     1600,
+     0
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1222,
+     888
+    ],
+    [
+     1279,
+     1073
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1256,
+     725
+    ],
+    [
+     1222,
+     888
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1279,
+     1073
+    ],
+    [
+     2121,
+     1978
+    ],
+    [
+     3145,
+     2933
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1279,
+     1073
+    ],
+    [
+     1168,
+     1343
+    ],
+    [
+     800,
+     1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     1936,
+     674
+    ],
+    [
+     1775,
+     1025
+    ],
+    [
+     1531,
+     1364
+    ]
+   ],
+   "nodes": 6
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     800,
+     1386
+    ],
+    [
+     350,
+     606
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     800,
+     1386
+    ],
+    [
+     1450,
+     2511
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     158,
+     1502
+    ],
+    [
+     290,
+     1645
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     0,
+     1450
+    ],
+    [
+     158,
+     1502
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     290,
+     1645
+    ],
+    [
+     603,
+     2837
+    ],
+    [
+     894,
+     4206
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     290,
+     1645
+    ],
+    [
+     580,
+     1683
+    ],
+    [
+     800,
+     1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -158,
+     1502
+    ],
+    [
+     -290,
+     1645
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     0,
+     1450
+    ],
+    [
+     -158,
+     1502
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -290,
+     1645
+    ],
+    [
+     -603,
+     2837
+    ],
+    [
+     -894,
+     4206
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -290,
+     1645
+    ],
+    [
+     -580,
+     1683
+    ],
+    [
+     -800,
+     1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     384,
+     2014
+    ],
+    [
+     0,
+     2050
+    ],
+    [
+     -384,
+     2014
+    ]
+   ],
+   "nodes": 6
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -800,
+     1386
+    ],
+    [
+     -350,
+     606
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -800,
+     1386
+    ],
+    [
+     -1450,
+     2511
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1222,
+     888
+    ],
+    [
+     -1279,
+     1073
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1256,
+     725
+    ],
+    [
+     -1222,
+     888
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1279,
+     1073
+    ],
+    [
+     -2155,
+     1940
+    ],
+    [
+     -3196,
+     2877
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1279,
+     1073
+    ],
+    [
+     -1168,
+     1343
+    ],
+    [
+     -800,
+     1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1379,
+     614
+    ],
+    [
+     -1569,
+     571
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1256,
+     725
+    ],
+    [
+     -1379,
+     614
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1569,
+     571
+    ],
+    [
+     -2758,
+     896
+    ],
+    [
+     -4090,
+     1329
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1569,
+     571
+    ],
+    [
+     -1747,
+     340
+    ],
+    [
+     -1600,
+     0
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1552,
+     1340
+    ],
+    [
+     -1775,
+     1025
+    ],
+    [
+     -1936,
+     674
+    ]
+   ],
+   "nodes": 6
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1600,
+     0
+    ],
+    [
+     -700,
+     0
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1600,
+     0
+    ],
+    [
+     -2900,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1379,
+     -614
+    ],
+    [
+     -1569,
+     -571
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1256,
+     -725
+    ],
+    [
+     -1379,
+     -614
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1569,
+     -571
+    ],
+    [
+     -2758,
+     -896
+    ],
+    [
+     -4090,
+     -1329
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1569,
+     -571
+    ],
+    [
+     -1747,
+     -340
+    ],
+    [
+     -1600,
+     0
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1222,
+     -888
+    ],
+    [
+     -1279,
+     -1073
+    ]
+   ],
+   "nodes": 2,
+   "ends": true
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1256,
+     -725
+    ],
+    [
+     -1222,
+     -888
+    ]
+   ],
+   "nodes": 0
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1279,
+     -1073
+    ],
+    [
+     -2155,
+     -1940
+    ],
+    [
+     -3196,
+     -2877
+    ]
+   ],
+   "nodes": 8
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1279,
+     -1073
+    ],
+    [
+     -1168,
+     -1343
+    ],
+    [
+     -800,
+     -1386
+    ]
+   ],
+   "nodes": 3
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -1936,
+     -674
+    ],
+    [
+     -1775,
+     -1025
+    ],
+    [
+     -1552,
+     -1340
+    ]
+   ],
+   "nodes": 6
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -800,
+     -1386
+    ],
+    [
+     -350,
+     -606
+    ],
+    [
+     0,
+     0
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "",
+   "points": [
+    [
+     -800,
+     -1386
+    ],
+    [
+     -1450,
+     -2511
+    ]
+   ],
+   "nodes": 4
+  },
+  {
+   "label": "mid ring",
+   "points": [
+    [
+     -2900,
+     0
+    ],
+    [
+     -2758,
+     -896
+    ],
+    [
+     -2155,
+     -1940
+    ],
+    [
+     -1450,
+     -2511
+    ],
+    [
+     -603,
+     -2837
+    ],
+    [
+     603,
+     -2837
+    ],
+    [
+     1450,
+     -2511
+    ],
+    [
+     2121,
+     -1978
+    ],
+    [
+     2758,
+     -896
+    ],
+    [
+     2900,
+     0
+    ],
+    [
+     2758,
+     896
+    ],
+    [
+     2121,
+     1978
+    ],
+    [
+     1450,
+     2511
+    ],
+    [
+     603,
+     2837
+    ],
+    [
+     -603,
+     2837
+    ],
+    [
+     -1450,
+     2511
+    ],
+    [
+     -2155,
+     1940
+    ],
+    [
+     -2758,
+     896
+    ],
+    [
+     -2900,
+     0
+    ]
+   ],
+   "nodes": 60
+  },
+  {
+   "label": "rim ring",
+   "points": [
+    [
+     -4300,
+     0
+    ],
+    [
+     -4090,
+     -1329
+    ],
+    [
+     -3196,
+     -2877
+    ],
+    [
+     -2150,
+     -3724
+    ],
+    [
+     -894,
+     -4206
+    ],
+    [
+     894,
+     -4206
+    ],
+    [
+     2150,
+     -3724
+    ],
+    [
+     3145,
+     -2933
+    ],
+    [
+     4090,
+     -1329
+    ],
+    [
+     4300,
+     0
+    ],
+    [
+     4090,
+     1329
+    ],
+    [
+     3145,
+     2933
+    ],
+    [
+     2150,
+     3724
+    ],
+    [
+     894,
+     4206
+    ],
+    [
+     -894,
+     4206
+    ],
+    [
+     -2150,
+     3724
+    ],
+    [
+     -3196,
+     2877
+    ],
+    [
+     -4090,
+     1329
+    ],
+    [
+     -4300,
+     0
+    ]
+   ],
+   "nodes": 78
+  }
+ ],
+ "links": [],
+ "moves": [
+  {
+   "id": "start.shade",
+   "to": [
+    1256,
+    -725
+   ]
+  },
+  {
+   "id": "start.mystic",
+   "to": [
+    0,
+    -1450
+   ]
+  },
+  {
+   "id": "start.strider",
+   "to": [
+    1256,
+    725
+   ]
+  },
+  {
+   "id": "start.reaver",
+   "to": [
+    0,
+    1450
+   ]
+  },
+  {
+   "id": "start.vanguard",
+   "to": [
+    -1256,
+    725
+   ]
+  },
+  {
+   "id": "start.zealot",
+   "to": [
+    -1256,
+    -725
+   ]
+  }
+ ]
+}

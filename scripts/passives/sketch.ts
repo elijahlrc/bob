@@ -11,6 +11,7 @@
  *     "region": "mystic",                       // optional: frames the picture on this region (and its borders)
  *     "clusters": [{ "id": "MY-1", "label": "spell damage + crit multiplier", "at": [x, y], "nodes": 4 }],
  *     "roads": [{ "label": "north rim road", "points": [[x, y], "spire.belfry.road.r3", [x, y]], "nodes": 9 }],
+ *                                              // a node sits on every corner; "ends": true puts one on each end too
  *     "links": [{ "from": "MY-1", "to": "knife.stair.road.s2", "label": "crossing: spell crit" }],
  *     "cuts": [["spire.cloister.wheel.a", "spire.cloister.wheel.b"]],
  *     "moves": [{ "id": "spire.cloister.quick.n", "to": [x, y] }]
@@ -26,7 +27,7 @@ type Sketch = {
   title?: string;
   region?: string;
   clusters?: { id: string; label?: string; at: Point; nodes?: number }[];
-  roads?: { label?: string; points: Point[]; nodes?: number }[];
+  roads?: { label?: string; points: Point[]; nodes?: number; ends?: boolean }[];
   links?: { from: Point; to: Point; label?: string }[];
   cuts?: [string, string][];
   moves?: { id: string; to: Point }[];
@@ -36,7 +37,7 @@ const argv = process.argv.slice(2);
 const file = argv.find((a) => a.endsWith('.json'));
 const out = argv.find((a) => a.endsWith('.png'));
 if (!file || !out) {
-  console.error('usage: sketch.ts sketch.json out.png [--box x0,y0,x1,y1] [--width 2000]');
+  console.error('usage: sketch.ts sketch.json out.png [--box x0,y0,x1,y1] [--width 2000] [--bare]');
   process.exit(1);
 }
 const opt = (k: string) => {
@@ -89,7 +90,8 @@ const X = (x: number) => (x - minX) * scale,
   Y = (y: number) => (y - minY) * scale;
 const font = Math.max(1, Math.round(width / 1100));
 
-// ---- Today's network, the sketched region brighter.
+// ---- Today's network, the sketched region brighter (left out with --bare: a sketch of a new layout).
+const bare = argv.includes('--bare');
 const REGION_COLOUR: Record<string, string> = {
   mystic: '#6a8cf0',
   shade: '#c45ad6',
@@ -100,7 +102,7 @@ const REGION_COLOUR: Record<string, string> = {
   centre: '#8a90a0',
 };
 const mine = (i: number) => !sk.region || built.place[i].region === sk.region;
-for (const n of nodes)
+if (!bare) for (const n of nodes)
   for (const k of n.links)
     if (k > n.id && live(n.id) && live(k))
       cv.line(
@@ -121,7 +123,7 @@ const R: Record<string, number> = {
   hub: 10,
 };
 for (const n of nodes) {
-  if (!live(n.id)) continue;
+  if (bare || !live(n.id)) continue;
   const c =
     n.kind === 'start' ? hex('#ffffff') : hex(REGION_COLOUR[built.place[n.id].region] ?? '#ffffff');
   cv.disc(X(n.x), Y(n.y), Math.max(1.5, R[n.kind] * scale), c, mine(n.id) ? 0.9 : 0.35);
@@ -129,7 +131,7 @@ for (const n of nodes) {
     cv.text(n.name, X(n.x), Y(n.y) + R[n.kind] * scale + 7 * font, font, hex('#b8bcc8'), 'middle');
 }
 for (const a of AREAS)
-  if (a.region !== 'centre' && (!sk.region || a.region === sk.region))
+  if (!bare && a.region !== 'centre' && (!sk.region || a.region === sk.region))
     cv.text(a.name, X(a.at[0]), Y(a.at[1]), font + 1, hex(REGION_COLOUR[a.region]), 'middle');
 
 // ---- The sketch.
@@ -142,28 +144,28 @@ for (const r of sk.roads ?? []) {
   const ps = r.points.map((p) => pos(p)).filter((q): q is [number, number] => !!q);
   for (let i = 1; i < ps.length; i++)
     cv.line(X(ps[i - 1][0]), Y(ps[i - 1][1]), X(ps[i][0]), Y(ps[i][1]), 3, ROAD, 0.9);
-  // Its nodes, spread evenly along the line.
-  const len = ps.slice(1).reduce((s, q, i) => s + Math.hypot(q[0] - ps[i][0], q[1] - ps[i][1]), 0);
-  const count = r.nodes ?? 0;
-  for (let k = 1; k <= count; k++) {
-    let d = (len * k) / (count + 1);
-    for (let i = 1; i < ps.length; i++) {
-      const seg = Math.hypot(ps[i][0] - ps[i - 1][0], ps[i][1] - ps[i - 1][1]);
-      if (d <= seg) {
-        const t = d / seg;
-        cv.ring(
-          X(ps[i - 1][0] + t * (ps[i][0] - ps[i - 1][0])),
-          Y(ps[i - 1][1] + t * (ps[i][1] - ps[i - 1][1])),
-          9 * scale + 2,
-          2,
-          ROAD,
-          1,
-        );
-        break;
-      }
-      d -= seg;
+  // Its nodes: one on every corner (and on the start of a closed road), the rest shared out between the segments by
+  // length and spread evenly within each, so the nodes between any two corners can be counted.
+  const node = (x: number, y: number) => cv.ring(X(x), Y(y), 9 * scale + 2, 2, ROAD, 1);
+  const closed =
+    ps.length > 2 && ps[0][0] === ps[ps.length - 1][0] && ps[0][1] === ps[ps.length - 1][1];
+  // `ends` marks a road whose end points are nodes too (a road out of a start to the hub where it branches).
+  const corners = r.ends ? ps : ps.slice(closed ? 0 : 1, -1);
+  for (const [x, y] of corners) node(x, y);
+  const segs = ps.slice(1).map((q, i) => Math.hypot(q[0] - ps[i][0], q[1] - ps[i][1]));
+  const len = segs.reduce((s, x) => s + x, 0);
+  const rest = Math.max(0, (r.nodes ?? 0) - corners.length);
+  let given = 0;
+  segs.forEach((_, i) => {
+    // Largest share first by rounding the running total, so the counts add up to `rest`.
+    const upTo = Math.round((rest * segs.slice(0, i + 1).reduce((s, x) => s + x, 0)) / (len || 1));
+    const n = upTo - given;
+    given = upTo;
+    for (let k = 1; k <= n; k++) {
+      const t = k / (n + 1);
+      node(ps[i][0] + t * (ps[i + 1][0] - ps[i][0]), ps[i][1] + t * (ps[i + 1][1] - ps[i][1]));
     }
-  }
+  });
   if (r.label && ps.length) {
     const m = ps[Math.floor(ps.length / 2)];
     cv.text(r.label, X(m[0]), Y(m[1]) - 10 * font, font + 1, ROAD, 'middle');
