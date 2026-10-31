@@ -1549,6 +1549,11 @@ matches. The tree read 1,365 at the end, with the Knife, the Cathedral and the c
 
 ### The centre (finalization, 2026-10-31)
 
+**Undone after the final review:** the six hexagon side nodes were put back. Cutting them brought starts two apart and
+opposite from 18 and 20 steps to 17 and 18 (the reference 22 and 26), the spacing the owner asked to follow the
+reference on. With them back the spacing is 18 and 20 again; the centre's distances are those of its first-pass note.
+The thinning below is kept as the record of what was tried.
+
 **Thinning.** The six hexagon side nodes (`centre.ring.road.h0`–`h5`) are gone; each side of the inner ring is now one
 long link from junction to junction. Each side node was a bare two-link attribute node sitting on the straight chord
 between its two junctions (no corner, no junction), and no build walked a hexagon side for its attributes. No other
