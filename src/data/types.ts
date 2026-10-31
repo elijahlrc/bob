@@ -1,6 +1,7 @@
 import type { DamageType, Mod, SkillTag } from '../mods/types';
 import type { TriggerDef } from './triggers';
 import type { Strategy } from './strategy';
+import type { RelicHoldings } from './runRewards';
 
 export type Attrs = { str: number; dex: number; int: number };
 
@@ -150,6 +151,35 @@ export type Build = {
   primaryAuto?: boolean;
   /** How the character mixes its skills and fights (the Strategy tab); unset parts take their defaults. */
   strategy?: Strategy;
+  /** Relics held, by id (data/runRewards.ts): on the build, so the sheet and the sim see them. */
+  relics?: RelicHoldings;
+  /** The Surgeon's trades (docs/ATTRITION.md): permanent mods on the character, a gain and its price for each trade. */
+  grafts?: Mod[];
+  /** What the tree's relics have done (relics 7 to 13, data/tree/rules.ts). Replaced, never edited in place. */
+  treeRelics?: TreeRelics;
+};
+
+/**
+ * The tree's relics on a build (docs/ATTRITION.md, relics 7 to 13). How many uses of a relic are left is never stored: it is
+ * the uses it gives less those recorded here.
+ */
+export type TreeRelics = {
+  /** 7: refunded passives that still carry the paths through them (one taken back again leaves the list). */
+  ghosts?: number[];
+  /** 7: how many of its uses were spent. */
+  ghostUses?: number;
+  /** 8: a notable taken with no path to it (it is also in `allocated`). */
+  floating?: number[];
+  /** 9: a passive burned (refunded, never taken again, still carrying paths) and the passive it was linked to. */
+  bridges?: { from: number; to: number }[];
+  /** 10: small passives grown from as if they were starts. */
+  anchors?: number[];
+  /** 11: notables whose cluster's small passives burned; each is three times as strong. */
+  hollowed?: number[];
+  /** 12: other classes whose starts passives grow from. */
+  roots?: string[];
+  /** 13: other classes' starts can be taken as notables. */
+  foreignStarts?: boolean;
 };
 
 export type ClassDef = {

@@ -6,7 +6,16 @@ import { DEFAULT, LEGACY, type Difficulty } from '../data/difficulty';
 import { classDef } from '../data/classes';
 import { factionOfSpec } from '../data/monsters';
 import { TABLET_PREFIX } from '../data/currency';
-import type { AnyItem, Build, CurrencyItem, GemItem, InventoryItem, Item } from '../data/types';
+import type {
+  AnyItem,
+  Build,
+  CurrencyItem,
+  FlaskItem,
+  GemItem,
+  InventoryItem,
+  Item,
+} from '../data/types';
+import { flaskBase } from '../data/flasks';
 import { rollCurrencyBundle, rollCurrencyDrops } from '../gen/currencyDrops';
 import { makeFlask, makeItem } from '../gen/items';
 import {
@@ -36,14 +45,18 @@ import type { MapResult } from '../sim/runMap';
 import { restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
-import { heldReward, waysideOf, type Wayside } from './wayside';
+import { grantRelic, heldReward, waysideOf, type Wayside } from './wayside';
+import { payBounty, rollBossRelics, throneDraught } from './relics';
+import type { RunRewardId } from '../data/runRewards';
 import type { StopId } from '../data/stops';
 import {
   addProvision,
+  dropProvision,
   endProvisions,
   forage,
   heldReprieveIds,
   mapAffixList,
+  glean,
   pouchRoom,
 } from './provisions';
 import { reprieveBlocker, spendReprieve } from './reprieves';
@@ -77,7 +90,9 @@ export type MapRecord = {
  * are the only place these appear beside items, so they are a separate kind and not part of what monsters drop.
  */
 export type PouchCard = { kind: 'pouch'; uid: number; id: string };
-export type RewardCard = AnyItem | PouchCard;
+/** A relic on a pick (a fallen boss's, docs/ATTRITION.md): `id` is the relic's (data/runRewards.ts). */
+export type RelicCard = { kind: 'relic'; uid: number; id: string };
+export type RewardCard = AnyItem | PouchCard | RelicCard;
 
 /** A reforge whose three alternatives have been drawn and shown, and not yet picked (EXPANSION 8.1). */
 export type PendingCraft = { itemUid: number; pinned: string[]; options: Item[] };
@@ -102,6 +117,8 @@ export type RunState = {
   history: MapRecord[];
   /** Pending reward offers (1 of 3), if earned. */
   reward: RewardCard[] | null;
+  /** A second pick waiting behind `reward` (a fallen boss's relics after its usual pick); it opens when that one is taken. */
+  nextReward?: RewardCard[] | null;
   /** Uids of the items, gems and flasks picked up that the player has not looked at yet (found.ts). */
   unseen: number[];
   /** The level (`run.map`) each item was found on, by uid: what "old" means for the clean-up. */
@@ -193,13 +210,14 @@ export function newRun(classId: string, seed: number, difficulty: Difficulty = D
   const body: Item = makeItem(uid, BODY_FOR_CLASS[classId], 1, 2);
   body.implicits.push(...(cls.startMods?.body ?? []).map((m) => ({ ...m })));
   run.build.equipment.body = body;
+  // Two life flasks (docs/ATTRITION.md, the playtests: kills no longer refill the first) in the slots that drink at 50% and
+  // 30%, and the mana flask in the last, at 15% (the owner, 2026-10-29): the early slots are left for the player to fill.
   run.build.flasks = [
+    null,
+    null,
+    makeFlask(uid, 'flask_life_1', 1),
     makeFlask(uid, 'flask_life_1', 1),
     makeFlask(uid, 'flask_mana_1', 1),
-    // A second life flask (docs/ATTRITION.md, the playtests): kills no longer refill the first.
-    makeFlask(uid, 'flask_life_1', 1),
-    null,
-    null,
   ];
   stampAll(run, 1);
   return run;
@@ -218,11 +236,15 @@ export function setMap(run: RunState, map: number): void {
 
 /** The level is over: the counter advances by one and the next level's offers are rolled (every way out of a level ends here). */
 export function advanceLevel(run: RunState): void {
+  // The Gleaner's Hook leaves a provision for the level passed (relic 1.2); camp says so like a forage.
+  const gleaned = glean(run);
   run.map += 1;
   run.offers = rollOffers(run.seed, run.map);
-  waysideOf(run).found = null;
+  waysideOf(run).found = gleaned;
   waysideOf(run).respite = null;
   waysideOf(run).restocks = {};
+  waysideOf(run).relicDraws = {};
+  waysideOf(run).stopVisit = null;
 }
 
 /**
@@ -287,7 +309,8 @@ export function lootMults(w: World): { quantity: number; rarity: number } {
 export function worldOptsFor(run: RunState, plan: MapPlan): MapOpts {
   const uid = uidSource(run);
   return {
-    start: run.vitals,
+    // Draught Before the Throne fills every flask halfway for a boss (relic 4).
+    start: { ...run.vitals, flasks: throneDraught(run, plan.map, run.vitals.flasks) },
     reprieves: heldReprieveIds(run),
     loot: (w, m): AnyItem[] => {
       if (!m.mon) return [];
@@ -386,6 +409,8 @@ export function finishMap(run: RunState, res: MapResult): void {
     ...res.vitals,
     flasks: keptFlasks(run, res.vitals),
   });
+  // The Headsman's Tally pays for the rares slain, cleared or not (relic 2).
+  payBounty(run, res.rares ?? 0);
   if (res.status === 'cleared') {
     run.refundPoints += 1;
     // A boss that falls refills every flask (docs/ATTRITION.md).
@@ -401,10 +426,18 @@ export function finishMap(run: RunState, res: MapResult): void {
     // mini-boss (§5.3).
     if (res.type === 'crawl') run.reward = rollCrawlReward(run);
     else if (run.map % 5 === 0) run.reward = rollRewards(run);
-    else if (run.map <= SKILL_REWARD_MAPS) run.reward = rollSkillRewards(run);
+    else if (run.map <= EARLY_PICKS.length) run.reward = rollEarlyPick(run);
+    // A boss that falls offers a pick of relics too (the owner, 2026-10-30), after its usual pick.
+    if (bossForMap(run.map)) {
+      const relics = rollBossRelics(run);
+      if (relics.length) {
+        if (run.reward) run.nextReward = relics;
+        else run.reward = relics;
+      }
+    }
   }
   advanceLevel(run);
-  waysideOf(run).found = found;
+  waysideOf(run).found = found ?? waysideOf(run).found;
   run.phase = 'camp';
 }
 
@@ -449,10 +482,55 @@ export function stash(run: RunState, it: CurrencyItem): void {
   } else run.currency[it.id] = (run.currency[it.id] ?? 0) + it.count;
 }
 
-/** The early maps that end with a pick of three skill gems (the others follow the every-fifth-map pick). */
-export const SKILL_REWARD_MAPS = 4;
+/**
+ * The picks after the first maps, one per map from map 1 (the owner, 2026-10-29): three skill gems, three flasks, three
+ * support gems, then one of each. The other maps follow the every-fifth-map pick.
+ */
+export const EARLY_PICKS = ['skills', 'flasks', 'supports', 'mix'] as const;
 /** Through this map a pick's gems are all of the class's corner of the attributes (`inClassAttrs`). */
 export const OWN_ATTR_PICK_MAPS = 5;
+
+/** The pick after an early map (`EARLY_PICKS`). */
+export function rollEarlyPick(run: RunState): AnyItem[] {
+  const uid = uidSource(run);
+  // Flasks of different kinds, magic like a reward pick's flask.
+  const flasks = (n: number): AnyItem[] => {
+    const rng = new Rng(run.seed).fork(`flaskreward${run.map}`);
+    const out: FlaskItem[] = [];
+    for (let i = 0; i < n; i++)
+      out.push(
+        rollFlask(
+          rng,
+          uid,
+          run.map,
+          1,
+          out.map((f) => flaskBase(f.baseId).kind),
+        ),
+      );
+    return out;
+  };
+  switch (EARLY_PICKS[run.map - 1]) {
+    case 'skills':
+      return rollSkillRewards(run);
+    case 'flasks':
+      return flasks(3);
+    case 'supports':
+      return supportsForMain(run, uid, 3);
+    case 'mix':
+      return [...rollSkillRewards(run).slice(0, 1), ...flasks(1), ...supportsForMain(run, uid, 1)];
+    default:
+      return [];
+  }
+}
+
+/** The gem ids the run holds, in the bag or socketed. */
+function heldGems(run: RunState): Set<string> {
+  const held = new Set<string>();
+  for (const it of run.inventory) if (it.kind === 'gem') held.add(it.gemId);
+  for (const it of Object.values(run.build.equipment))
+    for (const g of it?.sockets ?? []) if (g) held.add(g.gemId);
+  return held;
+}
 
 /**
  * Three different skill gems the run does not hold yet, that the weapons in hand can use (docs/NEWPLAYER.md N3) and that
@@ -462,10 +540,7 @@ export const OWN_ATTR_PICK_MAPS = 5;
  */
 export function rollSkillRewards(run: RunState): AnyItem[] {
   const rng = new Rng(run.seed).fork(`skillreward${run.map}`);
-  const held = new Set<string>();
-  for (const it of run.inventory) if (it.kind === 'gem') held.add(it.gemId);
-  for (const it of Object.values(run.build.equipment))
-    for (const g of it?.sockets ?? []) if (g) held.add(g.gemId);
+  const held = heldGems(run);
   const hold = new Character(run.build).weaponHold();
   const weight = (g: ActiveGemDef) => gemWeight(g, run.build.classId, run.map);
   const ownAttrs = (g: ActiveGemDef) =>
@@ -508,24 +583,55 @@ export const FIRST_SUPPORT_MAP = 5;
  * stream of its own); null with no skill socketed or none that fits.
  */
 export function supportForMain(run: RunState, uid: () => number): GemItem | null {
+  if (new Character(run.build).primary.gemUid === null) return null;
+  const [g] = supportsForMain(run, uid, 1, true);
+  return g ?? null;
+}
+
+/**
+ * Up to n different support gems of the class's own attributes (through `OWN_ATTR_PICK_MAPS`) for the weapon in hand,
+ * drawn as the drops are weighted. First those that do something for the main skill; unless `forMain`, the run's own are
+ * left out, and when too few are left the rest come from its other supports, then those held back early, then (last)
+ * those it holds.
+ */
+export function supportsForMain(
+  run: RunState,
+  uid: () => number,
+  n: number,
+  forMain = false,
+): GemItem[] {
   const ch = new Character(run.build);
-  if (ch.primary.gemUid === null) return null;
-  const skill = ch.primary.skill;
-  const types = new Set(skill.types);
+  const skill = ch.primary.gemUid === null ? null : ch.primary.skill;
+  const types = new Set(skill?.types ?? []);
   const hold = ch.weaponHold();
-  const weight = (g: (typeof SUPPORT_GEMS)[number]) =>
-    gemWeight(g, run.build.classId, run.map, hold);
-  const pool = SUPPORT_GEMS.filter(
-    (g) =>
-      weight(g) > 0 &&
-      (run.map > OWN_ATTR_PICK_MAPS || inClassAttrs(g, run.build.classId)) &&
-      typesAllow(g, types) &&
-      supportLive(g, skill).live &&
-      (!g.limitWeapon || g.limitWeapon.some((t) => hold.tags.has(t))),
-  );
-  if (!pool.length) return null;
-  const g = new Rng(run.seed).fork(`rewardsupport${run.map}`).weighted(pool, weight);
-  return { kind: 'gem', uid: uid(), gemId: g.id };
+  const held = heldGems(run);
+  type Support = (typeof SUPPORT_GEMS)[number];
+  const weight = (g: Support) => gemWeight(g, run.build.classId, run.map, hold);
+  const usable = (g: Support) =>
+    (run.map > OWN_ATTR_PICK_MAPS || inClassAttrs(g, run.build.classId)) &&
+    (!g.limitWeapon || g.limitWeapon.some((t) => hold.tags.has(t)));
+  const fits = (g: Support) => weight(g) > 0 && usable(g);
+  const helps = (g: Support) => !!skill && typesAllow(g, types) && supportLive(g, skill).live;
+  const fresh = (g: Support) => !held.has(g.id);
+  const tiers = forMain
+    ? [(g: Support) => fits(g) && helps(g)]
+    : [
+        (g: Support) => fits(g) && helps(g) && fresh(g),
+        (g: Support) => fits(g) && fresh(g),
+        (g: Support) => usable(g) && fresh(g),
+        usable,
+      ];
+  const rng = new Rng(run.seed).fork(`rewardsupport${run.map}`);
+  const picks: Support[] = [];
+  for (const tier of tiers) {
+    let pool = SUPPORT_GEMS.filter((g) => tier(g) && !picks.includes(g));
+    while (picks.length < n && pool.length) {
+      const g = rng.weighted(pool, (x) => Math.max(weight(x), 0.01));
+      picks.push(g);
+      pool = pool.filter((x) => x !== g);
+    }
+  }
+  return picks.map((g) => ({ kind: 'gem', uid: uid(), gemId: g.id }));
 }
 
 /** Three reward offers drawn from the item, gem and flask pools. */
@@ -609,26 +715,35 @@ export function rollCrawlReward(run: RunState): RewardCard[] {
   const offers = rollRewards(run);
   const rng = new Rng(run.seed).fork(`crawlreward${run.map}`);
   const unique = rollUniqueOf(rng, uidSource(run), Math.min(run.map, run.build.level));
-  if (unique && !offers.some((o) => o.kind !== 'pouch' && uniqueIdOf(o) !== undefined))
+  if (
+    unique &&
+    !offers.some((o) => o.kind !== 'pouch' && o.kind !== 'relic' && uniqueIdOf(o) !== undefined)
+  )
     offers[0] = unique;
   return offers;
 }
 
-/** Take one reward offer (or none) into the inventory. */
-export function takeReward(run: RunState, uid: number | null): boolean {
+/**
+ * Take one reward offer (or none) into the inventory. A card for the Wayside may not fit any more (the pouch filled since
+ * the pick appeared, as the Gleaner's Hook fills it when the level passes): `drop` names the provision thrown away to make
+ * room, and without it the pick stays open.
+ */
+export function takeReward(run: RunState, uid: number | null, drop?: string): boolean {
   if (!run.reward) return false;
   const it = run.reward.find((x) => x.uid === uid);
   if (it) {
     if (it.kind === 'pouch') {
-      // A card for the Wayside may not fit any more (the pouch filled since the pick appeared): the pick stays open.
+      if (!pouchRoom(run) && (!drop || !dropProvision(run, drop))) return false;
       if (!addProvision(run, it.id as ProvisionId)) return false;
-    } else if (it.kind === 'currency') stash(run, it);
+    } else if (it.kind === 'relic') grantRelic(run, it.id as RunRewardId);
+    else if (it.kind === 'currency') stash(run, it);
     else {
       run.inventory.push(it);
       noteFound(run, it);
     }
   }
-  run.reward = null;
+  run.reward = run.nextReward ?? null;
+  run.nextReward = null;
   return true;
 }
 

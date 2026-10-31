@@ -50,12 +50,16 @@ export const STATUS_LOOK: Record<StatusId, StatusLook> = {
   exposedLightning: { glyph: 'crack', color: ELEMENT_COLOR[1] },
   exposedCold: { glyph: 'crack', color: ELEMENT_COLOR[2] },
   exposedFire: { glyph: 'crack', color: ELEMENT_COLOR[3] },
+  tornLightning: { glyph: 'hollow', color: ELEMENT_COLOR[1] },
+  tornCold: { glyph: 'hollow', color: ELEMENT_COLOR[2] },
+  tornFire: { glyph: 'hollow', color: ELEMENT_COLOR[3] },
   overpowered: { glyph: 'hollow', color: 0xe0e4f0 },
   withered: { glyph: 'fork', color: 0xa8a050 },
   scarred: { glyph: 'slash', color: 0xe05050 },
   rimed: { glyph: 'slash', color: ELEMENT_COLOR[2] },
   // Mends less; goes off when it dies.
   regenLess: { glyph: 'asterisk', color: 0xcfeaff },
+  scar: { glyph: 'asterisk', color: 0xc84040 },
   venomed: { glyph: 'drop', color: 0xb8e848 },
   doomed: { glyph: 'skull', color: 0x8fd070 },
 };

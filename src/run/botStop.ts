@@ -6,6 +6,7 @@ import {
   hoardGems,
   hoardKinds,
   saleStock,
+  surgeonTrades,
   shrineBlessings,
   stopProblem,
   takeStop,
@@ -74,7 +75,17 @@ export function botStopChoice(run: RunState, slot: number): StopChoice | null {
   } else if (offer.stop === 'ferryman') {
     // A Revive if one is on offer (the bot does not swap what it holds).
     if (reprieveBlocker(run) === null) choice = { stop: 'ferryman', reprieve: 'lastSpark' };
+  } else if (offer.stop === 'surgeon') {
+    // One trade, the first of these on offer: life and defences before anything else (a first guess).
+    const offered = surgeonTrades(run, offer);
+    const order = ['manaForLife', 'wardForLife', 'speedForGuard', 'lifeForWard', 'lifeForWrath'];
+    const pick = order.find((id) => offered.includes(id)) ?? offered[0];
+    if (pick) choice = { stop: 'surgeon', trades: [pick] };
+  } else if (offer.stop === 'knucklebone') {
+    // The bot throws no bones: it only passes through (so the stopper meets the stop).
+    choice = { stop: 'knucklebone' };
   }
+  // The Envious Dead and Another's Remains need a fallen player from the rivals list, which the headless bot never has.
   return choice && stopProblem(run, slot, choice) === null ? choice : null;
 }
 
@@ -83,7 +94,7 @@ export function botWantsStop(run: RunState, slot: number): boolean {
   const offer = run.offers[slot];
   if (!offer || offer.kind !== 'stop' || botStopChoice(run, slot) === null) return false;
   // A socket on the item that holds the gems is worth a level, and so is insurance (a Reprieve bought at the Quartermaster, or
-  // given by the Ferryman); a handful of gems of a chosen kind and a blessing are not.
+  // given by the Bloodletter); a handful of gems of a chosen kind and a blessing are not.
   if (offer.stop === 'ferryman') return true;
   if (offer.stop === 'quartermaster') {
     const choice = botStopChoice(run, slot);

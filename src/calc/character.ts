@@ -1,3 +1,6 @@
+import { passiveMods } from '../data/tree/rules';
+import { hasRelic, relicMods } from './relics';
+import { LITANY_LEVELS } from '../data/runRewards';
 import {
   DUAL_WIELD_BLOCK,
   DUAL_WIELD_MORE_PHYS,
@@ -6,7 +9,9 @@ import {
   BASE_LIFE,
   BASE_MANA,
   BASE_MOVE_SPEED,
+  DEFAULT_MAX_RES,
   FISTS,
+  HARD_MAX_RES,
   STR_MELEE_PHYS_INC,
   SCATTER_HIT_SHARE,
 } from '../data/constants';
@@ -180,19 +185,6 @@ export type SteadyMode = 'clearing' | 'boss';
 
 /** The incoming damage mix of the reference monster: shares of physical, lightning, cold, fire and chaos. */
 export const DEFAULT_HIT_MIX: readonly number[] = [0.5, 0.14, 0.14, 0.14, 0.08];
-
-const nodeModsCache = new WeakMap<object, Mod[]>();
-
-/** What an allocated passive gives, with its source (the same objects every time: the passive tree never changes). */
-function nodeMods(n: { mods: readonly Mod[] }, id: number): Mod[] {
-  let out = nodeModsCache.get(n);
-  if (!out)
-    nodeModsCache.set(
-      n,
-      (out = n.mods.map((m) => ({ ...m, source: { kind: 'tree' as const, id: String(id) } }))),
-    );
-  return out;
-}
 
 export type SocketedGem = {
   gem: GemItem;
@@ -583,10 +575,8 @@ export class Character {
       );
     }
     const tree = getTree();
-    for (const id of build.allocated) {
-      const n = tree.nodes[id];
-      if (n) mods.push(...nodeMods(n, id));
-    }
+    // The passives, with what the tree's relics change (data/tree/rules.ts).
+    mods.push(...passiveMods(build, tree));
     for (const slot of EQUIP_SLOTS) {
       const it = build.equipment[slot];
       if (it) mods.push(...itemGlobalMods(it));
@@ -609,6 +599,8 @@ export class Character {
     }
     for (const m of this.config.extraMods)
       mods.push({ ...m, source: { kind: 'monster', id: 'map' } });
+    // Relics and the Surgeon's trades (docs/ATTRITION.md).
+    mods.push(...relicMods(build));
     // Items can grant a keystone (unless the tree already gave it).
     const have = new Set(build.allocated.map((id) => tree.nodes[id]?.name));
     const granted = new Set<string>();
@@ -727,6 +719,18 @@ export class Character {
       Math.round((db0.sum('base', s, ctx0) + all) * db0.mult(s, ctx0));
     this.attrs = { str: attr('str'), dex: attr('dex'), int: attr('int') };
     const attrs = this.attrs;
+    const resistPenalty = this.config.resistPenalty;
+    const overcap = (t: string): number => {
+      const res =
+        db0.sum('base', `resist.${t}`, ctx0) + db0.sum('base', 'resist.allEle', ctx0) - resistPenalty;
+      const max = Math.min(
+        HARD_MAX_RES,
+        DEFAULT_MAX_RES +
+          db0.sum('base', `maxResist.${t}`, ctx0) +
+          db0.sum('base', 'maxResist.allEle', ctx0),
+      );
+      return Math.max(0, res - max);
+    };
     const shieldItem = build.equipment.offHand;
     const shieldStats =
       shieldItem && itemBase(shieldItem.baseId).itemClass === 'shield'
@@ -745,13 +749,24 @@ export class Character {
                 ? attrs.int
                 : s === 'level'
                   ? level
-                  : s === 'charges.grit'
-                    ? held.grit
-                    : s === 'charges.fervour'
-                      ? held.fervour
-                      : s === 'charges.insight'
-                        ? held.insight
-                        : 0;
+                  : s === 'minAttr'
+                    ? Math.min(attrs.str, attrs.dex, attrs.int)
+                    : // Accuracy and increased armour as gear, tree and attributes give them (for The Marksman's Pulse and
+                      // the Thirst of the Anvil); what a skill adds to its own accuracy is not counted.
+                      s === 'accuracy'
+                      ? Math.round(db0.sum('base', 'accuracy', ctx0) * db0.mult('accuracy', ctx0))
+                      : s === 'incArmour'
+                        ? db0.sum('inc', 'armour', ctx0)
+                        : // Searing Excess: an element's resistance above its cap.
+                          s.startsWith('overcap.')
+                          ? overcap(s.slice('overcap.'.length))
+                          : s === 'charges.grit'
+                      ? held.grit
+                      : s === 'charges.fervour'
+                        ? held.fervour
+                        : s === 'charges.insight'
+                          ? held.insight
+                          : 0;
     const src = { kind: 'base' as const, id: 'attributes' };
     // Plated Hide and Strongarm both take dexterity's evasion bonus away.
     this.attrEffects = attributeEffects(
@@ -784,7 +799,9 @@ export class Character {
         const tags = gemTagsOf(def);
         const bonus =
           socketedGemBonus(it, tags, (st) => (st === 'level' ? level : 0)) +
-          db0.sum('base', 'gemLevel', { tags: tagMask(tags), ancestry: 0, conds: 0 });
+          db0.sum('base', 'gemLevel', { tags: tagMask(tags), ancestry: 0, conds: 0 }) +
+          // Relic 14: the primary skill is higher.
+          (g.uid === build.primaryGem && hasRelic(build, 'litanyOfTheChosen') ? LITANY_LEVELS : 0);
         this.gems.push({ gem: g, def, slot, socket, level: gemLevel(def, level, attrs, bonus) });
       });
     }
@@ -959,12 +976,20 @@ export class Character {
       this.actives.find((a) => a.usable && !a.triggered && !a.skill.utility);
     if (chosen && !chosen.usable) this.warnings.push(chosen.reason ?? 'Primary skill unusable');
     const starred = chosen && chosen.usable ? chosen : this.defaultAttack;
-    // Every skill the character casts itself, once a skill: the starred one first.
+    // Every skill the character casts itself, the starred one first: a utility once, a damage skill once for each set of
+    // supports (two copies with different supports are two skills on the Strategy tab).
     const casting = new Set<string>();
     const cast: SkillChoice[] = [];
+    const castKey = (a: SkillChoice) =>
+      a.skill.utility
+        ? a.skill.id
+        : `${a.skill.id}|${a.supports
+            .map((s) => s.def.id)
+            .sort()
+            .join(',')}`;
     for (const a of starred.gemUid === null ? this.actives : [starred, ...this.actives]) {
-      if (!a.usable || a.triggered || a.gemUid === null || casting.has(a.skill.id)) continue;
-      casting.add(a.skill.id);
+      if (!a.usable || a.triggered || a.gemUid === null || casting.has(castKey(a))) continue;
+      casting.add(castKey(a));
       if (a !== starred && (curseAuraOf(a) || this.hexTouched.has(a.gemUid))) continue;
       cast.push(a);
     }
@@ -973,11 +998,17 @@ export class Character {
     // A summon cast like a damage skill (Call Furies) is the main skill when no damage skill is, else periodic.
     const castLike = (a: SkillChoice) =>
       a.skill.utility?.kind === 'summon' && a.skill.utility.perCast !== undefined;
+    // Blind Fury takes the attacks' conditions away (relic 18): they are used on whatever is there.
+    const blind = hasRelic(build, 'blindFury');
+    const tactic = (a: SkillChoice) => {
+      const t = tacticOf(strat, a.gemUid);
+      return blind && a.skill.tags.includes('attack') ? { ...t, when: undefined } : t;
+    };
     const entries = cast.map((a) =>
       entryOf(
         a,
         a.skill,
-        tacticOf(strat, a.gemUid),
+        tactic(a),
         castLike(a)
           ? starred.gemUid === null
             ? 'main'
@@ -1981,8 +2012,13 @@ export class Character {
     const { hit, hc } = this.againstReference(def);
     const pool = def.maxLife - this.reservedLife + def.maxEs;
     let taken = 0;
+    // (The Mountain's Hide: a share of armour meets elemental hits too.)
+    const eleArmour = (t: number) =>
+      t >= 1 && t <= 3 && def.armourVsEle > 0
+        ? 1 - Math.min(0.9, armourReduction(def.armour * def.armourVsEle, hit))
+        : 1;
     const resMult = (t: number) =>
-      def.immune[t] ? 0 : 1 - effectiveRes(def.res[t], def.maxRes[t]) / 100;
+      def.immune[t] ? 0 : eleArmour(t) * (1 - effectiveRes(def.res[t], def.maxRes[t]) / 100);
     for (const [t, w] of hitMix.entries()) {
       let m: number;
       if (t === 0) {
@@ -2802,7 +2838,9 @@ export function channelMult(
 }
 
 export function skillRange(p: SkillProfile): number {
-  return skillReach(p) + (p.skill.travel ?? 0);
+  const r = skillReach(p) + (p.skill.travel ?? 0);
+  // Projectiles that fall short (Arrows at the Throat): the AI closes in to where they land.
+  return p.projRangeCap > 0 ? Math.min(r, p.projRangeCap) : r;
 }
 
 function skillReach(p: SkillProfile): number {

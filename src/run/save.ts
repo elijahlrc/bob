@@ -1,6 +1,7 @@
 import { stampAll } from './found';
 import { dropRetiredGems, releaseStrandedGems } from './inventory';
 import { LEGACY } from '../data/difficulty';
+import { resetTree } from '../data/tree/rules';
 import { pack, unpack } from './pack';
 import { SAVE_VERSION, type RunState } from './run';
 
@@ -63,7 +64,7 @@ export function migrate(version: number, run: RunState): RunState | null {
   // so a run in progress gets its passives back to spend for the new rules. The Wayside's new fields fill in by default.
   if (version === 23) {
     run.version = SAVE_VERSION;
-    run.build = { ...run.build, allocated: [] };
+    run.build = resetTree(run.build);
     return run;
   }
   // Version 20 has the hand-written tree before the growth of docs/tree/design/G-growth.md, version 21 the grown tree
@@ -71,7 +72,7 @@ export function migrate(version: number, run: RunState): RunState | null {
   // handed back as unspent points.
   if (version === 20 || version === 21 || version === 22) {
     run.version = SAVE_VERSION;
-    run.build = { ...run.build, allocated: [] };
+    run.build = resetTree(run.build);
     return run;
   }
   // Versions 18 and 19 have the generated passive tree, before the hand-written one (docs/PASSIVE-TREE.md, phase F): their
@@ -79,7 +80,7 @@ export function migrate(version: number, run: RunState): RunState | null {
   // Wayside state (docs/WAYSIDE.md), which every reader fills in with `waysideOf`.
   if (version === 18 || version === 19) {
     run.version = SAVE_VERSION;
-    run.build = { ...run.build, allocated: [] };
+    run.build = resetTree(run.build);
     return run;
   }
   // Versions 10 to 16 have a passive tree of before one of the iterations of docs/TREE-REDESIGN.md (10: roads and districts; 11: before
@@ -88,21 +89,21 @@ export function migrate(version: number, run: RunState): RunState | null {
   // nodes now, so the allocated passives are handed back as unspent points.
   if (version >= 10 && version <= 17) {
     run.version = SAVE_VERSION;
-    run.build = { ...run.build, allocated: [] };
+    run.build = resetTree(run.build);
     return run;
   }
   // Versions 8 and 9 have a passive tree of before docs/TREE.md "Look and density" and its second pass: their node ids mean
   // other nodes now, so the allocated passives are handed back as unspent points.
   if (version === 8 || version === 9) {
     run.version = SAVE_VERSION;
-    run.build = { ...run.build, allocated: [] };
+    run.build = resetTree(run.build);
     return run;
   }
   // Version 7 only lacks the difficulty settings: a run in progress keeps the curve it was balanced on.
   if (version === 7) {
     const old = run as RunState;
     old.version = SAVE_VERSION;
-    old.build = { ...old.build, allocated: [] };
+    old.build = resetTree(old.build);
     old.difficulty = { ...LEGACY };
     return old;
   }
@@ -110,7 +111,7 @@ export function migrate(version: number, run: RunState): RunState | null {
     const old = run as RunState & { newLoot?: number[] };
     delete old.newLoot;
     old.version = SAVE_VERSION;
-    old.build = { ...old.build, allocated: [] };
+    old.build = resetTree(old.build);
     old.unseen = [];
     old.acquired = {};
     old.favourites = [];

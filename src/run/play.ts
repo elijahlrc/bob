@@ -17,6 +17,7 @@ export function combineCrawl(parts: MapResult[]): MapResult {
     ticks: sum((r) => r.ticks),
     xpGained: sum((r) => r.xpGained),
     kills: sum((r) => r.kills),
+    rares: sum((r) => r.rares ?? 0),
     stuck: sum((r) => r.stuck),
     picked: parts.flatMap((r) => r.picked),
     ...(parts.some((r) => r.reprieves)
@@ -48,7 +49,13 @@ export function playOffer(
   const segments = offer.type === 'crawl' ? CRAWL_SEGMENTS : 1;
   for (let s = 0; s < segments; s++) {
     const plan = planFor(run, offer, s);
-    const opts = { ...worldOptsFor(run, plan), start, reprieves: readyReprieves(run, fired) };
+    const base = worldOptsFor(run, plan);
+    // The first map starts as the run says (a relic may fill the flasks for a boss); the later ones as the last left things.
+    const opts = {
+      ...base,
+      start: s === 0 ? base.start : start,
+      reprieves: readyReprieves(run, fired),
+    };
     tweak?.(opts);
     const res = runMap(plan, build, xp, opts, undefined, onTick);
     parts.push(res);

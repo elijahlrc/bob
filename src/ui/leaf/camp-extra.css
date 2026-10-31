@@ -1,25 +1,62 @@
-/* Gold Leaf: the camp's other pieces round the Next map tab (docs/mockups/style/STYLE-GUIDE.md): the reward pick (Next
-   map and Items tabs), the boss offer and the boss ahead, Wayfinder's Chalk, the Debug panel and a stop's emblem in its
+/* Gold Leaf: the camp's other pieces round the Next map tab (docs/mockups/style/STYLE-GUIDE.md): the reward pick (a
+   pop-up over the camp), the boss offer and the boss ahead, Wayfinder's Chalk, the Debug panel and a stop's emblem in its
    niche. The stops, the Satchel and the tips are in wayside.css, the map report in report.css. */
 
-/* ---- The reward pick: the offers are objects on small plaques with a thin gold rim ---- */
+/* ---- The reward pick: a pop-up over the camp (a lapis panel); the offers are objects on small plaques with a thin
+   gold rim. The veil scrolls, never the painted panel. ---- */
+html.leaf .reward-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  background: #0b0805b8;
+}
+html.leaf .reward-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 html.leaf .reward {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
+  box-sizing: border-box;
+  width: min(100%, 880px);
+  margin: auto;
+  padding: 26px 30px 30px;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
 }
-html.leaf .reward-head {
-  font: 400 var(--head-size) / 1 var(--title-font);
-  font-size-adjust: none;
-  color: var(--on-gold);
-  text-shadow: 0 2px 0 #e2c68166;
+html.leaf .reward > .lf-h {
+  margin: 0;
+}
+html.leaf .reward-sub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -4px;
+  color: var(--muted);
+}
+/* Two picks in a row (a boss's relics after its usual pick): which of the two this is. */
+html.leaf .reward-pips {
+  display: inline-flex;
+  gap: 6px;
+}
+html.leaf .reward-pips i {
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  background: var(--lapis-d);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+html.leaf .reward-pips i.on {
+  background: var(--gold-hi);
+  box-shadow: 0 0 0 1px var(--ink);
 }
 html.leaf .reward-cards {
   display: grid;
@@ -84,9 +121,39 @@ html.leaf .reward-buttons {
   display: flex;
   gap: 10px;
 }
-html.leaf .reward > .warn {
-  color: var(--on-gold);
-  font-weight: 600;
+/* The Satchel under a provision that does not fit: one marked to be thrown away goes on vermilion. */
+html.leaf .reward-drop {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+html.leaf .reward-drop-h {
+  padding-top: 12px;
+  text-align: center;
+  color: var(--gold-hi);
+  background: var(--s-dots);
+  background-position: left top;
+}
+html.leaf .reward-drop .reward-dropped {
+  margin-right: auto;
+  color: var(--pearl);
+}
+/* On a phone, Take sits below the scrolling pick, in reach. */
+html.leaf .reward-bar {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--t-lapis, #172049);
+  box-shadow: 0 -3px 0 #c09d4e;
+  text-align: center;
+  text-shadow: var(--text-shadow);
+}
+html.leaf .reward-bar .btn {
+  width: min(100%, 420px);
 }
 /* The preview: a lapis leaf with a gold ring (the item card inside is transparent). */
 html.leaf .reward-preview {
@@ -106,18 +173,10 @@ html.leaf .reward-preview.float {
 html.leaf .reward-preview .provision .muted {
   color: var(--muted);
 }
-/* Above the Items tab, after a map: the same pick, so the drops stay in view below. */
+/* Above the Items tab, after a map: where the gem just taken went. */
 html.leaf .items-reward {
   margin: 0 0 4px;
   padding: 0 20px;
-}
-html.leaf .items-reward .reward {
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-html.leaf .items-reward .reward .reward-preview {
-  flex-basis: auto;
 }
 /* Where the gem just taken went (docs/NEWPLAYER.md N7): a plaque the width of its words, centred, like the camp's notices. */
 html.leaf .notice.gem-taken {
@@ -348,6 +407,12 @@ html.leaf .stop-card .stop-emblem {
 @media (max-width: 600px) {
   html.leaf .reward-cards {
     grid-template-columns: 1fr;
+  }
+  html.leaf .reward-scroll {
+    padding: 10px;
+  }
+  html.leaf .reward {
+    padding: 22px 18px 24px;
   }
   html.leaf .items-reward {
     padding: 0 12px;

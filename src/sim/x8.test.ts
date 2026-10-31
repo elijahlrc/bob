@@ -337,12 +337,11 @@ describe('the Ashen Choir (EXPANSION 7.3)', () => {
     expect(w.actors.some((a) => a.alive && a.mon?.spec.type === 'choirmaster')).toBe(true);
   });
 
-  it('the hex mods roll on rares, and the Choir mod only on the Choir', () => {
+  it('the hex mods roll on rares', () => {
     const rng = new Rng(8);
     let warded = 0;
     for (let i = 0; i < 400; i++) {
-      const mods: MonsterModId[] = rollMonsterMods(rng, 'rare', 60, 'ossuary');
-      if (mods.includes('zealous')) throw new Error('Zealous on the Ossuary');
+      const mods: MonsterModId[] = rollMonsterMods(rng, 'rare', 60);
       if (mods.includes('hexWarded') || mods.includes('hexcaller')) warded++;
     }
     expect(warded).toBeGreaterThan(10);

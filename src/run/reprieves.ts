@@ -84,8 +84,8 @@ export function standingEffects(run: RunState): StandingEffect[] {
       const d = curseDef(c.id);
       out.push({ kind: 'curse', name: d.name, text: d.text, left: c.until - run.map + 1 });
     }
-  for (const [id, n] of Object.entries(w.rewards))
-    if (n > 0) {
+  for (const [id, n] of Object.entries(run.build.relics ?? {}))
+    if (n && n > 0) {
       const r = runRewardDef(id);
       out.push({
         kind: 'reward',

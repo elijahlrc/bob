@@ -111,7 +111,7 @@ export type SkillProfile = {
   hands: HandProfile[];
   /** Average seconds per use. */
   useTime: number;
-  /** Extra times the skill fires after each use (Echoing Cast): a use lands 1 + repeats times. */
+  /** Extra times the skill fires after each use (Echoing Cast): a use lands 1 + repeats times. A fraction is a chance (the sim rolls it). */
   repeats: number;
   /** Times one use hits a target that stays put: more than one for a zone that pulses (rain, a cloud). */
   pulses: number;
@@ -252,6 +252,8 @@ export type SkillProfile = {
   instantLeechAlways: boolean;
   /** Extra reach of melee skills, in tiles. */
   rangeBonus: number;
+  /** How far a projectile flies at most, in tiles (Arrows at the Throat); 0 for no limit. */
+  projRangeCap: number;
   /** Mods of the skill and its supports that give charges, buffs, rage or recovery on events (set by the Character). */
   gains: Mod[];
   leechLife: number[];
@@ -623,7 +625,10 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     tagMask: baseTags,
     hands,
     useTime,
-    repeats: Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))),
+    // A chance to fire again (The Echoing Word) counts as part of a repeat; the sim rolls it on each use.
+    repeats:
+      Math.max(0, Math.round(db.sum('base', 'repeats', baseCtx))) +
+      clamp(db.sum('base', 'repeatChance', baseCtx) / 100, 0, 1),
     // A crystal stands, then bursts once: it is a single hit, not a pulse of the ground each interval.
     pulses: singleHit
       ? 1
@@ -830,7 +835,12 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
     instantLeechAlways: db.flag('instantLeechAlways', baseCtx),
     gains: [],
     rangeBonus: beh.kind === 'melee' ? db.sum('base', 'meleeRange', baseCtx) : 0,
-    leechLife: perType('leech.life').map((v) => v * db.mult('leechRecovery', baseCtx)),
+    projRangeCap: skill.tags.includes('projectile')
+      ? db.sum('base', 'projectileRangeCap', baseCtx)
+      : 0,
+    leechLife: perType('leech.life').map(
+      (v) => v * db.mult('leechRecovery', baseCtx) * db.mult('leechRecoveryLife', baseCtx),
+    ),
     leechMana: perType('leech.mana').map((v) => v * db.mult('leechRecovery', baseCtx)),
     lifeOnHit: db.sum('base', 'lifeOnHit', baseCtx),
     manaOnHit: db.sum('base', 'manaOnHit', baseCtx),
@@ -893,7 +903,7 @@ export function distanceMult(p: SkillProfile, d: number): number {
   // More damage the farther the shot has flown or the charge has run.
   if (p.distMore) m *= 1 + (p.distMore.more / 100) * clamp(d / p.distMore.dist, 0, 1);
   if (b.kind === 'projectile') {
-    if (p.closeQuarters && p.isAttack) m *= 1.3 - (0.8 * (clamp(d, 1, 8) - 1)) / 7;
+    if (p.closeQuarters && p.isAttack) m *= 1.5 - (clamp(d, 1, 8) - 1) / 7;
     if (b.falloff !== undefined && b.range) m *= 1 - (1 - b.falloff) * clamp(d / b.range, 0, 1);
   }
   return m;

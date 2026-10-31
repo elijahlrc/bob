@@ -44,7 +44,7 @@ import { buildSignature, killerTracker, metTracker, RunTally } from './metrics';
 import { randomCraft } from './randomBot';
 import type { RunSummary } from './report';
 import { scoreTheme } from './threat';
-import { allocate, pathTo } from './tree';
+import { allocate, pathFor } from './tree';
 import { markSeen } from './found';
 
 /**
@@ -154,6 +154,8 @@ function buildKey(run: RunState, b: Build): string {
   for (const slot of EQUIP_SLOTS) parts.push(keyOf(b.equipment[slot]));
   for (const f of b.flasks) parts.push(keyOf(f));
   parts.push(keyOf(b.strategy));
+  // Relics, the Surgeon's trades and the tree's relics change the sheet too (docs/ATTRITION.md).
+  parts.push(keyOf(b.relics), keyOf(b.grafts), keyOf(b.treeRelics));
   return parts.join('|');
 }
 
@@ -248,7 +250,7 @@ export function botAllocate(run: RunState, maxDepth = 6): void {
       const kind = tree.nodes[id].kind;
       // Only evaluate path ends worth walking to (travel nodes count when adjacent).
       if (d > 1 && kind === 'travel') continue;
-      const path = pathTo(run.build.allocated, run.classId, id);
+      const path = pathFor(run.build, id, getTree());
       if (!path || path.length > pts) continue;
       const s = scoreOf(run, { ...run.build, allocated: [...run.build.allocated, ...path] });
       const value = (s - base) / base / path.length;
@@ -589,6 +591,8 @@ export function botArm(run: RunState): void {
 /** All camp decisions between maps. */
 export function botCamp(run: RunState, policy: CraftPolicy = 'greedy', wayside = true): void {
   botReward(run, policy !== 'none', wayside);
+  // A fallen boss's relics wait behind its usual pick.
+  if (run.reward) botReward(run, policy !== 'none', wayside);
   if (wayside) botArm(run);
   botEquip(run);
   botRegem(run);

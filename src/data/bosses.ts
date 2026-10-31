@@ -1,4 +1,4 @@
-import type { MonsterTypeId } from './monsters';
+import type { MonsterModId, MonsterTypeId } from './monsters';
 
 /**
  * The ten bosses (docs/BOSSES.md): one on every tenth map, and the last on map 100. Each asks the build one
@@ -244,10 +244,20 @@ export const REGIMENTS: { type: MonsterTypeId; n: number }[][] = [
   ],
 ];
 
+/**
+ * Each regiment marches under a banner (docs/ATTRITION.md, 2026-10-29): one mod its soldiers share, in turn, each a probe
+ * at a way of lasting (regeneration, the shield's recharge, leech).
+ */
+export const REGIMENT_BANNERS: MonsterModId[] = ['withering', 'shieldbreaking', 'bloodless'];
+
 // The Veiled Duellist (section 5b).
-/** The veil is up this long, then down for the rest of the cycle. */
+/**
+ * The veil is up this long, then down for the rest of the cycle. While it is up nothing crits him, he takes this much less
+ * (the owner, 2026-10-29: it went unnoticed) and he cannot be leeched from.
+ */
 export const VEIL_SECONDS = 3;
 export const VEIL_CYCLE = 9;
+export const VEIL_LESS = 0.6;
 /** When the veil drops he lunges: lanes of steel shown this long first, each a crit of this many of his blows. */
 export const FLURRY_TELL = 0.9;
 export const FLURRY_LANES = 3;
@@ -270,8 +280,9 @@ export const BAR_DOT = 0.3;
 export const PLATED_LESS = 0.35;
 export const BROKEN_SECONDS = 5;
 export const BROKEN_TAKEN = 0.5;
-/** Its blows stun the character (once in the boss lock). */
+/** Its blows stun the character (once in the boss lock), and hold the recharge of energy shield off this much longer. */
 export const ENGINE_STUN = 0.7;
+export const ENGINE_SHIELD_CRACK = 4;
 /** Every so often it grinds: a pattern of pistons on the floor. */
 export const GRIND_EVERY = 13;
 
@@ -280,13 +291,15 @@ export const GRIND_EVERY = 13;
 export const GRIEF_SPEED = 0.3;
 export const GRIEF_DAMAGE = 0.25;
 export const ECHO_EVERY = 6;
+/** Cinder is living flame: leech from it is this share of the usual. Ash's blows scar (no life regeneration for a while). */
+export const CINDER_LEECH = 0.5;
 
 // The Tollkeeper (section 4).
 export const TOLL_EVERY = 12;
 export const TOLL_TELL = 2;
 /** Its damage before the first toll (a multiple of the usual), then what each toll adds, for good: damage, speed, and a ring to the next toll's waves. */
 export const TOLL_START = 0.5;
-/** Its flail (the melee between tolls) hits for this much of what its stacks say; the toll's rings are not cut. */
+/** Its flail (the melee between tolls) hits for this much of what its stacks say; the toll's rings are not cut. Its blows scar. */
 export const TOLL_FLAIL = 0.5;
 export const TOLL_DAMAGE = 0.25;
 export const TOLL_SPEED = 0.06;
@@ -316,6 +329,8 @@ export const LANE_BURN_SECONDS = 6;
 export const LANE_WIDTH = 1.4;
 /** Chill slows it twice as much as it slows anything else. */
 export const COURSER_CHILL = 2;
+/** Its charge back tramples: a hit knocks this many drinks' worth of charges out of every worn flask. */
+export const TRAMPLE_DRINKS = 0.5;
 
 // The Magistrate (section 6).
 export const SENTENCE_EVERY = 15;
@@ -327,6 +342,8 @@ export const WITNESSES = 4;
 /** Each Witness after the first adds this to the hex the character carries. */
 export const WITNESS_HEX_STEP = 0.1;
 export const SENTENCE_STUN = 1.2;
+/** Each living Witness takes this share off the character's recovery: regeneration, leech, energy shield recharge, flasks. */
+export const WITNESS_RECOVERY = 0.1;
 
 // The Prism Warden (section 7).
 export const ATTUNE_SECONDS = 8;
@@ -334,6 +351,8 @@ export const ATTUNE_SHIFT = 1.5;
 export const FRACTURE_SECONDS = 3;
 export const FRACTURE_TAKEN = 0.4;
 export const PRISM_PATTERN_EVERY = 4.5;
+/** Attuned to cold it frostbites: the character's life and energy shield regeneration are this much less (Frostbitten). */
+export const FROSTBITE = 75;
 
 // The Rotwife (section 8).
 export const ROT_REGEN = 0.004;
@@ -344,6 +363,8 @@ export const BOSS_MAP_NO_AFFIX = ['mending'];
 export const ROT_PATCH_EVERY = 1.4;
 export const ROT_PATCH_SECONDS = 8;
 export const ROT_ROTATION = ['bleed', 'poison', 'ignite', 'freeze', 'shock'] as const;
+/** While the character is poisoned in her fight, flasks recover this much less. */
+export const ROT_FLASK_LESS = 0.3;
 export type RotAilment = (typeof ROT_ROTATION)[number];
 
 // The Unmaker (section 9).

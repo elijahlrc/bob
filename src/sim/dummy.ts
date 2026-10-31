@@ -56,6 +56,8 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
     leechToEs: false,
     regenToEs: false,
     chaosHitsEs: false,
+    chaosEsShare: 0,
+    armourVsEle: 0,
     physTakenAs: [0, 0, 0, 0, 0],
     damageTakenType: [1, 1, 1, 1, 1],
     unaffectedByShock: false,

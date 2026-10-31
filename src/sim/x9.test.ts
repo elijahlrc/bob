@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { MonsterSpec } from '../calc/monster';
 import { Rng } from '../core/rng';
-import { MONSTER_TYPES, type MonsterModId, type MonsterTypeId } from '../data/monsters';
+import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { MIXED_THEMES, themeDef } from '../data/themes';
 import { makeGem, makeItem } from '../gen/items';
 import { rollCurrencyDrops } from '../gen/currencyDrops';
-import { rollMonsterMods, typeShares } from '../gen/population';
+import { typeShares } from '../gen/population';
 import { newRun, planFor, rollThemes, setMap } from '../run/run';
 import { applyDamage, killActor } from './combat';
 import { createDummyWorld } from './dummy';
@@ -196,21 +196,13 @@ describe('the Swarm and the Reliquary (EXPANSION 7.3)', () => {
     expect(near.life).toBeLessThan(before);
   });
 
-  it('a Brood monster splits into Gnawers; the faction mod rolls only on the Swarm', () => {
+  it('a Brood monster splits into Gnawers', () => {
     const w = arena();
     const m = put(w, 'beetle', 12, 0, { rarity: 'magic', mods: ['brood'] });
     killActor(w, m);
     const kids = w.actors.filter((a) => a.alive && a.mon?.spec.type === 'gnawer');
     expect(kids.length).toBeGreaterThan(1);
     expect(kids.every((k) => k.noReward)).toBe(true);
-    const rng = new Rng(4);
-    let swarm = 0;
-    for (let i = 0; i < 500; i++) {
-      const o: MonsterModId[] = rollMonsterMods(rng, 'rare', 40, 'ossuary');
-      if (o.includes('brood')) throw new Error('Brood on the Ossuary');
-      if (rollMonsterMods(rng, 'rare', 40, 'swarm').includes('brood')) swarm++;
-    }
-    expect(swarm).toBeGreaterThan(20);
   });
 
   it('the Gnawing Queen burrows out of sight, warns where she will rise, and raises Nests', () => {

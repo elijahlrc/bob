@@ -113,10 +113,21 @@ function matches(c: Compiled, ctx: ModCtx, require = 0): boolean {
   return true;
 }
 
-function valueOf(c: Compiled, ctx: ModCtx): number {
+/**
+ * A `per` stat of the form `inc:<stat>` is the sum of that stat's increases in the database queried, under the use's
+ * conditions, never below 0: what holds this moment, flasks and buffs included (The Fleetfoot Oath). `top` is the database the
+ * query began on, so a database a flask extends is the one read. (A mod of `<stat>` must not itself be per `inc:<stat>`.)
+ */
+const LIVE_INC = 'inc:';
+
+function valueOf(c: Compiled, ctx: ModCtx, top: ModDB): number {
   const m = c.mod;
   if (!m.per) return m.value;
-  const v = ctx.statValue ? ctx.statValue(m.per.stat) : 0;
+  const v = m.per.stat.startsWith(LIVE_INC)
+    ? Math.max(0, top.sum('inc', m.per.stat.slice(LIVE_INC.length), { ...ctx, tags: 0, ancestry: 0 }))
+    : ctx.statValue
+      ? ctx.statValue(m.per.stat)
+      : 0;
   return m.value * Math.min(m.per.max ?? Infinity, Math.floor(v / m.per.div));
 }
 
@@ -184,20 +195,26 @@ export class ModDB {
    * Sum of matching mods of one kind. `require` (tag bitmask) additionally demands that the mod
    * carries at least one of those tags (used for ailment-only scaling).
    */
-  sum(kind: ModKind, stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
-    let s = this.parent ? this.parent.sum(kind, stat, ctx, require) : 0;
+  sum(
+    kind: ModKind,
+    stat: StatId,
+    ctx: ModCtx = EMPTY_CTX,
+    require = 0,
+    top: ModDB = this,
+  ): number {
+    let s = this.parent ? this.parent.sum(kind, stat, ctx, require, top) : 0;
     const b = this.byStat.get(stat);
     if (!b) return s;
-    for (const c of b[kind]) if (matches(c, ctx, require)) s += valueOf(c, ctx);
+    for (const c of b[kind]) if (matches(c, ctx, require)) s += valueOf(c, ctx, top);
     return s;
   }
 
   /** Product of (1 + more/100) over matching `more` mods. */
-  more(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0): number {
-    let p = this.parent ? this.parent.more(stat, ctx, require) : 1;
+  more(stat: StatId, ctx: ModCtx = EMPTY_CTX, require = 0, top: ModDB = this): number {
+    let p = this.parent ? this.parent.more(stat, ctx, require, top) : 1;
     const b = this.byStat.get(stat);
     if (!b) return p;
-    for (const c of b.more) if (matches(c, ctx, require)) p *= 1 + valueOf(c, ctx) / 100;
+    for (const c of b.more) if (matches(c, ctx, require)) p *= 1 + valueOf(c, ctx, top) / 100;
     return p;
   }
 
@@ -211,11 +228,11 @@ export class ModDB {
   }
 
   /** The last matching override, if any. */
-  override(stat: StatId, ctx: ModCtx = EMPTY_CTX): number | undefined {
-    let v = this.parent?.override(stat, ctx);
+  override(stat: StatId, ctx: ModCtx = EMPTY_CTX, top: ModDB = this): number | undefined {
+    let v = this.parent?.override(stat, ctx, top);
     const b = this.byStat.get(stat);
     if (!b) return v;
-    for (const c of b.override) if (matches(c, ctx)) v = valueOf(c, ctx);
+    for (const c of b.override) if (matches(c, ctx)) v = valueOf(c, ctx, top);
     return v;
   }
 

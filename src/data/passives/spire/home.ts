@@ -49,9 +49,9 @@ export const home: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [esFlat(15)],
+          lines: [esFlat(11)],
           at: [-70, -1242],
-          why: 'The west side: defence, a flat shield (the user, 2026-10-25; it was 5% increased, which is nothing on a character who starts with almost none).',
+          why: 'The west side: defence, a flat shield (the user, 2026-10-25; it was 5% increased, which is nothing on a character who starts with almost none; 15 until the energy shield cut of docs/ATTRITION.md).',
         },
         {
           id: 'n',

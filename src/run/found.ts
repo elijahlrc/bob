@@ -119,7 +119,7 @@ export function pruneFound(run: RunState): void {
     for (const g of it.sockets) if (g) live.add(g.uid);
   }
   for (const f of run.build.flasks) if (f) live.add(f.uid);
-  if (run.reward) for (const it of run.reward) live.add(it.uid);
+  for (const it of [...(run.reward ?? []), ...(run.nextReward ?? [])]) live.add(it.uid);
   run.unseen = run.unseen.filter((u) => live.has(u));
   run.favourites = run.favourites.filter((u) => live.has(u));
   for (const k of Object.keys(run.acquired))

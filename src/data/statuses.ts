@@ -19,8 +19,12 @@ export type StatusId =
   | 'venomed'
   | 'regenLess'
   | 'scarred'
+  | 'scar'
   | 'unnerved'
-  | 'rimed';
+  | 'rimed'
+  | 'tornLightning'
+  | 'tornCold'
+  | 'tornFire';
 
 export const STATUS_IDS: StatusId[] = [
   'hinder',
@@ -38,8 +42,12 @@ export const STATUS_IDS: StatusId[] = [
   'venomed',
   'regenLess',
   'scarred',
+  'scar',
   'unnerved',
   'rimed',
+  'tornLightning',
+  'tornCold',
+  'tornFire',
 ];
 
 export type StatusDef = {
@@ -136,6 +144,31 @@ export const STATUSES: Record<StatusId, StatusDef> = {
     max: 1,
     text: '-{v}% to fire resistance',
   },
+  // Elements at War (a relic, data/runRewards.ts): apart from exposure, so the two add up.
+  tornLightning: {
+    id: 'tornLightning',
+    name: 'Torn by the Storm',
+    seconds: 3,
+    v: 30,
+    max: 1,
+    text: '-{v}% to lightning resistance',
+  },
+  tornCold: {
+    id: 'tornCold',
+    name: 'Torn by the Frost',
+    seconds: 3,
+    v: 30,
+    max: 1,
+    text: '-{v}% to cold resistance',
+  },
+  tornFire: {
+    id: 'tornFire',
+    name: 'Torn by the Flame',
+    seconds: 3,
+    v: 30,
+    max: 1,
+    text: '-{v}% to fire resistance',
+  },
   overpowered: {
     id: 'overpowered',
     name: 'Overpowered',
@@ -163,11 +196,20 @@ export const STATUSES: Record<StatusId, StatusDef> = {
   },
   scarred: {
     id: 'scarred',
-    name: 'Scarred',
+    name: 'Gashed',
     seconds: 0.6,
     v: 8,
     max: 1,
     text: '{v}% increased physical damage taken',
+  },
+  // Wounds that will not close (docs/ATTRITION.md): put on the character by some monsters' hits and the Withering mod.
+  scar: {
+    id: 'scar',
+    name: 'Scarred',
+    seconds: 3,
+    v: 100,
+    max: 1,
+    text: 'No life regeneration',
   },
   unnerved: {
     id: 'unnerved',
@@ -200,6 +242,9 @@ export const EXPOSURE_TYPE: Partial<Record<StatusId, number>> = {
   exposedLightning: 1,
   exposedCold: 2,
   exposedFire: 3,
+  tornLightning: 1,
+  tornCold: 2,
+  tornFire: 3,
 };
 
 /** The stat ids of a skill's chance to inflict a status on hit (percent), and its overrides. */

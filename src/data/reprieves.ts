@@ -95,7 +95,7 @@ export type CurseDef = {
 export const CURSES: CurseDef[] = [
   {
     id: 'bargain',
-    name: "Ferryman's Bargain",
+    name: 'Bled White',
     text: '15% less maximum life',
     affix: { playerMods: [mod('life', 'more', -15)], reward: {} },
   },

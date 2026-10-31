@@ -842,7 +842,7 @@ export function ItemDetail(p: Props) {
       <ItemSheet it={selected} run={run} bad={bad} worn={!inBag && sel.from !== 'pile'} />
       {sel.from === 'pile' && (
         <div class="ix-verdict muted">
-          Worth {salvageValue(selected)} Bone Dust when you salvage the pile.
+          Worth {salvageValue(selected, run)} Bone Dust when you salvage the pile.
         </div>
       )}
     </Page>

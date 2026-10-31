@@ -202,21 +202,35 @@ const LATE_MODS: MonsterModId[] = ['fortified', 'raiser', 'rimeAura', 'frenzied'
 export const LATE_MOD_LEVEL = 15;
 export const MINIBOSS_LATE_MOD_LEVEL = 50;
 /**
- * How the mix of ordinary rooms' packs shifts with the map number (nothing on map 1, all of it on map 100): plain packs lose
- * `NORMAL_FADE` of the rooms and rare packs gain `RARE_GROWTH`, magic packs taking the rest. Map 1: 70% plain, 22% magic, 8%
- * rare; map 60: 52%, 27%, 21%; map 100: 40%, 30%, 30%.
+ * How the mix of ordinary rooms' packs shifts with the map number (nothing on map 1, all of it on map 100): plain packs start
+ * at `PLAIN_SHARE` and lose `NORMAL_FADE` of the rooms, rare packs gain `RARE_GROWTH`, magic packs take the rest. Map 1: 59%
+ * plain, 33% magic, 8% rare; map 60: 42%, 37%, 21%; map 100: 30%, 40%, 30% (magic packs a third early, the owner,
+ * 2026-10-29; they were 22% to 30%).
  */
-export const NORMAL_FADE = 0.3;
+export const PLAIN_SHARE = 0.59;
+export const NORMAL_FADE = 0.29;
 export const RARE_GROWTH = 0.22;
-/** One more magic monster in a magic pack, and in a rare's escort, for every this many maps. */
+/** One more magic monster in a rare's escort for every this many maps. */
 export const MAGIC_BAND_MAPS = 25;
+/**
+ * Early maps hold more monsters (the owner, 2026-10-29: they were over too quickly, about half as many again): the room
+ * packs grow by `EARLY_CROWD` through `EARLY_CROWD_FULL` (the end room's pack does not, so a map as a whole gains 40% to
+ * 60%; `npm run mapstats`), easing to the usual count by `EARLY_CROWD_END`.
+ */
+export const EARLY_CROWD = 1.7;
+export const EARLY_CROWD_FULL = 10;
+export const EARLY_CROWD_END = 40;
 
-export function rollMonsterMods(
-  rng: Rng,
-  rarity: MonsterRarity,
-  level = 100,
-  faction: FactionId = 'ossuary',
-): MonsterModId[] {
+/** The crowd multiplier of a map (`EARLY_CROWD`). */
+export function earlyCrowd(map: number): number {
+  const t = Math.min(
+    1,
+    Math.max(0, (map - EARLY_CROWD_FULL) / (EARLY_CROWD_END - EARLY_CROWD_FULL)),
+  );
+  return EARLY_CROWD + (1 - EARLY_CROWD) * t;
+}
+
+export function rollMonsterMods(rng: Rng, rarity: MonsterRarity, level = 100): MonsterModId[] {
   const [lo, hi] =
     rarity === 'magic'
       ? [1, 2]
@@ -232,7 +246,6 @@ export function rollMonsterMods(
       !m.chief &&
       // A twin is for a rare: a gate fight is hard enough with one champion (docs/ROSTER.md 7.5).
       !(m.id === 'mirrored' && rarity === 'miniboss') &&
-      (m.faction === undefined || m.faction === faction) &&
       level >= (m.minLevel ?? 0) &&
       (level >= (rarity === 'miniboss' ? MINIBOSS_LATE_MOD_LEVEL : LATE_MOD_LEVEL) ||
         !LATE_MODS.includes(m.id)),
@@ -393,7 +406,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
       variant: rollVariant(rng, type, opts.theme),
       rarity,
       level,
-      mods: rollMonsterMods(rng, rarity, level, MONSTER_TYPES[type].faction),
+      mods: rollMonsterMods(rng, rarity, level),
       ...affixField,
     };
   };
@@ -433,14 +446,20 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     }
     return Math.min(AREA_MAX, Math.max(AREA_MIN, a / AREA_REF));
   };
+  const crowd = earlyCrowd(opts.map);
   const sized = (n: number, room?: Room) =>
-    Math.max(1, Math.round(n * packMult * style.countMult * areaFactor(room)));
+    Math.max(1, Math.round(n * packMult * style.countMult * areaFactor(room) * crowd));
   // As the run goes on, fewer packs are plain: magic packs and rare packs take their share (docs/DESIGN.md, 2026-10-10).
   const depth = Math.min(1, opts.map / 100);
-  const normalCut = 0.7 - NORMAL_FADE * depth;
+  const normalCut = PLAIN_SHARE - NORMAL_FADE * depth;
   const magicCut = 0.92 - RARE_GROWTH * depth;
-  // A magic pack has more magic monsters, and a rare comes with magic escorts, deeper in.
+  // A rare comes with magic escorts, deeper in.
   const magicBand = Math.floor(opts.map / MAGIC_BAND_MAPS);
+  // A magic pack is all magic, and its monsters share one set of mods (the owner, 2026-10-29).
+  const magicPack = (types: MonsterTypeId[]): MonsterSpec[] => {
+    const shared = rollMonsterMods(rng, 'magic', level);
+    return types.map((t) => ({ ...normal('magic', t), mods: shared }));
+  };
   // A Holdout is eight waves into one arena, each from the edge, the last led by a rare.
   if (opts.type === 'holdout') {
     const room = lab.rooms[0];
@@ -608,15 +627,13 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
         }
       }
     } else if (roll < magicCut - style.toughShift / 2) {
-      const nm = rng.int(2, 3) + magicBand;
       const all = spots(rng, lab, room, sized(rng.int(3, 7) + extra, room));
       for (const [gi, ps] of groupsOf(all).entries()) {
         if (gi > 0) pack++;
         const plan = packPlan(rng, mix, ps.length, throng);
         const how = behave(room, plan);
-        ps.forEach((p, i) =>
-          add(room, normal(gi === 0 && i < nm ? 'magic' : 'normal', plan.types[i]), p, how),
-        );
+        const specs = magicPack(plan.types.slice(0, ps.length));
+        ps.forEach((p, i) => add(room, specs[i], p, how));
       }
     } else {
       const ps = spots(rng, lab, room, sized(1 + rng.int(2, 4) + extra, room));

@@ -7,7 +7,10 @@ import type { SkillProfile } from '../calc/skill';
 import { MINIONS, type MinionDef, type MinionId } from '../data/minions';
 import { MONSTER_TYPES, type MonsterTypeId } from '../data/monsters';
 import { newActor } from './actor';
-import { rawHit, tickActor } from './combat';
+import { lifeCap, rawHit, tickActor } from './combat';
+import { hasRelic } from '../calc/relics';
+import { TITHE_EXPIRED, TITHE_SLAIN } from '../data/runRewards';
+import { noteRecover } from './recovery';
 import { takeCorpse, type Corpse } from './factions';
 import { auraNow, minionStrike, refreshMinionDef } from './minionFx';
 import type { MinionSup } from './minionSup';
@@ -279,6 +282,15 @@ function step(w: World, m: Minion, tx: number, ty: number, dt: number, speed: nu
   m.moving = true;
 }
 
+/** Tithe of the Servants (an attribute relic): a minion gone heals its owner a share of its own maximum life. */
+function tithe(s: Side, m: Minion, share: number): void {
+  const p = s.player;
+  if (!p.alive || !hasRelic(s.build, 'servantsTithe')) return;
+  const l0 = p.life;
+  p.life = Math.min(lifeCap(p), p.life + m.def.maxLife * share);
+  noteRecover(p, 'life', p.life - l0);
+}
+
 export function tickMinions(w: World, s: Side, dt: number): void {
   if (s.minions.length === 0) return;
   const p = s.player;
@@ -292,12 +304,18 @@ export function tickMinions(w: World, s: Side, dt: number): void {
   let j = 0;
   for (const m of s.minions) {
     m.t -= dt;
-    if (!m.alive || m.t <= 0) continue;
+    if (!m.alive || m.t <= 0) {
+      tithe(s, m, m.alive ? TITHE_EXPIRED : TITHE_SLAIN);
+      continue;
+    }
     // The offering, the golem and the supports show in its defence.
     refreshMinionDef(m, aura);
     // Damage over time, regeneration and ailment timers.
     tickActor(w, m, dt);
-    if (!m.alive) continue;
+    if (!m.alive) {
+      tithe(s, m, TITHE_SLAIN);
+      continue;
+    }
     // Volatile Servants: at low life a minion bursts for a third of its life as fire, once.
     if (unstable && !m.boomed && m.life <= m.def.maxLife * LOW_LIFE) {
       m.boomed = true;

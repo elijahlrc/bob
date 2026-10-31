@@ -27,7 +27,7 @@ export function weaponBar(skill: Rules, hold: WeaponHold): string | null {
     reason = `${skill.name} needs a two-handed weapon`;
   if (skill.needsDualWield && !hold.dualWielding) reason = `${skill.name} needs two weapons`;
   if (skill.needsShield && !hold.holdingShield) reason = `${skill.name} needs a shield`;
-  if (skill.id === 'venomCut' && hold.tags.has('twoHand'))
+  if (skill.id === 'venomCut' && (hold.tags.has('twoHand') || hold.tags.has('bow')))
     reason = `${skill.name} needs a one-handed weapon`;
   return reason;
 }

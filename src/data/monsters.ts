@@ -196,6 +196,8 @@ export type MonsterTypeDef = {
   minLevel?: number;
   /** Its hits slow the character by 30% for 2 seconds (the Hobbling mod, as a trait of the type). */
   hobbles?: boolean;
+  /** Its hits scar: no life regeneration for a few seconds (docs/ATTRITION.md; the Withering mod, as a trait of the type). */
+  scars?: boolean;
   /** What it drops is this many times the usual (a chest that is found pays). */
   bonusLoot?: number;
   /** Leaves no body when it dies (a spectre unravels, a flame goes out): nothing for a Hag to raise or a Shambler to rise from. */
@@ -263,6 +265,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.2,
     attackTime: 1.9,
     radius: 0.6,
+    scars: true,
     mods: [mod('stunDamage', 'inc', 50)],
   },
   archer: {
@@ -300,7 +303,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 1.6,
     attackTime: 1.5,
     radius: 0.4,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 50)],
   },
   shieldbearer: {
     id: 'shieldbearer',
@@ -375,7 +378,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2,
     attackTime: 1.5,
     radius: 0.4,
-    mods: [mod('convert.physical.chaos', 'base', 100), mod('chance.poison', 'base', 40)],
+    mods: [mod('convert.physical.chaos', 'base', 50), mod('chance.poison', 'base', 40)],
   },
   hag: {
     id: 'hag',
@@ -395,7 +398,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.4,
     attackTime: 1.6,
     radius: 0.4,
-    mods: [mod('convert.physical.chaos', 'base', 100)],
+    mods: [mod('convert.physical.chaos', 'base', 50)],
   },
   gloomstalker: {
     id: 'gloomstalker',
@@ -513,6 +516,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 3.2,
     attackTime: 1.4,
     radius: 0.5,
+    scars: true,
     mods: [],
   },
   choirmaster: {
@@ -552,6 +556,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 4.6,
     attackTime: 1.0,
     radius: 0.3,
+    scars: true,
     mods: [mod('chance.bleed', 'base', 10)],
   },
   bat: {
@@ -572,7 +577,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 4.4,
     attackTime: 1.1,
     radius: 0.3,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 40)],
   },
   beetle: {
     id: 'beetle',
@@ -633,6 +638,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.8,
     radius: 0.65,
     // x2 armour (x4 was a wall for physical builds), x3 stun threshold.
+    scars: true,
     mods: [],
   },
   arbalest: {
@@ -739,6 +745,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.6,
     radius: 0.6,
     // The tusks stagger.
+    scars: true,
     mods: [mod('stunDamage', 'inc', 150)],
   },
   handler: {
@@ -897,6 +904,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 4.4,
     attackTime: 1,
     radius: 0.3,
+    scars: true,
     mods: [],
   },
   heap: {
@@ -937,6 +945,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2,
     attackTime: 1.8,
     radius: 0.7,
+    scars: true,
     mods: [],
   },
   watcher: {
@@ -1012,7 +1021,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.6,
     attackTime: 1.8,
     radius: 0.45,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 50)],
   },
   coffer: {
     id: 'coffer',
@@ -1076,6 +1085,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 1.8,
     attackTime: 2,
     radius: 0.6,
+    scars: true,
     mods: [],
   },
   leech: {
@@ -1097,7 +1107,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 3.8,
     attackTime: 1,
     radius: 0.3,
-    mods: [mod('leech.life', 'base', 8)],
+    mods: [mod('convert.physical.chaos', 'base', 40), mod('leech.life', 'base', 8)],
   },
   drowner: {
     id: 'drowner',
@@ -1161,6 +1171,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 1.7,
     attackTime: 2.2,
     radius: 0.75,
+    scars: true,
     mods: [mod('convert.physical.fire', 'base', 100)],
   },
   pyrepriest: {
@@ -1467,8 +1478,13 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
 export const isBossType = (type: MonsterTypeId): boolean => !!MONSTER_TYPES[type].bossOnly;
 
 /** Faction mods (EXPANSION 7.3): on every monster of the faction. */
-/** Faction-wide mods that are not defences (the Hollow's ethereal rule is in `FACTION_DEFENCE`). */
-export const FACTION_MODS: Partial<Record<FactionId, Mod[]>> = {};
+/**
+ * Faction-wide mods that are not defences (the Hollow's ethereal rule is in `FACTION_DEFENCE`). The Hollow have no blood
+ * to leech (docs/ATTRITION.md).
+ */
+export const FACTION_MODS: Partial<Record<FactionId, Mod[]>> = {
+  hollow: [mod('cannotBeLeechedFrom', 'flag', 1)],
+};
 
 /** Whether monsters of this faction cannot be made to bleed. */
 export function cannotBleed(type: MonsterTypeId): boolean {
@@ -1586,7 +1602,7 @@ export type MonsterModId =
   | 'brood'
   | 'wardingPulse'
   | 'mirrored'
-  // The Choir's faction mod, and the hex mods (EXPANSION 7.2).
+  // Zealous, and the hex mods (EXPANSION 7.2).
   | 'zealous'
   | 'hexWarded'
   | 'adaptive'
@@ -1602,8 +1618,6 @@ export type MonsterModDef = {
   mods: Mod[];
   /** Does not roll before this area level. */
   minLevel?: number;
-  /** Rolls only on monsters of this faction. */
-  faction?: FactionId;
   /** A champion: set by the theme on its mini-boss, never rolled, and it renames the monster. */
   chief?: boolean;
 };
@@ -1733,7 +1747,7 @@ MONSTER_MODS.push(
     id: 'siphoning',
     name: 'Siphoning',
     magic: true,
-    minLevel: 15,
+    minLevel: 40,
     mods: [mod('manaDrain', 'base', 5)],
   },
   {
@@ -1748,17 +1762,19 @@ MONSTER_MODS.push(
   { id: 'thorned', name: 'Thorned', magic: false, minLevel: 40, mods: [] },
 );
 
-/** Faction mods of the Rot (EXPANSION 7.3). Putrid is handled by the sim (a caustic cloud on death). */
+/**
+ * Once the Rot's own mods (EXPANSION 7.3), on any monster since 2026-10-29 (the owner). Putrid is handled by the sim (a
+ * caustic cloud on death).
+ */
 MONSTER_MODS.push(
   {
     id: 'festering',
     name: 'Festering',
     magic: true,
     minLevel: 8,
-    faction: 'rot',
     mods: [mod('chance.poison', 'base', 30)],
   },
-  { id: 'putrid', name: 'Putrid', magic: true, minLevel: 8, faction: 'rot', mods: [] },
+  { id: 'putrid', name: 'Putrid', magic: true, minLevel: 8, mods: [] },
 );
 
 /** The champions of the Rot and the Hollow. Their behaviour is in the sim (sim/factions.ts). */
@@ -1775,7 +1791,7 @@ MONSTER_MODS.push(
   { id: 'cinderTyrant', name: 'The Cinder Tyrant', magic: false, chief: true, mods: [] },
   // Counterplay mods: a rush that punishes kiting, a thief of flask charges, a hobbling touch.
   { id: 'charging', name: 'Charging', magic: true, minLevel: 12, mods: [] },
-  { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 20, mods: [] },
+  { id: 'flaskTaker', name: 'Flask-taker', magic: true, minLevel: 40, mods: [] },
   { id: 'hobbling', name: 'Hobbling', magic: true, minLevel: 15, mods: [] },
   // Emergencies for builds that sustain themselves (docs/ATTRITION.md): regeneration and the shield's recharge (leech has Bloodless).
   { id: 'withering', name: 'Withering', magic: true, minLevel: 12, mods: [] },
@@ -1786,18 +1802,18 @@ MONSTER_MODS.push(
   { id: 'wardingPulse', name: 'Warding Pulse', magic: false, minLevel: 20, mods: [] },
   { id: 'mirrored', name: 'Mirrored', magic: false, minLevel: 25, mods: [] },
 );
+// It splits into Gnawers when it dies (once the Swarm's own, on any monster since 2026-10-29).
 MONSTER_MODS.push({
   id: 'brood',
   name: 'Brood',
   magic: true,
   minLevel: 12,
-  faction: 'swarm',
   mods: [],
 });
 
-/** The Choir's faction mod, and the two hex mods of the counterplay list (EXPANSION 7.2). */
+/** Zealous (once the Choir's own, on any monster since 2026-10-29), and the two hex mods of the counterplay list (EXPANSION 7.2). */
 MONSTER_MODS.push(
-  { id: 'zealous', name: 'Zealous', magic: true, minLevel: 25, faction: 'choir', mods: [] },
+  { id: 'zealous', name: 'Zealous', magic: true, minLevel: 25, mods: [] },
   { id: 'hexWarded', name: 'Hex-warded', magic: true, minLevel: 25, mods: [] },
   { id: 'hexcaller', name: 'Hexcaller', magic: false, minLevel: 25, mods: [] },
   // docs/ENCOUNTERS.md 6: it resists the element that hurts it most, for a while.

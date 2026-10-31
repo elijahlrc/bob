@@ -22,6 +22,8 @@ export type MapResult = {
   xp: number;
   xpGained: number;
   kills: number;
+  /** Rare monsters slain. */
+  rares?: number;
   stuck: number;
   picked: AnyItem[];
   /** Hash of the full event log (determinism checks). */
@@ -76,6 +78,7 @@ export function worldResult(w: World, eventHash = 0): MapResult {
     xp: w.sides[0].xp,
     xpGained: w.sides[0].stats.xpGained,
     kills: w.sides[0].stats.kills,
+    rares: w.sides[0].stats.rares,
     stuck: w.sides[0].stats.stuck,
     picked: w.sides[0].picked,
     eventHash,

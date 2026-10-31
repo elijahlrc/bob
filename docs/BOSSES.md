@@ -909,3 +909,26 @@ look at every boss for regeneration that can lock a build out.
   the whole arena), and the body strides, bobs and swings its lance about a half as far again.
 - **Not changed:** the other map affixes that harden a boss (Hardy, the resistance ones, Unyielding) still apply: they are
   the map's price and pay their reward.
+
+## 21. Probes at the ways of lasting (2026-10-29)
+
+The owner, with flasks made scarce (docs/ATTRITION.md): no boss hard counters regeneration, leech, energy shield or flasks,
+but each probes at one, by a summon that carries a counter or a phase of the fight. Each is a mild extra (rule 1), lasts a
+window or comes from something that can be killed, and adds no damage (rule 5 is untouched). Numbers in `data/bosses.ts`.
+
+| Boss            | Probe                                                                                                   | Probes            |
+| --------------- | ------------------------------------------------------------------------------------------------------- | ----------------- |
+| Tollkeeper      | Its flail scars: no life regeneration for 3 s.                                                          | regeneration      |
+| Siege Marshal   | Each regiment marches under a banner, a mod its soldiers share: Withering, Shield-breaking, Bloodless.  | all three in turn |
+| Courser         | The charge back tramples: a hit knocks half a drink out of every worn flask (`TRAMPLE_DRINKS`).         | flasks            |
+| Veiled Duellist | Veiled, he takes 60% less (`VEIL_LESS`; the owner: the veil went unnoticed) and cannot be leeched from. | leech             |
+| Magistrate      | Each living Witness takes 10% off regeneration, leech, energy shield recharge and flasks.               | all, killable     |
+| Bulwark Engine  | Its blows crack the shield: its recharge waits 4 s longer (`ENGINE_SHIELD_CRACK`).                      | energy shield     |
+| Prism Warden    | Attuned to cold it frostbites: 75% less life and energy shield regeneration (Frostbitten).              | regeneration, ES  |
+| Sundered Twins  | Cinder gives half the usual leech; Ash's blows scar.                                                    | leech, regen      |
+| Rotwife         | While the character is poisoned, flasks recover 30% less.                                               | flasks            |
+| Unmaker         | Nothing new: it already steals the flasks and drinks them.                                              | flasks            |
+
+Mana is probed by none: the Siphoning mod was found too punishing on maps (the owner, 2026-10-29). The hooks are
+`bossRecovery`, `bossFlaskRecovery` and `bossLeechShare` (`sim/bosses.ts`), read where the character regenerates, recharges,
+leeches and drinks; the HUD's readout names the Witnesses' cut, the banner and the veil.

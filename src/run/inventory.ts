@@ -43,7 +43,7 @@ function attrsWithout(run: RunState, slot: EquipSlot | null): Attrs {
   const worn = Object.entries(b.equipment)
     .map(([k, it]) => `${k}${it?.uid}`)
     .join(',');
-  const key = `${slot}|${b.level}|${b.allocated.join(',')}|${worn}`;
+  const key = `${slot}|${b.level}|${b.allocated.join(',')}|${worn}|${JSON.stringify(b.grafts ?? [])}|${JSON.stringify(b.treeRelics ?? {})}`;
   let per = attrCache.get(b.equipment);
   if (!per) attrCache.set(b.equipment, (per = new Map()));
   const hit = per.get(key);

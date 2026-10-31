@@ -173,4 +173,37 @@ export function statTotals(
   return out.map(({ section, mod, mult, inc, more }) => ({ section, mod, mult, inc, more }));
 }
 
+/**
+ * The character's flat amounts of one stat (leech, life on hit), summed per line as `statTotals` sums increases: a line for
+ * each set of tags, damage types and condition the sheet does not take to hold. Only the character's own mods are here (gear,
+ * the tree, relics, buffs); what a skill's gems add to that skill is the skill's. Lines that come to nothing are dropped.
+ */
+export function statBaseLines(
+  db: ModDB,
+  conds: number,
+  statValue: (s: StatId) => number,
+  stat: StatId,
+): Mod[] {
+  const lines = new Map<string, Mod>();
+  for (const m of db.mods()) {
+    if (m.stat !== stat || m.kind !== 'base' || m.local) continue;
+    let condition: Condition | undefined;
+    if (m.condition && maskIntersects(conds, db.cond.peek(m.condition.id)) === !!m.condition.not) {
+      if (!CONDITION_TEXT[m.condition.id]) continue;
+      condition = m.condition;
+    }
+    const value = m.per ? m.value * Math.floor(statValue(m.per.stat) / m.per.div) : m.value;
+    if (value === 0) continue;
+    const l: Line = {
+      stat,
+      damageTypes: m.damageTypes?.length ? [...m.damageTypes].sort() : undefined,
+      tags: m.tags?.length ? [...m.tags].sort() : undefined,
+    };
+    const key = keyOf(l, condition);
+    const got = lines.get(key) ?? { ...l, kind: 'base' as const, value: 0, condition };
+    lines.set(key, { ...got, value: got.value + value });
+  }
+  return [...lines.values()].filter((m) => m.value !== 0).sort(keyCmp);
+}
+
 const keyCmp = (a: Mod, b: Mod) => (keyOf(a, a.condition) < keyOf(b, b.condition) ? -1 : 1);

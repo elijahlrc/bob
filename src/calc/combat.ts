@@ -104,6 +104,10 @@ export type Defence = {
   regenToEs: boolean;
   /** Chaos damage hits energy shield before life. */
   chaosHitsEs: boolean;
+  /** The share of chaos damage that hits energy shield before life when `chaosHitsEs` does not (Veil Against the Rot). */
+  chaosEsShare: number;
+  /** The share of armour that also reduces elemental hits (The Mountain's Hide); 0 for none. */
+  armourVsEle: number;
   /** Share (fraction) of physical hit damage taken as each type; index = damage type. */
   physTakenAs: number[];
   /** More or less damage taken of each type; index = damage type. */
@@ -281,6 +285,9 @@ export function mitigate(p: SkillProfile, t: TargetState, dmg: number[]): number
     } else if (i === CHAOS && def.immuneChaos) {
       dmg[i] = 0;
     } else {
+      // The Mountain's Hide: a share of armour meets an elemental hit before the resistance does.
+      if (i !== CHAOS && def.armourVsEle > 0)
+        dmg[i] *= 1 - Math.min(0.9, armourReduction(def.armour * def.armourVsEle, dmg[i]));
       const r = effectiveRes(def.res[i] + t.resShift[i], def.maxRes[i], p.pen[i]);
       dmg[i] *= 1 - r / 100;
     }

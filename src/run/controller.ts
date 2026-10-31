@@ -1,3 +1,5 @@
+import { enviousSeed, markDuel, visitShade } from './stops';
+import type { ShadeStatus } from './shades';
 import type { MonsterTypeId } from '../data/monsters';
 import { Emitter } from '../core/events';
 import { DT } from '../data/constants';
@@ -98,6 +100,8 @@ export type DuelMode = {
   watch: DuelWatch;
   /** Set for a fight against a rival (`startRivalDuel`); null for the Debug panel's. */
   rival: RivalFight | null;
+  /** Set for the Envious Dead's fight (`startShadeDuel`): the stop's slot. One fight only, and its end is the stop's. */
+  stop?: { slot: number } | null;
   /** The game's speed and pause before the duel: every fight starts at 1× (people watch them), and leaving puts these back. */
   runSpeed: { speed: number; paused: boolean };
 };
@@ -233,7 +237,13 @@ export class Controller {
 
   private changed(): void {
     // The game saves on entering camp and on any camp change (§5.5), into the run's own slot.
-    if (this.store && this.run && this.screen === 'camp') {
+    if (this.screen === 'camp') this.persist();
+    this.bus.emit('state', null);
+  }
+
+  /** Save the run into its slot now, wherever the game is (camp saves by itself; the Envious Dead's result must not wait). */
+  private persist(): void {
+    if (this.store && this.run) {
       try {
         // A run whose slot could not be reserved when it began tries again here.
         this.slot ??= newSlot(this.store);
@@ -244,7 +254,6 @@ export class Controller {
       }
       recordFound(this.store, this.run);
     }
-    this.bus.emit('state', null);
   }
 
   /** Showcase mode: an endless, invulnerable demo that cycles classes (for comparing visual styles). */
@@ -403,10 +412,50 @@ export class Controller {
     return true;
   }
 
+  /**
+   * The Envious Dead (docs/ATTRITION.md): fight the shade of the stop in a slot, the run's character as it is. The duel is marked
+   * as under way and saved before it starts, so leaving it or reloading counts as a loss; its end marks it won or lost and saves.
+   * The fight is played on copies: the run's life and flasks are as they were. Returns false when it did not start.
+   */
+  startShadeDuel(slot: number): boolean {
+    const run = this.run;
+    if (!run || this.screen !== 'camp') return false;
+    const offer = run.offers[slot];
+    const shade = visitShade(run, slot);
+    if (!shade || offer?.kind !== 'stop' || offer.stop !== 'enviousDead') return false;
+    if (waysideOf(run).stopVisit?.duel) return false;
+    markDuel(run, slot, 'fought');
+    this.undoStack = [];
+    this.changed();
+    let started: boolean;
+    try {
+      started = this.startDuel(run.build, shade.build, enviousSeed(run, offer), {
+        names: ['You', shade.name],
+      });
+    } catch {
+      // A shade whose build will not make a world: the fight never happened, and it counts as lost.
+      markDuel(run, slot, 'lost');
+      this.changed();
+      return false;
+    }
+    if (started) this.duel!.stop = { slot };
+    return started;
+  }
+
+  /** The shades of the rivals stops on offer, by `shadeKey` (src/rivals.ts fetches them): what their cards say. */
+  shades: Record<string, ShadeStatus> = {};
+
+  /** A rivals stop's shade was found or the stop closed (src/rivals.ts `loadShade`). */
+  setShade(key: string, status: ShadeStatus): void {
+    this.shades = { ...this.shades, [key]: status };
+    this.bus.emit('state', null);
+  }
+
   /** The same two characters again, on the next seed (a new fight: the arena and the order of the sides are drawn from it). */
   againDuel(): void {
     const d = this.duel;
-    if (!d) return;
+    // The Envious Dead fights once.
+    if (!d || d.stop) return;
     d.fought++;
     d.seed = d.base + d.fought;
     d.watch = duelWatch(d.opts);
@@ -475,6 +524,11 @@ export class Controller {
     this.world = null;
     this.bus.emit('mapEnd', null);
     this.screen = 'duelResult';
+    // The Envious Dead's fight is the stop's: won or lost (a draw is lost), saved at once.
+    if (d.stop && this.run) {
+      markDuel(this.run, d.stop.slot, result.winner === 0 ? 'won' : 'lost');
+      this.persist();
+    }
     this.changed();
     if (rv) {
       try {
@@ -872,6 +926,8 @@ export class Controller {
       bonusPoints,
       refundPoints,
       reward,
+      // The pick waiting behind it (a boss's relics): an undo of the first pick brings the second back behind it.
+      nextReward: run.nextReward ?? null,
       currency,
       dust,
       tablets,

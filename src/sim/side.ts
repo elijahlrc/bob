@@ -27,6 +27,8 @@ import type {
 /** What a side counts as it plays: the kills and the time lost, and the damage it took and dealt. */
 export type SideStats = {
   kills: number;
+  /** Rare monsters slain (a Headsman's Tally pays for each, docs/ATTRITION.md). */
+  rares: number;
   xpGained: number;
   stuck: number;
   stalls: number;
@@ -111,6 +113,17 @@ export type Side = {
   rageGainT: number;
   /** The Trophy Cord: monster mods held, by mod id, and the seconds left of each. */
   trophy: Record<string, number>;
+  /** Mantle of the Fiend (relic 20): the monster affix held (as a trophy) and when the next replaces it. */
+  fiend?: { id: string; next: number };
+  /** Blood of the Untouched and Quickening Cruelty (attribute relics): when each stack held ends (world time). */
+  untouched?: number[];
+  cruelty?: number[];
+  /** The Shield's Rebuke: when each monster (by id) can next be stunned by a block. */
+  rebuked?: Map<number, number>;
+  /** The Unseen Ward: an evaded attack started the energy shield recharging; the next damage stops it. */
+  esNow?: boolean;
+  /** The Ripening Wound: when the character last struck critically (world time). */
+  critAt?: number;
   trig: TriggerRuntime;
   /** When each secondary skill (by choice key) can next be cast (EXPANSION 5.5a). */
   secondaryReady: Record<string, number>;

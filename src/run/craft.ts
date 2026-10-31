@@ -1,3 +1,4 @@
+import { KNUCKLE_ODDS, type KnuckleFall, type KnuckleThrow } from '../data/stops';
 import { Rng } from '../core/rng';
 import { family, familyMods, FAMILIES, type Family } from '../data/affixes';
 import { itemBase } from '../data/bases';
@@ -37,6 +38,7 @@ import {
 } from '../gen/loot';
 import { uidSource, type RunState } from './run';
 import { noteFound } from './found';
+import { dustCut } from './relics';
 
 /**
  * Crafting (EXPANSION section 8). The player chooses what changes; chance fills in the details or
@@ -194,22 +196,31 @@ export function addRandomAffix(run: RunState, itemUid: number): CraftResult {
   const loc = locate(run, itemUid);
   if (!loc) return fail('No such item');
   const it = loc.item;
-  const fams = addableFamilies(it);
-  if (!fams.length) return fail('This item cannot take another affix');
+  if (!addableFamilies(it).length) return fail('This item cannot take another affix');
   const rng = craftRng(run);
   run.craftSeq++;
+  replace(run, loc, withAffix(it, rollAddedAffix(it, run.map, rng)!, rng));
+  return OK;
+}
+
+/** A new affix for an item, of a family it could take (null: none). */
+function rollAddedAffix(it: Item, level: number, rng: Rng): AffixRoll | null {
+  const fams = addableFamilies(it);
+  if (!fams.length) return null;
   const weights = fams.map((f) =>
     f.tiers.filter((t) => t.minIlvl <= it.ilvl).reduce((s, t) => s + t.weight, 0),
   );
   const f = fams[rng.weightedIndex(weights)];
   // At the best tier the item's level or the level being played allows, so a craft is worth a level (the playtests:
   // a drop-weighted roll gave +6 life).
-  const cap = Math.max(it.ilvl, run.map);
-  const tier = f.tiers.filter((t) => t.minIlvl <= cap).at(-1)!;
+  const tier = bestTier(it, f.id, level);
   const values = tier.ranges.map(([lo, hi], i) => rollValue(rng, lo, hi, f.mods[i].dec));
-  const roll = { family: f.id, tier: tier.tier, mods: familyMods(f, values) };
-  replace(run, loc, withAffix(it, roll, rng));
-  return OK;
+  return { family: f.id, tier: tier.tier, mods: familyMods(f, values) };
+}
+
+/** The best tier of a family that the item's level, or the level being played, allows. */
+function bestTier(it: Item, familyId: string, level: number): Family['tiers'][number] {
+  return family(familyId).tiers.filter((t) => t.minIlvl <= Math.max(it.ilvl, level)).at(-1)!;
 }
 
 /** The tier above an affix's that the item's level, or the level being played, allows, if any. */
@@ -241,6 +252,92 @@ export function raiseTier(run: RunState, itemUid: number, familyId: string): Cra
     polished: polished.length ? polished : undefined,
   });
   return OK;
+}
+
+// ---- The Knucklebone Man's throws (docs/ATTRITION.md) --------------------------------------------
+
+/** The tier below an affix's, if any. */
+function lowerTierOf(a: AffixRoll): Family['tiers'][number] | null {
+  const f = family(a.family);
+  const i = f.tiers.findIndex((t) => t.tier === a.tier);
+  return i > 0 ? f.tiers[i - 1] : null;
+}
+
+/** How many tiers an affix could still rise, to the best the item's level or the level being played allows. */
+function roomAbove(it: Item, a: AffixRoll, level: number): number {
+  const tiers = family(a.family).tiers;
+  return tiers.indexOf(bestTier(it, a.family, level)) - tiers.findIndex((t) => t.tier === a.tier);
+}
+
+/** An item with one affix moved to another tier of its family, rolled afresh there (a polished affix loses its polish). */
+function retiered(it: Item, familyId: string, tier: Family['tiers'][number], rng: Rng): Item {
+  const f = family(familyId);
+  const values = tier.ranges.map(([lo, hi], i) => rollValue(rng, lo, hi, f.mods[i].dec));
+  const polished = (it.polished ?? []).filter((x) => x !== familyId);
+  return {
+    ...it,
+    affixes: it.affixes.map((a) =>
+      a.family === familyId ? { family: f.id, tier: tier.tier, mods: familyMods(f, values) } : a,
+    ),
+    polished: polished.length ? polished : undefined,
+  };
+}
+
+/** Whether the bones could do an item good: neither unique nor sealed, with an affix that could rise or room for another. */
+export function knuckleCan(it: Item, level: number): boolean {
+  if (it.uniqueId || it.sealed) return false;
+  return addableFamilies(it).length > 0 || it.affixes.some((a) => roomAbove(it, a, level) > 0);
+}
+
+/**
+ * The Knucklebone Man throws his bones over an item: how they fall is drawn by `KNUCKLE_ODDS` (the owner, 2026-10-30: a gamble
+ * leans good and can pay big). Bad: an affix drops a tier. Good: one rises a tier. Great: the one with the most room rises to
+ * the best tier the level allows. Jackpot: every affix does, and one is added if there is room. Where nothing can rise, the
+ * good throws add an affix instead. The item is replaced, never edited in place. Returns what the bones did.
+ */
+export function throwBones(run: RunState, itemUid: number): CraftResult & { what?: KnuckleThrow } {
+  const loc = locate(run, itemUid);
+  if (!loc) return fail('No such item');
+  let it = loc.item;
+  const level = run.map;
+  if (!knuckleCan(it, level)) return fail('The bones can do nothing with this item');
+  const rng = craftRng(run);
+  run.craftSeq++;
+  const falls = Object.keys(KNUCKLE_ODDS) as KnuckleFall[];
+  const fall = falls[rng.weightedIndex(falls.map((f) => KNUCKLE_ODDS[f]))];
+  const rising = it.affixes.filter((a) => roomAbove(it, a, level) > 0);
+  const add = () => {
+    const roll = rollAddedAffix(it, level, rng);
+    if (roll) it = withAffix(it, roll, rng);
+  };
+  let what: KnuckleThrow;
+  if (fall === 'bad') {
+    const falling = it.affixes.filter((a) => lowerTierOf(a));
+    if (falling.length) {
+      const a = rng.pick(falling);
+      it = retiered(it, a.family, lowerTierOf(a)!, rng);
+      what = 'down';
+    } else what = 'nothing';
+  } else if (!rising.length) {
+    add();
+    what = 'add';
+  } else if (fall === 'good') {
+    const a = rng.pick(rising);
+    const tiers = family(a.family).tiers;
+    it = retiered(it, a.family, tiers[tiers.findIndex((t) => t.tier === a.tier) + 1], rng);
+    what = 'up';
+  } else if (fall === 'great') {
+    const most = Math.max(...rising.map((a) => roomAbove(it, a, level)));
+    const a = rng.pick(rising.filter((x) => roomAbove(it, x, level) === most));
+    it = retiered(it, a.family, bestTier(it, a.family, level), rng);
+    what = 'best';
+  } else {
+    for (const a of rising) it = retiered(it, a.family, bestTier(it, a.family, level), rng);
+    add();
+    what = 'all';
+  }
+  replace(run, loc, it);
+  return { ok: true, what };
 }
 
 // ---- The currencies ------------------------------------------------------------------------------
@@ -554,18 +651,22 @@ export function useEssence(
 
 // ---- The Workbench: Bone Dust --------------------------------------------------------------------
 
-/** Salvage value of an inventory item, in Bone Dust. */
-export function salvageValue(it: InventoryItem): number {
-  if (it.kind === 'gem') return SALVAGE_BASE.gem;
-  if (it.kind === 'flask') return Math.round(SALVAGE_BASE.flask * (1 + it.ilvl / 50));
-  return Math.round(SALVAGE_BASE[it.rarity] * (1 + it.ilvl / 50));
+/** Salvage value of an inventory item, in Bone Dust; for a run, after its relics' cut (relic 19). */
+export function salvageValue(it: InventoryItem, run?: RunState): number {
+  const v =
+    it.kind === 'gem'
+      ? SALVAGE_BASE.gem
+      : it.kind === 'flask'
+        ? Math.round(SALVAGE_BASE.flask * (1 + it.ilvl / 50))
+        : Math.round(SALVAGE_BASE[it.rarity] * (1 + it.ilvl / 50));
+  return run ? dustCut(run, v) : v;
 }
 
 export function salvage(run: RunState, uid: number): CraftResult {
   const i = run.inventory.findIndex((x) => x.uid === uid);
   if (i < 0) return fail('Only carried items can be salvaged');
   const it = run.inventory[i];
-  run.dust += salvageValue(it);
+  run.dust += salvageValue(it, run);
   run.inventory.splice(i, 1);
   // A gem inside the item is not salvaged with it.
   if (it.kind === 'item') for (const g of it.sockets) if (g) run.inventory.push(g);
@@ -574,7 +675,7 @@ export function salvage(run: RunState, uid: number): CraftResult {
 
 /** What the discarded pile would give if it were all salvaged. */
 export const discardedValue = (run: RunState): number =>
-  (run.discarded ?? []).reduce((n, x) => n + salvageValue(x), 0);
+  (run.discarded ?? []).reduce((n, x) => n + salvageValue(x, run), 0);
 
 /** Break down everything in the discarded pile for Bone Dust. Final. */
 export function salvageDiscarded(run: RunState): { count: number; dust: number } {

@@ -5,7 +5,9 @@ const lasts = (e: StandingEffect): string =>
   e.left === null
     ? e.kind === 'blessing'
       ? 'until the next Shrine'
-      : 'for the run'
+      : e.kind === 'reward'
+        ? 'relic, for the run'
+        : 'for the run'
     : `${e.left} level${e.left === 1 ? '' : 's'} left`;
 
 /**

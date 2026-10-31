@@ -5,7 +5,16 @@ import { modsText } from '../mods/text';
 import type { Mod } from '../mods/types';
 import type { Controller } from '../run/controller';
 import { passivePoints } from '../run/run';
-import { allocate, canRemove, pathTo, refund } from '../run/tree';
+import { allocate, canRefund, pathFor, refund, relicUsesLeft, spendTreeRelic } from '../run/tree';
+import {
+  frontier,
+  graphOf,
+  nodeModsFor,
+  passiveMods,
+  relicTargets,
+  TREE_RELICS,
+} from '../data/tree/rules';
+import { relicDef, type RunRewardId } from '../data/runRewards';
 import { useViewport } from './device';
 import { infoProps } from './info';
 import { introSeen, seeIntro } from './intro';
@@ -81,15 +90,17 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /** Mods that differ only in value, summed, then written out: what the passives give in all. */
 function totals(nodes: TreeNode[]): string[] {
+  return totalsOf(nodes.flatMap((n) => n.mods));
+}
+function totalsOf(mods: readonly Mod[]): string[] {
   const sum = new Map<string, Mod>();
-  for (const n of nodes)
-    for (const m of n.mods) {
-      const { value, source: _source, ...rest } = m;
-      const key = JSON.stringify(rest);
-      const had = sum.get(key);
-      if (had) had.value += value;
-      else sum.set(key, { ...m, value });
-    }
+  for (const m of mods) {
+    const { value, source: _source, ...rest } = m;
+    const key = JSON.stringify(rest);
+    const had = sum.get(key);
+    if (had) had.value += value;
+    else sum.set(key, { ...m, value });
+  }
   return modsText([...sum.values()]);
 }
 
@@ -116,6 +127,9 @@ export function TreeView({ c }: { c: Controller }) {
   const [matchAt, setMatchAt] = useState(0);
   const [showAll, setShowAll] = useState(false);
   const [sumOpen, setSumOpen] = useState(false);
+  // A tree relic being used (docs/ATTRITION.md, relics 7 to 12): the nodes it can go on light up; the Burnt Road picks twice.
+  const [relicMode, setRelicMode] = useState<{ relic: RunRewardId; from?: number } | null>(null);
+  const [relicNote, setRelicNote] = useState<string | null>(null);
 
   const start = tree.nodes[tree.starts[run.classId]];
   const live = useMemo(() => tree.nodes.filter(isLive), [tree]);
@@ -124,14 +138,20 @@ export function TreeView({ c }: { c: Controller }) {
     [tree],
   );
   const lines = useMemo(() => tree.nodes.map((n) => (isLive(n) ? modsText(n.mods) : [])), [tree]);
+  const bridges = run.build.treeRelics?.bridges;
   const edges = useMemo<Edge[]>(() => {
     const out: Edge[] = [];
     for (const n of live)
       for (const m of n.links)
         if (m > n.id && isLive(tree.nodes[m]))
           out.push({ a: n.id, b: m, path: new Path2D(edgePath(n, tree.nodes[m])) });
+    // The Burnt Road's links (relic 9), drawn straight.
+    for (const { from, to } of bridges ?? []) {
+      const [a, b] = [tree.nodes[from], tree.nodes[to]];
+      out.push({ a: from, b: to, path: new Path2D(`M${a.x},${a.y}L${b.x},${b.y}`) });
+    }
     return out;
-  }, [tree]);
+  }, [tree, bridges]);
   // Runs of small nodes that say the same thing get one word between them ("+6 Dex, +6 Int ×3").
   const runs = useMemo(() => {
     const text = (id: number) => lines[id].map(short).join(', ');
@@ -228,14 +248,25 @@ export function TreeView({ c }: { c: Controller }) {
   const points = passivePoints(run);
   const alloc = run.build.allocated;
   const allocSet = useMemo(() => new Set(alloc), [alloc]);
-  const taken = (id: number) => allocSet.has(id) || id === start.id;
-  const reachable = useMemo(() => {
-    const s = new Set<number>();
-    for (const id of [start.id, ...alloc])
-      for (const m of tree.nodes[id].links)
-        if (!allocSet.has(m) && tree.nodes[m].kind !== 'start') s.add(m);
-    return s;
-  }, [alloc, run.classId]);
+  const graph = graphOf(run.build, tree);
+  // A path runs through what conducts: held nodes, roots, hollowed paths and burnt nodes.
+  const taken = (id: number) => graph.conductive.has(id);
+  const reachable = useMemo(
+    () => frontier(run.build, tree),
+    [alloc, run.classId, run.build.treeRelics, run.build.relics],
+  );
+  const targets = useMemo(
+    () => (relicMode ? relicTargets(run.build, relicMode.relic, tree, relicMode.from) : null),
+    [relicMode, alloc, run.build.treeRelics],
+  );
+  /** A node's lines on this build (a hollowed notable's tripled, a start taken as a notable's). */
+  const linesOf = (id: number): string[] => {
+    const nd = tree.nodes[id];
+    return (nd.kind === 'start' && graph.foreignStarts) ||
+      run.build.treeRelics?.hollowed?.includes(id)
+      ? modsText(nodeModsFor(run.build, tree, id))
+      : lines[id];
+  };
   // The first tree a player opens with a point to spend rings the nodes it can take (docs/NEWPLAYER.md N11), until one is.
   const [cueSeen, setCueSeen] = useState(() => introSeen('tree'));
   const cue = !cueSeen && points > 0 && alloc.length === 0;
@@ -249,14 +280,17 @@ export function TreeView({ c }: { c: Controller }) {
   const path = useMemo(
     () =>
       looking !== null && !allocSet.has(looking)
-        ? new Set(pathTo(alloc, run.classId, looking) ?? [])
+        ? new Set(pathFor(run.build, looking, tree) ?? [])
         : null,
     [looking, alloc],
   );
   const state = (id: number): NodeState => {
     const n = tree.nodes[id];
-    if (n.kind === 'start') return id === start.id ? 'on' : 'off';
-    if (allocSet.has(id)) return 'on';
+    if (targets) return relicMode?.from === id ? 'path' : targets.has(id) ? 'can' : 'dim';
+    if (graph.burned.has(id)) return 'dim';
+    if (n.kind === 'start')
+      return graph.roots.has(id) || allocSet.has(id) ? 'on' : reachable.has(id) ? 'can' : 'off';
+    if (allocSet.has(id) || graph.roots.has(id)) return 'on';
     if (path?.has(id)) return 'path';
     if (matches) return matches.has(id) ? 'lit' : 'dim';
     return reachable.has(id) ? 'can' : 'off';
@@ -523,7 +557,7 @@ export function TreeView({ c }: { c: Controller }) {
     });
     return () => ro.disconnect();
   }, [run.classId]);
-  useEffect(draw, [allocSet, picked, hover, matches, phone, sumOpen, showAll]);
+  useEffect(draw, [allocSet, picked, hover, matches, phone, sumOpen, showAll, targets, edges]);
 
   // ---- Moving about and picking ----
   const pointers = useRef(new Map<number, Pt>());
@@ -537,8 +571,24 @@ export function TreeView({ c }: { c: Controller }) {
     return { x: (e.clientX - r.left) / sc, y: (e.clientY - r.top) / sc };
   };
   const commit = (n: number) => {
+    if (relicMode) return applyRelic(n);
     if (allocSet.has(n)) c.act((r) => refund(r, n));
     else passiveSound(c.act((r) => allocate(r, n)));
+  };
+  /** Use the relic being used on a node: the Burnt Road's first pick is the node it burns, its second where it leads. */
+  const applyRelic = (n: number) => {
+    if (!relicMode || !targets?.has(n)) return;
+    if (relicMode.relic === 'burntRoad' && relicMode.from === undefined) {
+      setRelicMode({ relic: 'burntRoad', from: n });
+      setRelicNote('Now choose where the road leads.');
+      return;
+    }
+    const why = c.act((r) => spendTreeRelic(r, relicMode.relic, n, relicMode.from));
+    setRelicNote(why ?? null);
+    if (!why) {
+      setRelicMode(null);
+      passiveSound([n]);
+    }
   };
   const onDown = (e: PointerEvent) => {
     const p = local(e);
@@ -653,10 +703,21 @@ export function TreeView({ c }: { c: Controller }) {
             : 'Passive';
     const on = allocSet.has(n.id);
     let act: preact.JSX.Element;
-    if (n.kind === 'start')
+    if (relicMode)
+      act = targets?.has(n.id) ? (
+        <button class="btn primary" onClick={() => commit(n.id)}>
+          {relicMode.relic === 'burntRoad' && relicMode.from === undefined
+            ? 'Burn this passive'
+            : `Use ${relicDef(relicMode.relic).name}`}
+        </button>
+      ) : (
+        <p class="tv-why">The relic cannot go here.</p>
+      );
+    else if (n.kind === 'start' && (n.id === start.id || graph.roots.has(n.id)))
       act = <p class="tv-why">Where the {classDef(n.classStart!).name} begins.</p>;
+    else if (graph.burned.has(n.id)) act = <p class="tv-why">Burnt: it can never be taken.</p>;
     else if (on) {
-      const removable = canRemove(alloc, run.classId, n.id);
+      const removable = canRefund(run.build, n.id);
       act = !removable ? (
         <p class="tv-why">Other passives hang from this one.</p>
       ) : run.refundPoints > 0 ? (
@@ -670,8 +731,15 @@ export function TreeView({ c }: { c: Controller }) {
         <p class="tv-why">No refund points left.</p>
       );
     } else {
-      const p = pathTo(alloc, run.classId, n.id);
-      if (!p) act = <p class="tv-why">Not connected to your passives yet.</p>;
+      const p = pathFor(run.build, n.id, tree);
+      if (!p)
+        act = (
+          <p class="tv-why">
+            {n.kind === 'start'
+              ? `Where the ${classDef(n.classStart!).name} begins.`
+              : 'Not connected to your passives yet.'}
+          </p>
+        );
       else {
         const way = totals(p.slice(0, -1).map((id) => tree.nodes[id]));
         act = (
@@ -709,7 +777,7 @@ export function TreeView({ c }: { c: Controller }) {
         </div>
         <div class="muted">{kindName}</div>
         <ul class="tv-lines">
-          {lines[n.id].map((l, i) => (
+          {linesOf(n.id).map((l, i) => (
             <li key={i}>{l}</li>
           ))}
         </ul>
@@ -717,7 +785,56 @@ export function TreeView({ c }: { c: Controller }) {
       </section>
     );
   }
-  const all = useMemo(() => totals(alloc.map((id) => tree.nodes[id])), [alloc]);
+  const all = useMemo(
+    () => totalsOf(passiveMods(run.build, tree)),
+    [alloc, run.build.treeRelics, run.build.relics],
+  );
+  // The tree's relics held, and how many uses each has left.
+  const relicsHeld = TREE_RELICS.filter((id) => (run.build.relics?.[id] ?? 0) > 0);
+  const relicBox =
+    relicsHeld.length > 0 ? (
+      <section class="tv-relics">
+        <h4 class="lf-h">Relics of the tree</h4>
+        {relicMode ? (
+          <>
+            <p class="tv-why">
+              {relicNote ??
+                `Choose where ${relicDef(relicMode.relic).name} goes: the lit passives.`}
+            </p>
+            <button
+              class="btn small"
+              onClick={() => {
+                setRelicMode(null);
+                setRelicNote(null);
+              }}
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <ul class="tv-lines">
+            {relicsHeld.map((id) => {
+              const left = relicUsesLeft(run, id);
+              return (
+                <li key={id}>
+                  <button
+                    class="btn small"
+                    disabled={left <= 0}
+                    {...infoProps(relicDef(id).text)}
+                    onClick={() => {
+                      setRelicMode({ relic: id });
+                      setRelicNote(null);
+                    }}
+                  >
+                    {relicDef(id).name} · {left} left
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+    ) : null;
   const shown = showAll ? all : all.slice(0, 12);
   const ledgerOpen = !phone || picked !== null || sumOpen;
   return (
@@ -815,6 +932,7 @@ export function TreeView({ c }: { c: Controller }) {
       </div>
       {ledgerOpen && (
         <aside class={'tv-ledger' + (phone && picked === null ? ' sum' : '')} data-paint="panel">
+          {relicBox}
           {look}
           {(!phone || (sumOpen && picked === null)) && (
             <section class="tv-sum">

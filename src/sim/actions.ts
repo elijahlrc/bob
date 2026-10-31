@@ -57,9 +57,13 @@ export function startAction(
 ): void {
   // What the supports make of this use: a Ruthless Blow, Intensity, the Seals spent as repeats.
   const started = startUse(w, a, p);
+  // A fraction of a repeat is a chance to fire again (The Echoing Word, relic 19), rolled for this use.
+  const whole = Math.floor(started.profile.repeats);
+  const extra =
+    started.profile.repeats > whole && w.rngTrig.chance(started.profile.repeats - whole) ? 1 : 0;
   p =
-    started.echoes > 0
-      ? { ...started.profile, repeats: started.profile.repeats + started.echoes }
+    started.echoes > 0 || extra > 0 || whole !== started.profile.repeats
+      ? { ...started.profile, repeats: whole + extra + started.echoes }
       : started.profile;
   const n = p.hands.length;
   const hand = n > 1 ? a.handIdx % n : 0;
@@ -148,7 +152,8 @@ export function actorById(w: World, id: number): Actor | undefined {
  */
 const echoeAt = (act: Action) =>
   (HIT_AT +
-    Math.min(ECHO_GAP, (0.98 - HIT_AT) / Math.max(1, act.profile.repeats)) * (act.echoes + 1)) *
+    Math.min(ECHO_GAP, (0.98 - HIT_AT) / Math.max(1, Math.floor(act.profile.repeats))) *
+      (act.echoes + 1)) *
   act.duration;
 
 /** Advance the current action; fire it at 60% of its use time. */
@@ -186,7 +191,7 @@ export function updateAction(w: World, a: Actor, dt: number): void {
   if (
     act.which !== 'utility' &&
     act.fired &&
-    act.echoes < act.profile.repeats &&
+    act.echoes < Math.floor(act.profile.repeats) &&
     act.elapsed >= echoeAt(act)
   ) {
     act.echoes++;

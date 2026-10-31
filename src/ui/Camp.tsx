@@ -1,3 +1,6 @@
+import { loadShade } from '../rivals';
+import { shadeKey } from '../run/shades';
+import { visitLocked } from '../run/stops';
 import { DebugPanel } from './Debug';
 import type { ComponentChildren, RefObject } from 'preact';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
@@ -330,6 +333,16 @@ export function Camp({ c }: { c: Controller }) {
   // The Respite's screen (docs/ATTRITION.md) shares the slot; a visit with crafts made keeps it open until the player rests.
   const visit = run ? waysideOf(run).respite : null;
   const respiteSlot = visit ? visit.slot : stopSlot;
+  // A stop whose visit holds the level (a throw made, a duel fought) keeps its screen open until it is left.
+  const stopVisit = run ? waysideOf(run).stopVisit : null;
+  const openStop = stopVisit && visitLocked(stopVisit) ? stopVisit.slot : stopSlot;
+  // The rivals stops on offer ask for their fallen player once (src/rivals.ts); their cards wait for the answer.
+  useEffect(() => {
+    if (!run) return;
+    run.offers.forEach((o, i) => {
+      if (o.kind === 'stop' && stopDef(o.stop!).rivals) void loadShade(c, i);
+    });
+  }, [run?.seed, run?.map]);
   useEffect(() => {
     if (ahead) return;
     const order: Tab[] = ['items', 'skills', 'sheet', 'strategy', 'next', 'report'];
@@ -427,7 +440,6 @@ export function Camp({ c }: { c: Controller }) {
           )}
         </div>
       )}
-      {run.reward && <Reward c={c} onTaken={setTaken} />}
       {!run.reward && (
         <CampGems
           c={c}
@@ -467,6 +479,9 @@ export function Camp({ c }: { c: Controller }) {
               );
             if (o.kind === 'stop') {
               const d = stopDef(o.stop!);
+              // A rivals stop is shown but closed until its fallen player is found (docs/ATTRITION.md).
+              const st = d.rivals ? c.shades[shadeKey(run, o.id)] : undefined;
+              const closed = !!d.rivals && st?.state !== 'ready';
               return (
                 <div key={o.id} class="theme-wrap">
                   <button
@@ -476,12 +491,19 @@ export function Camp({ c }: { c: Controller }) {
                     data-arch
                     data-pearls
                     data-foot
+                    disabled={closed}
                     onClick={() => setStopSlot(i)}
                   >
                     <div class="theme-name">{d.name}</div>
                     <div class="muted">Level {o.areaLevel}</div>
                     <StopEmblem stop={o.stop!} />
-                    <div class="affix">{d.text}</div>
+                    <div class="affix">
+                      {!closed
+                        ? d.text
+                        : st?.state === 'closed'
+                          ? st.why
+                          : 'Asking the rivals list…'}
+                    </div>
                   </button>
                 </div>
               );
@@ -578,11 +600,6 @@ export function Camp({ c }: { c: Controller }) {
       )}
       {t === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} focusGem={gemPick} />}
       {t === 'strategy' && <Strategy c={c} ch={ch} />}
-      {t === 'items' && run.reward && (
-        <div class="items-reward">
-          <Reward c={c} onTaken={setTaken} />
-        </div>
-      )}
       {t === 'items' && !run.reward && (
         <CampGems
           c={c}
@@ -624,8 +641,8 @@ export function Camp({ c }: { c: Controller }) {
       )}
       {t === 'next' && (
         <div class="camp-next camp-side-body">
-          {stopSlot !== null && run.offers[stopSlot]?.kind === 'stop' ? (
-            <StopScreen c={c} slot={stopSlot} onBack={() => setStopSlot(null)} />
+          {openStop !== null && run.offers[openStop]?.kind === 'stop' ? (
+            <StopScreen c={c} slot={openStop} onBack={() => setStopSlot(null)} />
           ) : respiteSlot !== null && run.offers[respiteSlot]?.kind === 'respite' ? (
             <RespiteScreen c={c} slot={respiteSlot} onBack={() => setStopSlot(null)} />
           ) : (
@@ -696,7 +713,7 @@ export function Camp({ c }: { c: Controller }) {
             </button>
           )}
           <button class={'tab' + (shown === 'next' ? ' on' : '')} onClick={() => setTab('next')}>
-            Next map{run.reward ? ' (reward)' : ''}
+            Next map
           </button>
           {edges.right && (
             <button
@@ -747,6 +764,8 @@ export function Camp({ c }: { c: Controller }) {
           )}
         </div>
       </div>
+      {/* The reward pick waits over the camp until a card is taken; the first run's intro, when it shows, comes first. */}
+      {run.reward && <Reward c={c} onTaken={setTaken} />}
       {runIntro && <RunIntro onDone={() => setRunIntro(false)} />}
     </div>
   );

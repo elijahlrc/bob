@@ -134,8 +134,9 @@
   `npm run sheet` draws every type (the review tool for a body), `npm run matrix` prints the build matrix.
 - **Status:** M0–M7 of DESIGN.md are complete (see `docs/PROGRESS.md`). Further work is the stretch list
   or balance changes. Balance constants live in `src/data/constants.ts`. `npm run sim` (headless bot balance
-  report) is useful for checking a balance change but is not required after every one; `--write-xp` regenerates
-  `src/data/measuredXp.ts` if you want XP pacing re-measured.
+  report) is useful for checking a balance change but is not required after every one. The level curve is one map's
+  experience at the character's level, every monster killed: `npm run xp:emit` rebuilds `src/data/mapXp.ts` from the
+  generated maps (no play) after a change to map size, density or monster experience.
 - **Bash tool quirk:** in Bash, Node is not on PATH; use `export PATH="/c/Program Files/nodejs:$PATH"`.
   Backslash escapes in heredocs can be collapsed; write files with the Write tool instead.
 

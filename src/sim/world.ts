@@ -1,3 +1,6 @@
+import { mapPlayerMods } from './mapMods';
+import { hasRelic } from '../calc/relics';
+import { BRIMMING_FADE } from '../data/runRewards';
 import { COLD } from '../calc/skill';
 import { MONSTER_TYPES } from '../data/monsters';
 import { reservedMana } from './reserve';
@@ -8,7 +11,6 @@ import { buildMonster, scaleOf, type MonsterSpec } from '../calc/monster';
 import { mix32 } from '../core/hash';
 import { Rng } from '../core/rng';
 import { DT } from '../data/constants';
-import { affixPlayerMods } from '../data/mapAffixes';
 import { MAX_LEVEL, xpToNext } from '../data/xpTable';
 import type { Build } from '../data/types';
 import type { MapPlan } from '../gen/mapPlan';
@@ -62,6 +64,7 @@ import { tickPackPlays } from './packPlays';
 import { inBlast, pending } from './blasts';
 import { afflictPlayer, stunPlayer } from './afflict';
 import { flasksSealed } from './theft';
+import { bossFlaskRecovery } from './bosses';
 import { crescendoStep, HOLDOUT_WAVES } from '../data/mapTypes';
 import type { Actor, GroundEffect, MapOpts, World, WorldOpts } from './types';
 import { hunted } from './side';
@@ -154,7 +157,7 @@ export function makeCharacter(
   return new Character(build, {
     areaLevel,
     resistPenalty: plan.resistPenalty,
-    extraMods: plan.affixes.flatMap((id) => affixPlayerMods(id, areaLevel)),
+    extraMods: mapPlayerMods(plan, build, areaLevel),
     charges,
   });
 }
@@ -218,6 +221,7 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
     },
     stats: {
       kills: 0,
+      rares: 0,
       xpGained: 0,
       stuck: 0,
       stalls: 0,
@@ -446,8 +450,10 @@ function useFlask(w: World, side: Side, i: number): void {
       f.queued = true;
     } else if (s.instant) {
       const l0 = p.life;
-      p.life = Math.min(lifeCap(p), p.life + s.life);
+      const heal = s.life * bossFlaskRecovery(w, p);
+      p.life = Math.min(lifeCap(p), p.life + heal);
       noteRecover(p, 'life', p.life - l0);
+      brim(side, l0 + heal - p.life);
     } else {
       f.activeT = s.duration;
       f.lifeRate = s.life / s.duration;
@@ -526,9 +532,23 @@ function useFlask(w: World, side: Side, i: number): void {
   rollGains(w, side, 'flask');
 }
 
+/**
+ * The Brimming Ward (relic 5): flask healing past full life becomes energy shield, up to the character's own; with none of
+ * its own, a shield that fades (`brim`), at most as large as its life.
+ */
+function brim(side: Side, over: number): void {
+  if (over <= 0 || !hasRelic(side.build, 'brimmingWard')) return;
+  const p = side.player;
+  if (p.def.maxEs > 0) p.es = Math.min(p.def.maxEs, p.es + over);
+  else p.brim = Math.min(p.def.maxLife, (p.brim ?? 0) + over);
+}
+
 function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
   const p = s.player;
+  if (p.brim) p.brim = Math.max(0, p.brim - (p.brim * BRIMMING_FADE + 1) * dt);
   for (const i of policy(w, s)) useFlask(w, s, i);
+  // A boss fight may cut what flasks give (docs/ATTRITION.md): the Magistrate's Witnesses, the Rotwife's poison.
+  const k = bossFlaskRecovery(w, p);
   for (const f of s.flasks) {
     if (f.esT > 0) {
       const e0 = p.es;
@@ -545,8 +565,13 @@ function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
     f.activeT -= dt;
     const l0 = p.life;
     const m0 = p.mana;
-    if (f.lifeRate) p.life = Math.min(lifeCap(p), p.life + f.lifeRate * step);
-    if (f.manaRate) p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + f.manaRate * step);
+    if (f.lifeRate) {
+      const heal = f.lifeRate * step * k;
+      p.life = Math.min(lifeCap(p), p.life + heal);
+      brim(s, l0 + heal - p.life);
+    }
+    if (f.manaRate)
+      p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + f.manaRate * step * k);
     noteRecover(p, 'life', p.life - l0);
     noteRecover(p, 'mana', p.mana - m0);
     if (f.activeT <= 0) {
@@ -606,6 +631,8 @@ function tickEffects(w: World, dt: number): void {
         if (caught && p.alive && e.stun) stunPlayer(w, s, e.stun);
         if (caught && p.alive && e.afflict)
           afflictPlayer(w, s, e.afflict.kind, e.afflict.value, e.afflict.seconds, true);
+        if (caught && p.alive && e.trample)
+          for (const f of s.flasks) f.charges = Math.max(0, f.charges - f.spec.perUse * e.trample);
         const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
         if (owner?.alive) pullPlayer(w, s, owner, e.pull!);
         for (const m of s.minions)

@@ -16,9 +16,9 @@ import type { RunState } from './run';
 import { standingAffixes } from './reprieves';
 import { heldReward, waysideOf } from './wayside';
 
-/** How many provisions the pouch can hold, and arm for one map: three, and one more for each Deeper Pouch (docs/ATTRITION.md). */
+/** How many provisions the pouch can hold, and arm for one map: three, and two more with the Gravewarden's Satchel (docs/ATTRITION.md). */
 export function pouchLimit(run: RunState): number {
-  return POUCH_LIMIT + heldReward(run, 'deeperPouch');
+  return POUCH_LIMIT + 2 * heldReward(run, 'deeperPouch');
 }
 
 /** How many provisions the pouch holds in all (a reprieve counts). */
@@ -69,6 +69,20 @@ export function disarmProvision(run: RunState, id: ProvisionId): CraftResult {
   if (i < 0) return { ok: false, reason: 'That one is not armed' };
   w.armed.splice(i, 1);
   return { ok: true };
+}
+
+/**
+ * Throw one of a provision away (a reprieve too), to make room in a full pouch for a pick's card. A spare one goes first;
+ * when every one held is armed, one is disarmed with it. False when the pouch holds none.
+ */
+export function dropProvision(run: RunState, id: string): boolean {
+  const w = waysideOf(run);
+  const n = w.pouch[id] ?? 0;
+  if (n <= 0) return false;
+  if (n === 1) delete w.pouch[id];
+  else w.pouch[id] = n - 1;
+  if (w.armed.filter((x) => x === id).length > n - 1) w.armed.splice(w.armed.indexOf(id), 1);
+  return true;
 }
 
 /**
@@ -127,9 +141,27 @@ export function forage(run: RunState): ProvisionId | null {
   return pick;
 }
 
-/** The hidden map affixes the given provisions add to a map: one each (a reprieve has none). */
-export function provisionAffixes(ids: readonly string[]): string[] {
-  return ids.filter((id) => !isReprieveId(id)).map(provisionAffixId);
+/**
+ * The hidden map affixes the given provisions add to a map: one each (a reprieve has none), and each twice with Twice-Steeped
+ * Dregs (relic 1.1: an affix listed twice counts twice everywhere it is read).
+ */
+export function provisionAffixes(ids: readonly string[], twice = false): string[] {
+  const out = ids.filter((id) => !isReprieveId(id)).map(provisionAffixId);
+  return twice ? out.flatMap((a) => [a, a]) : out;
+}
+
+/**
+ * The Gleaner's Hook (relic 1.2): every level passed leaves a provision in the pouch, drawn from the seed and the level, as
+ * foraging draws. Nothing when the pouch is full.
+ */
+export function glean(run: RunState): ProvisionId | null {
+  if (!heldReward(run, 'gleanersHook') || !pouchRoom(run)) return null;
+  const rng = new Rng(run.seed).fork(`glean${run.map}`);
+  const open = PROVISIONS.filter((p) => p.kind !== 'reprieve' && p.from <= run.map);
+  if (!open.length) return null;
+  const pick = rng.weighted(open, (p) => p.weight).id;
+  addProvision(run, pick);
+  return pick;
 }
 
 /**
@@ -137,7 +169,11 @@ export function provisionAffixes(ids: readonly string[]): string[] {
  * (curses, a blessing). `ids` is what is burning (the map plan) or armed (the preview).
  */
 export function mapAffixList(run: RunState, offer: MapOffer, ids: readonly string[]): string[] {
-  return [...offer.affixes, ...provisionAffixes(ids), ...standingAffixes(run)];
+  return [
+    ...offer.affixes,
+    ...provisionAffixes(ids, heldReward(run, 'twiceSteeped') > 0),
+    ...standingAffixes(run),
+  ];
 }
 
 /** The offer's affixes with the armed provisions', the curses' and the blessing's on top: what the threat preview and the bot's scoring should read. */

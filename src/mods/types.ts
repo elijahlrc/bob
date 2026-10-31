@@ -226,7 +226,7 @@ export type ModKind = 'base' | 'inc' | 'more' | 'flag' | 'override';
 export type Condition = { id: CondId; not?: boolean };
 
 export type ModSourceKind =
-  'tree' | 'item' | 'gem' | 'aura' | 'flask' | 'base' | 'monster' | 'class';
+  'tree' | 'item' | 'gem' | 'aura' | 'flask' | 'base' | 'monster' | 'class' | 'relic';
 export type ModSource = { kind: ModSourceKind; id: string };
 
 /**

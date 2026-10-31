@@ -398,7 +398,7 @@ export function planCraft(run: RunState, uid: number, a: CraftAction): CraftPlan
   } else if (a.kind === 'seal') {
     plan.odds = sealOdds(it);
   } else if (a.kind === 'salvage') {
-    plan.gain = `${salvageValue(it)} Bone Dust`;
+    plan.gain = `${salvageValue(it, run)} Bone Dust`;
   } else {
     plan.after = locate(copy, uid)?.item ?? null;
     plan.exact = true;

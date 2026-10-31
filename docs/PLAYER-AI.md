@@ -272,15 +272,14 @@ _Strategy:_
 ## 6. Flasks
 
 Flasks are drunk automatically, on top of whatever else the character is doing. Kills don't refill them unless gear or
-passives say so (docs/ATTRITION.md), so every drink counts. Each flask in the belt has its own setting on the Strategy
-tab:
+passives say so (docs/ATTRITION.md), so every drink counts. **Each belt slot has a number**, shown on the Strategy tab:
+85%, 70%, 50%, 30% and 15% from slot 1 to slot 5. Where you wear a flask decides when it is drunk:
 
-- **Life** (or hybrid): life flasks drink in **belt order**, each when life is below **its own threshold**: by default
-  50% for the first, then 35%, 25%, 15% and 10%. So the first is drunk early and the last is kept for the worst moment;
-  put a slow flask first and an instant one last. A flask that is already working isn't drunk again, but the next one
-  can be. Only one life flask per tick.
-- **Mana** (or hybrid): mana flasks drink in their own belt order, below their threshold (by default 25%, then 15%,
-  10%...). A hybrid flask has both thresholds and drinks below either.
+- **Life:** drunk when life is below its slot's number. A flask in slot 1 is drunk early, one in slot 5 is kept for the
+  worst moment; put a slow flask in an early slot and an instant one in a late one. A flask that is already working isn't drunk again, but
+  another can be. Only one life flask per tick.
+- **Mana:** drunk when mana is below its slot's number. A **hybrid** flask is drunk below its slot's number of life or
+  of mana.
 - **Utility:** each utility flask has a condition: **bosses only** (the default), **rares and bosses** (a rare,
   champion or boss within 8 tiles), **packs and rares** (also 5+ enemies within 8 tiles) or **any fight**.
 - **Life-to-energy-shield flask** (one that leaves you at 1 life for two seconds): only at **90%+ life**, with
@@ -296,8 +295,7 @@ tab:
   a player would click it off.
 
 _Strategy:_ Charges are scarce: a Respite, a fallen boss, a reprieve or Tapper's Brine refills them, and charge gain on
-gear or passives tops them up as you kill. Lower thresholds save charges; higher ones keep you safer against hard
-hitters. A utility flask set to bosses only keeps its charges for the fights that count.
+gear or passives tops them up as you kill. A late slot saves charges; an early one keeps you safer against hard hitters. A utility flask set to bosses only keeps its charges for the fights that count.
 
 ---
 
@@ -359,6 +357,20 @@ These are decided in camp, not by the character, but the character is what they 
     hurt it for a few seconds. Mana and the monsters are as they were. If the character was losing the fight, it is still
     losing it, only later and with full flasks; Last Spark also throws the monsters nearby back and stuns them, which is what
     buys the time.
+
+- **Relics** (kept for the run) can change what the character does, not only its numbers:
+  - **The Unflinching** never steps out of a warning on the ground (section 3 does not apply).
+  - **Blind Fury** fights the nearest enemy whatever the Target setting says, and its attacks ignore their condition (any
+    fight); the Strategy tab shows both locked.
+  - **The Echoing Word** gives every spell a 50% chance to land again a moment later, free, as a repeat does.
+  - **The Thirsting Cup** puts half a charge into the slot 1 flask for every kill; **Draught Before the Throne** starts a
+    boss map with every flask at least half full; **The Brimming Ward** turns flask healing past full life into energy
+    shield (section 6 still decides when a flask is drunk).
+  - **Arrows at the Throat** makes projectiles fall after 2 tiles, so a projectile skill's reach is 2 tiles: the character
+    walks in that close before it shoots, and such a skill never kites.
+  - **Mantle of the Fiend** carries one monster affix, in its version for the player, changed every minute of a map.
+  - Against the **Envious Dead** (a stop) the character fights a fallen player's shade as in a duel (section 11), once; a
+    loss or a draw costs only the level.
 
 ---
 

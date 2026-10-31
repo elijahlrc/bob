@@ -1,3 +1,4 @@
+import { mapPlayerMods } from './mapMods';
 import { Character, scenarioDps } from '../calc/character';
 import { buildMonster } from '../calc/monster';
 import {
@@ -14,6 +15,7 @@ import {
   BOSSES,
   BROKEN_SECONDS,
   BROKEN_TAKEN,
+  CINDER_LEECH,
   CANTER_RADIUS,
   CANTER_SECONDS,
   CANTER_SPEED,
@@ -22,6 +24,7 @@ import {
   COURSER_CHILL,
   DRINK_REGEN,
   ECHO_EVERY,
+  ENGINE_SHIELD_CRACK,
   ENGINE_STUN,
   EXPOSED_SECONDS,
   EXPOSED_TAKEN,
@@ -33,6 +36,7 @@ import {
   FLURRY_TELL,
   FLURRY_WIDTH,
   FRACTURE_TAKEN,
+  FROSTBITE,
   GALLOP_LENGTH,
   GALLOP_SPEED,
   GALLOP_TELL,
@@ -45,9 +49,11 @@ import {
   PLATED_LESS,
   PRISM_PATTERN_EVERY,
   REGIMENTS,
+  REGIMENT_BANNERS,
   ROT_PATCH_EVERY,
   ROT_PATCH_SECONDS,
   MEND_PAUSE,
+  ROT_FLASK_LESS,
   ROT_REGEN,
   ROT_ROTATION,
   ROUTED_SECONDS,
@@ -75,11 +81,14 @@ import {
   TOLL_SPEED,
   TOLL_START,
   TOLL_TELL,
+  TRAMPLE_DRINKS,
   VEIL_CYCLE,
+  VEIL_LESS,
   VEIL_SECONDS,
   SOLDIERS_MAX,
   WAVE_PUSH_SECONDS,
   WITNESSES,
+  WITNESS_RECOVERY,
   WITNESS_HEX_STEP,
   WITNESS_WEIGHT,
   bossOfType,
@@ -87,8 +96,12 @@ import {
   type TheftKind,
 } from '../data/bosses';
 import { HEX_IDS } from '../data/hexes';
-import { affixPlayerMods } from '../data/mapAffixes';
-import type { MonsterTypeId, Variant } from '../data/monsters';
+import {
+  monsterModDef,
+  type MonsterModId,
+  type MonsterTypeId,
+  type Variant,
+} from '../data/monsters';
 import { afflictPlayer, stunPlayer } from './afflict';
 import { castPattern } from './blasts';
 import { rebuildForTheft } from './charges';
@@ -99,6 +112,7 @@ import { setTheft, theftBuild, theftOf, type Theft } from './theft';
 import { armourReduction, hitChance } from '../calc/formulas';
 import type { Action, Actor, GroundEffect, World } from './types';
 import { spawnMonster } from './world';
+import { applyStatus } from './statuses';
 import { hunted } from './side';
 import type { Side } from './side';
 
@@ -182,6 +196,40 @@ export type BossState = {
 };
 
 const states = new WeakMap<Actor, BossState>();
+/** The bosses of a world, for what a fight does to the character's recovery wherever it stands. */
+const bossesOf = new WeakMap<World, Actor[]>();
+
+/** A living boss of a world with this id, and its state. */
+function livingBoss(w: World, id: BossId): BossState | undefined {
+  for (const a of bossesOf.get(w) ?? []) {
+    const st = states.get(a);
+    if (a.alive && st?.id === id) return st;
+  }
+  return undefined;
+}
+
+/**
+ * What the character's regeneration, leech and energy shield recharge are multiplied by in a boss fight (docs/ATTRITION.md):
+ * each living Witness of the Magistrate takes a share off.
+ */
+export function bossRecovery(w: World): number {
+  const st = livingBoss(w, 'magistrate');
+  return st ? Math.max(0, 1 - WITNESS_RECOVERY * livingWitnesses(st)) : 1;
+}
+
+/** What the character's flasks recover is multiplied by: the Witnesses, and the Rotwife's poison. */
+export function bossFlaskRecovery(w: World, p: Actor): number {
+  const rot = p.ail.poisons.length > 0 && livingBoss(w, 'rotwife') ? 1 - ROT_FLASK_LESS : 1;
+  return bossRecovery(w) * rot;
+}
+
+/** The share of the usual leech a hit on this monster gives: none from the veiled Duellist, half from Cinder. */
+export function bossLeechShare(m: Actor): number {
+  const st = states.get(m);
+  if (st?.id === 'duellist' && st.veiled) return 0;
+  if (st?.id === 'twins' && st.twin === 'cinder') return CINDER_LEECH;
+  return 1;
+}
 
 /** The boss state of a monster, if it is one of the bosses. */
 export function bossState(m: Actor): BossState | undefined {
@@ -246,7 +294,9 @@ export function initBoss(w: World, a: Actor): void {
     grief: false,
     echoT: ECHO_EVERY,
   });
-  void w;
+  const list = bossesOf.get(w) ?? [];
+  list.push(a);
+  bossesOf.set(w, list);
 }
 
 /** How fast a boss's own clock runs: chill slows it, freeze stops it (the Tollkeeper's toll, the Courser's stride). */
@@ -402,6 +452,7 @@ export function bossTaken(dst: Actor, dmg: number[]): void {
     for (let i = 0; i < 5; i++) dmg[i] *= k;
   }
   if (st.id === 'duellist' && st.bareT > 0) for (let i = 0; i < 5; i++) dmg[i] *= 1 + BARE_TAKEN;
+  if (st.id === 'duellist' && st.veiled) for (let i = 0; i < 5; i++) dmg[i] *= 1 - VEIL_LESS;
   if (st.id === 'bulwarkEngine') {
     if (st.brokenT > 0) for (let i = 0; i < 5; i++) dmg[i] *= 1 + BROKEN_TAKEN;
     else {
@@ -429,8 +480,15 @@ export function bossNoteTaken(m: Actor, dmg: number[]): void {
 /** A boss's blow lands on the character (from `onMonsterHitPlayer`): the Rotwife's ailment of the moment. */
 export function bossHitPlayer(w: World, s: Side, src: Actor): void {
   const st = states.get(src);
-  // The Engine's blows knock the character senseless for a moment (once in the boss lock).
-  if (st?.id === 'bulwarkEngine') stunPlayer(w, s, ENGINE_STUN);
+  // The Engine's blows knock the character senseless for a moment (once in the boss lock), and crack its shield: the
+  // recharge waits longer (docs/ATTRITION.md).
+  if (st?.id === 'bulwarkEngine') {
+    stunPlayer(w, s, ENGINE_STUN);
+    s.player.since.damaged = Math.min(s.player.since.damaged, -ENGINE_SHIELD_CRACK);
+  }
+  // The Tollkeeper's flail and Ash's blows scar: no life regeneration for a while.
+  if (st?.id === 'tollkeeper' || (st?.id === 'twins' && st.twin === 'ash'))
+    applyStatus(w, s.player, 'scar');
   if (st?.id !== 'rotwife') return;
   const kind = ROT_ROTATION[st.rot % ROT_ROTATION.length];
   st.rot++;
@@ -509,8 +567,15 @@ function dismiss(w: World, x: Actor): void {
 }
 
 /** Spawn a creature of a boss beside it: no experience, no loot, and awake. */
-function bring(w: World, m: Actor, type: MonsterTypeId, x: number, y: number): Actor {
-  const spec = { ...m.mon!.spec, type, rarity: 'normal' as const, mods: [] };
+function bring(
+  w: World,
+  m: Actor,
+  type: MonsterTypeId,
+  x: number,
+  y: number,
+  mods: MonsterModId[] = [],
+): Actor {
+  const spec = { ...m.mon!.spec, type, rarity: 'normal' as const, mods };
   const a = spawnMonster(w, spec, x, y, m.room, m.pack, '');
   a.name = a.mon!.kind.name;
   a.noReward = true;
@@ -626,6 +691,8 @@ function showLane(
   to: { x: number; y: number },
   seconds: number,
   damage: number,
+  /** The charge back tramples the flasks (docs/ATTRITION.md). */
+  trample = false,
 ): void {
   st.lane = { x: m.x, y: m.y, x2: to.x, y2: to.y };
   const e: GroundEffect = {
@@ -643,8 +710,9 @@ function showLane(
     dtype: 3,
     team: 1,
     shape: 'lane',
-    label: 'Gallop',
+    label: trample ? 'Trample' : 'Gallop',
     owner: m.id,
+    ...(trample ? { trample: TRAMPLE_DRINKS } : {}),
   };
   st.laneId = e.id;
   w.effects.push(e);
@@ -751,6 +819,7 @@ function courserAI(w: World, m: Actor, st: BossState, dt: number): void {
           to,
           GALLOP_TELL + Math.hypot(to.x - m.x, to.y - m.y) / GALLOP_SPEED,
           blow * 1.4,
+          true,
         );
         w.events.push({ t: 'window', id: m.id, kind: 'charge' });
       } else {
@@ -899,6 +968,8 @@ function tickPrism(w: World, m: Actor, st: BossState, dt: number): void {
     }
     return;
   }
+  // Attuned to cold it frostbites the character: its regeneration falls while the attunement lasts (docs/ATTRITION.md).
+  if (st.element === 2) applyStatus(w, hunted(w, m), 'regenLess', { seconds: 0.5, v: FROSTBITE });
   st.attuneT -= dt;
   if (st.attuneT <= 0) {
     // The shift: the core flickers through its colours, and for a moment it is immune to nothing.
@@ -975,6 +1046,8 @@ function marchIn(w: World, m: Actor, st: BossState): void {
   const cy = room ? room.cy + 0.5 : m.y;
   const r = room ? Math.min(room.rect.w, room.rect.h) / 2 - 2.5 : 6;
   const ranks = REGIMENTS[st.wave % REGIMENTS.length];
+  // Each regiment marches under a banner: a mod its soldiers share, in turn (docs/ATTRITION.md).
+  const banner = REGIMENT_BANNERS[st.wave % REGIMENT_BANNERS.length];
   const total = ranks.reduce((n, g) => n + g.n, 0);
   const start = w.rngAi.float(0, Math.PI * 2);
   st.soldiers = st.soldiers.filter((x) => x.alive);
@@ -986,7 +1059,7 @@ function marchIn(w: World, m: Actor, st: BossState): void {
         x: cx,
         y: cy,
       };
-      st.soldiers.push(bring(w, m, g.type, at.x, at.y));
+      st.soldiers.push(bring(w, m, g.type, at.x, at.y, [banner]));
     }
   st.wave++;
   st.waveT = WAVE_PUSH_SECONDS;
@@ -1180,7 +1253,7 @@ function strongestSupports(w: World, side: Side): number[] {
   const opts = {
     areaLevel: side.areaLevel,
     resistPenalty: w.plan.resistPenalty,
-    extraMods: w.plan.affixes.flatMap((id) => affixPlayerMods(id, side.areaLevel)),
+    extraMods: mapPlayerMods(w.plan, side.build, side.areaLevel),
     charges: ch.charges,
   };
   const base = scenarioDps(ch.sheet(undefined, 'boss'));
@@ -1291,6 +1364,7 @@ export function bossReadout(w: World, m: Actor): string[] {
     case 'magistrate': {
       const n = livingWitnesses(st);
       out.push(`Witnesses: ${n}`);
+      if (n > 0) out.push(`Your recovery ${Math.round(n * WITNESS_RECOVERY * 100)}% less`);
       out.push(
         st.countT > 0
           ? `Sentence in ${st.countT.toFixed(1)}s`
@@ -1313,12 +1387,22 @@ export function bossReadout(w: World, m: Actor): string[] {
       if (st.routedT > 0) out.push('Routed');
       else {
         out.push(`Regiment ${st.wave}: ${livingSoldiers(st)} standing`);
+        if (st.wave > 0)
+          out.push(
+            `Banner: ${monsterModDef(REGIMENT_BANNERS[(st.wave - 1) % REGIMENT_BANNERS.length]).name}`,
+          );
         if (commandLess(st) > 0) out.push(`Takes ${Math.round(commandLess(st) * 100)}% less`);
       }
       break;
     case 'duellist':
       out.push(
-        st.veiled ? 'Veiled' : st.flurryT > 0 ? 'Lunging' : st.bareT > 0 ? 'Bare' : 'Unveiled',
+        st.veiled
+          ? `Veiled: takes ${Math.round(VEIL_LESS * 100)}% less, no leech`
+          : st.flurryT > 0
+            ? 'Lunging'
+            : st.bareT > 0
+              ? 'Bare'
+              : 'Unveiled',
       );
       break;
     case 'bulwarkEngine':

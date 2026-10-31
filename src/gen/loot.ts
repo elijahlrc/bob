@@ -9,7 +9,7 @@ import {
   type SlotTag,
 } from '../data/affixes';
 import { isWeaponClass, ITEM_BASES, itemBase } from '../data/bases';
-import { FLASK_AFFIXES, FLASK_BASES } from '../data/flasks';
+import { FLASK_AFFIXES, FLASK_BASES, type FlaskKind } from '../data/flasks';
 import { classDef } from '../data/classes';
 import { ALL_GEMS, type GemDef } from '../data/gems';
 import { gemStart } from '../calc/gems';
@@ -483,9 +483,18 @@ export function rollGem(
 }
 
 /** A flask base the item level allows (biased to recent tiers), 35% magic with 1–2 affixes. */
-export function rollFlask(rng: Rng, uid: UidSource, ilvl: number, magicChance = 0.35): FlaskItem {
+export function rollFlask(
+  rng: Rng,
+  uid: UidSource,
+  ilvl: number,
+  magicChance = 0.35,
+  /** Kinds to leave out while others are left (a pick of different flasks). */
+  not: FlaskKind[] = [],
+): FlaskItem {
   const pool = FLASK_BASES.filter((f) => f.level <= ilvl && !f.uniqueOnly);
-  const kinds = [...new Set(pool.map((f) => f.kind))];
+  const all = [...new Set(pool.map((f) => f.kind))];
+  const rest = all.filter((k) => !not.includes(k));
+  const kinds = rest.length ? rest : all;
   const kind = rng.weighted(kinds, (k) =>
     k === 'life' ? 4 : k === 'mana' ? 2 : k === 'hybrid' ? 1 : 3,
   );

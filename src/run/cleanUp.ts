@@ -22,7 +22,7 @@ const plural = (n: number, one: string, many = one + 's') => `${n} ${n === 1 ? o
 export function cleanSummary(run: RunState, opts: CleanOpts): CleanSummary {
   const plan = oldItems(run, opts);
   const rows = plan.items
-    .map((item) => ({ item, age: ageOf(run, item.uid), dust: salvageValue(item) }))
+    .map((item) => ({ item, age: ageOf(run, item.uid), dust: salvageValue(item, run) }))
     .sort((a, b) => b.age - a.age || a.item.uid - b.item.uid);
   const dust = rows.reduce((n, r) => n + r.dust, 0);
   const k = plan.kept;

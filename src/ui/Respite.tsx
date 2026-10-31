@@ -74,7 +74,7 @@ export function RespiteScreen({
   if (kind && itemUid !== null)
     craft = kind === 'tier' ? (family ? { kind, itemUid, family } : null) : { kind, itemUid };
   const problem = craft ? respiteProblem(run, slot, craft) : 'Choose first';
-  const cost = chosen ? respiteCraftCost(run, chosen) : 0;
+  const cost = chosen && kind ? respiteCraftCost(run, chosen, kind) : 0;
 
   const make = () => {
     if (!craft) return;
@@ -142,7 +142,9 @@ export function RespiteScreen({
                   {kind === 'socket'
                     ? `${it.sockets.length} → ${it.sockets.length + 1} sockets`
                     : `${it.affixes.length} affix${it.affixes.length === 1 ? '' : 'es'}`}
-                  {respiteCraftCost(run, it) ? ` · ${respiteCraftCost(run, it)} Bone Dust` : ''}
+                  {respiteCraftCost(run, it, kind)
+                    ? ` · ${respiteCraftCost(run, it, kind)} Bone Dust`
+                    : ''}
                 </span>
               </button>
             ))}

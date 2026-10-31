@@ -271,6 +271,46 @@ html.leaf .st .st-sel select:focus-visible {
 .st-reset {
   align-self: flex-end;
 }
+/* ---- The flask belt: each slot's number, its flask, a utility flask's condition ---- */
+.st-belt {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-slot {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+}
+.st-at {
+  font: 400 28px / 1 var(--title-font);
+  font-size-adjust: none;
+  color: var(--gold-hi);
+  text-align: right;
+  text-shadow: 0 2px 0 var(--ink);
+}
+.st-slot[data-kind='utility'] .st-at,
+.st-slot[data-kind='empty'] .st-at {
+  opacity: 0.4;
+}
+.st-flask {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--pearl);
+  text-shadow: 0 2px 0 var(--ink);
+}
+.st-slot[data-kind='empty'] .st-flask {
+  color: var(--muted);
+}
+.st-flask small {
+  color: var(--muted);
+  font-size: 0.85em;
+}
 .st-says {
   margin: 18px 0 0;
   padding: 0;

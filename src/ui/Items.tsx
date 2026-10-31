@@ -344,7 +344,7 @@ export function Items({
   };
   const salvageJunk = async () => {
     if (!junk.length) return;
-    const dust = junk.reduce((n, x) => n + salvageValue(x), 0);
+    const dust = junk.reduce((n, x) => n + salvageValue(x, run), 0);
     const ok = await ask({
       title: 'Salvage the junk?',
       body: 'Every normal or magic item that is not an upgrade and not a favourite is broken down for good.',

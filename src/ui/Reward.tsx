@@ -3,14 +3,19 @@ import { currencyLabel, currencyText } from '../data/currency';
 import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
-import type { ItemClass } from '../data/types';
+import type { Build, ItemClass } from '../data/types';
+import { bossForMap } from '../data/bosses';
 import type { Controller } from '../run/controller';
 import { seatFirstSkill } from '../run/inventoryOps';
-import { takeReward } from '../run/run';
+import { pouchCount, pouchLimit, pouchRoom } from '../run/provisions';
+import { takeReward, type PouchCard, type RunState } from '../run/run';
+import { waysideOf } from '../run/wayside';
 import { useViewport } from './device';
 import { gemCardData } from './gemText';
 import { ItemCard, itemTitle, rarityClass } from './ItemCard';
 import { ProvisionCard } from './Satchel';
+import { RelicPanel } from './WareCard';
+import { runRewardDef } from '../data/runRewards';
 import { provisionDef } from '../data/provisions';
 import type { RewardCard } from '../run/run';
 import { uiZoom } from './uiScale';
@@ -20,11 +25,14 @@ import { rewardSound } from './sound/hooks';
 /** What a card of the pick is called on its button. */
 function cardTitle(o: RewardCard): string {
   if (o.kind === 'pouch') return provisionDef(o.id).name;
+  if (o.kind === 'relic') return runRewardDef(o.id).name;
   return o.kind === 'currency' ? `${o.count} × ${currencyLabel(o.id)}` : itemTitle(o);
 }
 
 function cardClass(o: RewardCard): string {
-  return o.kind === 'pouch' ? 'flaskitem' : o.kind === 'currency' ? 'flaskitem' : rarityClass(o);
+  return o.kind === 'pouch' || o.kind === 'relic' || o.kind === 'currency'
+    ? 'flaskitem'
+    : rarityClass(o);
 }
 
 /** The slot glyph (leaf/kinds.ts) of an item class. */
@@ -92,6 +100,7 @@ function CardIcon({ o }: { o: RewardCard }) {
 function cardKind(o: RewardCard): string | null {
   if (o.kind === 'gem') return gemCardData(gemDef(o.gemId), 1).tags.join(', ') || null;
   if (o.kind === 'pouch') return 'Provision';
+  if (o.kind === 'relic') return 'Relic';
   if (o.kind === 'item') {
     const b = itemBase(o.baseId).name;
     return b !== o.name ? b : null;
@@ -99,33 +108,141 @@ function cardKind(o: RewardCard): string | null {
   return null;
 }
 
+/** What a card of the pick holds, in full: the item's, gem's or flask's card, the provision, the relic, the currency. */
+function CardPreview({ o, build }: { o: RewardCard; build: Build }) {
+  if (o.kind === 'pouch') return <ProvisionCard id={o.id} />;
+  if (o.kind === 'relic') return <RelicPanel id={o.id} />;
+  if (o.kind === 'currency')
+    return (
+      <div class="item-card flaskitem">
+        <div class="ic-name" data-paint="panel" data-thin data-field="plaster">
+          {o.count} × {currencyLabel(o.id)}
+        </div>
+        <div class="muted">{currencyText(o.id)}</div>
+      </div>
+    );
+  return <ItemCard it={o} build={build} />;
+}
+
 /**
- * The 1-of-3 reward pick (§5.3). With a mouse, hovering previews an offer and a click takes it. On a coarse pointer
- * there is no hover, so the first tap previews (and marks) an offer and a Take button commits it: a tap must never
- * take a reward the player has not been able to read. Each offer is an object on a small plaque with a thin gold rim;
- * the marked one has the heavy rim.
+ * The Satchel when it is full and the card picked is a provision: one of what it holds is marked to be thrown away, and
+ * goes only when the pick is taken.
+ */
+function SatchelDrop({
+  run,
+  card,
+  drop,
+  onDrop,
+}: {
+  run: RunState;
+  card: string;
+  drop: string | null;
+  onDrop: (id: string | null) => void;
+}) {
+  const w = waysideOf(run);
+  const held = Object.keys(w.pouch).filter((id) => (w.pouch[id] ?? 0) > 0);
+  return (
+    <div class="reward-drop">
+      <div class="reward-drop-h">
+        Satchel full ({pouchCount(run)} of {pouchLimit(run)}): drop one for{' '}
+        {provisionDef(card).name}
+      </div>
+      <div class="satchel-list">
+        {held.map((id) => {
+          const n = w.pouch[id] ?? 0;
+          const armed = w.armed.filter((x) => x === id).length;
+          const out = drop === id;
+          return (
+            <ProvisionCard
+              key={id}
+              id={id}
+              plaque={armed && !out ? 'heavy' : 'thin'}
+              field={out ? 'vermilion' : undefined}
+              extra={
+                <div class="provision-buttons">
+                  <span class={out ? 'reward-dropped' : 'muted'}>
+                    {out
+                      ? n > 1
+                        ? 'One dropped when you take'
+                        : 'Dropped when you take'
+                      : `× ${n}${armed ? ` (${armed} armed)` : ''}`}
+                  </span>
+                  <button class="btn small" onClick={() => onDrop(out ? null : id)}>
+                    {out ? 'Keep' : 'Drop'}
+                  </button>
+                </div>
+              }
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The reward pick (§5.3), a pop-up over the camp that stays until one card is taken (the owner, 2026-10-30): it is easy
+ * to miss on a tab. A boss's relic pick follows in the same pop-up. With a mouse, hovering previews an offer and a click
+ * takes it. On a coarse pointer there is no hover, so the first tap previews (and marks) an offer and a Take button commits
+ * it: a tap must never take a reward the player has not been able to read. A provision that does not fit the full Satchel
+ * is marked on either, and the Satchel opens under it to drop one. Each offer is an object on a small plaque with a thin
+ * gold rim; the marked one has the heavy rim.
  */
 export function Reward({ c, onTaken }: { c: Controller; onTaken?: (uid: number) => void }) {
   const run = c.run!;
   const { coarse } = useViewport();
   const [hover, setHover] = useState<number | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
+  // The provision thrown away to make room for the one picked.
+  const [drop, setDrop] = useState<string | null>(null);
   const offers = run.reward ?? [];
-  const shown = offers.find((o) => o.uid === (coarse ? (picked ?? hover) : hover));
-  const [note, setNote] = useState<string | null>(null);
+  const pick = offers.find((o) => o.uid === picked) ?? null;
+  const tooFull = (o: RewardCard | null): o is PouchCard => o?.kind === 'pouch' && !pouchRoom(run);
+  // A phone shows the marked card inside the pop-up; a mouse, the hovered card by the pointer.
+  const inline = pick && (coarse || tooFull(pick)) ? pick : null;
+  const floating = coarse ? null : (offers.find((o) => o.uid === hover) ?? null);
   useEffect(() => rewardSound(offers), [offers]);
-  const take = (uid: number | null) => {
+  // A new pick (the relic pick after the first) starts unmarked, with the keyboard on its first card, not the camp behind.
+  const cards = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    setPicked(null);
+    setDrop(null);
+    setHover(null);
+    cards.current?.querySelector('button')?.focus({ preventScroll: true });
+  }, [offers]);
+  const take = (uid: number) => {
     // The run's first skill gem goes straight into a socket (docs/NEWPLAYER.md N7); the camp then says where it is.
     const ok = c.act((r) => {
-      const took = takeReward(r, uid);
-      if (took && uid !== null) seatFirstSkill(r, uid);
+      const took = takeReward(r, uid, drop ?? undefined);
+      if (took) seatFirstSkill(r, uid);
       return took;
     });
-    if (ok === false) sfx('denied');
-    else if (ok && uid !== null) sfx('equip');
-    setNote(ok === false ? 'That does not fit now: your pouch is full.' : null);
-    if (ok && uid !== null) onTaken?.(uid);
+    if (!ok) {
+      sfx('denied');
+      return;
+    }
+    sfx('equip');
+    onTaken?.(uid);
   };
+  const mark = (uid: number) => {
+    if (uid !== picked) setDrop(null);
+    setPicked(uid);
+  };
+  const ready = !!pick && (!tooFull(pick) || drop !== null);
+  const takeLabel =
+    pick && tooFull(pick) && drop
+      ? `Drop ${provisionDef(drop).name}, take ${provisionDef(pick.id).name}`
+      : 'Take';
+  const takeButton = (
+    <button class="btn primary" disabled={!ready} onClick={() => pick && take(pick.uid)}>
+      {takeLabel}
+    </button>
+  );
+  // Two picks in a row after a boss: the usual one, then its relics (`nextReward`).
+  const last = run.history[run.history.length - 1]?.map ?? run.map - 1;
+  const relics = offers.length > 0 && offers.every((o) => o.kind === 'relic');
+  const second = !run.nextReward?.length && relics && bossForMap(last) !== null;
+  const two = !!run.nextReward?.length || second;
   // With a mouse the preview floats by the pointer (it would push the page down in the flow), kept inside the window.
   const tip = useRef<HTMLDivElement>(null);
   const mouse = useRef({ x: 0, y: 0 });
@@ -143,70 +260,85 @@ export function Reward({ c, onTaken }: { c: Controller; onTaken?: (uid: number) 
     el.style.left = `${left}px`;
     el.style.top = `${top}px`;
   };
-  useLayoutEffect(place, [shown?.uid]);
+  useLayoutEffect(place, [floating?.uid]);
   return (
-    <div class="reward">
-      <div class="reward-head">
-        {offers.length > 0 && offers.every((o) => o.kind === 'gem')
-          ? 'Choose a skill gem'
-          : 'Choose a reward'}
-      </div>
-      <div class="reward-cards">
-        {offers.map((o) => {
-          const sel = coarse && picked === o.uid;
-          const kind = cardKind(o);
-          return (
-            <button
-              key={o.uid}
-              class={`reward-card${sel ? ' sel' : ''}`}
-              data-paint="panel"
-              data-thin={sel ? undefined : ''}
-              data-pk={sel ? 'sel' : ''}
-              onMouseEnter={(e) => {
-                mouse.current = { x: e.clientX, y: e.clientY };
-                setHover(o.uid);
-              }}
-              onMouseMove={(e) => {
-                mouse.current = { x: e.clientX, y: e.clientY };
-                place();
-              }}
-              onMouseLeave={() => setHover(null)}
-              onClick={() => (coarse ? setPicked(o.uid) : take(o.uid))}
-            >
-              <CardIcon o={o} />
-              <span class="reward-text">
-                <span class={`reward-name ${cardClass(o)}`}>{cardTitle(o)}</span>
-                {kind && <span class="muted">{kind}</span>}
+    <div class="reward-modal" role="dialog" aria-modal="true" aria-labelledby="reward-head">
+      <div class="reward-scroll">
+        <div class="reward" data-paint="panel">
+          <h2 id="reward-head" class="lf-h">
+            {offers.length === 0
+              ? 'Choose a reward'
+              : offers.every((o) => o.kind === 'gem' && gemDef(o.gemId).kind === 'support')
+                ? 'Choose a support gem'
+                : offers.every((o) => o.kind === 'gem')
+                  ? 'Choose a skill gem'
+                  : offers.every((o) => o.kind === 'flask')
+                    ? 'Choose a flask'
+                    : relics
+                      ? 'Choose a relic'
+                      : 'Choose a reward'}
+          </h2>
+          <div class="reward-sub">
+            {second ? 'The fallen boss leaves a relic' : `Map ${last} cleared`}
+            {two && (
+              <span class="reward-pips" aria-label={`Pick ${second ? 2 : 1} of 2`}>
+                <i class={second ? '' : 'on'} />
+                <i class={second ? 'on' : ''} />
               </span>
-            </button>
-          );
-        })}
-      </div>
-      {note && <div class="warn">{note}</div>}
-      <div class="reward-buttons">
-        {coarse && (
-          <button class="btn small primary" disabled={picked === null} onClick={() => take(picked)}>
-            Take
-          </button>
-        )}
-        <button class="btn small" onClick={() => take(null)}>
-          Skip
-        </button>
-      </div>
-      {shown && (
-        <div class={coarse ? 'reward-preview' : 'reward-preview float'} ref={tip}>
-          {shown.kind === 'pouch' ? (
-            <ProvisionCard id={shown.id} />
-          ) : shown.kind === 'currency' ? (
-            <div class="item-card flaskitem">
-              <div class="ic-name" data-paint="panel" data-thin data-field="plaster">
-                {shown.count} × {currencyLabel(shown.id)}
-              </div>
-              <div class="muted">{currencyText(shown.id)}</div>
+            )}
+          </div>
+          <div class="reward-cards" ref={cards}>
+            {offers.map((o) => {
+              const sel = picked === o.uid && (coarse || tooFull(o));
+              const kind = cardKind(o);
+              return (
+                <button
+                  key={o.uid}
+                  class={`reward-card${sel ? ' sel' : ''}`}
+                  data-paint="panel"
+                  data-thin={sel ? undefined : ''}
+                  data-pk={sel ? 'sel' : ''}
+                  onMouseEnter={(e) => {
+                    mouse.current = { x: e.clientX, y: e.clientY };
+                    setHover(o.uid);
+                  }}
+                  onMouseMove={(e) => {
+                    mouse.current = { x: e.clientX, y: e.clientY };
+                    place();
+                  }}
+                  onMouseLeave={() => setHover(null)}
+                  onClick={() => (coarse || tooFull(o) ? mark(o.uid) : take(o.uid))}
+                >
+                  <CardIcon o={o} />
+                  <span class="reward-text">
+                    <span class={`reward-name ${cardClass(o)}`}>{cardTitle(o)}</span>
+                    {kind && <span class="muted">{kind}</span>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {inline && (
+            <div class="reward-preview">
+              <CardPreview o={inline} build={run.build} />
             </div>
-          ) : (
-            <ItemCard it={shown} build={run.build} />
           )}
+          {pick && tooFull(pick) && (
+            <SatchelDrop run={run} card={pick.id} drop={drop} onDrop={setDrop} />
+          )}
+          {!coarse && pick && tooFull(pick) && <div class="reward-buttons">{takeButton}</div>}
+        </div>
+      </div>
+      {/* On a phone, Take stays in reach below the cards however far they scroll. */}
+      {coarse && (
+        <div class="reward-bar">
+          {takeButton}
+          {pick && !ready && <div class="muted">Drop a provision to make room</div>}
+        </div>
+      )}
+      {floating && (
+        <div class="reward-preview float" ref={tip}>
+          <CardPreview o={floating} build={run.build} />
         </div>
       )}
     </div>

@@ -1,3 +1,5 @@
+import { SURGEON_TRADES } from '../data/stops';
+import { isRelicId, relicDef } from '../data/runRewards';
 import { Rng } from '../core/rng';
 import { family } from '../data/affixes';
 import { itemBase } from '../data/bases';
@@ -725,7 +727,55 @@ function buildOk(b: unknown, classId: string, level: number): b is Build {
     return false;
   if (b.primaryGem !== undefined && !(typeof b.primaryGem === 'number' && gems.has(b.primaryGem)))
     return false;
-  return strategyOk(b.strategy);
+  return strategyOk(b.strategy) && perksOk(b);
+}
+
+/** The largest value each of the Surgeon's mods can have, by `stat|kind` (a trade's gain or price at full strength). */
+const GRAFT_MAX = new Map<string, number>();
+for (const t of SURGEON_TRADES)
+  for (const m of [...t.gain, ...t.price]) {
+    const k = `${m.stat}|${m.kind}`;
+    GRAFT_MAX.set(k, Math.max(GRAFT_MAX.get(k) ?? 0, Math.abs(m.value)));
+  }
+
+/**
+ * What the run's perks put on a build (docs/ATTRITION.md): relics this version knows, at most as many as a run can hold; the
+ * Surgeon's trades as his own mods, no bigger than a trade's; the tree's relics as lists of nodes this tree has.
+ */
+function perksOk(b: Record<string, unknown>): boolean {
+  if (b.relics !== undefined) {
+    if (!isObj(b.relics)) return false;
+    for (const [id, n] of Object.entries(b.relics))
+      if (!isRelicId(id) || !isInt(n, 0, relicDef(id).max)) return false;
+  }
+  if (b.grafts !== undefined) {
+    if (!Array.isArray(b.grafts) || b.grafts.length > 60) return false;
+    for (const m of b.grafts) {
+      if (!isObj(m) || Object.keys(m).some((k) => !['stat', 'kind', 'value'].includes(k)))
+        return false;
+      const max = GRAFT_MAX.get(`${m.stat}|${m.kind}`);
+      if (max === undefined || typeof m.value !== 'number' || Math.abs(m.value) > max) return false;
+    }
+  }
+  if (b.treeRelics !== undefined) {
+    if (!isObj(b.treeRelics)) return false;
+    const tree = getTree();
+    const node = (id: unknown) =>
+      isInt(id, 0, tree.nodes.length - 1) && isLive(tree.nodes[id as number]);
+    for (const [k, v] of Object.entries(b.treeRelics)) {
+      if (k === 'ghostUses' && isInt(v, 0, 9)) continue;
+      if (k === 'foreignStarts' && typeof v === 'boolean') continue;
+      if (!Array.isArray(v) || v.length > 9) return false;
+      if (k === 'roots') {
+        if (!v.every((c) => typeof c === 'string' && c in tree.starts)) return false;
+      } else if (k === 'bridges') {
+        if (!v.every((x) => isObj(x) && node(x.from) && node(x.to))) return false;
+      } else if (['ghosts', 'floating', 'anchors', 'hollowed'].includes(k)) {
+        if (!v.every(node)) return false;
+      } else return false;
+    }
+  }
+  return true;
 }
 
 /**

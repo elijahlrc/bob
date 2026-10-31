@@ -3,7 +3,7 @@ import type { ClassDef } from './types';
 
 /**
  * DESIGN.md §5.2. Classes differ only in attributes, starting weapons and tree start. A character starts with no
- * gems: the first skill gems come as rewards after the first maps (`SKILL_REWARD_MAPS`).
+ * gems: the first skill gems come as the pick after map 1 (`EARLY_PICKS`).
  */
 export const CLASSES: ClassDef[] = [
   {

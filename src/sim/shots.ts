@@ -107,7 +107,11 @@ export function launch(
     r: 0.15,
     travelled: 0,
     // A wanderer lasts a time, not a range: the way it covers in that time at its speed.
-    maxRange: p.skill.wander ? speed * p.skill.wander.seconds * p.skillDuration : o.range,
+    maxRange: p.skill.wander
+      ? speed * p.skill.wander.seconds * p.skillDuration
+      : p.projRangeCap > 0
+        ? Math.min(o.range, p.projRangeCap)
+        : o.range,
     profile: p,
     hand,
     hitIds: o.hitIds,

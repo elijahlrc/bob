@@ -1,7 +1,16 @@
 import { toChildArray, type ComponentChildren } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
-import { statTotals, type StatTotal, type TotalSection } from '../calc/statTotals';
+import {
+  statBaseLines,
+  statTotals,
+  type StatTotal,
+  type TotalSection,
+} from '../calc/statTotals';
+import { CONDITION_TEXT, TAG_TEXT } from '../data/statText';
+import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
+import { hitChance, monsterEvasion } from '../calc/formulas';
+import { BASE_CRIT_MULTI } from '../data/constants';
 import { HEXES, hexText } from '../data/hexes';
 import { GLOSSARY, glossFor } from '../data/glossary';
 import { modLabel } from '../mods/text';
@@ -14,11 +23,14 @@ import {
   dpsTip,
   ehpTip,
   evasionTip,
+  hitTip,
+  leechTip,
   lifeRegenTip,
   manaRegenTip,
   moveTip,
   poolTip,
   resistTip,
+  stunThresholdTip,
   stunTip,
   totalTip,
 } from './sheetMath';
@@ -113,6 +125,43 @@ const titled = (s: string) =>
     )
     .join(' ');
 
+/** What a flat line holds for, as words after its name: "with Attacks", "while on Low Life". */
+const qualifier = (m: Mod): string[] => [
+  ...(m.tags ?? []).flatMap((t) => (TAG_TEXT[t] ? [TAG_TEXT[t]] : [])),
+  ...(m.condition
+    ? [
+        m.condition.not
+          ? `unless ${(CONDITION_TEXT[m.condition.id] ?? '').replace(/^(while|if you have|against) /, '')}`
+          : (CONDITION_TEXT[m.condition.id] ?? ''),
+      ]
+    : []),
+];
+
+/** A flat line's value, as an amount or as a share of the pool. */
+const plus = (m: Mod | null) => `+${(Math.round((m?.value ?? 0) * 10) / 10).toLocaleString()}`;
+const share = (m: Mod | null) => `${(Math.round((m?.value ?? 0) * 10) / 10).toLocaleString()}%`;
+
+/** A line's damage types as words ("Fire", "Cold and Lightning"); empty for none. */
+const typesWord = (m: Mod | null): string =>
+  m?.damageTypes?.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(' and ') ?? '';
+
+/** The ailments a character can avoid, as the defence names them, and as the tab does. */
+const AILMENTS: ['ignite' | 'shock' | 'chill' | 'freeze' | 'bleed' | 'poison', string][] = [
+  ['ignite', 'Ignite'],
+  ['shock', 'Shock'],
+  ['chill', 'Chill'],
+  ['freeze', 'Freeze'],
+  ['bleed', 'Bleeding'],
+  ['poison', 'Poison'],
+];
+
+/** A leech line's value, after the character's increases to leech: "0.5%", "2% of Physical Damage". */
+const leechValue = (m: Mod | null, mult: number): string => {
+  const v = `${Math.round((m?.value ?? 0) * mult * 100) / 100}%`;
+  const types = m?.damageTypes?.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(' and ');
+  return types ? `${v} of ${types} Damage` : v;
+};
+
 const totalRow = (t: StatTotal) => (
   <Row
     key={modLabel(t.mod)}
@@ -152,6 +201,53 @@ function Section({
 export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
   const totals = useMemo(() => statTotals(ch.db, ch.configConds, ch.statValue), [ch]);
   const mit = useMemo(() => ch.mitigation(), [ch]);
+  // Leech and life or mana on hit as the character has them (gear, tree, relics), a line for each kind of hit they hold for;
+  // what a skill's own gems add is the skill's to say.
+  const flat = useMemo(() => {
+    const of = (stat: string) => statBaseLines(ch.db, ch.configConds, ch.statValue, stat);
+    const ctx = { tags: 0, ancestry: 0, conds: ch.configConds, statValue: ch.statValue };
+    const recovery = ch.db.mult('leechRecovery', ctx);
+    const def = ch.defence();
+    // Accuracy with the main hand (its own accuracy counts), against a typical monster of the area.
+    const accuracy = ch.db.calc('accuracy', ctx, ch.hands[0]?.accuracy ?? 0);
+    const evasion = monsterEvasion(ch.config.areaLevel);
+    return {
+      lifeLeech: of('leech.life'),
+      manaLeech: of('leech.mana'),
+      lifeOnHit: of('lifeOnHit'),
+      manaOnHit: of('manaOnHit'),
+      lifeOnKill: of('lifeOnKill'),
+      lifeOnKillPct: of('lifeOnKillPct'),
+      manaOnKill: of('manaOnKill'),
+      lifeOnBlock: of('lifeOnBlock'),
+      lifeOnBlockPct: of('lifeOnBlockPct'),
+      manaOnBlock: of('manaOnBlock'),
+      critMulti: of('critMulti'),
+      penetration: of('penetration'),
+      lifeMult: recovery * ch.db.mult('leechRecoveryLife', ctx),
+      manaMult: recovery,
+      def,
+      accuracy,
+      evasion,
+      hitChance: hitChance(accuracy, evasion),
+    };
+  }, [ch]);
+  /** Rows of a flat stat, one for each line (or, unless `zero` is false, one at nothing when there are none). */
+  const flatRows = (
+    label: string,
+    list: Mod[],
+    value: (m: Mod | null) => string,
+    tip: string,
+    zero = true,
+  ) =>
+    (list.length ? list : zero ? [null] : []).map((m) => (
+      <Row
+        key={label + (m ? modLabel(m) : '')}
+        label={titled([label, ...(m ? qualifier(m) : [])].join(' '))}
+        value={value(m)}
+        tip={tip}
+      />
+    ));
   const of = (id: TotalSection) => totals.filter((t) => t.section === id);
   /** The plain line of a stat (no tags, no condition), which sits beside what the stat is worth. */
   const plain = (list: StatTotal[], stat: string) =>
@@ -288,7 +384,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             {evasion && totalRow(evasion)}
             {defence.filter((t) => t !== armour && t !== evasion).map(totalRow)}
           </Section>
-          <Section title="Block and Stun">
+          <Section title="Block, Stuns and Ailments">
             <Row
               label="Chance to Block Attacks"
               value={pct(s.blockAttack)}
@@ -304,6 +400,23 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               value={pct(s.stunAvoid)}
               tip={stunTip(s.stunAvoid)}
             />
+            <Row
+              label="Stun Threshold"
+              value={f0(flat.def.stunThreshold)}
+              tip={stunThresholdTip(flat.def.stunThreshold)}
+            />
+            {AILMENTS.some(([k]) => flat.def.avoid[k] > 0) ? (
+              AILMENTS.filter(([k]) => flat.def.avoid[k] > 0).map(([k, name]) => (
+                <Row
+                  key={k}
+                  label={`Chance to Avoid ${name}`}
+                  value={pct(flat.def.avoid[k])}
+                  tip={GLOSSARY.ailments}
+                />
+              ))
+            ) : (
+              <Row label="Chance to Avoid Ailments" value="0%" tip={GLOSSARY.ailments} />
+            )}
             {of('block').map(totalRow)}
           </Section>
           <Section title="Damage Taken">{of('defenceOther').map(totalRow)}</Section>
@@ -320,13 +433,95 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               tip={manaRegenTip(s, manaRate)}
             />
             {manaRate && totalRow(manaRate)}
+            {flat.def.maxEs > 0 && (
+              <Row
+                label="Energy Shield Recharge"
+                value={`${f1(flat.def.esRecharge)}/s`}
+                raw={`after ${f1(flat.def.esDelay)}s`}
+                tip={GLOSSARY.es}
+              />
+            )}
+            {flatRows(
+              'Life Leech',
+              flat.lifeLeech,
+              (m) => leechValue(m, flat.lifeMult),
+              leechTip('life', flat.def.leechRate),
+            )}
+            {flatRows(
+              'Mana Leech',
+              flat.manaLeech,
+              (m) => leechValue(m, flat.manaMult),
+              leechTip('mana', flat.def.leechRate),
+            )}
+            {flatRows(
+              'Life Gained on Hit',
+              flat.lifeOnHit,
+              (m) => `+${f1(m?.value ?? 0)}`,
+              GLOSSARY.onHit,
+            )}
+            {flatRows(
+              'Mana Gained on Hit',
+              flat.manaOnHit,
+              (m) => `+${f1(m?.value ?? 0)}`,
+              GLOSSARY.onHit,
+            )}
+            {flatRows('Life Gained on Kill', flat.lifeOnKill, plus, GLOSSARY.onKill)}
+            {flatRows('Life Recovered on Kill', flat.lifeOnKillPct, share, GLOSSARY.onKill, false)}
+            {flatRows('Mana Gained on Kill', flat.manaOnKill, plus, GLOSSARY.onKill)}
+            {flatRows('Life Gained on Block', flat.lifeOnBlock, plus, GLOSSARY.onBlock)}
+            {flatRows('Life Recovered on Block', flat.lifeOnBlockPct, share, GLOSSARY.onBlock, false)}
+            {flatRows('Mana Gained on Block', flat.manaOnBlock, plus, GLOSSARY.onBlock)}
             {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
           </Section>
         </div>
         <div class="cs-col lf-panel" data-paint="panel">
-          <Section title="Damage">{of('damage').map(totalRow)}</Section>
+          <Section title="Damage">
+            {of('damage').map(totalRow)}
+            {(flat.penetration.length ? flat.penetration : [null]).map((m) => (
+              <Row
+                key={m ? modLabel(m) : 'pen'}
+                label={titled(
+                  [`${typesWord(m) || 'Elemental'} Penetration`, ...(m ? qualifier(m) : [])].join(' '),
+                )}
+                value={`${f0(m?.value ?? 0)}%`}
+                tip={GLOSSARY.penetration}
+              />
+            ))}
+          </Section>
           <Section title="Speed">{of('speed').map(totalRow)}</Section>
-          <Section title="Critical Strikes">{of('crit').map(totalRow)}</Section>
+          <Section title="Accuracy and Critical Strikes">
+            <Row
+              label="Accuracy Rating"
+              value={f0(flat.accuracy)}
+              tip={hitTip(flat.accuracy, flat.evasion, flat.hitChance)}
+            />
+            <Row
+              label="Chance to Hit"
+              value={pct(flat.hitChance)}
+              tip={hitTip(flat.accuracy, flat.evasion, flat.hitChance)}
+            />
+            <Row
+              label="Critical Strike Multiplier"
+              value={`${f0(
+                BASE_CRIT_MULTI +
+                  flat.critMulti
+                    .filter((m) => !m.tags && !m.condition && !m.damageTypes)
+                    .reduce((n, m) => n + m.value, 0),
+              )}%`}
+              tip={GLOSSARY.crit}
+            />
+            {flat.critMulti
+              .filter((m) => m.tags || m.condition || m.damageTypes)
+              .map((m) => (
+                <Row
+                  key={modLabel(m)}
+                  label={titled(['Critical Strike Multiplier', ...qualifier(m)].join(' '))}
+                  value={`+${f0(m.value)}%`}
+                  tip={GLOSSARY.crit}
+                />
+              ))}
+            {of('crit').map(totalRow)}
+          </Section>
           <Section title="Area and Projectiles">{of('reach').map(totalRow)}</Section>
           <Section title="Ailments" tip={GLOSSARY.ailments}>
             {of('ailments').map(totalRow)}
@@ -338,6 +533,16 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           </Section>
           <Section title="Minions, Totems and Effects" tip={GLOSSARY.minions}>
             {of('offenceOther').map(totalRow)}
+          </Section>
+          <Section title="Charges" tip={GLOSSARY.charges}>
+            {CHARGE_KINDS.map((k) => (
+              <Row
+                key={k}
+                label={`Maximum ${CHARGE_NAMES[k]} Charges`}
+                value={String(ch.chargeMax[k])}
+                tip={`Each charge: ${CHARGE_TEXT[k]}. A charge lasts ${CHARGE_SECONDS} seconds.`}
+              />
+            ))}
           </Section>
           <Section title="Movement and More">
             <Row

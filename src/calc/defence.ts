@@ -95,11 +95,13 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     ? 0
     : (db.sum('base', 'lifeRegen', ctx) + (db.sum('base', 'lifeRegenPct', ctx) / 100) * maxLife) *
       db.mult('lifeRegen', ctx);
-  // Increased mana regeneration scales flat regeneration too (as in the reference game).
+  // Increased mana regeneration scales flat regeneration too (as in the reference game). One Blood, Two Vessels adds the share
+  // of life regenerated a second as the same share of mana.
   const manaRegen =
     (maxMana * ((BASE_MANA_REGEN_PCT + db.sum('base', 'manaRegenPct', ctx)) / 100) +
       db.sum('base', 'manaRegenFlat', ctx)) *
-    db.mult('manaRegen', ctx);
+      db.mult('manaRegen', ctx) +
+    (flag('lifeRegenToMana') && maxLife > 0 ? (lifeRegen / maxLife) * maxMana : 0);
 
   return {
     isPlayer: opts.isPlayer,
@@ -157,6 +159,8 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     leechToEs: flag('leechToES'),
     regenToEs: flag('regenToES'),
     chaosHitsEs: flag('chaosNotBypassEs'),
+    chaosEsShare: clamp(db.sum('base', 'chaosToEs', ctx) / 100, 0, 1),
+    armourVsEle: clamp(db.sum('base', 'armourVsEle', ctx) / 100, 0, 1),
     physTakenAs: physTakenAs(db, ctx),
     damageTakenType: DAMAGE_TYPES.map((t) => db.mult(`damageTaken.${t}`, ctx)),
     unaffectedByShock: flag('unaffectedByShock'),

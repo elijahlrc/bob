@@ -50,7 +50,7 @@ html.leaf .stop-body > .muted {
 html.leaf .stop .muted {
   color: #c7b8c6;
 }
-/* A warning on a stop (the Ferryman's price, a problem with the cart): a vermilion plaque. */
+/* A warning on a stop (the Bloodletter's price, a problem with the cart): a vermilion plaque. */
 html.leaf .stop-warn {
   align-self: center;
   max-width: 100%;
@@ -206,13 +206,10 @@ html.leaf .stop-emblem .se-bottle {
 html.leaf .se-quartermaster .se-bottle:nth-child(2) {
   height: 64px;
 }
-html.leaf .stop-emblem .se-coin {
-  flex: none;
-  width: 44px;
-  height: 44px;
-}
-html.leaf .se-ferryman .se-coin + .se-coin {
-  margin: 20px 0 0 -14px;
+/* The Bloodletter (id ferryman): one tall bottle of life, nearly drained. */
+html.leaf .se-ferryman .se-bottle {
+  width: 60px;
+  height: 100px;
 }
 
 /* ---- The Quartermaster's wares ---- */

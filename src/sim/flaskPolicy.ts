@@ -54,11 +54,14 @@ export const autoFlaskPolicy: FlaskPolicy = (w, s) => {
   const brace = w.effects.length > 0 && braceFor(w, s);
   const cap = lifeCap(p);
   const manaCap = Math.max(0, p.def.maxMana - s.char.reservedMana);
-  // What the Strategy tab sets for each belt slot (thresholds by position unless set).
-  const rules = flaskRules(
-    s.flasks.map((f) => f.spec.kind),
+  // What each belt slot's flask is drunk for (its slot's threshold, a utility flask's condition). The worn flasks skip the
+  // empty slots, so each finds its slot by uid.
+  const belt = s.char.build.flasks;
+  const slotRules = flaskRules(
+    belt.map((f) => s.flasks.find((x) => x.spec.uid === f?.uid)?.spec.kind ?? null),
     s.char.build.strategy,
   );
+  const rules = s.flasks.map((f) => slotRules[belt.findIndex((b) => b?.uid === f.spec.uid)] ?? {});
   let nearbyRare = false;
   let nearbyBoss = false;
   let nearby = 0;

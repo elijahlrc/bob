@@ -28,17 +28,26 @@ export type RespiteCraft =
  */
 export const RESPITE_CRAFT_DUST = [0, 20, 60, 180];
 
+/**
+ * A socket costs more on top, by the socket it adds (index: the item's sockets once it is added) before the item's level: the
+ * first three nothing, a fourth some, a fifth and sixth a great deal, whether or not the craft is the visit's free one (the
+ * owner, 2026-10-29).
+ */
+export const RESPITE_SOCKET_DUST = [0, 0, 0, 0, 40, 150, 400];
+
 const worn = (run: RunState): Item[] =>
   EQUIP_SLOTS.map((s) => run.build.equipment[s]).filter((x): x is Item => !!x);
 
 /** The visit in progress, if the player has crafted at a Respite. */
 export const respiteVisit = (run: RunState) => waysideOf(run).respite;
 
-/** What the next craft of this visit costs on an item. */
-export function respiteCraftCost(run: RunState, it: Item): number {
+/** What the next craft of this visit costs on an item (a socket's own price included). */
+export function respiteCraftCost(run: RunState, it: Item, kind: RespiteCraft['kind']): number {
   const n = respiteVisit(run)?.crafts ?? 0;
   const base = RESPITE_CRAFT_DUST[Math.min(n, RESPITE_CRAFT_DUST.length - 1)];
-  const dust = base ? priceAt(base, it.ilvl) : 0;
+  const next = Math.min(it.sockets.length + 1, RESPITE_SOCKET_DUST.length - 1);
+  const socket = kind === 'socket' ? RESPITE_SOCKET_DUST[next] : 0;
+  const dust = (base ? priceAt(base, it.ilvl) : 0) + (socket ? priceAt(socket, it.ilvl) : 0);
   // Thrifty Hands halves it (docs/ATTRITION.md).
   return heldReward(run, 'thriftyHands') > 0 ? Math.ceil(dust / 2) : dust;
 }
@@ -66,7 +75,7 @@ export function respiteProblem(run: RunState, slot: number, craft: RespiteCraft)
         : 'That item has no affix to raise';
   if (craft.kind === 'tier' && !nextTier(item, craft.family, run.map))
     return 'That affix is at the best tier this level allows';
-  const cost = respiteCraftCost(run, item);
+  const cost = respiteCraftCost(run, item, craft.kind);
   if (run.dust < cost) return `That needs ${cost} Bone Dust`;
   return null;
 }
@@ -78,6 +87,7 @@ export function craftAtRespite(run: RunState, slot: number, craft: RespiteCraft)
   const cost = respiteCraftCost(
     run,
     respiteItems(run, craft.kind).find((it) => it.uid === craft.itemUid)!,
+    craft.kind,
   );
   const res =
     craft.kind === 'affix'

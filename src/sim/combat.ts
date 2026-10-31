@@ -1,3 +1,18 @@
+import { hasRelic } from '../calc/relics';
+import {
+  AGONY_SHARE,
+  FLAYING_REFLECT,
+  HEX_SPREAD_RANGE,
+  REBUKE_COOLDOWN,
+  RIPENING_FLOOR,
+  RIPENING_RATE,
+  REBUKE_STUN,
+  relicDef,
+  THIRSTING_CHARGES,
+  WARRING_RES,
+  WARRING_SECONDS,
+} from '../data/runRewards';
+import type { StatusId } from '../data/statuses';
 import {
   AILMENT_NAMES,
   resolveHit,
@@ -47,7 +62,7 @@ import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/t
 import { bannerStage } from './banners';
 import { invulnerable, reprieveFires } from './reprieve';
 import { rollGains } from './buffs';
-import { gainTrophy, rollCharges } from './charges';
+import { gainCruelty, gainTrophy, gainUntouched, rollCharges, untouchedLeech } from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
 import { mineAuraAt, mineAuraHit, mineBonus } from './deploy';
 import { noteRecover } from './recovery';
@@ -91,8 +106,15 @@ import { corpseBlast, fireTriggers } from './triggers';
 import { scaleProfile } from './shots';
 import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
-import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss } from './afflict';
-import { bossHitPlayer, bossVeiled } from './bosses';
+import {
+  afflictPlayer,
+  bossLocked,
+  flaskWards,
+  isBossSide,
+  lockBoss,
+  stunPlayer,
+} from './afflict';
+import { bossHitPlayer, bossLeechShare, bossRecovery, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
 import { hunted, livingEnemiesOf, MONSTERS } from './side';
 import type { Side } from './side';
@@ -305,6 +327,15 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
       if (total <= 0) return 0;
     }
   }
+  // Shared Agony: the character's minions take a share of it.
+  if (dst.isPlayer && dst.side!.minions.length && hasRelic(dst.side!.build, 'sharedAgony')) {
+    const taken = shareWithMinions(w, dst.side!, total);
+    if (taken > 0) {
+      const f = 1 - taken / total;
+      for (let i = 0; i < 5; i++) dmg[i] *= f;
+      total -= taken;
+    }
+  }
   noteDamage(w, dst, dmg, src);
   const def = dst.def;
   let rest = total - dmg[CHAOS];
@@ -314,6 +345,10 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   if (def.chaosHitsEs) {
     rest += chaos;
     chaos = 0;
+  } else if (def.chaosEsShare > 0) {
+    const moved = chaos * def.chaosEsShare;
+    rest += moved;
+    chaos -= moved;
   }
   // ES absorbs non-chaos damage first (unless it protects mana instead).
   let esTaken = 0;
@@ -323,6 +358,12 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
     dst.es -= a;
     rest -= a;
     esTaken = a;
+  }
+  if (!def.esProtectsMana && dst.brim && rest > 0) {
+    const a = Math.min(dst.brim, rest);
+    dst.brim -= a;
+    rest -= a;
+    esTaken += a;
   }
   let lifeDmg = rest + chaos;
   if (def.manaBeforeLife > 0 && dst.mana > 0) {
@@ -335,6 +376,7 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
   dst.life -= lifeDmg;
   if (dst.life <= 0) dst.overkill = -dst.life;
   dst.since.damaged = 0;
+  if (dst.isPlayer) dst.side!.esNow = false;
   if (dst.isPlayer && dst.side!.opts.godMode && dst.life <= 0) dst.life = 1;
   if (dst.isPlayer) dst.side!.stats.damageTaken += total;
   noteDealt(w, dst, dmg, total, src);
@@ -396,6 +438,84 @@ export function knockBack(w: World, src: Actor, dst: Actor, dist: number): void 
   dst.y = y;
 }
 
+/** An attack on the character missed: Blood of the Untouched stacks, The Unseen Ward starts the energy shield recharging. */
+function evaded(w: World, s: Side): void {
+  gainUntouched(w, s);
+  if (hasRelic(s.build, 'unseenWard')) s.esNow = true;
+}
+
+/**
+ * The Shield's Rebuke: a blocked attacker is stunned a moment (half as long for a boss), and the same one not again for
+ * `REBUKE_COOLDOWN` seconds.
+ */
+function rebuke(w: World, s: Side, src: Actor): void {
+  if (!hasRelic(s.build, 'shieldsRebuke') || !src.alive) return;
+  const rebuked = (s.rebuked ??= new Map());
+  if ((rebuked.get(src.id) ?? 0) > w.t) return;
+  const boss = src.rarity === 'boss' || src.rarity === 'miniboss';
+  const dur = REBUKE_STUN * (boss ? 0.5 : 1);
+  if (src.isPlayer) {
+    if (stunPlayer(w, src.side!, dur, false)) rebuked.set(src.id, w.t + REBUKE_COOLDOWN);
+    return;
+  }
+  if (src.stunT > 0 || src.graceT > 0) return;
+  rebuked.set(src.id, w.t + REBUKE_COOLDOWN);
+  src.stunT = dur;
+  src.action = null;
+  w.events.push({ t: 'stun', dst: src.id, dur });
+}
+
+/** The Spreading Hex: the curses on an enemy that dies pass to the nearest enemy near it, for the time they had left. */
+function spreadHexes(w: World, s: Side, dead: Actor): void {
+  if (!dead.hexes.length || !hasRelic(s.build, 'spreadingHex')) return;
+  let best: Actor | null = null;
+  let bd = HEX_SPREAD_RANGE;
+  for (const e of w.actors) {
+    if (!e.alive || e === dead || e.team !== dead.team || e.phaseT > 0) continue;
+    const d = Math.hypot(e.x - dead.x, e.y - dead.y);
+    if (d <= bd) {
+      best = e;
+      bd = d;
+    }
+  }
+  if (best)
+    for (const h of dead.hexes)
+      applyHex(w, best, h.id, h.effect, s.char.hexLimit, h.level, Math.max(1, h.t));
+}
+
+/**
+ * Shared Agony: the character's standing minions take a share of a blow instead of it, split evenly; what a minion cannot
+ * hold is lost with it. Returns what the minions took.
+ */
+function shareWithMinions(w: World, s: Side, total: number): number {
+  const standing = s.minions.filter((m) => m.alive && m.t > 0);
+  if (!standing.length) return 0;
+  const share = total * AGONY_SHARE;
+  for (const m of standing) {
+    m.life -= share / standing.length;
+    m.since.damaged = 0;
+    if (m.life <= 0) killActor(w, m);
+  }
+  return share;
+}
+
+/** The Ripening Wound: the critical strike chance (percent) that has grown since the character's last critical strike. */
+function ripening(w: World, s: Side): number {
+  return RIPENING_FLOOR + RIPENING_RATE * (w.t - (s.critAt ?? -1));
+}
+
+/** The statuses Elements at War puts on a target, by element (index 1 to 3, lightning, cold, fire). */
+const TORN: Record<number, StatusId> = { 1: 'tornLightning', 2: 'tornCold', 3: 'tornFire' };
+
+/** Elements at War: each element a hit dealt lowers the target's resistances to the other two. */
+function warElements(w: World, s: Side, dst: Actor, dmg: readonly number[]): void {
+  if (!hasRelic(s.build, 'warringElements')) return;
+  for (let e = 1; e <= 3; e++)
+    if (dmg[e] > 0)
+      for (let o = 1; o <= 3; o++)
+        if (o !== e) applyStatus(w, dst, TORN[o], { seconds: WARRING_SECONDS, v: WARRING_RES });
+}
+
 /** Apply a resolved hit from `src` to `dst`, including leech, ailments, stun and kill effects. */
 export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res: HitResult): void {
   if (src.isPlayer) {
@@ -416,6 +536,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (res.outcome === 'miss') {
     w.events.push({ t: 'miss', src: src.id, dst: dst.id });
     if (how) noteMiss(w, dst, how, false);
+    if (dst.isPlayer && p.isAttack && src.team !== dst.team) evaded(w, dst.side!);
     wake(w, dst);
     return;
   }
@@ -533,6 +654,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     }
     wake(w, dst);
     if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
+    if (dst.isPlayer && p.isAttack && src.team !== dst.team) rebuke(w, dst.side!, src);
     // A skill that wears blocking down leaves a blocking enemy Overpowered.
     if (src.isPlayer && dst.team !== src.team) rollStatuses(w, dst, p, true);
     return;
@@ -585,6 +707,10 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (src.isPlayer) {
       rollCharges(w, src.side!, 'crit', p.gains);
       rollGains(w, src.side!, 'crit', p.gains);
+      if (dst.team !== src.team) {
+        gainCruelty(w, src.side!);
+        src.side!.critAt = w.t;
+      }
     }
     if (p.overload) src.since.overload = 0;
   }
@@ -600,11 +726,20 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     src.def.instantLeech || p.instantLeechAlways || (res.crit && p.instantLeechOnCrit);
   let ll = 0;
   let lm = 0;
-  if (!dst.def.cannotBeLeechedFrom)
+  // A boss fight may cut it (docs/ATTRITION.md): the veiled Duellist gives none, Cinder half, the Witnesses take a share.
+  const leechShare = dst.enc ? bossLeechShare(dst) * (src.isPlayer ? bossRecovery(w) : 1) : 1;
+  if (!dst.def.cannotBeLeechedFrom) {
     for (let i = 0; i < 5; i++) {
-      ll += res.dmg[i] * p.leechLife[i];
-      lm += res.dmg[i] * p.leechMana[i];
+      ll += res.dmg[i] * p.leechLife[i] * leechShare;
+      lm += res.dmg[i] * p.leechMana[i] * leechShare;
     }
+    // Blood of the Untouched: the attacks of a character that has been evading leech more.
+    if (src.isPlayer && p.isAttack && dst.team !== src.team) {
+      const extra = untouchedLeech(w, src.side!);
+      if (extra > 0)
+        ll += (res.dmg[0] + res.dmg[1] + res.dmg[2] + res.dmg[3] + res.dmg[4]) * extra * leechShare;
+    }
+  }
   if (src.def.leechToEs && instant) {
     const es0 = src.es;
     src.es = Math.min(src.def.maxEs, src.es + ll);
@@ -614,7 +749,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   // Energy shield leeched from the damage (Ward Siphon).
   let le = 0;
   if (!dst.def.cannotBeLeechedFrom)
-    for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0);
+    for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0) * leechShare;
   if (le > 0) addLeech(src, 'es', le, instant);
   if (p.lifeOnHit > 0) {
     const l0 = src.life;
@@ -645,6 +780,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   if (wasAlive && dst.alive) {
     if (src.isPlayer) {
       rollStatuses(w, dst, p, false, res);
+      if (dst.team !== src.team) warElements(w, src.side!, dst, res.dmg);
       // Open Wounds: a chance to be maimed by an attack.
       if (p.isAttack && dst.hex.more.maimHit > 0 && w.rngTrig.chance(dst.hex.more.maimHit))
         applyStatus(w, dst, 'maim', { seconds: 4 });
@@ -684,6 +820,30 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     if (share > 0)
       rawHit(w, src, res.total * share, 0, null, 'Thorns', 'player', undefined, dst.id);
   }
+  // Wrath That Flays Its Bearer: every two-handed melee attack hit throws a share of its damage back, in its own types, through
+  // the character's own defences (two-handed melee only, like its speed: the owner, 2026-10-30).
+  if (
+    src.isPlayer &&
+    wasAlive &&
+    p.isAttack &&
+    dst.team !== src.team &&
+    hasRelic(src.side!.build, 'flayingWrath') &&
+    src.side!.char.weaponTags.has('twoHand') &&
+    maskIntersects(p.tagMask, tagBit('melee'))
+  )
+    for (let i = 0; i < 5; i++)
+      if (res.dmg[i] > 0)
+        rawHit(
+          w,
+          src,
+          res.dmg[i] * FLAYING_REFLECT,
+          i,
+          null,
+          relicDef('flayingWrath').name,
+          'player',
+          undefined,
+          dst.id,
+        );
   if (dst.isPlayer && src.mon) onMonsterHitPlayer(w, src, dst, p);
   const afterHit = () => {
     if (src.isPlayer)
@@ -896,6 +1056,12 @@ export function hit(
     consecratedAt(src.side!, dst.x, dst.y)
   )
     h = { ...h, critChance: h.critChance * CRIT_ON_CONSECRATED };
+  // The Ripening Wound: the chance grows each second since the last critical strike, from below the character's own.
+  if (src.isPlayer && dst.team !== src.team && hasRelic(src.side!.build, 'ripeningWound'))
+    h = {
+      ...h,
+      critChance: Math.min(1, Math.max(0, h.critChance + ripening(w, src.side!) / 100)),
+    };
   // The Veiled Duellist's veil: nothing crits it while it is up (docs/BOSSES.md 5b).
   const veiled = dst.enc !== undefined && bossVeiled(dst);
   if (veiled) h = { ...h, critChance: 0 };
@@ -975,9 +1141,10 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
   // A hobble is a chill: whatever keeps a chill off keeps it off (docs/BOSSES.md 11.2).
   if (hobbles) afflictPlayer(w, dst.side!, 'chill', 0.3, 2);
-  // Emergencies for builds that sustain themselves (docs/ATTRITION.md): a withering hit stops life regeneration, a
-  // shield-breaking one holds the energy shield recharge off longer (the recharge waits on the time since a hit).
-  if (src.modIds.includes('withering')) applyStatus(w, dst, 'regenLess', { seconds: 3, v: 100 });
+  // Emergencies for builds that sustain themselves (docs/ATTRITION.md): a withering or scarring hit stops life
+  // regeneration (Scarred), a shield-breaking one holds the energy shield recharge off longer (the recharge waits on the
+  // time since a hit).
+  if (src.modIds.includes('withering') || src.mon?.kind.scars) applyStatus(w, dst, 'scar');
   if (src.modIds.includes('shieldbreaking'))
     dst.since.damaged = Math.min(dst.since.damaged, -SHIELDBREAK_SECONDS);
   if (src.mon?.kind.bossOnly) bossHitPlayer(w, dst.side!, src);
@@ -1101,6 +1268,11 @@ export function rawHit(
       const red = Math.min(0.9, def.armour / (def.armour + 10 * dmg[0]) + def.physReduction);
       dmg[0] *= 1 - red;
     } else {
+      // The Mountain's Hide: a share of armour meets an elemental hit before the resistance does.
+      if (i !== CHAOS && def.armourVsEle > 0) {
+        const a = def.armour * def.armourVsEle;
+        dmg[i] *= 1 - Math.min(0.9, a / (a + 10 * dmg[i]));
+      }
       const shift = dst.resShift.v[i] - dst.hex.res[i] - st.res[i];
       const r = Math.max(-200, Math.min(def.res[i] + shift, def.maxRes[i]));
       dmg[i] *= 1 - r / 100;
@@ -1235,6 +1407,12 @@ function killGains(
       f.spec.maxCharges,
       f.charges + weight * Math.max(0, perKill + f.spec.chargesPerKill),
     );
+  // The Thirsting Cup: the flask in the belt's first slot gains half a charge for every kill (relic 3).
+  if (hasRelic(fs.build, 'thirstingCup')) {
+    const first = fs.build.flasks[0];
+    const f = first && fs.flasks.find((x) => x.spec.uid === first.uid);
+    if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + THIRSTING_CHARGES);
+  }
   const lok =
     fs.char.db.sum('base', 'lifeOnKill', kctx) +
     (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
@@ -1311,6 +1489,7 @@ export function killActor(w: World, a: Actor): void {
   const p = fs.player;
   if (!a.noReward) {
     fs.stats.kills++;
+    if (a.rarity === 'rare') fs.stats.rares++;
     p.since.kill = 0;
     const xp =
       (a.mon?.xp ?? 0) * levelPenalty(fs.build.level, a.mon?.spec.level ?? 1) * w.plan.xpMult;
@@ -1327,6 +1506,7 @@ export function killActor(w: World, a: Actor): void {
     // Killing an enemy under a hex that fills flasks (Mark of Plenty) doubles what the flasks gain.
     const cause0 = causes.get(a);
     const hexFlasks = cause0?.minion ? 0 : hexKill(w, a);
+    spreadHexes(w, fs, a);
     killGains(w, fs, kind, hexFlasks);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {
@@ -1577,9 +1757,11 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   // Regeneration (a Bursar or the Treasurer near the player stops it, with leech and the recharge of energy shield).
   const cap = lifeCap(a);
   const suppressed = a.suppressT > 0;
-  // A Rime Core leaves an enemy regenerating very little.
-  const regen = def.lifeRegen * (a.fx.regenLess ? 1 - a.fx.regenLess.v / 100 : 1);
-  if (!suppressed && regen > 0) {
+  // A Rime Core leaves an enemy regenerating very little; a scar stops life regeneration.
+  // The Magistrate's Witnesses take a share off the character's recovery (docs/ATTRITION.md).
+  const recovery = a.isPlayer ? bossRecovery(w) : 1;
+  const regen = def.lifeRegen * (a.fx.regenLess ? 1 - a.fx.regenLess.v / 100 : 1) * recovery;
+  if (!suppressed && regen > 0 && !a.fx.scar) {
     if (def.regenToEs) a.es = Math.min(def.maxEs, a.es + regen * dt);
     else a.life = Math.min(cap, a.life + regen * dt);
   }
@@ -1630,9 +1812,13 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   noteRecover(a, 'life', a.life - life0);
   noteRecover(a, 'es', a.es - es0);
   if (def.esRegen > 0 && a.es < def.maxEs) a.es = Math.min(def.maxEs, a.es + def.esRegen * dt);
-  // ES recharge.
-  if (def.maxEs > 0 && a.es < def.maxEs && a.since.damaged >= def.esDelay)
-    a.es = Math.min(def.maxEs, a.es + def.esRecharge * dt);
+  // ES recharge (at once after an evaded attack, with The Unseen Ward).
+  if (
+    def.maxEs > 0 &&
+    a.es < def.maxEs &&
+    (a.since.damaged >= def.esDelay || (a.isPlayer && a.side!.esNow))
+  )
+    a.es = Math.min(def.maxEs, a.es + def.esRecharge * recovery * dt);
 }
 
 /** The side that put most of the damage over time on an actor, whose the kill is if it dies of it (none when no side's). */

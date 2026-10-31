@@ -46,38 +46,22 @@ export function moveSkill(run: RunState, list: number[], gemUid: number, dir: -1
 /** Set one of the global settings; undefined puts it back to its default. */
 export function setStrategyOption(
   run: RunState,
-  patch: Pick<Strategy, 'target' | 'spacing' | 'lifeFlask' | 'utilityFlask'>,
+  patch: Pick<Strategy, 'target' | 'spacing' | 'utilityFlask'>,
 ): void {
   setStrategy(run, { ...(run.build.strategy ?? {}), ...patch });
 }
 
-/**
- * One belt slot's setting (docs/ATTRITION.md): its threshold (a hybrid's life threshold), a hybrid's mana threshold or, for a
- * utility flask, its condition.
- */
-export function setFlaskRule(
-  run: RunState,
-  slot: number,
-  patch: { at?: number; manaAt?: number; use?: UtilityFlaskUse },
-): void {
+/** One belt slot's setting (docs/ATTRITION.md): a utility flask's condition. */
+export function setFlaskRule(run: RunState, slot: number, patch: { use: UtilityFlaskUse }): void {
   const s = run.build.strategy ?? {};
   // Holes would not survive a save: an unset slot is null.
-  const fill = <T>(xs: (T | null)[] | undefined, v: T | undefined): (T | null)[] => {
-    const out = Array.from(
-      { length: Math.max(xs?.length ?? 0, slot + 1) },
-      (_, i) => xs?.[i] ?? null,
-    );
-    if (v !== undefined) out[slot] = v;
-    return out;
-  };
-  setStrategy(run, {
-    ...s,
-    flasks: {
-      at: fill(s.flasks?.at, patch.at),
-      manaAt: fill(s.flasks?.manaAt, patch.manaAt),
-      use: fill(s.flasks?.use, patch.use),
-    },
-  });
+  const xs = s.flasks?.use;
+  const use = Array.from(
+    { length: Math.max(xs?.length ?? 0, slot + 1) },
+    (_, i) => xs?.[i] ?? null,
+  );
+  use[slot] = patch.use;
+  setStrategy(run, { ...s, flasks: { ...s.flasks, use } });
 }
 
 /** Back to the defaults: every skill its usual role, every setting its default. */

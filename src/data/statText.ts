@@ -275,6 +275,13 @@ export const PER_TEXT: Record<string, string> = {
   dex: 'Dexterity',
   int: 'Intelligence',
   level: 'Level',
+  minAttr: 'of your lowest Attribute',
+  accuracy: 'Accuracy',
+  incArmour: '% increased Armour',
+  'inc:moveSpeed': '% increased Movement Speed',
+  'overcap.fire': '% Fire Resistance above the cap',
+  'overcap.cold': '% Cold Resistance above the cap',
+  'overcap.lightning': '% Lightning Resistance above the cap',
 };
 
 // ---- Stats added by the depth expansion (EXPANSION 5.3) ---------------------------------------

@@ -97,6 +97,8 @@ export type Actor = {
   alive: boolean;
   life: number;
   es: number;
+  /** Energy shield beyond the character's own that fades (The Brimming Ward, relic 5); it takes hits after `es`. */
+  brim?: number;
   mana: number;
   /** Cached defence for the current state. */
   def: Defence;
@@ -338,6 +340,8 @@ export type GroundEffect = {
   /** Seconds it stuns the character it lands on, and an ailment it puts on it (a toll's shock). */
   stun?: number;
   afflict?: { kind: 'shock' | 'chill' | 'freeze' | 'ignite'; value: number; seconds: number };
+  /** Drinks' worth of charges it knocks out of every worn flask of the character it lands on (the Courser's trample). */
+  trample?: number;
 };
 
 /**

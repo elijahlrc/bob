@@ -1,3 +1,4 @@
+import { hasRelic } from '../calc/relics';
 import type { ComponentChildren } from 'preact';
 import type { Character, SkillChoice } from '../calc/character';
 import { rolesFor, takesWhen, type RotationEntry } from '../calc/strategy';
@@ -5,8 +6,8 @@ import {
   ESCAPE_LIFE_CHOICES,
   EVERY_CHOICES,
   LIFE_CHOICES,
-  FLASK_AT_CHOICES,
   flaskRules,
+  flaskSlotAt,
   ROLE_NAMES,
   SPACING_NAMES,
   STRATEGY_DEFAULTS,
@@ -63,12 +64,14 @@ function Pick<T extends string | number>(p: {
   options: [T, string][];
   onChange: (v: T) => void;
   title?: string;
+  disabled?: boolean;
 }) {
   return (
     <label class="st-ctl" {...hoverInfo(p.title)}>
       <span class="st-lbl">{p.label}</span>
       <span class="st-sel" data-paint="panel" data-thin>
         <select
+          disabled={p.disabled}
           value={String(p.value)}
           onChange={(e) => {
             const raw = (e.target as HTMLSelectElement).value;
@@ -104,6 +107,12 @@ function SkillRow(p: {
   const ownCooldown = choice.skill.cooldown !== undefined;
   const starred = ch.build.primaryGem === uid;
   const note = entryNote(ch, e);
+  // Two copies of a skill (different supports) are told apart by their supports.
+  const twin = [...ch.mains, ...ch.rotation, ...ch.unused].some(
+    (x) => x.choice !== choice && x.choice.skill.id === choice.skill.id,
+  );
+  // Blind Fury (relic 18) takes the attacks' conditions away.
+  const blind = hasRelic(ch.build, 'blindFury') && choice.skill.tags.includes('attack');
   return (
     <li class={'st-skill' + (e.role === 'off' ? ' off' : '') + (p.mark === 'none' ? ' bare' : '')}>
       {p.mark === 'n' && (
@@ -120,6 +129,13 @@ function SkillRow(p: {
         <div class="st-name">
           {choice.skill.name}
           {starred && p.mark !== 'star' && <span class="st-star"> ★</span>}{' '}
+          {twin && (
+            <span class="st-kind">
+              {choice.supports.length
+                ? 'with ' + choice.supports.map((x) => x.def.name).join(', ')
+                : 'no supports'}
+            </span>
+          )}{' '}
           {choice.skill.utility ? (
             <span class="st-kind">utility</span>
           ) : (
@@ -140,6 +156,8 @@ function SkillRow(p: {
             <Pick<SkillWhen>
               label="When"
               value={e.when}
+              disabled={blind}
+              title={blind ? BLIND_FURY : undefined}
               options={(Object.keys(WHEN_NAMES) as SkillWhen[]).map((w) => [w, WHEN_NAMES[w]])}
               onChange={(when) => set({ when: when === 'any' ? undefined : when })}
             />
@@ -298,7 +316,8 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
   const warning = mainsWarning(ch);
   const opt = (patch: Parameters<typeof setStrategyOption>[1]) =>
     c.act((r) => setStrategyOption(r, patch));
-  const target = s.target ?? STRATEGY_DEFAULTS.target;
+  const blind = hasRelic(run.build, 'blindFury');
+  const target = blind ? STRATEGY_DEFAULTS.target : (s.target ?? STRATEGY_DEFAULTS.target);
   const spacing = s.spacing ?? STRATEGY_DEFAULTS.spacing;
   const empty = ch.mains.length + ch.rotation.length + ch.unused.length === 0;
   const first = (
@@ -396,6 +415,8 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
               <Pick<TargetPriority>
                 label="Target"
                 value={target}
+                disabled={blind}
+                title={blind ? BLIND_FURY : undefined}
                 options={(Object.keys(TARGET_NAMES) as TargetPriority[]).map((k) => [
                   k,
                   TARGET_NAMES[k],
@@ -413,7 +434,7 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
               />
             </div>
             <ul class="st-says">
-              <li>{TARGET_TEXT[target]}</li>
+              <li>{blind ? BLIND_FURY : TARGET_TEXT[target]}</li>
               <li>{SPACING_TEXT[spacing]}</li>
             </ul>
           </section>
@@ -424,6 +445,9 @@ export function Strategy({ c, ch }: { c: Controller; ch: Character }) {
     </div>
   );
 }
+
+/** What Blind Fury says where it locks a choice (relic 18). */
+const BLIND_FURY = 'Blind Fury: attacks go at the nearest enemy, whatever it is.';
 
 const TARGET_TEXT: Record<TargetPriority, string> = {
   nearest: 'Fights the nearest enemy, switching as others come nearer; nests and pylons first.',
@@ -440,69 +464,65 @@ const SPACING_TEXT: Record<Spacing, string> = {
   kite: 'A ranged character stands at full range and steps back when an enemy comes within 3 tiles, if its target stays in reach.',
 };
 
-/** The belt's own settings (docs/ATTRITION.md): every worn flask in belt order, with what it is drunk for. */
+/**
+ * The belt (docs/ATTRITION.md): every slot with the share of life or mana its flask is drunk below, and a utility flask's
+ * condition.
+ */
 function FlaskBelt({ c, ch }: { c: Controller; ch: Character }) {
   const run = c.run!;
   const belt = run.build.flasks;
   const kinds = belt.map((f) => (f ? flaskBase(f.baseId).kind : null));
   const rules = flaskRules(kinds, run.build.strategy);
   if (!belt.some(Boolean)) return null;
+  const POOL = { life: 'life', mana: 'mana', hybrid: 'life or mana' } as const;
   return (
     <section class="lf-panel st-group" data-paint="panel">
       <h4 class="lf-h">Flasks</h4>
-      <div class="st-ctls two">
+      <ol class="st-belt">
         {belt.map((f, slot) => {
-          if (!f) return null;
-          const spec = ch.flasks.find((s) => s.uid === f.uid);
+          const kind = kinds[slot];
+          const spec = f && ch.flasks.find((s) => s.uid === f.uid);
           const max = spec?.maxCharges ?? 0;
-          const have = Math.floor(max * (run.vitals.flasks[f.uid] ?? 1));
-          const label = `${slot + 1}. ${f.name} · ${have}/${max}`;
-          const rule = rules[slot];
-          if (kinds[slot] === 'utility')
-            return (
-              <Pick<UtilityFlaskUse>
-                key={slot}
-                label={label}
-                value={rule.use!}
-                options={(Object.keys(UTILITY_FLASK_NAMES) as UtilityFlaskUse[]).map((k) => [
-                  k,
-                  UTILITY_FLASK_NAMES[k],
-                ])}
-                onChange={(v) => c.act((r) => setFlaskRule(r, slot, { use: v }))}
-              />
-            );
-          const threshold = (
-            pool: 'life' | 'mana',
-            at: number,
-            key: 'at' | 'manaAt',
-            lbl: string,
-          ) => (
-            <Pick<number>
-              key={`${slot}${key}`}
-              label={lbl}
-              value={at}
-              options={[...new Set([...FLASK_AT_CHOICES, at])]
-                .sort((a, b) => a - b)
-                .map((v): [number, string] => [v, `Below ${pct(v)} ${pool}`])}
-              onChange={(v) => c.act((r) => setFlaskRule(r, slot, { [key]: v }))}
-            />
+          const have = f ? Math.floor(max * (run.vitals.flasks[f.uid] ?? 1)) : 0;
+          return (
+            <li key={slot} class="st-slot" data-kind={kind ?? 'empty'}>
+              <b class="st-at">{pct(flaskSlotAt(slot))}</b>
+              <span class="st-flask">
+                {f ? f.name : 'Empty'}
+                {f && (
+                  <small>
+                    {have}/{max}
+                    {kind && kind !== 'utility' && ` · ${POOL[kind]}`}
+                  </small>
+                )}
+              </span>
+              {kind === 'utility' && (
+                <span class="st-sel" data-paint="panel" data-thin>
+                  <select
+                    aria-label={`When ${f!.name} is drunk`}
+                    value={rules[slot].use}
+                    onChange={(e) =>
+                      c.act((r) =>
+                        setFlaskRule(r, slot, {
+                          use: (e.target as HTMLSelectElement).value as UtilityFlaskUse,
+                        }),
+                      )
+                    }
+                  >
+                    {(Object.keys(UTILITY_FLASK_NAMES) as UtilityFlaskUse[]).map((k) => (
+                      <option key={k} value={k}>
+                        {UTILITY_FLASK_NAMES[k]}
+                      </option>
+                    ))}
+                  </select>
+                </span>
+              )}
+            </li>
           );
-          // A hybrid flask is drunk below either of its thresholds.
-          if (kinds[slot] === 'hybrid')
-            return [
-              threshold('life', rule.life!, 'at', label),
-              threshold('mana', rule.mana!, 'manaAt', `${slot + 1}. ${f.name}, for mana`),
-            ];
-          return kinds[slot] === 'mana'
-            ? threshold('mana', rule.mana!, 'at', label)
-            : threshold('life', rule.life!, 'at', label);
         })}
-      </div>
+      </ol>
       <ul class="st-says">
-        <li>
-          Life and mana flasks drink in belt order: the first earliest, the last kept for the worst
-          moment.
-        </li>
+        <li>A flask is drunk when life or mana falls below its slot's number.</li>
       </ul>
     </section>
   );

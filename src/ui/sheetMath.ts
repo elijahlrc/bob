@@ -6,6 +6,9 @@ import {
   BASE_MANA_REGEN_PCT,
   BASE_MOVE_SPEED,
   ES_RECHARGE_RATE,
+  LEECH_INSTANCE_MAX,
+  LEECH_RATE_CAP,
+  LEECH_RATE_PER_INSTANCE,
   MIN_HIT_CHANCE,
 } from '../data/constants';
 import { GLOSSARY } from '../data/glossary';
@@ -155,6 +158,32 @@ export function lifeRegenTip(s: CharacterSheet, rate: StatTotal | undefined): st
       (s.life > 0 && s.lifeRegen > 0
         ? `, ${f1((s.lifeRegen / s.life) * 100)}% of your life.`
         : '.'),
+  );
+}
+
+/** Chance to hit: the accuracy against a typical monster of the area's evasion. */
+export function hitTip(accuracy: number, evasion: number, hc: number): string {
+  return lines(
+    GLOSSARY.accuracy,
+    `Chance to hit = ${ACCURACY_FACTOR} × accuracy ÷ (accuracy + (evasion ÷ 4)^0.8), from ${pc(MIN_HIT_CHANCE)} to 100%.`,
+    `Your ${f0(accuracy)} accuracy against a typical monster here (${f0(evasion)} evasion): you hit ${pc(hc)}. Spells always hit.`,
+  );
+}
+
+/** Stun threshold: how a hit's damage against it makes the chance to be stunned. */
+export function stunThresholdTip(threshold: number): string {
+  return lines(
+    GLOSSARY.stun,
+    `A hit's chance to stun you is twice its damage against ${f0(threshold)}: one that deals ${f0(threshold / 2)} always stuns.`,
+  );
+}
+
+/** Leech: what it is, and how fast it comes back (the caps, at the character's leech rate). */
+export function leechTip(pool: 'life' | 'mana', rate: number): string {
+  const p = (v: number) => `${Math.round(v * 1000) / 10}%`;
+  return lines(
+    GLOSSARY.leech,
+    `Each hit's ${pool} comes back over time, ${p(LEECH_RATE_PER_INSTANCE * rate)} of maximum ${pool} a second, and at most ${p(LEECH_RATE_CAP * rate)} a second from all hits together. One hit gives at most ${p(LEECH_INSTANCE_MAX)}.`,
   );
 }
 

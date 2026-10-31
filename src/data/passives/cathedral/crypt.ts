@@ -78,9 +78,9 @@ export const crypt: AreaSpec = {
           id: 'm5',
           kind: 'notable',
           name: 'Glass Wall',
-          lines: [shieldSpellBlock(4), shieldDef(15), esFlat(15)],
+          lines: [shieldSpellBlock(4), shieldDef(15), esFlat(11)],
           at: P(1850, 1250),
-          why: 'Spell block behind a shield, shield defences and flat shield: 2 + 1 + 1 units.',
+          why: 'Spell block behind a shield, shield defences and flat shield: 2 + 1 + 1 units. The flat shield was 15 before the energy shield cut of docs/ATTRITION.md.',
         },
         {
           id: 'm6',

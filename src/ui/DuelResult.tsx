@@ -59,6 +59,7 @@ export function DuelResultView({ c }: { c: Controller }) {
         {survivor !== null &&
           ` · ${survivor === 0 ? 'you' : names[1]} left with ${Math.round(result.sides[survivor].lifeLeft * 100)}% of ${survivor === 0 ? 'your' : 'its'} life`}
       </p>
+      {d.stop && result.winner !== 0 && <p class="sum-who">You live. Only the level is spent.</p>}
       {result.sides[0].reprievesHeld > 0 && (
         <p class="sum-who duel-reprieves">
           Reprieves used: you {result.sides[0].reprieves} of {result.sides[0].reprievesHeld} ·{' '}
@@ -71,9 +72,11 @@ export function DuelResultView({ c }: { c: Controller }) {
         </p>
       )}
       <div class="menu row">
-        <button class="btn primary" onClick={() => c.againDuel()}>
-          Again
-        </button>
+        {!d.stop && (
+          <button class="btn primary" onClick={() => c.againDuel()}>
+            Again
+          </button>
+        )}
         {d.rival && (
           <button class="btn" onClick={() => c.leaveDuel('rivals')}>
             Another rival

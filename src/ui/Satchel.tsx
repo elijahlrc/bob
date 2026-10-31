@@ -19,10 +19,13 @@ export function ProvisionCard({
   id,
   extra,
   plaque,
+  field,
 }: {
   id: string;
   extra?: preact.ComponentChildren;
   plaque?: 'thin' | 'heavy';
+  /** The plaque's ramp, when it is not lapis (leaf/ramps.ts): vermilion for one marked to be thrown away. */
+  field?: string;
 }) {
   const d = provisionDef(id);
   const family = isReprieveId(id) ? reprieveDef(id).family : null;
@@ -31,7 +34,8 @@ export function ProvisionCard({
       class={`provision ${d.kind}${family ? ` ${family}` : ''}`}
       data-paint={plaque ? 'panel' : undefined}
       data-thin={plaque === 'thin' ? '' : undefined}
-      data-pk={plaque}
+      data-field={plaque ? field : undefined}
+      data-pk={plaque && field ? `${plaque}${field}` : plaque}
     >
       <div class="provision-name">
         <span class="provision-title">{d.name}</span>

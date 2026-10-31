@@ -21,7 +21,7 @@ export const FACTION_ASKS: Record<FactionId, string> = {
 
 /** What every monster of a faction does, where the faction has such a rule. */
 export const FACTION_RULES: Partial<Record<FactionId, string>> = {
-  hollow: 'Ethereal: takes 50% less physical damage and cannot bleed.',
+  hollow: 'Ethereal: takes 50% less physical damage, cannot bleed and cannot be leeched from.',
   reliquary: 'Core Golems are immune to one element and its ailments.',
   kennel: 'Hounds leap from a distance; Handlers speed the pack up.',
   gilded: 'Cutpurses steal flask charges; Bursars stop your recovery.',
@@ -161,7 +161,9 @@ export type ThreatTag =
   | 'salvos'
   | 'lanes'
   | 'patterns'
-  | 'guards';
+  | 'guards'
+  | 'scarring'
+  | 'bloodless';
 
 export const TAG_ORDER: ThreatTag[] = [
   'ranged',
@@ -187,6 +189,8 @@ export const TAG_ORDER: ThreatTag[] = [
   'lanes',
   'patterns',
   'guards',
+  'scarring',
+  'bloodless',
 ];
 
 export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
@@ -264,31 +268,45 @@ export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
     name: 'Guards',
     text: 'Some cannot be hurt for a moment (a shield, plates, stone, a sanctuary): damage over time, many quick hits and a stun get through.',
   },
+  scarring: {
+    name: 'Scarring',
+    text: 'Their hits stop your life regeneration for a few seconds: leech, energy shield and flasks help.',
+  },
+  bloodless: {
+    name: 'Bloodless',
+    text: 'Cannot be leeched from: regeneration and flasks help.',
+  },
 };
 
 /** The tags each type carries (besides `ranged`, which follows from how it attacks). */
 export const TYPE_TAGS: Partial<Record<MonsterTypeId, ThreatTag[]>> = {
-  gnawer: ['swarm', 'ailments'],
+  gnawer: ['swarm', 'ailments', 'scarring'],
   bat: ['swarm', 'fliers'],
-  wisp: ['swarm', 'drains'],
+  wisp: ['swarm', 'drains', 'bloodless'],
   hexer: ['hexes'],
   hag: ['summoners'],
   nest: ['spawners', 'swarm'],
-  gloomstalker: ['blinkers'],
+  gloomstalker: ['blinkers', 'bloodless'],
   choirmaster: ['healers'],
-  wight: ['healers'],
+  wight: ['healers', 'bloodless'],
   pylon: ['healers', 'armoured'],
-  sentinel: ['armoured'],
+  sentinel: ['armoured', 'scarring'],
   golem: ['immunities', 'clouds'],
   bloater: ['clouds'],
   spitter: ['ailments'],
-  crawler: ['swarm', 'holders'],
-  wrack: ['holders'],
+  crawler: ['swarm', 'holders', 'scarring'],
+  wrack: ['holders', 'scarring'],
   cinderling: ['swarm'],
   slagworm: ['blinkers'],
   leech: ['swarm', 'holders', 'drains'],
   drowner: ['blinkers'],
   heap: ['armoured'],
   spinner: ['holders'],
-  wailer: ['ailments'],
+  wailer: ['ailments', 'bloodless'],
+  brute: ['scarring'],
+  slagbrute: ['scarring'],
+  gorger: ['scarring'],
+  flagellant: ['scarring'],
+  boar: ['scarring'],
+  watcher: ['bloodless'],
 };

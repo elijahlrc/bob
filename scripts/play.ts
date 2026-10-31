@@ -4,6 +4,16 @@
  *
  *   npx tsx scripts/play.ts <file> help
  */
+import type { RunRewardId } from '../src/data/runRewards';
+import {
+  knuckleCost,
+  knuckleItems,
+  knuckleThrow,
+  surgeonMods,
+  surgeonTrades,
+} from '../src/run/stops';
+import { spendTreeRelic } from '../src/run/tree';
+import { modsText } from '../src/mods/text';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { Character } from '../src/calc/character';
 import { bossAhead, BOSSES, bossForMap } from '../src/data/bosses';
@@ -62,7 +72,7 @@ import {
   takeStop,
   type StopChoice,
 } from '../src/run/stops';
-import { pathTo, allocate } from '../src/run/tree';
+import { pathFor, allocate } from '../src/run/tree';
 import { waysideOf } from '../src/run/wayside';
 import { stopDef } from '../src/data/stops';
 
@@ -85,6 +95,10 @@ const HELP = `Commands (the run is saved in ${file} after each):
                                 gemHoard: {"stop":"gemHoard","tag":"fire","picks":["gemId",...]}
                                 quartermaster: {"stop":"quartermaster","buy":["0","4"],"refill":true}
                                 ferryman: {"stop":"ferryman","reprieve":"<id>"}
+                                surgeon: {"stop":"surgeon","trades":["<id>",...]} (up to three)
+                                knucklebone: {"stop":"knucklebone"} (leave; throw first with "throw")
+  throw <offer> <itemUid>     the Knucklebone Man throws his bones over an item (Bone Dust, more each throw)
+  relic <id> <nodeId> [from]  use a tree relic on a node (the Burnt Road: the far node, then the burnt one)
   restock <offer>             buy new wares at the Quartermaster (paid at once)
   craft <offer> <affix|tier|socket> <itemUid> [affixFamily]   craft at the Respite (first free, then Bone Dust by item level)
   pick <n> | skip             take reward card n (from status), or none
@@ -93,7 +107,7 @@ const HELP = `Commands (the run is saved in ${file} after each):
   socket <slot> <n> <gemUid>  put a carried gem in socket n (1-based) of the item in a slot
   unsocket <slot> <n>         take a gem out
   alloc <nodeId>              allocate a passive node (and the path to it)
-  rule <1-5> <value>          a flask's setting: a life/mana threshold 0.1-0.9, or always|packs|rares|bosses
+  rule <1-5> <use>            a utility flask's condition: always|packs|rares|bosses
   arm <provisionId>           arm a provision for the next map
   salvage <uid> [uid...]      turn carried items into Bone Dust
   auto <gear|tree|flasks|all> let the bot do it (all: reward pick, arming, gear, gems, flasks, tree)`;
@@ -113,9 +127,14 @@ function lines(it: Item): string {
 /** Rounded the way a player reads it: whole charges, a drink to one decimal. */
 const one = (v: number) => String(Math.round(v * 10) / 10);
 
-function desc(it: AnyItem | { kind: 'pouch'; id: string }, db?: ModDB): string {
+function desc(
+  it: AnyItem | { kind: 'pouch'; id: string } | { kind: 'relic'; id: string },
+  db?: ModDB,
+): string {
   if (it.kind === 'pouch')
     return `${provisionDef(it.id as never).name} (provision: ${provisionDef(it.id as never).text})`;
+  if (it.kind === 'relic')
+    return `${runRewardDef(it.id).name} (relic: ${runRewardDef(it.id).text})`;
   if (it.kind === 'gem') {
     const g = gemDef(it.gemId);
     return `${g.name} (${g.kind} gem)`;
@@ -301,7 +320,7 @@ function tree(run: RunState, all: boolean): void {
     console.log('Notables and keystones within 6 steps:');
     for (const n of t.nodes) {
       if ((n.kind !== 'notable' && n.kind !== 'keystone') || have.has(n.id) || n.retired) continue;
-      const p = pathTo(run.build.allocated, run.classId, n.id);
+      const p = pathFor(run.build, n.id, getTree());
       if (p && p.length <= 6) console.log(`  ${p.length} steps: ${text(n.id)}`);
     }
   }
@@ -318,7 +337,7 @@ function look(run: RunState, i: number): void {
     for (const k of ['affix', 'tier', 'socket'] as const) {
       const items = respiteItems(run, k);
       console.log(
-        `  ${k}: ${items.map((it) => `${it.name} [uid ${it.uid}] (${respiteCraftCost(run, it)} Dust)`).join(', ') || 'nothing'}`,
+        `  ${k}: ${items.map((it) => `${it.name} [uid ${it.uid}] (${respiteCraftCost(run, it, k)} Dust)`).join(', ') || 'nothing'}`,
       );
       if (k === 'tier')
         for (const it of items)
@@ -369,6 +388,21 @@ function look(run: RunState, i: number): void {
       break;
     case 'awlsmith':
       console.log('  (the Awlsmith is no longer scheduled)');
+      break;
+    case 'surgeon':
+      for (const id of surgeonTrades(run, o))
+        console.log(`  ${id}: ${modsText(surgeonMods([id])).join(', ')}`);
+      console.log('  (each trade after the first gives 15% less of its gain)');
+      break;
+    case 'knucklebone':
+      for (const it of knuckleItems(run))
+        console.log(
+          `  ${it.uid}: ${desc(it)} · a throw costs ${knuckleCost(run, it, i)} Bone Dust`,
+        );
+      break;
+    case 'enviousDead':
+    case 'remains':
+      console.log('  (needs the rivals list: not available in the terminal)');
   }
 }
 
@@ -480,6 +514,20 @@ function run(): void {
       }
       break;
     }
+    case 'throw': {
+      const res = knuckleThrow(r, n(0), n(1));
+      console.log(res.ok ? `The bones: ${res.what}.` : `Not possible: ${res.reason}`);
+      const it = [...Object.values(r.build.equipment), ...r.inventory].find(
+        (x): x is Item => x?.kind === 'item' && x.uid === n(1),
+      );
+      if (res.ok && it) console.log(`Now: ${desc(it)}`);
+      break;
+    }
+    case 'relic': {
+      const why = spendTreeRelic(r, args[0] as RunRewardId, n(1), args[2] ? n(2) : undefined);
+      console.log(why ?? 'Done.');
+      break;
+    }
     case 'pick': {
       const card = r.reward?.[n(0) - 1];
       console.log(card && takeReward(r, card.uid) ? `Took ${desc(card as never)}` : 'No such card');
@@ -547,9 +595,11 @@ function run(): void {
     case 'rule': {
       const v = args[1];
       const slot = n(0) - 1;
-      if (['always', 'packs', 'rares', 'bosses'].includes(v))
-        setFlaskRule(r, slot, { use: v as UtilityFlaskUse });
-      else setFlaskRule(r, slot, { at: Number(v) });
+      if (!['always', 'packs', 'rares', 'bosses'].includes(v)) {
+        console.log('Only a utility flask has a rule: always, packs, rares or bosses.');
+        return;
+      }
+      setFlaskRule(r, slot, { use: v as UtilityFlaskUse });
       console.log(`Flasks: ${flaskLine(r)}`);
       return save(r);
     }

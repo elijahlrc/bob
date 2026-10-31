@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "check": "tsc && eslint . && prettier --check . && vitest run --passWithNoTests",
     "sim": "tsx scripts/simulate.ts",
+    "xp:emit": "tsx scripts/xpTable.ts",
     "dpsaudit": "tsx scripts/dps-audit.ts",
     "dpsgems": "tsx scripts/dps-gems.ts",
     "fxaudit": "tsx scripts/fx-audit.ts",

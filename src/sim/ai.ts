@@ -1,3 +1,4 @@
+import { hasRelic } from '../calc/relics';
 import { fireTriggers } from './triggers';
 import { bossAI } from './bosses';
 import { abilitiesOf } from '../data/abilities';
@@ -69,7 +70,9 @@ import {
   PACK_SIZE,
   STRATEGY_DEFAULTS,
   type SkillWhen,
+  type TargetPriority,
 } from '../data/strategy';
+import type { Build } from '../data/types';
 import type { Actor, World } from './types';
 import { foeMinions, hunted, livingEnemiesOf } from './side';
 import type { Side } from './side';
@@ -176,9 +179,16 @@ const SUPPORT_PRIORITY = 4;
 /** How much nearer a rare, champion or boss enemy counts with the `rares` target priority, in tiles. */
 const RARE_PRIORITY = 4;
 
+/** Whom the character fights first: the strategy's choice, or the default under Blind Fury (relic 18). */
+export function targetPriority(b: Build): TargetPriority {
+  return hasRelic(b, 'blindFury')
+    ? STRATEGY_DEFAULTS.target
+    : (b.strategy?.target ?? STRATEGY_DEFAULTS.target);
+}
+
 function findTarget(w: World, s: Side): Actor | null {
   const p = s.player;
-  const prio = s.char.build.strategy?.target ?? STRATEGY_DEFAULTS.target;
+  const prio = targetPriority(s.char.build);
   // In a duel the character engages the nearest enemy at any distance (docs/DUEL.md 3.4), and its enemies are the other side's
   // character and its minions. On a map the one side's enemies are the monsters of `w.actors`, as ever.
   const duel = !!s.opts.duel;
@@ -457,6 +467,8 @@ function bodyOnWay(
 function avoidHazard(w: World, s: Side, dt: number): boolean {
   const p = s.player;
   const ai = s.ai;
+  // The Unflinching stands its ground (relic 17).
+  if (hasRelic(s.build, 'theUnflinching')) return false;
   if (ai.dodgeRest > 0) {
     ai.dodgeRest -= dt;
     return false;
@@ -582,7 +594,7 @@ export function playerAI(w: World, s: Side, dt: number): void {
   ai.scanT -= dt;
   const strategy = s.char.build.strategy;
   // With the `stick` priority, a target is kept until it falls or gets away.
-  const stick = strategy?.target === 'stick' && !!target;
+  const stick = targetPriority(s.char.build) === 'stick' && !!target;
   if (!target || (ai.scanT <= 0 && !stick)) {
     ai.scanT = 0.1;
     target = findTarget(w, s) ?? undefined;

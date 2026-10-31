@@ -17,6 +17,8 @@ import {
   type MySnapshot,
 } from './run/rivals';
 import { SAVE_VERSION, type RunState } from './run/run';
+import { fixtureShade, pickShade, shadeKey } from './run/shades';
+import { visitShade } from './run/stops';
 import type { MapResult } from './sim/runMap';
 import { SINK, type Sink } from './run/telemetry';
 import { loadPref, savePref } from './ui/prefs';
@@ -71,6 +73,72 @@ let memoryToken: string | null = null;
 function newToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
   return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** The token this browser already has, if any (never made here: reading the rivals list is no reason to make one). */
+function existingToken(): string | null {
+  try {
+    return window.localStorage.getItem(TOKEN_KEY) ?? memoryToken ?? null;
+  } catch {
+    return memoryToken ?? null;
+  }
+}
+
+/**
+ * A rivals stop (docs/ATTRITION.md, the Envious Dead and Another's Remains) is made of another player's fallen character: ask
+ * the rivals near the level once per offer and draw its shade (`pickShade`), or close the stop and say why (rivals switched
+ * off, the list out of reach, none fallen near). A shade already drawn for the visit is kept. In a dev build, `?shades` in the
+ * address stands the character's own build in, so the stops can be tried with no network. Nothing here throws.
+ */
+export async function loadShade(
+  c: Controller,
+  slot: number,
+  deps: () => RivalDeps = realDeps,
+): Promise<void> {
+  const run = c.run;
+  const offer = run?.offers[slot];
+  if (!run || offer?.kind !== 'stop') return;
+  const key = shadeKey(run, offer.id);
+  if (c.shades[key]) return;
+  const kept = visitShade(run, slot);
+  if (kept) return c.setShade(key, { state: 'ready', shade: kept });
+  if (
+    import.meta.env.DEV &&
+    typeof location !== 'undefined' &&
+    new URLSearchParams(location.search).has('shades')
+  )
+    return c.setShade(key, { state: 'ready', shade: fixtureShade(run) });
+  if (!rivalsConfigured() || !rivalsOn())
+    return c.setShade(key, {
+      state: 'closed',
+      why: 'Needs the rivals list, and rivals are switched off.',
+    });
+  c.setShade(key, { state: 'loading' });
+  const unreachable = {
+    state: 'closed' as const,
+    why: 'Needs the rivals list, which could not be reached.',
+  };
+  try {
+    const d = deps();
+    const token = existingToken();
+    const rows = await fetchRivalsOrNull(d.fetch, d.sink, {
+      saveVersion: SAVE_VERSION,
+      map: run.map,
+      k: RIVALS_POOL,
+      excludeTokenHash: token ? await hashToken(token) : null,
+    });
+    if (c.run !== run) return;
+    if (rows === null) return c.setShade(key, unreachable);
+    const shade = pickShade(rows, run, offer.id, offer.stop === 'enviousDead');
+    c.setShade(
+      key,
+      shade
+        ? { state: 'ready', shade }
+        : { state: 'closed', why: 'No player has fallen near this level yet.' },
+    );
+  } catch {
+    if (c.run === run) c.setShade(key, unreachable);
+  }
 }
 
 /**

@@ -41,7 +41,9 @@ export const WEAPON_FAMILIES: WeaponFamilyDef[] = [
   { key: 'mace2', cls: 'mace2', hands: 2, tags: ['mace', 'twoHand'], spell: false },
   { key: 'staff', cls: 'staff', hands: 2, tags: ['staff', 'twoHand'], spell: true },
   { key: 'warstaff', cls: 'staff', hands: 2, tags: ['staff', 'twoHand'], spell: false },
-  { key: 'bow', cls: 'bow', hands: 2, tags: ['bow', 'twoHand'], spell: false },
+  // A bow takes both hands but is no two-handed weapon to a skill, a passive or a relic (the owner, 2026-10-30; its affixes
+  // go by `hands`).
+  { key: 'bow', cls: 'bow', hands: 2, tags: ['bow'], spell: false },
 ];
 
 const ARMOUR_SLOTS: ArmourSlot[] = ['helmet', 'gloves', 'boots', 'body'];

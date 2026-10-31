@@ -331,28 +331,10 @@ describe('the factions (EXPANSION 7.3)', () => {
     for (let k = 0; k < 500; k++)
       for (const rarity of ['magic', 'rare', 'miniboss'] as const)
         expect(
-          rollMonsterMods(rng, rarity, 80, 'rot').some(
+          rollMonsterMods(rng, rarity, 80).some(
             (id) => id === 'carrionMother' || id === 'unremembered',
           ),
         ).toBe(false);
-  });
-
-  it('faction mods roll only on their own faction', () => {
-    const rng = new Rng(3);
-    let rot = 0;
-    for (let k = 0; k < 600; k++) {
-      if (
-        rollMonsterMods(rng, 'rare', 60, 'ossuary').some(
-          (id) => id === 'festering' || id === 'putrid',
-        )
-      )
-        throw new Error('Rot mod on the Ossuary');
-      if (
-        rollMonsterMods(rng, 'rare', 60, 'rot').some((id) => id === 'festering' || id === 'putrid')
-      )
-        rot++;
-    }
-    expect(rot).toBeGreaterThan(20);
   });
 
   for (const theme of ['charnelPits', 'hollowVigil']) {

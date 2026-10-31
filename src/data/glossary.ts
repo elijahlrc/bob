@@ -21,13 +21,20 @@ export const GLOSSARY = {
   stun: 'A stun stops a fighter for a moment. Big hits stun.',
   regen: 'Refills by itself every second.',
   leech: 'Part of the damage you deal comes back to you as life or mana.',
+  onHit: 'Every hit that lands gives you a little life or mana at once.',
+  onKill: 'Every enemy your character kills gives back a little life or mana.',
+  onBlock: 'Every hit your character blocks gives back a little life or mana.',
   flask:
-    'Flasks are drunk by themselves (the Strategy tab says when). Kills refill them only with gear or passives that say so; a Respite or a fallen boss refills them all.',
+    'Flasks are drunk by themselves (the Strategy tab says when). A Respite, a fallen boss, or gear that says so refills them.',
+  relic: 'Kept for the rest of the run. It changes how the game plays, not just a number.',
   taken: 'Changes how much damage reaches you, after your other defences.',
   damage: 'How hard your character hits.',
   speed: 'How often your character attacks or casts.',
   crit: `A critical strike deals more damage: ${BASE_CRIT_MULTI}% of a normal hit to begin with.`,
   accuracy: "Lowers an enemy's chance to evade your attacks.",
+  charges:
+    'Short-lived stacks won in the fight (Grit, Fervour, Insight). Each kind gives its bonus once for every charge held.',
+  penetration: "Your hits treat the enemy's resistance as this much lower.",
   area: 'How far an area skill reaches, how fast and far projectiles go, how long effects last.',
   ailments:
     'Ignite burns, chill slows, freeze stops, shock makes the target take more damage; poison and bleeding hurt over time.',

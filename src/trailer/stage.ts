@@ -5,7 +5,7 @@ import { MONSTER_TYPES } from '../data/monsters';
 import { getTree } from '../data/tree';
 import { rollItemOf } from '../gen/loot';
 import { noteFound } from '../run/found';
-import { allocate, pathTo } from '../run/tree';
+import { allocate, pathFor } from '../run/tree';
 import { itemLines } from '../ui/ItemCard';
 import { forceBiome, type BiomeId } from '../data/biomes';
 import { forceDensity, type DensityId } from '../data/density';
@@ -190,7 +190,7 @@ export function treeShot(run: RunState, steps = 4): { name: string; path: number
   let best: { id: number; path: number[] } | null = null;
   for (const n of tree.nodes) {
     if (n.kind !== 'keystone' || n.retired) continue;
-    const p = pathTo(run.build.allocated, run.classId, n.id);
+    const p = pathFor(run.build, n.id, getTree());
     if (!p || p.length < steps) continue;
     if (!best || p.length < best.path.length) best = { id: n.id, path: p };
   }

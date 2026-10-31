@@ -1,3 +1,13 @@
+import { hasRelic } from '../calc/relics';
+import {
+  CRUELTY_MAX,
+  CRUELTY_SECONDS,
+  CRUELTY_SPEED,
+  FIEND_PERIOD,
+  UNTOUCHED_LEECH,
+  UNTOUCHED_SECONDS,
+} from '../data/runRewards';
+import { mapPlayerMods } from './mapMods';
 import { Character } from '../calc/character';
 import {
   CHARGE_KINDS,
@@ -7,10 +17,9 @@ import {
   type ChargeEvent,
   type ChargeKind,
 } from '../calc/charges';
-import { affixPlayerMods } from '../data/mapAffixes';
 import { TROPHY_MODS, TROPHY_SECONDS, trophyMods } from '../data/trophy';
 import { playerCtx, refreshPlayerDefence } from './combat';
-import type { Mod } from '../mods/types';
+import { mod, type Mod } from '../mods/types';
 import { theftBuild, theftKey, theftMods } from './theft';
 import type { World } from './types';
 import type { Side } from './side';
@@ -36,23 +45,57 @@ const trophyIds = (s: Side) => Object.keys(s.trophy).sort();
 /** The character for the world's build with these charges (built once, then kept). */
 export function characterWith(w: World, s: Side, counts: ChargeCounts): Character {
   const trophy = trophyIds(s);
+  const cruelty = s.cruelty?.length ?? 0;
   // What the Unmaker holds of the build is part of it too (docs/BOSSES.md 9).
-  const k = key(counts, trophy) + theftKey(w);
+  const k = key(counts, trophy) + theftKey(w) + (cruelty ? `|c${cruelty}` : '');
   let ch = s.chars.get(k);
   if (!ch) {
     ch = new Character(theftBuild(w, s.build), {
       areaLevel: s.areaLevel,
       resistPenalty: w.plan.resistPenalty,
       extraMods: [
-        ...w.plan.affixes.flatMap((id) => affixPlayerMods(id, s.areaLevel)),
+        ...mapPlayerMods(w.plan, s.build, s.areaLevel),
         ...trophyMods(trophy),
         ...theftMods(w),
+        ...(cruelty ? [mod('attackSpeed', 'inc', CRUELTY_SPEED * cruelty)] : []),
       ],
       charges: counts,
     });
     s.chars.set(k, ch);
   }
   return ch;
+}
+
+/** The stacks of an attribute relic still held: those ended by now are dropped. */
+function liveStacks(w: World, stacks: number[] | undefined): number[] {
+  return (stacks ?? []).filter((t) => t > w.t);
+}
+
+/**
+ * Quickening Cruelty (an attribute relic): a critical strike adds a stack of attack speed that holds `CRUELTY_SECONDS`, up to
+ * `CRUELTY_MAX`; at the most, the oldest gives way to the new one. Each stack ends on its own, so the speed ebbs away.
+ */
+export function gainCruelty(w: World, s: Side): void {
+  if (!hasRelic(s.build, 'quickeningCruelty')) return;
+  const held = liveStacks(w, s.cruelty);
+  const before = s.cruelty?.length ?? 0;
+  if (held.length >= CRUELTY_MAX / CRUELTY_SPEED) held.shift();
+  held.push(w.t + CRUELTY_SECONDS);
+  s.cruelty = held;
+  if (held.length !== before) swap(w, s, { ...s.char.charges });
+}
+
+/** Blood of the Untouched (an attribute relic): an evaded attack adds a stack of leech that holds `UNTOUCHED_SECONDS`. */
+export function gainUntouched(w: World, s: Side): void {
+  if (!hasRelic(s.build, 'untouchedBlood')) return;
+  s.untouched = [...liveStacks(w, s.untouched), w.t + UNTOUCHED_SECONDS];
+}
+
+/** The share of attack damage Blood of the Untouched leeches now (a fraction). */
+export function untouchedLeech(w: World, s: Side): number {
+  if (!s.untouched?.length) return 0;
+  s.untouched = liveStacks(w, s.untouched);
+  return (s.untouched.length * UNTOUCHED_LEECH) / 100;
 }
 
 /** Make the character match the charges now held. */
@@ -115,6 +158,17 @@ export function rollCharges(
 /** Run down the timers; a kind whose timer ends loses every charge. */
 export function tickCharges(w: World, s: Side, dt: number): void {
   let counts: ChargeCounts | null = null;
+  // Mantle of the Fiend (relic 20): every minute, one monster affix in its player version, held as a trophy for the minute.
+  if (hasRelic(s.build, 'mantleOfTheFiend') && w.t >= (s.fiend?.next ?? 0)) {
+    const id = w.rngTrig.pick(FIEND_POOL);
+    // The last one goes as this one comes (unless a trophy of its own holds it longer).
+    const last = s.fiend?.id;
+    if (last && last !== id && s.trophy[last] !== undefined && s.trophy[last] <= FIEND_PERIOD + dt)
+      s.trophy[last] = Math.min(s.trophy[last], dt);
+    if (!(id in s.trophy)) counts = { ...s.char.charges };
+    s.trophy[id] = Math.max(s.trophy[id] ?? 0, FIEND_PERIOD + dt);
+    s.fiend = { id, next: w.t + FIEND_PERIOD };
+  }
   for (const id of Object.keys(s.trophy)) {
     s.trophy[id] -= dt;
     if (s.trophy[id] <= 0) {
@@ -130,8 +184,19 @@ export function tickCharges(w: World, s: Side, dt: number): void {
       counts[kind] = 0;
     }
   }
+  // Quickening Cruelty's stacks end one by one.
+  if (s.cruelty?.length) {
+    const held = liveStacks(w, s.cruelty);
+    if (held.length !== s.cruelty.length) {
+      s.cruelty = held;
+      counts = counts ?? { ...s.char.charges };
+    }
+  }
   if (counts) swap(w, s, counts);
 }
+
+/** The monster affixes Mantle of the Fiend draws from: every one with a player version. */
+const FIEND_POOL = Object.keys(TROPHY_MODS);
 
 /** Register the world's starting character, so returning to no charges does not rebuild it. */
 export function seedCharacters(s: Side): void {

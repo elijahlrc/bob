@@ -16,8 +16,8 @@ import { addProvision } from './provisions';
 import { acquireReprieve } from './reprieves';
 import type { RunState } from './run';
 import { uidSource } from './run';
-import { heldReward, waysideOf, type Ware } from './wayside';
-import { RUN_REWARDS } from '../data/runRewards';
+import { grantRelic, keptRelics, type Ware } from './wayside';
+import { relicDef, type RunRewardId } from '../data/runRewards';
 
 /** The Quartermaster's: nine wares, a reprieve and a run reward among them (docs/WAYSIDE.md 5.2, docs/ATTRITION.md). */
 const SALE_SLOTS = [
@@ -117,17 +117,19 @@ export function rollSale(run: RunState, offerId: string): Ware[] {
   const rr = new Rng(run.seed).fork(`salereward${offerId}`);
   return slots.map((slot, i) =>
     slot === 'reward'
-      ? (rewardWare(run, i, rr) ?? ware(run, 'provision', i, rr))
+      ? (rewardWare(run, offerId, i, rr) ?? ware(run, 'provision', i, rr))
       : ware(run, slot, i, rng),
   );
 }
 
-/** A run reward the run can still take (fewer held than its most), for sale (docs/ATTRITION.md); null when there is none. */
-function rewardWare(run: RunState, index: number, rng: Rng): Ware | null {
-  const open = RUN_REWARDS.filter((r) => r.from <= run.map && heldReward(run, r.id) < r.max);
-  if (!open.length) return null;
-  const r = rng.pick(open);
-  return { id: String(index), kind: 'reward', price: priceAt(r.base, run.map), ref: r.id };
+/**
+ * A relic the run can still take, for sale (docs/ATTRITION.md): drawn by the character's attributes the first time the stock is
+ * looked at, then kept for the level (`keptRelics`). Null when there is none.
+ */
+function rewardWare(run: RunState, offerId: string, index: number, rng: Rng): Ware | null {
+  const id = keptRelics(run, `sale${offerId}.${index}`, rng, 1)[0];
+  if (!id) return null;
+  return { id: String(index), kind: 'reward', price: priceAt(relicDef(id).base, run.map), ref: id };
 }
 
 /** The ware joins the run (the Dust is the caller's business). */
@@ -141,7 +143,6 @@ export function grantWare(run: RunState, ware: Ware): void {
   } else if (ware.kind === 'provision' && ware.ref) {
     addProvision(run, ware.ref as ProvisionId);
   } else if (ware.kind === 'reward' && ware.ref) {
-    const held = waysideOf(run).rewards;
-    held[ware.ref] = (held[ware.ref] ?? 0) + 1;
+    grantRelic(run, ware.ref as RunRewardId);
   }
 }
