@@ -309,11 +309,31 @@ export function flaskUpgradeSlot(run: RunState, f: FlaskItem): number {
   return best;
 }
 
-/** The flask slot a flask goes into: an empty one, else the one it upgrades, else the lowest-level flask of the same kind, else the lowest-level one. */
+/**
+ * The flask slot a flask goes into: an empty one; for a life, mana or hybrid flask, the worn one of those with the least
+ * recovery left in it (life and mana a drink, times the drinks its charges hold now); else the one it upgrades, else the
+ * lowest-level flask of the same kind, else the lowest-level one.
+ */
 export function flaskTarget(run: RunState, f: FlaskItem): number {
   const flasks = run.build.flasks;
   const empty = flasks.findIndex((x) => !x);
   if (empty >= 0) return empty;
+  if (flaskBase(f.baseId).kind !== 'utility') {
+    const specs = new Character(run.build, cfgFor(run)).flasks;
+    let least = -1;
+    let leastLeft = Infinity;
+    flasks.forEach((x, i) => {
+      const s = x && specs.find((y) => y.uid === x.uid);
+      if (!s || s.kind === 'utility') return;
+      const charges = s.maxCharges * (run.vitals.flasks[s.uid] ?? 1);
+      const left = (s.life + s.mana) * Math.floor(charges / s.perUse);
+      if (left < leastLeft) {
+        least = i;
+        leastLeft = left;
+      }
+    });
+    if (least >= 0) return least;
+  }
   const up = flaskUpgradeSlot(run, f);
   if (up >= 0) return up;
   const rank = (x: (typeof flasks)[number]) => (x ? flaskBase(x.baseId).level : -1);

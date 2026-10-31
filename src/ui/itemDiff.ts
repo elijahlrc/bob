@@ -3,11 +3,13 @@ import { triggerText } from '../data/triggers';
 import { modsText } from '../mods/text';
 import { armourLine, flaskBaseLines, lineKey, weaponLine } from './ItemCard';
 
-/** A weapon's or armour piece's own numbers, one string each (the card's muted line). */
+/**
+ * The base's own properties at their final values, one string each (an attack speed affix shows in the APS). A property
+ * the base does not have, such as added cold damage, is only its affix below: nothing is shown twice (the owner, 2026-10-30).
+ */
 function statParts(it: Item): string[] {
   const w = weaponLine(it);
-  if (w)
-    return [w.phys, w.speed, w.crit, ...(w.extra.length ? [`Adds ${w.extra.join(', ')}`] : [])];
+  if (w) return [w.phys, w.speed, w.crit];
   return armourLine(it)?.map((p) => p.text) ?? [];
 }
 

@@ -215,10 +215,7 @@ function KeyNumbers({ it }: { it: Item }) {
       { v: w.speed.replace(' APS', ''), l: 'attacks a second', aug: w.aug[1] },
       { v: w.crit.replace(' crit', ''), l: 'critical chance', aug: w.aug[2] },
     );
-    for (const e of w.extra) {
-      const [v, type] = e.split(' ');
-      cells.push({ v, l: `${type} added`, aug: true });
-    }
+    // Added elemental damage is not a property of the base: its affix says it below (nothing is shown twice).
   }
   for (const p of armourLine(it) ?? []) {
     const i = p.text.indexOf(' ');

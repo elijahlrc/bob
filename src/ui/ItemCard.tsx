@@ -307,7 +307,6 @@ export function ItemCard({
           </span>
         </div>
       )}
-      {wl && wl.extra.length > 0 && <div class="ic-aug">Adds {wl.extra.join(', ')}</div>}
       {al && al.length > 0 && (
         <div class="muted">
           {al.map((p, i) => (

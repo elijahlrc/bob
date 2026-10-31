@@ -526,3 +526,7 @@ the changes after three playtests.
     migration), so the relics' uses come back; another class's start is kept.
   - Pyre of the Lesser can take 219 of the 279 notables; the rest share a cluster or have one small node.
   - Waiting: the flask stats, charge gain on the tree, and the design philosophy before any rebuild.
+- **2026-10-30, quicker and deadlier monsters.** With the early ease cut back the game was far too hard, and the old ease
+  made levels slow and safe. Every monster now has half its life and 30% more damage, the whole game
+  (`MONSTER_LIFE_MULT`, `MONSTER_DAMAGE_MULT` in `data/constants.ts`); whether it should only cover the first 20 levels is
+  open.

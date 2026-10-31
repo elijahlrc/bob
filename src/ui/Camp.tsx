@@ -330,6 +330,9 @@ export function Camp({ c }: { c: Controller }) {
   }, [tab]);
   // The stop whose screen is open in the Next map tab (docs/WAYSIDE.md 5); nothing of it is saved until it is taken.
   const [stopSlot, setStopSlot] = useState<number | null>(null);
+  // A new level has new offers: the screen open on the last one closes (else the next level's offer in the same place,
+  // a Respite or a stop, would open by itself).
+  useLayoutEffect(() => setStopSlot(null), [run?.map]);
   // The Respite's screen (docs/ATTRITION.md) shares the slot; a visit with crafts made keeps it open until the player rests.
   const visit = run ? waysideOf(run).respite : null;
   const respiteSlot = visit ? visit.slot : stopSlot;
@@ -613,6 +616,7 @@ export function Camp({ c }: { c: Controller }) {
       {t === 'items' && (
         <Items
           c={c}
+          ch={ch}
           focus={focus?.to === 'items' ? focus : null}
           onCraft={(uid) => goTo('workbench', uid)}
           onEditGems={(slot) => {

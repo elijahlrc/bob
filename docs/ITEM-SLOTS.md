@@ -46,7 +46,10 @@ items. So the layout stays as it is, and only what happens when you tap an item 
      - one line of sockets, before → after, counting the gems that lose their socket rather than naming them ("⚠ 3 gems
        unequipped").
    - **The two items:** each column shows the name, the base, "Requires … · ilvl", the sockets, the base stats, a divider,
-     and the affix stats.
+     and the affix stats. The base stats are the base's own properties at their final values (an attack speed affix
+     shows in the APS) and its implicits; a property the base does not have, such as added cold damage, is only its affix
+     below the divider. Nothing is shown twice in the same form (the owner, 2026-10-30), and the same holds wherever an
+     item is shown: the card, the item page and the compare.
    - **Stats both items have** sit on one row, with the new value green when higher and red when lower.
    - **Stats only one has** fill the rows side by side, with no empty rows: green on the new item, red on the worn one.
    - **The bar:** **Swap into Body**, or **Wear in Ring 2** when the slot is empty. It is disabled, with the reason beside

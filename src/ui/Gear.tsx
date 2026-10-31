@@ -2,6 +2,7 @@ import { itemBase } from '../data/bases';
 import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
 import type { EquipSlot, FlaskItem, Item } from '../data/types';
+import type { Character } from '../calc/character';
 import type { RunState } from '../run/run';
 import { slotName } from '../run/inventoryOps';
 import { rarityClass } from './ItemCard';
@@ -57,6 +58,8 @@ export type SlotMark = { ok: boolean; reason?: string };
 
 type Props = {
   run: RunState;
+  /** The character as worn: how many charges each flask holds at most. */
+  ch?: Character;
   selSlot: EquipSlot | null;
   selFlask: number | null;
   /** Slots the selected carried item can go into, with whether it may. */
@@ -155,6 +158,10 @@ export function Gear(p: Props) {
   };
   const flask = (f: FlaskItem | null, i: number) => {
     const aimed = p.aimFlask === i || p.selFlask === i;
+    // How full it is: the charges it carries from map to map (a flask never worn is full).
+    const full = f ? (run.vitals.flasks[f.uid] ?? 1) : 0;
+    const max = (f && p.ch?.flasks.find((s) => s.uid === f.uid)?.maxCharges) ?? 0;
+    const charges = max ? `${Math.floor(max * full)}/${max}` : '';
     return (
       <div key={i} class="ix-slot-wrap ix-flask-wrap">
         <button
@@ -168,10 +175,13 @@ export function Gear(p: Props) {
             class="ix-bottle-art"
             data-paint="bottle"
             data-liquid={f ? flaskBase(f.baseId).kind : 'empty'}
-            data-fill={f ? '0.8' : '0'}
-            data-pk={f ? String(f.uid) : 'empty'}
+            data-fill={full.toFixed(2)}
+            data-pk={f ? `${f.uid}:${full.toFixed(2)}` : 'empty'}
           />
-          <span class="ix-slot-tip">{f ? f.name : `Flask ${i + 1}: empty`}</span>
+          {charges && <span class="ix-flask-n">{charges}</span>}
+          <span class="ix-slot-tip">
+            {f ? `${f.name}${charges && ` · ${charges} charges`}` : `Flask ${i + 1}: empty`}
+          </span>
         </button>
         {f && !aiming && (
           <button

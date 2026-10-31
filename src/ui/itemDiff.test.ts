@@ -59,6 +59,10 @@ describe('the side-by-side compare of two items', () => {
     const rows = compareGroups(fast, plain).base;
     expect(rows.find((r) => /APS/.test(r.a ?? ''))!.mark).toBe('better');
     expect(rows.find((r) => /physical/.test(r.a ?? ''))!.mark).toBe('same');
+    // Added cold is a property the base does not have: only its affix shows it.
+    const cold = statGroups(withAffixes('sword_5', [['addColdLocal']]));
+    expect(cold.base.some((l) => /cold/i.test(l))).toBe(false);
+    expect(cold.affix.some((l) => /cold/i.test(l))).toBe(true);
   });
 
   it('flasks keep what they recover apart from their affixes', () => {

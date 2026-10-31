@@ -61,6 +61,7 @@ function loadView(): View {
  */
 export function Items({
   c,
+  ch,
   focus,
   onCraft,
   onEditGems,
@@ -68,6 +69,8 @@ export function Items({
   startView,
 }: {
   c: Controller;
+  /** The character as worn: its flasks' charges for the gear. */
+  ch?: Character;
   /** Select this item when it changes (set by the Workbench's "Show in Items"). */
   focus?: { uid: number; n: number } | null;
   /** Open the Workbench with this item. */
@@ -494,6 +497,7 @@ export function Items({
         {showGear && (
           <Gear
             run={run}
+            ch={ch}
             selSlot={sel?.from === 'slot' ? sel.slot : null}
             selFlask={sel?.from === 'flask' ? sel.idx : null}
             targets={targets}

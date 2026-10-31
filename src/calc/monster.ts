@@ -3,6 +3,8 @@ import {
   MONSTER_CRIT_MULTI,
   easeDamage,
   easeLife,
+  MONSTER_DAMAGE_MULT,
+  MONSTER_LIFE_MULT,
   openingDamage,
   openingLife,
 } from '../data/constants';
@@ -297,6 +299,7 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     monsterLife(sl) *
       easeLife(m) *
       openingLife(m) *
+      MONSTER_LIFE_MULT *
       (t.lifeMult / meanDurability(defProfile, m)) *
       r.life *
       share,
@@ -340,7 +343,14 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
         ? 2
         : 1;
   const defence = defenceFromDb(db, ctx, { isPlayer: false, resistPenalty: 0, stunThreshMult });
-  const baseHit = monsterHit(sl) * easeDamage(m) * openingDamage(m) * t.dmgMult * r.dmg * share;
+  const baseHit =
+    monsterHit(sl) *
+    easeDamage(m) *
+    openingDamage(m) *
+    MONSTER_DAMAGE_MULT *
+    t.dmgMult *
+    r.dmg *
+    share;
   const dmg = baseHit * (t.shape?.mult ?? 1) * areaPace(spec);
   // The Ossuary Regent's crushing swing takes 1.6 s (§12.7).
   const time = oldBoss ? BOSS_ATTACK_TIME : t.attackTime;
