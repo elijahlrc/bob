@@ -1006,6 +1006,14 @@ export const spellDamagePerMana = def('spellDamagePerMana', (v: number, max: num
     mod('damage', 'inc', v, { tags: ['spell'], per: { stat: 'maxMana', div: 100, max } }),
   ),
 );
+/** The Spire's spell minions: minion damage per 100 maximum mana (the joins pass: their hook, apart from the Cathedral's). */
+export const minionDamagePerMana = def('minionDamagePerMana', (v: number, max: number): Line =>
+  line(
+    `${v}% minion damage per 100 maximum mana, up to ${v * max}%`,
+    (v * Math.min(max, 6)) / 12,
+    mod('minionDamage', 'inc', v, { per: { stat: 'maxMana', div: 100, max } }),
+  ),
+);
 /** Extra energy shield of v per 100 maximum mana (v% of maximum mana, counted in hundreds). */
 export const manaAsEs = def('manaAsEs', (v: number): Line =>
   line(`gain ${v}% of maximum mana as extra energy shield`, v / 2, mod('es', 'base', v, { per: { stat: 'maxMana', div: 100 } })),

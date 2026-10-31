@@ -2,7 +2,7 @@
  * The Ford: The south spoke: close and physical, the Yard seam.
  * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31).
  */
-import { allAttr, areaDamage, attackSpeed, buffDuration, cooldownRecovery, dex, eleAttackOne, evasion, leechLife, life, lifeOnBlock, lifeOnHit, lifeRegenWhenHit, manaLeech, oneHandMelee, physAttack, physReduction, resAll, shieldAttack, shieldBlock, str, stunAvoid, swordDamage, weaponSpeed } from '../lines';
+import { allAttr, areaDamage, attackSpeed, buffDuration, cooldownRecovery, dex, eleAttackOne, evasion, leechLife, life, lifeOnBlock, lifeOnHit, lifeRegenWhenHit, manaLeech, moveSpeed, oneHandMelee, physAttack, physReduction, resAll, shieldAttack, shieldBlock, str, stunAvoid, swordDamage, weaponSpeed } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const steel: AreaSpec = {
@@ -57,7 +57,7 @@ export const steel: AreaSpec = {
       at: [752, 1157],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "n", kind: "notable", name: "Wanderer", lines: [allAttr(10), life(8)], at: [745, 1123], why: "Attributes for a Strider reaching into the Yard’s gear." },
+        { id: "n", kind: "notable", name: "Wanderer", lines: [moveSpeed(8), life(8), str(10)], at: [745, 1123], why: "The wanderer on the Yard’s seam: movement, life and the strength the Yard’s gear asks (the centre’s Well Rounded sells all attributes)." },
         { id: "a", kind: "small", lines: [allAttr(4)], at: [759, 1191] },
       ],
       links: [["n", "a"]],

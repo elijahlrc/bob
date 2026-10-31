@@ -221,8 +221,8 @@ roads.push({
 type Move = { from: string; area: string; id?: string; at: [number, number]; entry: [string, string][]; why: string; ats?: Record<string, [number, number]> };
 const M: Move[] = [
   // Home: steps 4 to 8, general. Spoils and Soft Step sit on the paths to the seams, placed by hand along the bow.
-  { from: 'home.spoils', area: 'home', at: A(1780, -23), ats: { a: A(1775, -19.5), n: A(1810, -23), b: A(1750, -26.8) }, entry: [['a', 'knife.home.pathN.b'], ['b', 'knife.home.seams.n']], why: 'Mana regeneration, mana on kill and flask recovery, on the north path to the Spire seam (step 5): the path runs through it.' },
-  { from: 'home.softStep', area: 'home', at: A(1780, 23), ats: { a: A(1775, 19.5), n: A(1810, 23), b: A(1750, 26.8) }, entry: [['a', 'knife.home.pathS.b'], ['b', 'knife.home.seams.s']], why: 'Evasion, movement and a little dodge, on the south path to the Bow seam (step 5): the path runs through it.' },
+  { from: 'home.spoils', area: 'home', at: A(1780, -23), ats: { a: A(1775, -19.5), n: A(1810, -23), b: A(1750, -26.8) }, entry: [['a', 'knife.home.pathN.b'], ['n', 'knife.home.seams.n']], why: 'Mana regeneration, mana on kill and flask recovery, on the north path to the Spire seam (step 5): the path runs through it.' },
+  { from: 'home.softStep', area: 'home', at: A(1780, 23), ats: { a: A(1775, 19.5), n: A(1810, 23), b: A(1750, 26.8) }, entry: [['a', 'knife.home.pathS.b'], ['n', 'knife.home.seams.s']], why: 'Evasion, movement and a little dodge, on the south path to the Bow seam (step 5): the path runs through it.' },
   { from: 'home.roadB', area: 'home', id: 'quick', at: A(2265, 0), entry: [['a', 'knife.home.keen.n']], why: 'Attack speed: a side room off Keen Instinct, straight out along the axis.' },
   { from: 'edge.thickBlood', area: 'home', at: A(2130, -20.5), entry: [['a', 'knife.home.spN.x']], why: 'Life and chaos resistance, off the north spoke at its junction (step 5), linked across to Spoils.' },
   { from: 'edge.star', area: 'home', at: A(2130, 20.5), entry: [['w', 'knife.home.spS.x']], why: 'The resist star, off the south spoke at its junction (step 5), linked across to Soft Step.' },
@@ -408,6 +408,8 @@ const OVER: Record<string, { name?: string; lines: string }> = {
 };
 // Long clusters cut to two or three smalls (the node budget for the twenty new notables).
 const TRIM: Record<string, string[]> = {
+  'knife.home.spoils': ['b'],
+  'knife.home.softStep': ['b'],
   'knife.hex.wiry': ['l2', 'e2'],
   'knife.hex.ward': ['s2'],
   'knife.rim.legs': ['d2', 'd1'],

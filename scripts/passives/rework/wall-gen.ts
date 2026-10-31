@@ -152,7 +152,7 @@ export const tables = { K, roads, links };
 // Here 'pathN', 'spN' and the 'n' ids are the Yard's side (south-east), 'pathS', 'spS' and 's' the Cathedral's (north).
 const moves: Move[] = [
   // The Gate (home, steps 5 to 8).
-  { from: 'home.ringing', area: 'home', at: K(1760, -24), ats: { a: K(1790, -20.5), b: K(1770, -24), n: K(1735, -27) }, entry: [['a', 'wall.home.pathN.b'], ['n', 'yard.home.seams.s']], why: "Melee damage and stun, on the south path to the Yard's seam (step 5): the path runs through it." },
+  { from: 'home.ringing', area: 'home', at: K(1760, -24), ats: { a: K(1790, -20.5), b: K(1770, -24), n: K(1735, -27) }, entry: [['b', 'wall.home.pathN.b'], ['n', 'yard.home.seams.s']], why: "Melee damage and stun, on the south path to the Yard's seam (step 5): the path runs through it." },
   { from: 'slams.secondWind', area: 'home', at: K(1450, -21), entry: [['a', 'wall.home.pathN.b']], why: 'Life and regeneration, a side room off the south path toward the centre.' },
   { from: 'maces.thickSkin', area: 'home', at: K(2260, -16), entry: [['a', 'wall.home.spN.x']], why: 'Armour and stun threshold, off the south spoke junction: the south half’s defence.' },
   { from: 'resists.star', area: 'home', at: K(1890, 21.5), entry: [['f', 'wall.home.pathS.b']], why: 'Resistances and life, a side room off the north path, outward: the north half’s second defence.' },
@@ -227,12 +227,13 @@ const over: Over = {
   'wall.maces.locked.n': { lines: "armour(16), gritOnBlock(15), lifeOnBlock(20)", why: "The Wall’s shield: a block builds grit and closes a wound." },
   'wall.maces.ram.n': { lines: "shieldAttack(24), blockPerGrit(1)", why: "The shield grows with the grit: block for every charge held." },
   'wall.maces.greatweight.n1': { lines: "twoHandDamage(34), stunDuration(20)", why: "The two-handed blow that holds the enemy down (one side of the swing-or-life choice)." },
-  'wall.maces.headsman.n': { lines: 'twoHandDamage(20), gritOnStun(30)', why: 'The two-hander\u2019s grit: each stun builds it (its lines copied the Yard\u2019s Momentum Swing).' },
+  'wall.maces.headsman.n': { lines: 'axeDamage(24), gritOnStun(25)', why: 'Axes\u2019 second home (the joins pass: their only other was the Yard\u2019s rim pair): the headsman\u2019s axe builds grit on each stun.' },
   'wall.grit.hotIron.n': { lines: "eleAttackOne('fire', 29), igniteChance(18)", why: 'Fire attacks that ignite (its stun line went).' },
   'wall.slams.strongarm.k': { name: 'Unbowed Arm', lines: '', why: 'The strength keystone (renamed: its old name was a reference keystone\u2019s).' },
 };
 const trim: Record<string, string[]> = {
   'wall.home.quartermaster': ['a'],
+  'wall.home.ringing': ['a'],
 };
 const newc: NewCluster[] = [
   { area: 'rampart', id: 'stand', name: 'Standing Iron', lines: "armourWhileStationary(45), stunAvoidStationary(35)", smalls: ['armour(10)', 'armour(10)'], entry: 'wall.rampart.spS.c', toward: K(3600, 7), why: 'The armour rule: armour that grows while the Vanguard holds still.' },

@@ -2,7 +2,7 @@
  * The Cloister: The west: energy shield, mana and life.
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { auraEffect, auraReserveLife, castSpeed, costReduction, damageOnLowLife, damageWhileEsFull, eleDamage, es, esRecharge, esRechargeDelay, esRechargeOnKill, igniteChance, int, life, lifeRegen, mana, minionDamage, minionLife, minionSpeed, reducedReservation, resOne, skillDuration, spellCrit, spellDamage, spellDamagePerMana, spellDamageWhenHit, stunAvoid, wandCastSpeed, wandSpellDamage } from '../lines';
+import { auraEffect, auraReserveLife, castSpeed, costReduction, damageOnLowLife, damageWhileEsFull, eleDamage, es, esRecharge, esRechargeDelay, esRechargeOnKill, igniteChance, int, life, lifeRegen, mana, minionDamage, minionDamagePerMana, minionLife, minionSpeed, reducedReservation, resOne, skillDuration, spellCrit, spellDamage, spellDamagePerMana, spellDamageWhenHit, stunAvoid, wandCastSpeed, wandSpellDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const well: AreaSpec = {
@@ -98,7 +98,7 @@ export const well: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [minionDamage(12)], at: [-1435, -2698] },
-        { id: "n", kind: "notable", name: "Familiars", lines: [minionDamage(20), minionLife(15), spellDamage(10)], at: [-1461, -2762] },
+        { id: "n", kind: "notable", name: "Familiars", lines: [minionDamagePerMana(4, 10), minionLife(24)], at: [-1461, -2762], why: "The Spire’s spell minions: their damage grows with the caster’s mana (the Cathedral’s servants pay while they stand)." },
         { id: "b", kind: "small", lines: [minionDamage(12)], at: [-1397, -2790] },
         { id: "n2", kind: 'notable', name: "Bound Host", lines: [minionDamage(15), minionSpeed(8), skillDuration(10)], at: [-1540, -2794], why: "The spell-minion caster’s offence." },
       ],

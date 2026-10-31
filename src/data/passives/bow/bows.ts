@@ -2,7 +2,7 @@
  * The Hedgerows: The north spoke: bows, accuracy, elemental attacks, the Knife seam.
  * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31).
  */
-import { accuracy, attackSpeed, bowDamage, bowSpeed, chain, chillEffect, dex, eleAttack, eleAttackOne, elePenetration, evasionWhileMoving, projectileDamage, projectileSpeed, trapDamage, trapGainCold, trapSpeed } from '../lines';
+import { accuracy, attackSpeed, bowDamage, bowSpeed, chain, chillEffect, dex, eleAttack, eleAttackOne, elePenetration, evasionWhileMoving, freezeChance, projectileDamage, projectileSpeed, trapDamage, trapGainCold, trapSpeed } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const bows: AreaSpec = {
@@ -46,7 +46,7 @@ export const bows: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [trapDamage(12)], at: [2471, 111] },
         { id: "b", kind: "small", lines: [trapDamage(12)], at: [2474, 169] },
-        { id: "n", kind: "notable", name: "Tripwire", lines: [trapDamage(16), trapGainCold(10), trapSpeed(6)], at: [2477, 239], why: "Traps that chill, for the kiting bow user: unlike the Knife’s traps." },
+        { id: "n", kind: "notable", name: "Tripwire", lines: [trapGainCold(12), chillEffect(15), freezeChance(8)], at: [2477, 239], why: "Traps that chill and freeze, for the kiting bow user (the Knife’s Venom Snare on the same road sells trap damage and poison)." },
         { id: "n2", kind: 'notable', name: "Kiting Snares", lines: [trapSpeed(12), evasionWhileMoving(20)], at: [2481, 324], why: "Traps laid on the run: the trapper who kites." },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "n2"]],

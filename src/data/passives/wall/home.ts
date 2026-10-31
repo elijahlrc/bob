@@ -123,11 +123,10 @@ export const home: AreaSpec = {
       at: [-1035, 1424],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [meleeDamage(8)], at: [-1139, 1381] },
         { id: "b", kind: "small", lines: [meleeDamage(8)], at: [-1040, 1432] },
         { id: "n", kind: "notable", name: "Ringing Blows", lines: [meleeDamage(19), enemyStunThreshold(14)], at: [-945, 1455] },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["b", "n"]],
     },
     {
       id: "secondWind",
@@ -224,7 +223,7 @@ export const home: AreaSpec = {
     { from: "wall.home.seams.s", to: "wall.resists.radW.a", why: "Along the border out to the mid ring." },
     { from: "wall.home.spN.x", to: "wall.slams.spN.a", why: "The north spoke goes on." },
     { from: "wall.home.spS.x", to: "wall.rampart.spS.a", why: "The south spoke goes on." },
-    { from: "wall.home.ringing.a", to: "wall.home.pathN.b", why: "The way in." },
+    { from: "wall.home.ringing.b", to: "wall.home.pathN.b", why: "The way in." },
     { from: "wall.home.ringing.n", to: "yard.home.seams.s", why: "The way in." },
     { from: "wall.home.secondWind.a", to: "wall.home.pathN.b", why: "The way in." },
     { from: "wall.home.thickSkin.a", to: "wall.home.spN.x", why: "The way in." },

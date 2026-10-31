@@ -198,10 +198,10 @@ const over: Over = {
   'bow.home.crit.n': { lines: "critChance(20), critMulti(20), recoverOn('crit', 'life', 1)", why: 'Crits close wounds: the attrition voice in the archer’s terms.' },
   'bow.home.life.n': { lines: "life(10), lifeRegen(0.6), recoverOn('kill', 'life', 2)", why: 'Life that comes back with each kill (Old Scars folded in).' },
   'bow.home.wayfarer.n': { lines: 'evasion(20), evasionWhileMoving(30)', why: 'Evasion that pays the kiter: more of it while moving.' },
-  'bow.home.quickSip.n': { lines: 'flaskRecovery(20), flaskEffect(10)', why: 'The flask layer near home: what a drink gives.' },
+  'bow.home.quickSip.n': { lines: 'flaskCharges(24), flaskRecovery(10)', why: 'The flask layer near home, the Bow\u2019s way: flasks refill faster (the Yard\u2019s Field Dressing by the same seam sells recovery and duration).' },
   'bow.home.speed.qh': { lines: 'attackSpeed(12), accuracy(25)', why: 'Speed and the accuracy to land it.' },
   // The Hedgerows and the Far Pasture.
-  'bow.bows.tripwire.n': { lines: 'trapDamage(16), trapGainCold(10), trapSpeed(6)', why: 'Traps that chill, for the kiting bow user: unlike the Knife’s traps.' },
+  'bow.bows.tripwire.n': { lines: 'trapGainCold(12), chillEffect(15), freezeChance(8)', why: 'Traps that chill and freeze, for the kiting bow user (the Knife\u2019s Venom Snare on the same road sells trap damage and poison).' },
   'bow.rim.killShot.n': { lines: "weaponCrit('bow', 30), weaponCritMulti('bow', 20), elusiveOn('crit', 15)", why: 'A bow crit makes the archer Elusive: the shot and the slip away.' },
   // The axis.
   'bow.string.rapid.n': { lines: 'bowDamage(20), bowSpeed(12)', why: 'Bow speed (its movement line went).' },
@@ -209,7 +209,7 @@ const over: Over = {
   // The Ford and the Water Meadows.
   'bow.steel.hardyStock.n': { lines: 'life(8), physReduction(3)', why: 'Life and a little physical reduction for an evasion build at the Yard seam.' },
   'bow.steel.roundShield.n': { lines: 'shieldAttack(20), shieldBlock(4)', why: 'Shield attacks, shared with the Yard.' },
-  'bow.steel.wanderer.n': { lines: 'allAttr(10), life(8)', why: 'Attributes for a Strider reaching into the Yard’s gear.' },
+  'bow.steel.wanderer.n': { lines: 'moveSpeed(8), life(8), str(10)', why: 'The wanderer on the Yard\u2019s seam: movement, life and the strength the Yard\u2019s gear asks (the centre\u2019s Well Rounded sells all attributes).' },
   'bow.steel.lightHand.n': { lines: 'oneHandMelee(24), attackSpeed(8)', why: 'One-handed weapons, the Yard seam’s theme.' },
   'bow.steel.pitch.n': { lines: "eleAttackOne('fire', 24), areaDamage(20)", why: 'Fire arrows that burst: fire attacks’ first home.' },
   'bow.string.tallGrass.n': { lines: "evasion(20), recoverOn('evade', 'life', 2)", why: 'Evasion’s rule: each attack evaded closes a wound.' },

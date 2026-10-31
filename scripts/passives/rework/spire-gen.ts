@@ -219,7 +219,7 @@ const over: Over = {
   'spire.home.haleScribe.n': { lines: "life(10), lifeOnHit(4, ['spell'])" },
   // The Cloister.
   'spire.well.devotion.n': { lines: 'auraReserveLife(), auraEffect(8), reducedReservation(5)' },
-  'spire.well.familiars.n': { lines: 'minionDamage(20), minionLife(15), spellDamage(10)' },
+  'spire.well.familiars.n': { lines: 'minionDamagePerMana(4, 10), minionLife(24)', why: 'The Spire\u2019s spell minions: their damage grows with the caster\u2019s mana (the Cathedral\u2019s servants pay while they stand).' },
   'spire.well.deepWell.n1': { lines: 'mana(16), spellDamagePerMana(2, 20)' },
   'spire.well.deepWell.n2': { lines: 'es(14), damageWhileEsFull(20)' },
   'spire.well.flashpoint.n': { lines: "eleDamage('fire', 16), spellCrit(25), igniteChance(10)" },
@@ -236,8 +236,8 @@ const over: Over = {
   'spire.storm.mistWalk.n': { lines: 'dodgeSpell(6), dodgeAttack(3), es(6)' },
   'spire.storm.needlework.n': { lines: 'wandAttack(16), wandPhysAsLightning(15), critChance(15)' },
   'spire.storm.longChant.n': { name: 'Recital', lines: 'costReduction(8), damageVsRare(20)' },
-  'spire.craft.withering.n': { lines: 'chaosDot(12), skillDuration(15)' },
-  'spire.craft.sharpTongue.n': { lines: 'daggerSpellDamage(20), costReduction(6)' },
+  'spire.craft.withering.n': { lines: 'damageVsCursed(25), curseEffect(8)', why: 'The hexer\u2019s payoff: more damage against the cursed (the Knife\u2019s Rotting Word and Lingering Malice sell the damage over time close by).' },
+  'spire.craft.sharpTongue.n': { lines: 'daggerSpellCrit(40), spellCritMulti(20)', why: 'Dagger spells that crit hard (the Knife\u2019s Quiet Knife sells dagger spell damage and cost).' },
   'spire.well.livingVerse.n': { lines: 'spellDamage(15), life(8), costReduction(5)' },
   // The Column.
   'spire.column.lingering.n': { name: 'Slow Burn', lines: 'burnDamage(20), coldDot(10), skillDuration(10)' },

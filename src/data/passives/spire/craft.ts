@@ -2,7 +2,7 @@
  * The Scriptorium: The east: spell offence.
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { arcaneTideOn, castSpeed, castSpeedOnCrit, channelDamage, chaosDot, costReduction, curseEffect, daggerSpellDamage, damageStationary, dotDamage, eleDamage, es, esLeech, esOnHit, int, manaOnKill, manaRegen, projectileSpeed, shockChance, skillDuration, spellCrit, spellCritMulti, wandAttack, weaponAccuracy } from '../lines';
+import { arcaneTideOn, castSpeed, castSpeedOnCrit, channelDamage, curseEffect, daggerSpellCrit, daggerSpellDamage, damageStationary, damageVsCursed, dotDamage, eleDamage, es, esLeech, esOnHit, int, manaOnKill, manaRegen, projectileSpeed, shockChance, spellCrit, spellCritMulti, wandAttack, weaponAccuracy } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const craft: AreaSpec = {
@@ -58,7 +58,7 @@ export const craft: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [dotDamage(10)], at: [1287, -2468] },
-        { id: "n", kind: "notable", name: "Withering", lines: [chaosDot(12), skillDuration(15)], at: [1219, -2450] },
+        { id: "n", kind: "notable", name: "Withering", lines: [damageVsCursed(25), curseEffect(8)], at: [1219, -2450], why: "The hexer’s payoff: more damage against the cursed (the Knife’s Rotting Word and Lingering Malice sell the damage over time close by)." },
       ],
       links: [["a", "n"]],
     },
@@ -71,7 +71,7 @@ export const craft: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [daggerSpellDamage(8)], at: [1427, -2692] },
         { id: "b", kind: "small", lines: [daggerSpellDamage(8)], at: [1428, -2746] },
-        { id: "n", kind: "notable", name: "Sharp Tongue", lines: [daggerSpellDamage(20), costReduction(6)], at: [1430, -2817] },
+        { id: "n", kind: "notable", name: "Sharp Tongue", lines: [daggerSpellCrit(40), spellCritMulti(20)], at: [1430, -2817], why: "Dagger spells that crit hard (the Knife’s Quiet Knife sells dagger spell damage and cost)." },
         { id: "c", kind: "small", lines: [daggerSpellDamage(8)], at: [1379, -2865] },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "c"]],

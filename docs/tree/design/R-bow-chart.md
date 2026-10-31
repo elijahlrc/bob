@@ -3,30 +3,25 @@
 | Step | Area | Notable | Before | Now | Units | Hook (why) |
 | --- | --- | --- | --- | --- | --- | --- |
 | 5 | home | Clear Head | mana(16), reducedReservation(6) | 16% mana; 6% reduced mana reservation | 4.0 | The one mana notable near home: a pool and room for an aura. |
+| 5 | home | Quick Sip | flaskEffect(10), flaskDuration(10), moveSpeed(4) | 24% increased flask charges gained; 10% flask recovery | 4.0 | The flask layer near home, the Bow’s way: flasks refill faster (the Yard’s Field Dressing by the same seam sells recovery and duration). |
 | 5 | home | Hawk's Eye | attackDamage(14), attackSpeed(5), dex(20) | 14% attack damage; 15% accuracy; 5% life; +15 dexterity | 4.9 | The home generalist, passed through between the two hubs (step 5). |
 | 6 | home | Vital Aim | critMulti(30), critChance(15) | 20% crit chance; +20% crit multiplier; recover 1% of life on crit | 4.2 | Crits close wounds: the attrition voice in the archer’s terms. |
 | 6 | home | Long Breath | life(10), lifeRegen(0.8) | 10% life; 0.6% life regenerated; recover 2% of life on kill | 5.1 | Life that comes back with each kill (Old Scars folded in). |
 | 6 | home | Wayfarer | evasion(20), resAll(8) | 20% evasion; 30% evasion while moving | 4.3 | Evasion that pays the kiter: more of it while moving. |
-| 6 | home | Quick Sip | flaskEffect(10), flaskDuration(10), moveSpeed(4) | 20% flask recovery; 10% flask effect | 4.0 | The flask layer near home: what a drink gives. |
 | 6 | home | Quick Hands | attackSpeed(10), castSpeed(5) | 12% attack speed; 25% accuracy | 4.9 | Speed and the accuracy to land it. |
-| 6 | steel | Wanderer | allAttr(8), life(8) | +10 all attributes; 8% life | 4.1 | Attributes for a Strider reaching into the Yard’s gear. |
 | 7 | home | Hard Target | evasion(17), life(10), stunAvoid(10) | 17% evasion; 10% life; 10% avoid stun | 4.2 | 1.7 + 2 + 0.5 units. |
-| 8 | steel | Thirsty Quiver | leechLife(0.8, ["attack"]), lifeOnHit(4, ["attack"]), manaLeech(0.4) | 0.8% attack life leech; +4 life on attack hit; 0.4% mana leech | 4.0 | 2 + 1 + 1 units. The exit, to the bleed wheel. |
 | 8 | string | Hunter's Rush | new | 40% chance to gain Quickened on kill; 8% attack speed | 4.0 | A speed buff from killing, off the south spoke toward the axis. |
+| 8 | steel | Wanderer | allAttr(8), life(8) | 8% movement speed; 8% life; +10 strength | 4.3 | The wanderer on the Yard’s seam: movement, life and the strength the Yard’s gear asks (the centre’s Well Rounded sells all attributes). |
 | 9 | string | Sure Aim | new | 3% attack damage per 200 accuracy, up to 30%; 25% accuracy | 4.9 | Accuracy as a theme, on the axis. |
 | 9 | bows | K Steady Draw | same |  | 0.0 |  |
 | 9 | steel | K Plated Hide | same |  | 0.0 |  |
-| 9 | bows | Tripwire | trapDamage(24), trapSpeed(8), cooldownRecovery(10) | 16% trap damage; traps gain 10% of physical damage as extra cold; 6% trap throwing speed | 4.8 | Traps that chill, for the kiting bow user: unlike the Knife’s traps. |
 | 9 | string | Rapid Fire | bowDamage(16), projectileDamage(10), moveSpeed(4) | 20% bow damage; 12% bow attack speed | 4.4 | Bow speed (its movement line went). |
 | 9 | bows | Frost Fletching | new | 24% cold damage with attacks; 20% effect of chill | 4.0 | Cold arrows' first rung, off the north spoke: chilled enemies close in slower. |
-| 9 | steel | Light Hand | oneHandMelee(15), attackSpeed(8) | 24% one-handed melee damage; 8% attack speed | 4.0 | One-handed weapons, the Yard seam’s theme. |
-| 9 | steel | Round Shield | shieldBlock(5), shieldStunAvoid(30) | 20% attack damage with a shield; +4% block with a shield | 4.0 | Shield attacks, shared with the Yard. |
+| 10 | bows | Tripwire | trapDamage(24), trapSpeed(8), cooldownRecovery(10) | traps gain 12% of physical damage as extra cold; 15% effect of chill; 8% chance to freeze | 4.9 | Traps that chill and freeze, for the kiting bow user (the Knife’s Venom Snare on the same road sells trap damage and poison). |
+| 10 | steel | Thirsty Quiver | leechLife(0.8, ["attack"]), lifeOnHit(4, ["attack"]), manaLeech(0.4) | 0.8% attack life leech; +4 life on attack hit; 0.4% mana leech | 4.0 | 2 + 1 + 1 units. The exit, to the bleed wheel. |
 | 10 | bows | Ricochet | chain(1), projectileSpeed(5) | chain 1 more; 5% projectile speed | 4.5 | 4 + 0.5 units: a chain is worth a notable on its own. |
 | 10 | steel | Deep Pull | physAttack(20), life(8), str(10) | 20% physical attack damage; 8% life; +10 strength | 4.3 | 2 + 1.6 + 0.7 units. |
-| 10 | steel | Fleet Blade | swordDamage(20), weaponSpeed("sword", 5), evasion(10) | 20% sword damage; 5% attack speed with swords; 10% evasion | 4.0 | Swords beside the Yard’s, out from where the south border road meets the mid ring. |
-| 10 | string | Skirmisher's Leap | new | 50% chance to gain Quickened when you blink; 10% cooldown recovery | 4.0 | The kiting archer’s blink starts a burst of speed: the tree speaks to the blink the character makes by itself. |
-| 10 | bows | Kiting Snares | new | 12% trap throwing speed; 20% evasion while moving | 4.5 | Traps laid on the run: the trapper who kites. |
-| 10 | steel | Braced Guard | new | +6% block with a shield; +20 life on block | 4.3 | A block that heals. |
+| 10 | string | Skirmisher's Leap | new | 50% chance to gain Quickened when you blink; 10% cooldown recovery | 4.0 | For a build with a blink skill: each blink, the kiting one included, may start a burst of speed. |
 | 10 | south | Archer's Breath | new | recover 2% of mana on crit; 8% reduced mana cost | 4.4 | Mana for attackers from crits, unlike the Yard’s mana on hit with leech. |
 | 11 | bows | Elemental Fletching | eleAttack(20), elePenetration(3) | 20% elemental damage with attacks; elemental penetration 3% | 4.0 | 2 + 2 units. |
 | 11 | flight | Far Flight | projectileDamage(20), projectileSpeed(20), dex(15) | 20% projectile damage; 20% projectile speed; +15 dexterity | 5.0 | 2 + 2 + 1 units. G3 round 1 (2026-10-22): dexterity 20 → 15, so the notable is 5 units, not 5.3 (CONSTRAINTS §8.6; the brief's ST-p2). |
@@ -36,14 +31,19 @@
 | 11 | south | Bright Shafts | eleAttack(24), bowDamage(16) | 24% elemental damage with attacks; 16% bow damage | 4.0 | 2.4 + 1.6 units. The exit, to Quick Sip. |
 | 11 | string | Wind Rider | new | 16% attack speed while moving; 15% evasion | 3.9 | The kiter shoots faster on the move: against Steadfast Aim’s archer who stands. |
 | 11 | bows | Longbow | bowDamage(16), bowSpeed(12), accuracy(10) | 16% bow damage; 12% bow attack speed; 10% accuracy | 5.0 | 1.6 + 2.4 + 1 units. G3 round 1 (2026-10-22, the brief's ST-p2): bow attack speed 13 → 12, so it is 5 units, not 5.3. |
+| 11 | steel | Light Hand | oneHandMelee(15), attackSpeed(8) | 24% one-handed melee damage; 8% attack speed | 4.0 | One-handed weapons, the Yard seam’s theme. |
+| 11 | steel | Round Shield | shieldBlock(5), shieldStunAvoid(30) | 20% attack damage with a shield; +4% block with a shield | 4.0 | Shield attacks, shared with the Yard. |
 | 11 | steel | Hardy Stock | life(10), resAll(8) | 8% life; 3% physical damage reduction | 4.6 | Life and a little physical reduction for an evasion build at the Yard seam. |
 | 11 | south | Spare Stock | new | 20% increased flask charges gained; 8% reduced flask charges used | 4.5 | More drinks: kills refill the flasks a little, and each drink costs less (attrition’s lever). |
 | 11 | south | Hunter's Satchel | new | 25% increased flask charges gained; 10% flask effect | 5.1 | Flask charges from kills in the middle ground (steps 9 to 11): the hunter who drinks often. |
+| 11 | bows | Kiting Snares | new | 12% trap throwing speed; 20% evasion while moving | 4.5 | Traps laid on the run: the trapper who kites. |
 | 11 | steel | Lingering Momentum | new | 25% buff duration; 10% cooldown recovery | 4.1 | Quickened and Elusive last longer, and blinks come back sooner. |
 | 12 | quiver | Split Volley | extraProjectile(1) | +1 projectile | 4.0 | An extra projectile: 4 units by the table, and the line a thrown or bow build reshapes itself around. |
 | 12 | quiver | Deep Cuts | bleedDamage(30), physAttack(12), bleedFaster(10) | 30% bleed damage; 12% physical attack damage; bleeds 10% faster | 4.7 | 2.5 + 1.2 + 1 units. |
 | 12 | south | Live Wire | eleAttackOne("lightning", 24), shockChance(20) | 24% lightning damage with attacks; 20% chance to shock | 4.0 | 2 + 2 units. The apex of the arc, square to the road. |
+| 12 | steel | Fleet Blade | swordDamage(20), weaponSpeed("sword", 5), evasion(10) | 20% sword damage; 5% attack speed with swords; 10% evasion | 4.0 | Swords beside the Yard’s, out from where the south border road meets the mid ring. |
 | 12 | quiver | Pursuit's End | new | 25% damage while Quickened; +30% crit multiplier while Elusive | 4.2 | The payoff of the two buffs the region hands out: Quickened (kills, blinks) and Elusive (bow crits). |
+| 12 | steel | Braced Guard | new | +6% block with a shield; +20 life on block | 4.3 | A block that heals. |
 | 12 | steel | Second Wind | new | 1.5% life regenerated if you were hit recently; 30% avoid stun | 4.0 | Hits taken are answered with regeneration (it was a separate home near the start, repeating Hard Target and Long Breath). |
 | 13 | string | K Arrow Weave | same |  | 0.0 |  |
 | 13 | rim | Kill Shot | bowDamage(16), weaponCrit("bow", 25), weaponCritMulti("bow", 15) | 30% crit chance with bows; +20% crit multiplier with bows; 15% chance to gain Elusive on crit | 4.9 | A bow crit makes the archer Elusive: the shot and the slip away. |

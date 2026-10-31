@@ -2,7 +2,7 @@
  * The Bulwark: The axis at the mid ring and the north toward the rim: shields, maces, the two-handed choice.
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { armour, blockPerGrit, damagePerGrit, damageVsStunned, enemyStunThreshold, gritOnBlock, gritOnHitTaken, gritOnStun, life, lifeOnBlock, lifeRegenPerGrit, meleePhys, minionLife, shieldAttack, shieldDef, str, stunDuration, stunRecovery, stunThreshold, twoHandDamage, weaponDamage } from '../lines';
+import { armour, axeDamage, blockPerGrit, damagePerGrit, damageVsStunned, enemyStunThreshold, gritOnBlock, gritOnHitTaken, gritOnStun, life, lifeOnBlock, lifeRegenPerGrit, meleePhys, minionLife, shieldAttack, shieldDef, str, stunDuration, stunRecovery, stunThreshold, twoHandDamage, weaponDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const maces: AreaSpec = {
@@ -50,7 +50,7 @@ export const maces: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [twoHandDamage(12)], at: [-4415, 863] },
         { id: "b", kind: "small", lines: [twoHandDamage(12)], at: [-4472, 869] },
-        { id: "n", kind: "notable", name: "Headsman", lines: [twoHandDamage(20), gritOnStun(30)], at: [-4542, 877], why: "The two-hander’s grit: each stun builds it (its lines copied the Yard’s Momentum Swing)." },
+        { id: "n", kind: "notable", name: "Headsman", lines: [axeDamage(24), gritOnStun(25)], at: [-4542, 877], why: "Axes’ second home (the joins pass: their only other was the Yard’s rim pair): the headsman’s axe builds grit on each stun." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },

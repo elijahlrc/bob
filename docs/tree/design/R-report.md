@@ -206,3 +206,50 @@ report for the owner is the last section (and its Artifact page).
   literal reading of skeleton §8); keep the hexagon and the three spokes (beyond the skeleton's six inner roads); amend
   CONSTRAINTS §3 item 8 ("the centre ring between neighbouring homes"), now that the ring is gone; more than eight
   notables in the centre (more flask notables as the attrition lever).
+
+## The joins pass (review of the borders, the links and the archetypes across regions)
+
+A fresh reviewer measured the six borders, the 32 links between regions, the keystones from every start, every
+archetype's homes and the names (its scratch output: `scratchpad/joins/`). Baseline: no crossings, nothing drawn over,
+both rings continuous across every border, the centre never a shortcut between neighbours.
+
+**Fixed (the reviewer's MUSTs 1-8):**
+
+- **Every path to a seam is two nodes.** The Knife's Spoils and Soft Step, the Wall's Ringing Blows and the Cathedral's
+  Bright Omen lost one small each, so every neighbouring pair of starts is 12 apart (it was 12-13) and no neighbour
+  reaches an owner's border notables first (twelve did, among them both Knife border keystones). The Knife's area file
+  was edited by hand (its generator reads a removed snapshot) and `knife-gen.ts` updated to match.
+- **Axes:** a second home. The Wall's Headsman (two-handed damage and grit on stun) became axe damage with grit on stun;
+  axes' only other home was the Yard's rim pair, Hewing and Wide Arc.
+- **Copies across borders, re-lined:** Quick Sip (the Bow) now flask charges gained (the Yard's Field Dressing by the
+  same seam sells recovery and duration); Withering (the Spire) now damage against cursed enemies and curse effect (it
+  combined the Knife's Rotting Word and Lingering Malice); Tripwire (the Bow) now cold for traps, chill and freeze (it
+  opened on trap damage like the Knife's Venom Snare on the same node); Familiars (the Spire) now minion damage per 100
+  maximum mana, a new line `minionDamagePerMana` (it copied the Cathedral's Shepherd); Sharp Tongue (the Spire) now
+  dagger spell crit (it copied the Knife's Quiet Knife); Wanderer (the Bow) now movement, life and strength (the centre's
+  Well Rounded sells all attributes).
+
+**Left for later (tidy pass, naming pass, flask stats, owner):**
+
+- MUST 9, moving Honed Mind (physical spells on the Knife's border road toward the Bow) and Standing Cairns (totems on
+  the Yard's border road, by the Wall) off their border roads: held for the owner's answer on the border-road standard
+  (below), since under the skeleton's seam themes many other placements stand as built.
+- Leech on the first node of three neighbouring border roads (Thirsty Quiver, Vampiric Strikes, Alms); five flask
+  notables at step 5-6 with near-identical lines (flask stats pass); Light Hand against Light Blades; the Bow's shields
+  (Round Shield, Braced Guard) copying the Yard's; Ember Litany against Warm Hearth (18 steps apart).
+- Reach: warcries all at the rim (Zealot 13, Vanguard 14), insight 17 from the Mystic, staves and physical spells 15-16
+  from the Mystic, curses never within 15 of a strength class, cold and lightning never within 16 of one; claws two
+  homes; three of six damage-over-time notables at the Mystic-Shade mid ring; 6 of 10 minion notables round the
+  Zealot-Mystic border.
+- Links between regions: 4-6 per border (CONSTRAINTS §17 records 7-9 before the rework, the reference 10-13); the
+  Shade-Strider border has 4.
+- Names: three Hymns, three Litanies, large word families (Ward ×9, Iron ×9, Guard ×7), pairs across borders (Withering
+  and Withering Word, Bulwark ×3, Hallowed ×2, Blood Rite and Blood Bargain, Crushing ×2, Steadfast ×2, Glass ×2).
+- Label overlaps: about 27 pairs listed (none across a region).
+
+**Owner questions from the joins pass:** which standard governs a border road inward of the mid ring, the skeleton's
+seam themes (the first five regions) or generic notables only (held for the Cathedral; about 16 placements and 4
+keystones would move); axes as an archetype with a second home (now the Wall's Headsman) or a line only; the Knife, the
+Wall and the Cathedral each lost a small on the path to their seams (done, reversible); 4-6 links per border intended;
+insight at 17 for the Mystic and warcries at 14 for the Vanguard; both minion regions facing each other at the
+Zealot-Mystic border.

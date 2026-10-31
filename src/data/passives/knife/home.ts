@@ -191,7 +191,6 @@ export const home: AreaSpec = {
           lines: [lifeOnKill(15), manaOnKill(10), damageOnKill(15)],
           at: [1089, -1446],
         },
-        { id: 'b', kind: 'small', lines: [manaRegen(10)], at: [958, -1464] },
         {
           id: 'n2',
           kind: 'notable',
@@ -203,7 +202,6 @@ export const home: AreaSpec = {
       ],
       links: [
         ['a', 'n'],
-        ['n', 'b'],
         ['n', 'n2'],
       ],
     },
@@ -222,12 +220,8 @@ export const home: AreaSpec = {
           lines: [evasion(15), avoidAilments(20), dodgeAttack(3)],
           at: [1797, -221],
         },
-        { id: 'b', kind: 'small', lines: [evasion(10)], at: [1747, -98] },
       ],
-      links: [
-        ['a', 'n'],
-        ['n', 'b'],
-      ],
+      links: [['a', 'n']],
     },
     {
       id: 'quick',
@@ -472,9 +466,9 @@ export const home: AreaSpec = {
     { from: 'knife.home.spN.x', to: 'knife.venom.spN.a', why: 'The north spoke goes on.' },
     { from: 'knife.home.spS.x', to: 'knife.edge.spS.a', why: 'The south spoke goes on.' },
     { from: 'knife.home.spoils.a', to: 'knife.home.pathN.b', why: 'The way in.' },
-    { from: 'knife.home.spoils.b', to: 'knife.home.seams.n', why: 'The way in.' },
+    { from: 'knife.home.spoils.n', to: 'knife.home.seams.n', why: 'The path runs on from Spoils to the Spire seam (two nodes, as every path to a seam).' },
     { from: 'knife.home.softStep.a', to: 'knife.home.pathS.b', why: 'The way in.' },
-    { from: 'knife.home.softStep.b', to: 'knife.home.seams.s', why: 'The way in.' },
+    { from: 'knife.home.softStep.n', to: 'knife.home.seams.s', why: 'The path runs on from Soft Step to the Bow seam (two nodes, as every path to a seam).' },
     { from: 'knife.home.quick.a', to: 'knife.home.keen.n', why: 'The way in.' },
     { from: 'knife.home.thickBlood.a', to: 'knife.home.spN.x', why: 'The way in.' },
     { from: 'knife.home.star.w', to: 'knife.home.spS.x', why: 'The way in.' },

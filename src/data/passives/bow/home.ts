@@ -2,7 +2,7 @@
  * The Bow Gate: The Strider's first points (R-bow.md).
  * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31).
  */
-import { accuracy, attackDamage, attackSpeed, critChance, critMulti, dex, evasion, evasionWhileMoving, flaskEffect, flaskRecovery, life, lifeRegen, mana, recoverOn, reducedReservation, resAll, stunAvoid } from '../lines';
+import { accuracy, attackDamage, attackSpeed, critChance, critMulti, dex, evasion, evasionWhileMoving, flaskCharges, flaskEffect, flaskRecovery, life, lifeRegen, mana, recoverOn, reducedReservation, resAll, stunAvoid } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -175,7 +175,7 @@ export const home: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "b", kind: "small", lines: [flaskEffect(5)], at: [1080, 1358] },
-        { id: "n", kind: "notable", name: "Quick Sip", lines: [flaskRecovery(20), flaskEffect(10)], at: [927, 1401], why: "The flask layer near home: what a drink gives." },
+        { id: "n", kind: "notable", name: "Quick Sip", lines: [flaskCharges(24), flaskRecovery(10)], at: [927, 1401], why: "The flask layer near home, the Bow’s way: flasks refill faster (the Yard’s Field Dressing by the same seam sells recovery and duration)." },
       ],
       links: [["b", "n"]],
     },

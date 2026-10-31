@@ -126,9 +126,8 @@ export const home: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [manaRegen(10)], at: [-1139, -1381] },
         { id: "n", kind: "notable", name: "Bright Omen", lines: [allDamage(16), minionDamage(16), castSpeed(4), attackSpeed(4)], at: [-1040, -1432], why: "Damage for every Zealot, spell, attack or servant, at the Spire's seam (the Spire sells spell crit and recharge there): 1.3 + 1.3 + 1 + 0.8 units." },
-        { id: "b", kind: "small", lines: [manaRegen(10)], at: [-945, -1455] },
       ],
-      links: [["a", "n"], ["n", "b"]],
+      links: [["a", "n"]],
     },
     {
       id: "lectern",
@@ -214,7 +213,7 @@ export const home: AreaSpec = {
     { from: "cathedral.home.vigil.a", to: "cathedral.home.pathN.b", why: "The way in." },
     { from: "cathedral.home.vigil.n", to: "wall.home.seams.s", why: "The way in." },
     { from: "cathedral.home.omen.a", to: "cathedral.home.pathS.b", why: "The way in." },
-    { from: "cathedral.home.omen.b", to: "spire.home.seams.w", why: "The way in." },
+    { from: "cathedral.home.omen.n", to: "spire.home.seams.w", why: "The way in." },
     { from: "cathedral.home.lectern.a", to: "cathedral.home.pathS.b", why: "The way in." },
     { from: "cathedral.home.star.f", to: "cathedral.home.pathN.b", why: "The way in." },
     { from: "cathedral.home.ardour.a", to: "cathedral.home.spS.x", why: "The way in." },

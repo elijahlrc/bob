@@ -139,7 +139,7 @@ export const tables = { K, roads, links };
 const moves: Move[] = [
   // The Gate (home, steps 5 to 8): hybrid generalists, not what either neighbour sells at its seam.
   { from: 'nave.vigil', area: 'home', at: K(1760, -24), ats: { a: K(1785, -20.5), n: K(1730, -26.5) }, entry: [['a', 'cathedral.home.pathN.b'], ['n', 'wall.home.seams.s']], why: "Life with mana regeneration, on the south-west path to the Wall's seam (step 5): the path runs through it." },
-  { from: 'crypt.omen', area: 'home', at: K(1760, 24), ats: { a: K(1790, 20.5), n: K(1770, 24), b: K(1735, 27) }, entry: [['a', 'cathedral.home.pathS.b'], ['b', 'spire.home.seams.w']], why: "Damage for spells, attacks and minions alike, on the north-east path to the Spire's seam (step 5): the path runs through it." },
+  { from: 'crypt.omen', area: 'home', at: K(1760, 24), ats: { a: K(1790, 20.5), n: K(1770, 24), b: K(1735, 27) }, entry: [['a', 'cathedral.home.pathS.b'], ['n', 'spire.home.seams.w']], why: "Damage for spells, attacks and minions alike, on the north-east path to the Spire's seam (step 5): the path runs through it." },
   { from: 'nave.lectern', area: 'home', at: K(1420, 16), entry: [['a', 'cathedral.home.pathS.b']], why: 'Spells with duration, a side room off the north-east path toward the centre.' },
   { from: 'nave.star', area: 'home', at: K(1450, -21), entry: [['f', 'cathedral.home.pathN.b']], why: 'Armour, energy shield and regeneration (the hybrid defence of the str/int class), a side room toward the centre.' },
   { from: 'home.ardour', area: 'home', at: K(2240, 19.5), entry: [['a', 'cathedral.home.spS.x']], why: 'Elemental attacks, off the north-east spoke junction.' },
@@ -216,7 +216,9 @@ const over: Over = {
   'cathedral.pyre.wheel.f5': { lines: "auraEffect(12), es(8), reducedReservation(4)", why: "Aura effect, energy shield and auras that cost less to hold: 2 + 1.6 + 1.3 units." },
   'cathedral.walk.crozier.n': { lines: "staffSpellDamage(20), castSpeed(4), mana(10)", why: "Spells cast through a staff: damage, speed and the mana to keep going: 2.5 + 1 + 1.3 units." },
 };
-const trim: Record<string, string[]> = {};
+const trim: Record<string, string[]> = {
+  'cathedral.home.omen': ['b'],
+};
 const newc: NewCluster[] = [
   { area: 'pyre', id: 'fireRule', name: 'Faith Aflame', lines: "physGainFire(8), eleDamage('fire', 12)", smalls: ["eleDamage('fire', 8)", "eleDamage('fire', 8)"], entry: 'cathedral.walk.ring.q3', toward: K(4560, -8), why: "Fire's rule: every hit, spell or attack, gains part of its physical damage as fire; the holy warrior's road to Searing Avatar: 2.7 + 1.2 units." },
   { area: 'walk', id: 'lightRule', name: 'Faith Unleashed', lines: "spellPhysToLightning(30), damageVsShocked(15)", smalls: ["eleDamage('lightning', 8)", "eleDamage('lightning', 8)"], entry: 'cathedral.walk.ring.q7', toward: K(4560, 19), why: "Lightning's rule, for the priest: physical spells turned to lightning (Shattering Rite's road), and more damage on shocked enemies: 3 + 1.5 units." },
