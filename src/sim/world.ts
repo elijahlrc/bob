@@ -581,6 +581,9 @@ function tickFlasks(w: World, s: Side, dt: number, policy: FlaskPolicy): void {
       if (f.queued) {
         f.queued = false;
         f.activeT = f.spec.duration;
+        // The queued drink is drunk now: the emergency lines ask about life now, not when the first drink began.
+        f.lifeRate = (f.spec.life * drinkLifeMult(w, s, f.spec.uid)) / f.spec.duration;
+        f.manaRate = f.spec.mana / f.spec.duration;
       } else {
         f.lifeRate = 0;
         f.manaRate = 0;

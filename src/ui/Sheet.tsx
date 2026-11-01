@@ -14,7 +14,7 @@ import { BASE_CRIT_MULTI } from '../data/constants';
 import { HEXES, hexText } from '../data/hexes';
 import { GLOSSARY, glossFor } from '../data/glossary';
 import { modLabel } from '../mods/text';
-import type { Mod } from '../mods/types';
+import { maskIntersects, type CondId, type Mod } from '../mods/types';
 import { infoProps } from './info';
 import {
   armourTip,
@@ -190,6 +190,59 @@ function Section({
       </h4>
       {rows}
     </section>
+  );
+}
+
+/** The element a use picks: the sheet takes it as fire, so it is no choice of the player's. */
+const NOT_A_SITUATION = new Set<string>(['elemFire', 'elemCold', 'elemLightning']);
+
+/**
+ * The situations the character has stats for that the Character tab leaves out unless asked (moving, Elusive, hit recently,
+ * against an ignited enemy...): every condition of its modifiers, buffs included, that the sheet does not already take as
+ * true (a held shield, two weapons). `ch` is the character with no situation asked.
+ */
+export function sheetSituations(ch: Character): { id: CondId; label: string }[] {
+  const seen = new Set<CondId>();
+  for (const m of ch.db.mods()) {
+    const id = m.condition?.id;
+    if (!id || seen.has(id) || NOT_A_SITUATION.has(id) || !CONDITION_TEXT[id]) continue;
+    if (maskIntersects(ch.configConds, ch.cond.peek(id))) continue;
+    seen.add(id);
+  }
+  return [...seen]
+    .map((id) => {
+      const t = CONDITION_TEXT[id];
+      return { id, label: t.charAt(0).toUpperCase() + t.slice(1) };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
+ * Checkboxes over the Character tab: each counts the stats that need a situation, so the numbers can be read with it and
+ * without it (the sheet takes none of them as true by itself).
+ */
+export function SheetSituations({
+  choices,
+  on,
+  toggle,
+}: {
+  choices: { id: CondId; label: string }[];
+  on: readonly string[];
+  toggle: (id: CondId) => void;
+}) {
+  if (!choices.length) return null;
+  return (
+    <div class="cs-situations">
+      <span class="cs-situations-head" {...infoProps('Tick a situation to count the stats that need it.')}>
+        Count as true
+      </span>
+      {choices.map((c) => (
+        <label key={c.id} class="cs-situation">
+          <input type="checkbox" checked={on.includes(c.id)} onChange={() => toggle(c.id)} />
+          {c.label}
+        </label>
+      ))}
+    </div>
   );
 }
 

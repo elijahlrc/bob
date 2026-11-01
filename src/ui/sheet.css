@@ -237,3 +237,29 @@
   color: var(--pearl);
   text-shadow: 0 2px 0 var(--ink);
 }
+
+/* ---- The situations counted as true (a checkbox each) ---- */
+.cs-situations {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 8px 24px 0;
+  font-size: 17px;
+  /* Dark text on the gold, as the pale medallions use. */
+  color: var(--ink);
+  text-shadow: 0 1px 0 #ffffff44;
+}
+.cs-situations-head {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.cs-situation {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}

@@ -22,6 +22,8 @@ import { passivePoints, type RunState } from '../run/run';
 import { markSeen, unseenItems } from '../run/found';
 import { ask } from './Confirm';
 import { infoProps } from './info';
+import { loadPref, savePref } from './prefs';
+import type { CondId } from '../mods/types';
 import { Items } from './Items';
 import { MapReportView } from './MapReport';
 import { OfferInfo, OfferTable } from './OfferInfo';
@@ -33,7 +35,7 @@ import { BossAhead, BossCard } from './BossCard';
 import { BOSSES, bossForMap } from '../data/bosses';
 import type { OfferPreview } from '../run/preview';
 import { Reward } from './Reward';
-import { Sheet } from './Sheet';
+import { Sheet, SheetSituations, sheetSituations } from './Sheet';
 import { CRAFTING_OPEN } from '../data/constants';
 import { Workbench } from './Workbench';
 import { Skills } from './Skills';
@@ -383,6 +385,8 @@ export function Camp({ c }: { c: Controller }) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [c]);
+  // The situations ticked over the Character tab, remembered per device.
+  const [sheetConds, setSheetConds] = useState<CondId[]>(() => loadPref<CondId[]>('sheetSituations', []));
   // New gems are counted on the Skills tab until it has been opened (docs/STREAMLINE.md S4).
   const newGems = run ? unseenItems(run).filter((x) => x.kind === 'gem') : [];
   useEffect(() => {
@@ -405,8 +409,26 @@ export function Camp({ c }: { c: Controller }) {
         : null,
     [run?.build, run?.difficulty],
   );
-  if (!run || !ch) return null;
+  // The Character tab's own character: the situations ticked over it counted as true (the other tabs keep `ch`).
+  const situations = useMemo(() => (ch ? sheetSituations(ch) : []), [ch]);
+  const sheetCh = useMemo(() => {
+    const conds = sheetConds.filter((id) => situations.some((s) => s.id === id));
+    return run && ch && conds.length
+      ? new Character(run.build, {
+          areaLevel: run.map,
+          difficulty: run.difficulty,
+          resistPenalty: resistPenaltyForMap(run.map),
+          conds,
+        })
+      : ch;
+  }, [ch, sheetConds, situations]);
+  if (!run || !ch || !sheetCh) return null;
   const sheet = ch.sheet();
+  const toggleSituation = (id: CondId) => {
+    const next = sheetConds.includes(id) ? sheetConds.filter((x) => x !== id) : [...sheetConds, id];
+    setSheetConds(next);
+    savePref('sheetSituations', next);
+  };
   const last = c.lastResult;
   const pts = passivePoints(run);
   const newCount = unseenItems(run).length;
@@ -598,7 +620,8 @@ export function Camp({ c }: { c: Controller }) {
       {t === 'sheet' && (
         <>
           <EffectsBar run={run} />
-          <Sheet s={sheet} ch={ch} />
+          <SheetSituations choices={situations} on={sheetConds} toggle={toggleSituation} />
+          <Sheet s={sheetCh === ch ? sheet : sheetCh.sheet()} ch={sheetCh} />
         </>
       )}
       {t === 'skills' && <Skills c={c} ch={ch} focusSlot={gemSlot} focusGem={gemPick} />}

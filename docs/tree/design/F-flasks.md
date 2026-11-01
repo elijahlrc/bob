@@ -171,6 +171,6 @@ you evade), Hound's Blood (was Field Poultice: Quickened on crit, critical strik
 on kill with it. Draught's mana on kill was dropped (the Spire has it on Siphon).
 
 Left open: prices (the Shade's regeneration notables cost about 5, more than the common scale); the Strider's new
-notables use event buffs the sheet counts as always up (R-final risk 1); Stout Measure and the far notables are dead
+notables use event buffs the Skills and Items comparisons count as always up (R-final risk 1; the Character tab now has checkboxes, "Count as true", to see the numbers with and without each situation); Stout Measure and the far notables are dead
 ends past 8 steps; labels crowd at Ember Tithe, Hard-Won Rations, Bitter Dregs, Heat of the Chase and Anointing (label
-pass); every new name waits for the naming pass; the new nodes are not registered and the tree is not baked. A drink queued behind a running flask keeps the first drink's rate, so it misses the emergency lines if life fell below 30% in between (`src/sim/world.ts`, `tickFlasks`; left for when that file is free).
+pass); every new name waits for the naming pass; the new nodes are not registered and the tree is not baked. A drink queued behind a running flask now asks the emergency lines when it starts.
