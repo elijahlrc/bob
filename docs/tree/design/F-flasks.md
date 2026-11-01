@@ -145,3 +145,32 @@ nodes.
 - First prices. The point costs of the flask stats were set before flasks became scarce. The proposal is to start each
   flask notable at about the value of a regeneration notable in the same region, then adjust by play.
 - Names that clash with the stops and provisions (Provisions, Draught, Camp Stores) are left to the naming pass.
+
+## 5. As built (2026-11-01)
+
+Built from sections 2 and 3 by one builder per region, the centre by the lead. Engine and lines in commit 401e2f8: the
+global `flaskMaxCharges`, `flaskChargesKilledBy` (the kind of damage over time that dealt the killing blow,
+`dotKind` in `src/sim/combat.ts`), `flaskChargesPerCharge` (the live charges held), and the two emergency lines
+(`src/sim/flaskDrink.ts`). 30 flask nodes (16 notables), against 27 (9 notables) before; the tree has 1,375 nodes.
+Every flask notable is priced at about 4 to 4.5 units, near its region's regeneration notable, and carries no other
+sustain. No flat charges on kill is left anywhere.
+
+| Class | Near the start | Further out | Far out |
+| --- | --- | --- | --- |
+| Mystic | Draught (5): 30% mana flask recovery, 8% fewer charges a drink | Distilled Grace (9, new): 20% flask effect | Ember Tithe (12, new): +0.5 charges for a kill by burning |
+| Shade | Smuggler's Flasks (5): 45% faster life flask recovery | Hidden Vial (10, new): 60% life from the last belt slot's flask | Slow Harvest (12, new): +0.5 charges for a kill by poison |
+| Strider | Quick Sip (5): 10% fewer charges a drink, 10% flask effect | Slow Measure (10, was Spare Stock): 40% flask duration | Heat of the Chase (11, new): +0.12 charges a kill per fervour charge |
+| Reaver | Field Dressing (6): 24% life flask recovery, 20% flask duration | Bitter Dregs (10, new): 50% life from flasks drunk below 30% life | Bled Dry (10, new): +0.5 charges for a kill by bleeding |
+| Vanguard | Camp Stores (5): 24% maximum flask charges | Stout Measure (9, new): 48% life flask recovery | Hard-Won Rations (12, new): +0.12 charges a kill per grit charge |
+| Zealot | Anointing (5, new): 12% flask effect, 20% flask duration | Sacristy (11, new): 18% maximum charges, 20% mana flask recovery | Cup of Revelation (13, new): +0.12 charges a kill per insight charge |
+| Centre | Provisions (12): 12% flask effect, 20% flask recovery (its mana regeneration went) | | |
+
+Each notable has one or two flask smalls before it. The Strider's other flask notables became notables of its own builds:
+Slip the Pack (was Hunter's Satchel: Elusive on kill, movement speed), Reedwalker (was Field Kit: evasion, Elusive when
+you evade), Hound's Blood (was Field Poultice: Quickened on crit, critical strike chance); Supply Line went, and its life
+on kill with it. Draught's mana on kill was dropped (the Spire has it on Siphon).
+
+Left open: prices (the Shade's regeneration notables cost about 5, more than the common scale); the Strider's new
+notables use event buffs the sheet counts as always up (R-final risk 1); Stout Measure and the far notables are dead
+ends past 8 steps; labels crowd at Ember Tithe, Hard-Won Rations, Bitter Dregs, Heat of the Chase and Anointing (label
+pass); every new name waits for the naming pass; the new nodes are not registered and the tree is not baked.

@@ -14,6 +14,7 @@ import {
   damageVsRare,
   dex,
   eleDamage,
+  flaskChargesKilledBy,
   int,
   leechLife,
   manaLeech,
@@ -137,7 +138,7 @@ export const edge: AreaSpec = {
     {
       id: 'smear',
       name: 'Smeared Edge',
-      why: "Daggers with poison, on from the Docks wheel's far side. Since the revision (2026-10-31) on the Gutter too: an alley of poison smalls from Ill Wish's curse run, past Smeared Edge, to Rust and Ruin and Carrion Claws, so the poison and chaos notables open off one lane between the Rookery wheel and the rim instead of hanging behind each other.",
+      why: "Daggers with poison, on from the Docks wheel's far side. Since the revision (2026-10-31) on the Gutter too: an alley of poison smalls from Ill Wish's curse run, past Smeared Edge, to Rust and Ruin and Carrion Claws, so the poison and chaos notables open off one lane between the Rookery wheel and the rim instead of hanging behind each other. Since the flask-lines pass (2026-11-01) Slow Harvest, the poisoner's flask charges, opens off the room's first small beside Smeared Edge.",
       at: [3281, -1600],
       shape: { kind: 'hand' },
       nodes: [
@@ -164,12 +165,21 @@ export const edge: AreaSpec = {
           at: [3437, -1608],
           why: "The Gutter's last step, into Rust and Ruin: its way in that passes no other notable.",
         },
+        {
+          id: 'n2',
+          kind: 'notable',
+          name: 'Slow Harvest',
+          lines: [flaskChargesKilledBy('poison', 50)],
+          at: [3150, -1540],
+          why: "The Shade's charges-on-kill notable (the flask-lines pass, 2026-11-01, F-flasks.md §3): flasks fill only from enemies the poison itself kills, so it pays the poisoner who stacks the venom and lets it finish the work. Off Smeared Edge's first small, not behind Smeared Edge, where the poison dagger and the poison trapper (in from the Trapper wheel, Venom Snare's partner) both pass (step 12, 12 or more from every start). 50 / 12 = 4.2 units, like the first wave's charges-on-kill notables; the line alone, as a far notable may.",
+        },
       ],
       links: [
         ['d', 'n'],
         ['n', 'p'],
         ['g1', 'p'],
         ['p', 'g3'],
+        ['d', 'n2'],
       ],
     },
     {

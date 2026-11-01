@@ -2,7 +2,7 @@
  * The Practice Ground: The west spoke: swords, axes, one-handed, armour.
  * Written for the attrition rework from docs/tree/design/R-yard.md (2026-10-31).
  */
-import { armour, armourVsEle, bleedDamage, bleedDuration, blockRecovery, damageAfterBlock, dex, impaleChance, leechLife, lifeRegen, meleePhys, oneHandMelee, shieldBlock, str, swordDamage } from '../lines';
+import { armour, armourVsEle, bleedDamage, bleedDuration, blockRecovery, damageAfterBlock, dex, flaskChargesKilledBy, impaleChance, leechLife, lifeRegen, meleePhys, oneHandMelee, shieldBlock, str, swordDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const blades: AreaSpec = {
@@ -107,15 +107,16 @@ export const blades: AreaSpec = {
     {
       id: "lasting",
       name: "Lasting Wounds",
-      why: "Bleed duration, off the west spoke past the mid ring, by the bleed payoff and the axes.",
+      why: "Bleed duration, off the west spoke past the mid ring, by the bleed payoff and the axes. Since the flask-lines pass (2026-11-01) its second small forks: on to Lasting Wounds, or to Bled Dry, where the bleeding that finishes a foe fills the flasks.",
       at: [-439, 3573],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [bleedDamage(12)], at: [-526, 3558] },
         { id: "b", kind: "small", lines: [bleedDamage(12)], at: [-472, 3577] },
         { id: "n", kind: "notable", name: "Lasting Wounds", lines: [bleedDamage(24), bleedDuration(30)], at: [-406, 3601], why: "A cut that will not close: 2 + 2 units." },
+        { id: "n2", kind: "notable", name: "Bled Dry", lines: [flaskChargesKilledBy('bleed', 50)], at: [-455, 3490], why: "The Yard's charges-on-kill notable (the flask-lines pass, 2026-11-01): flasks fill only from enemies the bleeding itself kills, so it pays the bleeder who opens the wound and lets it finish the work. Beside Lasting Wounds, off its second small and not behind it, where the long bleeds that outlive the fight are (step 10, 10 or more from every start). 50 / 12 = 4.2 units, about the region's regeneration notable (Stout Heart 4.2); the line alone, as a far notable may." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["b", "n2"]],
     },
     {
       id: "armour",

@@ -2,7 +2,7 @@
  * The Barrows: Toward the rim: grit, warcries, two-handed weapons, the keystones.
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { aoe, areaDamage, armour, attackSpeed, critChance, critMulti, doubleDamage, eleAttackOne, gritOnKill, gritOnMaceHit, gritOnWarcry, igniteChance, knockback, life, meleeArea, meleePhys, meleeRange, str, swordDamage, totemDuration, totemSpeed, twoHandDamage, twoHandSpeedPerGrit, warcryEffect, weaponCrit, weaponCritMulti, weaponDamage, weaponSpeed } from '../lines';
+import { aoe, areaDamage, armour, attackSpeed, critChance, critMulti, doubleDamage, eleAttackOne, flaskChargesPerCharge, gritOnKill, gritOnMaceHit, gritOnWarcry, igniteChance, knockback, life, meleeArea, meleePhys, meleeRange, str, swordDamage, totemDuration, totemSpeed, twoHandDamage, twoHandSpeedPerGrit, warcryEffect, weaponCrit, weaponCritMulti, weaponDamage, weaponSpeed } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const grit: AreaSpec = {
@@ -183,8 +183,9 @@ export const grit: AreaSpec = {
         { id: "s1", kind: "small", lines: [armour(8)], at: [-3094, 2861] },
         { id: "s2", kind: "small", lines: [armour(8)], at: [-3043, 2790] },
         { id: "n", kind: "notable", name: "Plunder of Iron", lines: [gritOnKill(25), meleePhys(15)], at: [-2992, 2718], why: "Kills build grit: the south’s way into the grit loop." },
+        { id: "n2", kind: "notable", name: "Hard-Won Rations", lines: [flaskChargesPerCharge('grit', 12)], at: [-3170, 2660], why: "The Wall's charges on kill (the flask-lines pass, 2026-11-01, F-flasks.md §3), far out (step 12, 12 or more from every start): flask charges on kill for each grit charge held, its line alone. Priced at three charges held: 12 × 3 / 8 = 4.5 units, about a regeneration notable of the region (Old Wounds 4.1, Barrow Ward 4). Beside Plunder of Iron, so the kill loop closes in one room: kills build grit, grit makes kills refill the flasks (and Unbroken, in the keep, holds one more charge). The room's armour smalls part to the two notables, so neither forces a point into the other." },
       ],
-      links: [["s1", "s2"], ["s2", "n"]],
+      links: [["s1", "s2"], ["s2", "n"], ["s2", "n2"]],
     },
   ],
   links: [

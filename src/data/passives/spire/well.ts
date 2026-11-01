@@ -2,7 +2,7 @@
  * The Cloister: The west: energy shield, mana and life.
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { auraEffect, auraReserveLife, castSpeed, costReduction, damageOnLowLife, damageWhileEsFull, eleDamage, es, esRecharge, esRechargeDelay, esRechargeOnKill, igniteChance, int, life, lifeRegen, mana, minionDamage, minionDamagePerMana, minionLife, minionSpeed, reducedReservation, resOne, skillDuration, spellCrit, spellDamage, spellDamagePerMana, spellDamageWhenHit, stunAvoid, wandCastSpeed, wandSpellDamage } from '../lines';
+import { auraEffect, auraReserveLife, castSpeed, costReduction, damageOnLowLife, damageWhileEsFull, eleDamage, es, esRecharge, esRechargeDelay, esRechargeOnKill, flaskEffect, igniteChance, int, life, lifeRegen, mana, minionDamage, minionDamagePerMana, minionLife, minionSpeed, reducedReservation, resOne, skillDuration, spellCrit, spellDamage, spellDamagePerMana, spellDamageWhenHit, stunAvoid, wandCastSpeed, wandSpellDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const well: AreaSpec = {
@@ -52,15 +52,17 @@ export const well: AreaSpec = {
     {
       id: "devotion",
       name: "Kept Vows",
-      why: "Reservation and energy shield on the seam with the Cathedral, a side room toward the centre.",
+      why: "Reservation and energy shield on the seam with the Cathedral, a side room toward the centre. Since the flask-lines pass (2026-11-01) it forks at its first small: on to Kept Vows' auras, or by a flask small to Distilled Grace, the buffs a caster drinks.",
       at: [-627, -1230],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [reducedReservation(3)], at: [-675, -1273] },
         { id: "b", kind: "small", lines: [reducedReservation(3)], at: [-629, -1232] },
         { id: "n", kind: "notable", name: "Kept Vows", lines: [auraReserveLife(), auraEffect(8), reducedReservation(5)], at: [-577, -1185] },
+        { id: "f", kind: "small", lines: [flaskEffect(5)], at: [-610, -1325], why: "The step to Distilled Grace: flask effect (1 unit), off the room's first small so neither notable hangs behind the other (the flask-lines pass, 2026-11-01)." },
+        { id: "n2", kind: "notable", name: "Distilled Grace", lines: [flaskEffect(20)], at: [-540, -1365], why: "The Spire's flask notable further out (the flask-lines pass, 2026-11-01): flask effect, which strengthens a utility flask's buff as an aura's effect strengthens the aura, so it stands beside Kept Vows for the caster who lives on buffs (step 9). 4 units, about a regeneration notable of the region (Quiet Pulse 4.3)." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["a", "f"], ["f", "n2"]],
     },
     {
       id: "quickening",

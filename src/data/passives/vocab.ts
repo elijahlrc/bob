@@ -7,7 +7,7 @@ import * as L from './lines';
 import type { Line, LineSpec } from './types';
 
 /** What one argument is: a number, an element, an element or chaos, a damage type, or an optional list of skill tags. */
-export type ParamKind = 'n' | 'ele' | 'ele4' | 'dmg' | 'weapon' | 'recoverEvent' | 'pool' | 'tideEvent' | 'buffEvent' | 'tags?';
+export type ParamKind = 'n' | 'ele' | 'ele4' | 'dmg' | 'weapon' | 'recoverEvent' | 'pool' | 'tideEvent' | 'buffEvent' | 'chargeKind' | 'ailment' | 'tags?';
 
 export const CHOICES: Record<Exclude<ParamKind, 'n' | 'tags?'>, readonly string[]> = {
   ele: ['fire', 'cold', 'lightning'],
@@ -18,6 +18,8 @@ export const CHOICES: Record<Exclude<ParamKind, 'n' | 'tags?'>, readonly string[
   pool: ['life', 'mana', 'es'],
   tideEvent: ['flask', 'crit', 'kill'],
   buffEvent: ['kill', 'crit', 'evade', 'blink'],
+  chargeKind: ['grit', 'fervour', 'insight'],
+  ailment: ['ignite', 'bleed', 'poison'],
 };
 
 const SPECIAL: Record<string, ParamKind[]> = {
@@ -51,6 +53,8 @@ const SPECIAL: Record<string, ParamKind[]> = {
   meleePerStr: ['n', 'n'],
   quickenedOn: ['buffEvent', 'n'],
   elusiveOn: ['buffEvent', 'n'],
+  flaskChargesPerCharge: ['chargeKind', 'n'],
+  flaskChargesKilledBy: ['ailment', 'n'],
 };
 const LEFT_OUT = new Set(['damage', 'flag', 'UNIT']);
 

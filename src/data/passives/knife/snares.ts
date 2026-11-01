@@ -19,6 +19,7 @@ import {
   dualDamage,
   dualSpeed,
   evasion,
+  flaskLastSlotRecovery,
   insightOnCrit,
   int,
   life,
@@ -141,7 +142,7 @@ export const snares: AreaSpec = {
     {
       id: 'tumble',
       name: 'Tumble',
-      why: "Dodge, out from the mid ring near the border. Since the revision (2026-10-31) an alley runs on from Tumble through a dual-wield small and Twin Shadows into Veiled Herald's evasion run, so Twin Shadows stands between two clusters, reached from the border road without Tumble.",
+      why: "Dodge, out from the mid ring near the border. Since the revision (2026-10-31) an alley runs on from Tumble through a dual-wield small and Twin Shadows into Veiled Herald's evasion run, so Twin Shadows stands between two clusters, reached from the border road without Tumble. Since the flask-lines pass (2026-11-01) its first small forks the other way too, to Hidden Vial, the evader's emergency flask.",
       at: [3142, -220],
       shape: { kind: 'hand' },
       nodes: [
@@ -168,11 +169,20 @@ export const snares: AreaSpec = {
           at: [3345, -200],
           why: "Dual wielding's second home (with Feint and Cut), its partner crit. Since the revision between Tumble and Veiled Herald.",
         },
+        {
+          id: 'n3',
+          kind: 'notable',
+          name: 'Hidden Vial',
+          lines: [flaskLastSlotRecovery(60)],
+          at: [3035, -275],
+          why: "The Shade's emergency flask, further out (the flask-lines pass, 2026-11-01, F-flasks.md §3: option A, by belt slot): the flask in the last slot, the one that drinks at 15% life, recovers more. The dodger is hit seldom and hard, and when a dodge fails this is the vial kept back for it; with Smuggler's Flasks' faster recovery near home it lands at once. Off Tumble's small, not behind Tumble, so the evader picks the dodge, the vial or both (step 10). 60 / 15 = 4 units, the first wave's scale for a flask notable; the line alone.",
+        },
       ],
       links: [
         ['b', 'n'],
         ['n', 'd'],
         ['d', 'n2'],
+        ['b', 'n3'],
       ],
     },
     {

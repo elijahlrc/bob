@@ -1,15 +1,17 @@
 /**
- * The Water Meadows: South toward the rim: fire and lightning arrows, poisoned bows, flasks.
- * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31).
+ * The Water Meadows: South toward the rim: fire and lightning arrows, poisoned bows, the two buffs on evades, kills and
+ * crits, and the utility flask.
+ * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31); the flask-lines pass (2026-11-01,
+ * docs/tree/design/F-flasks.md) took most of its flask lines away.
  */
-import { bowDamage, costReduction, critMulti, damageVsIgnited, damageVsLowLife, eleAttack, eleAttackOne, evasion, flaskCharges, flaskChargesUsed, flaskEffect, flaskRecovery, igniteChance, life, poisonChance, poisonDamage, recoverOn, shockChance } from '../lines';
+import { bowDamage, costReduction, critChance, critMulti, damageVsIgnited, damageVsLowLife, eleAttack, eleAttackOne, elusiveOn, evasion, flaskDuration, igniteChance, moveSpeed, poisonChance, poisonDamage, quickenedOn, recoverOn, shockChance } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const waterMeadows: AreaSpec = {
   id: "bow.south",
   region: "strider",
   name: "The Water Meadows",
-  why: "South toward the rim: fire and lightning arrows, poisoned bows, flasks.",
+  why: "South toward the rim: fire and lightning arrows, poisoned bows, the two buffs on evades, kills and crits, and the utility flask.",
   at: [2571, 3064],
   clusters: [
     {
@@ -27,18 +29,16 @@ export const waterMeadows: AreaSpec = {
     },
     {
       id: "fieldKit",
-      name: "Field Kit",
-      why: "Evasion and flasks, out from the rim ring at the south spoke. Grown (2026-10-31; Supply Line was hung one step past Field Kit), and made a fork in the finalization: two evasion smalls in, then the way parts, Field Kit on one side and a flask small to Supply Line on the other, so taking either never forces the other. Supply Line's first-pass door on the rim node by the fire and lightning rooms went: no flask build walks in from there.",
+      name: "Reedwalker",
+      why: "Evasion that feeds Elusive, out from the rim ring at the south spoke. It was Field Kit, evasion and flasks, with Supply Line on a fork; the flask-lines pass (2026-11-01) took its flask lines away, and Supply Line's place went to Heat of the Chase beside the fervour rooms (Supply Line's life on kill was dropped, not moved: the Bow's kill recovery is Long Breath's).",
       at: [3308, 3139],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [evasion(10)], at: [3215, 2995] },
-        { id: "c", kind: "small", lines: [evasion(10)], at: [3300, 3080], why: "Where the room parts (the finalization): Field Kit on, or the flask small to Supply Line." },
-        { id: "n", kind: "notable", name: "Field Kit", lines: [evasion(20), flaskRecovery(20)], at: [3415, 3170], why: "Evasion with the flask layer." },
-        { id: "g", kind: "small", lines: [flaskEffect(5)], at: [3290, 3200], why: "The flask layer on Supply Line's side of the fork (2026-10-31; the finalization made the room a fork)." },
-        { id: "n2", kind: 'notable', name: "Supply Line", lines: [flaskEffect(12), recoverOn('kill', 'life', 2)], at: [3195, 3262], why: "The field kit restocks between fights: a kill closes a wound." },
+        { id: "c", kind: "small", lines: [evasion(10)], at: [3300, 3080], why: "The second evasion small, on to Reedwalker (the fork went with Supply Line, 2026-11-01)." },
+        { id: "n", kind: "notable", name: "Reedwalker", lines: [evasion(20), elusiveOn('evade', 25)], at: [3415, 3170], why: "Evasion that feeds itself (the flask-lines pass, 2026-11-01; it was Field Kit): an evaded attack may make the archer Elusive, and Elusive dodges more, so an evasion build reaches the region's second buff with no crit or kill (Kill Shot's Elusive is on bow crits, Slip the Pack's on kills). Tall Grass turns an evade into life instead. 2 + 2 units." },
       ],
-      links: [["a", "c"], ["c", "n"], ["c", "g"], ["g", "n2"]],
+      links: [["a", "c"], ["c", "n"]],
     },
     {
       id: "liveWire",
@@ -84,14 +84,14 @@ export const waterMeadows: AreaSpec = {
     },
     {
       id: "sap",
-      name: "Spare Stock",
-      why: "More drinks: kills refill the flasks a little, and each drink costs less (attrition’s lever).",
+      name: "Slow Measure",
+      why: "The utility flask's room, off the south spoke (the flask-lines pass, 2026-11-01; it was Spare Stock, charges on kill and cheaper drinks): flasks last longer.",
       at: [2802, 2254],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "s1", kind: "small", lines: [flaskCharges(10)], at: [2689, 2389] },
-        { id: "s2", kind: "small", lines: [flaskCharges(10)], at: [2746, 2321] },
-        { id: "n", kind: "notable", name: "Spare Stock", lines: [flaskCharges(20), flaskChargesUsed(8)], at: [2802, 2254], why: "More drinks: kills refill the flasks a little, and each drink costs less (attrition’s lever)." },
+        { id: "s1", kind: "small", lines: [moveSpeed(4)], at: [2689, 2389], why: "The way in from the spoke (2026-11-01; it was a flask small): movement speed, what a Strider mostly drinks a utility flask for." },
+        { id: "s2", kind: "small", lines: [flaskDuration(10)], at: [2746, 2321], why: "Flask duration, on to Slow Measure (2026-11-01)." },
+        { id: "n", kind: "notable", name: "Slow Measure", lines: [flaskDuration(40)], at: [2802, 2254], why: "The Bow's flask notable further out (the flask-lines pass, 2026-11-01; it was Spare Stock): utility flasks last longer, so a speed or evasion flask covers a whole fight, and life flasks recover more over the longer drink. 4 units, about Long Breath's price." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },
@@ -110,27 +110,27 @@ export const waterMeadows: AreaSpec = {
     },
     {
       id: "charges",
-      name: "Hunter's Satchel",
-      why: "Flask charges from kills in the middle ground (steps 9 to 11): the hunter who drinks often.",
+      name: "Slip the Pack",
+      why: "Elusive from kills, in the middle ground beside Hunter's Rush (the flask-lines pass, 2026-11-01; it was Hunter's Satchel, flask charges on kill).",
       at: [2101, 1505],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "s1", kind: "small", lines: [flaskCharges(10)], at: [2223, 1632] },
-        { id: "s2", kind: "small", lines: [flaskCharges(10)], at: [2162, 1569] },
-        { id: "n", kind: "notable", name: "Hunter's Satchel", lines: [flaskCharges(25), flaskEffect(10)], at: [2101, 1505], why: "Flask charges from kills in the middle ground (steps 9 to 11): the hunter who drinks often." },
+        { id: "s1", kind: "small", lines: [moveSpeed(4)], at: [2223, 1632], why: "Movement speed, the mover's stat (2026-11-01; it was a flask small)." },
+        { id: "s2", kind: "small", lines: [moveSpeed(4)], at: [2162, 1569], why: "Movement speed, on to Slip the Pack (2026-11-01; it was a flask small)." },
+        { id: "n", kind: "notable", name: "Slip the Pack", lines: [elusiveOn('kill', 30), moveSpeed(8)], at: [2101, 1505], why: "A kill and the hunter is gone (the flask-lines pass, 2026-11-01; it was Hunter's Satchel): the only Elusive on kill in the region. Joined to Hunter's Rush (Quickened on kill), the same kills hand out both buffs that Pursuit's End, whose door is a step along the mid ring, pays off. 2.4 + 2 units." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },
     {
       id: "herbs",
-      name: "Field Poultice",
-      why: "Life flasks, out from the rim ring at the border.",
+      name: "Hound's Blood",
+      why: "Quickened from crits, out from the rim ring at the border beside Killing Eye (the flask-lines pass, 2026-11-01; it was Field Poultice, life and cheaper drinks).",
       at: [2343, 3904],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "s1", kind: "small", lines: [flaskRecovery(8)], at: [2214, 3784] },
-        { id: "s2", kind: "small", lines: [flaskRecovery(8)], at: [2279, 3844] },
-        { id: "n", kind: "notable", name: "Field Poultice", lines: [life(10), flaskChargesUsed(12)], at: [2343, 3904], why: "Life flasks, out from the rim ring at the border." },
+        { id: "s1", kind: "small", lines: [critChance(15)], at: [2214, 3784], why: "Crit chance (2026-11-01; it was a flask small): the stat that feeds Hound's Blood." },
+        { id: "s2", kind: "small", lines: [critChance(15)], at: [2279, 3844], why: "Crit chance, on to Hound's Blood (2026-11-01; it was a flask small)." },
+        { id: "n", kind: "notable", name: "Hound's Blood", lines: [quickenedOn('crit', 40), critChance(25)], at: [2343, 3904], why: "Crits quicken the hunter (the flask-lines pass, 2026-11-01; it was Field Poultice): the only Quickened on crit in the region, so the crit archer beside Killing Eye's finisher, who kills less often than a pack-clearer, keeps the speed that Wind Rider's kiter and Pursuit's End want; from the Yard's border a crit duellist reads it the same way. 2.4 + 1.7 units." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },
@@ -157,7 +157,7 @@ export const waterMeadows: AreaSpec = {
     { from: "bow.south.sap.s1", to: "bow.steel.spS.c", why: "The way in." },
     { from: "bow.south.kindling.s1", to: "bow.rim.ring.q7", why: "The way in." },
     { from: "bow.south.charges.s1", to: "bow.flight.ring.c", why: "The way in." },
-    { from: "bow.south.charges.n", to: "bow.string.rush.n", why: "Hunter's Satchel and Hunter's Rush joined (the finalization; the Satchel hung by one entrance): the hunter who kills fast and drinks often, kills quickening it and its flasks refilling, takes both in one walk between the middle exit's south arm and the mid ring; slower than the ring." },
+    { from: "bow.south.charges.n", to: "bow.string.rush.n", why: "Slip the Pack (Hunter's Satchel until 2026-11-01) and Hunter's Rush joined (the finalization; it hung by one entrance): the hunter who kills fast, every kill a chance at Quickened and at Elusive, takes both in one walk between the middle exit's south arm and the mid ring, on to Pursuit's End where both are spent; slower than the ring." },
     { from: "bow.south.herbs.s1", to: "bow.rim.ring.s0", why: "The way in." },
     { from: "bow.south.breath.s1", to: "bow.steel.spS.m", why: "The way in." },
     { from: "bow.south.killingEye.g2", to: "bow.south.brightShafts.b", why: "The mana run leaves Bright Shafts' room (2026-10-31): the elemental archer who runs short of mana goes on from Bright Shafts to Grim Tally, kills paying for the next shot, and on to Killing Eye's finishing blow; slower than the spoke and the rim." },

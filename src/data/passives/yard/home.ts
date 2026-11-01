@@ -2,7 +2,7 @@
  * The Yard Gate: The Reaver's first points (R-yard.md).
  * Written for the attrition rework from docs/tree/design/R-yard.md (2026-10-31).
  */
-import { armour, attackSpeed, attackSpeedOnKill, critMulti, dex, evasion, flaskDuration, flaskRecovery, globalDefences, life, lifeRegen, manaLeech, manaOnHit, meleePhys, physAttack, resAll, str } from '../lines';
+import { armour, attackSpeed, attackSpeedOnKill, critMulti, dex, evasion, flaskDuration, flaskLifeRecovery, globalDefences, life, lifeRegen, manaLeech, manaOnHit, meleePhys, physAttack, resAll, str } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -129,14 +129,14 @@ export const home: AreaSpec = {
     {
       id: "fieldDressing",
       name: "Field Dressing",
-      why: "The flask layer near home, off the east path, and since the revision (2026-10-31) the start's way in to the centre: a flask small on from the notable to the inner road along the Bow's border.",
+      why: "The flask layer near home, off the east path, and since the revision (2026-10-31) the start's way in to the centre: a small on from the notable to the inner road along the Bow's border. Since the flask-lines pass (2026-11-01) it is the Reaver's life flask: more life from each drink and longer drinks, with one flask small in front of the notable and the room's other smalls given to life and resistances.",
       at: [520, 1354],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [flaskRecovery(10)], at: [516, 1398] },
-        { id: "n", kind: "notable", name: "Field Dressing", lines: [flaskRecovery(20), flaskDuration(20)], at: [491, 1311], why: "The flask layer near home (its movement line went)." },
-        { id: "b", kind: "small", lines: [flaskRecovery(10)], at: [554, 1352] },
-        { id: "c", kind: "small", lines: [flaskRecovery(10)], at: [528, 1212], why: "The flask room's far side (2026-10-31): Field Dressing leads on to the centre's inner road instead of ending the path. Flasks are a generic layer, so the centre is where this room should open." },
+        { id: "a", kind: "small", lines: [life(5)], at: [516, 1398], why: "The room's first step, off the north path: life, the body the dressing mends (1 unit; its flask line went in the flask-lines pass, 2026-11-01, which leaves the room one flask small)." },
+        { id: "n", kind: "notable", name: "Field Dressing", lines: [flaskLifeRecovery(24), flaskDuration(20)], at: [491, 1311], why: "The flask layer near home (its movement line went). Since the flask-lines pass (2026-11-01) the Reaver's life flask near the start: more life from each drink and a longer drink, for the fighter who rations a supply between refills. 2 + 2 units, about the region's regeneration notable (Stout Heart 4.2)." },
+        { id: "b", kind: "small", lines: [flaskLifeRecovery(12)], at: [554, 1352], why: "The step into Field Dressing: life from flasks (1 unit; the flask-lines pass, 2026-11-01)." },
+        { id: "c", kind: "small", lines: [resAll(4)], at: [528, 1212], why: "The flask room's far side (2026-10-31): Field Dressing leads on to the centre's inner road instead of ending the path. Flasks are a generic layer, so the centre is where this room should open. Resistances since the flask-lines pass (2026-11-01; it was flask recovery): a defence every Reaver takes on the way into the centre's defence rooms." },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "c"]],
     },
@@ -231,7 +231,7 @@ export const home: AreaSpec = {
     { from: "yard.home.guarded.n", to: "yard.home.seams.s", why: "The way in." },
     { from: "yard.home.quick.n", to: "yard.home.fightingBreath.c", why: "The court (2026-10-31): Honed Steel opens onto the striker's side, so the node every Reaver wants leads on. The build: the fast attacker, who takes Honed Steel's speed and then runs on mana from its hits." },
     { from: "yard.home.cross.s2", to: "yard.home.cleanBreak.b", why: "The court (2026-10-31): the west road in from the hub parts at its last small, to Honed Steel or to Clean Break, so the guard's side of the court is reached without the generalist and the court closes through the road. The build: the heavy hitter on the guard's side, who wants physical crit near home without Honed Steel's speed." },
-    { from: "yard.home.fieldDressing.c", to: "centre.ring.road.i2", why: "The flask room on to the centre's inner road (2026-10-31), a step slower than the seam road beside it. The build: the Reaver who lives on flasks, on from Field Dressing to the centre's generic flask and defence rooms." },
+    { from: "yard.home.fieldDressing.c", to: "centre.ring.road.i2", why: "The flask room on to the centre's inner road (2026-10-31), a step slower than the seam road beside it. The build: the Reaver who lives on flasks, on from Field Dressing to the centre's generic flask and defence rooms (its far small gives resistances since the flask-lines pass, 2026-11-01)." },
     { from: "yard.home.life.c", to: "yard.blades.mail.n", why: "Stout Heart on into Mended Mail (2026-10-31): a way from the seam path to the west spoke, dearer than the roads. The build: the armoured regenerator, life and regeneration and then armour that hits back." },
   ],
 };

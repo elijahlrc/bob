@@ -2,7 +2,7 @@
  * The Thicket: The axis at and beyond the mid ring: more projectiles, fervour.
  * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31).
  */
-import { allDamage, attackSpeed, attackSpeedPerFervour, bleedDamage, bleedFaster, bowDamage, critMulti, critMultiWhileElusive, damageStationary, damageWhileQuickened, doubleDamage, eleAttack, elePenetration, extraProjectile, fervourDuration, fervourOnCrit, fervourOnKill, physAttack, projectileDamage } from '../lines';
+import { allDamage, attackSpeed, attackSpeedPerFervour, bleedDamage, bleedFaster, bowDamage, critMulti, critMultiWhileElusive, damageStationary, damageWhileQuickened, doubleDamage, eleAttack, elePenetration, extraProjectile, fervourDuration, fervourOnCrit, fervourOnKill, flaskChargesPerCharge, physAttack, projectileDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const quiver: AreaSpec = {
@@ -32,7 +32,7 @@ export const quiver: AreaSpec = {
     {
       id: "hotPursuit",
       name: "Hot Pursuit",
-      why: "Fervour on kill, in from the rim ring, beside the Knife’s fervour. Split in two rooms (2026-10-31; Hunter's Fervour was hung one step past Hot Pursuit): Hunter's Fervour stands on its own crit small from the next rim node (since the finalization Hot Pursuit's door is on q4 and Hunter's Fervour's on q5), and leads on by a fervour-duration small into Hot Pursuit, so a crit build earns its fervour in one room and spends it in the other.",
+      why: "Fervour on kill, in from the rim ring, beside the Knife’s fervour. Split in two rooms (2026-10-31; Hunter's Fervour was hung one step past Hot Pursuit): Hunter's Fervour stands on its own crit small from the next rim node (since the finalization Hot Pursuit's door is on q4 and Hunter's Fervour's on q5), and leads on by a fervour-duration small into Hot Pursuit, so a crit build earns its fervour in one room and spends it in the other. Since the flask-lines pass (2026-11-01) a third notable, Heat of the Chase (flask charges on kill per fervour charge), stands on the room's middle small with its own small to the rim at q5: a build that earns fervour at either notable walks one small on to have its kills refill the flasks.",
       at: [3321, 2157],
       shape: { kind: 'hand' },
       nodes: [
@@ -42,8 +42,10 @@ export const quiver: AreaSpec = {
         { id: "c", kind: "small", lines: [fervourDuration(15)], at: [3172, 2292], why: "Between earning fervour and spending it: the charges last longer (2026-10-31)." },
         { id: "n2", kind: 'notable', name: "Hunter's Fervour", lines: [fervourOnCrit(20), critMulti(15)], at: [3107, 2470], why: "Fervour from crits as well as kills, so a crit build feeds Hot Pursuit’s speed." },
         { id: "f2", kind: "small", lines: [critMulti(12)], at: [3184, 2512], why: "Hunter's Fervour's own way in (2026-10-31; one small since the finalization): crit multiplier, for the crit build it serves." },
+        { id: "n3", kind: 'notable', name: "Heat of the Chase", lines: [flaskChargesPerCharge('fervour', 12)], at: [3330, 2300], why: "The Bow's charges on kill (the flask-lines pass, 2026-11-01; docs/tree/design/F-flasks.md), far out (11 points) beside the fervour it counts: flasks refill on kills only while fervour is held, so the archer has to earn and keep the charges (Hot Pursuit, Hunter's Fervour) to drink from its kills. Alone on its notable, 4.5 units at three charges held, about Long Breath's price. It takes the place of Supply Line, which went from the Field Kit room." },
+        { id: "g3", kind: "small", lines: [fervourDuration(10)], at: [3370, 2410], why: "Heat of the Chase's own way in from the rim ring (2026-11-01): fervour lasts longer, the charges it counts." },
       ],
-      links: [["a2", "a3"], ["a3", "n"], ["n", "c"], ["c", "n2"], ["n2", "f2"]],
+      links: [["a2", "a3"], ["a3", "n"], ["n", "c"], ["c", "n2"], ["n2", "f2"], ["g3", "n3"], ["n3", "c"]],
     },
     {
       id: "tellingShot",
@@ -92,6 +94,7 @@ export const quiver: AreaSpec = {
     { from: "bow.quiver.tellingShot.s2", to: "bow.rim.ring.q4", why: "The way in." },
     { from: "bow.quiver.forces.s1", to: "bow.rim.ring.q5", why: "The way in." },
     { from: "bow.quiver.pursuit.s1", to: "bow.flight.ring.b", why: "The way in." },
+    { from: "bow.quiver.hotPursuit.g3", to: "bow.rim.ring.q5", why: "Heat of the Chase's own door (2026-11-01), so it is not hung behind Hot Pursuit or Hunter's Fervour: the fervour archer on the rim walks in by fervour duration." },
     { from: "bow.quiver.hotPursuit.f2", to: "bow.rim.ring.q5", why: "Hunter's Fervour's way in, from the rim ring (2026-10-31; from q5 since the finalization): the crit archer who wants fervour comes in by crit multiplier, earns fervour on crits and walks on to Hot Pursuit to spend it as speed." },
   ],
 };

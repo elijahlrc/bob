@@ -2,7 +2,7 @@
  * The Lychway: North-east toward the rim: lightning, minions, chaos, channelling.
  * Written for the attrition rework from docs/tree/design/R-cathedral.md (2026-10-31).
  */
-import { attackSpeed, castSpeed, channelDamage, channelGuard, chaosSpell, costReduction, damageVsShocked, eleAttackOne, eleDamage, int, mana, shieldBlock, shieldSpellBlock, shockChance, skillDuration, spellArea, spellDamage, spellPhysToLightning, staffDamage, staffSpellDamage, str, weaponCrit, weaponCritMulti } from '../lines';
+import { attackSpeed, castSpeed, channelDamage, channelGuard, chaosSpell, costReduction, damageVsShocked, eleAttackOne, eleDamage, flaskManaRecovery, flaskMaxCharges, int, mana, shieldBlock, shieldSpellBlock, shockChance, skillDuration, spellArea, spellDamage, spellPhysToLightning, staffDamage, staffSpellDamage, str, weaponCrit, weaponCritMulti } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const lychway: AreaSpec = {
@@ -99,15 +99,17 @@ export const lychway: AreaSpec = {
     {
       id: "vespers",
       name: "Vespers",
-      why: "Spells with duration, out from the rim ring.",
+      why: "Spells with duration, out from the rim ring. Since the flask-lines pass (2026-11-01, F-flasks.md section 3) the mana caster's corner: its door small parts to Vespers (more mana, cheaper skills) or, by a mana-flask small, to the Sacristy (a deeper flask store and more mana from each drink), so neither forces a point into the other.",
       at: [-3308, -3139],
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [spellDamage(8)], at: [-3254, -3071] },
         { id: "b", kind: "small", lines: [spellDamage(8)], at: [-3289, -3114] },
         { id: "n", kind: "notable", name: "Vespers", lines: [mana(20), costReduction(6)], at: [-3366, -3213], why: "The evening office: more mana and cheaper skills (spells with duration moved to Lectern): 2.5 + 1.5 units." },
+        { id: "m", kind: "small", lines: [flaskManaRecovery(15)], at: [-3370, -3000], why: "The Sacristy's door (the flask-lines pass, 2026-11-01), the region's one mana-flask small: 15/15 = 1 unit." },
+        { id: "store", kind: "notable", name: "Sacristy", lines: [flaskMaxCharges(18), flaskManaRecovery(20)], at: [-3480, -2930], why: "Where the vessels are kept (the flask-lines pass, 2026-11-01; the Cathedral's further flask stat, step 11): more maximum charges for every flask, so a refill lasts longer without a kill, and more mana from each mana flask, the caster's half: 18/6 + 20/15 = 3 + 1.3 = 4.3 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3, Chorus 4). Unlike the Wall's Camp Stores (maximum charges alone, near its start), it is the mana caster's store, far out beside Vespers. Flask only." },
       ],
-      links: [["a", "b"], ["b", "n"]],
+      links: [["a", "b"], ["b", "n"], ["a", "m"], ["m", "store"]],
     },
     {
       id: "lightRule",

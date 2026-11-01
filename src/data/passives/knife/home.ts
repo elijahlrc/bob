@@ -16,9 +16,7 @@ import {
   es,
   esLeech,
   evasion,
-  flaskDuration,
-  flaskEffect,
-  flaskRecovery,
+  flaskLifeRate,
   int,
   life,
   lifeOnKill,
@@ -173,7 +171,7 @@ export const home: AreaSpec = {
     {
       id: 'spoils',
       name: 'Spoils',
-      why: "Mana regeneration, mana on kill and flask recovery, on the north path to the Spire seam (step 5): the path runs through it. Grown in the revision (2026-10-31, R-revise.md): a run of mana regeneration goes on from Spoils to Low Tide and out to the north border road, so Low Tide stands where three ways meet (the border road, Spoils, Thick Blood) instead of hanging one step past Spoils.",
+      why: "Mana regeneration and life and mana on kill, on the north path to the Spire seam (step 5): the path runs through it. Grown in the revision (2026-10-31, R-revise.md): a run of mana regeneration goes on from Spoils to Low Tide and out to the north border road, so Low Tide stands where three ways meet (the border road, Spoils, Thick Blood) instead of hanging one step past Spoils.",
       at: [1071, -1422],
       shape: { kind: 'hand' },
       nodes: [
@@ -384,18 +382,31 @@ export const home: AreaSpec = {
     {
       id: 'flasks',
       name: "Smuggler's Flasks",
-      why: "The flask layer near home, for any build, off the north path toward the centre. Since the revision (2026-10-31) the north's two doors part at its second small: Smuggler's Flasks or Deep Reserves, each leading on into Hoarded Breath, so neither is the end of a path.",
+      why: "The flask layer near home, for any build, off the north path toward the centre. Since the revision (2026-10-31) the north's two doors part at its second small: Smuggler's Flasks or Deep Reserves, each leading on into Hoarded Breath, so neither is the end of a path. Since the flask-lines pass (2026-11-01, F-flasks.md §3) the Shade's near flask stat is speed: the same life from each drink, delivered sooner, for the light-armoured skirmisher who cannot stand in a slow heal.",
       at: [915, -994],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 's1', kind: 'small', lines: [flaskRecovery(10)], at: [1080, -1054] },
-        { id: 's2', kind: 'small', lines: [flaskRecovery(10)], at: [998, -1024] },
+        {
+          id: 's1',
+          kind: 'small',
+          lines: [life(5)],
+          at: [1080, -1054],
+          why: "The north path's step before its two doors, so it serves both: life, which prescribes neither the flask nor the mana pool (it was flask recovery until the flask-lines pass, 2026-11-01). 1 unit.",
+        },
+        {
+          id: 's2',
+          kind: 'small',
+          lines: [flaskLifeRate(10)],
+          at: [998, -1024],
+          why: "The step into Smuggler's Flasks, by its notable's stat since the flask-lines pass (2026-11-01): 10 / 10 = 1 unit. The mana door also parts here, so the caster headed for Deep Reserves pays this one flask point; the other small stays general so that the cost is one point, not two.",
+        },
         {
           id: 'n',
           kind: 'notable',
           name: "Smuggler's Flasks",
-          lines: [flaskEffect(15), flaskRecovery(15), flaskDuration(15)],
+          lines: [flaskLifeRate(45)],
           at: [915, -994],
+          why: "Faster life flask recovery and nothing else of flask (the flask-lines pass, 2026-11-01): each drink lands sooner, so a flask drunk in a fight heals before the next blow, and it is the start of an emergency flask build (Hidden Vial, out by Tumble). 45 / 10 = 4.5 units, the first wave's scale for a flask notable (4 to 4.5); its flask effect, recovery and duration went (the Shade's near row is the recovery speed only). Still a way onward, into Hoarded Breath by a mana small.",
         },
       ],
       links: [

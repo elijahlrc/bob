@@ -2,7 +2,7 @@
  * The Wall Gate: The Vanguard's first points (R-wall.md).
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { armour, critChance, enemyStunThreshold, flaskEffect, flaskRecovery, life, lifeRegen, manaOnHit, meleeArea, meleeDamage, meleePhys, resAll, resOne, str, stunThreshold } from '../lines';
+import { armour, critChance, enemyStunThreshold, flaskMaxCharges, life, lifeRegen, manaOnHit, meleeArea, meleeDamage, meleePhys, resAll, resOne, str, stunThreshold } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -172,12 +172,12 @@ export const home: AreaSpec = {
     {
       id: "quartermaster",
       name: "Camp Stores",
-      why: "The flask layer near home, run through on the north path to the Cathedral seam (the centre pass: every start about six steps from its seams).",
+      why: "The flask layer near home, run through on the north path to the Cathedral seam (the centre pass: every start about six steps from its seams). Since the flask-lines pass (2026-11-01, F-flasks.md §3) the Wall's near flask stat is more maximum charges: the soldier who carries a deeper store, so a refill lasts longer without killing anything.",
       at: [-1701, 179],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "n", kind: "notable", name: "Camp Stores", lines: [flaskRecovery(20), flaskEffect(12)], at: [-1677, 103], why: "The flask layer near home (renamed: Quartermaster is a stop)." },
-        { id: "b", kind: "small", lines: [flaskRecovery(10)], at: [-1716, 256] },
+        { id: "n", kind: "notable", name: "Camp Stores", lines: [flaskMaxCharges(24)], at: [-1677, 103], why: "The flask layer near home (renamed: Quartermaster is a stop). Since the flask-lines pass (2026-11-01) more maximum flask charges and nothing else of flask: 24/6 = 4 units, about Old Wounds (4.1) and Barrow Ward (4), the region's near regeneration notables. Its flask recovery and effect went (the Wall's near row is maximum charges only)." },
+        { id: "b", kind: "small", lines: [flaskMaxCharges(6)], at: [-1716, 256], why: "Camp Stores' small, by its notable's stat since the flask-lines pass (2026-11-01): 1 unit." },
       ],
       links: [["b", "n"]],
     },

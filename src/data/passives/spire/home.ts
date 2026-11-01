@@ -2,7 +2,7 @@
  * The Spire Gate: The Mystic's first points (R-spire.md).
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { allDamage, arcaneTideOn, castSpeed, critChance, es, esFlat, flaskEffect, flaskRecovery, int, life, lifeOnHit, mana, manaFlat, manaRegen, recoverOn, resAll, resOne, spellCrit, spellCritMulti, spellDamage } from '../lines';
+import { allDamage, arcaneTideOn, castSpeed, critChance, es, esFlat, flaskChargesUsed, flaskManaRecovery, int, life, lifeOnHit, mana, manaFlat, manaRegen, recoverOn, resAll, resOne, spellCrit, spellCritMulti, spellDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -176,12 +176,12 @@ export const home: AreaSpec = {
     {
       id: "draught",
       name: "Draught",
-      why: "The flask layer near home, run through on the west path to the Cathedral seam (the centre pass: every start about six steps from its seams).",
+      why: "The flask layer near home, run through on the west path to the Cathedral seam (the centre pass: every start about six steps from its seams). Since the flask-lines pass (2026-11-01) it is the mana caster's flask: more mana from each drink, fewer charges spent on it, so a refill lasts longer.",
       at: [-696, -1562],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [flaskEffect(5)], at: [-636, -1614] },
-        { id: "n", kind: "notable", name: "Draught", lines: [flaskEffect(12), flaskRecovery(12), recoverOn('kill', 'mana', 2)], at: [-750, -1503] },
+        { id: "a", kind: "small", lines: [flaskManaRecovery(15)], at: [-636, -1614], why: "The step into Draught: mana from flasks (1 unit; the flask-lines pass, 2026-11-01)." },
+        { id: "n", kind: "notable", name: "Draught", lines: [flaskManaRecovery(30), flaskChargesUsed(8)], at: [-750, -1503], why: "The mana caster's flask, near the start (the flask-lines pass, 2026-11-01): 2 + 2 units, about a regeneration notable of the region (Quiet Pulse 4.3). Its old recover 2% of mana on kill was dropped, not moved: a flask node carries no other sustain, and the region keeps mana on kill on Siphon." },
       ],
       links: [["n", "a"]],
     },

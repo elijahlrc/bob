@@ -2,7 +2,7 @@
  * The Cathedral Gate: The Zealot's first points (R-cathedral.md).
  * Written for the attrition rework from docs/tree/design/R-cathedral.md (2026-10-31).
  */
-import { accuracy, allDamage, armour, attackSpeed, castSpeed, eleAttack, eleDamageAll, es, globalDefences, int, life, lifeRegen, mana, manaRegen, minionDamage, resAll, resOne, skillDuration, spellDamage, str } from '../lines';
+import { accuracy, allDamage, armour, attackSpeed, auraEffect, castSpeed, eleAttack, eleDamageAll, es, flaskDuration, flaskEffect, globalDefences, int, life, lifeRegen, mana, manaRegen, minionDamage, resAll, resOne, skillDuration, spellDamage, str } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -155,6 +155,19 @@ export const home: AreaSpec = {
       links: [["a", "n"], ["n", "b"]],
     },
     {
+      id: "anoint",
+      name: "Anointing",
+      why: "The Cathedral's near flask room (the flask-lines pass, 2026-11-01, F-flasks.md section 3: flask effect and duration, the region of auras and buffs). Off the north-east hub on the Ardour side of the spoke, and on by an aura small to the spoke's next junction, where the Choirmaster wheel, Frozen Font and Lone Vow open: a way through beside the spoke, two steps slower than the road (four against two).",
+      at: [-1660, -1640],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [flaskDuration(10)], at: [-1527, -1547], why: "The door from the hub, by its notable's stat: 10/10 = 1 unit." },
+        { id: "n", kind: "notable", name: "Anointing", lines: [flaskEffect(12), flaskDuration(20)], at: [-1660, -1640], why: "Flasks that work longer and stronger, utility flasks above all, the buffs a Zealot carries beside the auras (step 5): 2.4 + 2 = 4.4 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3, Chorus 4) and Bright Omen (4.4) at the same step. Flask only: no regeneration or recovery on kill." },
+        { id: "b", kind: "small", lines: [auraEffect(6)], at: [-1745, -1745], why: "Anointing's way on toward the choir's auras: 6/6 = 1 unit." },
+      ],
+      links: [["a", "n"], ["n", "b"]],
+    },
+    {
       id: "wake",
       name: "Wake",
       why: "Energy shield and life, off the south-west hub (step 6); since finalization (2026-10-31) its far small joins Pilgrim's Mantle.",
@@ -203,6 +216,8 @@ export const home: AreaSpec = {
     { from: "cathedral.home.star.a", to: "cathedral.home.pathN.a", why: "The cross start (2026-10-31): the seam path's first small forks, on across to the seam, or back toward the centre by Litany for the Zealot who wants resistances and hybrid defence early." },
     { from: "cathedral.home.star.d", to: "centre.ring.road.i4", why: "Litany's way on to the centre's inner road along the Zealot–Vanguard border (2026-10-31): the Zealot capping resistances walks on from Litany's star into the centre's resistances (Shelter by j5, Sound Body's chaos resistance by s3). Eight steps from the start against the seam road's seven (finalization)." },
     { from: "cathedral.home.ardour.a", to: "cathedral.home.hubs.s", why: "The way in." },
+    { from: "cathedral.home.anoint.a", to: "cathedral.home.hubs.s", why: "Anointing's door on the north-east hub (the flask-lines pass, 2026-11-01): the Zealot who carries utility flasks beside the auras turns aside at the hub." },
+    { from: "cathedral.home.anoint.b", to: "cathedral.choir.spS.b", why: "Anointing leads on (the flask-lines pass, 2026-11-01) to the spoke's next junction: the aura-and-buff Zealot takes the flasks and walks on to the Choirmaster wheel or Lone Vow; four steps from the hub against the road's two." },
     { from: "cathedral.home.ardour.b", to: "cathedral.choir.wheel.c1", why: "Ardour on into the Choirmaster wheel at its door small (2026-10-31): the elemental striker who carries auras (an aura serves the elemental hit), slower than the spoke between the two doors." },
     { from: "cathedral.home.wake.a", to: "cathedral.home.hubs.n", why: "The way in." },
     { from: "cathedral.home.wake.c", to: "cathedral.ambulatory.plate.b", why: "Wake joins Pilgrim's Mantle (finalization, 2026-10-31): the Zealot standing in every pool takes Wake's energy shield, life and mana and walks on to the Mantle's life and ailment shrug, the two defence rooms between the hub and the Wall's border road; slower than the roads round." },

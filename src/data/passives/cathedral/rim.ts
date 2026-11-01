@@ -2,7 +2,7 @@
  * The Churchyard: South-west toward the rim: fire, auras, spell block.
  * Written for the attrition rework from docs/tree/design/R-cathedral.md (2026-10-31).
  */
-import { areaDamage, auraEffect, burnDamage, critMulti, damageWithMinion, igniteChance, igniteDuration, insightOnWarcry, minionDamage, minionLife, warcryEffect, weaponDamage } from '../lines';
+import { areaDamage, auraEffect, burnDamage, critMulti, damageWithMinion, flaskChargesPerCharge, igniteChance, igniteDuration, insightOnWarcry, minionDamage, minionLife, warcryEffect, weaponDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const outerWalk: AreaSpec = {
@@ -15,7 +15,7 @@ export const outerWalk: AreaSpec = {
     {
       id: "hymn",
       name: "Battle Hymn",
-      why: "Warcries and auras, in from the rim ring. Since the revision (2026-10-31) the entrance small parts two ways: to Battle Hymn (and on to Ossuary), or to Hymn of War, which leads on by two warcry smalls across the Wall border into the grit run, the war chant's insight beside the Wall's grit (its counterpart: the Wall's warcries give grit).",
+      why: "Warcries and auras, in from the rim ring. Since the revision (2026-10-31) the entrance small parts two ways: to Battle Hymn (and on to Ossuary), or to Hymn of War, which leads on by two warcry smalls across the Wall border into the grit run, the war chant's insight beside the Wall's grit (its counterpart: the Wall's warcries give grit). Since the flask-lines pass (2026-11-01) a third way from the entrance small, by a crit small to the Cup of Revelation (flask charges on kill per insight charge), which joins Hymn of War's way on at its first warcry small.",
       at: [-3938, -414],
       shape: { kind: 'hand' },
       nodes: [
@@ -24,9 +24,11 @@ export const outerWalk: AreaSpec = {
         { id: "a", kind: "small", lines: [warcryEffect(10)], at: [-4008, -415] },
         { id: "b", kind: "small", lines: [warcryEffect(10)], at: [-3868, -413] },
         { id: "n", kind: "notable", name: "Battle Hymn", lines: [warcryEffect(20), auraEffect(12)], at: [-3938, -414], why: "The war chant: warcries and auras both stronger, the holy warrior who shouts and the priest who sings: 2 + 2 units." },
+        { id: "c1", kind: "small", lines: [critMulti(12)], at: [-4060, -290], why: "The Cup of Revelation's door (the flask-lines pass, 2026-11-01), off the room's entrance small, by a crit line every insight build uses (an insight charge is crit chance): 12/12 = 1 unit." },
+        { id: "cup", kind: "notable", name: "Cup of Revelation", lines: [flaskChargesPerCharge('insight', 12)], at: [-4040, -140], why: "The Cathedral's charges on kill (the flask-lines pass, 2026-11-01, F-flasks.md section 3), far out (step 13, 13 or more from every start): flask charges on kill for each insight charge held, its line alone. Priced at three charges held: 12 x 3 / 8 = 4.5 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3) and the other regions' charges-on-kill notables. Beside Hymn of War, the region's warcry insight, and reached by smalls only, so the staff fighter whose insight comes from Whirling Ward's staff blocks need not take Hymn of War: the two notables stand side by side and both lead on to the warcry smalls into the Wall's grit run." },
         { id: "warHymn", kind: 'notable', name: "Hymn of War", lines: [insightOnWarcry(36), critMulti(12)], at: [-3938, -329], why: "The war chant kindles insight: a warcry may give an insight charge (the Wall's warcries give grit), and crits strike deeper: 3 + 1 units." },
       ],
-      links: [["a", "n"], ["n", "b"], ["a", "warHymn"], ["warHymn", "w1"], ["w1", "w2"]],
+      links: [["a", "n"], ["n", "b"], ["a", "warHymn"], ["warHymn", "w1"], ["w1", "w2"], ["a", "c1"], ["c1", "cup"], ["cup", "w1"]],
     },
     {
       id: "ossuary",

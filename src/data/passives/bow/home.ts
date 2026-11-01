@@ -2,7 +2,7 @@
  * The Bow Gate: The Strider's first points (R-bow.md).
  * Written for the attrition rework from docs/tree/design/R-bow.md (2026-10-31).
  */
-import { accuracy, attackDamage, attackSpeed, critChance, critMulti, dex, evasion, evasionWhileMoving, flaskCharges, flaskEffect, flaskRecovery, life, lifeRegen, mana, recoverOn, reducedReservation, resAll, stunAvoid } from '../lines';
+import { accuracy, attackDamage, attackSpeed, critChance, critMulti, dex, evasion, evasionWhileMoving, flaskChargesUsed, flaskEffect, life, lifeRegen, mana, recoverOn, reducedReservation, resAll, stunAvoid } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const START = {
@@ -170,12 +170,12 @@ export const home: AreaSpec = {
     {
       id: "quickSip",
       name: "Quick Sip",
-      why: "The flask layer near home, run through on the south path to the Yard seam (the centre pass: every start about six steps from its seams).",
+      why: "The flask layer near home, run through on the south path to the Yard seam (the centre pass: every start about six steps from its seams). Since the flask-lines pass (2026-11-01, docs/tree/design/F-flasks.md) it sells fewer charges per drink and a stronger drink; charges on kill went far out.",
       at: [1005, 1383],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "b", kind: "small", lines: [flaskEffect(5)], at: [1080, 1358] },
-        { id: "n", kind: "notable", name: "Quick Sip", lines: [flaskCharges(24), flaskRecovery(10)], at: [927, 1401], why: "The flask layer near home, the Bow’s way: flasks refill faster (the Yard’s Field Dressing by the same seam sells recovery and duration)." },
+        { id: "b", kind: "small", lines: [flaskEffect(5)], at: [1080, 1358], why: "The flask layer's first point, on the way to Quick Sip." },
+        { id: "n", kind: "notable", name: "Quick Sip", lines: [flaskChargesUsed(10), flaskEffect(10)], at: [927, 1401], why: "The flask layer near home, the Bow’s way (the flask-lines pass, 2026-11-01): each drink costs fewer charges and does more, so a refill lasts longer and each drink counts for more; nothing on kill this near a start. 2.5 + 2 units, about Long Breath's price. The Yard’s Field Dressing by the same seam sells life recovery and duration." },
       ],
       links: [["b", "n"]],
     },

@@ -2,7 +2,7 @@
  * The Bulwark: The axis at the mid ring and the north toward the rim: shields, maces, the two-handed choice.
  * Written for the attrition rework from docs/tree/design/R-wall.md (2026-10-31).
  */
-import { armour, axeDamage, blockPerGrit, damagePerGrit, damageVsStunned, enemyStunThreshold, gritDuration, gritOnBlock, gritOnHitTaken, gritOnStun, life, lifeOnBlock, lifeRegenPerGrit, maxGrit, maxResAll, meleePhys, minionLife, resAll, shieldAttack, shieldDef, str, stunDuration, stunRecovery, stunThreshold, twoHandDamage, weaponDamage } from '../lines';
+import { armour, axeDamage, blockPerGrit, damagePerGrit, damageVsStunned, enemyStunThreshold, flaskLifeRecovery,gritDuration, gritOnBlock, gritOnHitTaken, gritOnStun, life, lifeOnBlock, lifeRegenPerGrit, maxGrit, maxResAll, meleePhys, minionLife, resAll, shieldAttack, shieldDef, str, stunDuration, stunRecovery, stunThreshold, twoHandDamage, weaponDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const maces: AreaSpec = {
@@ -165,6 +165,18 @@ export const maces: AreaSpec = {
       links: [["a", "n1"], ["n1", "b"], ["b", "c"], ["c", "n2"], ["n2", "d"], ["d", "a"], ["d", "g1"], ["a", "g2"], ["c", "g4"]],
     },
     {
+      id: "measure",
+      name: "Stout Measure",
+      why: "Life flask recovery (the flask-lines pass, 2026-11-01, F-flasks.md §3: the Wall's further flask stat), a side room in from the mid ring at the axis, in the empty ground between the north spoke, Standing Iron and Shield Ram. It is the armoured stander's sustain: the Vanguard who holds the line behind armour (Ox Hide, Mortar and Stone, Standing Iron round it) and drinks deep instead of regenerating, so it stands apart from the striker's regeneration rooms (Old Wounds, Barrow Ward) on the other side of the axis.",
+      at: [-2875, 1225],
+      shape: { kind: 'hand' },
+      nodes: [
+        { id: "a", kind: "small", lines: [flaskLifeRecovery(12)], at: [-2790, 1205], why: "The room's door from the mid ring, by its notable's stat: 12/12 = 1 unit." },
+        { id: "n", kind: "notable", name: "Stout Measure", lines: [flaskLifeRecovery(48)], at: [-2960, 1245], why: "Each life flask drunk recovers more (step 9): 48/12 = 4 units, priced like the region's regeneration notables (Old Wounds 4.1, Barrow Ward 4) and like Mortar and Stone (4.5) beside it. Flask only: no regeneration or recovery on hit." },
+      ],
+      links: [["a", "n"]],
+    },
+    {
       id: "skull",
       name: "Skull Crack",
       why: "A second mace rule: the stunned enemy’s skull cracks.",
@@ -188,6 +200,7 @@ export const maces: AreaSpec = {
     { from: "wall.maces.locked.a", to: "wall.maces.ring.b", why: "The way in." },
     { from: "wall.maces.ram.a", to: "wall.maces.ring.b", why: "The way in." },
     { from: "wall.maces.stunGrit.s1", to: "wall.maces.ring.c", why: "The way in." },
+    { from: "wall.maces.measure.a", to: "wall.maces.ring.c", why: "The way in (the flask-lines pass, 2026-11-01): Stout Measure's door on the mid ring where the north spoke meets it. Who walks it: the armoured Vanguard, coming out from Ox Hide and Mortar and Stone, who lives on his life flasks." },
     { from: "wall.maces.gritPay.s1", to: "wall.maces.scarTissue.n", why: "The way in." },
     { from: "wall.maces.skull.s1", to: "wall.grit.ring.s1", why: "The way in." },
     { from: "wall.maces.locked.b", to: "wall.rampart.bulwark.n2", why: "A way across between neighbouring clusters, dearer than the roads. Since the revision (2026-10-31) the end of the defender's tower: Ox Hide → Mortar and Stone → Locked Shields → the mid ring. Who walks it: the armoured shield bearer, whose blocks then build grit and close wounds." },

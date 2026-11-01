@@ -2,7 +2,7 @@
  * The Lantern: The west toward the rim.
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
-import { burnDamage, curseArea, curseEffect, damageVsIgnited, eleDamage, eleDamageAll, es, esFlat, esLeech, igniteChance, manaAsEs, manaLeech, manaOnHit, manaRegen, minionDamage, minionLife, minionSpeed, penetration, recoverOn, resAll, spellBlock, wandAttack, wandSpellDamage } from '../lines';
+import { burnDamage, curseArea, curseEffect, damageVsIgnited, eleDamage, eleDamageAll, es, esFlat, esLeech, flaskChargesKilledBy, igniteChance, manaAsEs, manaLeech, manaOnHit, manaRegen, minionDamage, minionLife, minionSpeed, penetration, recoverOn, resAll, spellBlock, wandAttack, wandSpellDamage } from '../lines';
 import type { AreaSpec } from '../types';
 
 export const fire: AreaSpec = {
@@ -68,8 +68,9 @@ export const fire: AreaSpec = {
         { id: "c", kind: "small", lines: [burnDamage(12)], at: [-1013, -4455] },
         { id: "n2", kind: 'notable', name: "Warm Hearth", lines: [recoverOn('killIgnited', 'life', 3), recoverOn('killIgnited', 'es', 3), eleDamage('fire', 10)], at: [-1230, -4505], why: "The burning dead feed the caster: fire’s own defence. Between the two fire rooms, reached round Cinder's ring without taking Cinder." },
         { id: "h", kind: "small", lines: [burnDamage(12)], at: [-1335, -4395], why: "Burning, the thread between ignite (Cinder) and the fire payoff (Kiln Heart)." },
+        { id: "n3", kind: "notable", name: "Ember Tithe", lines: [flaskChargesKilledBy('ignite', 50)], at: [-900, -4500], why: "The Spire's charges-on-kill notable (the flask-lines pass, 2026-11-01): flasks fill only from enemies the burning itself kills, so it pays the igniter who lets the fire finish the work. Off Cinder's ring by a burning small, not through Cinder, at step 12 (12 or more from every start). 50 / 12 = 4.2 units, about a regeneration notable of the region (Quiet Pulse 4.3); the line alone, as a far notable may." },
       ],
-      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["b", "n2"], ["n2", "h"]],
+      links: [["a", "n"], ["n", "b"], ["b", "c"], ["c", "a"], ["b", "n2"], ["n2", "h"], ["c", "n3"]],
     },
     {
       id: "badCompany",

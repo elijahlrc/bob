@@ -575,3 +575,8 @@ the changes after three playtests.
   regeneration, leech or recovery on events); flasks are spread evenly over the regions, with no flask home; flask nodes
   are judged by play, not by the sheet or the bots ("bots are not players"). What the flask nodes should sell waits for
   the high-level design goals of flasks, which come first.
+- **2026-11-01, the tree's flask lines built** (docs/tree/design/F-flasks.md section 5): three flask notables in every
+  region (near the start, further out, far out), each start's of a different kind; charges on kill only far out, for
+  kills by burning, poison or bleeding or per grit, fervour or insight charge held; the two emergency flasks (the last
+  belt slot, the Shade; below 30% life, the Reaver); the Strider's spare flask notables became Elusive and Quickened
+  notables. 30 flask nodes. Not baked.
