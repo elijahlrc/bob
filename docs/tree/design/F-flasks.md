@@ -151,7 +151,7 @@ nodes.
 Built from sections 2 and 3 by one builder per region, the centre by the lead. Engine and lines in commit 401e2f8: the
 global `flaskMaxCharges`, `flaskChargesKilledBy` (the kind of damage over time that dealt the killing blow,
 `dotKind` in `src/sim/combat.ts`), `flaskChargesPerCharge` (the live charges held), and the two emergency lines
-(`src/sim/flaskDrink.ts`). 30 flask nodes (16 notables), against 27 (9 notables) before; the tree has 1,375 nodes.
+(`src/sim/flaskDrink.ts`). 30 flask nodes (19 notables, 11 smalls), against 27 (9 notables) before and the draft's "about 24"; the tree has 1,375 nodes.
 Every flask notable is priced at about 4 to 4.5 units, near its region's regeneration notable, and carries no other
 sustain. No flat charges on kill is left anywhere.
 
@@ -173,4 +173,4 @@ on kill with it. Draught's mana on kill was dropped (the Spire has it on Siphon)
 Left open: prices (the Shade's regeneration notables cost about 5, more than the common scale); the Strider's new
 notables use event buffs the sheet counts as always up (R-final risk 1); Stout Measure and the far notables are dead
 ends past 8 steps; labels crowd at Ember Tithe, Hard-Won Rations, Bitter Dregs, Heat of the Chase and Anointing (label
-pass); every new name waits for the naming pass; the new nodes are not registered and the tree is not baked.
+pass); every new name waits for the naming pass; the new nodes are not registered and the tree is not baked. A drink queued behind a running flask keeps the first drink's rate, so it misses the emergency lines if life fell below 30% in between (`src/sim/world.ts`, `tickFlasks`; left for when that file is free).
