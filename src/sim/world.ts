@@ -18,6 +18,7 @@ import { monsterName } from '../gen/population';
 import { actorById, tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
 import { lifeCap, monsterHitOf, rawHit, refreshPlayerDefence, tickActor } from './combat';
+import { drinkLifeMult } from './flaskDrink';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { abilitiesOf, RIME_AURA_RANGE } from '../data/abilities';
 import { cue, healed } from './cues';
@@ -451,13 +452,13 @@ function useFlask(w: World, side: Side, i: number): void {
       f.queued = true;
     } else if (s.instant) {
       const l0 = p.life;
-      const heal = s.life * bossFlaskRecovery(w, p);
+      const heal = s.life * bossFlaskRecovery(w, p) * drinkLifeMult(w, side, s.uid);
       p.life = Math.min(lifeCap(p), p.life + heal);
       noteRecover(p, 'life', p.life - l0);
       brim(side, l0 + heal - p.life);
     } else {
       f.activeT = s.duration;
-      f.lifeRate = s.life / s.duration;
+      f.lifeRate = (s.life * drinkLifeMult(w, side, s.uid)) / s.duration;
       f.manaRate = s.mana / s.duration;
     }
   } else {

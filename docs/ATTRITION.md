@@ -33,6 +33,26 @@ that later design work starts from it.
   stronger.
 - Monster damage may need to come down; that waits for playtests.
 
+**Flask lines on the tree** (the owner, 2026-10-31; the pass covers the tree's flask lines only)
+
+- What a life flask is for: mostly the run's clock (charges are what must last until the next refill), and a build can
+  specialise one or two flasks as emergency buttons.
+- What investing in flasks gives: fewer forced stops (a refill lasts longer) and bigger flask moments (a drink counts
+  for more). The two are hard to separate in practice.
+- Flask nodes compete with other sustain (regeneration, leech, energy shield): a build can take both, at a higher cost
+  in nodes.
+- Life flasks first, mana second, utility third; all three have room to improve.
+- Spread evenly over the regions, with no flask home. Judged by play, not by the sheet or the bots.
+- Flask charges on kill are one of the strongest kinds of sustain: rare on the tree and far from the starts, so stacking
+  them is costly, and gated by conditions. The condition is what dealt the killing blow, "killed by burning", not
+  "killed while burning" (the owner, 2026-11-01): much harder to arrange, so a real build choice. The Strider's, the
+  Vanguard's and the Zealot's are instead an amount per charge held: fervour, grit and insight (the owner, the same
+  day).
+- Both kinds of emergency flask are wanted: lines for the flask in a given belt slot, and lines for a flask drunk at low
+  life.
+- Nodes may be added and moved for this pass; the Strider's region will need new non-flask notables where flask
+  notables are removed. The draft is docs/tree/design/F-flasks.md.
+
 **Flask controls**
 
 - Each belt slot has its own threshold, the same for life and mana: 85%, 70%, 50%, 30%, 15% from slot 1 to 5 (slot 1 drinks first) (2026-10-29,
@@ -549,3 +569,9 @@ the changes after three playtests.
   made levels slow and safe. Every monster now has half its life and 30% more damage, the whole game
   (`MONSTER_LIFE_MULT`, `MONSTER_DAMAGE_MULT` in `data/constants.ts`); whether it should only cover the first 20 levels is
   open.
+- **2026-10-31, the flask-lines pass begins.** After the tree revision, a census of the reworked tree: 27 nodes with a
+  flask line, 14 of them in the Bow, none in the Cathedral; charges on kill only in the Bow (seven lines, 109%); five
+  near-identical flask notables at steps 5-6. The owner's answers: the pass covers the tree's flask lines only (not
+  regeneration, leech or recovery on events); flasks are spread evenly over the regions, with no flask home; flask nodes
+  are judged by play, not by the sheet or the bots ("bots are not players"). What the flask nodes should sell waits for
+  the high-level design goals of flasks, which come first.

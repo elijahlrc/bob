@@ -1129,9 +1129,31 @@ export const lifeRegenWhenHit = def('lifeRegenWhenHit', (v: number): Line =>
     mod('lifeRegenPct', 'base', v, { condition: { id: 'beenHitRecently' } }),
   ),
 );
-/** Flask charges gained: under attrition a kill gives charges only from this (src/sim/combat.ts `killGains`, +100% is one). */
+/**
+ * Flask charges on kill: under attrition a kill gives charges only from this (src/sim/combat.ts `killGains`, 100 is a
+ * charge to every flask), so the text says the flat gain, as items do (src/mods/text.ts).
+ */
 export const flaskCharges = def('flaskCharges', (v: number): Line =>
-  line(`${v}% increased flask charges gained`, v / 8, mod('flaskCharges', 'inc', v)),
+  line(`+${v / 100} flask charges per kill`, v / 8, mod('flaskCharges', 'inc', v)),
+);
+/** Flask charges on kill for each charge of a kind held (docs/tree/design/F-flasks.md); priced at three charges held. */
+export const flaskChargesPerCharge = def('flaskChargesPerCharge', (charge: 'grit' | 'fervour' | 'insight', v: number): Line =>
+  line(
+    `+${v / 100} flask charges per kill for each ${charge} charge`,
+    (v * 3) / 8,
+    mod('flaskCharges', 'inc', v, { per: { stat: `charges.${charge}`, div: 1 } }),
+  ),
+);
+/**
+ * Flask charges for an enemy killed by an ailment: the killing blow must be its damage, not a hit on a burning enemy
+ * (src/sim/combat.ts `dotKind`; docs/tree/design/F-flasks.md). Harder to arrange than any kill, so priced lower.
+ */
+export const flaskChargesKilledBy = def('flaskChargesKilledBy', (by: 'ignite' | 'bleed' | 'poison', v: number): Line =>
+  line(
+    `+${v / 100} flask charges when an enemy is killed by ${{ ignite: 'burning', bleed: 'bleeding', poison: 'poison' }[by]}`,
+    v / 12,
+    mod(`flaskChargesKilledBy.${by}`, 'base', v),
+  ),
 );
 export const flaskChargesUsed = def('flaskChargesUsed', (v: number): Line =>
   line(`${v}% reduced flask charges used`, v / 4, mod('flaskChargesUsed', 'base', v)),
@@ -1349,6 +1371,27 @@ export const flaskRecovery = def('flaskRecovery', (v: number): Line =>
 );
 export const flaskDuration = def('flaskDuration', (v: number): Line =>
   line(`${v}% flask duration`, v / 10, mod('flaskDuration', 'inc', v)),
+);
+// The flask-lines pass (docs/tree/design/F-flasks.md): life flasks first, mana second, and the two emergency flasks.
+export const flaskLifeRecovery = def('flaskLifeRecovery', (v: number): Line =>
+  line(`${v}% increased life recovery from flasks`, v / 12, mod('flaskLifeRecovery', 'inc', v)),
+);
+export const flaskManaRecovery = def('flaskManaRecovery', (v: number): Line =>
+  line(`${v}% increased mana recovery from flasks`, v / 15, mod('flaskManaRecovery', 'inc', v)),
+);
+export const flaskLifeRate = def('flaskLifeRate', (v: number): Line =>
+  line(`${v}% faster life flask recovery`, v / 10, mod('flaskLifeRate', 'inc', v)),
+);
+export const flaskMaxCharges = def('flaskMaxCharges', (v: number): Line =>
+  line(`${v}% increased maximum flask charges`, v / 6, mod('flaskMaxCharges', 'inc', v)),
+);
+/** The flask in the belt's last slot (it drinks at 15% life) recovers more: one way to keep an emergency flask (src/sim/flaskDrink.ts). */
+export const flaskLastSlotRecovery = def('flaskLastSlotRecovery', (v: number): Line =>
+  line(`${v}% increased life recovered by the flask in your last belt slot`, v / 15, mod('flaskLastSlotRecovery', 'inc', v)),
+);
+/** A life flask drunk below 30% life recovers more: the other way to keep emergency flasks (src/sim/flaskDrink.ts). */
+export const flaskLowLifeRecovery = def('flaskLowLifeRecovery', (v: number): Line =>
+  line(`${v}% increased life recovered by flasks drunk below 30% life`, v / 12, mod('flaskLowLifeRecovery', 'inc', v)),
 );
 // The Cathedral's rule benders (docs/tree/design/R-cathedral.md): what the Zealot plants works for it (minions standing,
 // one more brand, auras held), faith turned to fire and lightning, a defence while channelling.

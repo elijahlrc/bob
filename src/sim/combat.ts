@@ -1383,7 +1383,7 @@ function dropSpot(w: World, a: Actor, pos: { x: number; y: number }): { x: numbe
  */
 const causes = new WeakMap<
   Actor,
-  { tags: number; minion: boolean; gains: readonly Mod[]; side?: Side }
+  { tags: number; minion: boolean; gains: readonly Mod[]; side?: Side; dot?: DotKind }
 >();
 function noteCause(
   a: Actor,
@@ -1391,8 +1391,21 @@ function noteCause(
   minion: boolean,
   gains: readonly Mod[] = [],
   side?: Side,
+  dot?: DotKind,
 ): void {
-  if (!a.isPlayer) causes.set(a, { tags, minion, gains, side });
+  if (!a.isPlayer) causes.set(a, { tags, minion, gains, side, ...(dot ? { dot } : {}) });
+}
+
+/** The ailments a kill can be "by" (the tree's flask charges for kills by burning, poison or bleeding). */
+type DotKind = 'ignite' | 'bleed' | 'poison';
+/**
+ * Which ailment dealt a tick of damage over time: the largest of burning, bleeding and poison, when it is also more than the
+ * skills' debuffs give; none when the skills' debuffs lead or nothing does. A hit records no kind, so a kill by a hit is by none.
+ */
+function dotKind(ignite: number, bleed: number, poison: number, skills: number): DotKind | undefined {
+  const top = Math.max(ignite, bleed, poison);
+  if (top <= 0 || top < skills) return undefined;
+  return top === ignite ? 'ignite' : top === bleed ? 'bleed' : 'poison';
 }
 
 /**
@@ -1406,10 +1419,14 @@ function killGains(
   fs: Side,
   kind: keyof typeof FLASK_KILL_WEIGHT,
   hexFlasks: number,
+  dot?: DotKind,
 ): void {
   const p = fs.player;
   const kctx = playerCtx(w, fs);
-  const perKill = FLASK_CHARGES_PER_KILL + fs.char.db.inc('flaskCharges', kctx) + hexFlasks;
+  // The tree's charges for a kill by burning, poison or bleeding (docs/tree/design/F-flasks.md): 100 is a charge.
+  const byDot = dot ? fs.char.db.sum('base', `flaskChargesKilledBy.${dot}`, kctx) / 100 : 0;
+  const perKill =
+    FLASK_CHARGES_PER_KILL + fs.char.db.inc('flaskCharges', kctx) + hexFlasks + byDot;
   const weight = FLASK_KILL_WEIGHT[kind] * fs.char.db.more('flaskCharges', kctx);
   // A flask "of Gleaning" adds its own share to what every flask gets.
   for (const f of fs.flasks)
@@ -1520,7 +1537,7 @@ export function killActor(w: World, a: Actor): void {
     const cause0 = causes.get(a);
     const hexFlasks = cause0?.minion ? 0 : hexKill(w, a);
     spreadHexes(w, fs, a);
-    killGains(w, fs, kind, hexFlasks);
+    killGains(w, fs, kind, hexFlasks, cause0?.dot);
     if (w.opts.loot) {
       for (const item of w.opts.loot(w, a)) {
         const id = w.nextId++;
@@ -1716,10 +1733,13 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   // Debuffs that skills inflicted: Creeping Plague, Withering Breath, Sap Bolt, Decay.
   let dotLight = 0;
   let dotCold = 0;
+  // What the skills' debuffs give of this tick, for which kind of damage over time made a kill (`dotKind`).
+  let own0 = 0;
   if (a.sdots.length) {
     const own = [0, 0, 0, 0, 0];
     fromSkills = [...a.sdots];
     sumSkillDots(w, a, own, dt);
+    own0 = own[0] + own[1] + own[2] + own[3] + own[4];
     dotPhys += own[0];
     dotLight += own[1];
     dotCold += own[2];
@@ -1752,6 +1772,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
       false,
       [],
       multi ? dotOwner([igniteBy, bleedBy, poisonBy], fromSkills) : undefined,
+      dotKind(fromIgnite, fromBleed, fromPoison, own0),
     );
     applyDamage(w, a, dmg, {
       name: 'Damage over time',
