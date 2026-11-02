@@ -67,7 +67,7 @@ import { bossForMap } from '../data/bosses';
 
 export { rollThemes } from './offers';
 
-export const SAVE_VERSION = 24;
+export const SAVE_VERSION = 25;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {

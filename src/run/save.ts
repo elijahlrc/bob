@@ -62,7 +62,9 @@ export function migrate(version: number, run: RunState): RunState | null {
   if (version === SAVE_VERSION) return run;
   // Version 23 is from before flask scarcity (docs/ATTRITION.md): kills refilled the flasks and energy shield was stronger,
   // so a run in progress gets its passives back to spend for the new rules. The Wayside's new fields fill in by default.
-  if (version === 23) {
+  // Version 24 has the flask-scarcity tree before its rework and flask lines (docs/tree/design/R-revise.md, F-flasks.md):
+  // nodes were moved and retired, so the allocated passives are handed back as unspent points.
+  if (version === 23 || version === 24) {
     run.version = SAVE_VERSION;
     run.build = resetTree(run.build);
     return run;
