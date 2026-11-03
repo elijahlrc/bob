@@ -1,3 +1,4 @@
+import { sustainDeep } from './sustain';
 import type { UniqueMod } from './uniques';
 
 /**
@@ -25,7 +26,7 @@ const m = (
   extra: Partial<UniqueMod> = {},
 ): UniqueMod => ({ stat, kind, min, max, ...extra });
 
-export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
+const DEFS: UniqueFlaskDef[] = [
   {
     id: 'hoarfrostDraught',
     name: 'Hoarfrost Draught',
@@ -286,6 +287,12 @@ export const UNIQUE_FLASKS: UniqueFlaskDef[] = [
     flavour: 'It fills the other cups while it empties.',
   },
 ];
+
+/** The unique flasks, after the sustain pass (data/sustain.ts). */
+export const UNIQUE_FLASKS: UniqueFlaskDef[] = DEFS.map((u) => ({
+  ...u,
+  mods: sustainDeep(u.mods, 'item'),
+}));
 
 export function uniqueFlaskDef(id: string): UniqueFlaskDef {
   const u = UNIQUE_FLASKS.find((x) => x.id === id);

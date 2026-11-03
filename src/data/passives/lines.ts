@@ -7,9 +7,23 @@
  * fight obeys it). Nothing here is a node: the area files decide what a node carries.
  */
 import { mod, type Condition, type DamageType, type Mod, type SkillTag } from '../../mods/types';
+import { sustainMods } from '../sustain';
 import type { Line } from './types';
 
-const line = (label: string, units: number, ...mods: Mod[]): Line => ({ label, units, mods });
+/**
+ * A line. Its mods go through the sustain pass (data/sustain.ts: flat life and mana grow, regeneration and the other
+ * recovery that heals to full is cut, "while leeching" grows), and the label shows the number the node gives; the units
+ * stay those of the written value.
+ */
+const line = (label: string, units: number, ...mods: Mod[]): Line => {
+  const out = sustainMods(mods, 'tree');
+  const i = mods.findIndex((m, j) => out[j] !== m);
+  return {
+    label: i < 0 ? label : label.replace(String(mods[i].value), String(out[i].value)),
+    units,
+    mods: out,
+  };
+};
 
 /** A tagged line's tags as the words a node card shows before the stat ("two-handed melee", "brand"). */
 const TAG_WORDS: Partial<Record<SkillTag, string>> = {
@@ -306,7 +320,7 @@ export const totemDuration = def('totemDuration', (v: number): Line =>
 // ---- Recovery ----
 export const leechLife = def('leechLife', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `${v}% ${tagWords(tags)}life leech`,
+    `${v}% ${tagWords(tags)}replenish`,
     v / UNIT.leechLife,
     mod('leech.life', 'base', v, tags ? { tags } : undefined),
   ),
@@ -918,14 +932,14 @@ export const critWhileEsFull = def('critWhileEsFull', (v: number): Line =>
     mod('critChance', 'inc', v, { condition: { id: 'esFull' } }),
   ),
 );
-export const speedWhileLeeching = def('speedWhileLeeching', (v: number): Line => ({
-  label: `${v}% attack and cast speed while leeching`,
-  units: v / ((UNIT.attackSpeed * 3) / 2),
-  mods: [
+export const speedWhileLeeching = def('speedWhileLeeching', (v: number): Line =>
+  line(
+    `${v}% attack and cast speed while replenishing`,
+    v / ((UNIT.attackSpeed * 3) / 2),
     mod('attackSpeed', 'inc', v, { condition: { id: 'leeching' } }),
     mod('castSpeed', 'inc', v, { condition: { id: 'leeching' } }),
-  ],
-}));
+  ),
+);
 export const damageVsRare = def('damageVsRare', (v: number): Line =>
   line(
     `${v}% damage against rare and unique enemies`,
@@ -1267,7 +1281,7 @@ export const damageVsStunned = def('damageVsStunned', (v: number): Line =>
 );
 export const damageWhileLeeching = def('damageWhileLeeching', (v: number): Line =>
   line(
-    `${v}% damage while leeching`,
+    `${v}% damage while replenishing`,
     v / 10,
     mod('damage', 'inc', v, { condition: { id: 'leeching' } }),
   ),

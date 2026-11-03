@@ -1,3 +1,4 @@
+import { noteLifeLost } from './replenish';
 import type { Side } from './side';
 
 /** Whether the player can pay a skill's cost now (mana, mana plus ES for Mind Bastion, or life). */
@@ -13,6 +14,8 @@ export function payCost(s: Side, costsLife: boolean, cost: number): void {
   const p = s.player;
   if (cost <= 0) return;
   if (costsLife) {
+    // Life paid counts toward replenish, without which a build that pays in life couldn't use it (docs/SUSTAIN.md).
+    noteLifeLost(p, Math.min(cost, Math.max(0, p.life)));
     p.life -= cost;
     return;
   }

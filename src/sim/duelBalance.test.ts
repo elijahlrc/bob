@@ -139,13 +139,14 @@ describe('the lives of a duel', () => {
 });
 
 describe('the life curve', () => {
-  it('runs on a straight line from 1 at level 1 to 10 at level 100', () => {
-    expect(DUEL_LIFE_MULT_TOP).toBe(10);
+  it('runs on a straight line from 1 at level 1 to its top at level 100', () => {
+    // A bonus over 1 of 9, cut to a third by the sustain pass, which doubled life (docs/SUSTAIN.md).
+    expect(DUEL_LIFE_MULT_TOP).toBeCloseTo(1 + 9 * 0.33, 9);
     expect(duelLifeMult(1)).toBe(1);
-    expect(duelLifeMult(100)).toBe(10);
-    expect(duelLifeMult(50)).toBeCloseTo(1 + (9 * 49) / 99, 9);
+    expect(duelLifeMult(100)).toBeCloseTo(DUEL_LIFE_MULT_TOP, 9);
+    expect(duelLifeMult(50)).toBeCloseTo(1 + ((DUEL_LIFE_MULT_TOP - 1) * 49) / 99, 9);
     expect(duelLifeMult(0)).toBe(1);
-    expect(duelLifeMult(120)).toBe(10);
+    expect(duelLifeMult(120)).toBeCloseTo(DUEL_LIFE_MULT_TOP, 9);
   });
 
   it('multiplies each side’s life and energy shield by the curve of the other side’s level', () => {
@@ -196,7 +197,10 @@ describe('the life curve', () => {
     const [sa] = w.sides;
     fell(w, sa);
     expect(sa.player.life).toBeCloseTo(0.5 * sa.player.def.maxLife, 6);
-    expect(sa.player.def.maxLife).toBeGreaterThan(5 * sa.char.defence().maxLife);
+    // The larger pool: the second life's share of the curve's bonus (`DUEL_LIFE_STAGES`).
+    const k = 1 + DUEL_LIFE_STAGES[1] * (duelLifeMult(70) - 1);
+    expect(Math.abs(sa.player.def.maxLife - k * sa.char.defence().maxLife)).toBeLessThanOrEqual(k);
+    expect(sa.player.def.maxLife).toBeGreaterThan(2 * sa.char.defence().maxLife);
   });
 
   it('does not reach the minions: a minion has the same life with the curve on or off', () => {
@@ -212,7 +216,12 @@ describe('the life curve', () => {
         .maxLife;
     };
     expect(life(true)).toBe(life(false));
-    expect(createDuelWorld(a, b, 1, { stages: null }).sides[0].lifeMult).toBeGreaterThan(8);
+    // The curve is well over 1 here, so the minion's equal life is the curve passing it by.
+    expect(createDuelWorld(a, b, 1, { stages: null }).sides[0].lifeMult).toBeCloseTo(
+      duelLifeMult(90),
+      9,
+    );
+    expect(duelLifeMult(90)).toBeGreaterThan(3);
   });
 });
 

@@ -404,3 +404,22 @@ html.leaf .effects-bar .eff-curse b {
 html.leaf .effects-bar .muted {
   color: #c7b8c6;
 }
+/* The relics: a compact row of names, each one's text on hover or a tap (to become icons). */
+html.leaf .effects-bar ul + .effects-relics {
+  margin-top: 12px;
+}
+html.leaf .effects-bar .effects-relics {
+  gap: 6px;
+}
+html.leaf .effects-bar .effects-relics li {
+  padding: 4px 11px 5px;
+  color: var(--gold-hi);
+  background: #381a2a;
+  box-shadow: var(--ring);
+  cursor: default;
+}
+html.leaf .effects-bar .effects-relics li:hover,
+html.leaf .effects-bar .effects-relics li:focus-visible {
+  background: #4a2438;
+  outline: none;
+}

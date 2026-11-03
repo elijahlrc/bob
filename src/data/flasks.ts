@@ -3,6 +3,7 @@ import { BASE_ROWS } from './baseTables';
 import type { BuffId } from './buffs';
 import {
   FLASK_CAPACITY_SCALE,
+  FLASK_LIFE_SCALE,
   FLASK_MANA_CAPACITY_SCALE,
   FLASK_UTILITY_DURATION_SCALE,
 } from './constants';
@@ -69,7 +70,7 @@ function flasksOf(kind: FlaskKind): FlaskBase[] {
       name: r.name,
       kind,
       level: r.level,
-      life,
+      life: Math.round(life * FLASK_LIFE_SCALE),
       mana,
       maxCharges: Math.round(
         maxCharges * (kind === 'mana' ? FLASK_MANA_CAPACITY_SCALE : FLASK_CAPACITY_SCALE),

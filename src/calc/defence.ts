@@ -7,6 +7,11 @@ import {
   ES_RECHARGE_DELAY,
   ES_RECHARGE_RATE,
   HARD_MAX_RES,
+  REPLENISH_SHARE,
+  REPLENISH_SHARE_CAP,
+  REPLENISH_WINDOW,
+  REPLENISH_WINDOW_MAX,
+  REPLENISH_WINDOW_MIN,
 } from '../data/constants';
 import type { ModCtx, ModDB } from '../mods/modDb';
 import { DAMAGE_TYPES } from '../mods/types';
@@ -188,6 +193,13 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     reflect: DAMAGE_TYPES.map((t) => db.sum('base', `reflect.${t}`, ctx)),
     reflectPhysPct: clamp(db.sum('base', 'reflectPhysPct', ctx) / 100, 0, 1),
     leechRate: db.mult('leechRate', ctx),
+    replenishShare:
+      clamp(REPLENISH_SHARE + db.sum('base', 'replenishShare', ctx), 0, REPLENISH_SHARE_CAP) / 100,
+    replenishWindow: clamp(
+      REPLENISH_WINDOW * db.mult('replenishWindow', ctx),
+      REPLENISH_WINDOW_MIN,
+      REPLENISH_WINDOW_MAX,
+    ),
     noMovingBleed: flag('noMovingBleed'),
     dodgeAttack: clamp(db.sum('base', 'dodgeAttack', ctx) / 100, 0, 0.75),
     dodgeSpell: clamp(db.sum('base', 'dodgeSpell', ctx) / 100, 0, 0.75),

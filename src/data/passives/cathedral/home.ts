@@ -144,12 +144,12 @@ export const home: AreaSpec = {
       at: [-1750, -184],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [lifeRegen(0.25)], at: [-1761, -295] },
+        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-1761, -295] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Vigil',
-          lines: [lifeRegen(0.5), manaRegen(20), life(5)],
+          lines: [lifeRegen(0.8), manaRegen(20), life(5)],
           at: [-1727, -106],
           why: "Life and mana regenerated, the str/int vigil, at the Wall's seam (the Wall sells armour and resistances there): 2 + 2 + 1 units.",
         },
@@ -216,7 +216,7 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Litany',
-          lines: [armour(20), es(10), lifeRegen(0.35)],
+          lines: [armour(20), es(10), lifeRegen(0.6)],
           at: [-1432, -227],
           why: 'Armour, energy shield and regeneration, the hybrid defence of the str/int class (the one armour line near the Vanguard): 1.7 + 2 + 1.5 units.',
         },

@@ -107,7 +107,7 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     color: 0x8a1c2c,
     shape: 'ring',
     aura: false,
-    desc: 'Cannot be leeched from: life and mana leech do nothing.',
+    desc: 'Gives no replenish or leech.',
   },
   unyielding: {
     color: 0xd0d0d8,
@@ -263,7 +263,7 @@ export const MOD_MARKS: Record<MonsterModId, ModMark> = {
     color: 0xf0c848,
     shape: 'ring',
     aura: true,
-    desc: 'Stops your regeneration and leech near it, takes flask charges, and calls two Cutpurses at half life.',
+    desc: 'Stops your regeneration, replenish and leech near it, takes flask charges, and calls two Cutpurses at half life.',
   },
   cinderTyrant: {
     color: 0xe8782a,

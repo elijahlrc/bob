@@ -14,14 +14,14 @@ export const FACTION_ASKS: Record<FactionId, string> = {
   swarm: 'numbers',
   reliquary: 'armour and immunity',
   kennel: 'being caught: leaps, charges and ambushes',
-  gilded: 'recovery: flasks, regeneration and leech',
+  gilded: 'recovery: flasks, regeneration, replenish and leech',
   drowned: 'being held: hooks, slows and shock',
   emberborn: 'fire and burning ground: ignite, fire resistance, standing still',
 };
 
 /** What every monster of a faction does, where the faction has such a rule. */
 export const FACTION_RULES: Partial<Record<FactionId, string>> = {
-  hollow: 'Ethereal: takes 50% less physical damage, cannot bleed and cannot be leeched from.',
+  hollow: 'Ethereal: takes 50% less physical damage, cannot bleed and gives no replenish or leech.',
   reliquary: 'Core Golems are immune to one element and its ailments.',
   kennel: 'Hounds leap from a distance; Handlers speed the pack up.',
   gilded: 'Cutpurses steal flask charges; Bursars stop your recovery.',
@@ -92,7 +92,8 @@ export const TYPE_BLURBS: Record<MonsterTypeId, string> = {
   cat: 'Lies in wait, then pounces for a big hit.',
   cutpurse: 'Steals flask charges and runs; kill it to get them back.',
   guard: 'Armoured; throws back part of the melee damage it takes.',
-  bursar: 'While it stands, your regeneration, leech and energy shield recharge stop near it.',
+  bursar:
+    'While it stands, your regeneration, replenish, leech and energy shield recharge stop near it.',
   slinger: 'Slings two stones in quick succession and backs away as you close in.',
   crawler:
     'The top half of a skeleton on its hands: fast and fragile, its grip slows you, and it springs onto you with a Quick Step.',
@@ -270,11 +271,11 @@ export const TAG_INFO: Record<ThreatTag, { name: string; text: string }> = {
   },
   scarring: {
     name: 'Scarring',
-    text: 'Their hits stop your life regeneration for a few seconds: leech, energy shield and flasks help.',
+    text: 'Their hits stop your life regeneration for a few seconds: replenish, energy shield and flasks help.',
   },
   bloodless: {
     name: 'Bloodless',
-    text: 'Cannot be leeched from: regeneration and flasks help.',
+    text: 'Gives no replenish or leech: regeneration and flasks help.',
   },
 };
 

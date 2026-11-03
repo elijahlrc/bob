@@ -222,7 +222,7 @@ export const fosse: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Bloodied Edge',
-          lines: [swordDamage(20), leechLife(0.5, ['attack'])],
+          lines: [swordDamage(20), leechLife(0.8, ['attack'])],
           at: [1497, 4339],
           why: '2 + 2 units.',
         },
@@ -380,12 +380,12 @@ export const fosse: AreaSpec = {
       at: [934, 3928],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 's1', kind: 'small', lines: [leechLife(0.1)], at: [956, 4103] },
+        { id: 's1', kind: 'small', lines: [leechLife(0.2)], at: [956, 4103] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Red Thirst',
-          lines: [damageWhileLeeching(30), leechLife(0.3)],
+          lines: [damageWhileLeeching(30), leechLife(0.5)],
           at: [934, 3928],
           why: 'Damage while leeching, by Bloodied Edge, far from Red Harvest.',
         },

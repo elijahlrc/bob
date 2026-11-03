@@ -308,7 +308,7 @@ export const well: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Quiet Pulse',
-          lines: [life(10), lifeRegen(0.35), es(4)],
+          lines: [life(10), lifeRegen(0.6), es(4)],
           at: [-901, -2296],
           why: '2 + 1.5 + 0.8 units.',
         },

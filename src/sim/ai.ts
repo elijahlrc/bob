@@ -6,6 +6,7 @@ import { skillRange, type SkillChoice } from '../calc/character';
 import type { Defence } from '../calc/combat';
 import type { SkillProfile } from '../calc/skill';
 import {
+  DT,
   ENGAGE_RANGE,
   BLOCK_LIMIT,
   BLOCK_WINDOW,
@@ -1272,13 +1273,26 @@ function separateSides(w: World): void {
 }
 
 /**
- * Minions are bodies like any other: monsters cannot walk through them, so they hold a corridor and draw blows. A
- * monster that is awake and free to move gives way half; one that sleeps or never moves gives none, and the minion
- * yields instead. The player pushes minions aside.
+ * Minions are bodies like any other: monsters cannot walk through them, so they hold a corridor and draw blows. They
+ * hold a monster up but never drive it (the owner, 2026-10-30): however many press on it, in a tick they move a monster
+ * at most as far as it walked (`room`), so a walking monster is stopped and one standing is not moved at all; a boss
+ * walks through them, and one that sleeps or never moves gives no way either. The minion yields the rest. The player
+ * pushes minions aside.
  */
 function separateMinions(w: World, s: Side, list: Actor[]): void {
   const p = s.player;
   const ms = s.minions;
+  const room = new Map<number, number>();
+  const roomOf = (a: Actor): number => {
+    let r = room.get(a.id);
+    if (r === undefined) {
+      const holds = a.state === 'idle' || a.stationary || !a.moving;
+      const boss = a.rarity === 'boss' || a.rarity === 'miniboss';
+      r = holds || boss ? 0 : a.def.moveSpeed * DT;
+      room.set(a.id, r);
+    }
+    return r;
+  };
   const nudge = (a: Actor, dx: number, dy: number): void => {
     const x = a.x + dx;
     const y = a.y + dy;
@@ -1304,11 +1318,13 @@ function separateMinions(w: World, s: Side, list: Actor[]): void {
       if (d2 >= rr * rr || d2 < 1e-9) continue;
       const d = Math.sqrt(d2);
       const gap = rr - d;
-      const holds = a.state === 'idle' || a.stationary;
       const nx = dx / d;
       const ny = dy / d;
-      nudge(m, -nx * (holds ? gap : gap / 2), -ny * (holds ? gap : gap / 2));
-      if (!holds) nudge(a, nx * (gap / 2), ny * (gap / 2));
+      const left = roomOf(a);
+      const shove = Math.min(gap / 2, left);
+      room.set(a.id, left - shove);
+      nudge(m, -nx * (gap - shove), -ny * (gap - shove));
+      if (shove > 0) nudge(a, nx * shove, ny * shove);
     }
     for (let j = i + 1; j < ms.length; j++) {
       const o = ms[j];

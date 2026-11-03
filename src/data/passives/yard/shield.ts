@@ -145,12 +145,12 @@ export const shield: AreaSpec = {
       at: [-1238, 2668],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 's1', kind: 'small', lines: [lifeOnBlock(5)], at: [-1379, 2563] },
+        { id: 's1', kind: 'small', lines: [lifeOnBlock(8)], at: [-1379, 2563] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Bulwark Mending',
-          lines: [lifeOnBlock(21), costReduction(8)],
+          lines: [lifeOnBlock(35), costReduction(8)],
           at: [-1238, 2668],
           why: 'Shield sustain: the block heals, and each blow costs less to answer.',
         },

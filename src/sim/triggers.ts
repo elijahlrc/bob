@@ -1,3 +1,4 @@
+import { noteLifeLost } from './replenish';
 import type { SkillChoice } from '../calc/character';
 import { reservedMana } from './reserve';
 import type { TriggerDef, TriggerEffect } from '../data/triggers';
@@ -291,6 +292,7 @@ function sacrifice(w: World, s: Side, e: Extract<TriggerEffect, { kind: 'sacrifi
   const p = s.player;
   const amount = Math.min(Math.max(0, p.life - 1), (e.pctOfLife / 100) * p.def.maxLife);
   if (amount <= 0) return false;
+  noteLifeLost(p, amount, w.t);
   p.life -= amount;
   w.events.push({ t: 'sacrifice', src: p.id, amount });
   const pool = e.pool === 'es' ? 'es' : 'mana';

@@ -161,7 +161,7 @@ export const CURRENCIES: CurrencyDef[] = [
   {
     id: 'giltDust',
     name: 'Gilt Dust',
-    text: 'Add an affix of your choice: life regeneration, mana regeneration or life leech.',
+    text: 'Add an affix of your choice: life regeneration, mana regeneration or replenish.',
     minMap: 18,
     weight: 0,
     families: [...grp('lifeRegen', 'manaRegenGear', 'lifeLeech'), 'manaRegen', 'lifeLeechPhys'],
@@ -333,7 +333,7 @@ export const CURRENCY_VERBS: Record<CurrencyId, string> = {
   chitin: 'adds a speed or area affix you choose',
   reliquarySlag: 'adds a physical or armour affix you choose',
   houndtooth: 'adds a movement affix you choose',
-  giltDust: 'adds a regeneration or leech affix you choose',
+  giltDust: 'adds a regeneration or replenish affix you choose',
   brineSalt: 'adds a resistance or stun affix you choose',
   emberAsh: 'adds a fire affix you choose',
 };

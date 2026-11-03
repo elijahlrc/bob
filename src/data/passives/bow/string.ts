@@ -73,7 +73,7 @@ export const string: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Tall Grass',
-          lines: [evasion(20), recoverOn('evade', 'life', 1.2)],
+          lines: [evasion(20), recoverOn('evade', 'life', 2)],
           at: [3680, 1456],
           why: 'Evasion’s rule: each attack evaded closes a wound.',
         },

@@ -18,6 +18,7 @@ import {
 } from './duel';
 import { activeGem, buildFor, buildForActive } from './gemKit';
 import { makeMinion, summonMinions, type Minion } from './minions';
+import { noteLifeLost } from './replenish';
 import type { Side } from './side';
 import type { World } from './types';
 import { stepWorld } from './world';
@@ -454,7 +455,8 @@ describe('what a character goes for', () => {
       m.life = 40;
       return m;
     });
-    while (w.t < 60 && sb.player.alive && sa.player.alive) stepWorld(w);
+    // 120 s: since the sustain pass doubled life the sword takes about 80 s to fell B (it took under 60).
+    while (w.t < 120 && sb.player.alive && sa.player.alive) stepWorld(w);
     expect(screen.every((m) => !m.alive)).toBe(true);
     expect(sb.player.alive).toBe(false);
     expect(sa.stats.stalls).toBe(0);
@@ -476,6 +478,8 @@ describe('what a character goes for', () => {
       f.spec = { ...f.spec, chargesPerKill: 1 };
     }
     sa.player.life = 100;
+    // Life on kill is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(sa.player, 100, w.t);
     const theirs = minionOf(w, sb, 'callBonewalkers', sb.player.x - 3, sb.player.y);
     rawHit(w, theirs, 1e9, 0, sa, 'Test');
     expect(theirs.alive).toBe(false);

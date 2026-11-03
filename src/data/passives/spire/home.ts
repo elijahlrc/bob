@@ -307,7 +307,7 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Hale Scribe',
-          lines: [life(10), lifeOnHit(2, ['spell'])],
+          lines: [life(10), lifeOnHit(4, ['spell'])],
           at: [750, -1503],
         },
       ],

@@ -118,6 +118,8 @@ export type Side = {
   /** Blood of the Untouched and Quickening Cruelty (attribute relics): when each stack held ends (world time). */
   untouched?: number[];
   cruelty?: number[];
+  /** Blade and Word in Turn: the kind of skill whose critical strike chance the relic raises now, after a crit of the other. */
+  twinEdge?: 'melee' | 'spell';
   /** The Shield's Rebuke: when each monster (by id) can next be stunned by a block. */
   rebuked?: Map<number, number>;
   /** The Unseen Ward: an evaded attack started the energy shield recharging; the next damage stops it. */

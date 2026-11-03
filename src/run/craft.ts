@@ -569,7 +569,7 @@ export function useDie(run: RunState, itemUid: number): CraftResult {
   const uid = uidSource(run);
   const base = itemBase(loc.item.baseId);
   const r = rng.next();
-  const uniques = UNIQUES.filter((u) => u.baseId === base.id);
+  const uniques = UNIQUES.filter((u) => u.baseId === base.id && !u.noDrop);
   let made: Item;
   if (r >= 0.9 && uniques.length) made = rollUnique(rng, uid, rng.pick(uniques), loc.item.ilvl);
   else made = rollItemOf(rng, uid, base, loc.item.ilvl, r < 0.6 ? 'magic' : 'rare');

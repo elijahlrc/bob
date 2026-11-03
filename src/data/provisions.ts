@@ -69,7 +69,7 @@ const EFFECTS: (ProvisionDef & { id: EffectProvisionId })[] = [
     id: 'bloodsalt',
     name: 'Bloodsalt',
     kind: 'staple',
-    text: '2% of damage dealt is leeched as life',
+    text: '2% of damage dealt is replenished as life',
     base: 5,
     weight: 24,
     from: 3,
@@ -80,11 +80,12 @@ const EFFECTS: (ProvisionDef & { id: EffectProvisionId })[] = [
     id: 'tappersBrine',
     name: "Tapper's Brine",
     kind: 'staple',
-    text: 'Your flasks start the map full',
+    // Half, not full (the owner, 2026-10-30: full was too strong).
+    text: 'Your flasks start the map at least half full',
     base: 8,
     weight: 26,
     from: 3,
-    affix: { playerMods: [mod('flaskStartFull', 'flag', 1)], reward: {} },
+    affix: { playerMods: [mod('flaskStartFill', 'base', 50)], reward: {} },
   },
   {
     id: 'glassDraught',

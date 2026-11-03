@@ -309,15 +309,15 @@ describe('the headless bot (§15.5)', () => {
 
   // Timing tests depend on the machine: they run locally and are skipped on CI (shared runners are slower).
   // The bot's own camp decisions count in the wall time here, and a stronger build clears maps in less simulated time, so
-  // the floor is far below the 500× of the sim itself (the bot alone measured 500–560× when the coverage plan began; with the roster plan it is about 220× alone and less in a full parallel run, so 150).
+  // the floor is far below the 500× of the sim itself (the bot alone measured 500–560× when the coverage plan began; with the roster plan it is about 220× alone and less in a full parallel run, so 150; 100 since 2026-11-02, the owner, when it measured about 130× alone).
   it.skipIf(!!process.env.CI)(
-    'runs at least 150× real time',
+    'runs at least 100× real time',
     () => {
       const t0 = performance.now();
       const r = botRun('reaver', 5, 25);
       const wall = (performance.now() - t0) / 1000;
       const sim = r.maps.reduce((s, m) => s + m.time, 0);
-      expect(sim / wall).toBeGreaterThan(150);
+      expect(sim / wall).toBeGreaterThan(100);
     },
     60000,
   );

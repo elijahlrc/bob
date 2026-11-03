@@ -63,8 +63,8 @@ export const blades: AreaSpec = {
       at: [-781, 2269],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [lifeRegen(0.25)], at: [-694, 2272] },
-        { id: 'b', kind: 'small', lines: [lifeRegen(0.25)], at: [-752, 2270] },
+        { id: 'a', kind: 'small', lines: [lifeRegen(0.4)], at: [-694, 2272] },
+        { id: 'b', kind: 'small', lines: [lifeRegen(0.4)], at: [-752, 2270] },
         {
           id: 'n',
           kind: 'notable',
@@ -73,7 +73,7 @@ export const blades: AreaSpec = {
           at: [-810, 2268],
           why: 'Armour that hits back: guard and strike alike.',
         },
-        { id: 'c', kind: 'small', lines: [lifeRegen(0.25)], at: [-868, 2266] },
+        { id: 'c', kind: 'small', lines: [lifeRegen(0.4)], at: [-868, 2266] },
       ],
       links: [
         ['a', 'b'],
@@ -134,8 +134,8 @@ export const blades: AreaSpec = {
       at: [-815, 2939],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.25, ['attack'])], at: [-760, 2901] },
-        { id: 'b', kind: 'small', lines: [leechLife(0.25, ['attack'])], at: [-808, 2934] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [-760, 2901] },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [-808, 2934] },
         { id: 'k', kind: 'keystone', name: 'Blood Bargain', lines: [], at: [-877, 2982] },
       ],
       links: [

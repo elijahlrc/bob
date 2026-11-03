@@ -16,6 +16,7 @@ import { newRun, setMap } from '../run/run';
 import { applyHit, killActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
 import { autoFlaskPolicy } from './flaskPolicy';
+import { noteLifeLost } from './replenish';
 import { spawnMonster, stepWorld } from './world';
 
 let n = 5000;
@@ -257,6 +258,8 @@ describe('wave 2 uniques', () => {
     const pl = world.sides[0].player;
     pl.mana = 0;
     pl.life = 1;
+    // Life on hit is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(pl, 100, world.t);
     world.events.length = 0;
     applyHit(world, pl, dummy, world.sides[0].char.profile(world.sides[0].char.primary), okHit(1));
     expect(pl.mana).toBeGreaterThan(0);

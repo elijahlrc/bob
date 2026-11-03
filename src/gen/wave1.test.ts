@@ -347,7 +347,10 @@ describe('acquisition (EXPANSION 6.2 items 1–4)', () => {
 
   it('only uniques the item level allows are in the pool', () => {
     for (const e of uniquePool(10)) expect(e.def.level).toBeLessThanOrEqual(10);
-    expect(uniquePool(100).length).toBe(UNIQUES.length + UNIQUE_FLASKS.length);
+    // A unique out of the drop pool (`noDrop`) is not offered.
+    expect(uniquePool(100).length).toBe(
+      UNIQUES.filter((u) => !u.noDrop).length + UNIQUE_FLASKS.length,
+    );
   });
 
   function atMap(map: number): RunState {

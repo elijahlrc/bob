@@ -4,11 +4,12 @@ import type { Build } from '../data/types';
 import { makeGem, makeItem } from '../gen/items';
 import { rarityWeights, rollMonsterDrops } from '../gen/loot';
 import { Rng } from '../core/rng';
-import { LOW_LIFE } from '../data/constants';
+import { DT, LOW_LIFE } from '../data/constants';
 import { mod, type CondId, type Mod } from '../mods/types';
 import { newRun } from '../run/run';
-import { applyDamage, applyHit, playerConds, rawHit, targetConds } from './combat';
+import { applyDamage, applyHit, playerConds, rawHit, targetConds, tickActor } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
+import { noteLifeLost } from './replenish';
 import type { Actor, World } from './types';
 
 function buildWith(extra: Mod[], gems = ['crushingBlow', 'kindlingHalo']): Build {
@@ -93,6 +94,8 @@ describe('sim rules for the new verbs', () => {
     expect(player.life).toBe(100); // normal leech is gradual
     expect(player.leech.life.length).toBe(1);
     player.leech.life.length = 0;
+    // Life leech is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(player, 1000, world.t);
     applyHit(world, player, dummy, prof, res(true));
     expect(player.life).toBeCloseTo(200); // 10% of 1000, instantly
     dummy.def = dummyDefence({ cannotBeLeechedFrom: true });
@@ -143,7 +146,11 @@ describe('player and target conditions in the sim', () => {
     expect(has(world, 'esFull')).toBe(true);
     expect(has(world, 'onLowMana')).toBe(false);
     player.since.beenHit = 1;
+    // "While leeching" is while replenish wins something back (src/sim/replenish.ts): life lost, then leech paid out.
+    player.life = player.def.maxLife - 50;
+    noteLifeLost(player, 50, world.t);
     player.leech.life.push(10);
+    tickActor(world, player, DT);
     player.es = 50;
     player.mana = 20;
     expect(has(world, 'beenHitRecently')).toBe(true);

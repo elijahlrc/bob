@@ -246,7 +246,7 @@ export const home: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Stout Heart',
-          lines: [life(10), lifeRegen(0.35), str(10)],
+          lines: [life(10), lifeRegen(0.6), str(10)],
           at: [-747, 1797],
           why: '2 + 1.5 + 0.7 units.',
         },
@@ -254,7 +254,7 @@ export const home: AreaSpec = {
         {
           id: 'c',
           kind: 'small',
-          lines: [lifeRegen(0.25)],
+          lines: [lifeRegen(0.4)],
           at: [-785, 2035],
           why: "Regeneration, Mended Mail's small stat, leading from Stout Heart into Mended Mail (2026-10-31): the body that mends, on to the armour that mends.",
         },

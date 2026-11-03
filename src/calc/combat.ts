@@ -133,6 +133,10 @@ export type Defence = {
   reflectPhysPct: number;
   /** Multiplier on how fast leech is recovered (increased Life Leeched per second). */
   leechRate: number;
+  /** Replenish (docs/SUSTAIN.md): the share of the life lost in the window that life leech and life on hit may win back. */
+  replenishShare: number;
+  /** Replenish's window, in seconds. */
+  replenishWindow: number;
   /** Moving while bleeding does not make the bleed hurt more. */
   noMovingBleed: boolean;
   /** Chance (fraction) to dodge an attack hit, and a spell hit: the hit does nothing, apart from evasion. */

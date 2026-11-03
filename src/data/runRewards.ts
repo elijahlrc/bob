@@ -49,7 +49,14 @@ export type RunRewardId =
   | 'ripeningWound'
   | 'sharedAgony'
   | 'spreadingHex'
-  | 'searingExcess';
+  | 'searingExcess'
+  | 'splinteredRod'
+  | 'throughFlesh'
+  | 'twinEdge'
+  | 'ploughmansWrath'
+  | 'everyBlade'
+  | 'loneGrip'
+  | 'whisperedEdge';
 export type RelicId = RunRewardId;
 export type RelicAttr = 'str' | 'dex' | 'int';
 
@@ -244,7 +251,7 @@ export const RUN_REWARDS: RunRewardDef[] = [
   {
     id: 'blindFury',
     name: 'Blind Fury',
-    text: 'Attacks leech 0.5% of damage as life and mana. You can no longer choose whom they are used on.',
+    text: 'Attacks replenish 0.5% of damage as life and leech as much as mana. You can no longer choose whom they are used on.',
     base: 40,
     max: 1,
     from: 6,
@@ -305,7 +312,7 @@ export const RUN_REWARDS: RunRewardDef[] = [
   {
     id: 'untouchedBlood',
     name: 'Blood of the Untouched',
-    text: 'Each attack you evade makes your attacks leech 1% of their damage as life for 5 seconds. Stacks.',
+    text: 'Each attack you evade makes your attacks replenish 1% of their damage as life for 5 seconds. Stacks.',
     base: 45,
     max: 1,
     from: 6,
@@ -350,7 +357,7 @@ export const RUN_REWARDS: RunRewardDef[] = [
   {
     id: 'anvilThirst',
     name: 'Thirst of the Anvil',
-    text: 'Life leech is increased by your increased armour. 50% less armour.',
+    text: 'Replenish is increased by your increased armour. 50% less armour.',
     base: 45,
     max: 1,
     from: 6,
@@ -473,6 +480,71 @@ export const RUN_REWARDS: RunRewardDef[] = [
     from: 6,
     attrs: ['str', 'int'],
   },
+  // The owner's picks from the third brainstorm (2026-11-02).
+  {
+    id: 'splinteredRod',
+    name: 'The Splintered Rod',
+    text: 'Wand attacks fire an additional projectile.',
+    base: 50,
+    max: 1,
+    from: 6,
+    attrs: ['dex', 'int'],
+  },
+  {
+    id: 'throughFlesh',
+    name: 'Through Flesh and Beyond',
+    text: 'Ranged attacks pierce every enemy. Their projectiles travel 40% slower.',
+    base: 50,
+    max: 1,
+    from: 6,
+    attrs: ['dex'],
+  },
+  {
+    id: 'twinEdge',
+    name: 'Blade and Word in Turn',
+    text: 'A melee critical strike gives your spells 100% increased critical strike chance until a spell critical strike, which gives it to your melee attacks.',
+    base: 45,
+    max: 1,
+    from: 6,
+    attrs: ['dex', 'int'],
+  },
+  {
+    id: 'ploughmansWrath',
+    name: "The Ploughman's Wrath",
+    text: '50% increased area of effect of melee attacks. 20% reduced movement speed.',
+    base: 45,
+    max: 1,
+    from: 6,
+    attrs: ['str'],
+  },
+  // Lines of one kind that count for another (the owner, 2026-11-02): `relicBorrows`, calc/relics.ts.
+  {
+    id: 'everyBlade',
+    name: 'The School of Every Blade',
+    text: 'Sword, axe, mace, claw and dagger bonuses all apply to the one-handed weapon you wield. Your critical strikes deal no extra damage.',
+    base: 50,
+    max: 1,
+    from: 6,
+    attrs: ['str', 'dex'],
+  },
+  {
+    id: 'loneGrip',
+    name: 'The Lone Grip',
+    text: 'With a one-handed weapon and nothing in your off hand, two-handed weapon bonuses apply to it.',
+    base: 45,
+    max: 1,
+    from: 6,
+    attrs: ['str'],
+  },
+  {
+    id: 'whisperedEdge',
+    name: 'The Whispered Edge',
+    text: 'Spell critical strike chance and multiplier bonuses also apply to your dagger attacks.',
+    base: 45,
+    max: 1,
+    from: 6,
+    attrs: ['dex', 'int'],
+  },
 ];
 
 export const runRewardDef = (id: string): RunRewardDef => {
@@ -515,6 +587,12 @@ export const ECHO_DUST = 0.5;
 export const FIEND_PERIOD = 60;
 /** Relic 5: how fast energy shield beyond the character's own fades, as a share of it a second. */
 export const BRIMMING_FADE = 0.1;
+/** The third brainstorm's relics: projectiles a wand attack gains; ranged projectiles slower; crit chance passed over; melee area and movement. */
+export const SPLINTER_PROJECTILES = 1;
+export const THROUGH_FLESH_SLOW = 40;
+export const TWIN_EDGE_CRIT = 100;
+export const PLOUGHMAN_AOE = 50;
+export const PLOUGHMAN_MOVE = 20;
 /** How many relics a boss that falls offers to choose from. */
 export const BOSS_RELIC_CHOICES = 3;
 

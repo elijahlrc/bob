@@ -298,7 +298,7 @@ passives say so (docs/ATTRITION.md), so every drink counts. **Each belt slot has
 - **Burning aura** (Searing Mantle): it is **switched off below 40% life** and back on at **75%**, the way
   a player would click it off.
 
-_Strategy:_ Charges are scarce: a Respite, a fallen boss, a reprieve or Tapper's Brine refills them, and charge gain on
+_Strategy:_ Charges are scarce: a Respite, a fallen boss or a reprieve refills them, Tapper's Brine fills them half way, and charge gain on
 gear or passives tops them up as you kill. A late slot saves charges; an early one keeps you safer against hard hitters. A utility flask set to bosses only keeps its charges for the fights that count.
 
 ---
@@ -337,7 +337,8 @@ Most of how a fight goes depends on monsters. Here is what is useful to know:
   come back at full life.
 - **Ranged monsters** back off in short bursts when you're within 2 tiles. Kiters (Slingers, Handlers) back off
   at 4.5 tiles, faster and more often. A melee character chases them around.
-- **Minions are walls.** Monsters can't walk through your minions. A melee monster that is blocked for about a
+- **Minions are walls.** Monsters can't walk through your minions: a minion holds up a monster that walks into it,
+  but never drives it back or moves one that stands, however many crowd it, and a boss shoves minions aside. A melee monster that is blocked for about a
   third of a second hits the minion in its way. A ranged monster keeps walking toward **you** and only shoots a
   minion after being blocked for 1.5 seconds. Some monster types go for minions first. A **lure totem** draws
   every monster within its reach.
@@ -399,7 +400,7 @@ from the same Strategy tab, so everything above holds except this:
   anew each tick (the same for the same seed), so neither has the first blow by where it stands or by its speed.
 - **Damage is scaled to ×0.3** for both characters: hits, bursts, damage over time and what a self-damaging buff (such as Surge of Blood)
   costs. A minion takes full damage;
-  ailments and stuns are as strong as on a map (their damage is scaled like any other). Regeneration, leech and flasks work as on a
+  ailments and stuns are as strong as on a map (their damage is scaled like any other). Regeneration, replenish and flasks work as on a
   map, so a duel is long, and it favours builds that recover well.
 - **A kill of a minion by the other character** gives flask charges only through charge gain on gear or passives, and life
   and mana on kill, as a monster's kill does. Each life lost refills the flasks. The other character's death ends the fight.

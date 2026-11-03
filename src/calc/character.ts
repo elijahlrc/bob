@@ -1,5 +1,5 @@
 import { passiveMods } from '../data/tree/rules';
-import { hasRelic, relicMods } from './relics';
+import { hasRelic, relicBorrows, relicMods } from './relics';
 import { LITANY_LEVELS } from '../data/runRewards';
 import {
   DUAL_WIELD_BLOCK,
@@ -710,6 +710,8 @@ export class Character {
     this.rageMax =
       BASE_MAX_RAGE + mods.reduce((n, m) => (m.stat === 'maxRage' ? n + m.value : n), 0);
     this.defaultDyn = this.rageSource ? ASSUMED_RAGE << DYN_SHIFT : 0;
+    // Relics that make lines of one kind count for another, from everything gathered so far.
+    mods.push(...relicBorrows(build, mods, this.weaponTags));
     const db0 = new ModDB(mods, this.cond);
     const ctx0: ModCtx = { tags: 0, ancestry: 0, conds: cc, statValue: () => 0 };
 

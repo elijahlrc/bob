@@ -1,6 +1,7 @@
 import type { DamageType, Mod, ModKind, SkillTag } from '../mods/types';
 import { ARMOUR_FAMILY_DEFS } from './armourAffixes';
 import { ENERGY_SHIELD_SCALE } from './constants';
+import { sustainDec, sustainRange } from './sustain';
 import { tabled } from './tierTables';
 import type { TierTable } from './tierTables';
 import * as W from './weaponTables';
@@ -1164,13 +1165,22 @@ export function expandFamily(def: FamilyDef): Family {
         const cut = (v: number) => Math.max(1, Math.round(v * ENERGY_SHIELD_SCALE));
         ranges[j] = [cut(ranges[j][0]), cut(ranges[j][1])];
       }
+    // The sustain pass (data/sustain.ts): flat life and mana grow, recovery that heals to full is cut.
+    for (const [j, m] of def.mods.entries())
+      if (!m.same && ranges[j])
+        ranges[j] = sustainRange(m.stat, m.kind, undefined, ranges[j], 'item');
     // Higher tiers are rarer: the top tier weighs TOP_TIER_WEIGHT of the lowest, the others fall evenly between.
     const weight = Math.round(
       1000 * (def.weight ?? 1) * (n > 1 ? 1 - (1 - TOP_TIER_WEIGHT) * (i / (n - 1)) : 1),
     );
     return { tier: i + 1, minIlvl, weight, ranges };
   });
-  return { ...def, tiers };
+  // A cut value may need finer rolls than the reference's (a regeneration of 0.5 a second).
+  const mods = def.mods.map((m) => {
+    const dec = sustainDec(m.stat, m.kind, m.dec);
+    return dec === (m.dec ?? 0) ? m : { ...m, dec };
+  });
+  return { ...def, mods, tiers };
 }
 
 /** The weight multiplier of a family on an item with these tags. */

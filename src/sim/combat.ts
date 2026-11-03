@@ -62,7 +62,14 @@ import { maskIntersects, maskOr, tagBit, type CondId, type Mod } from '../mods/t
 import { bannerStage } from './banners';
 import { invulnerable, reprieveFires } from './reprieve';
 import { rollGains } from './buffs';
-import { gainCruelty, gainTrophy, gainUntouched, rollCharges, untouchedLeech } from './charges';
+import {
+  gainCruelty,
+  gainTrophy,
+  gainTwinEdge,
+  gainUntouched,
+  rollCharges,
+  untouchedLeech,
+} from './charges';
 import { ALL_HEX_IDS, HEXES } from '../data/hexes';
 import { mineAuraAt, mineAuraHit, mineBonus } from './deploy';
 import { noteRecover } from './recovery';
@@ -108,6 +115,7 @@ import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss, stunPlayer } from './afflict';
 import { bossHitPlayer, bossLeechShare, bossRecovery, bossVeiled } from './bosses';
+import { noteLifeLost, replenish, replenishes, replenishing, replenishTick } from './replenish';
 import type { Actor, Dot, World } from './types';
 import { hunted, livingEnemiesOf, MONSTERS } from './side';
 import type { Side } from './side';
@@ -141,7 +149,8 @@ const PLAYER_TESTS: Partial<Record<CondId, PlayerTest>> = {
   overloadActive: (_w, p) => p.since.overload < OVERLOAD_TIME,
   blockedRecently: (_w, p) => p.since.block < RECENT,
   beenHitRecently: (_w, p) => p.since.beenHit < RECENT,
-  leeching: (_w, p) => p.leech.life.length > 0,
+  // A character's "while leeching" is while replenish wins something back (src/sim/replenish.ts).
+  leeching: (w, p) => (replenishes(p) ? replenishing(w, p) : p.leech.life.length > 0),
   leechingEs: (_w, p) => p.leech.es.length > 0,
   esFull: (_w, p) => p.def.maxEs > 0 && p.es >= p.def.maxEs - 0.5,
   onLowMana: (_w, p) => p.mana <= Math.max(1, p.def.maxMana - reservedMana(p.side!)) * LOW_LIFE,
@@ -369,6 +378,8 @@ export function applyDamage(w: World, dst: Actor, dmg: number[], src?: DmgSrc): 
     manaTaken = m;
   }
   if (dst.isPlayer) notePools(dst.side!, esTaken, manaTaken, lifeDmg);
+  // What replenish may win back (src/sim/replenish.ts): the life lost, and the shield's too when leech goes to it.
+  noteLifeLost(dst, Math.min(lifeDmg, Math.max(0, dst.life)) + (def.leechToEs ? esTaken : 0), w.t);
   dst.life -= lifeDmg;
   if (dst.life <= 0) dst.overkill = -dst.life;
   dst.since.damaged = 0;
@@ -404,6 +415,9 @@ function addLeech(
       (list === 'life' ? src.def.maxLife : list === 'es' ? src.def.maxEs : src.def.maxMana),
   );
   if (instant) {
+    // A character's instant leech pays out what the replenish pool holds at once.
+    if (list === 'life' && replenishes(src))
+      amount = replenish(src, Math.max(0, Math.min(amount, lifeCap(src) - src.life)));
     if (list === 'life') src.life += amount;
     else if (list === 'es') src.es = Math.min(src.def.maxEs, src.es + amount);
     else src.mana += amount;
@@ -712,6 +726,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       rollGains(w, src.side!, 'crit', p.gains);
       if (dst.team !== src.team) {
         gainCruelty(w, src.side!);
+        gainTwinEdge(w, src.side!, p.skill.tags);
         src.side!.critAt = w.t;
       }
     }
@@ -745,7 +760,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
   }
   if (src.def.leechToEs && instant) {
     const es0 = src.es;
-    src.es = Math.min(src.def.maxEs, src.es + ll);
+    src.es = Math.min(src.def.maxEs, src.es + replenish(src, Math.min(ll, src.def.maxEs - src.es)));
     noteRecover(src, 'es', src.es - es0);
   } else addLeech(src, 'life', ll, instant);
   addLeech(src, 'mana', lm, instant);
@@ -755,8 +770,12 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     for (let i = 0; i < 5; i++) le += res.dmg[i] * (p.leechEs[i] ?? 0) * leechShare;
   if (le > 0) addLeech(src, 'es', le, instant);
   if (p.lifeOnHit > 0) {
+    // Life on hit draws on the replenish pool (src/sim/replenish.ts).
     const l0 = src.life;
-    src.life = Math.min(lifeCap(src), src.life + p.lifeOnHit);
+    src.life = Math.min(
+      lifeCap(src),
+      src.life + replenish(src, Math.min(p.lifeOnHit, lifeCap(src) - src.life)),
+    );
     noteRecover(src, 'life', src.life - l0);
   }
   if (p.esOnHit > 0 && src.isPlayer) {
@@ -1437,12 +1456,13 @@ function killGains(
     const f = first && fs.flasks.find((x) => x.spec.uid === first.uid);
     if (f) f.charges = Math.min(f.spec.maxCharges, f.charges + THIRSTING_CHARGES);
   }
+  // Life on kill, flat or a share, draws on the replenish pool, as life on hit does (src/sim/replenish.ts).
   const lok =
     fs.char.db.sum('base', 'lifeOnKill', kctx) +
     (fs.char.db.sum('base', 'lifeOnKillPct', kctx) / 100) * p.def.maxLife;
   if (lok > 0) {
     const l0 = p.life;
-    p.life = Math.min(lifeCap(p), p.life + lok);
+    p.life += replenish(p, Math.max(0, Math.min(lok, lifeCap(p) - p.life)));
     noteRecover(p, 'life', p.life - l0);
   }
   const mok = fs.char.db.sum('base', 'manaOnKill', kctx);
@@ -1630,6 +1650,7 @@ export function monsterHitOf(a: Actor): number {
 /** Per-tick upkeep: DoTs, regeneration, leech, ES recharge, timers. */
 export function tickActor(w: World, a: Actor, dt: number): void {
   if (!a.alive) return;
+  replenishTick(w, a);
   const ail = a.ail;
   const def = a.def;
   // Timers.
@@ -1813,10 +1834,11 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   if (suppressed) return;
   const life0 = a.life;
   const es0 = a.es;
+  // A character's life leech is replenish: paid out only while the pool holds some (src/sim/replenish.ts).
   if (def.leechToEs)
     leechTick(
       a.leech.life,
-      (x) => (a.es = Math.min(def.maxEs, a.es + x)),
+      (x) => (a.es = Math.min(def.maxEs, a.es + replenish(a, Math.min(x, def.maxEs - a.es)))),
       def.maxLife,
       dt,
       a.es >= def.maxEs,
@@ -1825,7 +1847,7 @@ export function tickActor(w: World, a: Actor, dt: number): void {
   else
     leechTick(
       a.leech.life,
-      (x) => (a.life = Math.min(cap, a.life + x)),
+      (x) => (a.life = Math.min(cap, a.life + replenish(a, Math.min(x, cap - a.life)))),
       def.maxLife,
       dt,
       a.life >= cap,

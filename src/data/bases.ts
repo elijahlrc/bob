@@ -1,6 +1,7 @@
 import { mod, type Mod, type SkillTag } from '../mods/types';
 import { BASE_ROWS, type BaseRow } from './baseTables';
 import { ENERGY_SHIELD_SCALE } from './constants';
+import { sustainMods } from './sustain';
 import type { ArmourSlot, Attrs, DefenceType, ItemBase, ItemClass, WeaponClass } from './types';
 
 /**
@@ -75,7 +76,7 @@ function weaponBases(): ItemBase[] {
         itemClass: f.cls,
         level: r.level,
         req: req(r.req),
-        implicits: r.implicits ?? [],
+        implicits: sustainMods(r.implicits ?? [], 'item'),
         weapon: {
           min: Math.round(min * WEAPON_DAMAGE_SCALE),
           max: Math.round(max * WEAPON_DAMAGE_SCALE),
@@ -117,7 +118,7 @@ function armourBases(): ItemBase[] {
           itemClass: slot,
           level: r.level,
           req: req(r.req),
-          implicits: r.implicits ?? [],
+          implicits: sustainMods(r.implicits ?? [], 'item'),
           defence: defenceOf(r.def!),
           defenceType: type,
           tags: [],
@@ -135,7 +136,7 @@ function jewelleryBases(): ItemBase[] {
         itemClass: cls,
         level: r.level,
         req: req(r.req),
-        implicits: r.implicits ?? [],
+        implicits: sustainMods(r.implicits ?? [], 'item'),
         tags: [],
         ...(r.sockets ? { sockets: r.sockets } : {}),
       });

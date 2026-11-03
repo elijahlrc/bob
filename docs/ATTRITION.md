@@ -603,3 +603,32 @@ the changes after three playtests.
   Kill Shot, Surging Tide, Reedwalker, Weaving), and Fortified on stun 10% (Hold the Line). Hammer Rhythm's grit per mace
   hit, rolled for every target struck, is 2%. Warcries and blinks, held back by their cooldowns, keep theirs (Iron Voice,
   Hymn of War, Skirmisher's Leap). The nodes' prices fell with their lines and nothing was added to make up for it.
+- **2026-11-02, the sustain pass planned** (the owner): self-recovery cut much further (the tree and gems by 80 to 90%
+  against main, items by about 75%), energy shield to 40% of main, life doubled and mana 50% more at the source, life
+  flasks heal 20% more. Then the same day: replenish, a leech capped by the life damage taken in the last 5 seconds,
+  replaces life leech and takes in life on hit. The plan, how it is built and its open questions are docs/SUSTAIN.md.
+  Built the same day, except the replenish share and window lines, which wait for the owner's review of a draft.
+- **2026-11-02, the third brainstorm's relics, built** (the owner's four; names provisional):
+  - **The Splintered Rod** (dexterity and intelligence): wand attacks fire an additional projectile. Wielding a wand, every
+    attack counts as a wand attack.
+  - **Through Flesh and Beyond** (dexterity): ranged attacks (attacks with projectiles) pierce every enemy, and their
+    projectiles travel 40% slower. The owner chose the slow projectiles from four downsides (also weaker on the first enemy
+    hit, no chaining or forking, damage fading with each enemy pierced).
+  - **Blade and Word in Turn** (dexterity and intelligence): a melee critical strike gives spells 100% increased critical
+    strike chance, and a spell critical strike gives it to melee attacks. It holds until a critical strike of the other kind
+    passes it back (the owner's choice over a fixed window). The sheet does not count it.
+  - **The Ploughman's Wrath** (strength): 50% increased area of effect of melee attacks, 20% reduced movement speed
+    ("reduced", the owner's choice over "less").
+- **2026-11-02, relics that make lines of one kind count for another, built** (the owner; names provisional). One
+  mechanism, `relicBorrows` in calc/relics.ts: copies of the character's own lines with a weapon tag, a skill tag or a
+  wielding condition swapped.
+  - **The School of Every Blade** (strength and dexterity): sword, axe, mace, claw and dagger lines all count for the
+    one-handed weapon held (lines for a two-handed weapon stay so). Its price, the owner's pick of four: critical strikes
+    deal no extra damage.
+  - **The Lone Grip** (strength): with a one-handed weapon and an empty off hand, two-handed weapon lines count for it.
+  - **The Whispered Edge** (dexterity and intelligence): spell critical strike chance and multiplier lines also count for
+    attacks while a dagger is held. A count of the tree first: 15 spell critical strike chance nodes (315%) and 7 multiplier
+    nodes, and two affix families.
+  - **Waiting for the owner:** an elemental bridge for staves and sceptres. The tree has no melee-only elemental lines (48
+    attack-wide ones, 72 global) and no staff or sceptre elemental lines; the proposal is that, while a staff or sceptre is
+    held, attack elemental lines count for spells and spell damage lines for the elemental damage of attacks.

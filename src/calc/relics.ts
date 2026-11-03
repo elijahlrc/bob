@@ -14,12 +14,16 @@ import {
   MOUNTAIN_SHARE,
   LINGERING_MORE,
   MARKSMAN_ACCURACY,
+  PLOUGHMAN_AOE,
+  PLOUGHMAN_MOVE,
+  SPLINTER_PROJECTILES,
+  THROUGH_FLESH_SLOW,
   ROT_VEIL_SHARE,
   UNFLINCHING_LESS,
   type RunRewardId,
 } from '../data/runRewards';
 import type { Build } from '../data/types';
-import { mod, type Mod } from '../mods/types';
+import { mod, type CondId, type Mod, type SkillTag } from '../mods/types';
 
 /** How many of a relic a build holds (docs/ATTRITION.md). */
 export const relicCount = (b: Pick<Build, 'relics'>, id: RunRewardId): number =>
@@ -136,6 +140,31 @@ export function relicMods(b: Build): Mod[] {
         }),
       ),
     );
+  // The third brainstorm's relics (the owner, 2026-11-02). A ranged attack is an attack with projectiles; 999 is every enemy.
+  if (hasRelic(b, 'splinteredRod'))
+    out.push(
+      // Wielding a wand, every attack is a wand attack (melee skills cannot be used with one).
+      mod('projectiles', 'base', SPLINTER_PROJECTILES, {
+        tags: ['attack'],
+        condition: { id: 'wieldingWand' },
+        ...src('splinteredRod'),
+      }),
+    );
+  if (hasRelic(b, 'throughFlesh'))
+    out.push(
+      mod('pierce', 'base', 999, { tags: ['attack', 'projectile'], ...src('throughFlesh') }),
+      mod('projectileSpeed', 'more', -THROUGH_FLESH_SLOW, {
+        tags: ['attack', 'projectile'],
+        ...src('throughFlesh'),
+      }),
+    );
+  if (hasRelic(b, 'ploughmansWrath'))
+    out.push(
+      mod('aoe', 'inc', PLOUGHMAN_AOE, { tags: ['attack', 'melee'], ...src('ploughmansWrath') }),
+      mod('moveSpeed', 'inc', -PLOUGHMAN_MOVE, src('ploughmansWrath')),
+    );
+  // The School of Every Blade's price: critical strikes do normal damage (skill.ts).
+  if (hasRelic(b, 'everyBlade')) out.push(mod('critNoExtraDamage', 'flag', 1, src('everyBlade')));
   for (const m of b.grafts ?? []) out.push({ ...m, source: { kind: 'relic', id: 'surgeon' } });
   return out;
 }
@@ -146,4 +175,71 @@ export function bossRelicMods(b: Build): Mod[] {
   return (['armour', 'evasion', 'es'] as const).map((s) =>
     mod(s, 'more', BULWARK_MORE, src('bulwarkBeforeTheThrone')),
   );
+}
+
+/** The one-handed weapon kinds The School of Every Blade joins, and the condition that names each. */
+const SCHOOL: readonly SkillTag[] = ['sword', 'axe', 'mace', 'claw', 'dagger'];
+const WIELDING: Partial<Record<SkillTag, CondId>> = {
+  sword: 'wieldingSword',
+  axe: 'wieldingAxe',
+  mace: 'wieldingMace',
+  claw: 'wieldingClaw',
+  dagger: 'wieldingDagger',
+};
+const schoolOf = (c: CondId): SkillTag | undefined => SCHOOL.find((t) => WIELDING[t] === c);
+
+/**
+ * Relics that make lines of one kind count for another (the owner, 2026-11-02): copies of the character's own mods with a tag or
+ * a condition swapped, made once the static mods are gathered. A copy keeps its value and conditions, so it is shown, summed
+ * and scaled like the line it comes from.
+ */
+export function relicBorrows(
+  b: Build,
+  mods: readonly Mod[],
+  weaponTags: ReadonlySet<SkillTag>,
+): Mod[] {
+  const out: Mod[] = [];
+  const swapTag = (m: Mod, from: SkillTag, to: SkillTag): SkillTag[] =>
+    (m.tags ?? []).map((t) => (t === from ? to : t));
+  // The Whispered Edge: spell critical strike lines count for attacks while a dagger is held (lines already for daggers aside).
+  if (hasRelic(b, 'whisperedEdge') && weaponTags.has('dagger'))
+    for (const m of mods)
+      if (
+        (m.stat === 'critChance' || m.stat === 'critMulti') &&
+        m.tags?.includes('spell') &&
+        !m.condition
+      )
+        out.push({
+          ...m,
+          tags: swapTag(m, 'spell', 'attack'),
+          condition: { id: 'wieldingDagger' },
+          ...src('whisperedEdge'),
+        });
+  // The Lone Grip: two-handed lines count for a one-handed weapon held alone.
+  if (hasRelic(b, 'loneGrip') && weaponTags.has('oneHand') && !b.equipment.offHand)
+    for (const m of mods) {
+      const tagged = m.tags?.includes('twoHand');
+      const cond = m.condition?.id === 'wieldingTwoHand' && !m.condition.not;
+      if (!tagged && !cond) continue;
+      out.push({
+        ...m,
+        tags: tagged ? swapTag(m, 'twoHand', 'oneHand') : m.tags,
+        condition: cond ? { id: 'wieldingOneHand' } : m.condition,
+        ...src('loneGrip'),
+      });
+    }
+  // The School of Every Blade: every kind's lines count for the one-handed kinds held. A line for one two-handed weapon stays so.
+  const held = SCHOOL.filter((t) => weaponTags.has(t));
+  if (hasRelic(b, 'everyBlade') && weaponTags.has('oneHand') && held.length)
+    for (const m of mods) {
+      if (m.tags?.includes('twoHand')) continue;
+      const other = (m.tags ?? []).find((t) => SCHOOL.includes(t) && !held.includes(t));
+      if (other && !(m.tags ?? []).some((t) => held.includes(t)))
+        for (const t of held) out.push({ ...m, tags: swapTag(m, other, t), ...src('everyBlade') });
+      const kind = m.condition && !m.condition.not ? schoolOf(m.condition.id) : undefined;
+      // One copy for a condition: a second would count twice for a character holding two kinds.
+      if (kind && !held.includes(kind))
+        out.push({ ...m, condition: { id: WIELDING[held[0]]! }, ...src('everyBlade') });
+    }
+  return out;
 }

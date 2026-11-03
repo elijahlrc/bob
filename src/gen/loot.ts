@@ -357,7 +357,10 @@ export type UniqueEntry = { kind: 'item'; def: UniqueDef } | { kind: 'flask'; de
 /** Every unique an item level allows. */
 export function uniquePool(ilvl: number): UniqueEntry[] {
   return [
-    ...UNIQUES.filter((u) => u.level <= ilvl).map((def) => ({ kind: 'item' as const, def })),
+    ...UNIQUES.filter((u) => u.level <= ilvl && !u.noDrop).map((def) => ({
+      kind: 'item' as const,
+      def,
+    })),
     ...UNIQUE_FLASKS.filter((u) => u.level <= ilvl).map((def) => ({ kind: 'flask' as const, def })),
   ];
 }

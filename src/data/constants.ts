@@ -15,8 +15,15 @@ export const spellBaseDamage = (level: number): number =>
   SPELL_BASE_L1 * Math.pow(SPELL_BASE_L20 / SPELL_BASE_L1, (level - 1) / 19);
 
 // §6.1 Base character stats.
-export const BASE_LIFE = (level: number): number => 38 + 12 * level;
-export const BASE_MANA = (level: number): number => 34 + 6 * level;
+/**
+ * The character's flat life and mana, as a multiple of the reference numbers: base life and mana by level, the life of
+ * Strength and the mana of Intelligence, and every flat life and mana line of the tree, gear and uniques (`sustainMods`,
+ * data/sustain.ts). The sustain pass (the owner, 2026-11-02, docs/SUSTAIN.md): bigger pools make up for weak self-recovery.
+ */
+export const LIFE_SCALE = 2;
+export const MANA_SCALE = 1.5;
+export const BASE_LIFE = (level: number): number => (38 + 12 * level) * LIFE_SCALE;
+export const BASE_MANA = (level: number): number => (34 + 6 * level) * MANA_SCALE;
 export const BASE_EVASION = (level: number): number => 53 + 3 * level;
 export const BASE_ACCURACY = (level: number): number => 2 * level;
 export const BASE_MANA_REGEN_PCT = 1.75;
@@ -27,11 +34,11 @@ export const BASE_MOVE_SPEED = 4.0;
 export const LOW_LIFE = 0.35;
 
 // §6.2 Attributes (per point).
-export const STR_LIFE = 0.5;
+export const STR_LIFE = 0.5 * LIFE_SCALE;
 export const STR_MELEE_PHYS_INC = 0.2;
 export const DEX_ACCURACY = 2;
 export const DEX_EVASION_INC = 0.2;
-export const INT_MANA = 0.5;
+export const INT_MANA = 0.5 * MANA_SCALE;
 export const INT_ES_INC = 0.2;
 
 // §6.3 Defences.
@@ -50,6 +57,27 @@ export const LEECH_RATE_PER_INSTANCE = 0.02;
 export const LEECH_RATE_CAP = 0.2;
 /** One leech instance can recover at most this share of the maximum (as in the reference game). */
 export const LEECH_INSTANCE_MAX = 0.1;
+/**
+ * Self-recovery that can heal to full (life regeneration, life on block, the share of life recovered on an event), as a
+ * multiple of its written value, by where the line comes from (the owner, 2026-11-02, docs/SUSTAIN.md): the tree's and
+ * the gems' are cut by 80 to 90%, items' (affixes and uniques) by about 75%. Life leech, life on hit and life on kill
+ * are replenish instead (below) and keep their numbers.
+ */
+export const TREE_RECOVERY_SCALE = 0.15;
+export const GEM_RECOVERY_SCALE = 0.15;
+export const ITEM_RECOVERY_SCALE = 0.25;
+/** "While leeching" lines, which since replenish hold only while it recovers, are this many times as strong. */
+export const WHILE_LEECHING_SCALE = 1.35;
+/**
+ * Replenish (docs/SUSTAIN.md): the character's life leech, life on hit and life on kill recover at most this share
+ * (%) of the life lost in the last `REPLENISH_WINDOW` seconds, less what they recovered in that time. Stats raise the share up to the
+ * cap and stretch or shorten the window within its limits.
+ */
+export const REPLENISH_SHARE = 50;
+export const REPLENISH_SHARE_CAP = 95;
+export const REPLENISH_WINDOW = 5;
+export const REPLENISH_WINDOW_MIN = 2;
+export const REPLENISH_WINDOW_MAX = 10;
 
 // §6.6 Ailments.
 export const IGNITE_DPS_FRAC = 0.5;
@@ -128,12 +156,15 @@ export const FLASK_CAPACITY_SCALE = 1.75;
 export const FLASK_MANA_CAPACITY_SCALE = 2.75;
 /** A utility flask's effect lasts this many times the reference game's (2026-10-29: each drink is scarcer, so worth more). */
 export const FLASK_UTILITY_DURATION_SCALE = 1.5;
+/** A flask's life recovery is this many times the reference game's (2026-11-02, docs/SUSTAIN.md); mana recovery is not. */
+export const FLASK_LIFE_SCALE = 1.2;
 /**
  * Energy shield, as a multiple of the reference numbers: every item base's, and every affix's flat energy shield (its rolls,
  * so items found before a change keep theirs). A moderate cut since 2026-10-29 (the owner, docs/ATTRITION.md): with kills no
- * longer refilling flasks, a shield that recharges in full between fights was the strongest way to last a run.
+ * longer refilling flasks, a shield that recharges in full between fights was the strongest way to last a run. 0.4 since
+ * 2026-11-02 (the sustain pass, docs/SUSTAIN.md).
  */
-export const ENERGY_SHIELD_SCALE = 0.75;
+export const ENERGY_SHIELD_SCALE = 0.4;
 
 // Duels (docs/DUEL.md 4.4).
 /**
@@ -148,8 +179,9 @@ export const DUEL_REPRIEVES = 3;
 /**
  * What a character's life and energy shield are multiplied by in a duel against an opponent of level 100 (docs/DUEL-BALANCE.md 4):
  * the factor runs on a straight line from 1 at level 1 to this at level 100, and each side's is read from the other side's level.
+ * The bonus over 1 was 9; a third of that since the sustain pass doubled life (the owner, 2026-11-02, docs/SUSTAIN.md).
  */
-export const DUEL_LIFE_MULT_TOP = 10;
+export const DUEL_LIFE_MULT_TOP = 1 + 9 * 0.33;
 /**
  * How much of the duel's modifiers (the damage scale and the life multiplier) a character has on each of its lives: the first
  * life, then after each Bargain Coin (the owner, 2026-10-24). Weakest on the first and strongest on the last, so a fight swings

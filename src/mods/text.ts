@@ -90,11 +90,12 @@ export function modText(m: Mod): string {
     return `${v}% increased Life recovered by the Flask in your last belt slot${sfx}`;
   if (m.stat === 'flaskLowLifeRecovery')
     return `${v}% increased Life recovered by Flasks drunk below 30% Life${sfx}`;
-  // "of Physical Attack Damage Leeched as Life": leech from attacks names the attacks before the damage.
+  // "of Physical Attack Damage Replenished as Life": leech from attacks names the attacks before the damage. Life leech is
+  // replenish (docs/SUSTAIN.md).
   if ((m.stat === 'leech.life' || m.stat === 'leech.mana') && m.tags?.includes('attack')) {
     const tp = typesPhrase(m.damageTypes);
     const rest = suffix({ ...m, tags: m.tags.filter((t) => t !== 'attack') });
-    return `${v}% of ${tp ? tp + ' ' : ''}Attack Damage Leeched as ${m.stat === 'leech.life' ? 'Life' : 'Mana'}${rest}`;
+    return `${v}% of ${tp ? tp + ' ' : ''}Attack Damage ${m.stat === 'leech.life' ? 'Replenished as Life' : 'Leeched as Mana'}${rest}`;
   }
   const conv = /^(convert|convertSkill|gain)\.(\w+)\.(\w+)$/.exec(m.stat);
   if (conv) {

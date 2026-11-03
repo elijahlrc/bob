@@ -59,7 +59,7 @@ export const KEYSTONES: KeystoneDef[] = [
     id: 'crimsonPact',
     name: 'Blood Bargain',
     mods: [mod('instantLeechNoRegen', 'flag', 1)],
-    description: 'Leech is instant. You have no life regeneration.',
+    description: 'Replenish and leech are instant. You have no life regeneration.',
   },
   {
     id: 'feverPitch',
@@ -104,7 +104,7 @@ export const KEYSTONES: KeystoneDef[] = [
     name: 'Shade Leech',
     mods: [mod('leechToES', 'flag', 1), mod('esRechargeRate', 'more', -50)],
     description:
-      'Life leech applies to energy shield instead. Energy shield recharge is 50% slower.',
+      'Replenish restores energy shield instead of life, and damage to energy shield can be replenished. Energy shield recharge is 50% slower.',
   },
   {
     id: 'strongarm',

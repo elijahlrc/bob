@@ -70,6 +70,8 @@ export function dummyDefence(over: Partial<Defence> = {}): Defence {
     reflect: [0, 0, 0, 0, 0],
     reflectPhysPct: 0,
     leechRate: 1,
+    replenishShare: 0.5,
+    replenishWindow: 5,
     noMovingBleed: false,
     dodgeAttack: 0,
     dodgeSpell: 0,

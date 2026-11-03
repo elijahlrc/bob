@@ -5,6 +5,7 @@ import { lootMults } from '../run/run';
 import { buildFor, classFor } from './gemKit';
 import { killActor, rawHit } from './combat';
 import { createDummyWorld, dummyDefence } from './dummy';
+import { noteLifeLost } from './replenish';
 import { chargeEnemy } from './skillFx';
 import { gainVirulence } from './skillFx';
 import { spawnMonster, stepWorld } from './world';
@@ -87,6 +88,8 @@ describe('conditional mods are seen by the sim', () => {
     kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
     expect(w.sides[0].char.charges.fervour).toBeGreaterThan(0);
     w.sides[0].player.life = 100;
+    // Flat life on kill is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(w.sides[0].player, 1000, w.t);
     kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
     expect(w.sides[0].player.life).toBeGreaterThanOrEqual(100 + 20);
   });

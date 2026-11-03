@@ -196,8 +196,8 @@ trail it; its gallop lanes are drawn before it runs them.
   **burning lane** (a fire zone, 6 s). Then it turns and **charges back** along a second shown lane into the canter. The
   charge is a dodgeable hit.
 - **Never fully still**, as the user asked. It has no stand and no rest. Chill and freeze are the only ways to hold it.
-- **Its gallop is not stopped by the character's body**, but minions block it, as they block every monster. A minion
-  in its lane breaks the gallop early: a minion build's answer. Totems, traps and mines have no body, so they do not
+- **Its gallop is not stopped by the character's body**, but a minion in its lane breaks the gallop early: a minion
+  build's answer. (Walking, it shoves minions aside, as every boss does; 2026-10-30.) Totems, traps and mines have no body, so they do not
   block it, but traps and mines are tripped as it passes.
 
 **Its card.**

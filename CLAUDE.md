@@ -118,6 +118,11 @@
   - In PowerShell, refresh PATH first:
     `$env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")`
   - Dev server: `npm run dev` on http://localhost:5173 (strict port).
+- **Sustain pass** (2026-11-02): [docs/SUSTAIN.md](docs/SUSTAIN.md). Life ×2 and mana ×1.5 at the source, self-recovery
+  that heals to full cut by where it comes from, energy shield at 40% of main; the levers are in `data/constants.ts` and
+  `data/sustain.ts` applies them where the data is made (a new source of life or recovery lines goes through it). Life
+  leech and life on hit are **replenish** (`src/sim/replenish.ts`): capped by a share of the life lost in the last few
+  seconds.
 - **Map choice plan:** [docs/MAPS.md](docs/MAPS.md) (milestones R0–R7): three offers per level, level offsets of ±2, carry-over of life, mana, ES and flasks, Abandon, Respite and map types. R0 to R6 are built as a first pass (the numbers are not tuned; see `docs/PROGRESS.md`); R7, the phase-2 types, is not. Decisions go in DESIGN.md Appendix A.
 - **Enemy variety and difficulty plan:** [docs/ENEMIES.md](docs/ENEMIES.md) (milestones E0–E7): built (section 14 says what changed and
   what the bot measured). Offer sets are drawn by weight with distinct leading factions, rooms are packs with shapes by role

@@ -73,7 +73,7 @@ export const edge: AreaSpec = {
           id: 'w3',
           kind: 'notable',
           name: 'Talon',
-          lines: [clawDamage(20), leechLife(0.6, ['attack']), manaLeech(0.6)],
+          lines: [clawDamage(20), leechLife(1, ['attack']), manaLeech(0.6)],
           at: [2358, -975],
         },
         { id: 'w4', kind: 'small', lines: [critChance(15)], at: [2439, -1092] },

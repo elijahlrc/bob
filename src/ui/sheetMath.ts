@@ -182,7 +182,7 @@ export function stunThresholdTip(threshold: number): string {
 export function leechTip(pool: 'life' | 'mana', rate: number): string {
   const p = (v: number) => `${Math.round(v * 1000) / 10}%`;
   return lines(
-    GLOSSARY.leech,
+    pool === 'life' ? GLOSSARY.replenish : GLOSSARY.leech,
     `Each hit's ${pool} comes back over time, ${p(LEECH_RATE_PER_INSTANCE * rate)} of maximum ${pool} a second, and at most ${p(LEECH_RATE_CAP * rate)} a second from all hits together. One hit gives at most ${p(LEECH_INSTANCE_MAX)}.`,
   );
 }

@@ -2,6 +2,7 @@ import type { CondId, DamageType, ModKind, SkillTag } from '../mods/types';
 import type { Attrs } from './types';
 import type { TriggerDef } from './triggers';
 import { itemBase } from './bases';
+import { sustainDeep } from './sustain';
 import { WAVE1_UNIQUES } from './uniquesWave1';
 import { WAVE2_UNIQUES } from './uniquesWave2';
 import { WAVE3_UNIQUES } from './uniquesWave3';
@@ -41,7 +42,15 @@ export type UniqueDef = {
   /** Authoring notes, never shown to players (EXPANSION 6.1 rule 3). */
   notes?: { pairsWith: string[]; weakAgainst: string[] };
   flavour: string;
+  /** Out of the drop pool (and the crafts that turn up uniques); copies already found keep working. */
+  noDrop?: boolean;
 };
+
+/**
+ * Uniques that no longer drop. Ebbing Cincture's leech to energy shield on full life can't work once life leech is
+ * replenish (the owner, 2026-11-02, docs/SUSTAIN.md): cut for now.
+ */
+const NO_DROP = new Set(['ebbingCincture']);
 
 const m = (
   stat: string,
@@ -429,7 +438,13 @@ const ALL_UNIQUES: UniqueDef[] = [
 /** Every unique, dropping no earlier than its base can be worn (a hand-written level below the base's is raised to it). */
 export const UNIQUES: UniqueDef[] = ALL_UNIQUES.map((u) => {
   const base = itemBase(u.baseId).level;
-  return u.level >= base ? u : { ...u, level: base };
+  // The sustain pass (data/sustain.ts): flat life and mana grow, recovery that heals to full is cut.
+  const v = {
+    ...u,
+    mods: sustainDeep(u.mods, 'item'),
+    ...(NO_DROP.has(u.id) ? { noDrop: true } : {}),
+  };
+  return v.level >= base ? v : { ...v, level: base };
 });
 
 export function uniqueDef(id: string): UniqueDef {

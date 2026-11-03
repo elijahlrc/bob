@@ -150,7 +150,7 @@ export const fire: AreaSpec = {
           kind: 'notable',
           name: 'Warm Hearth',
           lines: [
-            recoverOn('killIgnited', 'life', 1.8),
+            recoverOn('killIgnited', 'life', 3),
             recoverOn('killIgnited', 'es', 3),
             eleDamage('fire', 10),
           ],

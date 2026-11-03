@@ -34,12 +34,12 @@ export const ambulatory: AreaSpec = {
       at: [-2070, -199],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.25, ['attack'])], at: [-2043, -56] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [-2043, -56] },
         {
           id: 'n',
           kind: 'notable',
           name: 'Alms',
-          lines: [leechLife(0.6, ['attack']), lifeOnHit(4, ['attack'])],
+          lines: [leechLife(1, ['attack']), lifeOnHit(6, ['attack'])],
           at: [-2056, -126],
           why: "Leech and life on hit with attacks, generic ground on the Wall's border road (renamed: Tithe is a relic): 2.5 + 1.5 units.",
         },
@@ -96,7 +96,7 @@ export const ambulatory: AreaSpec = {
           id: 'ember',
           kind: 'notable',
           name: 'Ember Litany',
-          lines: [recoverOn('killIgnited', 'life', 2.4), eleAttackOne('fire', 12)],
+          lines: [recoverOn('killIgnited', 'life', 4), eleAttackOne('fire', 12)],
           at: [-3703, -979],
           why: 'The fire striker feeds on the burning: killing an ignited enemy mends 4% of life: 3.2 + 1 units.',
         },

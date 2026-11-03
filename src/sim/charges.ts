@@ -4,6 +4,7 @@ import {
   CRUELTY_SECONDS,
   CRUELTY_SPEED,
   FIEND_PERIOD,
+  TWIN_EDGE_CRIT,
   UNTOUCHED_LEECH,
   UNTOUCHED_SECONDS,
 } from '../data/runRewards';
@@ -47,7 +48,9 @@ export function characterWith(w: World, s: Side, counts: ChargeCounts): Characte
   const trophy = trophyIds(s);
   const cruelty = s.cruelty?.length ?? 0;
   // What the Unmaker holds of the build is part of it too (docs/BOSSES.md 9).
-  const k = key(counts, trophy) + theftKey(w) + (cruelty ? `|c${cruelty}` : '');
+  const twin = s.twinEdge;
+  const k =
+    key(counts, trophy) + theftKey(w) + (cruelty ? `|c${cruelty}` : '') + (twin ? `|t${twin}` : '');
   let ch = s.chars.get(k);
   if (!ch) {
     ch = new Character(theftBuild(w, s.build), {
@@ -58,6 +61,7 @@ export function characterWith(w: World, s: Side, counts: ChargeCounts): Characte
         ...trophyMods(trophy),
         ...theftMods(w),
         ...(cruelty ? [mod('attackSpeed', 'inc', CRUELTY_SPEED * cruelty)] : []),
+        ...(twin ? [mod('critChance', 'inc', TWIN_EDGE_CRIT, { tags: [twin] })] : []),
       ],
       charges: counts,
     });
@@ -83,6 +87,18 @@ export function gainCruelty(w: World, s: Side): void {
   held.push(w.t + CRUELTY_SECONDS);
   s.cruelty = held;
   if (held.length !== before) swap(w, s, { ...s.char.charges });
+}
+
+/**
+ * Blade and Word in Turn: a melee critical strike raises the critical strike chance of spells, a spell critical strike that of
+ * melee attacks; the raise holds until a critical strike of the other kind passes it back.
+ */
+export function gainTwinEdge(w: World, s: Side, tags: readonly string[]): void {
+  if (!hasRelic(s.build, 'twinEdge')) return;
+  const next = tags.includes('spell') ? 'melee' : tags.includes('melee') ? 'spell' : null;
+  if (!next || next === s.twinEdge) return;
+  s.twinEdge = next;
+  swap(w, s, { ...s.char.charges });
 }
 
 /** Blood of the Untouched (an attribute relic): an evaded attack adds a stack of leech that holds `UNTOUCHED_SECONDS`. */

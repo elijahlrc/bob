@@ -493,11 +493,17 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               />
             )}
             {flatRows(
-              'Life Leech',
+              'Replenish',
               flat.lifeLeech,
               (m) => leechValue(m, flat.lifeMult),
               leechTip('life', flat.def.leechRate),
             )}
+            <Row
+              label="Replenish Limit"
+              value={`${Math.round(flat.def.replenishShare * 100)}%`}
+              raw={`of life lost in ${f1(flat.def.replenishWindow)}s`}
+              tip={GLOSSARY.replenish}
+            />
             {flatRows(
               'Mana Leech',
               flat.manaLeech,

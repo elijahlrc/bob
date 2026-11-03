@@ -282,7 +282,8 @@ describe('the bases', () => {
     const imp = (id: string) => modsText(itemBase(id).implicits).join(' / ');
     // The old tier ids stand for the base of the type nearest their level (1, 20, 40, 60).
     expect(imp('shield_ar_1')).toBe('');
-    expect(imp('shield_ar_4')).toBe('+25 to maximum Life');
+    // Flat life is doubled since the sustain pass (`LIFE_SCALE`, docs/SUSTAIN.md).
+    expect(imp('shield_ar_4')).toBe('+50 to maximum Life');
     expect(imp('shield_ev_4')).toBe('6% increased Movement Speed');
     expect(imp('shield_es_4')).toBe('18% increased Spell Damage');
     expect(imp('shield_ares_4')).toBe('+4% to all Elemental Resistances');

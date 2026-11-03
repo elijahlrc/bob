@@ -75,10 +75,12 @@ export const STAT_TEXT: Record<string, StatText> = {
   'effect.chill': { name: 'Effect of Chill' },
   ailmentEffect: { name: 'Effect of non-damaging Ailments' },
   'leech.life': {
-    name: 'of Damage Leeched as Life',
+    name: 'of Damage Replenished as Life',
     pct: true,
-    base: '{v}% of {types}Damage Leeched as Life',
+    base: '{v}% of {types}Damage Replenished as Life',
   },
+  replenishShare: { base: '+{v}% of recent Life lost can be Replenished' },
+  replenishWindow: { name: 'Replenish window' },
   'leech.mana': {
     name: 'of Damage Leeched as Mana',
     pct: true,
@@ -116,7 +118,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   warcryEffect: { name: 'effect of your Warcries' },
   flaskEffect: { name: 'effect of Flasks' },
   flaskCharges: { name: 'Flask Charges gained' },
-  flaskStartFull: { flag: 'Flasks start the map full' },
+  flaskStartFill: { base: 'Flasks start the map at least {v}% full' },
   flaskRecovery: { name: 'Flask Recovery amount' },
   flaskDuration: { name: 'Flask effect Duration' },
   damageTaken: { name: 'Damage taken' },
@@ -143,7 +145,7 @@ export const STAT_TEXT: Record<string, StatText> = {
   closeQuarters: {
     flag: 'Projectile Attacks deal up to 50% more Damage at close range, falling to 50% less at long range',
   },
-  instantLeechNoRegen: { flag: 'Life Leech is instant; you have no Life Regeneration' },
+  instantLeechNoRegen: { flag: 'Replenish is instant; you have no Life Regeneration' },
   feverPitch: { flag: 'Critical Strike Multiplier is 100%' },
   painConduit: { flag: '' },
   cannotBeStunned: { flag: 'Cannot be Stunned' },
@@ -152,7 +154,9 @@ export const STAT_TEXT: Record<string, StatText> = {
     flag: "Your Hits give the target +25% resistance to the Hit's elements and -50% to the others for 5 seconds",
   },
   regenToES: { flag: 'Life Regeneration applies to Energy Shield instead' },
-  leechToES: { flag: 'Life Leech applies to Energy Shield instead' },
+  leechToES: {
+    flag: 'Replenish restores Energy Shield instead of Life, and damage to Energy Shield can be Replenished',
+  },
   strongarm: { flag: "Strength's Damage bonus applies to Projectile Attacks" },
   woundDance: { flag: 'Bleeding stacks up to 8 times; no extra Damage while moving' },
   cruelAgony: {
@@ -208,7 +212,7 @@ export const CONDITION_TEXT: Record<string, string> = {
   overloadActive: 'after a recent Critical Strike',
   blockedRecently: 'if you have Blocked Recently',
   beenHitRecently: 'if you have been Hit Recently',
-  leeching: 'while Leeching',
+  leeching: 'while Replenishing',
   esFull: 'while Energy Shield is full',
   targetLowLife: 'against Enemies on Low Life',
   onLowMana: 'while on Low Mana',
@@ -300,8 +304,8 @@ Object.assign(STAT_TEXT, {
   chaosNotBypassEs: { flag: 'Chaos Damage does not bypass Energy Shield' },
   minDamage: { name: 'minimum Damage' },
   maxDamage: { name: 'maximum Damage' },
-  instantLeechOnCrit: { flag: 'Leech from Critical Strikes is instant' },
-  cannotBeLeechedFrom: { flag: 'Cannot be Leeched from' },
+  instantLeechOnCrit: { flag: 'Replenish and Leech from Critical Strikes are instant' },
+  cannotBeLeechedFrom: { flag: 'Gives no Replenish or Leech' },
   immuneAilments: { flag: 'Immune to Ailments' },
   unaffectedByShock: { flag: 'Unaffected by Shock' },
   noElementalDamage: { flag: 'Deal no Elemental Damage' },
@@ -419,7 +423,9 @@ Object.assign(STAT_TEXT, {
   esRechargeOnKill: { flag: 'Energy Shield starts recharging when you Kill an Enemy' },
   chilledLessDamage: { base: 'Chilled Enemies deal {v}% less Damage to you' },
   // The Bow's.
-  farShot: { base: 'Projectile Attacks deal up to {v}% more Damage far away, and 20% less up close' },
+  farShot: {
+    base: 'Projectile Attacks deal up to {v}% more Damage far away, and 20% less up close',
+  },
   // The Yard's.
   armourVsEle: { base: '{v}% of Armour also applies to Elemental Hits' },
 } satisfies Record<string, StatText>);
@@ -563,8 +569,8 @@ Object.assign(STAT_TEXT, {
 } satisfies Record<string, StatText>);
 
 Object.assign(STAT_TEXT, {
-  leechRate: { name: 'Life and Mana Leeched per second' },
-  instantLeechAlways: { flag: 'Leech from Hits is instant' },
+  leechRate: { name: 'Replenish and Mana Leech speed' },
+  instantLeechAlways: { flag: 'Replenish and Leech from Hits are instant' },
   meleeRange: { base: '{v} to Melee Weapon and Unarmed range' },
   costFlat: { base: '{v} to Total Mana Cost of Skills' },
   flaskLifeRecovery: { name: 'Life Recovery from Flasks' },

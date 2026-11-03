@@ -43,14 +43,14 @@ export const MAP_AFFIXES: MapAffixDef[] = [
   {
     id: 'noLeech',
     name: 'Bloodless',
-    text: 'Monsters cannot be leeched from',
+    text: 'Monsters give no replenish or leech',
     monsterMods: [mod('cannotBeLeechedFrom', 'flag', 1)],
     reward: { quantity: 0.15 },
   },
   {
     id: 'lessRecovery',
     name: 'Draining',
-    text: 'Players have {40}% less recovery (life, energy shield, leech and flasks)',
+    text: 'Players have {40}% less recovery (life, energy shield, replenish, leech and flasks)',
     playerMods: [
       mod('lifeRegen', 'more', -40),
       mod('esRechargeRate', 'more', -40),

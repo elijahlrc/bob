@@ -146,7 +146,7 @@ export const resists: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Bulwark Spirit',
-          lines: [lifeRegenPerGrit(0.25), stunAvoid(30)],
+          lines: [lifeRegenPerGrit(0.4), stunAvoid(30)],
           at: [-2903, 264],
           why: 'Grit-shaped sustain at the Cathedral border: every charge mends.',
         },

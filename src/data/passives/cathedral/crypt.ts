@@ -79,7 +79,7 @@ export const crypt: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Reliquary',
-          lines: [totemDamage(24), regenWithTotem(0.5), totemDuration(10)],
+          lines: [totemDamage(24), regenWithTotem(0.8), totemDuration(10)],
           at: [-1867, -2338],
           why: 'The casting totem that lasts, and the Zealot mends while one stands on the consecrated ground: 2 + 1.6 + 0.7 units.',
         },

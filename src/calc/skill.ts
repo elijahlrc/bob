@@ -521,7 +521,10 @@ export function buildProfile(inp: ProfileInput): SkillProfile {
       // Lucky: the better of two rolls (the Keen Draught).
       if (db.flag('critLucky', ctx)) critChance = 1 - (1 - critChance) * (1 - critChance);
     }
-    const critMulti = overload ? 1 : (BASE_CRIT_MULTI + db.sum('base', 'critMulti', ctx)) / 100;
+    const critMulti =
+      overload || db.flag('critNoExtraDamage', ctx)
+        ? 1
+        : (BASE_CRIT_MULTI + db.sum('base', 'critMulti', ctx)) / 100;
     // Accuracy.
     const accuracy = db.calc('accuracy', ctx, hand?.accuracy ?? 0);
     // Speed.

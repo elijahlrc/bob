@@ -311,7 +311,7 @@ export const dual: AreaSpec = {
         {
           id: 'p2',
           kind: 'small',
-          lines: [leechLife(0.25, ['attack'])],
+          lines: [leechLife(0.4, ['attack'])],
           at: [1040, 3830],
           why: "Bloodied Pursuit on into Red Thirst (2026-10-31): the bleeder's damage, then the leech that keeps the duellist up.",
         },

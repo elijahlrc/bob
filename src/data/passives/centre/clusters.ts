@@ -91,7 +91,7 @@ export const clusters: AreaSpec = {
         {
           id: 'a',
           kind: 'small',
-          lines: [lifeOnKill(5)],
+          lines: [lifeOnKill(8)],
           at: [713, 100],
           why: 'Life on kill on the way in.',
         },
@@ -99,7 +99,7 @@ export const clusters: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Hard Living',
-          lines: [lifeOnHit(6), lifeOnKill(12)],
+          lines: [lifeOnHit(10), lifeOnKill(20)],
           at: [572, 143],
           why: 'Life on hit and on kill, which neither home sells by this seam (Clear Head, Soft Step, Grey Cloak and Ward of Smoke sell mana, evasion and resistances): priced as a home generalist (it sits 10 to 12 steps from every start).',
         },

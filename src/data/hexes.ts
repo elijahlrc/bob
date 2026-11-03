@@ -264,7 +264,7 @@ export const HEXES: Record<HexId, HexDef> = {
     name: 'Mark of the Warlord',
     low: 21,
     high: 30,
-    text: 'reduced stun recovery and a greater chance to be stunned; your attacks leech from it',
+    text: 'reduced stun recovery and a greater chance to be stunned; your attacks replenish and leech from it',
     fx: { stun: 10 },
     selfMods: [
       { stat: 'leech.life', kind: 'base', low: 2, high: 2, tags: ['attack'] },

@@ -7,6 +7,7 @@ import type { StatusId } from './statuses';
 import type { SkillType } from './skillTypes';
 import { GEN_ACTIVE_GEMS, GEN_AURA_GEMS, GEN_SUPPORT_GEMS } from './gemsGen';
 import { RETIRED_GEMS } from './retiredGems';
+import { sustainDeep } from './sustain';
 
 /**
  * A value authored at gem level 1 and level 20 (DESIGN.md §11.5), or a table with one entry for each gem level from the first
@@ -1346,7 +1347,7 @@ export const SUPPORT_GEMS: SupportGemDef[] = [
     supports: [],
     costMult: 1.3,
     mods: [{ stat: 'leech.life', kind: 'base', value: 2 }],
-    description: 'Damage the skill deals is leeched as life.',
+    description: 'Damage the skill deals is replenished as life.',
   },
   {
     kind: 'support',
@@ -1882,6 +1883,9 @@ export const GRANTED_GEMS: ActiveGemDef[] = [
 ACTIVE_GEMS.push(...GEN_ACTIVE_GEMS);
 SUPPORT_GEMS.push(...GEN_SUPPORT_GEMS);
 AURA_GEMS.push(...GEN_AURA_GEMS);
+// The sustain pass (data/sustain.ts): a gem's recovery that heals to full is cut, its "while leeching" lines grow.
+for (const list of [ACTIVE_GEMS, SUPPORT_GEMS, AURA_GEMS, GRANTED_GEMS] as GemDef[][])
+  for (let i = 0; i < list.length; i++) list[i] = sustainDeep(list[i], 'gem');
 
 /** Every gem that can drop. */
 export const ALL_GEMS: GemDef[] = [...ACTIVE_GEMS, ...SUPPORT_GEMS, HEXING_STRIKES, ...AURA_GEMS];

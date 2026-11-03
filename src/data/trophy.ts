@@ -1,5 +1,6 @@
 import { mod, type Mod } from '../mods/types';
 import type { MonsterModId } from './monsters';
+import { sustainMods } from './sustain';
 
 /**
  * The Trophy Cord (EXPANSION 6.4): killing a rare monster gives you its monster mods for 20 seconds, in versions
@@ -17,7 +18,8 @@ export const TROPHY_MODS: Partial<Record<MonsterModId, Mod[]>> = {
   frostBound: [mod('gain.physical.cold', 'base', 25)],
   stormBound: [mod('gain.physical.lightning', 'base', 25)],
   vampiric: [mod('leech.life', 'base', 2, { tags: ['attack'] })],
-  regenerating: [mod('lifeRegenPct', 'base', 1)],
+  // The Trophy Cord is an item: its regeneration takes the items' cut (data/sustain.ts).
+  regenerating: sustainMods([mod('lifeRegenPct', 'base', 1)], 'item'),
   fortified: [mod('life', 'inc', 25)],
   frenzied: [mod('damage', 'more', 25, { condition: { id: 'onLowLife' } })],
   unshakable: [mod('cannotBeStunned', 'flag', 1)],

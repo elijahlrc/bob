@@ -6,6 +6,7 @@ import { newRun } from '../run/run';
 import { applyDamage, lifeCap, tickActor } from './combat';
 import { createDummyWorld } from './dummy';
 import { autoFlaskPolicy } from './flaskPolicy';
+import { noteLifeLost } from './replenish';
 import { stepWorld } from './world';
 
 function world(classId = 'vanguard') {
@@ -56,6 +57,8 @@ describe('§6.4 recovery', () => {
     const p = w.sides[0].player;
     p.def = { ...p.def, lifeRegen: 0, maxLife: 1000 };
     p.life = 100;
+    // Life leech is replenish (src/sim/replenish.ts): with plenty lost in the window, the leech rates alone set the pace.
+    noteLifeLost(p, 1e6, w.t);
     p.leech.life = [1000];
     tickActor(w, p, 1);
     expect(p.life).toBeCloseTo(120);

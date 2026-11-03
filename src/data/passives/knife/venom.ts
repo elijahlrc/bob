@@ -166,8 +166,8 @@ export const venom: AreaSpec = {
       at: [2455, -2633],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.25, ['attack'])], at: [2503, -2585] },
-        { id: 'b', kind: 'small', lines: [leechLife(0.25, ['attack'])], at: [2461, -2627] },
+        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [2503, -2585] },
+        { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [2461, -2627] },
         { id: 'k', kind: 'keystone', name: 'Shade Leech', lines: [], at: [2401, -2687] },
       ],
       links: [

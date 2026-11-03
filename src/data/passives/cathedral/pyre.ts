@@ -92,7 +92,7 @@ export const pyre: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Sexton',
-          lines: [minionDamage(20), regenWithMinion(0.5), life(5)],
+          lines: [minionDamage(20), regenWithMinion(0.8), life(5)],
           at: [-3311, -2117],
           why: 'The gravedigger tends the summoner: minion damage, and the Zealot regenerates while a servant stands: 1.7 + 1.6 + 1 units.',
         },

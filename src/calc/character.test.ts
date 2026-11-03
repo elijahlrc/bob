@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../data/classes';
+import { BASE_LIFE, BASE_MANA, INT_MANA, STR_LIFE } from '../data/constants';
 import { makeItem } from '../gen/items';
 import { mod } from '../mods/types';
 import { newRun } from '../run/run';
@@ -12,8 +13,8 @@ describe('computeCharacter (§8.1)', () => {
       const run = withStarterGems(newRun(cls.id, 1));
       const s = computeCharacter(run.build);
       expect(s.attrs).toEqual(cls.attrs);
-      expect(s.life).toBe(Math.round(38 + 12 + cls.attrs.str * 0.5));
-      expect(s.mana).toBe(Math.round(34 + 6 + cls.attrs.int * 0.5));
+      expect(s.life).toBe(Math.round(BASE_LIFE(1) + cls.attrs.str * STR_LIFE));
+      expect(s.mana).toBe(Math.round(BASE_MANA(1) + cls.attrs.int * INT_MANA));
       expect(s.skill.isDefault).toBe(false);
       expect(s.skill.totalDps).toBeGreaterThan(0);
       expect(s.ehp).toBeGreaterThan(s.life);
