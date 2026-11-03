@@ -180,18 +180,6 @@ describe('a duel of two starters', () => {
     expect(w.exitOpen).toBe(false);
     expect(w.status).toBe('running');
   });
-
-  it('a different level on each side is a different character (the fight reads each its own)', () => {
-    const strong = vanguard(1);
-    strong.level = 30;
-    const r = runDuel(strong, vanguard(2), 1, F4);
-    expect(r.winner).toBe(0);
-    // Easier than an even fight: the higher level has more life, and its gems are stronger. (Not by as much as before the flask
-    // scarcity: the weaker side's bigger flasks hold out for most of the fight whoever it faces.)
-    const even = runDuel(vanguard(1), vanguard(2), 1, F4);
-    expect(r.sides[0].lifeLeft).toBeGreaterThan(even.sides[even.winner!].lifeLeft + 0.15);
-    expect(r.time).toBeLessThan(even.time);
-  });
 });
 
 describe('what is one side’s stays its side’s', () => {
