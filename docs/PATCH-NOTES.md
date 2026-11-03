@@ -4,6 +4,66 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-11-03
+
+This patch is a real doozy! It substantially diverges from more standard ARPG mechanical balance in order to make better use of its roguelike format. It also adds a bunch of **unique Relics** (buffs which last through the whole run and have radical impacts on gameplay) and new stops along your journey. At the highest level of abstraction, the balance changes make the game much more focused on sustaining your character across multiple levels. If all goes well you will find it much harder to keep your character's health and flasks up, and will need to take Respite stops in order to recharge and continue your journey.
+
+**Kills no longer refill your flasks.** Flasks hold far more, and charges come back at a Respite, when a boss falls, at a few stops, from provisions and from what you invest in: the passive tree, flask affixes and uniques. **Healing that can return your health to full is much weaker**. Life leech becomes Replenish, which wins back part of the damage you just took but never heals past it. **Life and mana pools are much larger** to make up for it, so the challenge moves from the single fight to the run. **Monsters have much less life**, **hit harder** and **swing slower**.
+
+**The passive tree is redesigned**, with flask paths in every region. Runs in progress get their passive points reset.
+
+The stops along your journey are still not developed to the point where I would like them to be. A big part of the motivation for this change was to make opportunities for interesting decision-making regarding which map to enter next, and non-combat stops are a key part of that. That said, I have only created a couple of them, and I will be adding more in the future.
+
+This patch is still not well playtested, so I expect major balance issues that need to be addressed. If you encounter any, or want to give me any other feedback, please let me know in the Discord!
+
+### Flasks
+
+- Kills refill flasks only through the passive tree, flask affixes and uniques; flasks hold far more, keep their charges when taken off, and a fallen boss refills them all.
+- Life flasks heal 20% more.
+- The new provision Tapper's Brine starts a map with your flasks at least half full.
+- Life and mana flasks are drunk by belt slot, each at a lower share of life or mana, and utility flasks are now kept for bosses unless the Strategy tab says otherwise.
+- New flask affixes Thrifty and of Gleaning, utility flasks last half again as long, and the weaker unique flasks are stronger.
+- A run starts with a second life flask, and flask bottles show their charges left.
+
+### Life and recovery
+
+- Life is about doubled and mana raised by half, while life regeneration and other healing from the tree, gems and items is much weaker.
+- Life leech, life on hit and life on kill become Replenish, which wins back part of the life you recently lost but never heals past it; Ebbing Cincture no longer drops.
+- New passives, a weapon suffix and eight uniques raise how much Replenish wins back or how long it remembers.
+- Energy shield on item bases and affixes is less than half what it was.
+
+### Respites, stops and relics
+
+- At a Respite you can craft on your items before a full rest; it turns up by chance rather than when you are worn down, and always comes before a boss.
+- Stops come at random and about half as often, and camp shows your Bone Dust and when the next Respite comes.
+- New stops: the Surgeon, the Knucklebone Man, the Envious Dead and Another's Remains; the Ferryman is now the Bloodletter, who also fills your flasks, and the Awlsmith's sockets are a Respite craft.
+- The Shrine's blessing lasts longer, the Gem Hoard offers more, and the Quartermaster also sells a flask refill and relics.
+- Relics are lasting powers for the run, bought, won from the Envious Dead or picked after a boss, and shown on the Character tab.
+- New map affixes weaken regeneration, flask recovery or energy shield recharge, or raise mana costs, and some monsters stop regeneration or delay energy shield recharge.
+
+### Passive tree
+
+- The passive tree is redesigned from scratch, with flask paths in every region and renamed keystones; every run's passive points are handed back to spend again.
+
+### Monsters and combat
+
+- Monsters have under half their life and hit 30% harder, but swing 25% slower.
+- Early maps have many more monsters.
+- Several melee skills that took any weapon now need a fitting melee weapon.
+- A kiting ranged character uses its blink to step away.
+- Glacier Wall blocks walkers but not shots, and monsters stuck behind it are set back on the floor instead of dying.
+- Minions no longer push monsters aside, and bosses push through minions.
+- In duels, the extra life against a higher-level opponent is about a third of what it was.
+
+### Interface
+
+- The Character tab shows more of your stats and lets you tick the situations your build counts on.
+- A skill socketed twice with different supports counts as two skills on the Strategy tab.
+- Item cards no longer show a stat twice, and numbers raised by an item's mods show in blue.
+- Reward picks open as a pop-up over the camp, and the picks after the first four maps offer skill gems, then flasks, then supports, then one of each.
+- The exit portal is no longer hidden behind walls.
+- Skinner's Knife is now Thin Mercy, Votive Hauberk is Candlewound Mail and Dusk Sceptre is Long Dusk, and maps once called the Shrine are now the Ruined Chapel.
+
 ## 2026-10-30
 
 - Your character now turns to face toward or away from the camera as it walks, not only left and right.
