@@ -103,7 +103,7 @@ export const seawall: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Glint',
-          lines: [spellCrit(40), maxInsight(1), insightOnCrit(20)],
+          lines: [spellCrit(40), maxInsight(1), insightOnCrit(10)],
           at: [3984, -2248],
         },
       ],

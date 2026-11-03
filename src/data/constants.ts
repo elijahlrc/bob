@@ -219,6 +219,11 @@ export const MONSTER_ACCURACY_GROWTH = 1.0299;
  */
 export const MONSTER_LIFE_MULT = 0.45;
 export const MONSTER_DAMAGE_MULT = 1.3;
+/**
+ * Every monster's attack and cast speed, the whole game (the owner, 2026-11-01: with the tree's regeneration, leech and
+ * life on hit cut, fewer swings rather than softer ones). A lever: 1 is the types' own attack times.
+ */
+export const MONSTER_ATTACK_SPEED = 0.75;
 /** Early-map easing: monster life and damage ramp from these fractions to full by EASE_LEVEL. */
 export const EASE_LEVEL = 20;
 export const EASE_LIFE = 0.5;

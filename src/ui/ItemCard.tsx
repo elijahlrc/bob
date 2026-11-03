@@ -5,6 +5,8 @@ import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { triggerText } from '../data/triggers';
 import { BUFFS } from '../data/buffs';
 import { flaskBase } from '../data/flasks';
+import { flaskSpec, type FlaskSpec } from '../calc/flasks';
+import { ModDB } from '../mods/modDb';
 import { naturalGemLevel } from '../calc/gems';
 import { gemDef } from '../data/gems';
 import type { InventoryItem, Build, EquipSlot, FlaskItem, Item } from '../data/types';
@@ -173,12 +175,25 @@ function flaskBuffLines(b: ReturnType<typeof flaskBase>): string[] {
   ];
 }
 
-/** What a flask's base gives: what it recovers and its buff. */
+/** The flask after its own affixes (charges, amount, duration), as the flask bar shows it before the character's flask mods. */
+export function flaskOwn(f: FlaskItem): FlaskSpec {
+  return flaskSpec(f, new ModDB([]));
+}
+
+/** The flask's top line: its level, its maximum charges and what a drink spends, and how long it runs, after its own affixes. */
+export function flaskSummary(f: FlaskItem): string {
+  const s = flaskOwn(f);
+  const n = (v: number) => Math.round(v * 10) / 10;
+  return `Requires level ${flaskBase(f.baseId).level} · ${s.maxCharges} charges, ${n(s.perUse)} per use · ${n(s.duration)} s`;
+}
+
+/** What a flask gives: what it recovers (after its own affixes) and its base's buff. */
 export function flaskBaseLines(f: FlaskItem): string[] {
   const b = flaskBase(f.baseId);
+  const s = flaskOwn(f);
   return [
-    ...(b.life > 0 ? [`Recovers ${b.life} life`] : []),
-    ...(b.mana > 0 ? [`Recovers ${b.mana} mana`] : []),
+    ...(s.life > 0 ? [`Recovers ${s.life} life`] : []),
+    ...(s.mana > 0 ? [`Recovers ${s.mana} mana`] : []),
     ...flaskBuffLines(b),
   ];
 }
@@ -247,20 +262,19 @@ export function ItemCard({
     return <GemCard gemId={it.gemId} level={build ? gemLevelIn(build, it.gemId) : 1} />;
   if (it.kind === 'flask') {
     const b = flaskBase(it.baseId);
+    const own = flaskOwn(it);
     return (
       <div class={`item-card ${it.uniqueId ? 'unique' : 'flaskitem'}`}>
         <NamePlaque it={it} name={it.name} />
-        <div class="muted">
-          Requires level {b.level} · {b.perUse}/{b.maxCharges} charges · {b.duration} s
-        </div>
-        {b.life > 0 && (
-          <div class={'ic-mod' + markClass(marks, `Recovers ${b.life} life`)}>
-            Recovers {b.life} life
+        <div class="muted">{flaskSummary(it)}</div>
+        {own.life > 0 && (
+          <div class={'ic-mod' + markClass(marks, `Recovers ${own.life} life`)}>
+            Recovers {own.life} life
           </div>
         )}
-        {b.mana > 0 && (
-          <div class={'ic-mod' + markClass(marks, `Recovers ${b.mana} mana`)}>
-            Recovers {b.mana} mana
+        {own.mana > 0 && (
+          <div class={'ic-mod' + markClass(marks, `Recovers ${own.mana} mana`)}>
+            Recovers {own.mana} mana
           </div>
         )}
         {flaskBuffLines(b).map((l, i) => (

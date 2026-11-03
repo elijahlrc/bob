@@ -87,7 +87,7 @@ export const resists: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [stunAvoid(10)], at: [-2901, 88] },
         { id: "s2", kind: "small", lines: [stunAvoid(10)], at: [-2902, 176] },
-        { id: "n", kind: "notable", name: "Bulwark Spirit", lines: [lifeRegenPerGrit(0.4), stunAvoid(30)], at: [-2903, 264], why: "Grit-shaped sustain at the Cathedral border: every charge mends." },
+        { id: "n", kind: "notable", name: "Bulwark Spirit", lines: [lifeRegenPerGrit(0.25), stunAvoid(30)], at: [-2903, 264], why: "Grit-shaped sustain at the Cathedral border: every charge mends." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

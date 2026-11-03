@@ -66,7 +66,7 @@ export const fire: AreaSpec = {
         { id: "n", kind: "notable", name: "Cinder", lines: [igniteChance(15), burnDamage(25), damageVsIgnited(20)], at: [-1117, -4413] },
         { id: "b", kind: "small", lines: [burnDamage(12)], at: [-1086, -4486] },
         { id: "c", kind: "small", lines: [burnDamage(12)], at: [-1013, -4455] },
-        { id: "n2", kind: 'notable', name: "Warm Hearth", lines: [recoverOn('killIgnited', 'life', 3), recoverOn('killIgnited', 'es', 3), eleDamage('fire', 10)], at: [-1230, -4505], why: "The burning dead feed the caster: fire’s own defence. Between the two fire rooms, reached round Cinder's ring without taking Cinder." },
+        { id: "n2", kind: 'notable', name: "Warm Hearth", lines: [recoverOn('killIgnited', 'life', 1.8), recoverOn('killIgnited', 'es', 3), eleDamage('fire', 10)], at: [-1230, -4505], why: "The burning dead feed the caster: fire’s own defence. Between the two fire rooms, reached round Cinder's ring without taking Cinder." },
         { id: "h", kind: "small", lines: [burnDamage(12)], at: [-1335, -4395], why: "Burning, the thread between ignite (Cinder) and the fire payoff (Kiln Heart)." },
         { id: "n3", kind: "notable", name: "Ember Tithe", lines: [flaskChargesKilledBy('ignite', 50)], at: [-900, -4500], why: "The Spire's charges-on-kill notable (the flask-lines pass, 2026-11-01): flasks fill only from enemies the burning itself kills, so it pays the igniter who lets the fire finish the work. Off Cinder's ring by a burning small, not through Cinder, at step 12 (12 or more from every start). 50 / 12 = 4.2 units, about a regeneration notable of the region (Quiet Pulse 4.3); the line alone, as a far notable may." },
       ],
@@ -109,7 +109,7 @@ export const fire: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [eleDamage('fire', 10)], at: [-1386, -4119] },
         { id: "s2", kind: "small", lines: [eleDamage('fire', 10)], at: [-1411, -4204] },
-        { id: "n", kind: "notable", name: "Kiln Heart", lines: [eleDamage('fire', 20), penetration('fire', 6), esLeech(0.3)], at: [-1436, -4288], why: "Fire's payoff, out from the rim ring." },
+        { id: "n", kind: "notable", name: "Kiln Heart", lines: [eleDamage('fire', 20), penetration('fire', 6), esLeech(0.2)], at: [-1436, -4288], why: "Fire's payoff, out from the rim ring." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

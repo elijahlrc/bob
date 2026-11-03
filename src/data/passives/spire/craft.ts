@@ -84,11 +84,11 @@ export const craft: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [esOnHit(4)], at: [813, -2436] },
-        { id: "n", kind: "notable", name: "Siphon", lines: [esLeech(0.8), esOnHit(6), manaOnKill(10)], at: [876, -2406], why: "2 + 1.5 + 1 units." },
+        { id: "n", kind: "notable", name: "Siphon", lines: [esLeech(0.5), esOnHit(6), manaOnKill(10)], at: [876, -2406], why: "2 + 1.5 + 1 units." },
         { id: "b", kind: "small", lines: [esOnHit(4)], at: [939, -2376] },
         { id: "t1", kind: "small", lines: [spellCrit(15)], at: [525, -2060] },
         { id: "t2", kind: "small", lines: [spellCrit(15)], at: [640, -2100] },
-        { id: "n2", kind: 'notable', name: "Surging Tide", lines: [arcaneTideOn('crit', 25), spellCrit(25), es(6)], at: [750, -2160], why: "Crits bring on Arcane Tide. On the crit floor, reached from the east spoke by spell crit (step 7) without taking Siphon, and leading on to it." },
+        { id: "n2", kind: 'notable', name: "Surging Tide", lines: [arcaneTideOn('crit', 10), spellCrit(25), es(6)], at: [750, -2160], why: "Crits bring on Arcane Tide. On the crit floor, reached from the east spoke by spell crit (step 7) without taking Siphon, and leading on to it." },
         { id: "t3", kind: "small", lines: [esOnHit(4)], at: [785, -2300] },
       ],
       links: [["a", "n"], ["n", "b"], ["t1", "t2"], ["t2", "n2"], ["n2", "t3"], ["t3", "a"]],

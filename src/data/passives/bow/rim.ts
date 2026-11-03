@@ -40,7 +40,7 @@ export const farPasture: AreaSpec = {
       nodes: [
         { id: "c", kind: "small", lines: [bowDamage(10)], at: [4250, 1290] },
         { id: "a", kind: "small", lines: [bowDamage(10)], at: [4320, 1330], why: "Two bow smalls in from the rim (three before the finalization)." },
-        { id: "n", kind: "notable", name: "Kill Shot", lines: [weaponCrit('bow', 30), weaponCritMulti('bow', 20), elusiveOn('crit', 15)], at: [4391, 1368], why: "A bow crit makes the archer Elusive: the shot and the slip away." },
+        { id: "n", kind: "notable", name: "Kill Shot", lines: [weaponCrit('bow', 30), weaponCritMulti('bow', 20), elusiveOn('crit', 10)], at: [4391, 1368], why: "A bow crit makes the archer Elusive: the shot and the slip away." },
         { id: "k1", kind: "small", lines: [critChance(15)], at: [4426, 1309] },
       ],
       links: [["c", "a"], ["a", "n"], ["n", "k1"]],

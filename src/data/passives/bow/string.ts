@@ -46,7 +46,7 @@ export const string: AreaSpec = {
       nodes: [
         { id: "e1", kind: "small", lines: [evasion(10)], at: [3780, 1531] },
         { id: "e2", kind: "small", lines: [evasion(10)], at: [3735, 1498] },
-        { id: "n", kind: "notable", name: "Tall Grass", lines: [evasion(20), recoverOn('evade', 'life', 2)], at: [3680, 1456], why: "Evasion’s rule: each attack evaded closes a wound." },
+        { id: "n", kind: "notable", name: "Tall Grass", lines: [evasion(20), recoverOn('evade', 'life', 1.2)], at: [3680, 1456], why: "Evasion’s rule: each attack evaded closes a wound." },
       ],
       links: [["e1", "e2"], ["e2", "n"]],
     },
@@ -86,7 +86,7 @@ export const string: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [attackSpeed(4)], at: [1690, 1340], why: "Hunter's Rush's door, on the middle exit's south arm since the finalization (it was on the south spoke)." },
         { id: "s2", kind: "small", lines: [attackSpeed(4)], at: [1800, 1420] },
-        { id: "n", kind: "notable", name: "Hunter's Rush", lines: [quickenedOn('kill', 40), attackSpeed(8)], at: [1940, 1412], why: "A speed buff from killing, off the south spoke toward the axis." },
+        { id: "n", kind: "notable", name: "Hunter's Rush", lines: [quickenedOn('kill', 10), attackSpeed(8)], at: [1940, 1412], why: "A speed buff from killing, off the south spoke toward the axis." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

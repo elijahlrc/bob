@@ -49,7 +49,7 @@ export const maces: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [twoHandDamage(12)], at: [-4415, 863] },
         { id: "b", kind: "small", lines: [twoHandDamage(12)], at: [-4472, 869] },
-        { id: "n", kind: "notable", name: "Headsman", lines: [axeDamage(24), gritOnStun(25)], at: [-4542, 877], why: "Axes’ second home (the joins pass: their only other was the Yard’s rim pair): the headsman’s axe builds grit on each stun." },
+        { id: "n", kind: "notable", name: "Headsman", lines: [axeDamage(24), gritOnStun(10)], at: [-4542, 877], why: "Axes’ second home (the joins pass: their only other was the Yard’s rim pair): the headsman’s axe builds grit on each stun." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },
@@ -61,7 +61,7 @@ export const maces: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [gritOnHitTaken(10)], at: [-3976, 385] },
-        { id: "n", kind: "notable", name: "Scar Tissue", lines: [gritOnHitTaken(24), lifeRegenPerGrit(0.4)], at: [-3908, 375], why: "Grit when hit, and the grit heals: the walk’s far end." },
+        { id: "n", kind: "notable", name: "Scar Tissue", lines: [gritOnHitTaken(10), lifeRegenPerGrit(0.25)], at: [-3908, 375], why: "Grit when hit, and the grit heals: the walk’s far end." },
       ],
       links: [["a", "n"]],
     },
@@ -101,7 +101,7 @@ export const maces: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [shieldDef(15)], at: [-2317, 1338] },
         { id: "b", kind: "small", lines: [shieldDef(15)], at: [-2309, 1261] },
-        { id: "n", kind: "notable", name: "Locked Shields", lines: [armour(16), gritOnBlock(15), lifeOnBlock(20)], at: [-2194, 1312], why: "The Wall’s shield: a block builds grit and closes a wound." },
+        { id: "n", kind: "notable", name: "Locked Shields", lines: [armour(16), gritOnBlock(10), lifeOnBlock(12)], at: [-2194, 1312], why: "The Wall’s shield: a block builds grit and closes a wound." },
         { id: "d", kind: "small", lines: [shieldDef(15)], at: [-2246, 1370] },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "d"], ["d", "a"]],
@@ -128,7 +128,7 @@ export const maces: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [stunDuration(8)], at: [-2612, 1043] },
         { id: "s2", kind: "small", lines: [stunDuration(8)], at: [-2614, 955] },
-        { id: "n", kind: "notable", name: "Broken Guard", lines: [gritOnStun(30), enemyStunThreshold(10)], at: [-2616, 867], why: "Stunning an enemy gives grit, by the shields on the axis: the grit walk runs from here north." },
+        { id: "n", kind: "notable", name: "Broken Guard", lines: [gritOnStun(10), enemyStunThreshold(10)], at: [-2616, 867], why: "Stunning an enemy gives grit, by the shields on the axis: the grit walk runs from here north." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

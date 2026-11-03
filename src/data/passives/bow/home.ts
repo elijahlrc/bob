@@ -124,7 +124,7 @@ export const home: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "b", kind: "small", lines: [critChance(15)], at: [1780, 322], why: "One crit small in from the north path (two before the finalization: with the north spoke a step shorter, a second left Vital Aim a valley between the path and the spoke)." },
-        { id: "n", kind: "notable", name: "Vital Aim", lines: [critChance(20), critMulti(20), recoverOn('crit', 'life', 1)], at: [1879, 295], why: "Crits close wounds: the attrition voice in the archer’s terms." },
+        { id: "n", kind: "notable", name: "Vital Aim", lines: [critChance(20), critMulti(20), recoverOn('crit', 'life', 0.6)], at: [1879, 295], why: "Crits close wounds: the attrition voice in the archer’s terms." },
       ],
       links: [["b", "n"]],
     },
@@ -149,7 +149,7 @@ export const home: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [life(5)], at: [2158, 449] },
         { id: "b", kind: "small", lines: [life(5)], at: [2140, 330], why: "Moved (2026-10-31) to meet Vital Aim: Long Breath's room is now the way on from the crit room to the north spoke." },
-        { id: "n", kind: "notable", name: "Long Breath", lines: [life(10), lifeRegen(0.6), recoverOn('kill', 'life', 2)], at: [2223, 423], why: "Life that comes back with each kill (Old Scars folded in)." },
+        { id: "n", kind: "notable", name: "Long Breath", lines: [life(10), lifeRegen(0.35), recoverOn('kill', 'life', 1.2)], at: [2223, 423], why: "Life that comes back with each kill (Old Scars folded in)." },
       ],
       links: [["a", "n"], ["b", "n"]],
     },

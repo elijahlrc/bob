@@ -36,7 +36,7 @@ export const crypt: AreaSpec = {
         { id: "r1", kind: "small", lines: [skillDuration(10)], at: [-1793, -2675], why: "Runecarver on toward the Spire's spell servants (2026-10-31), by the room's duration line." },
         { id: "r2", kind: "small", lines: [skillDuration(10)], at: [-1684, -2843], why: "The duration run's second small, just inside the Spire border (2026-10-31)." },
         { id: "w", kind: "small", lines: [skillDuration(10)], at: [-1811, -2428] },
-        { id: "n", kind: "notable", name: "Reliquary", lines: [totemDamage(24), regenWithTotem(0.8), totemDuration(10)], at: [-1867, -2338], why: "The casting totem that lasts, and the Zealot mends while one stands on the consecrated ground: 2 + 1.6 + 0.7 units." },
+        { id: "n", kind: "notable", name: "Reliquary", lines: [totemDamage(24), regenWithTotem(0.5), totemDuration(10)], at: [-1867, -2338], why: "The casting totem that lasts, and the Zealot mends while one stands on the consecrated ground: 2 + 1.6 + 0.7 units." },
         { id: "e", kind: "small", lines: [skillDuration(10)], at: [-1957, -2394] },
         { id: "s", kind: "notable", name: "Runecarver", lines: [brandDamage(24), skillDuration(10), areaDamage(10)], at: [-1901, -2484], why: "Brands: damage, duration and area. 2 + 1 + 1 units." },
         { id: "hallowed", kind: 'notable', name: "Hallowed Ground", lines: [damageWithTotem(25), globalDefences(12)], at: [-2115, -2387], why: "What the Zealot plants works for it: while a totem stands, it hits harder and holds firmer: 2.5 + 1.5 units." },

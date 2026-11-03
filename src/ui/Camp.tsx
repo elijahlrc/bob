@@ -154,14 +154,14 @@ function Chalk({ c, offer }: { c: Controller; offer: number }) {
 
 /** When the next Respite comes (docs/ATTRITION.md): the sets follow from the seed alone, so camp can say. */
 function RespiteAhead({ run }: { run: RunState }) {
-  // The one on offer now counts first (the playtests: skipping it hid the last rest before a boss).
+  // The one on offer now counts first (the playtests: skipping it hid the last rest before a boss). Its card shows it, so camp
+  // speaks only when it is the last rest before a boss.
   if (run.offers.some((o) => o.kind === 'respite')) {
     const boss = bossForMap(run.map + 1);
+    if (!boss) return null;
     return (
       <div class="camp-last" data-paint="panel" data-thin>
-        {boss
-          ? `The last rest before ${BOSSES[boss].name}: a Respite is on offer.`
-          : 'A Respite is on offer.'}
+        {`The last rest before ${BOSSES[boss].name}: a Respite is on offer.`}
       </div>
     );
   }

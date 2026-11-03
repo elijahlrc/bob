@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
-import type { SheetDiff } from '../calc/character';
+import type { Character, SheetDiff } from '../calc/character';
 import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { CRAFTING_OPEN } from '../data/constants';
 import { flaskBase } from '../data/flasks';
@@ -25,6 +25,7 @@ import { gemCardData } from './gemText';
 import {
   armourLine,
   flaskBaseLines,
+  flaskSummary,
   gemLevelIn,
   itemTitle,
   NamePlaque,
@@ -128,6 +129,8 @@ type Actions = {
 
 type Props = Actions & {
   run: RunState;
+  /** The character as worn: a worn flask's charges are counted against its maximum there, as on the flask bar. */
+  ch?: Character;
   sel: Sel | null;
   selected: InventoryItem | null;
   info: ItemInfo | undefined;
@@ -255,11 +258,13 @@ function Lines({ lines, cls }: { lines: string[]; cls: string }) {
 function ItemSheet({
   it,
   run,
+  ch,
   bad,
   worn,
 }: {
   it: InventoryItem;
   run: RunState;
+  ch?: Character;
   /** Why it cannot be worn, said beside its requirements. */
   bad?: string;
   /** A worn item names the gems in its sockets. */
@@ -289,13 +294,32 @@ function ItemSheet({
     );
   }
   if (it.kind === 'flask') {
-    const b = flaskBase(it.baseId);
+    // A worn flask says what it holds now, counted as the flask bar counts it (it carries its charges from map to map).
+    const spec = worn ? ch?.flasks.find((f) => f.uid === it.uid) : undefined;
+    const have = spec ? Math.floor(spec.maxCharges * (run.vitals.flasks[it.uid] ?? 1)) : 0;
+    const drinks = spec ? Math.floor(have / spec.perUse) : 0;
+    const full = spec ? (run.vitals.flasks[it.uid] ?? 1) : 1;
     return (
       <div class="ix-sheet">
         <NamePlaque it={it} name={it.name} />
-        <div class="muted">
-          Requires level {b.level} · {b.perUse}/{b.maxCharges} charges · {b.duration} s
+        {/* A small bottle as the flask bar paints it, and what it holds. */}
+        <div class="ix-flask-head">
+          <span class="ix-flask-pic">
+            <i
+              class="ix-bottle-art"
+              data-paint="bottle"
+              data-liquid={flaskBase(it.baseId).kind}
+              data-fill={full.toFixed(2)}
+              data-pk={`${it.uid}:${full.toFixed(2)}`}
+            />
+          </span>
+          {spec && (
+            <span>
+              {have}/{spec.maxCharges} charges · {drinks} drink{drinks === 1 ? '' : 's'} left
+            </span>
+          )}
         </div>
+        <div class="muted">{flaskSummary(it)}</div>
         <Lines lines={flaskBaseLines(it)} cls="implicit" />
         <Lines lines={it.affixes.flatMap((a) => modsText(a.mods))} cls="explicit" />
       </div>
@@ -458,8 +482,7 @@ function CompareGrid({
   const none = <span class="none">—</span>;
   const sub = (x: Item | FlaskItem) => {
     if (x.kind === 'flask') {
-      const b = flaskBase(x.baseId);
-      return `Requires level ${b.level} · ${b.perUse}/${b.maxCharges} charges · ${b.duration} s`;
+      return flaskSummary(x);
     }
     const b = itemBase(x.baseId);
     return [
@@ -836,7 +859,7 @@ export function ItemDetail(p: Props) {
         </>
       }
     >
-      <ItemSheet it={selected} run={run} bad={bad} worn={!inBag && sel.from !== 'pile'} />
+      <ItemSheet it={selected} run={run} ch={p.ch} bad={bad} worn={!inBag && sel.from !== 'pile'} />
       {sel.from === 'pile' && (
         <div class="ix-verdict muted">
           Worth {salvageValue(selected, run)} Bone Dust when you salvage the pile.

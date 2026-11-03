@@ -297,7 +297,7 @@ export const snares: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Cold Read',
-          lines: [insightOnCrit(20), critChance(15), int(10)],
+          lines: [insightOnCrit(10), critChance(15), int(10)],
           at: [2948, -560],
         },
       ],

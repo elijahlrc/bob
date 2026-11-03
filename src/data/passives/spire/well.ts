@@ -159,7 +159,7 @@ export const well: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [life(5)], at: [-773, -2291] },
         { id: "b", kind: "small", lines: [life(5)], at: [-831, -2293] },
-        { id: "n", kind: "notable", name: "Quiet Pulse", lines: [life(10), lifeRegen(0.6), es(4)], at: [-901, -2296], why: "2 + 1.5 + 0.8 units." },
+        { id: "n", kind: "notable", name: "Quiet Pulse", lines: [life(10), lifeRegen(0.35), es(4)], at: [-901, -2296], why: "2 + 1.5 + 0.8 units." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },

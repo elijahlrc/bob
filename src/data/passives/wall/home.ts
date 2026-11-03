@@ -134,10 +134,10 @@ export const home: AreaSpec = {
       at: [-913, 1127],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [lifeRegen(0.4)], at: [-968, 1152] },
-        { id: "b", kind: "small", lines: [lifeRegen(0.4)], at: [-918, 1129] },
-        { id: "n", kind: "notable", name: "Old Wounds", lines: [lifeRegen(1), life(8)], at: [-854, 1101], why: "Life and regeneration near home (renamed: the Bow has a Second Wind)." },
-        { id: "c", kind: "small", lines: [lifeRegen(0.4)], at: [-740, 1092], why: "Old Wounds' door onto the centre's inner road (the finalization, 2026-10-31): one small between the notable and i3, so the way through the room is a step slower than the seam road (8 against 7 from the start)." },
+        { id: "a", kind: "small", lines: [lifeRegen(0.25)], at: [-968, 1152] },
+        { id: "b", kind: "small", lines: [lifeRegen(0.25)], at: [-918, 1129] },
+        { id: "n", kind: "notable", name: "Old Wounds", lines: [lifeRegen(0.6), life(8)], at: [-854, 1101], why: "Life and regeneration near home (renamed: the Bow has a Second Wind)." },
+        { id: "c", kind: "small", lines: [lifeRegen(0.25)], at: [-740, 1092], why: "Old Wounds' door onto the centre's inner road (the finalization, 2026-10-31): one small between the notable and i3, so the way through the room is a step slower than the seam road (8 against 7 from the start)." },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "c"]],
     },
@@ -203,7 +203,7 @@ export const home: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "n", kind: "notable", name: "Oathbound", lines: [life(8), meleePhys(14), str(15)], at: [-1727, 1170], why: "The striker's generalist (step 5): life and steel every Vanguard uses, reached from the melee hub, and a way on." },
-        { id: "o", kind: "small", lines: [lifeRegen(0.4)], at: [-1814, 1319], why: "Oathbound on into Barrow Ward (2026-10-31), by Barrow Ward's small stat." },
+        { id: "o", kind: "small", lines: [lifeRegen(0.25)], at: [-1814, 1319], why: "Oathbound on into Barrow Ward (2026-10-31), by Barrow Ward's small stat." },
       ],
       links: [["n", "o"]],
     },

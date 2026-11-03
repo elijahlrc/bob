@@ -36,7 +36,7 @@ export const waterMeadows: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [evasion(10)], at: [3215, 2995] },
         { id: "c", kind: "small", lines: [evasion(10)], at: [3300, 3080], why: "The second evasion small, on to Reedwalker (the fork went with Supply Line, 2026-11-01)." },
-        { id: "n", kind: "notable", name: "Reedwalker", lines: [evasion(20), elusiveOn('evade', 25)], at: [3415, 3170], why: "Evasion that feeds itself (the flask-lines pass, 2026-11-01; it was Field Kit): an evaded attack may make the archer Elusive, and Elusive dodges more, so an evasion build reaches the region's second buff with no crit or kill (Kill Shot's Elusive is on bow crits, Slip the Pack's on kills). Tall Grass turns an evade into life instead. 2 + 2 units." },
+        { id: "n", kind: "notable", name: "Reedwalker", lines: [evasion(20), elusiveOn('evade', 10)], at: [3415, 3170], why: "Evasion that feeds itself (the flask-lines pass, 2026-11-01; it was Field Kit): an evaded attack may make the archer Elusive, and Elusive dodges more, so an evasion build reaches the region's second buff with no crit or kill (Kill Shot's Elusive is on bow crits, Slip the Pack's on kills). Tall Grass turns an evade into life instead. 0.8 + 2 units (10% since the reference-rate pass, 2026-11-02)." },
       ],
       links: [["a", "c"], ["c", "n"]],
     },
@@ -117,7 +117,7 @@ export const waterMeadows: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [moveSpeed(4)], at: [2223, 1632], why: "Movement speed, the mover's stat (2026-11-01; it was a flask small)." },
         { id: "s2", kind: "small", lines: [moveSpeed(4)], at: [2162, 1569], why: "Movement speed, on to Slip the Pack (2026-11-01; it was a flask small)." },
-        { id: "n", kind: "notable", name: "Slip the Pack", lines: [elusiveOn('kill', 30), moveSpeed(8)], at: [2101, 1505], why: "A kill and the hunter is gone (the flask-lines pass, 2026-11-01; it was Hunter's Satchel): the only Elusive on kill in the region. Joined to Hunter's Rush (Quickened on kill), the same kills hand out both buffs that Pursuit's End, whose door is a step along the mid ring, pays off. 2.4 + 2 units." },
+        { id: "n", kind: "notable", name: "Slip the Pack", lines: [elusiveOn('kill', 10), moveSpeed(8)], at: [2101, 1505], why: "A kill and the hunter is gone (the flask-lines pass, 2026-11-01; it was Hunter's Satchel): the only Elusive on kill in the region. Joined to Hunter's Rush (Quickened on kill), the same kills hand out both buffs that Pursuit's End, whose door is a step along the mid ring, pays off. 0.8 + 2 units (10% since the reference-rate pass, 2026-11-02)." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },
@@ -130,7 +130,7 @@ export const waterMeadows: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [critChance(15)], at: [2214, 3784], why: "Crit chance (2026-11-01; it was a flask small): the stat that feeds Hound's Blood." },
         { id: "s2", kind: "small", lines: [critChance(15)], at: [2279, 3844], why: "Crit chance, on to Hound's Blood (2026-11-01; it was a flask small)." },
-        { id: "n", kind: "notable", name: "Hound's Blood", lines: [quickenedOn('crit', 40), critChance(25)], at: [2343, 3904], why: "Crits quicken the hunter (the flask-lines pass, 2026-11-01; it was Field Poultice): the only Quickened on crit in the region, so the crit archer beside Killing Eye's finisher, who kills less often than a pack-clearer, keeps the speed that Wind Rider's kiter and Pursuit's End want; from the Yard's border a crit duellist reads it the same way. 2.4 + 1.7 units." },
+        { id: "n", kind: "notable", name: "Hound's Blood", lines: [quickenedOn('crit', 10), critChance(25)], at: [2343, 3904], why: "Crits quicken the hunter (the flask-lines pass, 2026-11-01; it was Field Poultice): the only Quickened on crit in the region, so the crit archer beside Killing Eye's finisher, who kills less often than a pack-clearer, keeps the speed that Wind Rider's kiter and Pursuit's End want; from the Yard's border a crit duellist reads it the same way. 0.6 + 1.7 units (10% since the reference-rate pass, 2026-11-02)." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

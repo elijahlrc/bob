@@ -135,6 +135,18 @@ html.leaf .ix-bottle-art {
   position: absolute;
   inset: 0;
 }
+/* A flask's page: a small bottle beside what it holds. */
+html.leaf .ix-flask-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+html.leaf .ix-flask-pic {
+  position: relative;
+  width: 20px;
+  height: 30px;
+  flex: none;
+}
 html.leaf .ix-slot.ix-flask:is(.target, .aimed) {
   outline: 2px dashed #eee8d6;
   outline-offset: 4px;

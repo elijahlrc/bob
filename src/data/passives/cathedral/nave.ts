@@ -40,7 +40,7 @@ export const nave: AreaSpec = {
         { id: "n6", kind: "small", lines: [eleDamage("fire", 10)], at: [-2357, -1279] },
         { id: "n7", kind: "small", lines: [shieldBlock(2)], at: [-2163, -1331] },
         { id: "n8", kind: "small", lines: [eleDamage("fire", 10)], at: [-2234, -1208] },
-        { id: "steadfast", kind: 'notable', name: "Steadfast Faith", lines: [shieldBlock(4), recoverOn('block', 'life', 2)], at: [-2125, -1440], why: "Block recovery, the Cathedral's sustain behind a shield: every block mends 2% of life: 2 + 2.4 units. Since the revision (2026-10-31) on the nave's shield aisle, reached by Frozen Font's shield-block smalls and leading on into the wheel's shield-block small beside Iron Faith, no longer one step past Iron Faith." },
+        { id: "steadfast", kind: 'notable', name: "Steadfast Faith", lines: [shieldBlock(4), recoverOn('block', 'life', 1.2)], at: [-2125, -1440], why: "Block recovery, the Cathedral's sustain behind a shield: every block mends 2% of life: 2 + 2.4 units. Since the revision (2026-10-31) on the nave's shield aisle, reached by Frozen Font's shield-block smalls and leading on into the wheel's shield-block small beside Iron Faith, no longer one step past Iron Faith." },
       ],
       links: [["n1", "n2"], ["n2", "n3"], ["n3", "n7"], ["n7", "n4"], ["n4", "n8"], ["n8", "n5"], ["n5", "n6"], ["n6", "n1"], ["steadfast", "n7"]],
     },
@@ -53,7 +53,7 @@ export const nave: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [staffSpellBlock(2)], at: [-2551, -1022] },
         { id: "n", kind: "notable", name: "Warding Staff", lines: [staffDamage(24), staffSpellBlock(4)], at: [-2482, -1008], why: "Staff damage and spell block with a staff: 2 + 2 units. A staff blocks spells without a shield." },
-        { id: "whirl", kind: 'notable', name: "Whirling Ward", lines: [insightOnStaffBlock(25), staffDamage(12)], at: [-2423, -1069], why: "The staff's payoff: a block with a staff may give an insight charge (crit for the staff fighter): 3.1 + 1 units. Since the revision (2026-10-31) on the staff aisle, reached by its smalls and leading on into Warding Staff, no longer one step past it." },
+        { id: "whirl", kind: 'notable', name: "Whirling Ward", lines: [insightOnStaffBlock(20), staffDamage(12)], at: [-2423, -1069], why: "The staff's payoff: a block with a staff may give an insight charge (crit for the staff fighter): 2.5 + 1 units (20% since the reference-rate pass, 2026-11-02). Since the revision (2026-10-31) on the staff aisle, reached by its smalls and leading on into Warding Staff, no longer one step past it." },
         { id: "w2", kind: "small", lines: [staffSpellBlock(2)], at: [-2300, -1008], why: "The staff aisle (2026-10-31): from Buttress's spell block to the staff's, and where the arcade opens into the Iron Faith wheel. One small since finalization (it was two)." },
       ],
       links: [["a", "n"], ["n", "whirl"], ["w2", "whirl"]],
@@ -80,7 +80,7 @@ export const nave: AreaSpec = {
       nodes: [
         { id: "s1", kind: "small", lines: [auraEffect(4)], at: [-2339, -1763] },
         { id: "s2", kind: "small", lines: [auraEffect(4)], at: [-2395, -1832] },
-        { id: "n", kind: "notable", name: "Chorus", lines: [regenPerAura(0.4), reducedReservation(6)], at: [-2450, -1900], why: "Every aura held mends the Zealot (the calc’s count of auras standing), and auras cost less to hold: 2 units at two auras + 2." },
+        { id: "n", kind: "notable", name: "Chorus", lines: [regenPerAura(0.25), reducedReservation(6)], at: [-2450, -1900], why: "Every aura held mends the Zealot (the calc’s count of auras standing), and auras cost less to hold: 2 units at two auras + 2." },
       ],
       links: [["s1", "s2"], ["s2", "n"]],
     },

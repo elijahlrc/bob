@@ -162,9 +162,9 @@ export const home: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [life(5)], at: [-642, 1722] },
-        { id: "n", kind: "notable", name: "Stout Heart", lines: [life(10), lifeRegen(0.6), str(10)], at: [-747, 1797], why: "2 + 1.5 + 0.7 units." },
+        { id: "n", kind: "notable", name: "Stout Heart", lines: [life(10), lifeRegen(0.35), str(10)], at: [-747, 1797], why: "2 + 1.5 + 0.7 units." },
         { id: "b", kind: "small", lines: [life(5)], at: [-690, 1756] },
-        { id: "c", kind: "small", lines: [lifeRegen(0.4)], at: [-785, 2035], why: "Regeneration, Mended Mail's small stat, leading from Stout Heart into Mended Mail (2026-10-31): the body that mends, on to the armour that mends." },
+        { id: "c", kind: "small", lines: [lifeRegen(0.25)], at: [-785, 2035], why: "Regeneration, Mended Mail's small stat, leading from Stout Heart into Mended Mail (2026-10-31): the body that mends, on to the armour that mends." },
       ],
       links: [["a", "b"], ["b", "n"], ["n", "c"]],
     },

@@ -193,7 +193,7 @@ export const home: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "b", kind: "small", lines: [life(5)], at: [636, -1614] },
-        { id: "n", kind: "notable", name: "Hale Scribe", lines: [life(10), lifeOnHit(4, ['spell'])], at: [750, -1503] },
+        { id: "n", kind: "notable", name: "Hale Scribe", lines: [life(10), lifeOnHit(2, ['spell'])], at: [750, -1503] },
       ],
       links: [["b", "n"]],
     },

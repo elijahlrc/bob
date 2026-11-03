@@ -40,7 +40,7 @@ export const pyre: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [minionDamage(12)], at: [-3414, -2185] },
         { id: "b", kind: "small", lines: [minionDamage(12)], at: [-3368, -2155] },
-        { id: "n", kind: "notable", name: "Sexton", lines: [minionDamage(20), regenWithMinion(0.8), life(5)], at: [-3311, -2117], why: "The gravedigger tends the summoner: minion damage, and the Zealot regenerates while a servant stands: 1.7 + 1.6 + 1 units." },
+        { id: "n", kind: "notable", name: "Sexton", lines: [minionDamage(20), regenWithMinion(0.5), life(5)], at: [-3311, -2117], why: "The gravedigger tends the summoner: minion damage, and the Zealot regenerates while a servant stands: 1.7 + 1.6 + 1 units." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },

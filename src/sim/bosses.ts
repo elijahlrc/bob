@@ -1,6 +1,7 @@
 import { mapPlayerMods } from './mapMods';
 import { Character, scenarioDps } from '../calc/character';
 import { buildMonster } from '../calc/monster';
+import { MONSTER_ATTACK_SPEED } from '../data/constants';
 import {
   ADAPT_MAX,
   ADAPT_WINDOW,
@@ -756,7 +757,7 @@ function courserAI(w: World, m: Actor, st: BossState, dt: number): void {
       st.strikeT -= dt * rate;
       const d = Math.hypot(p.x - m.x, p.y - m.y);
       if (st.strikeT <= 0 && d <= m.mon!.range + p.r + m.r + 0.4) {
-        st.strikeT = m.mon!.kind.attackTime;
+        st.strikeT = m.mon!.kind.attackTime / MONSTER_ATTACK_SPEED;
         const prof = m.mon!.profile(monsterConds(m));
         const facing = Math.atan2(p.y - m.y, p.x - m.x);
         w.events.push({

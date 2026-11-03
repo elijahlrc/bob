@@ -580,3 +580,26 @@ the changes after three playtests.
   kills by burning, poison or bleeding or per grit, fervour or insight charge held; the two emergency flasks (the last
   belt slot, the Shade; below 30% life, the Reaver); the Strider's spare flask notables became Elusive and Quickened
   notables. 30 flask nodes. Not baked.
+- **2026-11-01, the tree baked, then regeneration and leech cut** (the owner): the reworked tree with its flask lines is
+  baked for playtesting (save version 25 hands back the passives of older saves of this branch). A rough count of the
+  life recovered in a map, against main, found it down to about 35 to 45% (almost all of it the flasks), and the owner
+  worried that regeneration, leech and energy shield would still blunt the attrition: every life regeneration line on
+  the tree (plain, per grit, when hit, with a minion, a totem or per aura) and every life and energy shield leech line
+  is cut by 40%, to the nearest 0.05 (the tree's total regeneration 15% to 9%, life leech 14% to about 9%). Mana leech,
+  gear, keystones and the "why" notes' unit counts are left as they were. Then, the same day, life on hit, life on kill
+  and the share of life recovered on a kill (or a kill of an ignited enemy) by the same 40% (flat values to whole
+  numbers: 4 to 2, 6 to 4, 8 to 5, 10 to 6, 15 to 9, 20 to 12; shares to one decimal: 2% to 1.2%, 3% to 1.8%, 4% to 2.4%). Then life on block (8 to 5, 20 to 12, 35 to 21) and the
+  share of life recovered on a block, a critical strike or an evade (2% to 1.2%, 1% to 0.6%) by the same 40%.
+- **2026-11-01, monsters swing slower** (the owner): a new lever, `MONSTER_ATTACK_SPEED` in data/constants.ts, is every
+  monster's attack and cast speed (25% less at 0.75, as a "more" multiplier on each monster): fewer swings rather than
+  softer ones. An area blow's wind-up and warning follow its swing, so they last longer too. Boss abilities keep their
+  own timers.
+- **2026-11-02, charges and short buffs at the reference rates** (the owner): Plunder of Iron's 25% grit on kill kept a
+  vanguard's grit full on any dense map, and a pass over the tree found the same in other nodes. Every charge and
+  short-buff chance on the tree now matches the reference tree's line for the same event, or the nearest kind where it
+  has none: a charge on kill 5% (Plunder of Iron, Hot Pursuit, Feint and Cut); a charge on crit, block, stun or being hit
+  10% (Glint, Cold Read, Hunter's Fervour, Locked Shields, Hot Blood, Headsman, Broken Guard, Scar Tissue); a staff
+  block's insight 20% (Whirling Ward); a buff on kill, crit or evade 10% (Hunter's Rush, Hound's Blood, Slip the Pack,
+  Kill Shot, Surging Tide, Reedwalker, Weaving), and Fortified on stun 10% (Hold the Line). Hammer Rhythm's grit per mace
+  hit, rolled for every target struck, is 2%. Warcries and blinks, held back by their cooldowns, keep theirs (Iron Voice,
+  Hymn of War, Skirmisher's Leap). The nodes' prices fell with their lines and nothing was added to make up for it.

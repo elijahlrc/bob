@@ -38,9 +38,9 @@ export const quiver: AreaSpec = {
       nodes: [
         { id: "a2", kind: "small", lines: [attackSpeed(5)], at: [3349, 2171] },
         { id: "a3", kind: "small", lines: [attackSpeed(5)], at: [3300, 2147] },
-        { id: "n", kind: "notable", name: "Hot Pursuit", lines: [fervourOnKill(25), attackSpeedPerFervour(3)], at: [3237, 2115], why: "Fervour from kills, and speed for every charge held." },
+        { id: "n", kind: "notable", name: "Hot Pursuit", lines: [fervourOnKill(5), attackSpeedPerFervour(3)], at: [3237, 2115], why: "Fervour from kills, and speed for every charge held." },
         { id: "c", kind: "small", lines: [fervourDuration(15)], at: [3172, 2292], why: "Between earning fervour and spending it: the charges last longer (2026-10-31)." },
-        { id: "n2", kind: 'notable', name: "Hunter's Fervour", lines: [fervourOnCrit(20), critMulti(15)], at: [3107, 2470], why: "Fervour from crits as well as kills, so a crit build feeds Hot Pursuit’s speed." },
+        { id: "n2", kind: 'notable', name: "Hunter's Fervour", lines: [fervourOnCrit(10), critMulti(15)], at: [3107, 2470], why: "Fervour from crits as well as kills, so a crit build feeds Hot Pursuit’s speed." },
         { id: "f2", kind: "small", lines: [critMulti(12)], at: [3184, 2512], why: "Hunter's Fervour's own way in (2026-10-31; one small since the finalization): crit multiplier, for the crit build it serves." },
         { id: "n3", kind: 'notable', name: "Heat of the Chase", lines: [flaskChargesPerCharge('fervour', 12)], at: [3330, 2300], why: "The Bow's charges on kill (the flask-lines pass, 2026-11-01; docs/tree/design/F-flasks.md), far out (11 points) beside the fervour it counts: flasks refill on kills only while fervour is held, so the archer has to earn and keep the charges (Hot Pursuit, Hunter's Fervour) to drink from its kills. Alone on its notable, 4.5 units at three charges held, about Long Breath's price. It takes the place of Supply Line, which went from the Field Kit room." },
         { id: "g3", kind: "small", lines: [fervourDuration(10)], at: [3370, 2410], why: "Heat of the Chase's own way in from the rim ring (2026-11-01): fervour lasts longer, the charges it counts." },

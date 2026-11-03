@@ -96,8 +96,8 @@ export const home: AreaSpec = {
       at: [-1750, -184],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [lifeRegen(0.4)], at: [-1761, -295] },
-        { id: "n", kind: "notable", name: "Vigil", lines: [lifeRegen(0.8), manaRegen(20), life(5)], at: [-1727, -106], why: "Life and mana regenerated, the str/int vigil, at the Wall's seam (the Wall sells armour and resistances there): 2 + 2 + 1 units." },
+        { id: "a", kind: "small", lines: [lifeRegen(0.25)], at: [-1761, -295] },
+        { id: "n", kind: "notable", name: "Vigil", lines: [lifeRegen(0.5), manaRegen(20), life(5)], at: [-1727, -106], why: "Life and mana regenerated, the str/int vigil, at the Wall's seam (the Wall sells armour and resistances there): 2 + 2 + 1 units." },
       ],
       links: [["a", "n"]],
     },
@@ -134,7 +134,7 @@ export const home: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [resAll(4)], at: [-1478, -380], why: "The approach from the seam path (2026-10-31), by the star's own stat (the resistances the old road to Zeal carried)." },
-        { id: "n", kind: "notable", name: "Litany", lines: [armour(20), es(10), lifeRegen(0.6)], at: [-1432, -227], why: "Armour, energy shield and regeneration, the hybrid defence of the str/int class (the one armour line near the Vanguard): 1.7 + 2 + 1.5 units." },
+        { id: "n", kind: "notable", name: "Litany", lines: [armour(20), es(10), lifeRegen(0.35)], at: [-1432, -227], why: "Armour, energy shield and regeneration, the hybrid defence of the str/int class (the one armour line near the Vanguard): 1.7 + 2 + 1.5 units." },
         { id: "f", kind: "small", lines: [resOne("fire", 10)], at: [-1489, -267] },
         { id: "s", kind: "small", lines: [resOne("chaos", 10)], at: [-1375, -186] },
         { id: "d", kind: "small", lines: [resAll(4)], at: [-1312, -93], why: "The star's door to the centre (finalization, 2026-10-31), by the star's own stat: one step more, so the way through Litany to the inner road is slower than the seam road (it was as fast)." },

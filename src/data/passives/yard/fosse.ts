@@ -93,7 +93,7 @@ export const fosse: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "a", kind: "small", lines: [swordDamage(10)], at: [1449, 4233] },
-        { id: "n", kind: "notable", name: "Bloodied Edge", lines: [swordDamage(20), leechLife(0.8, ["attack"])], at: [1497, 4339], why: "2 + 2 units." },
+        { id: "n", kind: "notable", name: "Bloodied Edge", lines: [swordDamage(20), leechLife(0.5, ["attack"])], at: [1497, 4339], why: "2 + 2 units." },
         { id: "c", kind: "small", lines: [swordDamage(10)], at: [1520, 4391] },
       ],
       links: [["a", "n"], ["n", "c"]],
@@ -160,8 +160,8 @@ export const fosse: AreaSpec = {
       at: [934, 3928],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "s1", kind: "small", lines: [leechLife(0.2)], at: [956, 4103] },
-        { id: "n", kind: "notable", name: "Red Thirst", lines: [damageWhileLeeching(30), leechLife(0.5)], at: [934, 3928], why: "Damage while leeching, by Bloodied Edge, far from Red Harvest." },
+        { id: "s1", kind: "small", lines: [leechLife(0.1)], at: [956, 4103] },
+        { id: "n", kind: "notable", name: "Red Thirst", lines: [damageWhileLeeching(30), leechLife(0.3)], at: [934, 3928], why: "Damage while leeching, by Bloodied Edge, far from Red Harvest." },
       ],
       links: [["s1", "n"]],
     },
@@ -173,7 +173,7 @@ export const fosse: AreaSpec = {
       shape: { kind: 'hand' },
       nodes: [
         { id: "s1", kind: "small", lines: [armour(8)], at: [-1340, 3950] },
-        { id: "n", kind: "notable", name: "Hold the Line", lines: [fortifyOnStun(50), damageWhileFortified(20)], at: [-1298, 3779], why: "Fortified is earned by stunning (two-handers and shields stun), then paid off: a state the duellist works for." },
+        { id: "n", kind: "notable", name: "Hold the Line", lines: [fortifyOnStun(10), damageWhileFortified(20)], at: [-1298, 3779], why: "Fortified is earned by stunning (two-handers and shields stun), then paid off: a state the duellist works for." },
       ],
       links: [["s1", "n"]],
     },

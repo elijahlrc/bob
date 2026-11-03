@@ -523,6 +523,7 @@ export function Items({
       >
         <ItemDetail
           run={run}
+          ch={ch}
           sel={sel}
           selected={selected}
           info={info}

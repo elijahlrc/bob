@@ -86,8 +86,8 @@ export const shield: AreaSpec = {
       at: [-1238, 2668],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "s1", kind: "small", lines: [lifeOnBlock(8)], at: [-1379, 2563] },
-        { id: "n", kind: "notable", name: "Bulwark Mending", lines: [lifeOnBlock(35), costReduction(8)], at: [-1238, 2668], why: "Shield sustain: the block heals, and each blow costs less to answer." },
+        { id: "s1", kind: "small", lines: [lifeOnBlock(5)], at: [-1379, 2563] },
+        { id: "n", kind: "notable", name: "Bulwark Mending", lines: [lifeOnBlock(21), costReduction(8)], at: [-1238, 2668], why: "Shield sustain: the block heals, and each blow costs less to answer." },
         { id: "n2", kind: "notable", name: "Bitter Dregs", lines: [flaskLowLifeRecovery(50)], at: [-1335, 2652], why: "The Reaver's emergency flask, further out (the flask-lines pass, 2026-11-01): flasks drunk below 30% life recover more, so the belt's last two slots become the duellist's last stand. Beside Bulwark Mending, off its small and not behind it: the guard picks the block that heals or the flask that saves, and pays points for both (step 10). 50 / 12 = 4.2 units, about the region's regeneration notable (Stout Heart 4.2); the line alone." },
       ],
       links: [["s1", "n"], ["s1", "n2"]],

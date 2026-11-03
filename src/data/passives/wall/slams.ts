@@ -44,9 +44,9 @@ export const slams: AreaSpec = {
       at: [-1842, 1491],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [lifeRegen(0.4)], at: [-1791, 1526] },
-        { id: "b", kind: "small", lines: [lifeRegen(0.4)], at: [-1839, 1493] },
-        { id: "n", kind: "notable", name: "Barrow Ward", lines: [lifeRegen(0.8), physReduction(2)], at: [-1897, 1454], why: "2 + 2 units." },
+        { id: "a", kind: "small", lines: [lifeRegen(0.25)], at: [-1791, 1526] },
+        { id: "b", kind: "small", lines: [lifeRegen(0.25)], at: [-1839, 1493] },
+        { id: "n", kind: "notable", name: "Barrow Ward", lines: [lifeRegen(0.5), physReduction(2)], at: [-1897, 1454], why: "2 + 2 units." },
       ],
       links: [["a", "b"], ["b", "n"]],
     },
@@ -97,8 +97,8 @@ export const slams: AreaSpec = {
       at: [-1107, 1737],
       shape: { kind: 'hand' },
       nodes: [
-        { id: "a", kind: "small", lines: [leechLife(0.4, ["melee"])], at: [-1073, 1746] },
-        { id: "n", kind: "notable", name: "Vampiric Strikes", lines: [leechLife(0.8, ["melee"]), lifeOnHit(6, ["melee"]), manaLeech(0.4)], at: [-1141, 1728], why: "2 + 1.5 + 1 units." },
+        { id: "a", kind: "small", lines: [leechLife(0.25, ["melee"])], at: [-1073, 1746] },
+        { id: "n", kind: "notable", name: "Vampiric Strikes", lines: [leechLife(0.5, ["melee"]), lifeOnHit(4, ["melee"]), manaLeech(0.4)], at: [-1141, 1728], why: "2 + 1.5 + 1 units." },
       ],
       links: [["a", "n"]],
     },
@@ -137,7 +137,7 @@ export const slams: AreaSpec = {
       nodes: [
         { id: "a", kind: "small", lines: [weaponDamage("mace", 10)], at: [-1913, 2475] },
         { id: "b", kind: "small", lines: [weaponDamage("mace", 10)], at: [-1929, 2530] },
-        { id: "n", kind: "notable", name: "Sledge and Sinew", lines: [weaponDamage('mace', 22), lifeOnHit(8, ['melee'])], at: [-2002, 2548], why: "Maces that heal on the hit." },
+        { id: "n", kind: "notable", name: "Sledge and Sinew", lines: [weaponDamage('mace', 22), lifeOnHit(5, ['melee'])], at: [-2002, 2548], why: "Maces that heal on the hit." },
         { id: "c", kind: "small", lines: [weaponDamage("mace", 10)], at: [-1949, 2602] },
         { id: "s", kind: "small", lines: [str(10)], at: [-2235, 2610], why: "Sledge and Sinew on into Brute Force (2026-10-31), by Brute Force's own stat: the brawler who comes in from the Yard's Scarred Hide walks on from the mace to the strength rule." },
       ],

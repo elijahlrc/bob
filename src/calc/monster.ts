@@ -3,6 +3,7 @@ import {
   MONSTER_CRIT_MULTI,
   easeDamage,
   easeLife,
+  MONSTER_ATTACK_SPEED,
   MONSTER_DAMAGE_MULT,
   MONSTER_LIFE_MULT,
   openingDamage,
@@ -311,6 +312,9 @@ export function buildMonster(spec: MonsterSpec): MonsterStats {
     mod('armour', 'base', monsterArmour(m)),
     mod('moveSpeed', 'base', t.speed),
     mod('critMulti', 'base', MONSTER_CRIT_MULTI - BASE_CRIT_MULTI),
+    // The global lever on how often monsters swing and cast (`MONSTER_ATTACK_SPEED`).
+    mod('attackSpeed', 'more', (MONSTER_ATTACK_SPEED - 1) * 100),
+    mod('castSpeed', 'more', (MONSTER_ATTACK_SPEED - 1) * 100),
     ...t.mods,
     ...defenceMods(defProfile, life),
     ...shapeMods(t),
