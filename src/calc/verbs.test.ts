@@ -316,8 +316,8 @@ describe('item rules (EXPANSION 5.3)', () => {
     const c = new Character(buildWith('vanguard', [grant]), {});
     expect(c.db.flag('manaBeforeLife30')).toBe(true);
     expect(new Character(buildWith('vanguard', []), {}).db.flag('manaBeforeLife30')).toBe(false);
-    // Searing Avatar converts 50% of physical to fire; the tree and an item together must not stack.
-    const node = getTree().nodes.find((n) => n.name === 'Searing Avatar')!;
+    // One Flame converts 50% of physical to fire; the tree and an item together must not stack.
+    const node = getTree().nodes.find((n) => n.name === 'One Flame')!;
     const both = buildWith('vanguard', [mod('grantsKeystone.searingAvatar', 'flag', 1)]);
     both.allocated = [node.id];
     expect(new Character(both, {}).db.sum('base', 'convert.physical.fire')).toBe(50);

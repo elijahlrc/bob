@@ -43,7 +43,7 @@ export const resists: AreaSpec = {
     },
     {
       id: 'ironLungs',
-      name: 'Iron Lungs',
+      name: 'Deep Lungs',
       why: 'Mana from melee, off the north border road.',
       at: [-2070, 199],
       shape: { kind: 'hand' },
@@ -52,7 +52,7 @@ export const resists: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Iron Lungs',
+          name: 'Deep Lungs',
           lines: [manaOnHit(8), costReduction(8)],
           at: [-2089, 198],
           why: 'Mana from melee and cheaper blows (unlike the Yard’s mana on hit with leech).',

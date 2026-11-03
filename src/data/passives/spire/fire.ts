@@ -130,7 +130,7 @@ export const fire: AreaSpec = {
     },
     {
       id: 'cinder',
-      name: 'Cinder',
+      name: 'Smoulder',
       why: "Fire's ignite payoff, out from the rim ring where the west spoke meets it. Since the revision (2026-10-31) fire's ladder's top rung: Warm Hearth joins it to Kiln Heart, so the two fire rooms past the rim are one way across, slower than the rim ring.",
       at: [-1065, -4434],
       shape: { kind: 'hand' },
@@ -139,7 +139,7 @@ export const fire: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Cinder',
+          name: 'Smoulder',
           lines: [igniteChance(15), burnDamage(25), damageVsIgnited(20)],
           at: [-1117, -4413],
         },
@@ -155,14 +155,14 @@ export const fire: AreaSpec = {
             eleDamage('fire', 10),
           ],
           at: [-1230, -4505],
-          why: "The burning dead feed the caster: fire’s own defence. Between the two fire rooms, reached round Cinder's ring without taking Cinder.",
+          why: "The burning dead feed the caster: fire’s own defence. Between the two fire rooms, reached round Smoulder's ring without taking Smoulder.",
         },
         {
           id: 'h',
           kind: 'small',
           lines: [burnDamage(12)],
           at: [-1335, -4395],
-          why: 'Burning, the thread between ignite (Cinder) and the fire payoff (Kiln Heart).',
+          why: 'Burning, the thread between ignite (Smoulder) and the fire payoff (Kiln Heart).',
         },
         {
           id: 'n3',
@@ -170,7 +170,7 @@ export const fire: AreaSpec = {
           name: 'Ember Tithe',
           lines: [flaskChargesKilledBy('ignite', 50)],
           at: [-900, -4500],
-          why: "The Spire's charges-on-kill notable (the flask-lines pass, 2026-11-01): flasks fill only from enemies the burning itself kills, so it pays the igniter who lets the fire finish the work. Off Cinder's ring by a burning small, not through Cinder, at step 12 (12 or more from every start). 50 / 12 = 4.2 units, about a regeneration notable of the region (Quiet Pulse 4.3); the line alone, as a far notable may.",
+          why: "The Spire's charges-on-kill notable (the flask-lines pass, 2026-11-01): flasks fill only from enemies the burning itself kills, so it pays the igniter who lets the fire finish the work. Off Smoulder's ring by a burning small, not through Smoulder, at step 12 (12 or more from every start). 50 / 12 = 4.2 units, about a regeneration notable of the region (Quiet Pulse 4.3); the line alone, as a far notable may.",
         },
       ],
       links: [
@@ -283,7 +283,7 @@ export const fire: AreaSpec = {
     {
       from: 'spire.fire.cinder.h',
       to: 'spire.fire.pyre.n',
-      why: "Fire's ladder's top rung (the revision, 2026-10-31): Warm Hearth's burning small into Kiln Heart. Walked by the igniter, who wants Cinder's ignites, Warm Hearth's recovery from the burning dead and Kiln Heart's penetration, in one walk past the rim.",
+      why: "Fire's ladder's top rung (the revision, 2026-10-31): Warm Hearth's burning small into Kiln Heart. Walked by the igniter, who wants Smoulder's ignites, Warm Hearth's recovery from the burning dead and Kiln Heart's penetration, in one walk past the rim.",
     },
     {
       from: 'spire.fire.badCompany.n2',

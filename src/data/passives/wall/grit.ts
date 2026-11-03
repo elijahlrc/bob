@@ -88,7 +88,7 @@ export const grit: AreaSpec = {
     },
     {
       id: 'crushing',
-      name: 'Crushing Blow',
+      name: 'Skull Cracker',
       why: 'Mace crit, out from the rim ring at the south spoke.',
       at: [-3308, 3139],
       shape: { kind: 'hand' },
@@ -97,7 +97,7 @@ export const grit: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Crushing Blow',
+          name: 'Skull Cracker',
           lines: [weaponCrit('mace', 17), weaponCritMulti('mace', 23), doubleDamage(6)],
           at: [-3310, 3142],
         },
@@ -125,7 +125,7 @@ export const grit: AreaSpec = {
           kind: 'small',
           lines: [eleAttackOne('fire', 12)],
           at: [-3420, 3330],
-          why: 'Hot Iron on into Bellows (the finalization, 2026-10-31), outside the rim past Crushing Blow: the fire attacker who ignites and swings wide takes both fire rooms in one walk. It was a tail small off the door.',
+          why: 'Hot Iron on into Bellows (the finalization, 2026-10-31), outside the rim past Skull Cracker: the fire attacker who ignites and swings wide takes both fire rooms in one walk. It was a tail small off the door.',
         },
       ],
       links: [
@@ -274,7 +274,7 @@ export const grit: AreaSpec = {
           name: 'Bellows',
           lines: [eleAttackOne('fire', 24), meleeArea(16)],
           at: [-3592, 2860],
-          why: "2 + 2 units: 4. Fire with the swing's reach, for the slam and the cleave alike (Hot Iron's partner is stun, Kindled Steel's ignite, Elemental Edge's accuracy). The triangle's apex, south-east of the chain.",
+          why: "2 + 2 units: 4. Fire with the swing's reach, for the slam and the cleave alike (Hot Iron's partner is stun, Kindled Steel's ignite, Red-hot Blades's accuracy). The triangle's apex, south-east of the chain.",
         },
       ],
       links: [
@@ -342,7 +342,7 @@ export const grit: AreaSpec = {
     },
     {
       id: 'plunder',
-      name: 'Plunder of Iron',
+      name: 'War Plunder',
       why: 'Kills build grit: the south’s way into the grit loop.',
       at: [-2992, 2718],
       shape: { kind: 'hand' },
@@ -352,7 +352,7 @@ export const grit: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Plunder of Iron',
+          name: 'War Plunder',
           lines: [gritOnKill(5), meleePhys(15)],
           at: [-2992, 2718],
           why: 'Kills build grit: the south’s way into the grit loop.',
@@ -363,7 +363,7 @@ export const grit: AreaSpec = {
           name: 'Hard-Won Rations',
           lines: [flaskChargesPerCharge('grit', 12)],
           at: [-3170, 2660],
-          why: "The Wall's charges on kill (the flask-lines pass, 2026-11-01, F-flasks.md §3), far out (step 12, 12 or more from every start): flask charges on kill for each grit charge held, its line alone. Priced at three charges held: 12 × 3 / 8 = 4.5 units, about a regeneration notable of the region (Old Wounds 4.1, Barrow Ward 4). Beside Plunder of Iron, so the kill loop closes in one room: kills build grit, grit makes kills refill the flasks (and Unbroken, in the keep, holds one more charge). The room's armour smalls part to the two notables, so neither forces a point into the other.",
+          why: "The Wall's charges on kill (the flask-lines pass, 2026-11-01, F-flasks.md §3), far out (step 12, 12 or more from every start): flask charges on kill for each grit charge held, its line alone. Priced at three charges held: 12 × 3 / 8 = 4.5 units, about a regeneration notable of the region (Old Wounds 4.1, Barrow Ward 4). Beside War Plunder, so the kill loop closes in one room: kills build grit, grit makes kills refill the flasks (and Unbroken, in the keep, holds one more charge). The room's armour smalls part to the two notables, so neither forces a point into the other.",
         },
       ],
       links: [
@@ -403,12 +403,12 @@ export const grit: AreaSpec = {
     {
       from: 'wall.grit.hotIron.c',
       to: 'wall.grit.bellows.b',
-      why: "The fire rooms joined (the finalization, 2026-10-31): the fire attacker who ignites with Hot Iron and swings wide with Bellows takes both in one walk outside the rim, past Crushing Blow; 6 steps between their doors against the rim road's 2.",
+      why: "The fire rooms joined (the finalization, 2026-10-31): the fire attacker who ignites with Hot Iron and swings wide with Bellows takes both in one walk outside the rim, past Skull Cracker; 6 steps between their doors against the rim road's 2.",
     },
     {
       from: 'wall.grit.plunder.n',
       to: 'wall.grit.heavyHands.a',
-      why: "Earn, then spend (the finalization, 2026-10-31): the two-hander who builds grit with every kill (Plunder of Iron) and swings faster for every charge held (Heavy Hands) walks from one to the other inside the rim; 5 steps between their doors against the rim road's 1.",
+      why: "Earn, then spend (the finalization, 2026-10-31): the two-hander who builds grit with every kill (War Plunder) and swings faster for every charge held (Heavy Hands) walks from one to the other inside the rim; 5 steps between their doors against the rim road's 1.",
     },
     {
       from: 'wall.grit.watch.n',

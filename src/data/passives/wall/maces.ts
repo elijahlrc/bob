@@ -132,14 +132,14 @@ export const maces: AreaSpec = {
     },
     {
       id: 'rooted',
-      name: 'Rooted Stance',
+      name: 'Planted Feet',
       why: 'The standing keystone, a tip past the rim ring.',
       at: [-4634, 487],
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'small', lines: [stunThreshold(8)], at: [-4568, 476] },
         { id: 'b', kind: 'small', lines: [stunThreshold(8)], at: [-4625, 485] },
-        { id: 'k', kind: 'keystone', name: 'Rooted Stance', lines: [], at: [-4709, 500] },
+        { id: 'k', kind: 'keystone', name: 'Planted Feet', lines: [], at: [-4709, 500] },
       ],
       links: [
         ['a', 'b'],

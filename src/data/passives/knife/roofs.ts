@@ -241,7 +241,7 @@ export const roofs: AreaSpec = {
     },
     {
       id: 'mercy',
-      name: 'Mercy Stroke',
+      name: 'Put Down',
       why: 'The finisher: in from the rim ring, south.',
       at: [4061, -418],
       shape: { kind: 'hand' },
@@ -250,7 +250,7 @@ export const roofs: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Mercy Stroke',
+          name: 'Put Down',
           lines: [damageVsLowLife(30), cullingStrike()],
           at: [4061, -418],
         },

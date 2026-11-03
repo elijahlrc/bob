@@ -273,7 +273,7 @@ export const storm: AreaSpec = {
     {
       from: 'spire.storm.wandVolley.n2',
       to: 'spire.column.lingering.a',
-      why: "The mid floor (the revision, 2026-10-31): from Slow Burn's crossroads east into the wand rooms. Walked by the wand attacker who wants chain before speed (Hail of Sparks without Wand Volley), and by the wand attacker who stands in the press (Iron Litany across the crossroads). Since finalization the floor's wand small is gone: Hail of Sparks meets the crossroads itself.",
+      why: "The mid floor (the revision, 2026-10-31): from Slow Burn's crossroads east into the wand rooms. Walked by the wand attacker who wants chain before speed (Hail of Sparks without Wand Volley), and by the wand attacker who stands in the press (Taught by Blows across the crossroads). Since finalization the floor's wand small is gone: Hail of Sparks meets the crossroads itself.",
     },
   ],
 };

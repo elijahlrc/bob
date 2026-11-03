@@ -235,7 +235,7 @@ const LIST: Archetype[] = [
       'weaponCritMulti:mace': 0.3,
       warcryEffect: 0.3,
     },
-    keystones: { 'Unerring Discipline': 3, 'Rooted Stance': 3 },
+    keystones: { 'Unerring Discipline': 3, 'Planted Feet': 3 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -362,7 +362,7 @@ const LIST: Archetype[] = [
       projectileSpeed: 0.3,
       'leechLife:attack': 0.4,
     },
-    keystones: { 'Close Quarters': 2, 'Arrow Weave': 3, 'Steady Draw': 4 },
+    keystones: { "Arm's Length": 2, 'Arrow Weave': 3, 'Steady Draw': 4 },
     main: {
       life: F.life,
       evasion: F.evasion,
@@ -617,7 +617,7 @@ const LIST: Archetype[] = [
       'penetration:fire': 0.6,
       'maxResOne:fire': 0.5,
     },
-    keystones: { 'Fever Pitch': 2, 'Searing Avatar': 3 },
+    keystones: { 'Fever Pitch': 2, 'One Flame': 3 },
     main: {
       'fire damage': ['eleDamage:fire', 'eleDamageAll', 'burnDamage', 'dotDamage'],
       'spell damage': F.spell,
@@ -832,7 +832,7 @@ const LIST: Archetype[] = [
       burnDamage: 0.5,
       'maxResOne:fire': 0.5,
     },
-    keystones: { 'Blood Rite': 2, 'Searing Avatar': 4 },
+    keystones: { 'Blood Rite': 2, 'One Flame': 4 },
     main: {
       life: F.life,
       armour: F.armour,
@@ -949,7 +949,7 @@ const LIST: Archetype[] = [
       igniteChance: 0.6,
       'maxResOne:fire': 0.4,
     },
-    keystones: { 'Searing Avatar': 3 },
+    keystones: { 'One Flame': 3 },
     main: {
       life: F.life,
       'fire attack damage': ['eleAttackOne:fire', 'eleAttack', 'eleDamage:fire'],

@@ -110,7 +110,7 @@ export const clusters: AreaSpec = {
     {
       id: 'wasteNot',
       name: 'Waste Not',
-      why: "At the junction of the Strider and the Reaver, which has no spoke to the middle. A yoke since the revision (2026-10-31): the room's door is on its junction, and from the notable an arm of cheaper skills runs inward to each spoke beside it (s1, s3). The attacker short of mana takes it on the way in to Provisions' mana regeneration at the middle, and the attacker who lives on kills reaches it from Hard Living's spoke.",
+      why: "At the junction of the Strider and the Reaver, which has no spoke to the middle. A yoke since the revision (2026-10-31): the room's door is on its junction, and from the notable an arm of cheaper skills runs inward to each spoke beside it (s1, s3). The attacker short of mana takes it on the way in to Well Stocked's mana regeneration at the middle, and the attacker who lives on kills reaches it from Hard Living's spoke.",
       at: [163, 567],
       shape: { kind: 'hand' },
       nodes: [
@@ -141,7 +141,7 @@ export const clusters: AreaSpec = {
           kind: 'small',
           lines: [costReduction(3)],
           at: [-37, 489],
-          why: "The arm toward the spoke of the Reaver and the Vanguard: the skill spammer short of mana walks on from cheaper skills to Provisions' flasks and the mana regeneration on its way across at the middle, three steps beyond the spoke.",
+          why: "The arm toward the spoke of the Reaver and the Vanguard: the skill spammer short of mana walks on from cheaper skills to Well Stocked's flasks and the mana regeneration on its way across at the middle, three steps beyond the spoke.",
         },
       ],
       links: [
@@ -195,7 +195,7 @@ export const clusters: AreaSpec = {
           name: 'Quick March',
           lines: [moveSpeed(10), cooldownRecovery(15)],
           at: [-572, -143],
-          why: 'Movement and cooldowns, which neither home sells by this seam (Camp Stores, Vigil, Alms and Iron Lungs sell flasks, regeneration, leech and mana): priced as a home generalist (it sits 10 to 12 steps from every start).',
+          why: 'Movement and cooldowns, which neither home sells by this seam (Larder, Vigil, Alms and Deep Lungs sell flasks, regeneration, leech and mana): priced as a home generalist (it sits 10 to 12 steps from every start).',
         },
         {
           id: 's3',
@@ -238,7 +238,7 @@ export const clusters: AreaSpec = {
           name: 'Shelter',
           lines: [resAll(12), life(8)],
           at: [-163, -567],
-          why: 'Resistances, which neither home sells by this seam (Draught, Bright Omen, Kept Vows and Quickening sell flasks, damage, auras and recharge): priced as a home generalist (it sits 10 to 12 steps from every start).',
+          why: 'Resistances, which neither home sells by this seam (Still Water, Bright Omen, Kept Vows and Quickening sell flasks, damage, auras and recharge): priced as a home generalist (it sits 10 to 12 steps from every start).',
         },
       ],
       links: [['a', 'n']],
@@ -280,7 +280,7 @@ export const clusters: AreaSpec = {
     },
     {
       id: 'provisions',
-      name: 'Provisions',
+      name: 'Well Stocked',
       why: 'At the middle, shared by every class. Joined to the yoke room of its own cell (the owner, 2026-10-31, with a third middle notable): each of the three cells between the spokes now holds one middle notable and one yoke, so each pair of classes gets one such join and none is favoured.',
       at: [140, 242],
       shape: { kind: 'hand' },
@@ -295,7 +295,7 @@ export const clusters: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Provisions',
+          name: 'Well Stocked',
           lines: [flaskEffect(12), flaskRecovery(20)],
           at: [140, 242],
           why: 'Flasks, the attrition lever, at the middle: as far from every start: priced as a home generalist (about 4.4 units). Since the flask-lines pass (2026-11-01, F-flasks.md) a flask node only: its mana regeneration went, as no flask node carries other sustain, and its recovery rose from 15 to 20 in its place.',
@@ -391,7 +391,7 @@ export const clusters: AreaSpec = {
     {
       from: 'provisions.w',
       to: 'wasteNot.n',
-      why: "Provisions' way meets Waste Not: from the middle to Waste Not 4 steps against 3 by the spoke and Waste Not's arm.",
+      why: "Well Stocked's way meets Waste Not: from the middle to Waste Not 4 steps against 3 by the spoke and Waste Not's arm.",
     },
     {
       from: 'commonWard.w',
@@ -416,7 +416,7 @@ export const clusters: AreaSpec = {
     {
       from: 'wasteNot.s3',
       to: 'centre.ring.road.s3',
-      why: "Waste Not's arm meets the spoke of the Reaver and the Vanguard: the attacker short of mana walks from cheaper skills on to Provisions' flasks and its way's mana regeneration at the middle. From j2 to the spoke 4 steps against the road's 2 by j3.",
+      why: "Waste Not's arm meets the spoke of the Reaver and the Vanguard: the attacker short of mana walks from cheaper skills on to Well Stocked's flasks and its way's mana regeneration at the middle. From j2 to the spoke 4 steps against the road's 2 by j3.",
     },
     {
       from: 'quickMarch.s3',

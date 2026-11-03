@@ -583,12 +583,12 @@ The tree is authored at the **district** level, never node by node.
 | Blood Rite          | Skills cost life instead of mana. Max mana is 0. Auras reserve life instead of mana.                     | reference |
 | Plated Hide         | Evasion rating is converted to armour. Dexterity gives no evasion bonus.                                 | reference |
 | Mind Bulwark        | 30% of damage is taken from mana before life.                                                            | reference |
-| Searing Avatar      | 50% of physical, lightning and cold damage is converted to fire. Deal no non-fire damage.                | reference |
-| Close Quarters      | Projectile damage: up to 50% more at short range, falling to 50% less at long range (linear, 1–8 tiles). | reference |
+| One Flame           | 50% of physical, lightning and cold damage is converted to fire. Deal no non-fire damage.                | reference |
+| Arm's Length        | Projectile damage: up to 50% more at short range, falling to 50% less at long range (linear, 1–8 tiles). | reference |
 | Crimson Pact        | Leech is instant. You have no life regeneration.                                                         | reference |
 | Fever Pitch         | After a crit, 40% more elemental damage for 8 s. Crit multiplier is fixed at 100%.                       | reference |
 | Pain Conduit        | 30% more spell damage while on low life.                                                                 | reference |
-| Rooted Stance       | Cannot be stunned. Cannot evade enemy attacks.                                                           | reference |
+| Planted Feet        | Cannot be stunned. Cannot evade enemy attacks.                                                           | reference |
 | Prismatic Balance   | Your hits give the target +25% resist to the hit's element(s) and −50% to the other elements, for 5 s.   | reference |
 | Living Ward         | Life regeneration applies to ES instead of life. Max life is 1 (needs Hollow Vessel to be sensible).     | reference |
 | Shade Leech         | Life leech applies to ES instead. No life leech. ES recharge is 50% slower.                              | reference |

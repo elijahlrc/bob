@@ -899,7 +899,7 @@ export function formedProfile(p: SkillProfile): SkillProfile {
   return q;
 }
 
-/** Distance-based damage multiplier for projectile skills (Close Quarters, falloff). */
+/** Distance-based damage multiplier for projectile skills (Arm's Length, falloff). */
 export function distanceMult(p: SkillProfile, d: number): number {
   let m = 1;
   const b = p.skill.behaviour;

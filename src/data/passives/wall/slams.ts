@@ -261,7 +261,7 @@ export const slams: AreaSpec = {
           kind: 'small',
           lines: [str(10)],
           at: [-2235, 2610],
-          why: "Sledge and Sinew on into Brute Force (2026-10-31), by Brute Force's own stat: the brawler who comes in from the Yard's Scarred Hide walks on from the mace to the strength rule.",
+          why: "Sledge and Sinew on into Brawn (2026-10-31), by Brawn's own stat: the brawler who comes in from the Yard's Scarred Hide walks on from the mace to the strength rule.",
         },
       ],
       links: [
@@ -320,7 +320,7 @@ export const slams: AreaSpec = {
     },
     {
       id: 'brute',
-      name: 'Brute Force',
+      name: 'Brawn',
       why: 'The strength rule: melee physical damage for every 10 strength.',
       at: [-2462, 2657],
       shape: { kind: 'hand' },
@@ -330,7 +330,7 @@ export const slams: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Brute Force',
+          name: 'Brawn',
           lines: [meleePerStr(2, 15), meleePhys(10)],
           at: [-2462, 2657],
           why: 'The strength rule: melee physical damage for every 10 strength.',
@@ -382,7 +382,7 @@ export const slams: AreaSpec = {
     {
       from: 'wall.slams.sledge.s',
       to: 'wall.slams.brute.n',
-      why: "A way across beyond the mid ring (2026-10-31): Sledge and Sinew to Brute Force, slower than the spoke between their doors. Who walks it: the mace brawler who stacks strength, many of them coming in from the Yard's Scarred Hide.",
+      why: "A way across beyond the mid ring (2026-10-31): Sledge and Sinew to Brawn, slower than the spoke between their doors. Who walks it: the mace brawler who stacks strength, many of them coming in from the Yard's Scarred Hide.",
     },
     {
       from: 'wall.slams.stagger.b',

@@ -134,7 +134,7 @@ export const farPasture: AreaSpec = {
     {
       id: 'longShot',
       name: 'Far Reach',
-      why: 'Projectiles hit harder the farther they fly: the counterpart of Close Quarters, out from the rim ring.',
+      why: "Projectiles hit harder the farther they fly: the counterpart of Arm's Length, out from the rim ring.",
       at: [4500, 400],
       shape: { kind: 'hand' },
       nodes: [
@@ -146,7 +146,7 @@ export const farPasture: AreaSpec = {
           name: 'Far Reach',
           lines: [farShot(30), projectileDamage(10)],
           at: [4500, 400],
-          why: 'Projectiles hit harder the farther they fly: the counterpart of Close Quarters, out from the rim ring.',
+          why: "Projectiles hit harder the farther they fly: the counterpart of Arm's Length, out from the rim ring.",
         },
       ],
       links: [

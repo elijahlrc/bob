@@ -35,7 +35,7 @@ export const quiver: AreaSpec = {
   clusters: [
     {
       id: 'wheel',
-      name: 'Split Volley and Deep Cuts',
+      name: 'Double Nock and Deep Cuts',
       why: 'More projectiles or deeper bleeding, out from the mid ring east of the axis.',
       at: [2431, 2004],
       shape: { kind: 'hand' },
@@ -46,7 +46,7 @@ export const quiver: AreaSpec = {
         {
           id: 'n1',
           kind: 'notable',
-          name: 'Split Volley',
+          name: 'Double Nock',
           lines: [extraProjectile(1)],
           at: [2709, 1814],
           why: 'An extra projectile: 4 units by the table, and the line a thrown or bow build reshapes itself around.',
@@ -184,7 +184,7 @@ export const quiver: AreaSpec = {
     {
       id: 'pursuit',
       name: "Pursuit's End",
-      why: "The payoff of the two buffs the region hands out: Quickened (kills, blinks) and Elusive (bow crits). Moved out past Close Quarters' tip (2026-10-31) so Skirmisher's Leap's way on can reach it: entered from the mid ring at the axis, where Hunter's Rush's room also comes out through Rapid Fire, or from the blink.",
+      why: "The payoff of the two buffs the region hands out: Quickened (kills, blinks) and Elusive (bow crits). Moved out past Arm's Length's tip (2026-10-31) so Skirmisher's Leap's way on can reach it: entered from the mid ring at the axis, where Hunter's Rush's room also comes out through Rapid Fire, or from the blink.",
       at: [2949, 1772],
       shape: { kind: 'hand' },
       nodes: [

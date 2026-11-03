@@ -272,7 +272,7 @@ export const home: AreaSpec = {
     },
     {
       id: 'draught',
-      name: 'Draught',
+      name: 'Still Water',
       why: "The flask layer near home, run through on the west path to the Cathedral seam (the centre pass: every start about six steps from its seams). Since the flask-lines pass (2026-11-01) it is the mana caster's flask: more mana from each drink, fewer charges spent on it, so a refill lasts longer.",
       at: [-696, -1562],
       shape: { kind: 'hand' },
@@ -282,12 +282,12 @@ export const home: AreaSpec = {
           kind: 'small',
           lines: [flaskManaRecovery(15)],
           at: [-636, -1614],
-          why: 'The step into Draught: mana from flasks (1 unit; the flask-lines pass, 2026-11-01).',
+          why: 'The step into Still Water: mana from flasks (1 unit; the flask-lines pass, 2026-11-01).',
         },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Draught',
+          name: 'Still Water',
           lines: [flaskManaRecovery(30), flaskChargesUsed(8)],
           at: [-750, -1503],
           why: "The mana caster's flask, near the start (the flask-lines pass, 2026-11-01): 2 + 2 units, about a regeneration notable of the region (Quiet Pulse 4.3). Its old recover 2% of mana on kill was dropped, not moved: a flask node carries no other sustain, and the region keeps mana on kill on Siphon.",

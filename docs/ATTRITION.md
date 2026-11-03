@@ -632,3 +632,20 @@ the changes after three playtests.
   - **Waiting for the owner:** an elemental bridge for staves and sceptres. The tree has no melee-only elemental lines (48
     attack-wide ones, 72 global) and no staff or sceptre elemental lines; the proposal is that, while a staff or sceptre is
     held, attack elemental lines count for spells and spell damage lines for the elemental damage of attacks.
+- **2026-11-03, the naming pass** (the owner's picks, from two or three proposals each; every new name checked against
+  the reference names and Bob's own). The tree's ids do not change, so no save bump.
+  - **Tree names shared with a gem:** Brute Force → Brawn, Close Quarters (keystone) → Arm's Length, Crushing Blow →
+    Skull Cracker, Elemental Edge → Red-hot Blades, Mercy Stroke → Put Down, Ricochet → Skipping Stone, Split Volley →
+    Double Nock.
+  - **Shared with a monster, a monster mod or a stop:** Choirmaster → Cantor, Cinder → Smoulder, Withering → Ill Omen, the
+    Knife's Bloodletter → Opened Veins (the stop keeps the name). Siphon stays.
+  - **Words of the game's systems:** Provisions → Well Stocked, Draught → Still Water, Camp Stores → Larder. Ember Tithe
+    stays.
+  - **A word shared with the reference keystone of the same mechanic:** Rooted Stance → Planted Feet, Searing Avatar → One
+    Flame. Blood Rite stays (the owner: fine as it is).
+  - **Word families:** Iron Litany → Taught by Blows, Iron Lungs → Deep Lungs, Plunder of Iron → War Plunder, Hymn of War
+    → War Chant. The other Irons, the Wards, the Litanies and Battle Hymn stay.
+  - **Elsewhere:** the relic Keen Eye (a support gem's name) → Second Glance; the Shrine biome → Ruined Chapel (the stop
+    keeps the name); three uniques named exactly as their base: Dusk Sceptre → Long Dusk, Skinner's Knife → Thin Mercy,
+    Votive Hauberk → Candlewound Mail (ids kept in the decision files). The Brimming Ward, the Surgeon and Another's
+    Remains keep their names, and the other relics keep theirs as approved.

@@ -38,7 +38,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'searingAvatar',
-    name: 'Searing Avatar',
+    name: 'One Flame',
     mods: [
       mod('avatarOfFire', 'flag', 1),
       mod('convert.physical.fire', 'base', 50),
@@ -50,7 +50,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'closeQuarters',
-    name: 'Close Quarters',
+    name: "Arm's Length",
     mods: [mod('closeQuarters', 'flag', 1)],
     description:
       'Projectile attack damage: up to 50% more at close range, falling to 50% less at long range.',
@@ -82,7 +82,7 @@ export const KEYSTONES: KeystoneDef[] = [
   },
   {
     id: 'rootedStance',
-    name: 'Rooted Stance',
+    name: 'Planted Feet',
     mods: [mod('cannotBeStunned', 'flag', 1), mod('cannotEvade', 'flag', 1)],
     description: 'Cannot be stunned. Cannot evade enemy attacks.',
   },

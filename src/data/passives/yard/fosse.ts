@@ -128,7 +128,7 @@ export const fosse: AreaSpec = {
     },
     {
       id: 'elementalEdge',
-      name: 'Elemental Edge',
+      name: 'Red-hot Blades',
       why: 'Elemental blades, in from the rim ring at the axis (a melee hook in the notables pass).',
       at: [-180, 3956],
       shape: { kind: 'hand' },
@@ -138,7 +138,7 @@ export const fosse: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Elemental Edge',
+          name: 'Red-hot Blades',
           lines: [eleAttack(16), meleeGainFire(10)],
           at: [-136, 3934],
           why: 'Burning blades: melee hits gain fire, which the Bow’s arrows cannot.',
@@ -444,7 +444,7 @@ export const fosse: AreaSpec = {
     {
       from: 'yard.fosse.shieldBash.a',
       to: 'yard.fosse.ring.q5',
-      why: 'The way in (finalization, 2026-10-31: from the axis node, beside Elemental Edge, since the rim node it hung from went).',
+      why: 'The way in (finalization, 2026-10-31: from the axis node, beside Red-hot Blades, since the rim node it hung from went).',
     },
     {
       from: 'yard.fosse.bloodied.a',
@@ -479,7 +479,7 @@ export const fosse: AreaSpec = {
     {
       from: 'yard.fosse.fencer.s',
       to: 'yard.fosse.shieldBash.b',
-      why: 'Measured Cut to Shield Bash (2026-10-31), a way from the round to the rim beside Elemental Edge. The build: the shield basher, whose shield stuns and whose crit finds the stunned.',
+      why: 'Measured Cut to Shield Bash (2026-10-31), a way from the round to the rim beside Red-hot Blades. The build: the shield basher, whose shield stuns and whose crit finds the stunned.',
     },
     {
       from: 'yard.fosse.hewing.w',

@@ -240,7 +240,7 @@ export const home: AreaSpec = {
     {
       id: 'ardour',
       name: 'Ardour',
-      why: 'Elemental attacks, off the north-east hub (step 5), and since the revision (2026-10-31) on by an elemental-attack small into the Choirmaster wheel: the striker who carries auras (an aura serves the elemental hit), slower than the spoke between the two doors.',
+      why: 'Elemental attacks, off the north-east hub (step 5), and since the revision (2026-10-31) on by an elemental-attack small into the Cantor wheel: the striker who carries auras (an aura serves the elemental hit), slower than the spoke between the two doors.',
       at: [-1455, -1703],
       shape: { kind: 'hand' },
       nodes: [
@@ -269,7 +269,7 @@ export const home: AreaSpec = {
     {
       id: 'anoint',
       name: 'Anointing',
-      why: "The Cathedral's near flask room (the flask-lines pass, 2026-11-01, F-flasks.md section 3: flask effect and duration, the region of auras and buffs). Off the north-east hub on the Ardour side of the spoke, and on by an aura small to the spoke's next junction, where the Choirmaster wheel, Frozen Font and Lone Vow open: a way through beside the spoke, two steps slower than the road (four against two).",
+      why: "The Cathedral's near flask room (the flask-lines pass, 2026-11-01, F-flasks.md section 3: flask effect and duration, the region of auras and buffs). Off the north-east hub on the Ardour side of the spoke, and on by an aura small to the spoke's next junction, where the Cantor wheel, Frozen Font and Lone Vow open: a way through beside the spoke, two steps slower than the road (four against two).",
       at: [-1660, -1640],
       shape: { kind: 'hand' },
       nodes: [
@@ -438,12 +438,12 @@ export const home: AreaSpec = {
     {
       from: 'cathedral.home.anoint.b',
       to: 'cathedral.choir.spS.b',
-      why: "Anointing leads on (the flask-lines pass, 2026-11-01) to the spoke's next junction: the aura-and-buff Zealot takes the flasks and walks on to the Choirmaster wheel or Lone Vow; four steps from the hub against the road's two.",
+      why: "Anointing leads on (the flask-lines pass, 2026-11-01) to the spoke's next junction: the aura-and-buff Zealot takes the flasks and walks on to the Cantor wheel or Lone Vow; four steps from the hub against the road's two.",
     },
     {
       from: 'cathedral.home.ardour.b',
       to: 'cathedral.choir.wheel.c1',
-      why: 'Ardour on into the Choirmaster wheel at its door small (2026-10-31): the elemental striker who carries auras (an aura serves the elemental hit), slower than the spoke between the two doors.',
+      why: 'Ardour on into the Cantor wheel at its door small (2026-10-31): the elemental striker who carries auras (an aura serves the elemental hit), slower than the spoke between the two doors.',
     },
     { from: 'cathedral.home.wake.a', to: 'cathedral.home.hubs.n', why: 'The way in.' },
     {

@@ -75,7 +75,7 @@ export const BIOMES: BiomeDef[] = [
   },
   {
     id: 'shrine',
-    name: 'Shrine',
+    name: 'Ruined Chapel',
     text: 'Stately halls in a long procession.',
     layout: 'chain',
     from: 1,

@@ -700,7 +700,7 @@ export function rollRewards(run: RunState): RewardCard[] {
   return out;
 }
 
-/** A Keen Eye (docs/ATTRITION.md) adds a choice to a pick: a rare item, from a stream of its own so the other cards stay put. */
+/** A Second Glance (docs/ATTRITION.md) adds a choice to a pick: a rare item, from a stream of its own so the other cards stay put. */
 function keenEyeCards(run: RunState, out: RewardCard[]): void {
   const n = heldReward(run, 'keenEye');
   if (!n) return;

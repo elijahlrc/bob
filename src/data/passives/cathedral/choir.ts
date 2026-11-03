@@ -83,7 +83,7 @@ export const choir: AreaSpec = {
     },
     {
       id: 'wheel',
-      name: 'Choirmaster',
+      name: 'Cantor',
       why: 'Auras or minions, the two sides of one wheel, off the north-east spoke.',
       at: [-1784, -2053],
       shape: { kind: 'hand' },
@@ -93,7 +93,7 @@ export const choir: AreaSpec = {
         {
           id: 'c3',
           kind: 'notable',
-          name: 'Choirmaster',
+          name: 'Cantor',
           lines: [reducedReservation(6), auraEffect(12)],
           at: [-1874, -2098],
           why: 'Auras held cheaper and stronger, the choir master (its mana line went: one mana notable near home): 2 + 2 units.',

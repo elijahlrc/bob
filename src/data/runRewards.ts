@@ -286,7 +286,7 @@ export const RUN_REWARDS: RunRewardDef[] = [
   // Kept from the first four (2026-10-29).
   {
     id: 'keenEye',
-    name: 'Keen Eye',
+    name: 'Second Glance',
     text: 'Every reward pick offers one more choice.',
     base: 35,
     max: 1,

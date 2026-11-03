@@ -29,7 +29,7 @@ export const outerWalk: AreaSpec = {
     {
       id: 'hymn',
       name: 'Battle Hymn',
-      why: "Warcries and auras, in from the rim ring. Since the revision (2026-10-31) the entrance small parts two ways: to Battle Hymn (and on to Ossuary), or to Hymn of War, which leads on by two warcry smalls across the Wall border into the grit run, the war chant's insight beside the Wall's grit (its counterpart: the Wall's warcries give grit). Since the flask-lines pass (2026-11-01) a third way from the entrance small, by a crit small to the Cup of Revelation (flask charges on kill per insight charge), which joins Hymn of War's way on at its first warcry small.",
+      why: "Warcries and auras, in from the rim ring. Since the revision (2026-10-31) the entrance small parts two ways: to Battle Hymn (and on to Ossuary), or to War Chant, which leads on by two warcry smalls across the Wall border into the grit run, the war chant's insight beside the Wall's grit (its counterpart: the Wall's warcries give grit). Since the flask-lines pass (2026-11-01) a third way from the entrance small, by a crit small to the Cup of Revelation (flask charges on kill per insight charge), which joins War Chant's way on at its first warcry small.",
       at: [-3938, -414],
       shape: { kind: 'hand' },
       nodes: [
@@ -38,14 +38,14 @@ export const outerWalk: AreaSpec = {
           kind: 'small',
           lines: [warcryEffect(10)],
           at: [-3889, -144],
-          why: "Hymn of War's way on toward the Wall (2026-10-31).",
+          why: "War Chant's way on toward the Wall (2026-10-31).",
         },
         {
           id: 'w2',
           kind: 'small',
           lines: [warcryEffect(10)],
           at: [-3822, 80],
-          why: "Hymn of War's way on, just across the angle of the Wall border (2026-10-31).",
+          why: "War Chant's way on, just across the angle of the Wall border (2026-10-31).",
         },
         { id: 'a', kind: 'small', lines: [warcryEffect(10)], at: [-4008, -415] },
         { id: 'b', kind: 'small', lines: [warcryEffect(10)], at: [-3868, -413] },
@@ -70,12 +70,12 @@ export const outerWalk: AreaSpec = {
           name: 'Cup of Revelation',
           lines: [flaskChargesPerCharge('insight', 12)],
           at: [-4040, -140],
-          why: "The Cathedral's charges on kill (the flask-lines pass, 2026-11-01, F-flasks.md section 3), far out (step 13, 13 or more from every start): flask charges on kill for each insight charge held, its line alone. Priced at three charges held: 12 x 3 / 8 = 4.5 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3) and the other regions' charges-on-kill notables. Beside Hymn of War, the region's warcry insight, and reached by smalls only, so the staff fighter whose insight comes from Whirling Ward's staff blocks need not take Hymn of War: the two notables stand side by side and both lead on to the warcry smalls into the Wall's grit run.",
+          why: "The Cathedral's charges on kill (the flask-lines pass, 2026-11-01, F-flasks.md section 3), far out (step 13, 13 or more from every start): flask charges on kill for each insight charge held, its line alone. Priced at three charges held: 12 x 3 / 8 = 4.5 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3) and the other regions' charges-on-kill notables. Beside War Chant, the region's warcry insight, and reached by smalls only, so the staff fighter whose insight comes from Whirling Ward's staff blocks need not take War Chant: the two notables stand side by side and both lead on to the warcry smalls into the Wall's grit run.",
         },
         {
           id: 'warHymn',
           kind: 'notable',
-          name: 'Hymn of War',
+          name: 'War Chant',
           lines: [insightOnWarcry(36), critMulti(12)],
           at: [-3938, -329],
           why: "The war chant kindles insight: a warcry may give an insight charge (the Wall's warcries give grit), and crits strike deeper: 3 + 1 units.",
@@ -184,7 +184,7 @@ export const outerWalk: AreaSpec = {
     {
       from: 'cathedral.rim.hymn.w2',
       to: 'wall.maces.gritPay.s1',
-      why: "Across the Wall border, outside the mid ring where no road runs (2026-10-31): Hymn of War's warcry smalls into the Grit and Gravel run between its two payoffs, the shouting holy warrior's way into grit; no shorter than the rim road round by q1, s0 and Scar Tissue (five steps either way).",
+      why: "Across the Wall border, outside the mid ring where no road runs (2026-10-31): War Chant's warcry smalls into the Grit and Gravel run between its two payoffs, the shouting holy warrior's way into grit; no shorter than the rim road round by q1, s0 and Scar Tissue (five steps either way).",
     },
   ],
 };

@@ -97,14 +97,14 @@ describe('keystones (§9.4) — every one has an effect', () => {
     expect(c.defence().manaBeforeLife).toBe(0.3);
   });
 
-  it('Searing Avatar: deals only fire damage', () => {
+  it('One Flame: deals only fire damage', () => {
     const c = both('vanguard', 'searingAvatar').with;
     const chunks = c.profile(c.primary).hands[0].chunks;
     expect(chunks.length).toBeGreaterThan(0);
     for (const ch of chunks) expect(ch.type).toBe(3);
   });
 
-  it('Close Quarters: more damage up close, less far away', () => {
+  it("Arm's Length: more damage up close, less far away", () => {
     const c = both('strider', 'closeQuarters').with;
     const p = c.profile(c.primary);
     expect(distanceMult(p, 1)).toBeCloseTo(1.5);
@@ -135,7 +135,7 @@ describe('keystones (§9.4) — every one has an effect', () => {
     expect(lo / hi).toBeCloseTo(1.3);
   });
 
-  it('Rooted Stance: cannot be stunned, cannot evade', () => {
+  it('Planted Feet: cannot be stunned, cannot evade', () => {
     const d = both('vanguard', 'rootedStance').with.defence();
     expect(d.cannotBeStunned).toBe(true);
     expect(d.cannotEvade).toBe(true);

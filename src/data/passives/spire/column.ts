@@ -158,7 +158,7 @@ export const column: AreaSpec = {
     {
       id: 'lingering',
       name: 'Slow Burn',
-      why: "Elemental damage over time, out from the mid ring along the axis; a dearer link across to Hoarfrost. Since the revision (2026-10-31) its small is the mid floor's crossroads: the floor from Composure and Iron Litany comes in from the west and goes on east to Hail of Sparks and Wand Volley.",
+      why: "Elemental damage over time, out from the mid ring along the axis; a dearer link across to Hoarfrost. Since the revision (2026-10-31) its small is the mid floor's crossroads: the floor from Composure and Taught by Blows comes in from the west and goes on east to Hail of Sparks and Wand Volley.",
       at: [150, -3427],
       shape: { kind: 'hand' },
       nodes: [

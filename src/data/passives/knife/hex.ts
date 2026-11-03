@@ -134,7 +134,7 @@ export const hex: AreaSpec = {
     },
     {
       id: 'bloodletter',
-      name: 'Bloodletter',
+      name: 'Opened Veins',
       why: 'Life leech and crit multiplier, out from the mid ring.',
       at: [2046, -2395],
       shape: { kind: 'hand' },
@@ -144,7 +144,7 @@ export const hex: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Bloodletter',
+          name: 'Opened Veins',
           lines: [
             leechLife(1, ['attack']),
             manaLeech(0.5),

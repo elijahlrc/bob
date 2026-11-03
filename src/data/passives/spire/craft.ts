@@ -88,7 +88,7 @@ export const craft: AreaSpec = {
     },
     {
       id: 'withering',
-      name: 'Withering',
+      name: 'Ill Omen',
       why: "Chaos over time, in from where the Knife's border road meets the mid ring; a dearer link across to Hexwright.",
       at: [1253, -2459],
       shape: { kind: 'hand' },
@@ -97,7 +97,7 @@ export const craft: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Withering',
+          name: 'Ill Omen',
           lines: [damageVsCursed(25), curseEffect(8)],
           at: [1219, -2450],
           why: 'The hexer’s payoff: more damage against the cursed (the Knife’s Rotting Word and Lingering Malice sell the damage over time close by).',

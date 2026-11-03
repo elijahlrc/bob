@@ -253,7 +253,7 @@ export const home: AreaSpec = {
     },
     {
       id: 'quartermaster',
-      name: 'Camp Stores',
+      name: 'Larder',
       why: "The flask layer near home, run through on the north path to the Cathedral seam (the centre pass: every start about six steps from its seams). Since the flask-lines pass (2026-11-01, F-flasks.md §3) the Wall's near flask stat is more maximum charges: the soldier who carries a deeper store, so a refill lasts longer without killing anything.",
       at: [-1701, 179],
       shape: { kind: 'hand' },
@@ -261,7 +261,7 @@ export const home: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Camp Stores',
+          name: 'Larder',
           lines: [flaskMaxCharges(24)],
           at: [-1677, 103],
           why: "The flask layer near home (renamed: Quartermaster is a stop). Since the flask-lines pass (2026-11-01) more maximum flask charges and nothing else of flask: 24/6 = 4 units, about Old Wounds (4.1) and Barrow Ward (4), the region's near regeneration notables. Its flask recovery and effect went (the Wall's near row is maximum charges only).",
@@ -271,7 +271,7 @@ export const home: AreaSpec = {
           kind: 'small',
           lines: [flaskMaxCharges(6)],
           at: [-1716, 256],
-          why: "Camp Stores' small, by its notable's stat since the flask-lines pass (2026-11-01): 1 unit.",
+          why: "Larder's small, by its notable's stat since the flask-lines pass (2026-11-01): 1 unit.",
         },
       ],
       links: [['b', 'n']],
@@ -279,7 +279,7 @@ export const home: AreaSpec = {
     {
       id: 'stoneHeart',
       name: 'Weak Spot',
-      why: "Melee crit, off the armour spoke's first junction: offence on the armour exit too. Since the revision (2026-10-31) it leads on by a mana-on-hit small into Iron Lungs: the striker who finds the gap and lives off his hits, a way from the spoke to the border road slower than the road round.",
+      why: "Melee crit, off the armour spoke's first junction: offence on the armour exit too. Since the revision (2026-10-31) it leads on by a mana-on-hit small into Deep Lungs: the striker who finds the gap and lives off his hits, a way from the spoke to the border road slower than the road round.",
       at: [-2202, 408],
       shape: { kind: 'hand' },
       nodes: [
@@ -297,7 +297,7 @@ export const home: AreaSpec = {
           kind: 'small',
           lines: [manaOnHit(4, ['melee'])],
           at: [-2160, 300],
-          why: "Weak Spot on into Iron Lungs (2026-10-31), by Iron Lungs' own small stat: one step dearer than the road from the spoke to the border road.",
+          why: "Weak Spot on into Deep Lungs (2026-10-31), by Deep Lungs' own small stat: one step dearer than the road from the spoke to the border road.",
         },
       ],
       links: [
@@ -391,7 +391,7 @@ export const home: AreaSpec = {
     {
       from: 'wall.home.stoneHeart.m',
       to: 'wall.resists.ironLungs.b',
-      why: 'Weak Spot on into Iron Lungs (2026-10-31). Who walks it: the melee crit striker who finds the gap and runs on the mana his hits give back, with cheaper blows.',
+      why: 'Weak Spot on into Deep Lungs (2026-10-31). Who walks it: the melee crit striker who finds the gap and runs on the mana his hits give back, with cheaper blows.',
     },
     {
       from: 'wall.home.seams.s',

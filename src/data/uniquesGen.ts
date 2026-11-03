@@ -507,7 +507,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   },
   {
     id: 'skinnersKnife',
-    name: "Skinner's Knife",
+    name: 'Thin Mercy',
     baseId: 'dagger_l30',
     level: 35,
     mods: [
@@ -7032,7 +7032,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   },
   {
     id: 'votiveHauberk',
-    name: 'Votive Hauberk',
+    name: 'Candlewound Mail',
     baseId: 'body_ares_l35',
     level: 35,
     mods: [
@@ -8775,7 +8775,7 @@ export const GENERATED_UNIQUES: UniqueDef[] = [
   },
   {
     id: 'duskSceptre',
-    name: 'Dusk Sceptre',
+    name: 'Long Dusk',
     baseId: 'sceptre_l50',
     level: 50,
     mods: [

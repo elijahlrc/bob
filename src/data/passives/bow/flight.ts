@@ -71,13 +71,13 @@ export const flight: AreaSpec = {
     },
     {
       id: 'closeQuarters',
-      name: 'Close Quarters',
+      name: "Arm's Length",
       why: 'The close-range keystone, a spur out from the mid ring at the axis, far from the long shot.',
       at: [2816, 1561],
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'small', lines: [projectileDamage(10)], at: [2777, 1545] },
-        { id: 'k', kind: 'keystone', name: 'Close Quarters', lines: [], at: [2855, 1577] },
+        { id: 'k', kind: 'keystone', name: "Arm's Length", lines: [], at: [2855, 1577] },
       ],
       links: [['a', 'k']],
     },

@@ -104,14 +104,14 @@ export const pyre: AreaSpec = {
     },
     {
       id: 'searingAvatar',
-      name: 'Searing Avatar',
+      name: 'One Flame',
       why: "Fire's keystone, a tip past the rim ring.",
       at: [-4106, -2183],
       shape: { kind: 'hand' },
       nodes: [
         { id: 'a', kind: 'small', lines: [eleDamage('fire', 10)], at: [-4050, -2145] },
         { id: 'b', kind: 'small', lines: [eleDamage('fire', 10)], at: [-4099, -2178] },
-        { id: 'k', kind: 'keystone', name: 'Searing Avatar', lines: [], at: [-4169, -2225] },
+        { id: 'k', kind: 'keystone', name: 'One Flame', lines: [], at: [-4169, -2225] },
       ],
       links: [
         ['a', 'b'],
@@ -144,7 +144,7 @@ export const pyre: AreaSpec = {
     {
       id: 'fireRule',
       name: 'Faith Aflame',
-      why: "Fire's rule: every hit, spell or attack, gains part of its physical damage as fire; the holy warrior's road to Searing Avatar: 2.7 + 1.2 units.",
+      why: "Fire's rule: every hit, spell or attack, gains part of its physical damage as fire; the holy warrior's road to One Flame: 2.7 + 1.2 units.",
       at: [-4166, -1685],
       shape: { kind: 'hand' },
       nodes: [
@@ -155,7 +155,7 @@ export const pyre: AreaSpec = {
           name: 'Faith Aflame',
           lines: [physGainFire(8), eleDamage('fire', 12)],
           at: [-4166, -1685],
-          why: "Fire's rule: every hit, spell or attack, gains part of its physical damage as fire; the holy warrior's road to Searing Avatar: 2.7 + 1.2 units.",
+          why: "Fire's rule: every hit, spell or attack, gains part of its physical damage as fire; the holy warrior's road to One Flame: 2.7 + 1.2 units.",
         },
       ],
       links: [['s1', 'n']],
@@ -179,7 +179,7 @@ export const pyre: AreaSpec = {
     {
       from: 'cathedral.pyre.fireRule.n',
       to: 'cathedral.pyre.searingAvatar.a',
-      why: "Faith Aflame leads on into fire's keystone (finalization, 2026-10-31): the holy warrior who turns his hits to fire walks from the rule to Searing Avatar without stepping back to the rim; beyond the rim, four steps between q4 and q5 against the rim's one (since the second thinning).",
+      why: "Faith Aflame leads on into fire's keystone (finalization, 2026-10-31): the holy warrior who turns his hits to fire walks from the rule to One Flame without stepping back to the rim; beyond the rim, four steps between q4 and q5 against the rim's one (since the second thinning).",
     },
   ],
 };

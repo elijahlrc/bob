@@ -346,7 +346,7 @@ export const well: AreaSpec = {
     {
       id: 'composure',
       name: 'Composure',
-      why: "Energy shield and casting through stuns, off the west spoke past the mid ring. Since the revision (2026-10-31) it is the west end of the mid floor, a way across the middle band from the west spoke to the east one beside the mid ring: Composure, Iron Litany, Slow Burn's small (a crossroads), Hail of Sparks and Wand Volley (finalization, 2026-10-31: the connecting shield and wand smalls went, and one stun small).",
+      why: "Energy shield and casting through stuns, off the west spoke past the mid ring. Since the revision (2026-10-31) it is the west end of the mid floor, a way across the middle band from the west spoke to the east one beside the mid ring: Composure, Taught by Blows, Slow Burn's small (a crossroads), Hail of Sparks and Wand Volley (finalization, 2026-10-31: the connecting shield and wand smalls went, and one stun small).",
       at: [-439, -3573],
       shape: { kind: 'hand' },
       nodes: [
@@ -363,7 +363,7 @@ export const well: AreaSpec = {
         {
           id: 'n2',
           kind: 'notable',
-          name: 'Iron Litany',
+          name: 'Taught by Blows',
           lines: [stunAvoid(30), spellDamageWhenHit(25), es(6)],
           at: [-180, -3520],
           why: "Being hit feeds the casting. On the mid floor, reached straight from Slow Burn's crossroads without taking Composure: the caster who stands in the press.",
@@ -459,7 +459,7 @@ export const well: AreaSpec = {
     {
       from: 'spire.well.composure.n2',
       to: 'spire.column.lingering.a',
-      why: "The mid floor (the revision, 2026-10-31): Iron Litany into Slow Burn's small, the floor's crossroads, and on east to the wand rooms. Walked by the caster who stands in the press and burns or chills what crowds in (Iron Litany, then Slow Burn), and by the wand attacker who wants to stand through stuns (on to Hail of Sparks). Since finalization the floor's shield small is gone: Iron Litany meets the crossroads itself.",
+      why: "The mid floor (the revision, 2026-10-31): Taught by Blows into Slow Burn's small, the floor's crossroads, and on east to the wand rooms. Walked by the caster who stands in the press and burns or chills what crowds in (Taught by Blows, then Slow Burn), and by the wand attacker who wants to stand through stuns (on to Hail of Sparks). Since finalization the floor's shield small is gone: Taught by Blows meets the crossroads itself.",
     },
     {
       from: 'spire.well.kindle.n',

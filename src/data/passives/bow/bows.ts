@@ -144,7 +144,7 @@ export const bows: AreaSpec = {
     },
     {
       id: 'ricochet',
-      name: 'Ricochet',
+      name: 'Skipping Stone',
       why: 'Chain, off the north spoke past the mid ring.',
       at: [3540, 656],
       shape: { kind: 'hand' },
@@ -153,7 +153,7 @@ export const bows: AreaSpec = {
         {
           id: 'n',
           kind: 'notable',
-          name: 'Ricochet',
+          name: 'Skipping Stone',
           lines: [chain(1), projectileSpeed(5)],
           at: [3511, 635],
           why: '4 + 0.5 units: a chain is worth a notable on its own.',
@@ -245,7 +245,7 @@ export const bows: AreaSpec = {
     {
       from: 'bow.bows.longbow.n1',
       to: 'bow.bows.ricochet.n',
-      why: 'Longbow and Ricochet joined: the bow user who clears packs wants bow speed and chaining arrows; dearer than the roads.',
+      why: 'Longbow and Skipping Stone joined: the bow user who clears packs wants bow speed and chaining arrows; dearer than the roads.',
     },
   ],
 };

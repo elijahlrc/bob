@@ -227,7 +227,7 @@ export const lychway: AreaSpec = {
           name: 'Sacristy',
           lines: [flaskMaxCharges(18), flaskManaRecovery(20)],
           at: [-3480, -2930],
-          why: "Where the vessels are kept (the flask-lines pass, 2026-11-01; the Cathedral's further flask stat, step 11): more maximum charges for every flask, so a refill lasts longer without a kill, and more mana from each mana flask, the caster's half: 18/6 + 20/15 = 3 + 1.3 = 4.3 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3, Chorus 4). Unlike the Wall's Camp Stores (maximum charges alone, near its start), it is the mana caster's store, far out beside Vespers. Flask only.",
+          why: "Where the vessels are kept (the flask-lines pass, 2026-11-01; the Cathedral's further flask stat, step 11): more maximum charges for every flask, so a refill lasts longer without a kill, and more mana from each mana flask, the caster's half: 18/6 + 20/15 = 3 + 1.3 = 4.3 units, about the region's regeneration notables (Vigil 5, Reliquary 4.3, Chorus 4). Unlike the Wall's Larder (maximum charges alone, near its start), it is the mana caster's store, far out beside Vespers. Flask only.",
         },
       ],
       links: [
