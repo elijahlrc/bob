@@ -9,7 +9,8 @@ const DETERMINISTIC = HEADLESS;
 
 export default defineConfig(
   // scripts/passives/rework: the one-off drafting scripts of the tree rework (docs/tree/design/), kept as a record.
-  globalIgnores(['dist', 'coverage', 'reference', 'scripts/passives/rework']),
+  // .claude/worktrees: other branches checked out by agents, each with its own config.
+  globalIgnores(['dist', 'coverage', 'reference', 'scripts/passives/rework', '.claude/worktrees']),
   js.configs.recommended,
   tseslint.configs.recommended,
   {
