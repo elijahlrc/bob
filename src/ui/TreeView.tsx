@@ -89,9 +89,6 @@ function short(line: string): string {
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /** Mods that differ only in value, summed, then written out: what the passives give in all. */
-function totals(nodes: TreeNode[]): string[] {
-  return totalsOf(nodes.flatMap((n) => n.mods));
-}
 function totalsOf(mods: readonly Mod[]): string[] {
   const sum = new Map<string, Mod>();
   for (const m of mods) {
