@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { MonsterSpec } from '../calc/monster';
 import type { MonsterTypeId } from '../data/monsters';
+import { MONSTER_ATTACK_SPEED } from '../data/constants';
 import { makeGem, makeItem } from '../gen/items';
 import { newRun } from '../run/run';
 import { startAction } from './actions';
@@ -69,8 +70,8 @@ describe('attack shapes (docs/ROSTER.md section 5)', () => {
       true,
     );
     expect(inTelegraph(t, m.x + 2, m.y, 0.3)).toBe(false);
-    // The aim is still following the character 0.3 s in, and fixed by 0.7 s (a lock at 0.3 of a 1.14 s wind-up).
-    for (let i = 0; i < 24; i++) stepWorld(w);
+    // The aim locks at 0.3 of the wind-up (1.14 s at the type's own speed, longer at MONSTER_ATTACK_SPEED): step past it.
+    for (let i = 0; i < Math.ceil(24 / MONSTER_ATTACK_SPEED); i++) stepWorld(w);
     const locked = telegraphs(w)[0];
     expect(locked.kind).toBe('arc');
     if (locked.kind !== 'arc') return;

@@ -11,8 +11,11 @@ import { newRun } from './run';
 
 const starter = (cls: string, seed = 1): Build => newRun(cls, seed).build;
 
-/** The rules of F4 (no reprieves, no life curve, 90 s): two level 1 starters take minutes to go through four lives each. */
-const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 90 };
+/**
+ * The rules of F4 (no reprieves, no life curve), with a 200 s cap: two level 1 starters take minutes to go through four lives
+ * each, and since kills stopped refilling the flasks (docs/ATTRITION.md) their flasks alone hold out about 90 s.
+ */
+const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 200 };
 
 /** A controller at camp with a run, as the Debug panel finds it. */
 function atCamp(): Controller {

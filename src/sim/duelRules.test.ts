@@ -28,10 +28,11 @@ import { stepWorld } from './world';
  */
 
 /**
- * The rules of F4, before docs/DUEL-BALANCE.md: no reprieves, no life curve, a 90 s cap. Two level 1 starters with no gems take
+ * The rules of F4, before docs/DUEL-BALANCE.md: no reprieves, no life curve, a 200 s cap (90 s until kills stopped refilling the
+ * flasks, docs/ATTRITION.md: a starter's flasks alone now hold out about that long). Two level 1 starters with no gems take
  * minutes to go through four lives each, so the tests of how a fight works (not of the balance) play by these.
  */
-const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 90 };
+const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 200 };
 
 const vanguard = (seed = 1): Build => newRun('vanguard', seed).build;
 const skeletons = (): Build => buildForActive(activeGem('callBonewalkers'));
@@ -469,7 +470,11 @@ describe('what a character goes for', () => {
     const w = createDuelWorld(a, skeletons(), 1);
     const [sa, sb] = w.sides;
     expect(sa.flasks.length).toBeGreaterThan(0);
-    for (const f of sa.flasks) f.charges = 0;
+    // Kills give no charges of their own (docs/ATTRITION.md): a flask that gains them for a kill shows the minion's counts.
+    for (const f of sa.flasks) {
+      f.charges = 0;
+      f.spec = { ...f.spec, chargesPerKill: 1 };
+    }
     sa.player.life = 100;
     const theirs = minionOf(w, sb, 'callBonewalkers', sb.player.x - 3, sb.player.y);
     rawHit(w, theirs, 1e9, 0, sa, 'Test');

@@ -243,6 +243,7 @@ function cleansingFlask(): World['sides'][number]['flasks'][number] {
     duration: 4,
     maxCharges: 50,
     perUse: 10,
+    chargesPerKill: 0,
     instant: false,
     buff: [],
     removeIgnite: true,

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { themeDef, themesFor } from '../data/themes';
 import { chalkAdd, chalkOptions } from './craft';
-import { fullVitals, type Vitals } from '../sim/types';
+import { fullVitals } from '../sim/types';
 import { roomsForMap, resistPenaltyForMap } from '../gen/mapPlan';
 import { runMap } from '../sim/runMap';
-import { isHurt, makeOffer, OFFERS_PER_SET, OFFSETS, OFFSETS_FROM_MAP, rollOffers } from './offers';
+import { makeOffer, OFFERS_PER_SET, OFFSETS, OFFSETS_FROM_MAP, rollOffers } from './offers';
 import { finishMap, mapSeed, newRun, planFor, setMap, stash, worldOptsFor } from './run';
 import { loadRun, MemoryStore, saveRun } from './save';
 import type { MapResult } from '../sim/runMap';
@@ -29,14 +29,14 @@ const cleared = (level: number): MapResult => ({
 
 describe('map offers (docs/MAPS.md section 4)', () => {
   it('a level offers three maps with three different themes that exist at that level', () => {
-    // (A boss map has a single offer: docs/BOSSES.md 10. A stop takes a map's place on the levels the schedule gives one.)
+    // (A boss map has a single offer: docs/BOSSES.md 10. A stop or a Respite takes a map's place on the levels that have one.)
     for (const map of [1, 4, 8, 15, 25, 41, 61, 99]) {
       for (let seed = 1; seed <= 10; seed++) {
         const offers = rollOffers(seed, map);
         expect(offers).toHaveLength(OFFERS_PER_SET);
         const themes = offers.filter((o) => o.kind === 'map').map((o) => o.themeId);
-        const stops = offers.filter((o) => o.kind === 'stop').length;
-        expect(new Set(themes).size, `${seed}/${map}`).toBe(OFFERS_PER_SET - stops);
+        const others = offers.filter((o) => o.kind !== 'map').length;
+        expect(new Set(themes).size, `${seed}/${map}`).toBe(OFFERS_PER_SET - others);
         const allowed = new Set(themesFor(map).map((t) => t.id));
         for (const id of themes) expect(allowed.has(id), id).toBe(true);
         for (const o of offers.filter((x) => x.kind === 'map'))
@@ -62,26 +62,6 @@ describe('map offers (docs/MAPS.md section 4)', () => {
     // At map 100 a raised offer clamps to 100 itself.
     for (let seed = 1; seed <= 200; seed++)
       for (const o of rollOffers(seed, 100)) expect(o.areaLevel).toBeLessThanOrEqual(100);
-  });
-
-  it('a hurt character sees lower maps more often', () => {
-    const count = (vitals: Vitals) => {
-      let lower = 0;
-      let sets = 0;
-      for (let seed = 1; seed <= 400; seed++) {
-        // Map 25: three offers (a tenth map is a boss's, and has one). A Respite may take a slot now and then for a character
-        // below 90%, as on any map; the sets are still counted over the maps that are left.
-        const offers = rollOffers(seed, 25, vitals);
-        sets++;
-        if (offers.some((o) => o.offset < 0)) lower++;
-      }
-      return { lower: lower / sets };
-    };
-    const well = count(fullVitals());
-    const hurt = count({ ...fullVitals(), life: 0.5 });
-    expect(hurt.lower).toBeGreaterThan(well.lower);
-    expect(isHurt({ ...fullVitals(), flasks: { 4: 0.2 } })).toBe(true);
-    expect(isHurt(fullVitals())).toBe(false);
   });
 
   it('the plan follows the offer: monsters and loot at its level, everything else at the map number', () => {

@@ -916,7 +916,7 @@ describe('a boss map at camp (docs/BOSSES.md 10)', () => {
   it('is the one offer of its level, at its own level, with no Respite and no map type', async () => {
     const { rollOffers } = await import('../run/offers');
     for (const id of BOSS_IDS) {
-      const offers = rollOffers(5, BOSSES[id].map, { life: 0.2, mana: 0.2, es: 0.2, flasks: {} });
+      const offers = rollOffers(5, BOSSES[id].map);
       expect(offers).toHaveLength(1);
       expect(offers[0].kind).toBe('map');
       expect(offers[0].type).toBe('plain');

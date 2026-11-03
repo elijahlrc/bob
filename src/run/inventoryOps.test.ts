@@ -105,9 +105,11 @@ describe('a flask that upgrades a worn one is an upgrade', () => {
     expect(itemInfos(run).get(high.uid)!.flaskSlot).toBeUndefined();
   });
 
-  it('a plain Equip puts it in the slot it upgrades', () => {
+  it('a plain Equip puts it in place of the worn flask with the least recovery left', () => {
     const { run, uid } = setup();
-    wear(run, makeFlask(uid, 'flask_life_l12', 20), makeFlask(uid, 'flask_life_l3', 20));
+    const low = makeFlask(uid, 'flask_life_l3', 20);
+    wear(run, makeFlask(uid, 'flask_life_l12', 20), low);
+    run.vitals.flasks[low.uid] = 0;
     const f = makeFlask(uid, 'flask_life_l6', 20);
     run.inventory.push(f);
     expect(quickEquip(run, f.uid)).toMatchObject({ ok: true, flask: 1 });

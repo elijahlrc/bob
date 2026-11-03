@@ -8,7 +8,8 @@ const HEADLESS = ['src/{core,data,mods,calc,gen,sim,run}/**/*.{ts,tsx}'];
 const DETERMINISTIC = HEADLESS;
 
 export default defineConfig(
-  globalIgnores(['dist', 'coverage', 'reference']),
+  // scripts/passives/rework: the one-off drafting scripts of the tree rework (docs/tree/design/), kept as a record.
+  globalIgnores(['dist', 'coverage', 'reference', 'scripts/passives/rework']),
   js.configs.recommended,
   tseslint.configs.recommended,
   {

@@ -15,6 +15,9 @@ import { attackHitChance, mitigate, resolveHit } from './combat';
 import { distanceMult } from './skill';
 import { Rng } from '../core/rng';
 
+/** Keystones defined but no longer on the tree (docs/tree/design/CONSTRAINTS.md: the Shade's start reworked). */
+const OFF_TREE = ['hollowVessel', 'livingWard'];
+
 function ksNode(id: string): number {
   const name = KEYSTONES.find((k) => k.id === id)!.name;
   return getTree().nodes.find((n) => n.kind === 'keystone' && n.name === name)!.id;
@@ -33,7 +36,14 @@ function build(classId: string, keystones: string[], gems?: string[], main?: str
     b.equipment.body = body;
     b.primaryGem = body.sockets[0]!.uid;
   }
-  b.allocated = keystones.map(ksNode);
+  b.allocated = keystones.filter((k) => !OFF_TREE.includes(k)).map(ksNode);
+  // A keystone off the tree is given by the body armour instead, so that what it does is still tested.
+  const off = keystones.filter((k) => OFF_TREE.includes(k));
+  if (off.length) {
+    const body = b.equipment.body ?? makeItem(uid, 'body_ar_1', 40, 1);
+    const mods = off.flatMap((k) => KEYSTONES.find((x) => x.id === k)!.mods);
+    b.equipment.body = { ...body, uniqueMods: [...(body.uniqueMods ?? []), ...mods] };
+  }
   return b;
 }
 
@@ -43,8 +53,9 @@ const both = (classId: string, ks: string, gems?: string[], main?: string) => ({
 });
 
 describe('keystones (§9.4) — every one has an effect', () => {
-  it('all 21 keystones are in the tree', () => {
-    for (const k of KEYSTONES) expect(ksNode(k.id)).toBeGreaterThanOrEqual(0);
+  it('every keystone but the retired ones is in the tree', () => {
+    for (const k of KEYSTONES)
+      if (!OFF_TREE.includes(k.id)) expect(ksNode(k.id)).toBeGreaterThanOrEqual(0);
   });
 
   it('Unerring Discipline: attacks always hit and never crit', () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { MONSTER_ATTACK_SPEED } from '../data/constants';
 import type { MonsterSpec } from '../calc/monster';
 import type { MonsterTypeId } from '../data/monsters';
 import { makeGem, makeItem } from '../gen/items';
@@ -73,12 +74,15 @@ describe('the Emberborn in play', () => {
     const w = arena();
     put(w, 'pyrepriest', 7);
     let ring = false;
-    for (let i = 0; i < 6 * 60; i++) {
+    let burning = false;
+    // Six seconds at the type's own cast speed, longer at MONSTER_ATTACK_SPEED.
+    for (let i = 0; i < (6 * 60) / MONSTER_ATTACK_SPEED; i++) {
       stepWorld(w);
       if (telegraphs(w).some((t) => t.kind === 'ring')) ring = true;
+      if (ring && w.effects.some((e) => e.kind === 'burning')) burning = true;
     }
     expect(ring).toBe(true);
-    expect(w.effects.some((e) => e.kind === 'burning')).toBe(true);
+    expect(burning).toBe(true);
   });
 
   it('a Slagworm dives and comes up in a ring of fire', () => {

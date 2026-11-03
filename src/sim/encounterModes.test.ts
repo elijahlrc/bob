@@ -98,9 +98,15 @@ describe('windows and modes (docs/ENCOUNTERS.md 5 and 6)', () => {
     expect(m.enc!.plates).toBe(0);
     expect(m.enc!.vulnT).toBeGreaterThan(0);
     const before = m.life;
-    strike(w, m, [100, 0, 0, 0, 0]);
-    // The damage is given after mitigation: 100 becomes more.
-    expect(before - m.life).toBeGreaterThan(100);
+    strike(w, m, [40, 0, 0, 0, 0]);
+    // Against one whose guard stands but whose plates are spent, the same hit (small enough to pass under its carapace).
+    const w2 = arena();
+    const plain = put(w2, 'sentinel', 12);
+    steps(w2, 1);
+    plain.enc!.plates = 0;
+    const plainBefore = plain.life;
+    strike(w2, plain, [40, 0, 0, 0, 0]);
+    expect((before - m.life) / (plainBefore - plain.life)).toBeCloseTo(1.5, 5);
   });
 
   it('a Gloomstalker hurt for a quarter of its life fades out of reach, then comes back behind the character', () => {

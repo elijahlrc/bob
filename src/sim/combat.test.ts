@@ -135,13 +135,16 @@ describe('§6.9 flask policy', () => {
   it('uses a life flask below 50% life and queues recovery over its duration', () => {
     const { w, run } = world();
     const uid = () => run.nextUid++;
-    w.sides[0].build.flasks = [makeFlask(uid, 'flask_life_1', 1), null, null, null, null];
+    const worn = makeFlask(uid, 'flask_life_1', 1);
+    w.sides[0].build.flasks = [worn, null, null, null, null];
+    // The policy finds a flask's belt slot (and the slot's threshold) by its uid.
+    w.sides[0].char.build.flasks = w.sides[0].build.flasks;
     // Rebuild flask state from the character.
     w.sides[0].flasks = [
       {
         spec: {
           ...w.sides[0].char.flasks[0],
-          uid: 1,
+          uid: worn.uid,
           kind: 'life',
           life: 70,
           duration: 4,

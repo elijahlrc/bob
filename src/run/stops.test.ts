@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { HOARD_TAKE, STOP_FROM } from '../data/stops';
+import { HOARD_TAKE, STOP_FROM, STOPS, type StopId } from '../data/stops';
 import type { Item } from '../data/types';
 import { botRun } from './bot';
 import { botStopChoice } from './botStop';
-import { rollOffers, stopAt, stopLevels } from './offers';
+import { makeStop, respiteSlot, rollOffers, stopAt } from './offers';
 import { newRun, setMap, type RunState } from './run';
 import { awlsmithCost, awlsmithItems, hoardGems, hoardKinds, stopProblem, takeStop } from './stops';
 import { waysideOf } from './wayside';
 
-/** A run standing at the first level where the schedule puts the given stop (or any stop). */
-function atStop(seed: number, want?: string): { run: RunState; slot: number } {
+/**
+ * A run standing at the first level where the schedule puts the given stop (or any stop). A stop no longer scheduled (the
+ * Awlsmith) is put in the second slot of the first level that may hold one, as an older save may hold it.
+ */
+function atStop(seed: number, want?: StopId): { run: RunState; slot: number } {
   for (let map = STOP_FROM; map < 100; map++) {
     const s = stopAt(seed, map);
     if (!s || (want && s !== want)) continue;
@@ -17,11 +20,15 @@ function atStop(seed: number, want?: string): { run: RunState; slot: number } {
     setMap(run, map);
     return { run, slot: run.offers.findIndex((o) => o.kind === 'stop') };
   }
-  throw new Error('no such stop');
+  if (!want || STOPS.find((s) => s.id === want)!.weight > 0) throw new Error('no such stop');
+  const run = newRun('vanguard', seed);
+  setMap(run, STOP_FROM);
+  run.offers[1] = makeStop(STOP_FROM, 1, want);
+  return { run, slot: 1 };
 }
 
 describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
-  it('puts the stops of each window where stopAt finds them, never on a fifth or tenth level, before STOP_FROM or on two levels in a row', () => {
+  it('never puts a stop on a fifth or tenth level, before STOP_FROM or on two levels in a row', () => {
     for (const seed of [1, 2, 3, 77, 1234]) {
       const at: number[] = [];
       for (let map = 1; map <= 100; map++) if (stopAt(seed, map)) at.push(map);
@@ -30,7 +37,6 @@ describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
         expect(m % 5).not.toBe(0);
       }
       for (let i = 1; i < at.length; i++) expect(at[i] - at[i - 1]).toBeGreaterThan(1);
-      for (let w = 0; w < 18; w++) for (const l of stopLevels(seed, w)) expect(at).toContain(l);
     }
   });
 
@@ -57,12 +63,11 @@ describe('a stop in a set of offers', () => {
     }
   });
 
-  it('does not take the slot of a forced Respite', () => {
+  it('does not take the slot of a Respite', () => {
     for (const seed of [1, 2, 3, 4, 5, 6]) {
       for (let map = STOP_FROM; map < 100; map++) {
-        if (!stopAt(seed, map)) continue;
-        const hurt = { life: 0.2, mana: 1, es: 1, flasks: {} };
-        const offers = rollOffers(seed, map, hurt);
+        if (!stopAt(seed, map) || respiteSlot(seed, map) < 0) continue;
+        const offers = rollOffers(seed, map);
         expect(offers.filter((o) => o.kind === 'respite')).toHaveLength(1);
         expect(offers.filter((o) => o.kind === 'stop')).toHaveLength(1);
         expect(offers[0].kind).toBe('map');
@@ -159,7 +164,7 @@ describe('the Gem Hoard', () => {
 describe('the bot at a stop', () => {
   it('has something valid to do at each stop', () => {
     for (const seed of [11, 12, 13]) {
-      for (const want of ['awlsmith', 'gemHoard']) {
+      for (const want of ['awlsmith', 'gemHoard'] as const) {
         const { run, slot } = atStop(seed, want);
         const choice = botStopChoice(run, slot);
         expect(choice).not.toBeNull();

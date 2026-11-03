@@ -141,7 +141,9 @@ describe('the second wave of affixes (docs/MAPS.md 6.2)', () => {
     expect(at('sundered').defence().armour).toBeLessThan(d.armour);
     expect(at('sundered').defence().evasion).toBeLessThan(d.evasion);
     expect(at('stifled').db.mult('aoe')).toBeLessThan(plain.db.mult('aoe'));
-    expect(at('dry').db.mult('flaskCharges')).toBeLessThan(plain.db.mult('flaskCharges'));
+    expect(at('dry').db.sum('base', 'flaskChargesUsed')).toBeLessThan(
+      plain.db.sum('base', 'flaskChargesUsed'),
+    );
     expect(d.blockAttack).toBeGreaterThan(0);
     expect(at('unguarded').defence().blockAttack).toBeLessThan(d.blockAttack);
   });

@@ -33,7 +33,9 @@ describe('stat text', () => {
         !GENERATED.test(s) &&
         s !== 'damage' &&
         s !== 'damage.min' &&
-        s !== 'damage.max',
+        s !== 'damage.max' &&
+        // Worded by modText itself (a hundredth of a charge per point).
+        s !== 'flask.chargesPerKill',
     );
     expect(missing).toEqual([]);
   });

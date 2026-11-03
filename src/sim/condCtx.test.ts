@@ -70,12 +70,12 @@ describe('conditional mods are seen by the sim', () => {
     f.spec = { ...f.spec, maxCharges: 100 };
     f.charges = 0;
     f.activeT = 0;
+    // Kills give no charges of their own (docs/ATTRITION.md): 100% "increased" is a flat charge a kill, here only while a flask runs.
     kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
-    const plain = f.charges;
-    f.charges = 0;
+    expect(f.charges).toBeCloseTo(0, 5);
     f.activeT = 10;
     kill(w, w.sides[0].player.x + 3, w.sides[0].player.y);
-    expect(f.charges).toBeCloseTo(plain * 2, 5);
+    expect(f.charges).toBeCloseTo(1, 5);
   });
 
   it('life on kill per charge held counts the charges the character holds', () => {

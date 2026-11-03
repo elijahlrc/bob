@@ -34,7 +34,7 @@ describe('the Shrine', () => {
     expect(run.map).toBe(13);
   });
 
-  it("is ended by the next stop, and replaced by the next Shrine's", () => {
+  it("lasts through another stop, and is replaced by the next Shrine's", () => {
     const { run, slot } = withStop('shrine', 12);
     const first = shrineBlessings(run, run.offers[slot])[0];
     takeStop(run, slot, { stop: 'shrine', blessing: first });
@@ -43,7 +43,7 @@ describe('the Shrine', () => {
     expect(takeStop(run, 1, { stop: 'awlsmith', itemUid: run.build.equipment.body!.uid }).ok).toBe(
       true,
     );
-    expect(waysideOf(run).blessing).toBeNull();
+    expect(waysideOf(run).blessing).toBe(first);
     run.offers[1] = makeStop(run.map, 1, 'shrine');
     const next = shrineBlessings(run, run.offers[1])[0];
     takeStop(run, 1, { stop: 'shrine', blessing: next });

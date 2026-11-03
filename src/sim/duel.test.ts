@@ -25,10 +25,11 @@ import type { World } from './types';
 import { spawnMonster, stepWorld } from './world';
 
 /**
- * The rules of F4, before docs/DUEL-BALANCE.md: no reprieves, no life curve, a 90 s cap. Two level 1 starters with no gems take
+ * The rules of F4, before docs/DUEL-BALANCE.md: no reprieves, no life curve, a 200 s cap (90 s until kills stopped refilling the
+ * flasks, docs/ATTRITION.md: a starter's flasks alone now hold out about that long). Two level 1 starters with no gems take
  * minutes to go through four lives each, so the tests of how a fight works (not of the balance) play by these.
  */
-const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 90 };
+const F4: DuelOpts = { reprieves: 0, lifeCurve: false, maxTime: 200 };
 
 /**
  * Duels (docs/DUEL.md 8.2): asymmetric by design. Every kit is given to one side only and the effect is looked for on the right
@@ -185,9 +186,11 @@ describe('a duel of two starters', () => {
     strong.level = 30;
     const r = runDuel(strong, vanguard(2), 1, F4);
     expect(r.winner).toBe(0);
-    // Far easier than an even fight: the higher level has more life, and its gems are stronger.
+    // Easier than an even fight: the higher level has more life, and its gems are stronger. (Not by as much as before the flask
+    // scarcity: the weaker side's bigger flasks hold out for most of the fight whoever it faces.)
     const even = runDuel(vanguard(1), vanguard(2), 1, F4);
-    expect(r.sides[0].lifeLeft).toBeGreaterThan(even.sides[even.winner!].lifeLeft + 0.4);
+    expect(r.sides[0].lifeLeft).toBeGreaterThan(even.sides[even.winner!].lifeLeft + 0.15);
+    expect(r.time).toBeLessThan(even.time);
   });
 });
 
@@ -608,9 +611,10 @@ describe('the events of a duel say whose they are', () => {
   });
 
   it('a fall is the faller’s: `src` of playerDied is the character that died', () => {
-    // One side starts on its last point of life: two new characters with the reference game's weapons outlast each other's flasks.
+    // One side starts on its last point of life with its flasks empty: two new characters outlast each other's flasks.
     const { w, all } = events(vanguard(1), vanguard(2), 1, (w) => {
       w.sides[1].player.life = 1;
+      for (const f of w.sides[1].flasks) f.charges = 0;
     });
     const dead = w.sides.filter((s) => !s.player.alive);
     expect(dead.length).toBeGreaterThan(0);

@@ -18,6 +18,8 @@ function withFlask(id: string) {
   const b = run.build;
   b.level = 60;
   b.flasks = [null, null, makeFlask(uid, id, 60), null, null];
+  // A utility flask is kept for bosses unless told otherwise: these face a rare.
+  b.strategy = { ...b.strategy, utilityFlask: 'rares' };
   return b;
 }
 
