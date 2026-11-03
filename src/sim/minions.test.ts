@@ -170,7 +170,9 @@ describe('mortal minions', () => {
     keep.speed = 0;
     w.sides[0].player.x = 8.5;
     w.sides[0].player.y = 15.5;
-    monsterAt(w, 'warrior', 14.5, 15.5);
+    // At a slow monster's pace: a fast one shoves the minion out of the corridor (docs/MONSTER-SPEED.md).
+    const m = monsterAt(w, 'warrior', 14.5, 15.5);
+    m.def = { ...m.def, moveSpeed: 3 };
     w.sides[0].player.life = w.sides[0].player.def.maxLife;
     run(w, 6, () => keep.life < keep.def.maxLife || !keep.alive);
     expect(keep.life < keep.def.maxLife || !keep.alive).toBe(true);

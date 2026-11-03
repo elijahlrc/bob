@@ -1,8 +1,8 @@
 /**
  * Archetypes (docs/ROSTER.md 6.1): a bundle of a combat role's stats, defence lean, movement and engagement. A monster type
  * is one archetype plus its deviations, and a faction's variety is the spread of archetypes it fields. The numbers are the
- * envelope a type of the archetype lies in (its toughness, damage, speed and reach); a data test keeps every type inside
- * its own, so the roster cannot drift into sixteen names for the same monster.
+ * envelope a type of the archetype was written in (its toughness, damage, speed and reach): a description of the role, not
+ * a limit, so a type may be tuned outside it (the owner, 2026-11-03).
  */
 export type ArchetypeId =
   | 'brawler'

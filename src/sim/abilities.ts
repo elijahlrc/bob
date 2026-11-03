@@ -172,16 +172,14 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
     openZone(w, m.x, m.y, ab.range!, ab.amount!, 'burning', monsterHitOf(m) * 0.3);
   },
   devour({ w, m, dt, ab }) {
-    // Eats a body within reach, and is the better for it. It looks twice a second, and eats once in its interval; the first
-    // meal does not wait out the delay every monster starts with.
-    if (m.skillT > ab.interval!) m.skillT = 0.4;
+    // Eats a body within reach, and is the better for it. Hungry, it looks every tick, so a fast one does not run past a
+    // meal (the owner, 2026-11-03); it eats once in its interval, and the first meal does not wait out the delay every
+    // monster starts with.
+    if (m.skillT > ab.interval!) m.skillT = 0;
     m.skillT -= dt;
     if (m.skillT > 0) return;
     const c = w.corpses.find((o) => Math.hypot(o.x - m.x, o.y - m.y) <= ab.range!);
-    if (!c) {
-      m.skillT = 0.5;
-      return;
-    }
+    if (!c) return;
     w.corpses.splice(w.corpses.indexOf(c), 1);
     m.life = Math.min(m.def.maxLife, m.life + m.def.maxLife * ab.amount!);
     m.skillT = ab.interval!;

@@ -149,16 +149,19 @@ describe('the Tollkeeper (docs/BOSSES.md 4)', () => {
     w.sides[0].player.stunT = 1e9;
     const m = putBoss(w, 'tollkeeper', 5, 0, 10);
     const fresh = bossDamageMult(m);
-    run(w, TOLL_EVERY + TOLL_TELL + 2);
     const st = bossState(m)!;
+    let first = -1;
+    for (let i = 0; i < 60 * (TOLL_EVERY + TOLL_TELL + 2); i++) {
+      stepWorld(w);
+      if (first < 0 && st.tolls === 1) first = w.t;
+    }
     expect(st.tolls).toBe(1);
     expect(bossDamageMult(m)).toBeGreaterThan(fresh);
     expect(w.effects.some((e) => e.label === 'Toll' && e.shape === 'donut')).toBe(true);
-    // The next comes ten seconds of its clock later, and the swing takes its own time (a blow in hand finishes first).
-    let n = 0;
-    for (; n < 60 * (TOLL_EVERY + TOLL_TELL + 2) && st.tolls < 2; n++) stepWorld(w);
+    // The next comes a full clock and a tell after the first (and later still when a blow in hand finishes first).
+    for (let n = 0; n < 60 * (TOLL_EVERY + TOLL_TELL + 2) && st.tolls < 2; n++) stepWorld(w);
     expect(st.tolls).toBe(2);
-    expect(n / 60).toBeGreaterThan(TOLL_EVERY + TOLL_TELL - 1);
+    expect(w.t - first).toBeGreaterThan(TOLL_EVERY + TOLL_TELL - 0.1);
   });
 
   it('a stun in the swing cancels the toll', () => {

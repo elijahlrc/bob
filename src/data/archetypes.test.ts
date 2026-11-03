@@ -1,37 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { buildMonster, type MonsterSpec } from '../calc/monster';
 import { durabilityTable, meanDurability } from '../calc/matrix';
-import { ARCHETYPES } from './archetypes';
 import { profileOf } from './defence';
 import { MONSTER_TYPES, type MonsterTypeId } from './monsters';
 
-// The bosses are not pack monsters and keep no archetype's envelope (docs/BOSSES.md): their cards are their own.
+// The bosses are not pack monsters (docs/BOSSES.md): their defences are their own.
 const TYPES = (Object.keys(MONSTER_TYPES) as MonsterTypeId[]).filter(
   (id) => !MONSTER_TYPES[id].bossOnly,
 );
-const inside = (v: number, r: readonly [number, number]) => v >= r[0] - 1e-9 && v <= r[1] + 1e-9;
 const spec = (type: MonsterTypeId, level = 30): MonsterSpec => ({
   type,
   variant: 'none',
   rarity: 'normal',
   level,
   mods: [],
-});
-
-describe('archetypes (docs/ROSTER.md 6.1)', () => {
-  it('every type has one, and lies inside its envelope of toughness, damage, speed and reach', () => {
-    for (const id of TYPES) {
-      const t = MONSTER_TYPES[id];
-      const a = ARCHETYPES[t.archetype];
-      expect(a, id).toBeDefined();
-      expect(inside(t.lifeMult, a.toughness), `${id} toughness ${t.lifeMult} in ${a.name}`).toBe(
-        true,
-      );
-      expect(inside(t.dmgMult, a.damage), `${id} damage ${t.dmgMult} in ${a.name}`).toBe(true);
-      expect(inside(t.speed, a.speed), `${id} speed ${t.speed} in ${a.name}`).toBe(true);
-      expect(inside(t.range, a.reach), `${id} reach ${t.range} in ${a.name}`).toBe(true);
-    }
-  });
 });
 
 describe('defence profiles and the build matrix (docs/ROSTER.md 6.2)', () => {
