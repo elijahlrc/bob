@@ -34,6 +34,13 @@ Loose ends to come back to. Plans with milestones live in `docs/`; this is the s
   (`src/ui/leaf/painter.ts`, kept between sessions) by palette; add a setting. Item rarity and damage-type colours are
   the bulk of the cleanup. The base theme (backgrounds, gold, text) swaps cheaply.
 
+## Passive tree
+
+- **Rework the Shade's start** (the Knife region, `src/data/passives/knife/`; asked 2026-10-28). Too many weapon-specific
+  nodes sit near the start, so a Shade build has to pick a weapon type early. Specialising in a weapon should come later
+  in a build's progression; the first points should serve any weapon. Follow docs/tree/design/PHILOSOPHY.md, and after the
+  change run `npm run passives:bake` (and bump the save version with a refund if nodes in deployed saves move).
+
 ## Meta progression
 
 - **A winner's heirloom** (asked 2026-10-26). A save that wins its run passes one item on to a future character, as a
