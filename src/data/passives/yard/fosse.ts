@@ -37,6 +37,7 @@ import {
   twoHandDamage,
   warcryDuration,
   warcryEffect,
+  replenishWindow,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -385,9 +386,9 @@ export const fosse: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Red Thirst',
-          lines: [damageWhileLeeching(30), leechLife(0.5)],
+          lines: [damageWhileLeeching(30), leechLife(0.5), replenishWindow(20)],
           at: [934, 3928],
-          why: 'Damage while leeching, by Bloodied Edge, far from Red Harvest.',
+          why: 'Damage while leeching, by Bloodied Edge, far from Red Harvest. A longer window keeps the bonus up between hits taken (2026-11-03).',
         },
       ],
       links: [['s1', 'n']],

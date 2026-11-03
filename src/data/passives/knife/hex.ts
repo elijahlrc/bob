@@ -26,6 +26,8 @@ import {
   skillDuration,
   speedWhileLeeching,
   spellDamage,
+  replenishShare,
+  replenishWindow,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -143,8 +145,15 @@ export const hex: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Bloodletter',
-          lines: [leechLife(1, ['attack']), manaLeech(0.5), speedWhileLeeching(8)],
+          lines: [
+            leechLife(1, ['attack']),
+            manaLeech(0.5),
+            speedWhileLeeching(8),
+            replenishShare(15),
+            replenishWindow(-30),
+          ],
           at: [2103, -2428],
+          why: 'The largest raise of any node to how much of the life lost replenish wins back, for a shorter window: for the build that replenishes fast (2026-11-03).',
         },
       ],
       links: [

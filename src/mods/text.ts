@@ -90,6 +90,8 @@ export function modText(m: Mod): string {
     return `${v}% increased Life recovered by the Flask in your last belt slot${sfx}`;
   if (m.stat === 'flaskLowLifeRecovery')
     return `${v}% increased Life recovered by Flasks drunk below 30% Life${sfx}`;
+  if (m.stat === 'replenishWindow' && m.kind === 'inc')
+    return `${fmt(Math.abs(m.value))}% ${m.value < 0 ? 'shorter' : 'longer'} Replenish window${sfx}`;
   // "of Physical Attack Damage Replenished as Life": leech from attacks names the attacks before the damage. Life leech is
   // replenish (docs/SUSTAIN.md).
   if ((m.stat === 'leech.life' || m.stat === 'leech.mana') && m.tags?.includes('attack')) {

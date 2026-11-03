@@ -726,6 +726,37 @@ const HAND_DEFS: FamilyDef[] = [
     names: ['Hungering', 'Draining', 'Ravenous'],
     weight: 0.5,
   },
+  // Replenish wins back more of the life lost lately (docs/SUSTAIN.md section 6, 2026-11-03): weapons only, two-handed more.
+  {
+    id: 'replenishShare',
+    type: 'suffix',
+    slots: ['oneHand'],
+    ...tabled(
+      [
+        [30, [4, 4]],
+        [50, [7, 7]],
+        [70, [10, 10]],
+      ],
+      [{ stat: 'replenishShare', kind: 'base' }],
+    ),
+    names: ['of Mending', 'of Stitching', 'of the Suture'],
+    weight: 0.5,
+  },
+  {
+    id: 'replenishShare2h',
+    type: 'suffix',
+    slots: ['twoHand'],
+    ...tabled(
+      [
+        [30, [6, 6]],
+        [50, [10, 10]],
+        [70, [15, 15]],
+      ],
+      [{ stat: 'replenishShare', kind: 'base' }],
+    ),
+    names: ['of Mending', 'of Stitching', 'of the Suture'],
+    weight: 0.5,
+  },
   {
     id: 'manaLeechPhys',
     type: 'prefix',

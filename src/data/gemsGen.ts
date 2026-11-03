@@ -4610,7 +4610,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       radius: 2,
     },
     description:
-      'Marks an enemy: it is easier to stun, your attacks leech life and mana from it, and killing it may give a Grit charge.',
+      'Marks an enemy: it is easier to stun, your attacks on it replenish life and leech mana, and killing it may give a Grit charge.',
   },
   {
     kind: 'active',
@@ -4989,7 +4989,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
       ],
     },
     description:
-      'Your blood runs hot: faster attacks that leech life, at a cost in life each second.',
+      'Your blood runs hot: faster attacks that replenish life, at a cost in life each second.',
   },
   {
     kind: 'active',

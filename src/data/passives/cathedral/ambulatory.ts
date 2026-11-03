@@ -17,6 +17,7 @@ import {
   manaOnHit,
   recoverOn,
   weaponDamage,
+  replenishShare,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -39,9 +40,9 @@ export const ambulatory: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Alms',
-          lines: [leechLife(1, ['attack']), lifeOnHit(6, ['attack'])],
+          lines: [leechLife(1, ['attack']), lifeOnHit(6, ['attack']), replenishShare(8)],
           at: [-2056, -126],
-          why: "Leech and life on hit with attacks, generic ground on the Wall's border road (renamed: Tithe is a relic): 2.5 + 1.5 units.",
+          why: "Leech and life on hit with attacks, generic ground on the Wall's border road (renamed: Tithe is a relic): 2.5 + 1.5 + 2 units.",
         },
       ],
       links: [['a', 'n']],

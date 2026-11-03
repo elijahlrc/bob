@@ -44,6 +44,8 @@ const SPECIAL: Record<string, ParamKind[]> = {
   critMulti: ['n', 'tags?'],
   aoe: ['n', 'tags?'],
   leechLife: ['n', 'tags?'],
+  replenishShare: ['n'],
+  replenishWindow: ['n'],
   lifeOnHit: ['n', 'tags?'],
   manaLeech: ['n', 'tags?'],
   manaOnHit: ['n', 'tags?'],

@@ -23,6 +23,7 @@ import {
   totemLimit,
   twoHandDamage,
   weaponDamage,
+  replenishShare,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -179,9 +180,14 @@ export const slams: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Vampiric Strikes',
-          lines: [leechLife(0.8, ['melee']), lifeOnHit(6, ['melee']), manaLeech(0.4)],
+          lines: [
+            leechLife(0.8, ['melee']),
+            lifeOnHit(6, ['melee']),
+            manaLeech(0.4),
+            replenishShare(8),
+          ],
           at: [-1141, 1728],
-          why: '2 + 1.5 + 1 units.',
+          why: '2 + 1.5 + 1 + 2 units.',
         },
       ],
       links: [['a', 'n']],

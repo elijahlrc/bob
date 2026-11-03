@@ -325,6 +325,18 @@ export const leechLife = def('leechLife', (v: number, tags?: SkillTag[]): Line =
     mod('leech.life', 'base', v, tags ? { tags } : undefined),
   ),
 );
+/** How much of the life lost lately replenish may win back, added to its 50% (docs/SUSTAIN.md section 6): +10 is worth a notable's leech. */
+export const replenishShare = def('replenishShare', (v: number): Line =>
+  line(`+${v}% of recent life lost can be replenished`, v / 4, mod('replenishShare', 'base', v)),
+);
+/** How far back replenish looks: longer for a positive value, shorter (a price) for a negative one. */
+export const replenishWindow = def('replenishWindow', (v: number): Line =>
+  line(
+    `${Math.abs(v)}% ${v < 0 ? 'shorter' : 'longer'} replenish window`,
+    v / 10,
+    mod('replenishWindow', 'inc', v),
+  ),
+);
 export const lifeOnHit = def('lifeOnHit', (v: number, tags?: SkillTag[]): Line =>
   line(
     `+${v} life on ${tagWords(tags)}hit`,

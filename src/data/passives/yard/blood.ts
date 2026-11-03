@@ -20,6 +20,8 @@ import {
   resOne,
   str,
   twoHandDamage,
+  replenishShare,
+  replenishWindow,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -141,22 +143,34 @@ export const blood: AreaSpec = {
       at: [469, 3135],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [444, 3081] },
+        {
+          id: 'a',
+          kind: 'small',
+          lines: [replenishShare(3)],
+          at: [444, 3081],
+          why: 'Replenish that wins back more of the life lost (docs/SUSTAIN.md, 2026-11-03), on the way into Red Harvest.',
+        },
         {
           id: 'n',
           kind: 'notable',
           name: 'Red Harvest',
-          lines: [leechLife(1.2, ['attack']), leechRate(10)],
+          lines: [leechLife(1.2, ['attack']), leechRate(10), replenishShare(10)],
           at: [513, 3114],
-          why: '3 + 1 units.',
+          why: "3 + 1 + 2.5 units. The room's largest raise to how much of the life lost replenish wins back (2026-11-03).",
         },
         { id: 'b', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [494, 3189] },
-        { id: 'c', kind: 'small', lines: [leechLife(0.4, ['attack'])], at: [425, 3156] },
+        {
+          id: 'c',
+          kind: 'small',
+          lines: [replenishShare(3)],
+          at: [425, 3156],
+          why: "The second of the room's smalls that win back more of the life lost (2026-11-03); the third keeps its leech.",
+        },
         {
           id: 'n2',
           kind: 'notable',
           name: 'Crimson Reaping',
-          lines: [leechLife(0.8), leechRate(20)],
+          lines: [leechLife(0.8), leechRate(20), replenishShare(8), replenishWindow(20)],
           at: [575, 3420],
           why: "Leech that flows faster: the Yard’s sustain is blood drawn, not kills counted. Since the revision (2026-10-31) the room's way on, out of its far small toward the standard: life drawn back by leech, for the bearer whose auras hold the mana.",
         },

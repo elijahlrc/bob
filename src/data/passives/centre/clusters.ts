@@ -28,6 +28,7 @@ import {
   resOne,
   stunAvoid,
   stunRecovery,
+  replenishShare,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -99,7 +100,7 @@ export const clusters: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Hard Living',
-          lines: [lifeOnHit(10), lifeOnKill(20)],
+          lines: [lifeOnHit(10), lifeOnKill(20), replenishShare(5)],
           at: [572, 143],
           why: 'Life on hit and on kill, which neither home sells by this seam (Clear Head, Soft Step, Grey Cloak and Ward of Smoke sell mana, evasion and resistances): priced as a home generalist (it sits 10 to 12 steps from every start).',
         },

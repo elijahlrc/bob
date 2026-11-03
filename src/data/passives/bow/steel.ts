@@ -28,6 +28,7 @@ import {
   stunAvoid,
   swordDamage,
   weaponSpeed,
+  replenishShare,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -113,9 +114,14 @@ export const steel: AreaSpec = {
           id: 'n',
           kind: 'notable',
           name: 'Thirsty Quiver',
-          lines: [leechLife(0.8, ['attack']), lifeOnHit(4, ['attack']), manaLeech(0.4)],
+          lines: [
+            leechLife(0.8, ['attack']),
+            lifeOnHit(4, ['attack']),
+            manaLeech(0.4),
+            replenishShare(8),
+          ],
           at: [1270, 1671],
-          why: '2 + 1 + 1 units. The exit, to the bleed wheel.',
+          why: '2 + 1 + 1 + 2 units. The exit, to the bleed wheel.',
         },
       ],
       links: [
