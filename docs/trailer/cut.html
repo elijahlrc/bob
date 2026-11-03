@@ -201,7 +201,7 @@
     <button id="play" type="button">▶ Play</button>
     <div class="scrub">
       <div class="marks" id="marks"></div>
-      <input id="scrub" type="range" min="0" max="31" step="0.01" value="0" aria-label="Position" />
+      <input id="scrub" type="range" min="0" max="33" step="0.01" value="0" aria-label="Position" />
     </div>
     <div class="time" id="time">0:00.0 / 0:31</div>
   </div>
@@ -311,6 +311,35 @@
       `<g transform="translate(160 ${y - 5}) scale(${lerp(1.25, 1, ease(k))}) translate(-160 ${-(y - 5)})">${txt(160, y, t, { size, font: 'display', anchor: 'middle', o: k })}</g>`
     );
   };
+  /* the width of `t` in the display face at `size` (stage units) */
+  const textWidth = (() => {
+    const c = document.createElement('canvas').getContext('2d');
+    return (t, size) => {
+      c.font = `${size}px 'Jacquard 24'`;
+      return c.measureText(t).width;
+    };
+  })();
+  /* a line in two halves on one band near the top: the first alone and centred from `t1`; on `t2` the second stamps in beside it,
+     the first sliding over to make room, so the two are centred together */
+  const captionPair = (a, b, lt, t1, t2, y = 34, size = 17) => {
+    const k1 = clamp((lt - t1) / 0.18);
+    if (k1 <= 0) return '';
+    const k2 = clamp((lt - t2) / 0.18);
+    const wa = textWidth(a, size);
+    const wb = textWidth(b, size);
+    const full = wa + size * 0.6 + wb;
+    const ax = lerp(160, 160 - full / 2 + wa / 2, ease(k2));
+    const bx = 160 + full / 2 - wb / 2;
+    const stamp = (x, t, k, from) =>
+      `<g transform="translate(${x} ${y - 5}) scale(${lerp(from, 1, ease(k))}) translate(${-x} ${-(y - 5)})">` +
+      txt(x, y, t, { size, font: 'display', anchor: 'middle', o: k }) +
+      '</g>';
+    return (
+      `<rect x="0" y="${y - 24}" width="320" height="34" fill="#000" opacity="${0.65 * k1}"/>` +
+      stamp(ax, a, k1, 1.25) +
+      (k2 > 0 ? stamp(bx, b, k2, 1.5) : '')
+    );
+  };
   const label = (x, y, t) => txt(x, y, t, { size: 6.5, col: C.mute });
   const deadAfter = (t0, lt) => clamp(1 - (lt - t0) / 0.25);
   const crack = (x, y, o) =>
@@ -342,10 +371,10 @@
   /* ---------- footage (docs/trailer/footage, filmed by scripts/trailer/capture.ts) ---------- */
   const FPS = 30;
   /* the length of the cut, in seconds */
-  const DUR = 31;
+  const DUR = 33;
   /* frames filmed of each clip (the last is held past the end) */
   const LEN = {
-    endgame: 150,
+    'open-army': 121,
     tree3: 90,
     vanguard: 150,
     skills: 60,
@@ -367,9 +396,8 @@
   };
   /* where each clip is cut in: the frame shown at the shot's (or sub-shot's) first frame; picked by eye from the events */
   const IN = {
-    endgame: 62,
     vanguard: 23,
-    shade: 179,
+    shade: 196,
     strider: 0,
     reaver: 0,
     zealot: 16,
@@ -565,16 +593,17 @@
   /* ---------- the shots ---------- */
   const SHOTS = [
     {
-      t: [0, 2],
-      name: 'Endgame',
-      what: 'Cold open on a late Shade: Spire Traps and orbiting blades through a packed room. No text.',
-      draw: (lt) => img(at('endgame', lt)),
+      t: [0, 3],
+      name: 'The army',
+      what: 'Cold open (2026-10-28, as in the vertical cut): forty of the Emberborn march down; the Mystic runs up, throws three shards and meets them with a Frost Ring, which kills 24 on the crash (frame 59, 1.97). "You will fall." near the top, and "Not yet." beside it with the blast.',
+      draw: (lt) =>
+        img(at('open-army', lt)) + captionPair('You will fall.', 'Not yet.', lt, 0.15, 1.97),
     },
     {
-      t: [2, 5],
+      t: [3, 5],
       name: 'The tree',
-      what: 'One build growing from level 1 to 100 on the passive tree, zoomed out so the whole constellation reads as big; the level counts up in large type.',
-      draw: (lt) => img(at('tree3', lt, 0)),
+      what: 'One build growing from level 1 to 100 on the passive tree, zoomed out so the whole constellation reads as big; the level counts up in large type. At one and a half times speed: its 3 s of footage in 2.',
+      draw: (lt) => img(at('tree3', lt * 1.5, 0)),
     },
     {
       t: [5, 6],
@@ -585,13 +614,15 @@
     {
       t: [6, 10.5],
       name: 'Run two: the Shade',
-      what: 'The gem list, the socket and the DPS in one view: Wired Harm is picked up, its socket lights, and the Spire Trap’s damage jumps; then the traps, a trap thrown at a Slag Brute that falls and drops a rare amulet, held a second; the card against the worn locket, and Swap.',
+      what: 'The gem list, the socket and the DPS in one view: Wired Harm is picked up, its socket lights, and the Spire Trap’s damage jumps; then the traps, a trap thrown at a Slag Brute that falls and drops a rare amulet, held a second; the card against the worn locket, and Swap pressed (the gear it swaps into is not shown).',
       draw(lt) {
         if (lt < 2) return img(at('skills', lt, 0));
         /* one shot: a trap thrown at the big one (8.17), it falls on 8.5 and the amulet lies there a second */
         if (lt < 3.5) return img(at('shade', lt - 2));
-        /* the camp screen, from under its tabs to under the Swap button (the clip is filmed 1280 × 990); Swap on 10.0 */
-        return crop(at('equip', lt - 3.5, 15), [0, 100, 1280, 720], [0, 0, 320, 180], 1280, 990);
+        /* the Items screen whole, at a desktop window's size (its three panels: the gear, the compare card, the bag): the
+           compare card (0.6 s), then Swap pressed on 10.1 (0.4 s: frames 21 to 29), and the cut comes before the swap */
+        const et = lt - 3.5;
+        return img(src('equip', et < 0.6 ? 15 : 21 + (et - 0.6) * 20));
       },
     },
     {
@@ -615,16 +646,16 @@
       },
     },
     {
-      t: [12.5, 15],
+      t: [12.5, 17],
       name: 'Level 1 to 100',
-      what: 'Four cuts on the beat, each a different build in a different place against different monsters, the level in large type: the first a beat longer, the other three a beat each.',
+      what: 'Four cuts on the beat, each a different build in a different place against different monsters, the level in large type: the first 1.5 s, the other three 1 s each (2 s longer since 2026-10-28, so the levels can be read).',
       draw(lt) {
         /* where each cut starts (s), its clip, its level and its place */
         const CUTS = [
           [0, 'climb1', 12, 'Crypt'],
-          [1, 'climb2', 20, 'Forge'],
-          [1.5, 'climb4', 42, 'Ruins'],
-          [2, 'climb5', 52, 'Marsh'],
+          [1.5, 'climb2', 20, 'Forge'],
+          [2.5, 'climb4', 42, 'Ruins'],
+          [3.5, 'climb5', 52, 'Marsh'],
         ];
         let i = 0;
         CUTS.forEach((c, j) => {
@@ -637,9 +668,9 @@
       },
     },
     {
-      t: [15, 20],
+      t: [17, 22],
       name: 'The fall',
-      what: 'Level 72, the Shade (two daggers, no skill, no damage numbers: the bell is what moves) against the Tollkeeper, one shot: his fourth toll, opening on the bell already rising over his head, held while its six rings show from 16.75, brought down as the first ring strikes and kills the Shade on 17.5 (the screen edged red); the body held; the end screen, Slain on level 63, held, the duel button pressed on 19.25.',
+      what: 'Level 72, the Shade (two daggers, no skill; its stabs are seen to hurt him) against the Tollkeeper, one shot: his fourth toll, opening on the bell already rising over his head, held while its six rings show from 18.75, brought down as the first ring strikes and kills the Shade on 19.5 (the screen edged red); the body held; the end screen, Slain on level 63, held, the duel button pressed on 21.25.',
       draw(lt) {
         if (lt < 3.35) {
           let s = img(at('fall', lt));
@@ -655,31 +686,31 @@
           );
         }
         /* from "Slain on level 63" down to "Killed by the Tollkeeper" */
-        /* held on its first frame until the duel button is pressed on 19.25 (the clip's frame 12) */
+        /* held on its first frame until the duel button is pressed on 21.25 (the clip's frame 12) */
         return crop(at('summary', lt - 3.35, -15), [100, 14, 1080, 607.5]);
       },
     },
     {
-      t: [20, 23.5],
+      t: [22, 25.5],
       name: 'The duel',
-      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 23.25, with no hold.',
+      what: 'The arena: our Mystic against Sin’s Reaver, Sin’s name on the boss bar. They trade blows from the first second and the deciding blow lands on 25.25, with no hold.',
       draw: (lt) =>
         img(at('duel', lt, 0)) + caption('Duel against other slain builds.', lt, 0.1, 150, 16),
     },
     {
-      t: [23.5, 24.5],
+      t: [25.5, 26.5],
       name: 'The rating',
-      what: 'The result screen: the rating counts up, 712 to 748.',
-      draw: (lt) => crop(at('result', lt, 0), [400, 0, 480, 270]),
+      what: 'The result screen, whole: the rating counts up, 712 to 748.',
+      draw: (lt) => img(at('result', lt, 0)),
     },
     {
-      t: [24.5, 26],
+      t: [26.5, 28],
       name: 'The board',
       what: 'The high scores, Sin on top; our row climbs past two players.',
       draw: (lt) => img(at('board', lt, 0)) + caption('Take the top spot.', lt, 0.35, 150, 16),
     },
     {
-      t: [26, 28],
+      t: [28, 30],
       name: 'The genres',
       what: 'All four words on screen at once, appearing one per beat, each over footage that proves it.',
       draw(lt) {
@@ -718,7 +749,7 @@
       },
     },
     {
-      t: [28, 31],
+      t: [30, 33],
       name: 'Battle of Builds',
       what: 'The title and “Free on itch.io” over the dimmed genre grid, held; the torch gutters out.',
       draw(lt) {
@@ -763,9 +794,9 @@
   ];
 
   /* hard cuts that land on a hit get a short flash */
-  const FLASH = [1.5, 5.0, 23.25, 26.0, 26.5, 27.0, 27.5, 28.0];
-  /* the toll's ring lands on the Shade (fall frame 114, drawn from 17.53): the screen's edge goes red, strong at once and fading, until the end screen */
-  const HURT = [17.52, 18.35];
+  const FLASH = [1.97, 5.0, 25.25, 28.0, 28.5, 29.0, 29.5, 30.0];
+  /* the toll's ring lands on the Shade (fall frame 114, drawn from 19.53): the screen's edge goes red, strong at once and fading, until the end screen */
+  const HURT = [19.52, 20.35];
   const hurt = (t) => {
     const k = t - HURT[0];
     if (k < 0 || t >= HURT[1]) return '';

@@ -4,6 +4,13 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-10-30
+
+- Your character now turns to face toward or away from the camera as it walks, not only left and right.
+- Starting a map or resting at the Respite now asks first; tick "Don't ask me again" to skip it, and the "Ask first" button in camp settings brings it back.
+- A support gem linked twice to the same skill now says "Duplicate" on the Skills tab.
+- The passive tree's node panel no longer lists what is on the way, and on phones the tree's buttons and hints no longer cover it.
+
 ## 2026-10-28
 
 - Crushing Blow hits about 17% harder.

@@ -11,7 +11,7 @@ export function gemStatus(
   ch: Character,
   uid: number,
   def: ReturnType<typeof gemDef>,
-): { ok: boolean; text: string } | null {
+): { ok: boolean; text: string; dup?: boolean } | null {
   if (def.kind === 'support') {
     const on = ch.actives.filter((a) => a.supports.some((x) => x.gem.uid === uid));
     if (on.length)
@@ -22,6 +22,7 @@ export function gemStatus(
       return {
         ok: false,
         text: `${idle.inert ? 'No effect' : 'Not supporting anything'}: ${idle.why}`,
+        ...(idle.dup ? { dup: true } : {}),
       };
     return null;
   }
@@ -42,17 +43,18 @@ export function gemStatus(
 
 /**
  * Why a support supports nothing (null when it supports something): linked to a skill it fits by type but cannot act on
- * (`inert`), or no skill of its kind in the same item. `why` reads after the gem's name: "needs a melee skill in the same item".
+ * (`inert`; `dup` when only because the same support is already linked there), or no skill of its kind in the same item.
+ * `why` reads after the gem's name: "needs a melee skill in the same item".
  */
 function supportIdle(
   ch: Character,
   uid: number,
   def: ReturnType<typeof gemDef>,
-): { why: string; inert: boolean } | null {
+): { why: string; inert: boolean; dup?: boolean } | null {
   if (def.kind !== 'support') return null;
   if (ch.actives.some((a) => a.supports.some((x) => x.gem.uid === uid))) return null;
   const idle = ch.actives.flatMap((a) => (a.inert ?? []).filter((x) => x.gem.gem.uid === uid));
-  if (idle.length) return { why: idle[0].why, inert: true };
+  if (idle.length) return { why: idle[0].why, inert: true, dup: idle.every((x) => x.dup) };
   return { why: `needs ${aSkill(def.supports)} in the same item`, inert: false };
 }
 

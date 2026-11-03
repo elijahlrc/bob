@@ -6,7 +6,7 @@
  *   npx tsx scripts/trailer/screenshots.ts [shot ...]      (to docs/trailer/promo/screenshots/, git-ignored)
  *
  * Desktop shots are 1280 × 720 drawn at 1.25× (1600 × 900); the phone shot is 390 × 844 drawn at 2.25× (878 × 1899).
- * Needs playwright-core (`npm i --no-save playwright-core`) and Chrome or Chromium (CHROME_PATH).
+ * Needs Chrome or Chromium (CHROME_PATH).
  */
 import { mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';

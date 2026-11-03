@@ -30,8 +30,6 @@ const BARE = `.hud-top, .speeds, .biome-banner, .hud-abandon { display: none !im
 const PHONE = { w: 390, h: 844, phone: true };
 /** The phone's whole map screen (top line, abandon button, bars); only the biome's title card, which fades mid-clip, is hidden. */
 const PHONE_UI = `.biome-banner { display: none !important; }`;
-/** The camp and title screens: 1280×720 drawn at 1.5× (the text reads at trailer size). */
-const UI = { w: 854, h: 480, scale: 1.5 };
 /** The Shade that falls at level 72 (the fall and its end screen): two daggers and no skill, so its blows are plain stabs. */
 const FALLEN = {
   classId: 'shade',
@@ -98,8 +96,13 @@ const tab = (t: Take, label: string) => t.page.click(`.tabs .tab:has-text("${lab
 /** The map's zoom of the climb, the fall and the duel, so that the cuts between them keep one scale. */
 const CLOSE = 3.2;
 
-/** A camp screen with more room than `UI` has (1138×640 drawn at 1.125×): the redesigned Skills and High scores screens need it. */
+/** A camp screen drawn at 1.125× (1138×640): the High scores screen. */
 const ROOMY = { w: 1138, h: 640, scale: 1.125 };
+/**
+ * A camp screen at a desktop window's own size, not zoomed (2026-10-28: the tree, the Skills and the Items shots were too close
+ * at 1.5× and 1.125×; at this size the Items tab shows its three panels side by side).
+ */
+const DESK = { w: 1600, h: 900 };
 
 /** Our character's name on the board and in the duel. */
 const ME = 'Morrow';
@@ -132,11 +135,11 @@ export const CLIPS: Clip[] = [
     {
       zoom: 3,
       pack: 6,
-      // The strike that lands with the crash (frame 81, cut in so it is on 1.5 s) falls on the pack around the Mystic and kills
-      // it: from frame 73, after the strike before it, the markers are kept on the pack.
+      // The pack comes in as a strike lands on frame 0; the next strike (about frame 55, cut in so it is on 1.5 s) falls on the
+      // pack and kills it: from frame 20, after the first, the markers are kept on the pack (within 6 tiles: it stands off).
       each: (S, c, i) => {
-        if (i < 73) return;
-        S.aimMarkers(c.world);
+        if (i < 20) return;
+        S.aimMarkers(c.world, 6);
         S.doomMarked(c.world);
       },
     },
@@ -161,10 +164,10 @@ export const CLIPS: Clip[] = [
   /* 2. The tree: a whole build growing, level 5 to 100, zoomed out so that it reads as big, and kept in frame. */
   {
     name: 'tree3',
-    viewport: UI,
+    viewport: DESK,
     css: `.tv-hud, .tv-ledger, .tv-look { display: none !important; }
       * { user-select: none !important; -webkit-user-select: none !important; }
-      #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 400 44px/1 'Jacquard 24', Georgia, serif;
+      #trailer-level { position: fixed; left: 24px; top: 58px; z-index: 9999; font: 400 60px/1 'Jacquard 24', Georgia, serif;
         color: #d98a3a; text-shadow: 0 2px 6px #000, 0 0 14px #000; pointer-events: none; }`,
     async film(t) {
       // The build a two-handed mace Vanguard plans (tree-build.json, written by treeBuild.ts), in the order it is taken.
@@ -282,13 +285,13 @@ export const CLIPS: Clip[] = [
   /* 4a. The Shade's skills: Wired Harm into the trap's link, the damage jumps. */
   {
     name: 'skills',
-    viewport: ROOMY,
+    viewport: DESK,
     // The gem in the bag, the empty socket and the number that moves (the damage medal) are all on screen at once. The gem and the
     // socket it goes to are lit, and an arrow runs from one to the other, before the gem is placed.
     css: `
       .sk-hint { display: none !important; }
       .trailer-lit { box-shadow: 0 0 0 2px #d98a3a, 0 0 22px rgba(217,138,58,.75) !important; }
-      .sk-medal.trailer-flash b { color: #ffd27a !important; text-shadow: 0 0 14px #d98a3a !important; }
+      .trailer-flash b { color: #ffd27a !important; text-shadow: 0 0 14px #d98a3a !important; }
     `,
     async film(t) {
       await t.stage((S, c) => {
@@ -311,7 +314,15 @@ export const CLIPS: Clip[] = [
         for (const w of [run.build.equipment.mainHand, run.build.equipment.offHand])
           if (w) w.sockets = [];
         const uid = () => run.nextUid++;
-        run.inventory = run.inventory.concat({ kind: 'gem', uid: uid(), gemId: 'wiredHarm' });
+        // The bag holds more than the one gem (an empty bag read as a staged screen): Wired Harm among a few others, few enough
+        // that it is still on a phone screen (the bag lists skills, then supports, by name).
+        run.inventory = run.inventory.concat(
+          ['frostTrap', 'tripleShot', 'wiredHarm', 'shrapnelTrap', 'volleySplit'].map((gemId) => ({
+            kind: 'gem',
+            uid: uid(),
+            gemId,
+          })),
+        );
         S.toCamp(c, run);
       });
       await tab(t, 'Skills');
@@ -324,19 +335,18 @@ export const CLIPS: Clip[] = [
           await t.page.mouse.move(5, 470);
           await t.page.evaluate(() => {
             document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0));
-            [...document.querySelectorAll('.sk-name.sk-empty')]
+            [...document.querySelectorAll('.sk-sock.empty')]
               .filter((e) => (e as HTMLElement).offsetParent)[0]
-              ?.closest('.sk-sock')
               ?.classList.add('trailer-lit');
           });
         }
         if (i === 30) {
-          await t.page.click('button:has-text("Socket in the best place")');
+          await t.page.click('button:has-text("Best place")');
           await t.page.mouse.move(5, 470);
-          // The click scrolls the tab; the damage medal is at the top.
+          // The click scrolls the tab; the damage (a medal, or the phone's strip) is at the top.
           await t.page.evaluate(() => {
             document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0));
-            document.querySelector('.sk-medal')?.classList.add('trailer-flash');
+            document.querySelector('.sk-medal, .sk-strip > span')?.classList.add('trailer-flash');
           });
         }
         await t.still(1);
@@ -367,9 +377,11 @@ export const CLIPS: Clip[] = [
         },
       );
       // A big monster walks into the shot (frame 100) and is held up through the fight. From frame 120 the traps leave it alone,
-      // so nothing is lit over it; from 135 a trap thrown at it is let be, and the first hit after that throw fells it: the
-      // amulet drops where it stood, and the Shade stands still (no more throws, no walk to the loot) while it lies there. The
-      // frames of the throw and the fall are printed, for the cut.
+      // so nothing is lit over it; from 135 a trap thrown at it is let be: it lands at its feet, every other trap and spire of the
+      // Shade's is taken off the ground, and the first strike of the spire it springs fells it (2026-10-28: it was felled by the
+      // first hit of any kind, a tick of damage over time, before its trap had sprung, with an older spire standing to one side).
+      // The amulet drops where it stood, alone (the loot of the fight is cleared), and the Shade stands still (no more throws, no
+      // walk to the loot) while it lies there. The frames of the throw and the fall are printed, for the cut.
       await t.rec(270, {
         each: (S, c, i) => {
           const win = window as any;
@@ -389,16 +401,40 @@ export const CLIPS: Clip[] = [
             return;
           }
           if (win.__toss == null) {
-            const near = w.sides[0].deployables.some(
+            const s = w.sides[0];
+            // From 175 no spire stands (one off to the side, still fading, drew the eye from the throw).
+            if (i >= 175) {
+              s.zones = [];
+              s.fields = [];
+            }
+            const thrown = s.deployables.find(
               (d: any) => !win.__had.has(d.id) && Math.hypot(d.x - m.x, d.y - m.y) < 2.5,
             );
-            if (near) win.__toss = i - 1;
+            if (thrown) {
+              win.__toss = i - 1;
+              s.deployables = [thrown];
+              s.zones = [];
+              s.fields = [];
+              // It lands at the monster's feet, not a step or two off (its spire stood beside it): the trap and the arc drawn
+              // for its throw are moved there.
+              thrown.x = m.x;
+              thrown.y = m.y;
+              const flight = win.__game.scene.getScene('map').style.fx.flights.get(thrown.id);
+              if (flight) {
+                flight.x = m.x;
+                flight.y = m.y;
+              }
+            }
             S.keepBig(w, win.__big);
-            win.__life = m.life;
             return;
           }
-          if (m.life < win.__life - 1e-6) {
+          // The last frame's strikes (an area going off: the spire's) that reach it.
+          const struck = w.events.some(
+            (e: any) => e.t === 'explode' && Math.hypot(e.x - m.x, e.y - m.y) <= e.r + m.r,
+          );
+          if (struck) {
             const uid = S.rareAmulet(win.__run, 70);
+            w.drops = [];
             S.fellBig(w, win.__run, win.__big, uid);
             win.__run.inventory = win.__run.inventory.filter((x: any) => x.uid !== uid);
             S.standStill(c, win.__game);
@@ -406,7 +442,6 @@ export const CLIPS: Clip[] = [
             return;
           }
           S.keepBig(w, win.__big);
-          win.__life = m.life;
         },
       });
       const at = await t.page.evaluate(() => [(window as any).__toss, (window as any).__fell]);
@@ -417,8 +452,7 @@ export const CLIPS: Clip[] = [
   /* 4c. The amulet's card in the bag, and Equip on 10.2 s. */
   {
     name: 'equip',
-    // Taller than the other camp screens (1280×990 drawn), so that both cards show whole with the Swap button under them.
-    viewport: { w: 854, h: 660, scale: 1.5 },
+    viewport: DESK,
     async film(t) {
       const name = await t.stage((S, c) => {
         const run = S.stagedRun(
@@ -433,7 +467,9 @@ export const CLIPS: Clip[] = [
       });
       await tab(t, 'Items');
       await t.page.waitForTimeout(200);
+      // The amulet's page, then Compare: the new amulet beside the worn one (docs/ITEM-SLOTS.md).
       await t.page.click(`text=${name}`);
+      await t.page.click('button:has-text("Compare")');
       await t.page.mouse.move(5, 470);
       // Both cards from their titles down: nothing scrolled.
       await t.page.evaluate(() => document.querySelectorAll('*').forEach((e) => (e.scrollTop = 0)));
@@ -443,7 +479,7 @@ export const CLIPS: Clip[] = [
         if (i === 21)
           await t.page.evaluate(() => {
             const b = [...document.querySelectorAll('button')].find((x) =>
-              /^(Equip|Swap|Wear)/.test(x.textContent ?? ''),
+              /^(Swap|Wear)/.test(x.textContent ?? ''),
             );
             (b as HTMLElement | undefined)?.classList.add('trailer-press');
           });
@@ -452,22 +488,10 @@ export const CLIPS: Clip[] = [
             (document.querySelector('.trailer-press') as HTMLElement | null)?.click(),
           );
           await t.page.waitForTimeout(100);
-          // The game selects the old amulet after a swap (is it worth keeping?); the shot is about the new one: its slot is
-          // selected and lit, so the card shows the Night Locket worn. (The old one is let go first: a slot clicked with a bag
-          // item selected wears that item.)
-          await t.page.click('.ix-close');
-          await t.page.waitForTimeout(50);
-          // On a phone the worn gear is folded to one line: it is opened, so that the amulet is seen on the character.
-          if (await t.page.locator('.ix-gear-toggle').count()) {
-            await t.page.click('.ix-gear-toggle');
-            await t.page.waitForTimeout(100);
-          }
-          await t.page.evaluate(() => {
-            const slot = document.querySelector('.ix-slot[aria-label$="Night Locket"]') as
-              HTMLElement | undefined;
-            slot?.click();
-            slot?.classList.add('trailer-lit');
-          });
+          // The swap goes back to the gear, open, with the slot just filled glowing; it is lit for the shot as well.
+          await t.page.evaluate(() =>
+            document.querySelector('.ix-slot.fresh')?.classList.add('trailer-lit'),
+          );
           await t.page.mouse.move(5, 470);
         }
         // Nothing scrolls: the screen stays as it was, only what changed moves.
@@ -551,9 +575,10 @@ export const CLIPS: Clip[] = [
   /* 7. The fall, level 72: the Shade fights the Tollkeeper, and his whole fourth toll runs: the bell hoisted over his head
         through the tell and held while its six rings show, then brought down as the first ring strikes and kills. The body
         is held. The shot
-        is kept plain so the bell is what is seen: the Shade only stabs with its daggers (no skill and its effects), and no
-        damage numbers are drawn. It opens on blows a moment before the tell; the frames the tell starts on and the ring lands
-        on are printed, for the cut. */
+        is kept plain so the bell is what is seen: the Shade only stabs with its daggers (no skill and its effects). Its stabs
+        are seen to hurt him: the damage numbers show, and his life bar falls through the shot (about 73 % to 49 %: each hit
+        takes 25 times its damage, and he is held above 25 %). It opens on blows a moment before the tell; the frames the tell starts on and the
+        ring lands on are printed, for the cut. */
   {
     name: 'fall',
     zoom: CLOSE,
@@ -569,16 +594,24 @@ export const CLIPS: Clip[] = [
         S.settle(game, c);
         // Hit after hit, he would flash white end to end: his flash is kept off, so the bell is always seen.
         S.calmFlash(game, S.boss(c.world).m.id, Infinity);
-        S.quietNumbers(game);
       }, FALLEN);
       // A second and a half drawn and not kept: what the drawing queued through the warm-up (the earlier tolls' call-outs, dust)
       // plays out before the shot.
       await t.rec(45, { film: false, each: (S, c) => S.keepBoss(c.world) });
+      // He starts at 85 %, so the stabs are seen to take his life down.
+      await t.stage((S, c) => {
+        const b = S.boss(c.world).m;
+        b.life = b.def.maxLife * 0.85;
+        (window as any).__bossLife = b.life;
+      });
       await t.rec(170, {
         each: (S, c, i) => {
           const w = c.world;
           const win = window as any;
-          S.keepBoss(w);
+          const m = S.boss(w)?.m;
+          if (m && m.life < win.__bossLife) m.life -= (win.__bossLife - m.life) * 24;
+          S.keepBoss(w, 0.25);
+          if (m) win.__bossLife = m.life;
           const b = S.boss(w);
           if (b && b.st.tellT > 0 && win.__tell == null) win.__tell = i;
           // Deathless until a ring that will catch it lands.
@@ -638,13 +671,14 @@ export const CLIPS: Clip[] = [
 
   /* 8. The duel: our Mystic against Sin's Reaver, the whole fight: they trade blows from the first second and the Mystic lands the
         deciding blow on 3.25 s, with the frames after it filmed; then the rating. The duel's own rules are turned up (the damage
-        each takes is multiplied by 5, not 0.3) so a fight is a few seconds, not over a minute. */
+        each takes is multiplied by 1, not 0.3) so a fight is a few seconds, not over a minute; the Reaver has a two-handed sword
+        so that it lands its blows before the Mystic's bolts end it. */
   {
     name: 'duel',
     zoom: CLOSE,
     css: `.hud-top .muted, .speeds, .biome-banner { display: none !important; }`,
     async film(t) {
-      const RULES = { damageScale: 2.2 };
+      const RULES = { damageScale: 1 };
       const n = await t.stage(
         (S, c, _g, a) => {
           const mk = (l: any) => S.stagedRun(l, 80).build;
@@ -654,9 +688,16 @@ export const CLIPS: Clip[] = [
             weapon: 'wand_l72',
             body: ['flameBolt', 'echoingCast'],
           });
-          const y = mk({ classId: 'reaver', level: 84, body: ['reapingArc', 'bruteForce'] });
+          const y = mk({
+            classId: 'reaver',
+            level: 84,
+            weapon: 'sword2_l70',
+            offHand: null,
+            body: ['reapingArc', 'bruteForce'],
+          });
           (window as any).__builds = [x, y];
           // A seed the Mystic wins with a third of its life left, in a fight of 3.3 to 4.2 s.
+          const tried: string[] = [];
           for (let seed = 1; seed < 60; seed++) {
             S.duel(c, x, y, seed, [a.me, 'Sin'], { before: 712, after: 748 }, a.rules);
             let f = 0;
@@ -666,6 +707,8 @@ export const CLIPS: Clip[] = [
             }
             const out = c.lastDuel;
             const left = out ? out.result.sides[0].lifeLeft : 0;
+            if (out)
+              tried.push(`${seed}:${out.result.winner}/${out.result.how}/${f}f/${left.toFixed(2)}`);
             if (out && out.result.winner === 0 && out.result.how === 'death') {
               if (f >= 100 && f <= 126 && left > 0.2 && left < 0.7) {
                 (window as any).__seed = seed;
@@ -673,11 +716,12 @@ export const CLIPS: Clip[] = [
               }
             }
           }
-          return -1;
+          return tried.join(' ');
         },
         { me: ME, rules: RULES },
       );
-      if (n < 0) throw new Error('no duel the Mystic wins');
+      // What each seed came to (seed:winner/how/frames/life left), for a search that finds none.
+      if (typeof n === 'string') throw new Error(`no duel the Mystic wins: ${n}`);
       // Start so that the last blow is the 98th frame of the clip (3.25 s), then film a few frames more.
       await t.stage(
         (S, c, game, a) => {
@@ -791,8 +835,224 @@ export const CLIPS: Clip[] = [
   ),
 ];
 
-/** The vertical cut's map clips (docs/trailer/VERTICAL.md): the same staging in a 9:16 phone view, one zoom across the cuts. */
+/**
+ * A candidate opening shot of the vertical cut (2026-10-28: the endgame shot was too busy): a clean picture (no HUD, numbers,
+ * marks or loot) with the character in the middle of the biggest room facing the camera, and a crowd of `crowd` monsters
+ * closing on it. Until frame `hold` the character stands still and the crowd only closes in; then both fight. With `release`
+ * the character waits instead until `n` monsters are within `r` tiles, and the crowd attacks all along (its hits leave no
+ * white flash on the character). With `walk` the character walks on while it waits (`dir`: toward the camera by default), into
+ * the middle of the room. With `army` the crowd is an army of `kinds` in ranks ahead of the character, `ahead` tiles up its
+ * way, instead of a ring. `ambient` lights the map more than its biome does (so what comes from the edge of the frame is seen),
+ * `widen` makes the character's areas that many times as wide, and `quietDeaths` draws deaths with no ice shards and a
+ * quarter of the bone dust. `low` keeps the character that far down the screen. With `lead` the character uses that skill
+ * once on its way in, from the 12th frame (stopping for the cast), and every other skill after the release; `juice` gives
+ * the blow of that skill more weight (flash, shake, ice and a moment of slow motion). On the release (or frame `wipeAt`)
+ * every monster within `wipe` tiles is left on its last point of life, so the first blow to reach it kills.
+ */
+function opener(
+  name: string,
+  loadout: Record<string, unknown>,
+  map: number,
+  where: Where,
+  o: {
+    crowd: number;
+    dist?: number;
+    approach?: number;
+    hold?: number;
+    release?: { r: number; n: number };
+    walk?: number;
+    /** How far back down its way the walk starts (2.5 tiles). */
+    start?: number;
+    dir?: { dx: number; dy: number };
+    army?: { kinds: string[]; n: number; ahead: number; width: number; depth: number };
+    ambient?: number;
+    widen?: number;
+    quietDeaths?: boolean;
+    low?: number;
+    lead?: string;
+    juice?: string;
+    wipe?: number;
+    wipeAt?: number;
+    zoom?: number;
+    frames?: number;
+    /** The phone view of the vertical cut by default. */
+    viewport?: Clip['viewport'];
+  },
+): Clip {
+  return {
+    name,
+    viewport: 'viewport' in o ? o.viewport : VERTICAL,
+    zoom: o.zoom ?? 2,
+    css: OPENER_CSS,
+    async film(t) {
+      await t.stage(
+        (S, c, game, a) => {
+          const run = S.stagedRun(a.loadout, a.map);
+          S.playMap(c, run, a.where);
+          S.holdEnd(c);
+          S.centre(c.world);
+          // Toward the camera by default (screen down is the world's +x +y), a little to the right.
+          const dir = a.dir ?? { dx: 0.8, dy: 0.6 };
+          const p = c.world.sides[0].player;
+          const mid = { x: p.x, y: p.y };
+          if (a.walk) {
+            // It starts back down its way, so that it walks into the middle.
+            const k = a.start;
+            const back = c.world.grid.collide(p.x - dir.dx * k, p.y - dir.dy * k, p.r);
+            p.x = back.x;
+            p.y = back.y;
+          }
+          S.warm(c, 2);
+          p.facing = Math.atan2(dir.dy, dir.dx);
+          const waits = a.hold != null || a.release != null;
+          const still = waits
+            ? S.standStill(
+                c,
+                game,
+                a.walk
+                  ? { ...dir, speed: a.walk, casts: a.lead ? 1 : 0, castAfter: 12 }
+                  : undefined,
+              )
+            : () => {};
+          const calm = a.hold != null ? S.harmless(c) : () => {};
+          const rest = a.lead ? S.onlySkill(c.world, a.lead) : () => {};
+          (window as any).__go = () => {
+            still();
+            calm();
+            rest();
+          };
+          S.clean(game, c);
+          // It stands its ground: no step out of the fire on the floor before the blow.
+          c.world.sides[0].ai.dodgeRest = Infinity;
+          if (a.ambient) game.scene.getScene('map').lights.setAmbientColor(a.ambient);
+          if (a.widen) S.widen(c.world, a.widen);
+          if (a.quietDeaths) S.quietDeaths(game);
+          if (a.low) S.lowCamera(game, a.low);
+          if (a.juice) S.juice(game, c, a.juice);
+          if (a.army) {
+            // The army has the room to itself.
+            S.clearAround(c.world, 16);
+            const l = Math.hypot(dir.dx, dir.dy);
+            S.army(c.world, run, a.army.kinds, a.army.n, {
+              x: mid.x + (dir.dx / l) * a.army.ahead,
+              y: mid.y + (dir.dy / l) * a.army.ahead,
+              ax: dir.dy / l,
+              ay: -dir.dx / l,
+              width: a.army.width,
+              depth: a.army.depth,
+            });
+          } else S.crowd(c.world, run, a.crowd, a.dist);
+          S.warm(c, a.approach);
+          S.settle(game, c);
+          // (After the first drawing: the figure is made then.)
+          S.calmFlash(game, c.world.sides[0].player.id, Infinity);
+        },
+        {
+          loadout: { difficulty: SOFT, ...loadout },
+          map,
+          where: { density: 'packed', ...where },
+          crowd: o.crowd,
+          dist: o.dist ?? 5,
+          approach: o.approach ?? 0,
+          hold: o.hold ?? null,
+          release: o.release ?? null,
+          walk: o.walk ?? 0,
+          start: o.start ?? 2.5,
+          dir: o.dir ?? null,
+          army: o.army ?? null,
+          ambient: o.ambient ?? 0,
+          widen: o.widen ?? 0,
+          quietDeaths: o.quietDeaths ?? false,
+          low: o.low ?? 0,
+          lead: o.lead ?? null,
+          juice: o.juice ?? null,
+        },
+      );
+      const hold = o.hold ?? -1;
+      const wipeAt = o.wipeAt ?? hold;
+      const r = o.wipe ?? 0;
+      const rel = o.release;
+      await t.rec(o.frames ?? 90, {
+        each: new Function(
+          'S',
+          'c',
+          'i',
+          rel
+            ? `if (i % 10 === 0) (window.__near ??= []).push([2, 3, 4].map((d) => S.near(c.world, d)).join('/') + '@' + c.world.sides[0].player.x.toFixed(1) + ',' + c.world.sides[0].player.y.toFixed(1));
+               if (window.__went == null && S.near(c.world, ${rel.r}) >= ${rel.n}) { window.__went = i; window.__go(); S.wipe(c.world, ${r}); }`
+            : `if (i === ${hold}) window.__go(); if (i === ${wipeAt} && ${r}) S.wipe(c.world, ${r});`,
+        ) as (S: any, c: any, i: number) => void,
+      });
+      // Where it let go, and every ten frames how many were within 2, 3 and 4 tiles and where the character was (to set `release`).
+      if (rel)
+        console.log(
+          `  ${name}: let go on frame ${await t.page.evaluate(() => `${(window as any).__went} (${(window as any).__near.join(' ')})`)}`,
+        );
+    },
+  };
+}
+
+/** The phone view of the vertical cut. */
 const VERTICAL = { w: 360, h: 640, phone: true, scale: Number(process.env.TRAILER_VSCALE ?? 3) };
+/** An opening shot shows the map alone. */
+const OPENER_CSS = `.hud, .hud-head, .biome-banner, .hud-abandon, .speeds { display: none !important; }`;
+
+/**
+ * The cold open of both cuts (`open-army` 1280×720, `open-army-v` the phone view): an army of the Emberborn marching down the
+ * screen; a Mystic runs up at it, casts Chilling Shard once (three shards, with Triple Shot) and meets it with a Frost Ring (half
+ * as wide again, with more weight to it). Not a Glacier Dart: a Frost Ring goes off from the darts in flight.
+ */
+const army = (name: string, viewport?: Clip['viewport']): Clip =>
+  opener(
+    name,
+    {
+      classId: 'mystic',
+      level: 92,
+      weapon: 'wand_l72',
+      body: ['frostRing', 'wideBlast'],
+      helmet: ['chillingShard', 'tripleShot'],
+    },
+    84,
+    { theme: 'kilnHall', biome: 'hollow' },
+    {
+      crowd: 0,
+      // Up the screen (the world's -x -y), a little to the right.
+      dir: { dx: -0.6, dy: -0.8 },
+      army: {
+        // Slagworms, Pyre Priests and Slag Brutes, and few Cinderlings (each bursts as it dies).
+        kinds: [
+          'slagworm',
+          'pyrepriest',
+          'slagbrute',
+          'slagworm',
+          'cinderling',
+          'pyrepriest',
+          'slagworm',
+          'slagbrute',
+        ],
+        n: 40,
+        ahead: 4.5,
+        width: 6,
+        depth: 3,
+      },
+      walk: 3.2,
+      start: 6,
+      ambient: 0x9a8878,
+      widen: 1.5,
+      quietDeaths: true,
+      low: 0.62,
+      lead: 'chillingShard',
+      juice: 'frostRing',
+      release: { r: 2.2, n: 3 },
+      wipe: 6,
+      // Closer in the wide frame (the climb's and the fall's zoom): the room fills it, not the dark round it.
+      zoom: viewport ? 2.2 : CLOSE,
+      frames: 120,
+      viewport,
+    },
+  );
+CLIPS.push(army('open-army', undefined), army('open-army-v', VERTICAL));
+
 /** CSS that sets the text of a vertical clip lower, clear of the feed apps' own buttons (the top 13 % of the frame; docs/trailer/VERTICAL.md). */
 const VERTICAL_CSS: Record<string, string> = {
   tree3: `#trailer-level { top: 100px !important; }`,
@@ -801,7 +1061,7 @@ const VERTICAL_CSS: Record<string, string> = {
     .screen.summary { padding-top: 100px !important; }`,
 };
 const VERTICAL_ZOOM: Record<string, number> = {
-  endgame: 2,
+  endgame: 1.5,
   vanguard: 2,
   shade: 2,
   climb1: 2,
@@ -812,6 +1072,7 @@ const VERTICAL_ZOOM: Record<string, number> = {
   duel: 2,
   auto: 2,
 };
+/** The vertical cut's map clips (docs/trailer/VERTICAL.md): the same staging in a 9:16 phone view, one zoom across the cuts. */
 CLIPS.push(
   ...CLIPS.filter((c) => c.name in VERTICAL_ZOOM).map((c) => ({
     ...c,

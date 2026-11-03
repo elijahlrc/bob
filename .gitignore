@@ -37,3 +37,11 @@ scripts/tree/staging/
 /reference/
 docs/trailer/footage/
 docs/trailer/promo/
+# Trailer renders beyond the committed cut.mp4, the itch.io page's art, and the font study's screenshots
+docs/trailer/cut-*.mp4
+/itch-cover/
+/itch-promo/
+/itch-screenshots/
+docs/mockups/fonts/
+# A picture drawn by npm run passives:pic with no path given
+/passives.png

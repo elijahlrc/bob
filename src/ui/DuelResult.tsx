@@ -54,14 +54,14 @@ export function DuelResultView({ c }: { c: Controller }) {
   return (
     <div class="screen summary duel-result">
       <h2>{headline(o)}</h2>
-      <p class="sum-who">
+      <p class="sum-who" data-paint="panel" data-thin>
         {result.time.toFixed(1)} s
         {survivor !== null &&
           ` · ${survivor === 0 ? 'you' : names[1]} left with ${Math.round(result.sides[survivor].lifeLeft * 100)}% of ${survivor === 0 ? 'your' : 'its'} life`}
       </p>
       {d.stop && result.winner !== 0 && <p class="sum-who">You live. Only the level is spent.</p>}
       {result.sides[0].reprievesHeld > 0 && (
-        <p class="sum-who duel-reprieves">
+        <p class="sum-who duel-reprieves" data-paint="panel" data-thin>
           Reprieves used: you {result.sides[0].reprieves} of {result.sides[0].reprievesHeld} ·{' '}
           {names[1]} {result.sides[1].reprieves} of {result.sides[1].reprievesHeld}
         </p>

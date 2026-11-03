@@ -6,7 +6,7 @@
  * 1. Runs docs/trailer/audio/chip_score.py, which writes the score and sound effects (needs Python 3 with numpy;
  *    set PYTHON to pick the interpreter).
  * 2. Opens the animatic in headless Chromium at 1280×720 and screenshots every frame at 30 fps through the page's
- *    `window.seek(t)`. Needs playwright-core, which the project does not install: `npm i --no-save playwright-core`.
+ *    `window.seek(t)`. Needs playwright-core (a dev dependency).
  *    Chromium is the one Playwright installs (`npx playwright install chromium`), or set CHROME_PATH to another.
  * 3. Joins the frames and the score with ffmpeg (on PATH) into docs/trailer/animatic.mp4, and writes
  *    docs/trailer/animatic.mp3 for the page's own player.
@@ -14,7 +14,7 @@
  * Frames go to a temporary folder that is removed at the end. `--frames-only` skips the audio and keeps the old score.
  *
  * `--cut` renders docs/trailer/cut.html, the cut with the game's footage (film it first: scripts/trailer/capture.ts), to
- * docs/trailer/cut.mp4 over the same score (written afresh, as for the animatic).
+ * docs/trailer/cut.mp4 over its own score (the script is run with TRAILER_CUT=1: 33 s, its own opening and a longer climb).
  *
  * `--vertical` renders docs/trailer/cut-vertical.html (1080×1920, docs/trailer/VERTICAL.md) over its own score (the script
  * is run with TRAILER_VERTICAL=1) to docs/trailer/cut-vertical.mp4; `--frames-only` needs a score written by an earlier run.
@@ -30,7 +30,8 @@ import path from 'node:path';
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const DIR = path.join(ROOT, 'docs/trailer');
 const FPS = 30;
-const SECONDS = process.argv.includes('--vertical') ? 32 : 31;
+/** The vertical cut is 34 s, the landscape cut 33 s (their own opening and a longer climb: audio/chip_score.py), the animatic 31 s. */
+const SECONDS = process.argv.includes('--vertical') ? 34 : process.argv.includes('--cut') ? 33 : 31;
 /** `TRAILER_SCALE=2` renders 2560×1440 (and reads footage filmed with the same setting): the layout is the same, the pixels twice as many. */
 const Q = Number(process.env.TRAILER_SCALE ?? 1);
 const EXT = Q > 1 || process.argv.includes('--vertical') ? 'jpg' : 'png';
@@ -45,6 +46,7 @@ async function main(): Promise<void> {
   const vertical = process.argv.includes('--vertical');
   if (vertical) process.env.TRAILER_VERTICAL = '1';
   const cut = process.argv.includes('--cut') || vertical;
+  if (cut) process.env.TRAILER_CUT = '1';
   const framesOnly = process.argv.includes('--frames-only');
   const name = vertical ? 'cut-vertical' : cut ? 'cut' : 'animatic';
   const arg = (k: string) => {
@@ -62,7 +64,8 @@ async function main(): Promise<void> {
     if (!framesOnly) {
       const python = process.env.PYTHON ?? (process.platform === 'win32' ? 'python' : 'python3');
       run(python, [path.join(DIR, 'audio/chip_score.py'), wav]);
-      if (!vertical)
+      // The animatic's score is kept as animatic.mp3 (the cuts' scores are their own).
+      if (!cut)
         run('ffmpeg', [
           '-y',
           '-loglevel',
@@ -106,7 +109,7 @@ async function main(): Promise<void> {
     process.stdout.write('\n');
     if (errors.length) throw new Error('page errors: ' + errors.join('; '));
 
-    const audio = framesOnly && !vertical ? path.join(DIR, 'animatic.mp3') : wav;
+    const audio = framesOnly && !cut ? path.join(DIR, 'animatic.mp3') : wav;
     if (!existsSync(audio)) throw new Error('no score: run without --frames-only first');
     // prettier-ignore
     run('ffmpeg', [
