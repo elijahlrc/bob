@@ -14,26 +14,46 @@ S16 = BEAT / 4
 # separate buses so the kick can duck the music and the lead can get its echo (made below, once the cut's length is known)
 
 
-# TRAILER_VERTICAL=1 scores the vertical cut (docs/trailer/VERTICAL.md): 32 s. It has no "three more builds" shot (landscape 10.5 to
-# 12.5); in its place the gem is held 0.5 s, the amulet shown 0.5 s longer and the equip shot 1.0 s longer, which fills those 2 s
-# exactly, so the groove and everything from 12.5 on are where they are in the landscape cut, until the end screen, which is held
-# 1.0 s longer before the duel button (landscape 19.25), after which all is 1.0 s later.
-#   `T` maps the time of a sound effect, which is placed against the picture: from 7.5 the gem shot is +0.5, the amulet's card
-#   (from 9.5) +1.0 and the Swap click (10.0) +1.4; the three phones' own sounds are dropped (None).
-#   `TM` maps the music, which is not tied to the cuts: it only moves with the end screen.
+# The times below are the animatic's (31 s), which is scored as written. The two cuts with the game's footage move them:
+# TRAILER_CUT=1 scores the landscape cut (docs/trailer/cut.html, 33 s) and TRAILER_VERTICAL=1 the vertical cut
+# (docs/trailer/VERTICAL.md, 34 s). Both have (2026-10-28):
+#   - their own opening: a 3 s shot of an army met by a Frost Ring, whose blast is the first hit, on 2.0 (the animatic's on 1.5),
+#     and a tree shot of 2 s played fast, whose chimes run in sixteenths from 3.0. From 5.0 the picture is where it was.
+#   - the Swap pressed after the compare card has been read (the gear it swaps into is not shown): landscape 10.1, vertical 12.1.
+#   - a climb 2 s longer (its levels were gone before they could be read): its four cuts on 12.5, 14, 15 and 16 (their impacts
+#     placed as they are, `RAW`), the boss on 17. The music gets one more bar of the groove on 14, and all after it is 2 s later.
+# The vertical cut has no "three more builds" shot (10.5 to 12.5); in its place the gem is held 0.5 s, the amulet shown 0.5 s
+# longer and the equip shot 1.0 s longer; and its end screen is held 1.0 s longer before the duel button (19.25), after which
+# all is a further 1.0 s later.
+#   `T` maps the time of a sound effect, which is placed against the picture (None: not in that cut); `TM` maps the music,
+#   which is not tied to the cuts: it only moves with the climb and the end screen.
 import os
 
 VERTICAL = os.environ.get('TRAILER_VERTICAL') == '1'
-DUR = 32.0 if VERTICAL else 31.0
+CUT = VERTICAL or os.environ.get('TRAILER_CUT') == '1'
+DUR = 34.0 if VERTICAL else 33.0 if CUT else 31.0
+# Placed at the time given, unmapped (set while a cut's own opening and climb are scored).
+RAW = False
 N = int(SR * DUR)
 L = np.zeros(N)
 R = np.zeros(N)
 bus = {k: np.zeros(N) for k in ('pad', 'bass', 'lead', 'drums', 'sfx')}
 
 
+def later(t):
+    """How much later a time from the climb on is in a cut: 2 s, and 1 s more after the vertical cut's end screen."""
+    return 3.0 if VERTICAL and t >= 19.25 else 2.0
+
+
 def T(t):
-    if not VERTICAL:
+    if not CUT:
         return t
+    if t >= 15.0:
+        return t + later(t)
+    if t >= 12.5:
+        return None  # the climb's own cuts are placed RAW
+    if not VERTICAL:
+        return t + 0.1 if 9.95 <= t < 10.5 else t
     if t < 7.5:
         return t
     if t < 9.5:
@@ -41,16 +61,12 @@ def T(t):
     if t < 9.95:
         return t + 1.0
     if t < 10.5:
-        return t + 1.4
-    if t < 12.5:
-        return None
-    if t < 19.25:
-        return t
-    return t + 1.0
+        return t + 2.1
+    return None  # the three phones
 
 
 def TM(t):
-    return t + 1.0 if VERTICAL and t >= 19.25 else t
+    return t + later(t) if CUT and t >= 14.0 else t
 
 
 def midi(m):
@@ -58,7 +74,8 @@ def midi(m):
 
 
 def place(name, at, sig, gain=1.0):
-    at = T(at) if name == 'sfx' else TM(at)
+    if not RAW:
+        at = T(at) if name == 'sfx' else TM(at)
     if at is None:
         return
     i = int(round(at * SR))
@@ -260,11 +277,15 @@ def motif(t0, g=0.32):
 
 
 # 0-16.75 s: the groove, eight bars and most of a ninth, stopped dead by the Tollkeeper's bell on 16.75 (the and of 2). In on
-# the first frame, one hit at 1.5 on the opening's biggest burst.
+# the first frame, one hit on the opening's biggest burst (1.5; the cuts' blast is on 2.0).
 for b in range(8):
     bar(b * 2.0)
 bar(16.0, steps=6)
-boom(1.5)
+boom(2.0 if CUT else 1.5)
+if CUT:  # the climb's two seconds more: one more bar of the groove on 14 (the animatic's bar from 14 on is 2 s later)
+    RAW = True
+    bar(14.0)
+    RAW = False
 for t0 in (4.0, 8.0, 12.0):  # the phrase every other bar from bar 3
     motif(t0)
 for st in range(8):  # a short roll into the stop
@@ -372,16 +393,29 @@ def tick(at, m=88, g=1.0):
     blip(at, m, 0.03, 0.6 * g, 0.5)
 
 
-# 0-2: three trap spires, then the big burst
-for at in (0.0, 0.5, 1.0):
-    zap(at)
-thud(1.5, 1.2)
-whoosh(1.5, 0.4, 0.8)
-# 2-5: the tree grows: a chime per eighth note, climbing a pentatonic scale, the last ones fuller
 SCALE = (74, 77, 79, 81, 84, 86, 89, 91, 93, 96, 98)
-for k in range(11):
-    at = 2.25 + k * 0.25
-    blip(at, SCALE[k], 0.14 if k < 9 else 0.3, 0.7 + 0.03 * k, 0.125)
+if CUT:
+    # 0-3: the army. Three shards thrown (0.72) break on the front rank (0.95); the Frost Ring's blast (1.97)
+    zap(0.72, 96)
+    whoosh(0.72, 0.2, 0.7)
+    for at in (0.95, 1.0, 1.05):
+        blip(at, 98, 0.06, 0.6, 0.5, slide=-6)
+    thud(1.97, 1.4)
+    whoosh(1.97, 0.5, 1.0)
+    place('sfx', 1.97, noise(0.9, 14000) * np.exp(-np.arange(int(0.9 * SR)) / SR / 0.25), 0.2)  # the ice
+    # 3-5: the tree grows, played fast: a chime per sixteenth, climbing the scale, the last ones fuller
+    for k in range(11):
+        blip(3.0 + k * S16, SCALE[k], 0.1 if k < 9 else 0.3, 0.7 + 0.03 * k, 0.125)
+else:
+    # 0-2: three trap spires, then the big burst
+    for at in (0.0, 0.5, 1.0):
+        zap(at)
+    thud(1.5, 1.2)
+    whoosh(1.5, 0.4, 0.8)
+    # 2-5: the tree grows: a chime per eighth note, climbing a pentatonic scale, the last ones fuller
+    for k in range(11):
+        at = 2.25 + k * 0.25
+        blip(at, SCALE[k], 0.14 if k < 9 else 0.3, 0.7 + 0.03 * k, 0.125)
 blip(4.5, 98, 0.4, 0.5, 0.25)
 whoosh(4.6, 0.4, 0.8)
 thud(5.0, 1.5)
@@ -414,6 +448,11 @@ for n in range(5):
 # 12.5-15: an impact on every cut (the first climb shot is a beat longer), and on the cut to the boss on 15
 for at, fx in ((12.5, zap), (13.5, thud), (14.0, zap), (14.5, zap), (15.0, thud)):
     fx(at + 0.12)
+if CUT:  # the climb's own cuts, on 12.5, 14, 15 and 16 (the boss's above is mapped to 17)
+    RAW = True
+    for at, fx in ((12.5, zap), (14.0, thud), (15.0, zap), (16.0, zap)):
+        fx(at + 0.12)
+    RAW = False
 # 15-20: the Tollkeeper's bell rises (a slow climb under the fight), the rings of its fourth toll crackle onto the floor, the
 # bell comes down as the first strikes; the duel button
 place('sfx', 15.0, pulse(midi(50), 1.75, 0.25, slide=0.5) * np.linspace(0, 1, int(1.75 * SR)) ** 2, 0.12)

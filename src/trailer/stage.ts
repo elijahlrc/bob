@@ -409,11 +409,15 @@ export function fellBig(w: World, run: RunState, id: number, uid: number): void 
 /**
  * From now on the character stands where it is and does nothing (after each sim frame, before it is drawn): no step (it would
  * walk to the loot and pick it up), no skill, and nothing new thrown or set down is drawn or kept. What is already down plays on.
+ * Returns the release: from then on the character acts again. With `walk` it walks on instead, `speed` tiles a second along
+ * (`dx`, `dy`), still using no skill; with `casts` too it uses its skills that many times as it goes, stopping for each (none before frame `castAfter`).
  */
 export function standStill(
   c: Controller,
   game: { scene: { getScene(key: string): unknown } },
-): void {
+  walk?: { dx: number; dy: number; speed: number; casts?: number; castAfter?: number },
+): () => void {
+  let on = true;
   const w = c.world!;
   const s = w.sides[0];
   const p = s.player;
@@ -434,23 +438,411 @@ export function standStill(
   };
   grounded();
   const draw = style.onEvents.bind(style);
+  const casts = walk?.casts ?? 0;
+  const after = walk?.castAfter ?? 0;
+  let frame = 0;
+  let used = 0;
+  let allowed: unknown = null;
   style.onEvents = (events, ww) =>
     draw(
-      events.filter(
-        (e) =>
-          !(e.t === 'deploy' && !e.end && !had.has(e.id)) && !(e.t === 'use' && e.src === p.id),
-      ),
+      !on
+        ? events
+        : events.filter(
+            (e) =>
+              !(e.t === 'deploy' && !e.end && !had.has(e.id) && !casts) &&
+              !(e.t === 'use' && e.src === p.id && (used >= casts || frame < after)),
+          ),
       ww,
     );
-  c.bus.on('ticked', () => {
+  const step = walk ? walk.speed / 30 / Math.hypot(walk.dx, walk.dy) : 0;
+  c.bus.on('ticked', ({ events }) => {
+    if (!on) return;
+    frame++;
+    for (const e of events)
+      if (e.t === 'use' && e.src === p.id && used < casts && frame > after) {
+        used++;
+        allowed = p.action;
+      }
+    if (p.action && p.action === allowed) {
+      // A cast it may make: it stands where it is until the cast is done.
+      p.x = at.x;
+      p.y = at.y;
+      p.moving = false;
+      return;
+    }
+    if (walk) {
+      const to = w.grid.collide(at.x + walk.dx * step, at.y + walk.dy * step, p.r);
+      at.x = to.x;
+      at.y = to.y;
+      at.facing = Math.atan2(walk.dy, walk.dx);
+    }
     p.x = at.x;
     p.y = at.y;
     p.facing = at.facing;
-    p.moving = false;
+    p.moving = !!walk;
     p.action = null;
+    // (What its casts threw flies on.)
+    if (casts) return;
     s.deployables = s.deployables.filter((d) => had.has(d.id));
     w.projectiles = w.projectiles.filter((o) => o.owner !== p.id);
     grounded();
+  });
+  return () => {
+    on = false;
+  };
+}
+
+/**
+ * A crowd for an opening shot: `n` plain monsters of the kinds already on the map, set down in a ring `dist` tiles round the
+ * character and all coming for it. Returns their ids.
+ */
+export function crowd(w: World, run: RunState, n: number, dist = 5): number[] {
+  const p = w.sides[0].player;
+  const kinds = [
+    ...new Set(
+      w.actors.filter((a) => !a.isPlayer && a.side === null && a.mon).map((a) => a.mon!.spec.type),
+    ),
+  ];
+  if (!kinds.length) throw new Error('no monsters on the map to copy');
+  const ids: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * Math.PI * 2 + (i % 2) * 0.3;
+    const d = dist + (i % 3) * 0.7;
+    const spot = w.grid.collide(p.x + Math.cos(ang) * d, p.y + Math.sin(ang) * d, 0.6);
+    const room = w.plan.lab.rooms.findIndex(
+      (r) =>
+        spot.x >= r.rect.x &&
+        spot.x < r.rect.x + r.rect.w &&
+        spot.y >= r.rect.y &&
+        spot.y < r.rect.y + r.rect.h,
+    );
+    const type = kinds[i % kinds.length];
+    const spec = {
+      type,
+      variant: 'none' as const,
+      rarity: 'normal' as const,
+      level: run.map,
+      mods: [],
+    };
+    const m = spawnMonster(
+      w,
+      spec,
+      spot.x,
+      spot.y,
+      Math.max(0, room),
+      998,
+      MONSTER_TYPES[type].name,
+    );
+    m.state = 'chase';
+    ids.push(m.id);
+  }
+  return ids;
+}
+
+/** Put the character in the middle of the map's biggest room (an opening shot wants open ground round it). */
+export function centre(w: World): void {
+  // Of the biggest rooms, the one nearest the middle of the map (one at its edge has the void beyond its wall in the shot).
+  const mid = (r: { rect: { x: number; y: number; w: number; h: number } }) =>
+    Math.hypot(r.rect.x + r.rect.w / 2 - w.grid.w / 2, r.rect.y + r.rect.h / 2 - w.grid.h / 2);
+  const room = [...w.plan.lab.rooms].sort(
+    (a, b) => b.rect.w * b.rect.h - a.rect.w * a.rect.h || mid(a) - mid(b),
+  )[0];
+  const p = w.sides[0].player;
+  const at = w.grid.nearestReachable(room.rect.x + room.rect.w / 2, room.rect.y + room.rect.h / 2);
+  p.x = at?.x ?? room.rect.x + room.rect.w / 2;
+  p.y = at?.y ?? room.rect.y + room.rect.h / 2;
+}
+
+/**
+ * From now on the monsters only close in: no blow is started, and nothing of theirs is thrown or laid on the ground. Returns the
+ * release.
+ */
+export function harmless(c: Controller): () => void {
+  let on = true;
+  c.bus.on('ticked', () => {
+    const w = c.world;
+    if (!on || !w) return;
+    const foe = new Set<number>();
+    for (const a of w.actors)
+      if (!a.isPlayer && a.side === null) {
+        foe.add(a.id);
+        a.action = null;
+      }
+    w.effects = w.effects.filter((e) => e.owner == null || !foe.has(e.owner));
+    w.projectiles = w.projectiles.filter((o) => !foe.has(o.owner));
+  });
+  return () => {
+    on = false;
+  };
+}
+
+/** Take every monster within `r` tiles of the character off the map (the ground an army is set down on). */
+export function clearAround(w: World, r: number): void {
+  const p = w.sides[0].player;
+  w.actors = w.actors.filter(
+    (a) => a.isPlayer || a.side !== null || Math.hypot(a.x - p.x, a.y - p.y) > r,
+  );
+}
+
+/**
+ * An army for an opening shot: `n` plain monsters of `kinds` (taken in turn) in ranks round (`x`, `y`), `width` tiles
+ * across the line (`ax`, `ay`) and `depth` tiles deep behind it, all coming for the character. Returns their ids.
+ */
+export function army(
+  w: World,
+  run: RunState,
+  kinds: (keyof typeof MONSTER_TYPES)[],
+  n: number,
+  at: { x: number; y: number; ax: number; ay: number; width: number; depth: number },
+): number[] {
+  const p = w.sides[0].player;
+  // Behind the line: away from the character.
+  const bl = Math.hypot(at.x - p.x, at.y - p.y) || 1;
+  const bx = (at.x - p.x) / bl;
+  const by = (at.y - p.y) / bl;
+  const per = Math.max(1, Math.round(at.width / 0.9));
+  const ids: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const rank = Math.floor(i / per);
+    const file = i % per;
+    const across = (file / Math.max(1, per - 1) - 0.5) * at.width + (rank % 2) * 0.45;
+    const back = (rank / Math.max(1, Math.ceil(n / per) - 1)) * at.depth;
+    const x = at.x + at.ax * across + bx * back;
+    const y = at.y + at.ay * across + by * back;
+    const room = w.plan.lab.rooms.findIndex(
+      (r) => x >= r.rect.x && x < r.rect.x + r.rect.w && y >= r.rect.y && y < r.rect.y + r.rect.h,
+    );
+    const type = kinds[i % kinds.length];
+    const spec = {
+      type,
+      variant: 'none' as const,
+      rarity: 'normal' as const,
+      level: run.map,
+      mods: [],
+    };
+    const m = spawnMonster(w, spec, x, y, Math.max(0, room), 997, MONSTER_TYPES[type].name);
+    m.state = 'chase';
+    // Ten times as tough: what the character throws on its way in hurts the army without thinning it (`wipe` brings it low).
+    // (Its own defence, made for it when it was set down.)
+    m.def.maxLife *= 10;
+    m.life = m.def.maxLife;
+    ids.push(m.id);
+  }
+  return ids;
+}
+
+/** The character's areas are `k` times as wide (a nova that must read on a phone screen). */
+export function widen(w: World, k: number): void {
+  const ch = w.sides[0].char;
+  const of = ch.profile.bind(ch);
+  const wide = new WeakMap<object, ReturnType<typeof of>>();
+  ch.profile = (...args: Parameters<typeof of>) => {
+    const p = of(...args);
+    let q = wide.get(p);
+    if (!q) wide.set(p, (q = { ...p, radiusMult: p.radiusMult * k }));
+    return q;
+  };
+}
+
+/**
+ * Deaths drawn quietly, so that many at once do not hide the blow that killed them: frozen monsters fall as others do, without
+ * bursting into ice shards, and the bone, dust and motes thrown up by a death are `keep` of what they were.
+ */
+export function quietDeaths(
+  game: { scene: { getScene(key: string): unknown } },
+  keep = 0.25,
+): void {
+  type Events = (events: World['events'], w: World) => void;
+  type Burst = { explode(n: number, x: number, y: number): unknown };
+  const style = (
+    game.scene.getScene('map') as { style: { onEvents: Events; em: Record<string, Burst> } | null }
+  ).style;
+  if (!style) throw new Error('no map style');
+  const draw = style.onEvents.bind(style);
+  style.onEvents = (events, ww) =>
+    draw(
+      events.filter((e) => e.t !== 'shatter'),
+      ww,
+    );
+  for (const k of ['bone', 'dust', 'mote']) {
+    const em = style.em[k];
+    const burst = em.explode.bind(em);
+    em.explode = (n, x, y) => burst(Math.max(1, Math.round(n * keep)), x, y);
+  }
+}
+
+/** The camera keeps the character `at` of the way down the screen (a half when it is centred), easing as the game's does. */
+export function lowCamera(game: { scene: { getScene(key: string): unknown } }, at: number): void {
+  type Cam = { width: number; height: number; scrollX: number; scrollY: number };
+  const style = (
+    game.scene.getScene('map') as {
+      style: {
+        scene: { cameras: { main: Cam } };
+        shake: number;
+        playerPos(w: World): { x: number; y: number };
+        project(x: number, y: number): { x: number; y: number };
+        followCamera(w: World, dt: number): void;
+      } | null;
+    }
+  ).style;
+  if (!style) throw new Error('no map style');
+  const st = style;
+  st.followCamera = (w, dt) => {
+    const cam = st.scene.cameras.main;
+    const pp = st.playerPos(w);
+    const p = st.project(pp.x, pp.y);
+    const k = Math.min(1, dt * 6);
+    cam.scrollX += (p.x - cam.width / 2 - cam.scrollX) * k;
+    cam.scrollY += (p.y - cam.height * at - cam.scrollY) * k;
+    if (st.shake > 0.05) {
+      cam.scrollX += (Math.random() - 0.5) * st.shake;
+      cam.scrollY += (Math.random() - 0.5) * st.shake;
+      st.shake *= Math.pow(0.001, dt);
+    } else st.shake = 0;
+  };
+}
+
+/**
+ * From now on the character uses only its skill `id`, whatever part the build gives it; the release takes that skill away and
+ * gives back all the others.
+ */
+export function onlySkill(w: World, id: string): () => void {
+  type Entry = World['sides'][number]['char']['mains'][number];
+  const ch = w.sides[0].char;
+  const { mains, rotation } = ch;
+  const e = [...mains, ...rotation].find((x) => x.choice.skill.id === id);
+  if (!e) throw new Error(`the character has no skill ${id}`);
+  // (Worked out by getters in the game: the staging puts its own lists over them.)
+  const set = (m: readonly Entry[], r: readonly Entry[]) => {
+    Object.defineProperty(ch, 'mains', { value: m, configurable: true });
+    Object.defineProperty(ch, 'rotation', { value: r, configurable: true });
+  };
+  set([e], []);
+  return () =>
+    set(
+      mains.filter((x) => x !== e),
+      rotation.filter((x) => x !== e),
+    );
+}
+
+/**
+ * More weight to the blow of the skill `skill` than the game gives it (for a shot about that blow): when its area goes off, a
+ * cold shockwave rings out to the edge of the area trailing ice, the screen shakes hard and lights up, and the fight all but
+ * stops for three frames, then runs at `slow` speed for `frames` more (the effects play on at full speed).
+ */
+export function juice(
+  game: { scene: { getScene(key: string): unknown } },
+  c: Controller,
+  skill: string,
+  slow = 0.35,
+  frames = 14,
+): void {
+  type Burst = { explode(n: number, x: number, y: number): unknown };
+  type Pen = {
+    clear(): Pen;
+    lineStyle(w: number, color: number, alpha: number): Pen;
+    strokeEllipse(x: number, y: number, w: number, h: number): Pen;
+    fillStyle(color: number, alpha: number): Pen;
+    fillEllipse(x: number, y: number, w: number, h: number): Pen;
+    setDepth(d: number): Pen;
+    setBlendMode(m: number): Pen;
+  };
+  const style = (
+    game.scene.getScene('map') as {
+      style: {
+        scene: { add: { graphics(): Pen } };
+        shake: number;
+        em: Record<string, Burst>;
+        project(x: number, y: number): { x: number; y: number };
+        flash(x: number, y: number, color: number, scale?: number, intensity?: number): void;
+      } | null;
+    }
+  ).style;
+  if (!style) throw new Error('no map style');
+  const st = style;
+  // Over everything on the ground, added to what is under it (1: Phaser's ADD).
+  const pen = st.scene.add.graphics().setDepth(99999).setBlendMode(1);
+  const WAVE = 10;
+  let left = -1;
+  let wave: { x: number; y: number; r: number; t: number } | null = null;
+  c.bus.on('ticked', ({ events }) => {
+    if (left > 0) {
+      left--;
+      c.speed = left === 0 ? 1 : left < frames ? slow : 0.05;
+    }
+    pen.clear();
+    if (wave) {
+      const k = 1 - Math.pow(1 - wave.t / WAVE, 2);
+      const mid = st.project(wave.x, wave.y);
+      // A circle on the ground is an ellipse twice as wide as it is high on screen.
+      const half = (r: number) =>
+        Math.abs(st.project(wave!.x + r * Math.SQRT1_2, wave!.y - r * Math.SQRT1_2).x - mid.x);
+      const a = 1 - wave.t / WAVE;
+      for (const [lag, width, alpha] of [
+        [0, 7, 1],
+        [0.18, 3, 0.6],
+      ] as const) {
+        const rw = half(wave.r * Math.max(0.05, k - lag));
+        pen
+          .lineStyle(width * (0.4 + a), 0xbfe8ff, alpha * a)
+          .strokeEllipse(mid.x, mid.y, rw * 2, rw);
+      }
+      const rw = half(wave.r * k);
+      pen.fillStyle(0x6fb8ff, 0.22 * a).fillEllipse(mid.x, mid.y, rw * 2, rw);
+      for (let i = 0; i < 18; i++) {
+        const ang = (i / 18) * Math.PI * 2 + wave.t;
+        const q = st.project(
+          wave.x + Math.cos(ang) * wave.r * k,
+          wave.y + Math.sin(ang) * wave.r * k,
+        );
+        st.em.ice.explode(2, q.x, q.y - 4);
+      }
+      if (++wave.t > WAVE) wave = null;
+    }
+    const e = events.find(
+      (x): x is Extract<World['events'][number], { t: 'explode' }> =>
+        x.t === 'explode' && x.skill === skill && !x.pulse,
+    );
+    if (!e) return;
+    const mid = st.project(e.x, e.y);
+    st.shake = Math.max(st.shake, 18);
+    st.flash(mid.x, mid.y, 0x9ad8ff, 3, 0.6);
+    st.em.ice.explode(60, mid.x, mid.y - 8);
+    wave = { x: e.x, y: e.y, r: e.r, t: 0 };
+    c.speed = 0.05;
+    left = frames + 3;
+  });
+}
+
+/** Every monster within `r` tiles of the character is left on its last point of life: the next blow that reaches it kills it. */
+export function wipe(w: World, r: number): void {
+  for (const e of packOf(w, r)) {
+    e.life = Math.min(e.life, 1);
+    e.es = 0;
+  }
+}
+
+/**
+ * A clean picture for an opening shot: no words or numbers over the fight, no marks over the monsters (bars, pips), no
+ * warnings of their blows on the ground, and no loot.
+ */
+export function clean(game: { scene: { getScene(key: string): unknown } }, c: Controller): void {
+  const style = (
+    game.scene.getScene('map') as {
+      style: {
+        floater: unknown;
+        drawTelegraph: unknown;
+        marks: { destroy(): void } | null;
+      } | null;
+    }
+  ).style;
+  if (!style) throw new Error('no map style');
+  style.floater = () => {};
+  style.drawTelegraph = () => {};
+  style.marks?.destroy();
+  style.marks = null;
+  c.bus.on('ticked', () => {
+    if (c.world) c.world.drops.length = 0;
   });
 }
 

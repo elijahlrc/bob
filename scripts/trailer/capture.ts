@@ -8,7 +8,7 @@
  * stopped), so a clip is the same every time and takes as long as it takes to draw (milliseconds a frame on a GPU, about a
  * second in software WebGL). Frames go to docs/trailer/footage/<clip>/f0000.jpg (git-ignored), with `events.json`, the sim events of each
  * frame (to find where the hits land). `--peek` saves four stills of each clip to footage/peek/ instead.
- * Needs playwright-core (`npm i --no-save playwright-core`) and Chromium (CHROME_PATH, or the one Playwright installs).
+ * Needs Chromium (CHROME_PATH, or the one Playwright installs).
  */
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -43,7 +43,7 @@ async function open(browser: any, clip: Clip): Promise<{ page: Page; cdp: any }>
       if (prefs.__zoom) (window as any).__zoom = prefs.__zoom;
       for (const [k, v] of Object.entries(prefs)) localStorage.setItem(k, JSON.stringify(v));
     },
-    { ...clip.prefs, ...(clip.zoom ? { __zoom: clip.zoom } : {}) },
+    { ...SEEN, ...clip.prefs, ...(clip.zoom ? { __zoom: clip.zoom } : {}) },
   );
   await page.goto(DEV);
   await page.waitForFunction(() => (window as any).__dev);
@@ -52,6 +52,14 @@ async function open(browser: any, clip: Clip): Promise<{ page: Page; cdp: any }>
   await page.addStyleTag({ content: (clip.css ?? '') + CSS });
   return { page, cdp: await ctx.newCDPSession(page) };
 }
+
+/** The first-time screens (src/ui/intro.ts), seen already in every clip. */
+const SEEN = Object.fromEntries(
+  ['intro.map', 'intro.run', 'intro.tree', 'intro.support', 'skills.hintSeen'].map((k) => [
+    `bob.pref.${k}`,
+    true,
+  ]),
+);
 
 /** Hidden in every clip: the showcase bar, the speed buttons and the dev overlays. */
 const CSS = `.hud-showcase, .speed-row, .hud-speed { display: none !important; }`;
@@ -161,7 +169,8 @@ async function film(browser: any, clip: Clip, peek: boolean): Promise<void> {
         frame++;
       }
     },
-    cut: begin,
+    // A second clip of a vertical clip is vertical too: `result` from `duel-v` is `result-v` (one folder would serve both cuts).
+    cut: (n) => begin(clip.name.endsWith('-v') && !n.endsWith('-v') ? `${n}-v` : n),
   };
   await clip.film(take);
   flush();

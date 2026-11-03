@@ -13,7 +13,9 @@ The trailer, 31 seconds, planned with the owner on 2026-10-21. Nothing here ship
   older than the cut: it no longer lines up with the score after 15 s).
 
 - `cut.html`, `cut.mp4`: the first cut with real footage: the animatic's timing, captions and score over clips filmed from the
-  game. Each clip is staged by `src/trailer/stage.ts` (a dev-only module the game never imports: a character with chosen gems,
+  game. Since 2026-10-28 it is 33 s and has the vertical cut's changes: the army cold open, a faster tree, the equip shot
+  ending on the compare card, a climb 2 s longer (its score is `TRAILER_CUT=1` in `audio/chip_score.py`; the animatic keeps
+  the 31 s score). Each clip is staged by `src/trailer/stage.ts` (a dev-only module the game never imports: a character with chosen gems,
   a theme, a biome, a boss) and filmed frame by frame by `scripts/trailer/capture.ts` from the clip list in
   `scripts/trailer/clips.ts`. The frames go to `footage/` (git-ignored); `cut.html` picks which frames each shot uses (its `IN`
   table; `npx tsx scripts/trailer/events.ts` shows where the kills fall in each clip).
@@ -22,7 +24,7 @@ The trailer, 31 seconds, planned with the owner on 2026-10-21. Nothing here ship
 
 **Filming the footage:**
 
-1. Once: `npm i --no-save playwright-core`, then `npx playwright install chromium`.
+1. Once: `npx playwright-core install chromium` (playwright-core is a dev dependency).
 2. In one terminal, `npm run dev`.
 3. In another, `npm run trailer:capture` films every clip; name clips to film only those, e.g.
    `npm run trailer:capture -- climb2 duel`. Don't edit `src/` while it runs: the dev server reloads the page and the clip
@@ -41,7 +43,7 @@ differs from it.
 
 **Re-rendering:** `npm run trailer:render` (`scripts/trailer/render.ts`) runs the score script, renders every frame in
 headless Chromium and joins them with ffmpeg. It needs Python 3 with numpy, ffmpeg on PATH and
-`npm i --no-save playwright-core` (with `npx playwright install chromium`, or `CHROME_PATH` set). Output is
+Chromium (`npx playwright-core install chromium`, or `CHROME_PATH` set). Output is
 deterministic: an unchanged page and score give byte-identical files.
 
 **Decisions so far (the owner):**
@@ -51,7 +53,10 @@ deterministic: an unchanged page and score give byte-identical files.
 - Text, in order: "Grind to level 100 in a sitting." / "Duel against other slain builds." / "Take the top
   spot." / "Arcade. ARPG. Roguelike. Autobattler." / "Battle of Builds · Free on itch.io".
 - Shots: endgame cold open (a Skyfall in a mixed pack; the strike on the crash, 1.5 s, falls on the pack round the
-  Mystic and kills it); the tree, one build growing from level 1 to 100: the two-handed mace Vanguard the build
+  Mystic and kills it; since 2026-10-28 both cuts open on 3 s of an army met by a Frost Ring under "You will fall. /
+  Not yet.", see VERTICAL.md, decision 1; the landscape cut shows the line on one band near the top, "Not yet." stamped in
+  beside the first half with the blast, the two then centred together; the Items screen is shown whole, and the Slag Brute
+  that drops the locket is felled by the strike of the spire its trap raises at its feet); the tree, one build growing from level 1 to 100: the two-handed mace Vanguard the build
   allocator plans at 60 points and grows to 100, in the order a player takes it (`scripts/trailer/treeBuild.ts` writes
   `tree-build.json`; run it again after the tree changes), the camera opening zoomed in and zooming out as it grows,
   following what is lit until the whole build is in frame (no class screen, no text); the Vanguard's slam on 5 s and the

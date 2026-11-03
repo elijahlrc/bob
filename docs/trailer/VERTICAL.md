@@ -102,8 +102,23 @@ Nothing here touches `src/` except the dev-only staging module if a clip needs a
 1. **A hook in the first seconds?** Feeds judge a video in about two seconds, and the first caption lands on 12.5 s. Options:
    leave as is (strict recut), or move or repeat a short caption early ("Grind to level 100 in a sitting." over the cold open
    and the tree). It changes no shot timing, only when the text shows.
+   **Chosen (2026-10-28): a new cold open of its own, 3 s, with its own line.** The endgame Skyfall shot read as busy and
+   generic. In its place, `open-army` (`opener()` in `scripts/trailer/clips.ts`): forty of the Emberborn (Slagworms, Pyre
+   Priests, Slag Brutes, a few Cinderlings) march down the screen; a Mystic runs up at them, throws three Chilling Shards in
+   one cast (Triple Shot) and meets them with a Frost Ring, which kills 24 on frame 59 (1.97 s), on the score's crash, moved to
+   2.0 for this cut. The picture is the real game with its HUD, numbers, monster marks and loot hidden; the staging (all in
+   `src/trailer/stage.ts`) makes the army ten times as tough until it reaches the Mystic, then leaves it on its last point of
+   life, and gives the Frost Ring half as much area again, fewer death particles, a shockwave, a shake and a moment of slow
+   motion. The line, in two halves high in the frame (one and a half band heights from the top): "You will fall." from the
+   start, "Not yet." with the blast. The owner's notes on the line: no "build" in it (it breaks the fantasy), no hype; the
+   player is a hero, at least in their own mind. The tree shot gives up its first second and plays at 1.5× speed (3 to 5 s);
+   from 5 s on nothing moves.
 2. **Where the freed 2 s go:** chosen (end screen +1.0, gem +0.5, amulet +0.5); "locket" is read as the amulet. The 31 s stays.
+   **Revised (2026-10-28):** the equip shot ends on the compare card (1.6 s) and Swap pressed (0.4 s); the gear it swaps
+   into says nothing at phone size, so it is not shown, and the Swap click moves to the press (12.1).
 3. **Length:** the full 31 s (default). A shorter 15–20 s feed cut would be a different pacing, so not part of this plan.
+   **Revised (2026-10-28): 34 s.** The climb was too quick to read its levels; it is 2 s longer (cuts of 1.5, 1, 1 and 1 s
+   on 12.5, 14, 15 and 16), and everything after it is 2 s later. The score gets one more bar of the groove on 14.
 
 ## Built (2026-10-24)
 
