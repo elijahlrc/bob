@@ -7,7 +7,8 @@ const ROOT = 'E:/Proj/Auto/.claude/worktrees/flask-scarcity/';
 const R = 'file:///' + ROOT + 'src/';
 const region = process.argv[2];
 const out = ROOT + `scripts/passives/rework/before/${region}.json`;
-if (fs.existsSync(out) && !process.argv.includes('--force')) throw new Error('snapshot exists: ' + out);
+if (fs.existsSync(out) && !process.argv.includes('--force'))
+  throw new Error('snapshot exists: ' + out);
 const { buildAll } = await import(R + 'data/passives/index.ts');
 const built = buildAll({ allowNew: true });
 const dir = ROOT + `src/data/passives/${region}/`;
@@ -38,7 +39,11 @@ for (const f of fs.readdirSync(dir)) {
             kind: n.kind,
             name: n.name,
             why: n.why,
-            lines: n.lines.map((l: any) => (l.spec ? `${l.spec.fn}(${l.spec.args.map((a: unknown) => JSON.stringify(a)).join(', ')})` : '?' + l.label)),
+            lines: n.lines.map((l: any) =>
+              l.spec
+                ? `${l.spec.fn}(${l.spec.args.map((a: unknown) => JSON.stringify(a)).join(', ')})`
+                : '?' + l.label,
+            ),
             at,
           };
         }),
@@ -50,4 +55,10 @@ for (const f of fs.readdirSync(dir)) {
 }
 fs.mkdirSync(ROOT + 'scripts/passives/rework/before', { recursive: true });
 fs.writeFileSync(out, JSON.stringify(areas, null, 1));
-console.log(region, areas.length, 'areas', areas.reduce((s, a) => s + a.clusters.length, 0), 'clusters');
+console.log(
+  region,
+  areas.length,
+  'areas',
+  areas.reduce((s, a) => s + a.clusters.length, 0),
+  'clusters',
+);

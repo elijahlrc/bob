@@ -98,7 +98,8 @@ export function relicMods(b: Build): Mod[] {
       mod('damage', 'more', ARROWS_MORE, { tags: ['projectile'], ...src('arrowsAtTheThroat') }),
       mod('projectileRangeCap', 'base', ARROWS_RANGE, src('arrowsAtTheThroat')),
     );
-  if (hasRelic(b, 'rotVeil')) out.push(mod('chaosToEs', 'base', ROT_VEIL_SHARE * 100, src('rotVeil')));
+  if (hasRelic(b, 'rotVeil'))
+    out.push(mod('chaosToEs', 'base', ROT_VEIL_SHARE * 100, src('rotVeil')));
   if (hasRelic(b, 'twoVessels')) out.push(mod('lifeRegenToMana', 'flag', 1, src('twoVessels')));
   // The second brainstorm's relics the sheet can see (the owner, 2026-10-30).
   if (hasRelic(b, 'burningThrough'))
@@ -116,11 +117,15 @@ export function relicMods(b: Build): Mod[] {
     out.push(
       ...(['attackSpeed', 'castSpeed'] as const).map((s) =>
         // Movement speed as it is this moment, flasks and buffs included (the owner, 2026-10-30; modDb's `inc:`).
-        mod(s, 'inc', 1, { per: { stat: 'inc:moveSpeed', div: FLEETFOOT_DIV }, ...src('fleetfootOath') }),
+        mod(s, 'inc', 1, {
+          per: { stat: 'inc:moveSpeed', div: FLEETFOOT_DIV },
+          ...src('fleetfootOath'),
+        }),
       ),
       mod('evasion', 'more', -FLEETFOOT_LESS, src('fleetfootOath')),
     );
-  if (hasRelic(b, 'sharedAgony')) out.push(mod('minionLife', 'more', -AGONY_LESS, src('sharedAgony')));
+  if (hasRelic(b, 'sharedAgony'))
+    out.push(mod('minionLife', 'more', -AGONY_LESS, src('sharedAgony')));
   if (hasRelic(b, 'searingExcess'))
     out.push(
       ...(['fire', 'cold', 'lightning'] as const).map((t) =>

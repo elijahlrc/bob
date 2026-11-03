@@ -68,7 +68,7 @@ export const roofs: AreaSpec = {
     {
       id: 'athame',
       name: 'Athame',
-      why: "The dagger wheel: spells one side, attacks the other, in from the rim ring. Thinned in the second thinning (2026-10-31): Long Knives stands next to the door, Athame one dagger spell small past it.",
+      why: 'The dagger wheel: spells one side, attacks the other, in from the rim ring. Thinned in the second thinning (2026-10-31): Long Knives stands next to the door, Athame one dagger spell small past it.',
       at: [3236, -2266],
       shape: { kind: 'hand' },
       nodes: [

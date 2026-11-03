@@ -386,7 +386,9 @@ export function Camp({ c }: { c: Controller }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [c]);
   // The situations ticked over the Character tab, remembered per device.
-  const [sheetConds, setSheetConds] = useState<CondId[]>(() => loadPref<CondId[]>('sheetSituations', []));
+  const [sheetConds, setSheetConds] = useState<CondId[]>(() =>
+    loadPref<CondId[]>('sheetSituations', []),
+  );
   // New gems are counted on the Skills tab until it has been opened (docs/STREAMLINE.md S4).
   const newGems = run ? unseenItems(run).filter((x) => x.kind === 'gem') : [];
   useEffect(() => {

@@ -15,15 +15,15 @@ agent reviews the whole first pass afterwards.
 
 ## Region names
 
-| Folder | Class (`--region` for the tools) | Start id |
-| --- | --- | --- |
-| knife | shade | start.shade |
-| spire | mystic | start.mystic |
-| bow | strider | start.strider |
-| yard | reaver | start.reaver |
-| wall | vanguard | start.vanguard |
-| cathedral | zealot | start.zealot |
-| centre | (none) | |
+| Folder    | Class (`--region` for the tools) | Start id       |
+| --------- | -------------------------------- | -------------- |
+| knife     | shade                            | start.shade    |
+| spire     | mystic                           | start.mystic   |
+| bow       | strider                          | start.strider  |
+| yard      | reaver                           | start.reaver   |
+| wall      | vanguard                         | start.vanguard |
+| cathedral | zealot                           | start.zealot   |
+| centre    | (none)                           |                |
 
 ## The work
 

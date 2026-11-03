@@ -32,21 +32,36 @@ const NICHE =
 const GENERAL_ONLY = /^(attack|spell|melee)$/i;
 for (const [cls, s] of starts as [string, number][]) {
   const d = bfs(s);
-  const notables = nodes.map((_: any, i: number) => i).filter((i: number) => nodes[i].kind === 'notable' && d[i] <= 14);
+  const notables = nodes
+    .map((_: any, i: number) => i)
+    .filter((i: number) => nodes[i].kind === 'notable' && d[i] <= 14);
   console.log(`\n# ${cls}: ${notables.length} notables within 14`);
   const gates: string[] = [];
   for (let c = 0; c < N; c++) {
     if (c === s || d[c] > 6 || nodes[c].kind === 'start') continue;
     const dc = bfs(s, c);
     const hit = notables.filter((i: number) => i !== c && dc[i] - d[i] >= 3).length;
-    if (hit >= 4) gates.push(`${String(hit).padStart(3)} behind ${d[c]}-pt ${nodes[c].kind} ${nodes[c].name || ''} [${built.place[c]?.area}] ${label(c)}`);
+    if (hit >= 4)
+      gates.push(
+        `${String(hit).padStart(3)} behind ${d[c]}-pt ${nodes[c].kind} ${nodes[c].name || ''} [${built.place[c]?.area}] ${label(c)}`,
+      );
   }
   gates.sort().reverse();
-  console.log(gates.length ? gates.join('\n') : 'no gate: nothing within 6 points holds 4+ notables behind it');
-  const near8 = nodes.map((_: any, i: number) => i).filter((i: number) => nodes[i].kind === 'notable' && d[i] <= 8);
+  console.log(
+    gates.length
+      ? gates.join('\n')
+      : 'no gate: nothing within 6 points holds 4+ notables behind it',
+  );
+  const near8 = nodes
+    .map((_: any, i: number) => i)
+    .filter((i: number) => nodes[i].kind === 'notable' && d[i] <= 8);
   const niche = near8.filter((i: number) => {
-    const words = label(i).split(';').map((x: string) => x.trim());
+    const words = label(i)
+      .split(';')
+      .map((x: string) => x.trim());
     return words.filter((w: string) => NICHE.test(w)).length > words.length / 2;
   });
-  console.log(`within 8: ${near8.length} notables, ${niche.length} mostly niche: ${niche.map((i: number) => nodes[i].name).join(', ')}`);
+  console.log(
+    `within 8: ${near8.length} notables, ${niche.length} mostly niche: ${niche.map((i: number) => nodes[i].name).join(', ')}`,
+  );
 }

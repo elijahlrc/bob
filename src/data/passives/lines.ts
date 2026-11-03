@@ -1016,7 +1016,11 @@ export const minionDamagePerMana = def('minionDamagePerMana', (v: number, max: n
 );
 /** Extra energy shield of v per 100 maximum mana (v% of maximum mana, counted in hundreds). */
 export const manaAsEs = def('manaAsEs', (v: number): Line =>
-  line(`gain ${v}% of maximum mana as extra energy shield`, v / 2, mod('es', 'base', v, { per: { stat: 'maxMana', div: 100 } })),
+  line(
+    `gain ${v}% of maximum mana as extra energy shield`,
+    v / 2,
+    mod('es', 'base', v, { per: { stat: 'maxMana', div: 100 } }),
+  ),
 );
 /** Auras reserve life instead of mana (src/calc/character.ts, the aura loop): the low-life build's notable. */
 export const auraReserveLife = def('auraReserveLife', (): Line =>
@@ -1029,7 +1033,11 @@ export const esRechargeOnKill = def('esRechargeOnKill', (): Line =>
 /** A share of a pool's maximum recovered on an event (src/data/buffs.ts `recoverPctStat`, src/sim/buffs.ts). */
 export const recoverOn = def(
   'recoverOn',
-  (event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken' | 'evade' | 'blink' | 'block', pool: 'life' | 'mana' | 'es', v: number): Line =>
+  (
+    event: 'kill' | 'killIgnited' | 'crit' | 'hitTaken' | 'evade' | 'blink' | 'block',
+    pool: 'life' | 'mana' | 'es',
+    v: number,
+  ): Line =>
     line(
       `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
       v * (event === 'kill' || event === 'killIgnited' ? 0.8 : 1.2),
@@ -1037,12 +1045,14 @@ export const recoverOn = def(
     ),
 );
 /** A chance to gain Arcane Tide (the arcaneSurge buff: more spell damage, cast speed, mana) on an event. */
-export const arcaneTideOn = def('arcaneTideOn', (event: 'flask' | 'crit' | 'kill', v: number): Line =>
-  line(
-    `${v === 100 ? 'gain' : `${v}% chance to gain`} Arcane Tide ${{ flask: 'when you use a flask', crit: 'on crit', kill: 'on kill' }[event]}`,
-    (v / 100) * (event === 'flask' ? 2 : 4),
-    mod(`buffOn.${event}.arcaneSurge`, 'base', v),
-  ),
+export const arcaneTideOn = def(
+  'arcaneTideOn',
+  (event: 'flask' | 'crit' | 'kill', v: number): Line =>
+    line(
+      `${v === 100 ? 'gain' : `${v}% chance to gain`} Arcane Tide ${{ flask: 'when you use a flask', crit: 'on crit', kill: 'on kill' }[event]}`,
+      (v / 100) * (event === 'flask' ? 2 : 4),
+      mod(`buffOn.${event}.arcaneSurge`, 'base', v),
+    ),
 );
 /** Chilled enemies deal less damage to you (src/sim/combat.ts, before a hit lands; at most 50%). */
 export const chilledLessDamage = def('chilledLessDamage', (v: number): Line =>
@@ -1072,10 +1082,18 @@ export const critMultiVsFrozen = def('critMultiVsFrozen', (v: number): Line =>
   ),
 );
 export const wandPhysAsLightning = def('wandPhysAsLightning', (v: number): Line =>
-  line(`gain ${v}% of wand physical damage as extra lightning`, v / 4, mod('gain.physical.lightning', 'base', v, { tags: ['wand'] })),
+  line(
+    `gain ${v}% of wand physical damage as extra lightning`,
+    v / 4,
+    mod('gain.physical.lightning', 'base', v, { tags: ['wand'] }),
+  ),
 );
 export const wandChain = def('wandChain', (v: number): Line =>
-  line(`wand attacks chain ${v} more`, v * 3, mod('chains', 'base', v, { tags: ['attack', 'wand'] })),
+  line(
+    `wand attacks chain ${v} more`,
+    v * 3,
+    mod('chains', 'base', v, { tags: ['attack', 'wand'] }),
+  ),
 );
 export const spellExtraProjectile = def('spellExtraProjectile', (v: number): Line =>
   line(`+${v} projectile with spells`, v * 3, mod('projectiles', 'base', v, { tags: ['spell'] })),
@@ -1083,7 +1101,11 @@ export const spellExtraProjectile = def('spellExtraProjectile', (v: number): Lin
 // The Bow's rule benders (docs/tree/design/R-bow-notables.md).
 /** Projectile attacks hit harder the farther they fly (src/calc/skill.ts `distanceMult`): a fifth less point blank. */
 export const farShot = def('farShot', (v: number): Line =>
-  line(`projectile attacks deal up to ${v}% more damage far away, 20% less up close`, v / 8, mod('farShot', 'base', v)),
+  line(
+    `projectile attacks deal up to ${v}% more damage far away, 20% less up close`,
+    v / 8,
+    mod('farShot', 'base', v),
+  ),
 );
 export const evasionWhileMoving = def('evasionWhileMoving', (v: number): Line =>
   line(
@@ -1093,12 +1115,14 @@ export const evasionWhileMoving = def('evasionWhileMoving', (v: number): Line =>
   ),
 );
 /** Attack damage per 200 accuracy (the calc's `accuracy` per stat), at most `max` times. */
-export const attackDamagePerAccuracy = def('attackDamagePerAccuracy', (v: number, max: number): Line =>
-  line(
-    `${v}% attack damage per 200 accuracy, up to ${v * max}%`,
-    (v * Math.min(max, 8)) / 10,
-    mod('damage', 'inc', v, { tags: ['attack'], per: { stat: 'accuracy', div: 200, max } }),
-  ),
+export const attackDamagePerAccuracy = def(
+  'attackDamagePerAccuracy',
+  (v: number, max: number): Line =>
+    line(
+      `${v}% attack damage per 200 accuracy, up to ${v * max}%`,
+      (v * Math.min(max, 8)) / 10,
+      mod('damage', 'inc', v, { tags: ['attack'], per: { stat: 'accuracy', div: 200, max } }),
+    ),
 );
 /** A chance to gain Quickened (the onslaught buff: attack, cast and movement speed) on an event. */
 export const quickenedOn = def('quickenedOn', (event: 'kill' | 'crit' | 'blink', v: number): Line =>
@@ -1109,18 +1133,28 @@ export const quickenedOn = def('quickenedOn', (event: 'kill' | 'crit' | 'blink',
   ),
 );
 /** A chance to gain Elusive (dodge, fading) on an event. */
-export const elusiveOn = def('elusiveOn', (event: 'kill' | 'crit' | 'evade' | 'blink', v: number): Line =>
-  line(
-    `${v === 100 ? 'gain' : `${v}% chance to gain`} Elusive ${{ kill: 'on kill', crit: 'on crit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
-    (v / 100) * 8,
-    mod(`buffOn.${event}.elusive`, 'base', v),
-  ),
+export const elusiveOn = def(
+  'elusiveOn',
+  (event: 'kill' | 'crit' | 'evade' | 'blink', v: number): Line =>
+    line(
+      `${v === 100 ? 'gain' : `${v}% chance to gain`} Elusive ${{ kill: 'on kill', crit: 'on crit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
+      (v / 100) * 8,
+      mod(`buffOn.${event}.elusive`, 'base', v),
+    ),
 );
 export const trapGainCold = def('trapGainCold', (v: number): Line =>
-  line(`traps gain ${v}% of physical damage as extra cold`, v / 5, mod('gain.physical.cold', 'base', v, { tags: ['trap'] })),
+  line(
+    `traps gain ${v}% of physical damage as extra cold`,
+    v / 5,
+    mod('gain.physical.cold', 'base', v, { tags: ['trap'] }),
+  ),
 );
 export const attackPhysToCold = def('attackPhysToCold', (v: number): Line =>
-  line(`${v}% of physical attack damage converted to cold`, v / 10, mod('convert.physical.cold', 'base', v, { tags: ['attack'] })),
+  line(
+    `${v}% of physical attack damage converted to cold`,
+    v / 10,
+    mod('convert.physical.cold', 'base', v, { tags: ['attack'] }),
+  ),
 );
 export const lifeRegenWhenHit = def('lifeRegenWhenHit', (v: number): Line =>
   line(
@@ -1137,23 +1171,27 @@ export const flaskCharges = def('flaskCharges', (v: number): Line =>
   line(`+${v / 100} flask charges per kill`, v / 8, mod('flaskCharges', 'inc', v)),
 );
 /** Flask charges on kill for each charge of a kind held (docs/tree/design/F-flasks.md); priced at three charges held. */
-export const flaskChargesPerCharge = def('flaskChargesPerCharge', (charge: 'grit' | 'fervour' | 'insight', v: number): Line =>
-  line(
-    `+${v / 100} flask charges per kill for each ${charge} charge`,
-    (v * 3) / 8,
-    mod('flaskCharges', 'inc', v, { per: { stat: `charges.${charge}`, div: 1 } }),
-  ),
+export const flaskChargesPerCharge = def(
+  'flaskChargesPerCharge',
+  (charge: 'grit' | 'fervour' | 'insight', v: number): Line =>
+    line(
+      `+${v / 100} flask charges per kill for each ${charge} charge`,
+      (v * 3) / 8,
+      mod('flaskCharges', 'inc', v, { per: { stat: `charges.${charge}`, div: 1 } }),
+    ),
 );
 /**
  * Flask charges for an enemy killed by an ailment: the killing blow must be its damage, not a hit on a burning enemy
  * (src/sim/combat.ts `dotKind`; docs/tree/design/F-flasks.md). Harder to arrange than any kill, so priced lower.
  */
-export const flaskChargesKilledBy = def('flaskChargesKilledBy', (by: 'ignite' | 'bleed' | 'poison', v: number): Line =>
-  line(
-    `+${v / 100} flask charges when an enemy is killed by ${{ ignite: 'burning', bleed: 'bleeding', poison: 'poison' }[by]}`,
-    v / 12,
-    mod(`flaskChargesKilledBy.${by}`, 'base', v),
-  ),
+export const flaskChargesKilledBy = def(
+  'flaskChargesKilledBy',
+  (by: 'ignite' | 'bleed' | 'poison', v: number): Line =>
+    line(
+      `+${v / 100} flask charges when an enemy is killed by ${{ ignite: 'burning', bleed: 'bleeding', poison: 'poison' }[by]}`,
+      v / 12,
+      mod(`flaskChargesKilledBy.${by}`, 'base', v),
+    ),
 );
 export const flaskChargesUsed = def('flaskChargesUsed', (v: number): Line =>
   line(`${v}% reduced flask charges used`, v / 4, mod('flaskChargesUsed', 'base', v)),
@@ -1173,17 +1211,33 @@ export const critWhileStationary = def('critWhileStationary', (v: number): Line 
   ),
 );
 export const damageWhileQuickened = def('damageWhileQuickened', (v: number): Line =>
-  line(`${v}% damage while Quickened`, v / 10, mod('damage', 'inc', v, { condition: { id: 'onslaught' } })),
+  line(
+    `${v}% damage while Quickened`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'onslaught' } }),
+  ),
 );
 export const critMultiWhileElusive = def('critMultiWhileElusive', (v: number): Line =>
-  line(`+${v}% crit multiplier while Elusive`, v / (UNIT.critMulti * 1.5), mod('critMulti', 'base', v, { condition: { id: 'elusive' } })),
+  line(
+    `+${v}% crit multiplier while Elusive`,
+    v / (UNIT.critMulti * 1.5),
+    mod('critMulti', 'base', v, { condition: { id: 'elusive' } }),
+  ),
 );
 export const fervourOnCrit = def('fervourOnCrit', (v: number): Line =>
-  line(`${v}% chance to gain a fervour charge on crit`, v / 6, mod('chargeOn.crit.fervour', 'base', v)),
+  line(
+    `${v}% chance to gain a fervour charge on crit`,
+    v / 6,
+    mod('chargeOn.crit.fervour', 'base', v),
+  ),
 );
 /** Attack speed per fervour charge held (the calc's charges.fervour per stat). */
 export const attackSpeedPerFervour = def('attackSpeedPerFervour', (v: number): Line =>
-  line(`${v}% attack speed per fervour charge`, v * 0.9, mod('attackSpeed', 'inc', v, { per: { stat: 'charges.fervour', div: 1 } })),
+  line(
+    `${v}% attack speed per fervour charge`,
+    v * 0.9,
+    mod('attackSpeed', 'inc', v, { per: { stat: 'charges.fervour', div: 1 } }),
+  ),
 );
 export const buffDuration = def('buffDuration', (v: number): Line =>
   line(`${v}% buff duration`, v / 8, mod('buffDuration', 'inc', v)),
@@ -1198,46 +1252,93 @@ export const quickenedOnDualBlock = def('quickenedOnDualBlock', (v: number): Lin
   ),
 );
 export const damageAfterBlock = def('damageAfterBlock', (v: number): Line =>
-  line(`${v}% damage if you blocked recently`, v / 10, mod('damage', 'inc', v, { condition: { id: 'blockedRecently' } })),
+  line(
+    `${v}% damage if you blocked recently`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'blockedRecently' } }),
+  ),
 );
 export const damageVsStunned = def('damageVsStunned', (v: number): Line =>
-  line(`${v}% damage against stunned enemies`, v / 8, mod('damage', 'inc', v, { condition: { id: 'targetStunned' } })),
+  line(
+    `${v}% damage against stunned enemies`,
+    v / 8,
+    mod('damage', 'inc', v, { condition: { id: 'targetStunned' } }),
+  ),
 );
 export const damageWhileLeeching = def('damageWhileLeeching', (v: number): Line =>
-  line(`${v}% damage while leeching`, v / 10, mod('damage', 'inc', v, { condition: { id: 'leeching' } })),
+  line(
+    `${v}% damage while leeching`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'leeching' } }),
+  ),
 );
 export const fortifyOnMeleeHit = def('fortifyOnMeleeHit', (v: number): Line =>
-  line(`${v}% chance to gain Fortified on melee hit`, (v / 100) * 8, mod('buffOn.meleeHit.fortify', 'base', v)),
+  line(
+    `${v}% chance to gain Fortified on melee hit`,
+    (v / 100) * 8,
+    mod('buffOn.meleeHit.fortify', 'base', v),
+  ),
 );
 /** Fortified earned in the duel: when you stun an enemy (the `stun` event, src/sim/buffs.ts). */
 export const fortifyOnStun = def('fortifyOnStun', (v: number): Line =>
-  line(`${v}% chance to gain Fortified when you stun an enemy`, (v / 100) * 4, mod('buffOn.stun.fortify', 'base', v)),
+  line(
+    `${v}% chance to gain Fortified when you stun an enemy`,
+    (v / 100) * 4,
+    mod('buffOn.stun.fortify', 'base', v),
+  ),
 );
 export const fervourOnBlock = def('fervourOnBlock', (v: number): Line =>
-  line(`${v}% chance to gain a fervour charge when you block`, v / 8, mod('chargeOn.block.fervour', 'base', v)),
+  line(
+    `${v}% chance to gain a fervour charge when you block`,
+    v / 8,
+    mod('chargeOn.block.fervour', 'base', v),
+  ),
 );
 /** Damage per fervour charge held, while dual wielding (the calc's charges.fervour per stat). */
 export const dualDamagePerFervour = def('dualDamagePerFervour', (v: number): Line =>
   line(
     `${v}% damage per fervour charge while dual wielding`,
     v * 0.8,
-    mod('damage', 'inc', v, { condition: { id: 'dualWielding' }, per: { stat: 'charges.fervour', div: 1 } }),
+    mod('damage', 'inc', v, {
+      condition: { id: 'dualWielding' },
+      per: { stat: 'charges.fervour', div: 1 },
+    }),
   ),
 );
 export const critVsBleeding = def('critVsBleeding', (v: number): Line =>
-  line(`${v}% crit chance against bleeding enemies`, v / (UNIT.critChance * 1.5), mod('critChance', 'inc', v, { condition: { id: 'targetBleeding' } })),
+  line(
+    `${v}% crit chance against bleeding enemies`,
+    v / (UNIT.critChance * 1.5),
+    mod('critChance', 'inc', v, { condition: { id: 'targetBleeding' } }),
+  ),
 );
 export const critVsStunned = def('critVsStunned', (v: number): Line =>
-  line(`${v}% crit chance against stunned enemies`, v / (UNIT.critChance * 1.5), mod('critChance', 'inc', v, { condition: { id: 'targetStunned' } })),
+  line(
+    `${v}% crit chance against stunned enemies`,
+    v / (UNIT.critChance * 1.5),
+    mod('critChance', 'inc', v, { condition: { id: 'targetStunned' } }),
+  ),
 );
 export const meleeAreaOnKill = def('meleeAreaOnKill', (v: number): Line =>
-  line(`${v}% melee area if you killed recently`, v / 12, mod('aoe', 'inc', v, { tags: ['melee'], condition: { id: 'killedRecently' } })),
+  line(
+    `${v}% melee area if you killed recently`,
+    v / 12,
+    mod('aoe', 'inc', v, { tags: ['melee'], condition: { id: 'killedRecently' } }),
+  ),
 );
 export const damageWhileFortified = def('damageWhileFortified', (v: number): Line =>
-  line(`${v}% damage while Fortified`, v / 10, mod('damage', 'inc', v, { condition: { id: 'fortified' } })),
+  line(
+    `${v}% damage while Fortified`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'fortified' } }),
+  ),
 );
 export const impaleChance = def('impaleChance', (v: number): Line =>
-  line(`${v}% chance to impale with attacks`, v / 6, mod('chance.impale', 'base', v, { tags: ['attack'] })),
+  line(
+    `${v}% chance to impale with attacks`,
+    v / 6,
+    mod('chance.impale', 'base', v, { tags: ['attack'] }),
+  ),
 );
 export const impaleEffect = def('impaleEffect', (v: number): Line =>
   line(`${v}% impale effect`, v / 8, mod('impaleEffect', 'inc', v)),
@@ -1250,51 +1351,101 @@ export const armourVsEle = def('armourVsEle', (v: number): Line =>
   line(`${v}% of armour also applies to elemental hits`, v / 4, mod('armourVsEle', 'base', v)),
 );
 export const meleeGainFire = def('meleeGainFire', (v: number): Line =>
-  line(`melee attacks gain ${v}% of physical damage as extra fire`, v / 4, mod('gain.physical.fire', 'base', v, { tags: ['melee'] })),
+  line(
+    `melee attacks gain ${v}% of physical damage as extra fire`,
+    v / 4,
+    mod('gain.physical.fire', 'base', v, { tags: ['melee'] }),
+  ),
 );
 // The Wall's rule benders (docs/tree/design/R-wall.md): grit gained on events the fight rolls charges for (block, stun),
 // grit as a per stat, totems on the deploy count, strikes on the calc's extra targets.
 export const gritOnStun = def('gritOnStun', (v: number): Line =>
-  line(`${v}% chance to gain a grit charge when you stun an enemy`, v / 8, mod('chargeOn.stun.grit', 'base', v)),
+  line(
+    `${v}% chance to gain a grit charge when you stun an enemy`,
+    v / 8,
+    mod('chargeOn.stun.grit', 'base', v),
+  ),
 );
 export const gritOnBlock = def('gritOnBlock', (v: number): Line =>
-  line(`${v}% chance to gain a grit charge when you block`, v / 8, mod('chargeOn.block.grit', 'base', v)),
+  line(
+    `${v}% chance to gain a grit charge when you block`,
+    v / 8,
+    mod('chargeOn.block.grit', 'base', v),
+  ),
 );
 export const gritOnKill = def('gritOnKill', (v: number): Line =>
   line(`${v}% chance to gain a grit charge on kill`, v / 8, mod('chargeOn.kill.grit', 'base', v)),
 );
 /** A warcry may give grit (the `warcry` charge event, rolled when a warcry is used: src/sim/utility.ts). */
 export const gritOnWarcry = def('gritOnWarcry', (v: number): Line =>
-  line(`${v}% chance to gain a grit charge when you use a warcry`, v / 12, mod('chargeOn.warcry.grit', 'base', v)),
+  line(
+    `${v}% chance to gain a grit charge when you use a warcry`,
+    v / 12,
+    mod('chargeOn.warcry.grit', 'base', v),
+  ),
 );
 /** Mace hits may give grit (charges are rolled under the fight's conditions: wielding a mace). */
 export const gritOnMaceHit = def('gritOnMaceHit', (v: number): Line =>
-  line(`${v}% chance to gain a grit charge on melee hit with a mace`, v / 2, mod('chargeOn.meleeHit.grit', 'base', v, { condition: { id: 'wieldingMace' } })),
+  line(
+    `${v}% chance to gain a grit charge on melee hit with a mace`,
+    v / 2,
+    mod('chargeOn.meleeHit.grit', 'base', v, { condition: { id: 'wieldingMace' } }),
+  ),
 );
 /** Block chance per grit charge while holding a shield. */
 export const blockPerGrit = def('blockPerGrit', (v: number): Line =>
-  line(`+${v}% block per grit charge while holding a shield`, v * 3, mod('blockAttack', 'base', v, { condition: { id: 'holdingShield' }, per: { stat: 'charges.grit', div: 1 } })),
+  line(
+    `+${v}% block per grit charge while holding a shield`,
+    v * 3,
+    mod('blockAttack', 'base', v, {
+      condition: { id: 'holdingShield' },
+      per: { stat: 'charges.grit', div: 1 },
+    }),
+  ),
 );
 /** Melee physical damage per 10 strength, at most `max` times. */
 export const meleePerStr = def('meleePerStr', (v: number, max: number): Line =>
   line(
     `${v}% melee physical damage per 10 strength, up to ${v * max}%`,
     (v * Math.min(max, 25)) / 10,
-    mod('damage', 'inc', v, { tags: ['melee'], damageTypes: ['physical'], per: { stat: 'str', div: 10, max } }),
+    mod('damage', 'inc', v, {
+      tags: ['melee'],
+      damageTypes: ['physical'],
+      per: { stat: 'str', div: 10, max },
+    }),
   ),
 );
 /** Two-handed attack speed per grit charge held: grit spent as momentum. */
 export const twoHandSpeedPerGrit = def('twoHandSpeedPerGrit', (v: number): Line =>
-  line(`${v}% two-handed attack speed per grit charge`, v * 0.9, mod('attackSpeed', 'inc', v, { tags: ['twoHand', 'melee'], per: { stat: 'charges.grit', div: 1 } })),
+  line(
+    `${v}% two-handed attack speed per grit charge`,
+    v * 0.9,
+    mod('attackSpeed', 'inc', v, {
+      tags: ['twoHand', 'melee'],
+      per: { stat: 'charges.grit', div: 1 },
+    }),
+  ),
 );
 export const damagePerGrit = def('damagePerGrit', (v: number): Line =>
-  line(`${v}% melee damage per grit charge`, v * 0.8, mod('damage', 'inc', v, { tags: ['melee'], per: { stat: 'charges.grit', div: 1 } })),
+  line(
+    `${v}% melee damage per grit charge`,
+    v * 0.8,
+    mod('damage', 'inc', v, { tags: ['melee'], per: { stat: 'charges.grit', div: 1 } }),
+  ),
 );
 export const armourWhileStationary = def('armourWhileStationary', (v: number): Line =>
-  line(`${v}% armour while standing still`, v / ((UNIT.armour * 4) / 3), mod('armour', 'inc', v, { condition: { id: 'stationary' } })),
+  line(
+    `${v}% armour while standing still`,
+    v / ((UNIT.armour * 4) / 3),
+    mod('armour', 'inc', v, { condition: { id: 'stationary' } }),
+  ),
 );
 export const stunAvoidStationary = def('stunAvoidStationary', (v: number): Line =>
-  line(`${v}% avoid stun while standing still`, v / 25, mod('stunAvoid', 'base', v, { condition: { id: 'stationary' } })),
+  line(
+    `${v}% avoid stun while standing still`,
+    v / 25,
+    mod('stunAvoid', 'base', v, { condition: { id: 'stationary' } }),
+  ),
 );
 /** One more totem out at a time: the deploy count totems are placed by (src/calc/skill.ts `deployCount`). */
 export const totemLimit = def('totemLimit', (v: number): Line =>
@@ -1302,7 +1453,11 @@ export const totemLimit = def('totemLimit', (v: number): Line =>
 );
 /** Strike skills hit one more nearby enemy (the calc's `extraTargets`). */
 export const strikeTargets = def('strikeTargets', (v: number): Line =>
-  line(`strike skills hit ${v} more nearby enemy`, v * 3.5, mod('extraTargets', 'base', v, { tags: ['strike'] })),
+  line(
+    `strike skills hit ${v} more nearby enemy`,
+    v * 3.5,
+    mod('extraTargets', 'base', v, { tags: ['strike'] }),
+  ),
 );
 export const critOnFullLife = def('critOnFullLife', (v: number): Line =>
   line(
@@ -1387,11 +1542,19 @@ export const flaskMaxCharges = def('flaskMaxCharges', (v: number): Line =>
 );
 /** The flask in the belt's last slot (it drinks at 15% life) recovers more: one way to keep an emergency flask (src/sim/flaskDrink.ts). */
 export const flaskLastSlotRecovery = def('flaskLastSlotRecovery', (v: number): Line =>
-  line(`${v}% increased life recovered by the flask in your last belt slot`, v / 15, mod('flaskLastSlotRecovery', 'inc', v)),
+  line(
+    `${v}% increased life recovered by the flask in your last belt slot`,
+    v / 15,
+    mod('flaskLastSlotRecovery', 'inc', v),
+  ),
 );
 /** A life flask drunk below 30% life recovers more: the other way to keep emergency flasks (src/sim/flaskDrink.ts). */
 export const flaskLowLifeRecovery = def('flaskLowLifeRecovery', (v: number): Line =>
-  line(`${v}% increased life recovered by flasks drunk below 30% life`, v / 12, mod('flaskLowLifeRecovery', 'inc', v)),
+  line(
+    `${v}% increased life recovered by flasks drunk below 30% life`,
+    v / 12,
+    mod('flaskLowLifeRecovery', 'inc', v),
+  ),
 );
 // The Cathedral's rule benders (docs/tree/design/R-cathedral.md): what the Zealot plants works for it (minions standing,
 // one more brand, auras held), faith turned to fire and lightning, a defence while channelling.
@@ -1416,7 +1579,11 @@ export const spellPhysToLightning = def('spellPhysToLightning', (v: number): Lin
   ),
 );
 export const damageWithMinion = def('damageWithMinion', (v: number): Line =>
-  line(`${v}% damage while you have a minion`, v / 10, mod('damage', 'inc', v, { condition: { id: 'minionsOut' } })),
+  line(
+    `${v}% damage while you have a minion`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'minionsOut' } }),
+  ),
 );
 export const regenWithMinion = def('regenWithMinion', (v: number): Line =>
   line(
@@ -1441,7 +1608,11 @@ export const insightOnStaffBlock = def('insightOnStaffBlock', (v: number): Line 
   ),
 );
 export const insightOnWarcry = def('insightOnWarcry', (v: number): Line =>
-  line(`${v}% chance to gain an insight charge when you use a warcry`, v / 12, mod('chargeOn.warcry.insight', 'base', v)),
+  line(
+    `${v}% chance to gain an insight charge when you use a warcry`,
+    v / 12,
+    mod('chargeOn.warcry.insight', 'base', v),
+  ),
 );
 export const regenWithTotem = def('regenWithTotem', (v: number): Line =>
   line(
@@ -1451,11 +1622,19 @@ export const regenWithTotem = def('regenWithTotem', (v: number): Line =>
   ),
 );
 export const damageWithTotem = def('damageWithTotem', (v: number): Line =>
-  line(`${v}% damage while you have a totem`, v / 10, mod('damage', 'inc', v, { condition: { id: 'totemOut' } })),
+  line(
+    `${v}% damage while you have a totem`,
+    v / 10,
+    mod('damage', 'inc', v, { condition: { id: 'totemOut' } }),
+  ),
 );
 /** Damage for every aura standing (the calc's `auras` per stat). */
 export const damagePerAura = def('damagePerAura', (v: number): Line =>
-  line(`${v}% damage for each aura you have`, (v * 2) / 10, mod('damage', 'inc', v, { per: { stat: 'auras', div: 1 } })),
+  line(
+    `${v}% damage for each aura you have`,
+    (v * 2) / 10,
+    mod('damage', 'inc', v, { per: { stat: 'auras', div: 1 } }),
+  ),
 );
 /** Life regenerated for every aura standing (the calc's `auras` per stat). */
 export const regenPerAura = def('regenPerAura', (v: number): Line =>

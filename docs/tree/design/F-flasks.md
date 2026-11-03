@@ -39,13 +39,13 @@ seven lines refills about one drink of the first life flask for every six normal
 Five of the six starting areas have almost the same flask notable 5 or 6 points from the start. Each mixes flask
 recovery, flask effect and flask duration:
 
-| Class (region) | Notable | Points from start | What it gives |
-| --- | --- | --- | --- |
-| Mystic | Draught | 5 | 12% flask effect, 12% flask recovery, recover 2% of mana on kill |
-| Shade | Smuggler's Flasks | 5 | 15% flask effect, 15% flask recovery, 15% flask duration |
-| Strider | Quick Sip | 5 | 24% flask charges gained, 10% flask recovery |
-| Reaver | Field Dressing | 6 | 20% flask recovery, 20% flask duration |
-| Vanguard | Camp Stores | 5 | 20% flask recovery, 12% flask effect |
+| Class (region) | Notable           | Points from start | What it gives                                                    |
+| -------------- | ----------------- | ----------------- | ---------------------------------------------------------------- |
+| Mystic         | Draught           | 5                 | 12% flask effect, 12% flask recovery, recover 2% of mana on kill |
+| Shade          | Smuggler's Flasks | 5                 | 15% flask effect, 15% flask recovery, 15% flask duration         |
+| Strider        | Quick Sip         | 5                 | 24% flask charges gained, 10% flask recovery                     |
+| Reaver         | Field Dressing    | 6                 | 20% flask recovery, 20% flask duration                           |
+| Vanguard       | Camp Stores       | 5                 | 20% flask recovery, 12% flask effect                             |
 
 Further out, the Strider's region has five more flask notables (Hunter's Satchel, Spare Stock, Field Kit, Supply Line,
 Field Poultice), and the centre has Provisions (flask effect, flask recovery and mana regeneration).
@@ -77,18 +77,18 @@ Field Poultice), and the centre has Provisions (flask effect, flask recovery and
 **Charges on kill, with a condition** (new; the owner, 2026-10-31)
 
 Charges on kill should be rare on the tree and placed far out, so that stacking them costs a lot of points. Each line
-counts only enemies killed *by* something (the owner, 2026-11-01): the killing blow must come from that source, not
+counts only enemies killed _by_ something (the owner, 2026-11-01): the killing blow must come from that source, not
 merely land while the enemy is burning or bleeding. That is much harder to arrange, so it is a real build choice. Ideas,
 one for each region's character:
 
-| Class | Line |
-| --- | --- |
-| Mystic | flask charges when an enemy is killed by burning |
-| Shade | flask charges when an enemy is killed by poison |
-| Reaver | flask charges when an enemy is killed by bleeding |
-| Strider | flask charges on kill for each fervour charge you have (a small amount per charge) |
-| Vanguard | flask charges on kill for each grit charge you have (a small amount per charge) |
-| Zealot | flask charges on kill for each insight charge you have (a small amount per charge) |
+| Class    | Line                                                                               |
+| -------- | ---------------------------------------------------------------------------------- |
+| Mystic   | flask charges when an enemy is killed by burning                                   |
+| Shade    | flask charges when an enemy is killed by poison                                    |
+| Reaver   | flask charges when an enemy is killed by bleeding                                  |
+| Strider  | flask charges on kill for each fervour charge you have (a small amount per charge) |
+| Vanguard | flask charges on kill for each grit charge you have (a small amount per charge)    |
+| Zealot   | flask charges on kill for each insight charge you have (a small amount per charge) |
 
 The Strider, the Vanguard and the Zealot use a different form (the owner, 2026-11-01): an amount per charge held,
 fervour (the dexterity charge, already used in the Strider's region) for the Strider, grit for the Vanguard and insight
@@ -117,14 +117,14 @@ nodes.
 - **Every starting area different.** Each start's nearby flask notable gives a different kind of stat, chosen to suit
   that region. No charges on kill near any start:
 
-  | Class | Near the start | Further out | Far out (about 10+ points) |
-  | --- | --- | --- | --- |
-  | Mystic | mana flask recovery, fewer charges per drink | flask effect (for utility flasks) | charges for kills by burning |
-  | Shade | faster life flask recovery | emergency flask, option A (slot 5) | charges for kills by poison |
-  | Strider | fewer charges per drink, flask effect | flask duration (utility) | charges on kill per fervour charge |
-  | Reaver | life flask recovery, flask duration | emergency flask, option B (below 30% life) | charges for kills by bleeding |
-  | Vanguard | more maximum charges | life flask recovery | charges on kill per grit charge |
-  | Zealot | flask effect and duration (the region is about auras and buffs) | more maximum charges | charges on kill per insight charge |
+  | Class    | Near the start                                                  | Further out                                | Far out (about 10+ points)         |
+  | -------- | --------------------------------------------------------------- | ------------------------------------------ | ---------------------------------- |
+  | Mystic   | mana flask recovery, fewer charges per drink                    | flask effect (for utility flasks)          | charges for kills by burning       |
+  | Shade    | faster life flask recovery                                      | emergency flask, option A (slot 5)         | charges for kills by poison        |
+  | Strider  | fewer charges per drink, flask effect                           | flask duration (utility)                   | charges on kill per fervour charge |
+  | Reaver   | life flask recovery, flask duration                             | emergency flask, option B (below 30% life) | charges for kills by bleeding      |
+  | Vanguard | more maximum charges                                            | life flask recovery                        | charges on kill per grit charge    |
+  | Zealot   | flask effect and duration (the region is about auras and buffs) | more maximum charges                       | charges on kill per insight charge |
 
 - **Flask nodes compete with other sustain.** A flask node gives no regeneration, leech or "recover on kill". Three
   notables have one today (Draught, Supply Line and Provisions); it would move to another node. A build that wants
@@ -155,15 +155,15 @@ global `flaskMaxCharges`, `flaskChargesKilledBy` (the kind of damage over time t
 Every flask notable is priced at about 4 to 4.5 units, near its region's regeneration notable, and carries no other
 sustain. No flat charges on kill is left anywhere.
 
-| Class | Near the start | Further out | Far out |
-| --- | --- | --- | --- |
-| Mystic | Draught (5): 30% mana flask recovery, 8% fewer charges a drink | Distilled Grace (9, new): 20% flask effect | Ember Tithe (12, new): +0.5 charges for a kill by burning |
-| Shade | Smuggler's Flasks (5): 45% faster life flask recovery | Hidden Vial (10, new): 60% life from the last belt slot's flask | Slow Harvest (12, new): +0.5 charges for a kill by poison |
-| Strider | Quick Sip (5): 10% fewer charges a drink, 10% flask effect | Slow Measure (10, was Spare Stock): 40% flask duration | Heat of the Chase (11, new): +0.12 charges a kill per fervour charge |
-| Reaver | Field Dressing (6): 24% life flask recovery, 20% flask duration | Bitter Dregs (10, new): 50% life from flasks drunk below 30% life | Bled Dry (10, new): +0.5 charges for a kill by bleeding |
-| Vanguard | Camp Stores (5): 24% maximum flask charges | Stout Measure (9, new): 48% life flask recovery | Hard-Won Rations (12, new): +0.12 charges a kill per grit charge |
-| Zealot | Anointing (5, new): 12% flask effect, 20% flask duration | Sacristy (11, new): 18% maximum charges, 20% mana flask recovery | Cup of Revelation (13, new): +0.12 charges a kill per insight charge |
-| Centre | Provisions (12): 12% flask effect, 20% flask recovery (its mana regeneration went) | | |
+| Class    | Near the start                                                                     | Further out                                                       | Far out                                                              |
+| -------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Mystic   | Draught (5): 30% mana flask recovery, 8% fewer charges a drink                     | Distilled Grace (9, new): 20% flask effect                        | Ember Tithe (12, new): +0.5 charges for a kill by burning            |
+| Shade    | Smuggler's Flasks (5): 45% faster life flask recovery                              | Hidden Vial (10, new): 60% life from the last belt slot's flask   | Slow Harvest (12, new): +0.5 charges for a kill by poison            |
+| Strider  | Quick Sip (5): 10% fewer charges a drink, 10% flask effect                         | Slow Measure (10, was Spare Stock): 40% flask duration            | Heat of the Chase (11, new): +0.12 charges a kill per fervour charge |
+| Reaver   | Field Dressing (6): 24% life flask recovery, 20% flask duration                    | Bitter Dregs (10, new): 50% life from flasks drunk below 30% life | Bled Dry (10, new): +0.5 charges for a kill by bleeding              |
+| Vanguard | Camp Stores (5): 24% maximum flask charges                                         | Stout Measure (9, new): 48% life flask recovery                   | Hard-Won Rations (12, new): +0.12 charges a kill per grit charge     |
+| Zealot   | Anointing (5, new): 12% flask effect, 20% flask duration                           | Sacristy (11, new): 18% maximum charges, 20% mana flask recovery  | Cup of Revelation (13, new): +0.12 charges a kill per insight charge |
+| Centre   | Provisions (12): 12% flask effect, 20% flask recovery (its mana regeneration went) |                                                                   |                                                                      |
 
 Each notable has one or two flask smalls before it. The Strider's other flask notables became notables of its own builds:
 Slip the Pack (was Hunter's Satchel: Elusive on kill, movement speed), Reedwalker (was Field Kit: evasion, Elusive when

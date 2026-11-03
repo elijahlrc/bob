@@ -722,7 +722,9 @@ export class Character {
     const resistPenalty = this.config.resistPenalty;
     const overcap = (t: string): number => {
       const res =
-        db0.sum('base', `resist.${t}`, ctx0) + db0.sum('base', 'resist.allEle', ctx0) - resistPenalty;
+        db0.sum('base', `resist.${t}`, ctx0) +
+        db0.sum('base', 'resist.allEle', ctx0) -
+        resistPenalty;
       const max = Math.min(
         HARD_MAX_RES,
         DEFAULT_MAX_RES +
@@ -752,28 +754,31 @@ export class Character {
                   : // Maximum mana before anything scales with it (the tree's mana-scaled lines: spell damage per
                     // 100 mana, mana as extra energy shield); no mana mod may itself be per maxMana.
                     s === 'maxMana'
-                    ? Math.max(0, Math.round(db0.calc('mana', { ...ctx0, statValue: this.statValue })))
-                  : s === 'minAttr'
-                    ? Math.min(attrs.str, attrs.dex, attrs.int)
-                    : // Accuracy and increased armour as gear, tree and attributes give them (for The Marksman's Pulse and
-                      // the Thirst of the Anvil); what a skill adds to its own accuracy is not counted.
-                      s === 'accuracy'
-                      ? Math.round(db0.sum('base', 'accuracy', ctx0) * db0.mult('accuracy', ctx0))
-                      : s === 'incArmour'
-                        ? db0.sum('inc', 'armour', ctx0)
-                        : // Searing Excess: an element's resistance above its cap.
-                          s.startsWith('overcap.')
-                          ? overcap(s.slice('overcap.'.length))
-                          : // The Cathedral's Chorus: auras standing now (each regenerates a little life).
-                            s === 'auras'
-                            ? this.auras.filter((a) => a.active).length
-                          : s === 'charges.grit'
-                      ? held.grit
-                      : s === 'charges.fervour'
-                        ? held.fervour
-                        : s === 'charges.insight'
-                          ? held.insight
-                          : 0;
+                    ? Math.max(
+                        0,
+                        Math.round(db0.calc('mana', { ...ctx0, statValue: this.statValue })),
+                      )
+                    : s === 'minAttr'
+                      ? Math.min(attrs.str, attrs.dex, attrs.int)
+                      : // Accuracy and increased armour as gear, tree and attributes give them (for The Marksman's Pulse and
+                        // the Thirst of the Anvil); what a skill adds to its own accuracy is not counted.
+                        s === 'accuracy'
+                        ? Math.round(db0.sum('base', 'accuracy', ctx0) * db0.mult('accuracy', ctx0))
+                        : s === 'incArmour'
+                          ? db0.sum('inc', 'armour', ctx0)
+                          : // Searing Excess: an element's resistance above its cap.
+                            s.startsWith('overcap.')
+                            ? overcap(s.slice('overcap.'.length))
+                            : // The Cathedral's Chorus: auras standing now (each regenerates a little life).
+                              s === 'auras'
+                              ? this.auras.filter((a) => a.active).length
+                              : s === 'charges.grit'
+                                ? held.grit
+                                : s === 'charges.fervour'
+                                  ? held.fervour
+                                  : s === 'charges.insight'
+                                    ? held.insight
+                                    : 0;
     const src = { kind: 'base' as const, id: 'attributes' };
     // Plated Hide and Strongarm both take dexterity's evasion bonus away.
     this.attrEffects = attributeEffects(

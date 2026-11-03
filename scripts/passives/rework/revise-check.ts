@@ -17,7 +17,11 @@ const big = (i: number) => kind[i] === 'notable' || kind[i] === 'keystone';
 const starts = all.map((n, i) => (n.kind === 'start' && live[i] ? i : -1)).filter((i) => i >= 0);
 const name = (i: number) => (big(i) || kind[i] === 'start' ? all[i].name : built.ids[i]);
 
-function bfs(from: number[], blocked: (i: number) => boolean = () => false, only?: (i: number) => boolean): Int32Array {
+function bfs(
+  from: number[],
+  blocked: (i: number) => boolean = () => false,
+  only?: (i: number) => boolean,
+): Int32Array {
   const d = new Int32Array(N).fill(-1);
   const q: number[] = [];
   for (const s of from) {
@@ -40,7 +44,9 @@ const say = (s: string) => out.push(s);
 let links = 0;
 for (let i = 0; i < N; i++) links += adj[i].length;
 const liveCount = live.filter(Boolean).length;
-say(`nodes ${liveCount}, notables ${kind.filter((k, i) => live[i] && k === 'notable').length}, keystones ${kind.filter((k, i) => live[i] && k === 'keystone').length}, mean links ${(links / liveCount).toFixed(2)}`);
+say(
+  `nodes ${liveCount}, notables ${kind.filter((k, i) => live[i] && k === 'notable').length}, keystones ${kind.filter((k, i) => live[i] && k === 'keystone').length}, mean links ${(links / liveCount).toFixed(2)}`,
+);
 
 // 1. Notables whose every way in from a start runs through another notable or keystone.
 const hung: number[] = [];
@@ -50,7 +56,8 @@ for (let x = 0; x < N; x++) {
   if (d[x] < 0) hung.push(x);
 }
 say(`hung behind a notable: ${hung.length}`);
-if (list) for (const x of hung) say(`  ${name(x)} (${region[x]}) <- ${adj[x].map(name).join(', ')}`);
+if (list)
+  for (const x of hung) say(`  ${name(x)} (${region[x]}) <- ${adj[x].map(name).join(', ')}`);
 
 // 2. Dead-end notables within 8 steps of each start: nothing beyond them (no neighbour farther from the start).
 // 3. The first notable down each direction: per exit, and per node two steps out.
@@ -58,8 +65,13 @@ for (const s of starts) {
   const d = bfs([s], (i) => i !== s && kind[i] === 'start');
   const dead = [];
   for (let x = 0; x < N; x++)
-    if (live[x] && big(x) && d[x] > 0 && d[x] <= 8 && adj[x].every((m) => d[m] <= d[x])) dead.push(x);
-  const firstOwn = Math.min(...[...Array(N).keys()].filter((x) => live[x] && kind[x] === 'notable' && region[x] === region[s] && d[x] > 0).map((x) => d[x]));
+    if (live[x] && big(x) && d[x] > 0 && d[x] <= 8 && adj[x].every((m) => d[m] <= d[x]))
+      dead.push(x);
+  const firstOwn = Math.min(
+    ...[...Array(N).keys()]
+      .filter((x) => live[x] && kind[x] === 'notable' && region[x] === region[s] && d[x] > 0)
+      .map((x) => d[x]),
+  );
   const dirs: string[] = [];
   for (const e of adj[s]) {
     const de = bfs([e], (i) => i === s || kind[i] === 'start');
@@ -74,13 +86,22 @@ for (const s of starts) {
     for (let x = 0; x < N; x++) if (big(x) && dt[x] >= 0) best = Math.min(best, dt[x] + 2);
     return best;
   });
-  say(`${region[s]}: first own notable ${firstOwn}; dead-end notables within 8: ${dead.length}${list && dead.length ? ' (' + dead.map(name).join(', ') + ')' : ''}; first notable per exit ${dirs.join('/')}; per step-2 node ${at2.sort((a, b) => a - b).join(' ')} (${two.length} nodes at step 2)`);
+  say(
+    `${region[s]}: first own notable ${firstOwn}; dead-end notables within 8: ${dead.length}${list && dead.length ? ' (' + dead.map(name).join(', ') + ')' : ''}; first notable per exit ${dirs.join('/')}; per step-2 node ${at2.sort((a, b) => a - b).join(' ')} (${two.length} nodes at step 2)`,
+  );
 }
 
 // Steps between starts.
 const ss: string[] = [];
 for (const a of starts) {
-  ss.push(`${region[a]} ` + starts.filter((b) => b !== a).map((b) => bfs([a], (i) => i !== a && i !== b && kind[i] === 'start')[b]).sort((x, y) => x - y).join(' '));
+  ss.push(
+    `${region[a]} ` +
+      starts
+        .filter((b) => b !== a)
+        .map((b) => bfs([a], (i) => i !== a && i !== b && kind[i] === 'start')[b])
+        .sort((x, y) => x - y)
+        .join(' '),
+  );
 }
 say('steps to the other starts: ' + ss.join('; '));
 
@@ -88,8 +109,10 @@ say('steps to the other starts: ' + ss.join('; '));
 // shorter than the roads' own. Many such pairs are by design (a start's seam paths run through its home clusters), so the
 // count alone says little. `--save <file>` writes every road pair's distances; `--base <file>` then names only the pairs
 // whose way through clusters got shorter than it was in the saved tree and is now shorter than the road: a new shortcut.
-const road = (i: number) => live[i] && (kind[i] === 'travel' || kind[i] === 'hub' || kind[i] === 'start');
-const arg = (k: string) => (process.argv.indexOf(k) >= 0 ? process.argv[process.argv.indexOf(k) + 1] : null);
+const road = (i: number) =>
+  live[i] && (kind[i] === 'travel' || kind[i] === 'hub' || kind[i] === 'start');
+const arg = (k: string) =>
+  process.argv.indexOf(k) >= 0 ? process.argv[process.argv.indexOf(k) + 1] : null;
 const saveTo = arg('--save');
 const basePath = arg('--base');
 const base: Record<string, number> = basePath ? JSON.parse(fs.readFileSync(basePath, 'utf8')) : {};
@@ -132,6 +155,12 @@ for (let i = 0; i < N; i++)
       if (!road(i) && !road(m)) v[1]++;
       cross.set(k, v);
     }
-say('links across borders (all / cluster to cluster): ' + [...cross].sort().map(([k, v]) => `${k} ${v[0]}/${v[1]}`).join(', '));
+say(
+  'links across borders (all / cluster to cluster): ' +
+    [...cross]
+      .sort()
+      .map(([k, v]) => `${k} ${v[0]}/${v[1]}`)
+      .join(', '),
+);
 
 console.log(out.join('\n'));

@@ -287,7 +287,7 @@ Elemental attacks in general, off the north spoke past the mid ring toward the a
 
 - `a` 10% increased Elemental Damage with Attack Skills (1.0 units)
 - `b` 10% increased Elemental Damage with Attack Skills (1.0 units)
-- `n` **notable Elemental Fletching** 20% increased Elemental Damage with Attack Skills; Damage Penetrates 3% of Enemy Elemental  Resistance (4.0 units) — 2 + 2 units.
+- `n` **notable Elemental Fletching** 20% increased Elemental Damage with Attack Skills; Damage Penetrates 3% of Enemy Elemental Resistance (4.0 units) — 2 + 2 units.
 - `c` 10% increased Elemental Damage with Attack Skills (1.0 units)
 - `d` 10% increased Elemental Damage with Attack Skills (1.0 units)
 
@@ -388,7 +388,7 @@ Elemental attacks’ payoff, out from the rim ring at the axis.
 
 - `s1` 10% increased Elemental Damage with Attack Skills (1.0 units)
 - `s2` 10% increased Elemental Damage with Attack Skills (1.0 units)
-- `n` **notable Storm-Feathered** 16% increased Elemental Damage with Attack Skills; Damage Penetrates 4% of Enemy Elemental  Resistance (4.3 units) — Elemental attacks’ payoff, out from the rim ring at the axis.
+- `n` **notable Storm-Feathered** 16% increased Elemental Damage with Attack Skills; Damage Penetrates 4% of Enemy Elemental Resistance (4.3 units) — Elemental attacks’ payoff, out from the rim ring at the axis.
 
 ### Pursuit's End (pursuit)
 

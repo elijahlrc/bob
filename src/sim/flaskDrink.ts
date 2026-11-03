@@ -15,7 +15,8 @@ export function drinkLifeMult(w: World, side: Side, uid: number): number {
   const db = side.char.db;
   const ctx = playerCtx(w, side);
   let inc = 0;
-  if (side.build.flasks[EMERGENCY_SLOT]?.uid === uid) inc += db.sum('inc', 'flaskLastSlotRecovery', ctx);
+  if (side.build.flasks[EMERGENCY_SLOT]?.uid === uid)
+    inc += db.sum('inc', 'flaskLastSlotRecovery', ctx);
   const p = side.player;
   if (p.life < EMERGENCY_LIFE * lifeCap(p)) inc += db.sum('inc', 'flaskLowLifeRecovery', ctx);
   return 1 + inc / 100;

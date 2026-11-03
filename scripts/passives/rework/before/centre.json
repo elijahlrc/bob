@@ -1,967 +1,586 @@
 [
- {
-  "file": "clusters",
-  "export": "clusters",
-  "id": "centre.inner",
-  "name": "The inner ring",
-  "why": "Eight small arches on the inside of the ring: resistances at the top, stun protection north-east, movement east, life on hit south-east, all attributes at the bottom, chaos resistance south-west, flasks west, mana cost north-west. A build that crosses the ring for a neighbour passes one of them; a build that wants only the stat pays two or three points on the ring it was walking anyway.",
-  "start": null,
-  "clusters": [
-   {
-    "id": "shelter",
-    "name": "Shelter",
-    "why": "Resistances, at the top under the Mystic: the stat every build needs by map 20. Two small resistance nodes and a notable with resistances and a little life.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The west foot, on the ring toward the Zealot.",
-      "lines": [
-       "resAll(4)"
-      ],
-      "at": [
-       -61,
-       -647
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Shelter",
-      "why": "2 + 1 units; one step inside the ring's top node.",
-      "lines": [
-       "resAll(8)",
-       "life(5)"
-      ],
-      "at": [
-       0,
-       -612
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The east foot, on the ring toward the Shade.",
-      "lines": [
-       "resAll(4)"
-      ],
-      "at": [
-       61,
-       -647
-      ]
-     }
+  {
+    "file": "clusters",
+    "export": "clusters",
+    "id": "centre.inner",
+    "name": "The inner ring",
+    "why": "Eight small arches on the inside of the ring: resistances at the top, stun protection north-east, movement east, life on hit south-east, all attributes at the bottom, chaos resistance south-west, flasks west, mana cost north-west. A build that crosses the ring for a neighbour passes one of them; a build that wants only the stat pays two or three points on the ring it was walking anyway.",
+    "start": null,
+    "clusters": [
+      {
+        "id": "shelter",
+        "name": "Shelter",
+        "why": "Resistances, at the top under the Mystic: the stat every build needs by map 20. Two small resistance nodes and a notable with resistances and a little life.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The west foot, on the ring toward the Zealot.",
+            "lines": ["resAll(4)"],
+            "at": [-61, -647]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Shelter",
+            "why": "2 + 1 units; one step inside the ring's top node.",
+            "lines": ["resAll(8)", "life(5)"],
+            "at": [0, -612]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The east foot, on the ring toward the Shade.",
+            "lines": ["resAll(4)"],
+            "at": [61, -647]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "firmFooting",
+        "name": "Firm Footing",
+        "why": "Stun protection, north-east between the Mystic and the Shade (G1-brief §3, CE-1): neither home sells it within ten steps, and a caster or a dagger build in light armour is the one a stun stops. Two avoid-stun nodes and a notable with avoid stun and shorter stuns. Not stun threshold, which is life-side and belongs to the strength homes.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The north foot, on the ring node of the Mystic's east link.",
+            "lines": ["stunAvoid(20)"],
+            "at": [271, -591]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Firm Footing",
+            "why": "2 + 1 units; one step inside the ring node between the Mystic and the Shade.",
+            "lines": ["stunAvoid(40)", "stunRecovery(15)"],
+            "at": [306, -530]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The east foot, on the ring node of the Shade's north link.",
+            "lines": ["stunAvoid(20)"],
+            "at": [376, -530]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "quickMarch",
+        "name": "Quick March",
+        "why": "Movement, on the east under the Shade and the Strider: pace between packs for anyone. Two movement nodes and a notable with movement and cooldown recovery.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The north foot, on the ring toward the Shade.",
+            "lines": ["moveSpeed(4)"],
+            "at": [647, -61]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Quick March",
+            "why": "2 + 1 units.",
+            "lines": ["moveSpeed(8)", "cooldownRecovery(10)"],
+            "at": [612, 0]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The south foot, on the ring toward the Strider.",
+            "lines": ["moveSpeed(4)"],
+            "at": [647, 61]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "hardLiving",
+        "name": "Hard Living",
+        "why": "Life back from fighting, south-east between the Strider and the Reaver (G1-brief §3, CE-2): both homes sell life regeneration near their starts, so this is the other kind of sustain, earned per hit and per kill. Two life-on-hit nodes and a notable with life on hit and life on kill. Life on hit is untagged here, unlike the regions' attack and melee lines, so a spell or a totem build crossing the ring gets it too: the centre stays generic.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The east foot, on the ring node of the Strider's south link.",
+            "lines": ["lifeOnHit(4)"],
+            "at": [376, 530]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Hard Living",
+            "why": "2 + 1 units; one step inside the ring node between the Strider and the Reaver.",
+            "lines": ["lifeOnHit(8)", "lifeOnKill(10)"],
+            "at": [306, 530]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The south foot, on the ring node of the Reaver's east link.",
+            "lines": ["lifeOnHit(4)"],
+            "at": [271, 591]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "wellRounded",
+        "name": "Well Rounded",
+        "why": "All attributes, at the bottom under the Reaver: the cheap partial answer to a gear requirement for anyone (brief §7). Two all-attribute nodes and a notable with all attributes and a little life.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The east foot, on the ring toward the Strider.",
+            "lines": ["allAttr(4)"],
+            "at": [61, 647]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Well Rounded",
+            "why": "2 + 1 units.",
+            "lines": ["allAttr(8)", "life(5)"],
+            "at": [0, 612]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The west foot, on the ring toward the Vanguard.",
+            "lines": ["allAttr(4)"],
+            "at": [-61, 647]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "soundBody",
+        "name": "Sound Body",
+        "why": "Chaos resistance, south-west between the Reaver and the Vanguard (G1-brief §3, CE-3): the scarcest resistance, and the Vanguard already sells stun protection four steps from its start. Two chaos-resistance nodes and a notable with chaos resistance and a chance to avoid elemental ailments.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The south foot, on the ring node of the Reaver's west link.",
+            "lines": ["resOne(\"chaos\", 10)"],
+            "at": [-271, 591]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Sound Body",
+            "why": "2 + 1 units (chaos resistance 16% to 20% when its unit became 10, G4 round 2); one step inside the ring node between the Reaver and the Vanguard.",
+            "lines": ["resOne(\"chaos\", 20)", "avoidAilments(10)"],
+            "at": [-306, 530]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The west foot, on the ring node of the Vanguard's east link.",
+            "lines": ["resOne(\"chaos\", 10)"],
+            "at": [-376, 530]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "provisions",
+        "name": "Provisions",
+        "why": "Flasks and mana, on the west under the Vanguard and the Zealot: the early game is flasks, and every class casts something. Two flask recovery nodes and a notable with flask effect, recovery and mana regeneration.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The south foot, on the ring toward the Vanguard.",
+            "lines": ["flaskRecovery(10)"],
+            "at": [-647, 61]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Provisions",
+            "why": "1.6 + 1 + 1 units.",
+            "lines": ["flaskEffect(8)", "flaskRecovery(10)", "manaRegen(10)"],
+            "at": [-612, 0]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The north foot, on the ring toward the Zealot.",
+            "lines": ["flaskRecovery(10)"],
+            "at": [-647, -61]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      },
+      {
+        "id": "wasteNot",
+        "name": "Waste Not",
+        "why": "Cheaper skills, north-west between the Zealot and the Mystic (G1-brief §3, CE-4): both homes sell maximum mana and regeneration near their starts, so this sells the other side of the mana sum, cost, and mana back per kill. Not maximum mana, which is the channeller's main want. Two reduced-cost nodes and a notable with reduced cost and mana on kill.",
+        "nodes": [
+          {
+            "id": "a",
+            "kind": "small",
+            "why": "The west foot, on the ring node of the Zealot's north link.",
+            "lines": ["costReduction(4)"],
+            "at": [-376, -530]
+          },
+          {
+            "id": "n",
+            "kind": "notable",
+            "name": "Waste Not",
+            "why": "2 + 1 units; one step inside the ring node between the Zealot and the Mystic.",
+            "lines": ["costReduction(8)", "manaOnKill(10)"],
+            "at": [-306, -530]
+          },
+          {
+            "id": "b",
+            "kind": "small",
+            "why": "The north foot, on the ring node of the Mystic's west link.",
+            "lines": ["costReduction(4)"],
+            "at": [-271, -591]
+          }
+        ],
+        "links": [
+          ["a", "n"],
+          ["n", "b"]
+        ]
+      }
     ],
     "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
+      {
+        "from": "centre.ring.road.r0",
+        "to": "shelter.n",
+        "why": "The ring's top node touches the resistances notable."
+      },
+      {
+        "from": "centre.ring.road.r23",
+        "to": "shelter.a",
+        "why": "The west foot of the resistances arch."
+      },
+      {
+        "from": "shelter.b",
+        "to": "centre.ring.road.r1",
+        "why": "The east foot of the resistances arch."
+      },
+      {
+        "from": "centre.ring.road.r2",
+        "to": "firmFooting.n",
+        "why": "The ring node between the Mystic and the Shade touches the stun notable."
+      },
+      {
+        "from": "centre.ring.road.r1",
+        "to": "firmFooting.a",
+        "why": "The north foot of the stun arch."
+      },
+      {
+        "from": "firmFooting.b",
+        "to": "centre.ring.road.r3",
+        "why": "The east foot of the stun arch."
+      },
+      {
+        "from": "centre.ring.road.r6",
+        "to": "quickMarch.n",
+        "why": "The ring's east node touches the movement notable."
+      },
+      {
+        "from": "centre.ring.road.r5",
+        "to": "quickMarch.a",
+        "why": "The north foot of the movement arch."
+      },
+      {
+        "from": "quickMarch.b",
+        "to": "centre.ring.road.r7",
+        "why": "The south foot of the movement arch."
+      },
+      {
+        "from": "centre.ring.road.r10",
+        "to": "hardLiving.n",
+        "why": "The ring node between the Strider and the Reaver touches the life-on-hit notable."
+      },
+      {
+        "from": "centre.ring.road.r9",
+        "to": "hardLiving.a",
+        "why": "The east foot of the life-on-hit arch."
+      },
+      {
+        "from": "hardLiving.b",
+        "to": "centre.ring.road.r11",
+        "why": "The south foot of the life-on-hit arch."
+      },
+      {
+        "from": "centre.ring.road.r12",
+        "to": "wellRounded.n",
+        "why": "The ring's bottom node touches the attributes notable."
+      },
+      {
+        "from": "centre.ring.road.r11",
+        "to": "wellRounded.a",
+        "why": "The east foot of the attributes arch."
+      },
+      {
+        "from": "wellRounded.b",
+        "to": "centre.ring.road.r13",
+        "why": "The west foot of the attributes arch."
+      },
+      {
+        "from": "centre.ring.road.r14",
+        "to": "soundBody.n",
+        "why": "The ring node between the Reaver and the Vanguard touches the chaos-resistance notable."
+      },
+      {
+        "from": "centre.ring.road.r13",
+        "to": "soundBody.a",
+        "why": "The south foot of the chaos-resistance arch."
+      },
+      {
+        "from": "soundBody.b",
+        "to": "centre.ring.road.r15",
+        "why": "The west foot of the chaos-resistance arch."
+      },
+      {
+        "from": "centre.ring.road.r18",
+        "to": "provisions.n",
+        "why": "The ring's west node touches the flask notable."
+      },
+      {
+        "from": "centre.ring.road.r17",
+        "to": "provisions.a",
+        "why": "The south foot of the flask arch."
+      },
+      {
+        "from": "provisions.b",
+        "to": "centre.ring.road.r19",
+        "why": "The north foot of the flask arch."
+      },
+      {
+        "from": "centre.ring.road.r22",
+        "to": "wasteNot.n",
+        "why": "The ring node between the Zealot and the Mystic touches the mana-cost notable."
+      },
+      {
+        "from": "centre.ring.road.r21",
+        "to": "wasteNot.a",
+        "why": "The west foot of the mana-cost arch."
+      },
+      {
+        "from": "wasteNot.b",
+        "to": "centre.ring.road.r23",
+        "why": "The north foot of the mana-cost arch."
+      }
     ]
-   },
-   {
-    "id": "firmFooting",
-    "name": "Firm Footing",
-    "why": "Stun protection, north-east between the Mystic and the Shade (G1-brief §3, CE-1): neither home sells it within ten steps, and a caster or a dagger build in light armour is the one a stun stops. Two avoid-stun nodes and a notable with avoid stun and shorter stuns. Not stun threshold, which is life-side and belongs to the strength homes.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The north foot, on the ring node of the Mystic's east link.",
-      "lines": [
-       "stunAvoid(20)"
-      ],
-      "at": [
-       271,
-       -591
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Firm Footing",
-      "why": "2 + 1 units; one step inside the ring node between the Mystic and the Shade.",
-      "lines": [
-       "stunAvoid(40)",
-       "stunRecovery(15)"
-      ],
-      "at": [
-       306,
-       -530
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The east foot, on the ring node of the Shade's north link.",
-      "lines": [
-       "stunAvoid(20)"
-      ],
-      "at": [
-       376,
-       -530
-      ]
-     }
+  },
+  {
+    "file": "ring",
+    "export": "ring",
+    "id": "centre.ring",
+    "name": "The ring",
+    "why": "The cheap crossing between neighbouring homes: a road of attribute nodes, nothing else, so that walking to a neighbour pays in the attribute the neighbour's gear will ask for. Four steps from one class's junction to the next, as in the reference (its centre crossing is about as long).",
+    "start": null,
+    "clusters": [
+      {
+        "id": "road",
+        "name": "The ring road",
+        "why": "One cluster so that the ring is one place; its nodes are the only attribute road the centre has.",
+        "nodes": [
+          {
+            "id": "r0",
+            "kind": "attribute",
+            "lines": ["int(7)"],
+            "at": [0, -750]
+          },
+          {
+            "id": "r1",
+            "kind": "attribute",
+            "lines": ["int(7)"],
+            "at": [194, -724]
+          },
+          {
+            "id": "r2",
+            "kind": "attribute",
+            "lines": ["int(6)", "dex(6)"],
+            "at": [375, -650]
+          },
+          {
+            "id": "r3",
+            "kind": "attribute",
+            "lines": ["dex(6)", "int(6)"],
+            "at": [530, -530]
+          },
+          {
+            "id": "r4",
+            "kind": "attribute",
+            "lines": ["dex(6)", "int(6)"],
+            "at": [650, -375]
+          },
+          {
+            "id": "r5",
+            "kind": "attribute",
+            "lines": ["dex(6)", "int(6)"],
+            "at": [724, -194]
+          },
+          {
+            "id": "r6",
+            "kind": "attribute",
+            "lines": ["dex(7)"],
+            "at": [750, 0]
+          },
+          {
+            "id": "r7",
+            "kind": "attribute",
+            "lines": ["dex(7)"],
+            "at": [724, 194]
+          },
+          {
+            "id": "r8",
+            "kind": "attribute",
+            "lines": ["dex(7)"],
+            "at": [650, 375]
+          },
+          {
+            "id": "r9",
+            "kind": "attribute",
+            "lines": ["dex(7)"],
+            "at": [530, 530]
+          },
+          {
+            "id": "r10",
+            "kind": "attribute",
+            "lines": ["dex(6)", "str(6)"],
+            "at": [375, 650]
+          },
+          {
+            "id": "r11",
+            "kind": "attribute",
+            "lines": ["str(6)", "dex(6)"],
+            "at": [194, 724]
+          },
+          {
+            "id": "r12",
+            "kind": "attribute",
+            "lines": ["str(6)", "dex(6)"],
+            "at": [0, 750]
+          },
+          {
+            "id": "r13",
+            "kind": "attribute",
+            "lines": ["str(6)", "dex(6)"],
+            "at": [-194, 724]
+          },
+          {
+            "id": "r14",
+            "kind": "attribute",
+            "lines": ["str(7)"],
+            "at": [-375, 650]
+          },
+          {
+            "id": "r15",
+            "kind": "attribute",
+            "lines": ["str(7)"],
+            "at": [-530, 530]
+          },
+          {
+            "id": "r16",
+            "kind": "attribute",
+            "lines": ["str(7)"],
+            "at": [-650, 375]
+          },
+          {
+            "id": "r17",
+            "kind": "attribute",
+            "lines": ["str(7)"],
+            "at": [-724, 194]
+          },
+          {
+            "id": "r18",
+            "kind": "attribute",
+            "lines": ["str(7)"],
+            "at": [-750, 0]
+          },
+          {
+            "id": "r19",
+            "kind": "attribute",
+            "lines": ["str(6)", "int(6)"],
+            "at": [-724, -194]
+          },
+          {
+            "id": "r20",
+            "kind": "attribute",
+            "lines": ["str(6)", "int(6)"],
+            "at": [-650, -375]
+          },
+          {
+            "id": "r21",
+            "kind": "attribute",
+            "lines": ["str(6)", "int(6)"],
+            "at": [-530, -530]
+          },
+          {
+            "id": "r22",
+            "kind": "attribute",
+            "lines": ["str(6)", "int(6)"],
+            "at": [-375, -650]
+          },
+          {
+            "id": "r23",
+            "kind": "attribute",
+            "lines": ["int(7)"],
+            "at": [-194, -724]
+          }
+        ],
+        "links": [
+          ["r0", "r1"],
+          ["r1", "r2"],
+          ["r2", "r3"],
+          ["r3", "r4"],
+          ["r4", "r5"],
+          ["r5", "r6"],
+          ["r6", "r7"],
+          ["r7", "r8"],
+          ["r8", "r9"],
+          ["r9", "r10"],
+          ["r10", "r11"],
+          ["r11", "r12"],
+          ["r12", "r13"],
+          ["r13", "r14"],
+          ["r14", "r15"],
+          ["r15", "r16"],
+          ["r16", "r17"],
+          ["r17", "r18"],
+          ["r18", "r19"],
+          ["r19", "r20"],
+          ["r20", "r21"],
+          ["r21", "r22"],
+          ["r22", "r23"],
+          ["r23", "r0"]
+        ]
+      }
     ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   },
-   {
-    "id": "quickMarch",
-    "name": "Quick March",
-    "why": "Movement, on the east under the Shade and the Strider: pace between packs for anyone. Two movement nodes and a notable with movement and cooldown recovery.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The north foot, on the ring toward the Shade.",
-      "lines": [
-       "moveSpeed(4)"
-      ],
-      "at": [
-       647,
-       -61
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Quick March",
-      "why": "2 + 1 units.",
-      "lines": [
-       "moveSpeed(8)",
-       "cooldownRecovery(10)"
-      ],
-      "at": [
-       612,
-       0
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The south foot, on the ring toward the Strider.",
-      "lines": [
-       "moveSpeed(4)"
-      ],
-      "at": [
-       647,
-       61
-      ]
-     }
-    ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   },
-   {
-    "id": "hardLiving",
-    "name": "Hard Living",
-    "why": "Life back from fighting, south-east between the Strider and the Reaver (G1-brief §3, CE-2): both homes sell life regeneration near their starts, so this is the other kind of sustain, earned per hit and per kill. Two life-on-hit nodes and a notable with life on hit and life on kill. Life on hit is untagged here, unlike the regions' attack and melee lines, so a spell or a totem build crossing the ring gets it too: the centre stays generic.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The east foot, on the ring node of the Strider's south link.",
-      "lines": [
-       "lifeOnHit(4)"
-      ],
-      "at": [
-       376,
-       530
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Hard Living",
-      "why": "2 + 1 units; one step inside the ring node between the Strider and the Reaver.",
-      "lines": [
-       "lifeOnHit(8)",
-       "lifeOnKill(10)"
-      ],
-      "at": [
-       306,
-       530
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The south foot, on the ring node of the Reaver's east link.",
-      "lines": [
-       "lifeOnHit(4)"
-      ],
-      "at": [
-       271,
-       591
-      ]
-     }
-    ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   },
-   {
-    "id": "wellRounded",
-    "name": "Well Rounded",
-    "why": "All attributes, at the bottom under the Reaver: the cheap partial answer to a gear requirement for anyone (brief §7). Two all-attribute nodes and a notable with all attributes and a little life.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The east foot, on the ring toward the Strider.",
-      "lines": [
-       "allAttr(4)"
-      ],
-      "at": [
-       61,
-       647
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Well Rounded",
-      "why": "2 + 1 units.",
-      "lines": [
-       "allAttr(8)",
-       "life(5)"
-      ],
-      "at": [
-       0,
-       612
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The west foot, on the ring toward the Vanguard.",
-      "lines": [
-       "allAttr(4)"
-      ],
-      "at": [
-       -61,
-       647
-      ]
-     }
-    ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   },
-   {
-    "id": "soundBody",
-    "name": "Sound Body",
-    "why": "Chaos resistance, south-west between the Reaver and the Vanguard (G1-brief §3, CE-3): the scarcest resistance, and the Vanguard already sells stun protection four steps from its start. Two chaos-resistance nodes and a notable with chaos resistance and a chance to avoid elemental ailments.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The south foot, on the ring node of the Reaver's west link.",
-      "lines": [
-       "resOne(\"chaos\", 10)"
-      ],
-      "at": [
-       -271,
-       591
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Sound Body",
-      "why": "2 + 1 units (chaos resistance 16% to 20% when its unit became 10, G4 round 2); one step inside the ring node between the Reaver and the Vanguard.",
-      "lines": [
-       "resOne(\"chaos\", 20)",
-       "avoidAilments(10)"
-      ],
-      "at": [
-       -306,
-       530
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The west foot, on the ring node of the Vanguard's east link.",
-      "lines": [
-       "resOne(\"chaos\", 10)"
-      ],
-      "at": [
-       -376,
-       530
-      ]
-     }
-    ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   },
-   {
-    "id": "provisions",
-    "name": "Provisions",
-    "why": "Flasks and mana, on the west under the Vanguard and the Zealot: the early game is flasks, and every class casts something. Two flask recovery nodes and a notable with flask effect, recovery and mana regeneration.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The south foot, on the ring toward the Vanguard.",
-      "lines": [
-       "flaskRecovery(10)"
-      ],
-      "at": [
-       -647,
-       61
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Provisions",
-      "why": "1.6 + 1 + 1 units.",
-      "lines": [
-       "flaskEffect(8)",
-       "flaskRecovery(10)",
-       "manaRegen(10)"
-      ],
-      "at": [
-       -612,
-       0
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The north foot, on the ring toward the Zealot.",
-      "lines": [
-       "flaskRecovery(10)"
-      ],
-      "at": [
-       -647,
-       -61
-      ]
-     }
-    ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   },
-   {
-    "id": "wasteNot",
-    "name": "Waste Not",
-    "why": "Cheaper skills, north-west between the Zealot and the Mystic (G1-brief §3, CE-4): both homes sell maximum mana and regeneration near their starts, so this sells the other side of the mana sum, cost, and mana back per kill. Not maximum mana, which is the channeller's main want. Two reduced-cost nodes and a notable with reduced cost and mana on kill.",
-    "nodes": [
-     {
-      "id": "a",
-      "kind": "small",
-      "why": "The west foot, on the ring node of the Zealot's north link.",
-      "lines": [
-       "costReduction(4)"
-      ],
-      "at": [
-       -376,
-       -530
-      ]
-     },
-     {
-      "id": "n",
-      "kind": "notable",
-      "name": "Waste Not",
-      "why": "2 + 1 units; one step inside the ring node between the Zealot and the Mystic.",
-      "lines": [
-       "costReduction(8)",
-       "manaOnKill(10)"
-      ],
-      "at": [
-       -306,
-       -530
-      ]
-     },
-     {
-      "id": "b",
-      "kind": "small",
-      "why": "The north foot, on the ring node of the Mystic's west link.",
-      "lines": [
-       "costReduction(4)"
-      ],
-      "at": [
-       -271,
-       -591
-      ]
-     }
-    ],
-    "links": [
-     [
-      "a",
-      "n"
-     ],
-     [
-      "n",
-      "b"
-     ]
-    ]
-   }
-  ],
-  "links": [
-   {
-    "from": "centre.ring.road.r0",
-    "to": "shelter.n",
-    "why": "The ring's top node touches the resistances notable."
-   },
-   {
-    "from": "centre.ring.road.r23",
-    "to": "shelter.a",
-    "why": "The west foot of the resistances arch."
-   },
-   {
-    "from": "shelter.b",
-    "to": "centre.ring.road.r1",
-    "why": "The east foot of the resistances arch."
-   },
-   {
-    "from": "centre.ring.road.r2",
-    "to": "firmFooting.n",
-    "why": "The ring node between the Mystic and the Shade touches the stun notable."
-   },
-   {
-    "from": "centre.ring.road.r1",
-    "to": "firmFooting.a",
-    "why": "The north foot of the stun arch."
-   },
-   {
-    "from": "firmFooting.b",
-    "to": "centre.ring.road.r3",
-    "why": "The east foot of the stun arch."
-   },
-   {
-    "from": "centre.ring.road.r6",
-    "to": "quickMarch.n",
-    "why": "The ring's east node touches the movement notable."
-   },
-   {
-    "from": "centre.ring.road.r5",
-    "to": "quickMarch.a",
-    "why": "The north foot of the movement arch."
-   },
-   {
-    "from": "quickMarch.b",
-    "to": "centre.ring.road.r7",
-    "why": "The south foot of the movement arch."
-   },
-   {
-    "from": "centre.ring.road.r10",
-    "to": "hardLiving.n",
-    "why": "The ring node between the Strider and the Reaver touches the life-on-hit notable."
-   },
-   {
-    "from": "centre.ring.road.r9",
-    "to": "hardLiving.a",
-    "why": "The east foot of the life-on-hit arch."
-   },
-   {
-    "from": "hardLiving.b",
-    "to": "centre.ring.road.r11",
-    "why": "The south foot of the life-on-hit arch."
-   },
-   {
-    "from": "centre.ring.road.r12",
-    "to": "wellRounded.n",
-    "why": "The ring's bottom node touches the attributes notable."
-   },
-   {
-    "from": "centre.ring.road.r11",
-    "to": "wellRounded.a",
-    "why": "The east foot of the attributes arch."
-   },
-   {
-    "from": "wellRounded.b",
-    "to": "centre.ring.road.r13",
-    "why": "The west foot of the attributes arch."
-   },
-   {
-    "from": "centre.ring.road.r14",
-    "to": "soundBody.n",
-    "why": "The ring node between the Reaver and the Vanguard touches the chaos-resistance notable."
-   },
-   {
-    "from": "centre.ring.road.r13",
-    "to": "soundBody.a",
-    "why": "The south foot of the chaos-resistance arch."
-   },
-   {
-    "from": "soundBody.b",
-    "to": "centre.ring.road.r15",
-    "why": "The west foot of the chaos-resistance arch."
-   },
-   {
-    "from": "centre.ring.road.r18",
-    "to": "provisions.n",
-    "why": "The ring's west node touches the flask notable."
-   },
-   {
-    "from": "centre.ring.road.r17",
-    "to": "provisions.a",
-    "why": "The south foot of the flask arch."
-   },
-   {
-    "from": "provisions.b",
-    "to": "centre.ring.road.r19",
-    "why": "The north foot of the flask arch."
-   },
-   {
-    "from": "centre.ring.road.r22",
-    "to": "wasteNot.n",
-    "why": "The ring node between the Zealot and the Mystic touches the mana-cost notable."
-   },
-   {
-    "from": "centre.ring.road.r21",
-    "to": "wasteNot.a",
-    "why": "The west foot of the mana-cost arch."
-   },
-   {
-    "from": "wasteNot.b",
-    "to": "centre.ring.road.r23",
-    "why": "The north foot of the mana-cost arch."
-   }
-  ]
- },
- {
-  "file": "ring",
-  "export": "ring",
-  "id": "centre.ring",
-  "name": "The ring",
-  "why": "The cheap crossing between neighbouring homes: a road of attribute nodes, nothing else, so that walking to a neighbour pays in the attribute the neighbour's gear will ask for. Four steps from one class's junction to the next, as in the reference (its centre crossing is about as long).",
-  "start": null,
-  "clusters": [
-   {
-    "id": "road",
-    "name": "The ring road",
-    "why": "One cluster so that the ring is one place; its nodes are the only attribute road the centre has.",
-    "nodes": [
-     {
-      "id": "r0",
-      "kind": "attribute",
-      "lines": [
-       "int(7)"
-      ],
-      "at": [
-       0,
-       -750
-      ]
-     },
-     {
-      "id": "r1",
-      "kind": "attribute",
-      "lines": [
-       "int(7)"
-      ],
-      "at": [
-       194,
-       -724
-      ]
-     },
-     {
-      "id": "r2",
-      "kind": "attribute",
-      "lines": [
-       "int(6)",
-       "dex(6)"
-      ],
-      "at": [
-       375,
-       -650
-      ]
-     },
-     {
-      "id": "r3",
-      "kind": "attribute",
-      "lines": [
-       "dex(6)",
-       "int(6)"
-      ],
-      "at": [
-       530,
-       -530
-      ]
-     },
-     {
-      "id": "r4",
-      "kind": "attribute",
-      "lines": [
-       "dex(6)",
-       "int(6)"
-      ],
-      "at": [
-       650,
-       -375
-      ]
-     },
-     {
-      "id": "r5",
-      "kind": "attribute",
-      "lines": [
-       "dex(6)",
-       "int(6)"
-      ],
-      "at": [
-       724,
-       -194
-      ]
-     },
-     {
-      "id": "r6",
-      "kind": "attribute",
-      "lines": [
-       "dex(7)"
-      ],
-      "at": [
-       750,
-       0
-      ]
-     },
-     {
-      "id": "r7",
-      "kind": "attribute",
-      "lines": [
-       "dex(7)"
-      ],
-      "at": [
-       724,
-       194
-      ]
-     },
-     {
-      "id": "r8",
-      "kind": "attribute",
-      "lines": [
-       "dex(7)"
-      ],
-      "at": [
-       650,
-       375
-      ]
-     },
-     {
-      "id": "r9",
-      "kind": "attribute",
-      "lines": [
-       "dex(7)"
-      ],
-      "at": [
-       530,
-       530
-      ]
-     },
-     {
-      "id": "r10",
-      "kind": "attribute",
-      "lines": [
-       "dex(6)",
-       "str(6)"
-      ],
-      "at": [
-       375,
-       650
-      ]
-     },
-     {
-      "id": "r11",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "dex(6)"
-      ],
-      "at": [
-       194,
-       724
-      ]
-     },
-     {
-      "id": "r12",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "dex(6)"
-      ],
-      "at": [
-       0,
-       750
-      ]
-     },
-     {
-      "id": "r13",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "dex(6)"
-      ],
-      "at": [
-       -194,
-       724
-      ]
-     },
-     {
-      "id": "r14",
-      "kind": "attribute",
-      "lines": [
-       "str(7)"
-      ],
-      "at": [
-       -375,
-       650
-      ]
-     },
-     {
-      "id": "r15",
-      "kind": "attribute",
-      "lines": [
-       "str(7)"
-      ],
-      "at": [
-       -530,
-       530
-      ]
-     },
-     {
-      "id": "r16",
-      "kind": "attribute",
-      "lines": [
-       "str(7)"
-      ],
-      "at": [
-       -650,
-       375
-      ]
-     },
-     {
-      "id": "r17",
-      "kind": "attribute",
-      "lines": [
-       "str(7)"
-      ],
-      "at": [
-       -724,
-       194
-      ]
-     },
-     {
-      "id": "r18",
-      "kind": "attribute",
-      "lines": [
-       "str(7)"
-      ],
-      "at": [
-       -750,
-       0
-      ]
-     },
-     {
-      "id": "r19",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "int(6)"
-      ],
-      "at": [
-       -724,
-       -194
-      ]
-     },
-     {
-      "id": "r20",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "int(6)"
-      ],
-      "at": [
-       -650,
-       -375
-      ]
-     },
-     {
-      "id": "r21",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "int(6)"
-      ],
-      "at": [
-       -530,
-       -530
-      ]
-     },
-     {
-      "id": "r22",
-      "kind": "attribute",
-      "lines": [
-       "str(6)",
-       "int(6)"
-      ],
-      "at": [
-       -375,
-       -650
-      ]
-     },
-     {
-      "id": "r23",
-      "kind": "attribute",
-      "lines": [
-       "int(7)"
-      ],
-      "at": [
-       -194,
-       -724
-      ]
-     }
-    ],
-    "links": [
-     [
-      "r0",
-      "r1"
-     ],
-     [
-      "r1",
-      "r2"
-     ],
-     [
-      "r2",
-      "r3"
-     ],
-     [
-      "r3",
-      "r4"
-     ],
-     [
-      "r4",
-      "r5"
-     ],
-     [
-      "r5",
-      "r6"
-     ],
-     [
-      "r6",
-      "r7"
-     ],
-     [
-      "r7",
-      "r8"
-     ],
-     [
-      "r8",
-      "r9"
-     ],
-     [
-      "r9",
-      "r10"
-     ],
-     [
-      "r10",
-      "r11"
-     ],
-     [
-      "r11",
-      "r12"
-     ],
-     [
-      "r12",
-      "r13"
-     ],
-     [
-      "r13",
-      "r14"
-     ],
-     [
-      "r14",
-      "r15"
-     ],
-     [
-      "r15",
-      "r16"
-     ],
-     [
-      "r16",
-      "r17"
-     ],
-     [
-      "r17",
-      "r18"
-     ],
-     [
-      "r18",
-      "r19"
-     ],
-     [
-      "r19",
-      "r20"
-     ],
-     [
-      "r20",
-      "r21"
-     ],
-     [
-      "r21",
-      "r22"
-     ],
-     [
-      "r22",
-      "r23"
-     ],
-     [
-      "r23",
-      "r0"
-     ]
-    ]
-   }
-  ],
-  "links": []
- }
+    "links": []
+  }
 ]

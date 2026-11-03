@@ -171,7 +171,7 @@ export const home: AreaSpec = {
     {
       id: 'spoils',
       name: 'Spoils',
-      why: "Mana regeneration and life and mana on kill, on the north path to the Spire seam (step 5): the path runs through it. Grown in the revision (2026-10-31, R-revise.md): a run of mana regeneration goes on from Spoils to Low Tide and out to the north border road, so Low Tide stands where three ways meet (the border road, Spoils, Thick Blood) instead of hanging one step past Spoils.",
+      why: 'Mana regeneration and life and mana on kill, on the north path to the Spire seam (step 5): the path runs through it. Grown in the revision (2026-10-31, R-revise.md): a run of mana regeneration goes on from Spoils to Low Tide and out to the north border road, so Low Tide stands where three ways meet (the border road, Spoils, Thick Blood) instead of hanging one step past Spoils.',
       at: [1071, -1422],
       shape: { kind: 'hand' },
       nodes: [
@@ -288,7 +288,7 @@ export const home: AreaSpec = {
     {
       id: 'star',
       name: 'Snakeskin',
-      why: "The resist star, off the south spoke at its junction (step 5). Its link across to Soft Step went in the second thinning (2026-10-31): with the spoke a node shorter it ran from the spoke to the Bow seam faster than the road, and no build walked it.",
+      why: 'The resist star, off the south spoke at its junction (step 5). Its link across to Soft Step went in the second thinning (2026-10-31): with the spoke a node shorter it ran from the spoke to the Bow seam faster than the road, and no build walked it.',
       at: [2101, -352],
       shape: { kind: 'hand' },
       nodes: [
@@ -497,9 +497,17 @@ export const home: AreaSpec = {
     { from: 'knife.home.spN.x', to: 'knife.venom.spN.a', why: 'The north spoke goes on.' },
     { from: 'knife.home.spS.x', to: 'knife.edge.spS.a', why: 'The south spoke goes on.' },
     { from: 'knife.home.spoils.a', to: 'knife.home.pathN.b', why: 'The way in.' },
-    { from: 'knife.home.spoils.n', to: 'knife.home.seams.n', why: 'The path runs on from Spoils to the Spire seam (two nodes, as every path to a seam).' },
+    {
+      from: 'knife.home.spoils.n',
+      to: 'knife.home.seams.n',
+      why: 'The path runs on from Spoils to the Spire seam (two nodes, as every path to a seam).',
+    },
     { from: 'knife.home.softStep.a', to: 'knife.home.pathS.b', why: 'The way in.' },
-    { from: 'knife.home.softStep.n', to: 'knife.home.seams.s', why: 'The path runs on from Soft Step to the Bow seam (two nodes, as every path to a seam).' },
+    {
+      from: 'knife.home.softStep.n',
+      to: 'knife.home.seams.s',
+      why: 'The path runs on from Soft Step to the Bow seam (two nodes, as every path to a seam).',
+    },
     { from: 'knife.home.quick.a', to: 'knife.home.keen.n', why: 'The way in.' },
     { from: 'knife.home.thickBlood.a', to: 'knife.home.spN.x', why: 'The way in.' },
     { from: 'knife.home.star.w', to: 'knife.home.spS.x', why: 'The way in.' },

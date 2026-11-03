@@ -3,9 +3,20 @@
 // positions from the local reference data's groups and orbits, links from the summary, the six class starts marked, and
 // rings at 4, 8 and 12 steps from one start (argv[3]) so the skeleton near a start can be read.
 import fs from 'fs';
-import { Canvas, hex } from 'file:///E:/Proj/Auto/.claude/worktrees/flask-scarcity/scripts/tree/png.ts';
-const raw = fs.readFileSync('E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/pob/x/PathOfBuilding-1.4.155/TreeData/3_9/tree.lua', 'utf8');
-const ref = JSON.parse(fs.readFileSync('E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json', 'utf8'));
+import {
+  Canvas,
+  hex,
+} from 'file:///E:/Proj/Auto/.claude/worktrees/flask-scarcity/scripts/tree/png.ts';
+const raw = fs.readFileSync(
+  'E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/pob/x/PathOfBuilding-1.4.155/TreeData/3_9/tree.lua',
+  'utf8',
+);
+const ref = JSON.parse(
+  fs.readFileSync(
+    'E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json',
+    'utf8',
+  ),
+);
 const radii = [0, 82, 162, 335, 493];
 const per = [1, 6, 12, 12, 40];
 const groups = new Map<number, [number, number]>();
@@ -13,9 +24,11 @@ const gi = raw.indexOf('["groups"]={');
 const gre = /\[(\d+)\]=\{\["x"\]=(-?[\d.]+),\["y"\]=(-?[\d.]+)/g;
 gre.lastIndex = gi;
 let m: RegExpExecArray | null;
-while ((m = gre.exec(raw)) && m.index < gi + 400000) groups.set(Number(m[1]), [Number(m[2]), Number(m[3])]);
+while ((m = gre.exec(raw)) && m.index < gi + 400000)
+  groups.set(Number(m[1]), [Number(m[2]), Number(m[3])]);
 const pos = new Map<number, [number, number]>();
-const nre = /\["id"\]=(\d+),[^\[]*?(?:\[[^\]]*\][^\[]*?)*?\["g"\]=(\d+),\["o"\]=(\d+),\["oidx"\]=(\d+)/g;
+const nre =
+  /\["id"\]=(\d+),[^\[]*?(?:\[[^\]]*\][^\[]*?)*?\["g"\]=(\d+),\["o"\]=(\d+),\["oidx"\]=(\d+)/g;
 const starts = [47175, 50459, 54447, 50986, 61525, 44683];
 for (const id of [...Object.values(ref.nodes).map((n: any) => n.id), ...starts]) {
   const i = raw.indexOf(`["id"]=${id},`);
@@ -46,29 +59,42 @@ const add = (a: number, b: number) => {
   if (!adj.has(a)) adj.set(a, []);
   adj.get(a)!.push(b);
 };
-for (const n of Object.values(ref.nodes) as any[]) for (const l of n.links) if (pos.has(l) && pos.has(n.id)) (add(n.id, l), add(l, n.id));
+for (const n of Object.values(ref.nodes) as any[])
+  for (const l of n.links) if (pos.has(l) && pos.has(n.id)) (add(n.id, l), add(l, n.id));
 const d = new Map<number, number>([[focus, 0]]);
 const q = [focus];
 while (q.length) {
   const a = q.shift()!;
-  for (const b of adj.get(a) ?? []) if (!d.has(b) && !(starts.includes(b) && b !== focus)) (d.set(b, d.get(a)! + 1), q.push(b));
+  for (const b of adj.get(a) ?? [])
+    if (!d.has(b) && !(starts.includes(b) && b !== focus)) (d.set(b, d.get(a)! + 1), q.push(b));
 }
-for (const [a, bs] of adj) for (const b of bs) if (a < b) {
-  const [ax, ay] = P(a);
-  const [bx, by] = P(b);
-  cv.line(ax, ay, bx, by, 1.5, hex('#5a6070'), 0.8);
-}
+for (const [a, bs] of adj)
+  for (const b of bs)
+    if (a < b) {
+      const [ax, ay] = P(a);
+      const [bx, by] = P(b);
+      cv.line(ax, ay, bx, by, 1.5, hex('#5a6070'), 0.8);
+    }
 const colour = (k: number | undefined) =>
-  k === undefined ? hex('#444a55') : k <= 4 ? hex('#ffffff') : k <= 8 ? hex('#ffd23c') : k <= 12 ? hex('#ff7a3c') : hex('#6f7890');
+  k === undefined
+    ? hex('#444a55')
+    : k <= 4
+      ? hex('#ffffff')
+      : k <= 8
+        ? hex('#ffd23c')
+        : k <= 12
+          ? hex('#ff7a3c')
+          : hex('#6f7890');
 for (const n of Object.values(ref.nodes) as any[]) {
   if (!pos.has(n.id)) continue;
   const [x, y] = P(n.id);
   const r = n.kind === 'keystone' ? 7 : n.kind === 'notable' ? 5 : 2.5;
   cv.disc(x, y, r, colour(d.get(n.id)));
 }
-for (const s of starts) if (pos.has(s)) {
-  const [x, y] = P(s);
-  cv.ring(x, y, 10, 3, hex('#3cff8c'));
-}
+for (const s of starts)
+  if (pos.has(s)) {
+    const [x, y] = P(s);
+    cv.ring(x, y, 10, 3, hex('#3cff8c'));
+  }
 cv.save(process.argv[2]);
 console.log(`${W}x${H}, ${pos.size} placed`);

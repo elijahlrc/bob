@@ -220,7 +220,9 @@ function rollAddedAffix(it: Item, level: number, rng: Rng): AffixRoll | null {
 
 /** The best tier of a family that the item's level, or the level being played, allows. */
 function bestTier(it: Item, familyId: string, level: number): Family['tiers'][number] {
-  return family(familyId).tiers.filter((t) => t.minIlvl <= Math.max(it.ilvl, level)).at(-1)!;
+  return family(familyId)
+    .tiers.filter((t) => t.minIlvl <= Math.max(it.ilvl, level))
+    .at(-1)!;
 }
 
 /** The tier above an affix's that the item's level, or the level being played, allows, if any. */

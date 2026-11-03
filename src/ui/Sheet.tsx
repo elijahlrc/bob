@@ -1,12 +1,7 @@
 import { toChildArray, type ComponentChildren } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
-import {
-  statBaseLines,
-  statTotals,
-  type StatTotal,
-  type TotalSection,
-} from '../calc/statTotals';
+import { statBaseLines, statTotals, type StatTotal, type TotalSection } from '../calc/statTotals';
 import { CONDITION_TEXT, TAG_TEXT } from '../data/statText';
 import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
 import { hitChance, monsterEvasion } from '../calc/formulas';
@@ -233,7 +228,10 @@ export function SheetSituations({
   if (!choices.length) return null;
   return (
     <div class="cs-situations">
-      <span class="cs-situations-head" {...infoProps('Tick a situation to count the stats that need it.')}>
+      <span
+        class="cs-situations-head"
+        {...infoProps('Tick a situation to count the stats that need it.')}
+      >
         Count as true
       </span>
       {choices.map((c) => (
@@ -522,7 +520,13 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
             {flatRows('Life Recovered on Kill', flat.lifeOnKillPct, share, GLOSSARY.onKill, false)}
             {flatRows('Mana Gained on Kill', flat.manaOnKill, plus, GLOSSARY.onKill)}
             {flatRows('Life Gained on Block', flat.lifeOnBlock, plus, GLOSSARY.onBlock)}
-            {flatRows('Life Recovered on Block', flat.lifeOnBlockPct, share, GLOSSARY.onBlock, false)}
+            {flatRows(
+              'Life Recovered on Block',
+              flat.lifeOnBlockPct,
+              share,
+              GLOSSARY.onBlock,
+              false,
+            )}
             {flatRows('Mana Gained on Block', flat.manaOnBlock, plus, GLOSSARY.onBlock)}
             {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
           </Section>
@@ -534,7 +538,9 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               <Row
                 key={m ? modLabel(m) : 'pen'}
                 label={titled(
-                  [`${typesWord(m) || 'Elemental'} Penetration`, ...(m ? qualifier(m) : [])].join(' '),
+                  [`${typesWord(m) || 'Elemental'} Penetration`, ...(m ? qualifier(m) : [])].join(
+                    ' ',
+                  ),
                 )}
                 value={`${f0(m?.value ?? 0)}%`}
                 tip={GLOSSARY.penetration}

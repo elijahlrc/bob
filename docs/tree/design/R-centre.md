@@ -55,16 +55,16 @@ The far junctions are 13 or more, which is right: they are the other pairs' grou
 Each junction's notable suits the pair of classes either side and is not what either home sells at that seam (checked in
 the structure pass against real positions).
 
-| Notable | Place | Why there |
-| --- | --- | --- |
-| Firm Footing (stun) | the Mystic and Shade junction (border -60) | The two casters least able to take a stun. |
-| Shelter (resistances, life) | the Shade and Strider junction (border 0) | The evasive pair, light on resistances. |
-| Sound Body (chaos resistance, ailments) | the Strider and Reaver junction (border 60) | The pair that meets poison and bleed most. |
-| Quick March (movement, cooldown) | the Reaver and Vanguard junction (border 120) | The melee pair, slow on their feet. |
-| Waste Not (mana cost, mana on kill) | the Vanguard and Zealot junction (border 180) | The strength pair, short of mana. |
-| Hard Living (life on hit and kill) | the Zealot and Mystic junction (border 240) | The caster pair, short of life recovery. |
-| Well Rounded (attributes, life) | the middle | Attributes every build needs for its gear: equal for all. |
-| Provisions (flasks, mana regeneration) | the middle | Flasks, the attrition lever (CONSTRAINTS §16): equal for all. |
+| Notable                                 | Place                                         | Why there                                                     |
+| --------------------------------------- | --------------------------------------------- | ------------------------------------------------------------- |
+| Firm Footing (stun)                     | the Mystic and Shade junction (border -60)    | The two casters least able to take a stun.                    |
+| Shelter (resistances, life)             | the Shade and Strider junction (border 0)     | The evasive pair, light on resistances.                       |
+| Sound Body (chaos resistance, ailments) | the Strider and Reaver junction (border 60)   | The pair that meets poison and bleed most.                    |
+| Quick March (movement, cooldown)        | the Reaver and Vanguard junction (border 120) | The melee pair, slow on their feet.                           |
+| Waste Not (mana cost, mana on kill)     | the Vanguard and Zealot junction (border 180) | The strength pair, short of mana.                             |
+| Hard Living (life on hit and kill)      | the Zealot and Mystic junction (border 240)   | The caster pair, short of life recovery.                      |
+| Well Rounded (attributes, life)         | the middle                                    | Attributes every build needs for its gear: equal for all.     |
+| Provisions (flasks, mana regeneration)  | the middle                                    | Flasks, the attrition lever (CONSTRAINTS §16): equal for all. |
 
 ## 6. Size
 
@@ -92,17 +92,18 @@ Cathedral built none); with one node on each hexagon side the next junction is 2
   writes the why of the new clusters it had dropped.
 - **Must 2, placements against the real neighbours** (the notables within four steps of each seam):
 
-| Junction | Notable | What the homes sell by that seam |
-| --- | --- | --- |
-| -60, Mystic and Shade | Firm Footing (stun) | Hale Scribe, Spoils, Hoarded Breath, Low Tide: life, mana, energy shield |
-| 0, Shade and Strider | Hard Living (life on hit and kill) | Clear Head, Soft Step, Grey Cloak, Ward of Smoke: mana, evasion, resistances |
-| 60, Strider and Reaver | Waste Not (mana cost, mana on kill) | Quick Sip, Killing Pace, Wanderer, Thirsty Quiver: flasks, speed, attributes, leech |
-| 120, Reaver and Vanguard | Sound Body (chaos resistance, ailments) | Ringing Blows, Guarded, Vampiric Strikes: melee damage, armour, evasion, leech |
-| 180, Vanguard and Zealot | Quick March (movement, cooldown) | Camp Stores, Vigil, Alms, Iron Lungs: flasks, regeneration, leech, mana |
-| 240, Zealot and Mystic | Shelter (resistances, life) | Draught, Bright Omen, Kept Vows, Quickening: flasks, damage, auras, recharge |
+| Junction                 | Notable                                 | What the homes sell by that seam                                                    |
+| ------------------------ | --------------------------------------- | ----------------------------------------------------------------------------------- |
+| -60, Mystic and Shade    | Firm Footing (stun)                     | Hale Scribe, Spoils, Hoarded Breath, Low Tide: life, mana, energy shield            |
+| 0, Shade and Strider     | Hard Living (life on hit and kill)      | Clear Head, Soft Step, Grey Cloak, Ward of Smoke: mana, evasion, resistances        |
+| 60, Strider and Reaver   | Waste Not (mana cost, mana on kill)     | Quick Sip, Killing Pace, Wanderer, Thirsty Quiver: flasks, speed, attributes, leech |
+| 120, Reaver and Vanguard | Sound Body (chaos resistance, ailments) | Ringing Blows, Guarded, Vampiric Strikes: melee damage, armour, evasion, leech      |
+| 180, Vanguard and Zealot | Quick March (movement, cooldown)        | Camp Stores, Vigil, Alms, Iron Lungs: flasks, regeneration, leech, mana             |
+| 240, Zealot and Mystic   | Shelter (resistances, life)             | Draught, Bright Omen, Kept Vows, Quickening: flasks, damage, auras, recharge        |
 
-  Sound Body's false reason is gone. **For the joins pass:** Well Rounded (the middle) against the Bow's Wanderer (+10
-  all attributes, 8% life, two steps from the 60 seam).
+Sound Body's false reason is gone. **For the joins pass:** Well Rounded (the middle) against the Bow's Wanderer (+10
+all attributes, 8% life, two steps from the 60 seam).
+
 - **Must 3, the inner roads from real positions:** the first node of five inner roads bends 3 to 6 degrees off the
   border, away from Ward of Smoke and Grey Cloak, the breath smalls, Wanderer and Kept Vows' smalls. Every centre link
   keeps 90 units or more from every other node (a scratch check); crossings 0, drawn over 0; no unreachable node.
@@ -112,14 +113,14 @@ Cathedral built none); with one node on each hexagon side the next junction is 2
   node. The old ring road and its arch smalls are gone (their ids stay retired).
 - **Must 5, the acceptance table** (steps from each start, `walks.ts`):
 
-| Class | Its two junctions | The two next | The two far | The middle's two |
-| --- | --- | --- | --- | --- |
-| Mystic | 10, 10 | 12, 12 | 14, 14 | 12, 12 |
-| Shade | 11, 11 | 13, 13 | 15, 15 | 13, 13 |
-| Strider | 10, 10 | 12, 12 | 14, 14 | 12, 12 |
-| Reaver | 10, 10 | 12, 12 | 14, 14 | 12, 12 |
-| Vanguard | 10, 11 | 12, 13 | 14, 15 | 13, 13 |
-| Zealot | 10, 11 | 12, 13 | 13, 15 | 13, 13 |
+| Class    | Its two junctions | The two next | The two far | The middle's two |
+| -------- | ----------------- | ------------ | ----------- | ---------------- |
+| Mystic   | 10, 10            | 12, 12       | 14, 14      | 12, 12           |
+| Shade    | 11, 11            | 13, 13       | 15, 15      | 13, 13           |
+| Strider  | 10, 10            | 12, 12       | 14, 14      | 12, 12           |
+| Reaver   | 10, 10            | 12, 12       | 14, 14      | 12, 12           |
+| Vanguard | 10, 11            | 12, 13       | 14, 15      | 13, 13           |
+| Zealot   | 10, 11            | 12, 13       | 13, 15      | 13, 13           |
 
-  Every class within one step of every other, notable by notable (the Shade one step further throughout: the Knife's two
-  run-throughs have three nodes).
+Every class within one step of every other, notable by notable (the Shade one step further throughout: the Knife's two
+run-throughs have three nodes).

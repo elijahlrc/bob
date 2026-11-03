@@ -102,18 +102,19 @@ const REGION_COLOUR: Record<string, string> = {
   centre: '#8a90a0',
 };
 const mine = (i: number) => !sk.region || built.place[i].region === sk.region;
-if (!bare) for (const n of nodes)
-  for (const k of n.links)
-    if (k > n.id && live(n.id) && live(k))
-      cv.line(
-        X(n.x),
-        Y(n.y),
-        X(nodes[k].x),
-        Y(nodes[k].y),
-        1,
-        hex('#8a90a0'),
-        mine(n.id) || mine(k) ? 0.7 : 0.3,
-      );
+if (!bare)
+  for (const n of nodes)
+    for (const k of n.links)
+      if (k > n.id && live(n.id) && live(k))
+        cv.line(
+          X(n.x),
+          Y(n.y),
+          X(nodes[k].x),
+          Y(nodes[k].y),
+          1,
+          hex('#8a90a0'),
+          mine(n.id) || mine(k) ? 0.7 : 0.3,
+        );
 const R: Record<string, number> = {
   start: 34,
   keystone: 38,

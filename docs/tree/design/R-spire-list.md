@@ -549,7 +549,7 @@ Fire's payoff, out from the rim ring.
 
 - `s1` 10% increased Fire Damage (1.0 units)
 - `s2` 10% increased Fire Damage (1.0 units)
-- `n` **notable Pyre** 20% increased Fire Damage; Damage Penetrates 6% of Enemy Fire  Resistance; +0.3% to of damage leeched as Energy Shield (5.8 units)
+- `n` **notable Pyre** 20% increased Fire Damage; Damage Penetrates 6% of Enemy Fire Resistance; +0.3% to of damage leeched as Energy Shield (5.8 units)
 
 Links:
 
@@ -579,7 +579,7 @@ Cold's second rung (freeze), in from the rim ring at the axis.
 
 - `a` 8% chance to Freeze (1.0 units)
 - `b` 8% chance to Freeze (1.0 units)
-- `n` **notable Shatter** 14% increased Cold Damage; Damage Penetrates 5% of Enemy Cold  Resistance; 8% chance to Freeze (4.9 units)
+- `n` **notable Shatter** 14% increased Cold Damage; Damage Penetrates 5% of Enemy Cold Resistance; 8% chance to Freeze (4.9 units)
 - `c` 8% chance to Freeze (1.0 units)
 
 ### Piercing Word (piercing)
@@ -588,7 +588,7 @@ Penetration for any element, in from the rim ring at the axis.
 
 - `a` 10% increased Elemental Damage (1.0 units)
 - `c` 10% increased Elemental Damage (1.0 units)
-- `n` **notable Piercing Word** 15% increased Spell Damage; Damage Penetrates 3% of Enemy Elemental  Resistance; 5% reduced Mana Cost of Skills (5.1 units)
+- `n` **notable Piercing Word** 15% increased Spell Damage; Damage Penetrates 3% of Enemy Elemental Resistance; 5% reduced Mana Cost of Skills (5.1 units)
 - `b` 10% increased Elemental Damage (1.0 units)
 
 ### Harsh Weather (harshWeather)
@@ -707,7 +707,7 @@ Lightning's payoff, out from the rim ring.
 
 - `s1` 10% increased Lightning Damage (1.0 units)
 - `s2` 10% increased Lightning Damage (1.0 units)
-- `n` **notable Arc** 16% increased Lightning Damage; Damage Penetrates 5% of Enemy Lightning  Resistance; 30% increased Critical Strike Chance against Shocked Enemies (5.4 units)
+- `n` **notable Arc** 16% increased Lightning Damage; Damage Penetrates 5% of Enemy Lightning Resistance; 30% increased Critical Strike Chance against Shocked Enemies (5.4 units)
 
 ### Volley (volley)
 

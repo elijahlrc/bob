@@ -2,7 +2,11 @@
 // Nodes of a region (argv: place region, e.g. strider) that no class start reaches, and dead-end chains of road nodes.
 const R = 'file:///E:/Proj/Auto/.claude/worktrees/flask-scarcity/src/';
 const { buildAll } = await import(R + 'data/passives/index.ts');
-const ids = (await import('file:///E:/Proj/Auto/.claude/worktrees/flask-scarcity/src/data/passives/ids.json', { with: { type: 'json' } })).default as Record<string, number>;
+const ids = (
+  await import('file:///E:/Proj/Auto/.claude/worktrees/flask-scarcity/src/data/passives/ids.json', {
+    with: { type: 'json' },
+  })
+).default as Record<string, number>;
 const b = buildAll({ allowNew: true });
 const { nodes } = b.tree;
 const name = new Map<number, string>();
@@ -20,9 +24,19 @@ while (q.length) {
   const a = q.shift()!;
   for (const c of nodes[a].links) if (!seen.has(c)) (seen.add(c), q.push(c));
 }
-const lost = nodes.map((_: any, i: number) => i).filter((i: number) => b.place[i]?.region === reg && !seen.has(i));
-console.log(`${reg}: ${lost.length} unreachable`, lost.map((i: number) => name.get(i) ?? i).join(', '));
+const lost = nodes
+  .map((_: any, i: number) => i)
+  .filter((i: number) => b.place[i]?.region === reg && !seen.has(i));
+console.log(
+  `${reg}: ${lost.length} unreachable`,
+  lost.map((i: number) => name.get(i) ?? i).join(', '),
+);
 const roadEnds = nodes
   .map((n: any, i: number) => i)
-  .filter((i: number) => b.place[i]?.region === reg && nodes[i].kind === 'attribute' && nodes[i].links.length < 2);
-console.log(`road dead ends: ${roadEnds.map((i: number) => name.get(i) ?? i).join(', ') || 'none'}`);
+  .filter(
+    (i: number) =>
+      b.place[i]?.region === reg && nodes[i].kind === 'attribute' && nodes[i].links.length < 2,
+  );
+console.log(
+  `road dead ends: ${roadEnds.map((i: number) => name.get(i) ?? i).join(', ') || 'none'}`,
+);

@@ -73,58 +73,58 @@ totems and banners planted beside it. Side roads:
 
 ## 5. Where every cluster goes
 
-| Cluster (notables) | Area | Road | Step | Why there |
-| --- | --- | --- | --- | --- |
-| Oathbound | Gate | the home hub | 5 | The generalist. |
-| Elemental Ward | Gate | north path, outward | 5 | North's defence. |
-| Quartermaster (renamed) | Gate | north path, toward the centre | 5 | The flask layer. |
-| Ox Hide | Gate | north spoke junction | 7 | Armour with stun threshold. |
-| Ringing Blows | Gate | south path, run through | 5 | South's damage, on the road to the Yard. |
-| Second Wind (renamed) | Gate | south path, toward the centre | 5 | Life and regeneration. |
-| Weak Spot | Gate | south spoke junction | 7 | Melee crit. |
-| Warlord's Banner | Battlements | the north seam, toward the centre | 7 | Auras, shared with the Cathedral. |
-| Graven Posts | Battlements | north border road | 9 | Totems with resistances, beside the Cathedral's totems. |
-| Hallowed Hammer | Battlements | north border road | 10 | Elemental maces, the Cathedral seam's theme. |
-| Tempered / Unbroken wheel | Battlements | where the north border road meets the mid ring | 11 | Resistances or grit. |
-| Steady Hands | Rampart | north spoke, outer | 8 | Accuracy and speed. |
-| Mortar and Stone | Rampart | north spoke, outer | 9 | Armour. |
-| Stagger | Rampart | north spoke, outer | 9 | Stun. |
-| Iron Lungs | Rampart | the mid ring's north stretch | 10 | Mana from melee. |
-| Unerring Discipline (K) | Rampart | north spoke at the mid ring, a spur | 10 | The accuracy keystone. |
-| Weight of Iron | Barbican | north spoke past the mid ring | 11 | Maces with stun. |
-| Crushing Blow | Barbican | the rim ring's north stretch | 13 | Mace crit. |
-| Rooted Stance (K) | Barbican | out from the rim ring, north | 14 | The standing keystone. |
-| Hot Iron | Barbican | the rim ring's north stretch | 13 | Fire attacks with stun. |
-| new: armour rule | Rampart | the mid ring's north stretch | 11 | Armour that grows while standing still. |
-| Locked Shields | Bulwark | in from the mid ring at the axis | 9 | Shields with armour, on the axis (the Yard's shields are at the south-east border). |
-| Bracing | Bulwark | in from the mid ring at the axis | 10 | Block recovery and stun threshold. |
-| Shield Ram | Bulwark | out from the mid ring at the axis | 11 | Shield attacks with stun. |
-| Greatweight / Broad Back wheel | Quarry | the mid ring at the axis | 11 | Two-handed or life: a choice. |
-| Thunderstep | Quarry | south spoke, outer | 9 | Two-handed slams. |
-| Ground Shaker | Quarry | south spoke, outer | 9 | Area and knockback. |
-| Standing Cairns | Quarry | the Yard's border road | 9 | Totems with area. |
-| Vampiric Strikes | Quarry | the Yard's border road | 9 | Leech. |
-| Strongarm (K, renamed) | Quarry | south spoke at the mid ring, a spur | 10 | The strength keystone. |
-| Sledge and Sinew | Quarry | the mid ring's south stretch | 10 | Maces with life. |
-| Unbloodied | Quarry | south spoke past the mid ring | 11 | Full life. |
-| War Drums | Barrows | south spoke past the mid ring | 11 | Warcries. |
-| Iron Voice | Barrows | the rim ring at the axis | 13 | Warcries with armour. |
-| Scar Tissue | Barrows | the rim ring | 13 | Grit when hit. |
-| Headsman | Barrows | out from the rim ring | 14 | Two-handed stun. |
-| Heavy Hands | Barrows | the rim ring | 13 | Two-handed speed. |
-| Greatblade | Barrows | out from the rim ring | 14 | Two-handed swords. |
-| Cleaver | Barrows | the rim ring's south stretch | 13 | Axes beside the Yard's. |
-| Hammer Rhythm | Barrows | the rim ring | 13 | Mace speed. |
-| Long Reach | Barrows | out from the rim ring | 14 | Reach and area. |
-| Bellows | Barrows | out from the rim ring | 14 | Fire with area. |
-| Long Watch | Barrows | the rim ring | 13 | Totem speed and duration. |
-| Barrow Ward | Barrows | the rim ring | 13 | Regeneration and reduction. |
-| Blood Rite (K) | Barrows | out from the rim ring, south | 15 | The farthest keystone. |
-| new: grit payoff | Barrows | the rim ring | 13 | Grit paid off (armour or damage per charge). |
-| new: totem count | Battlements | north, the mid ring | 11 | One more totem (the deploy count totems already use). |
-| new: a strike rule | Quarry | south, the mid ring | 11 | Strikes that hit one more nearby enemy, or slams that stun. |
-| new: stun that builds grit | Rampart | north past the mid ring | 12 | Stunning an enemy gives grit: the Wall's stun is its own. |
-| Grave Host, Grim Oath, Iron Liturgy, Two Fists, Stone Ward, Unhurried | cut | | | Strays (minions, curses, spells, dual wielding, spell block, movement). |
+| Cluster (notables)                                                    | Area        | Road                                           | Step | Why there                                                                           |
+| --------------------------------------------------------------------- | ----------- | ---------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| Oathbound                                                             | Gate        | the home hub                                   | 5    | The generalist.                                                                     |
+| Elemental Ward                                                        | Gate        | north path, outward                            | 5    | North's defence.                                                                    |
+| Quartermaster (renamed)                                               | Gate        | north path, toward the centre                  | 5    | The flask layer.                                                                    |
+| Ox Hide                                                               | Gate        | north spoke junction                           | 7    | Armour with stun threshold.                                                         |
+| Ringing Blows                                                         | Gate        | south path, run through                        | 5    | South's damage, on the road to the Yard.                                            |
+| Second Wind (renamed)                                                 | Gate        | south path, toward the centre                  | 5    | Life and regeneration.                                                              |
+| Weak Spot                                                             | Gate        | south spoke junction                           | 7    | Melee crit.                                                                         |
+| Warlord's Banner                                                      | Battlements | the north seam, toward the centre              | 7    | Auras, shared with the Cathedral.                                                   |
+| Graven Posts                                                          | Battlements | north border road                              | 9    | Totems with resistances, beside the Cathedral's totems.                             |
+| Hallowed Hammer                                                       | Battlements | north border road                              | 10   | Elemental maces, the Cathedral seam's theme.                                        |
+| Tempered / Unbroken wheel                                             | Battlements | where the north border road meets the mid ring | 11   | Resistances or grit.                                                                |
+| Steady Hands                                                          | Rampart     | north spoke, outer                             | 8    | Accuracy and speed.                                                                 |
+| Mortar and Stone                                                      | Rampart     | north spoke, outer                             | 9    | Armour.                                                                             |
+| Stagger                                                               | Rampart     | north spoke, outer                             | 9    | Stun.                                                                               |
+| Iron Lungs                                                            | Rampart     | the mid ring's north stretch                   | 10   | Mana from melee.                                                                    |
+| Unerring Discipline (K)                                               | Rampart     | north spoke at the mid ring, a spur            | 10   | The accuracy keystone.                                                              |
+| Weight of Iron                                                        | Barbican    | north spoke past the mid ring                  | 11   | Maces with stun.                                                                    |
+| Crushing Blow                                                         | Barbican    | the rim ring's north stretch                   | 13   | Mace crit.                                                                          |
+| Rooted Stance (K)                                                     | Barbican    | out from the rim ring, north                   | 14   | The standing keystone.                                                              |
+| Hot Iron                                                              | Barbican    | the rim ring's north stretch                   | 13   | Fire attacks with stun.                                                             |
+| new: armour rule                                                      | Rampart     | the mid ring's north stretch                   | 11   | Armour that grows while standing still.                                             |
+| Locked Shields                                                        | Bulwark     | in from the mid ring at the axis               | 9    | Shields with armour, on the axis (the Yard's shields are at the south-east border). |
+| Bracing                                                               | Bulwark     | in from the mid ring at the axis               | 10   | Block recovery and stun threshold.                                                  |
+| Shield Ram                                                            | Bulwark     | out from the mid ring at the axis              | 11   | Shield attacks with stun.                                                           |
+| Greatweight / Broad Back wheel                                        | Quarry      | the mid ring at the axis                       | 11   | Two-handed or life: a choice.                                                       |
+| Thunderstep                                                           | Quarry      | south spoke, outer                             | 9    | Two-handed slams.                                                                   |
+| Ground Shaker                                                         | Quarry      | south spoke, outer                             | 9    | Area and knockback.                                                                 |
+| Standing Cairns                                                       | Quarry      | the Yard's border road                         | 9    | Totems with area.                                                                   |
+| Vampiric Strikes                                                      | Quarry      | the Yard's border road                         | 9    | Leech.                                                                              |
+| Strongarm (K, renamed)                                                | Quarry      | south spoke at the mid ring, a spur            | 10   | The strength keystone.                                                              |
+| Sledge and Sinew                                                      | Quarry      | the mid ring's south stretch                   | 10   | Maces with life.                                                                    |
+| Unbloodied                                                            | Quarry      | south spoke past the mid ring                  | 11   | Full life.                                                                          |
+| War Drums                                                             | Barrows     | south spoke past the mid ring                  | 11   | Warcries.                                                                           |
+| Iron Voice                                                            | Barrows     | the rim ring at the axis                       | 13   | Warcries with armour.                                                               |
+| Scar Tissue                                                           | Barrows     | the rim ring                                   | 13   | Grit when hit.                                                                      |
+| Headsman                                                              | Barrows     | out from the rim ring                          | 14   | Two-handed stun.                                                                    |
+| Heavy Hands                                                           | Barrows     | the rim ring                                   | 13   | Two-handed speed.                                                                   |
+| Greatblade                                                            | Barrows     | out from the rim ring                          | 14   | Two-handed swords.                                                                  |
+| Cleaver                                                               | Barrows     | the rim ring's south stretch                   | 13   | Axes beside the Yard's.                                                             |
+| Hammer Rhythm                                                         | Barrows     | the rim ring                                   | 13   | Mace speed.                                                                         |
+| Long Reach                                                            | Barrows     | out from the rim ring                          | 14   | Reach and area.                                                                     |
+| Bellows                                                               | Barrows     | out from the rim ring                          | 14   | Fire with area.                                                                     |
+| Long Watch                                                            | Barrows     | the rim ring                                   | 13   | Totem speed and duration.                                                           |
+| Barrow Ward                                                           | Barrows     | the rim ring                                   | 13   | Regeneration and reduction.                                                         |
+| Blood Rite (K)                                                        | Barrows     | out from the rim ring, south                   | 15   | The farthest keystone.                                                              |
+| new: grit payoff                                                      | Barrows     | the rim ring                                   | 13   | Grit paid off (armour or damage per charge).                                        |
+| new: totem count                                                      | Battlements | north, the mid ring                            | 11   | One more totem (the deploy count totems already use).                               |
+| new: a strike rule                                                    | Quarry      | south, the mid ring                            | 11   | Strikes that hit one more nearby enemy, or slams that stun.                         |
+| new: stun that builds grit                                            | Rampart     | north past the mid ring                        | 12   | Stunning an enemy gives grit: the Wall's stun is its own.                           |
+| Grave Host, Grim Oath, Iron Liturgy, Two Fists, Stone Ward, Unhurried | cut         |                                                |      | Strays (minions, curses, spells, dual wielding, spell block, movement).             |
 
 ## 6. Size
 

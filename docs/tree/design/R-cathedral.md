@@ -77,57 +77,57 @@ it fights, and its faith turns damage into an element. Side roads:
 
 ## 5. Where every cluster goes
 
-| Cluster (notables) | Area | Road | Step | Why there |
-| --- | --- | --- | --- | --- |
-| Zeal | Gate | the home hub | 5 | The generalist. |
-| Homily (from the Undercroft wheel) | Gate | NE path, run through | 5 | Spells near home. |
-| Lectern | Gate | NE path, toward the centre | 5 | Spells and reservation. |
-| Vigil | Gate | NE spoke junction | 7 | Regeneration and recharge. |
-| Litany | Gate | SW path, run through | 5 | Resistances. |
-| Consecrated Plate | Gate | SW path, toward the centre | 5 | Armour. |
-| Ardour | Gate | SW spoke junction | 7 | Elemental attacks. |
-| Reliquary / Runecarver | Undercroft | the Spire's border road | 9-10 | Totems or brands (the Spire's border holds neither). |
-| Brandwright | Undercroft | where the Spire's border road meets the mid ring | 11 | Brand crit. |
-| Sigil Warden (K) | Undercroft | a spur from the Spire's border road | 12 | The brand keystone. |
-| Choirmaster / Shepherd wheel | Choir | NE spoke, outer | 9-10 | Auras or minions: a choice. |
-| Sexton | Choir | NE spoke, outer | 9 | Minions with life. |
-| Lone Vow (K) | Choir | NE spoke at the mid ring, a spur | 10 | The aura keystone. |
-| Hymn | Choir | the mid ring's NE stretch | 10 | Lightning's first home. |
-| Thunder Peal | Lychway | NE spoke past the mid ring | 12 | Lightning's second home. |
-| Ossuary | Lychway | the rim ring's NE stretch | 13 | Minions with energy shield. |
-| Volatile Servants (K) | Lychway | out from the rim ring, NE | 15 | The minion keystone. |
-| Tomb Dust | Lychway | out from the rim ring | 14 | Chaos spells. |
-| Bright Omen | Lychway | the rim ring | 13 | Spell crit. |
-| Vespers / Plainsong | Lychway | the rim ring at the axis | 13 | Duration; channelling. |
-| Rood Screen | Lychway | the rim ring | 13 | Spell block and energy shield. |
-| Iron Faith / Hearthfire wheel | Nave | in from the mid ring at the axis | 9-10 | Shields or fire: a choice (Iron Faith past 8 from the Vanguard). |
-| Glass Wall | Nave | the axis, the mid ring | 11 | Spell block with a shield. |
-| Twofold Guard | Nave | out from the mid ring at the axis | 11 | Both blocks with a shield. |
-| Shattering Rite | Bell Tower | the mid ring at the axis | 11 | Physical and elemental spells. |
-| Rimed Steel / Benediction wheel | Bell Tower | the rim ring at the axis | 13 | Cold attacks or auras. |
-| Frozen Font | Bell Tower | out from the rim ring | 14 | Cold's second home. |
-| Searing Avatar (K) | Bell Tower | a tip past the rim ring | 15 | Fire's keystone. |
-| Quarterstaff / Gilded Rod wheel | Vestry | SW spoke, outer | 9-10 | Staves or sceptres: a choice. |
-| Warding Staff | Vestry | SW spoke, outer | 9 | Staves with spell block. |
-| Idle Hands (K) | Vestry | SW spoke at the mid ring, a spur | 10 | The staff keystone. |
-| Crozier | Vestry | the mid ring's SW stretch | 11 | Staff spells. |
-| Verger | Ambulatory | the Wall's border road | 10 | Sceptres with armour, past 8 from the Vanguard. |
-| Kindled Steel | Ambulatory | the Wall's border road | 10 | Fire attacks. |
-| Tithe (renamed) | Ambulatory | where the Wall's border road meets the mid ring | 11 | Leech. |
-| Battle Hymn | Ambulatory | SW spoke past the mid ring | 12 | Warcries and auras. |
-| Censer | Churchyard | the rim ring's SW stretch | 13 | Burning. |
-| Brazier | Churchyard | out from the rim ring | 14 | Sceptre fire. |
-| Procession | Churchyard | the rim ring | 13 | Auras (its movement line goes). |
-| Buttress | Churchyard | the rim ring | 13 | Spell block and resistances. |
-| Wake | Churchyard | out from the rim ring by the Wall border | 14 | Energy shield and life. |
-| Living Ward (K) | cut | | | Removed (the skeleton). |
-| new: fire's rule | Churchyard | out from the rim ring | 14 | Faith turned to fire (gain as extra fire for spells and attacks). |
-| new: lightning's rule | Lychway | out from the rim ring | 14 | Faith turned to lightning. |
-| new: a brand count | Undercroft | NE, the mid ring | 12 | One more brand (the deploy count brands use). |
-| new: minion sustain | Choir | NE, the mid ring | 11 | Minions that recover (life on kill for minions, or regeneration). |
-| new: a channelling defence | Lychway | the rim ring | 13 | Damage reduction while channelling. |
-| new: staff crit with a payoff | Vestry | SW, past the mid ring | 12 | Staff crit and block. |
-| new: aura per aura | Choir | NE, the rim ring | 13 | Something for every aura held. |
+| Cluster (notables)                 | Area       | Road                                             | Step | Why there                                                         |
+| ---------------------------------- | ---------- | ------------------------------------------------ | ---- | ----------------------------------------------------------------- |
+| Zeal                               | Gate       | the home hub                                     | 5    | The generalist.                                                   |
+| Homily (from the Undercroft wheel) | Gate       | NE path, run through                             | 5    | Spells near home.                                                 |
+| Lectern                            | Gate       | NE path, toward the centre                       | 5    | Spells and reservation.                                           |
+| Vigil                              | Gate       | NE spoke junction                                | 7    | Regeneration and recharge.                                        |
+| Litany                             | Gate       | SW path, run through                             | 5    | Resistances.                                                      |
+| Consecrated Plate                  | Gate       | SW path, toward the centre                       | 5    | Armour.                                                           |
+| Ardour                             | Gate       | SW spoke junction                                | 7    | Elemental attacks.                                                |
+| Reliquary / Runecarver             | Undercroft | the Spire's border road                          | 9-10 | Totems or brands (the Spire's border holds neither).              |
+| Brandwright                        | Undercroft | where the Spire's border road meets the mid ring | 11   | Brand crit.                                                       |
+| Sigil Warden (K)                   | Undercroft | a spur from the Spire's border road              | 12   | The brand keystone.                                               |
+| Choirmaster / Shepherd wheel       | Choir      | NE spoke, outer                                  | 9-10 | Auras or minions: a choice.                                       |
+| Sexton                             | Choir      | NE spoke, outer                                  | 9    | Minions with life.                                                |
+| Lone Vow (K)                       | Choir      | NE spoke at the mid ring, a spur                 | 10   | The aura keystone.                                                |
+| Hymn                               | Choir      | the mid ring's NE stretch                        | 10   | Lightning's first home.                                           |
+| Thunder Peal                       | Lychway    | NE spoke past the mid ring                       | 12   | Lightning's second home.                                          |
+| Ossuary                            | Lychway    | the rim ring's NE stretch                        | 13   | Minions with energy shield.                                       |
+| Volatile Servants (K)              | Lychway    | out from the rim ring, NE                        | 15   | The minion keystone.                                              |
+| Tomb Dust                          | Lychway    | out from the rim ring                            | 14   | Chaos spells.                                                     |
+| Bright Omen                        | Lychway    | the rim ring                                     | 13   | Spell crit.                                                       |
+| Vespers / Plainsong                | Lychway    | the rim ring at the axis                         | 13   | Duration; channelling.                                            |
+| Rood Screen                        | Lychway    | the rim ring                                     | 13   | Spell block and energy shield.                                    |
+| Iron Faith / Hearthfire wheel      | Nave       | in from the mid ring at the axis                 | 9-10 | Shields or fire: a choice (Iron Faith past 8 from the Vanguard).  |
+| Glass Wall                         | Nave       | the axis, the mid ring                           | 11   | Spell block with a shield.                                        |
+| Twofold Guard                      | Nave       | out from the mid ring at the axis                | 11   | Both blocks with a shield.                                        |
+| Shattering Rite                    | Bell Tower | the mid ring at the axis                         | 11   | Physical and elemental spells.                                    |
+| Rimed Steel / Benediction wheel    | Bell Tower | the rim ring at the axis                         | 13   | Cold attacks or auras.                                            |
+| Frozen Font                        | Bell Tower | out from the rim ring                            | 14   | Cold's second home.                                               |
+| Searing Avatar (K)                 | Bell Tower | a tip past the rim ring                          | 15   | Fire's keystone.                                                  |
+| Quarterstaff / Gilded Rod wheel    | Vestry     | SW spoke, outer                                  | 9-10 | Staves or sceptres: a choice.                                     |
+| Warding Staff                      | Vestry     | SW spoke, outer                                  | 9    | Staves with spell block.                                          |
+| Idle Hands (K)                     | Vestry     | SW spoke at the mid ring, a spur                 | 10   | The staff keystone.                                               |
+| Crozier                            | Vestry     | the mid ring's SW stretch                        | 11   | Staff spells.                                                     |
+| Verger                             | Ambulatory | the Wall's border road                           | 10   | Sceptres with armour, past 8 from the Vanguard.                   |
+| Kindled Steel                      | Ambulatory | the Wall's border road                           | 10   | Fire attacks.                                                     |
+| Tithe (renamed)                    | Ambulatory | where the Wall's border road meets the mid ring  | 11   | Leech.                                                            |
+| Battle Hymn                        | Ambulatory | SW spoke past the mid ring                       | 12   | Warcries and auras.                                               |
+| Censer                             | Churchyard | the rim ring's SW stretch                        | 13   | Burning.                                                          |
+| Brazier                            | Churchyard | out from the rim ring                            | 14   | Sceptre fire.                                                     |
+| Procession                         | Churchyard | the rim ring                                     | 13   | Auras (its movement line goes).                                   |
+| Buttress                           | Churchyard | the rim ring                                     | 13   | Spell block and resistances.                                      |
+| Wake                               | Churchyard | out from the rim ring by the Wall border         | 14   | Energy shield and life.                                           |
+| Living Ward (K)                    | cut        |                                                  |      | Removed (the skeleton).                                           |
+| new: fire's rule                   | Churchyard | out from the rim ring                            | 14   | Faith turned to fire (gain as extra fire for spells and attacks). |
+| new: lightning's rule              | Lychway    | out from the rim ring                            | 14   | Faith turned to lightning.                                        |
+| new: a brand count                 | Undercroft | NE, the mid ring                                 | 12   | One more brand (the deploy count brands use).                     |
+| new: minion sustain                | Choir      | NE, the mid ring                                 | 11   | Minions that recover (life on kill for minions, or regeneration). |
+| new: a channelling defence         | Lychway    | the rim ring                                     | 13   | Damage reduction while channelling.                               |
+| new: staff crit with a payoff      | Vestry     | SW, past the mid ring                            | 12   | Staff crit and block.                                             |
+| new: aura per aura                 | Choir      | NE, the rim ring                                 | 13   | Something for every aura held.                                    |
 
 ## 6. Size
 

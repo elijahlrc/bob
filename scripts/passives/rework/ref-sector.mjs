@@ -2,7 +2,12 @@
 // sector (local data, study only; output goes to the scratchpad, never the repo): node count by kind, and each notable's
 // lines with its depth (0 centre, 1 rim). Run: node ref-sector.mjs <sector 0-5>
 import fs from 'fs';
-const ref = JSON.parse(fs.readFileSync('E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json', 'utf8'));
+const ref = JSON.parse(
+  fs.readFileSync(
+    'E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json',
+    'utf8',
+  ),
+);
 const sec = Number(process.argv[2]);
 if (process.argv[3]) {
   const lines = [];
@@ -15,5 +20,6 @@ for (const n of ns) by[n.kind] = (by[n.kind] || 0) + 1;
 console.log(`sector ${sec} (${ref.sectors[sec]}):`, JSON.stringify(by));
 for (const k of ['keystone', 'notable']) {
   console.log(`\n## ${k}s`);
-  for (const n of ns.filter((x) => x.kind === k).sort((a, b) => a.depth - b.depth)) console.log(`${n.depth.toFixed(2)} ${n.name} | ${n.lines.join('; ')}`);
+  for (const n of ns.filter((x) => x.kind === k).sort((a, b) => a.depth - b.depth))
+    console.log(`${n.depth.toFixed(2)} ${n.name} | ${n.lines.join('; ')}`);
 }

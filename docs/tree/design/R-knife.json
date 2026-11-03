@@ -1,690 +1,429 @@
 {
- "title": "The Knife: plan (R-knife.md)",
- "clusters": [
-  {
-   "id": "Keen Instinct (home hub)",
-   "label": "Keen Instinct (home hub)",
-   "at": [
-    1775,
-    -1025
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Spoils",
-   "label": "Spoils",
-   "at": [
-    1414,
-    -1685
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Soft Step",
-   "label": "Soft Step",
-   "at": [
-    2167,
-    -382
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Quick Wrists",
-   "label": "Quick Wrists",
-   "at": [
-    1992,
-    -1150
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Thick Blood",
-   "label": "Thick Blood",
-   "at": [
-    1632,
-    -1690
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Snakeskin",
-   "label": "Snakeskin",
-   "at": [
-    2290,
-    -529
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Hoarded Breath (seam: Spire)",
-   "label": "Hoarded Breath (seam: Spire)",
-   "at": [
-    901,
-    -1442
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Grey Cloak (seam: Bow)",
-   "label": "Grey Cloak (seam: Bow)",
-   "at": [
-    1699,
-    -59
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Quiet Knife",
-   "label": "Quiet Knife",
-   "at": [
-    2063,
-    -1499
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Rotting Word / Sapper",
-   "label": "Rotting Word / Sapper",
-   "at": [
-    1625,
-    -2156
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Shifting Ward",
-   "label": "Shifting Ward",
-   "at": [
-    1334,
-    -2055
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "K Spellslip",
-   "label": "K Spellslip",
-   "at": [
-    1552,
-    -2390
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Rookery: Barbed Point / Shroud",
-   "label": "Rookery: Barbed Point / Shroud",
-   "at": [
-    2196,
-    -1655
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Bloodletter",
-   "label": "Bloodletter",
-   "at": [
-    1982,
-    -2448
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Second Curse",
-   "label": "Second Curse",
-   "at": [
-    2580,
-    -1807
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Static Edge",
-   "label": "Static Edge",
-   "at": [
-    2603,
-    -2108
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "K Shade Leech",
-   "label": "K Shade Leech",
-   "at": [
-    2601,
-    -2342
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Wiry Frame",
-   "label": "Wiry Frame",
-   "at": [
-    2008,
-    -2867
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Ill Wish",
-   "label": "Ill Wish",
-   "at": [
-    2953,
-    -2145
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Athame / Long Knives",
-   "label": "Athame / Long Knives",
-   "at": [
-    3180,
-    -1987
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Ritual Blade",
-   "label": "Ritual Blade",
-   "at": [
-    2677,
-    -2973
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Thrown Voice",
-   "label": "Thrown Voice",
-   "at": [
-    3186,
-    -2580
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Black Powder",
-   "label": "Black Powder",
-   "at": [
-    2293,
-    -3399
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Salt in the Wound",
-   "label": "Salt in the Wound",
-   "at": [
-    2988,
-    -2507
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "K Cruel Agony",
-   "label": "K Cruel Agony",
-   "at": [
-    2872,
-    -1725
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Fine Point",
-   "label": "Fine Point",
-   "at": [
-    2375,
-    -1058
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Talon",
-   "label": "Talon",
-   "at": [
-    2631,
-    -607
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "K Nimble Gambit",
-   "label": "K Nimble Gambit",
-   "at": [
-    2884,
-    -303
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Quiet Shot",
-   "label": "Quiet Shot",
-   "at": [
-    2661,
-    -1021
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Smeared Edge",
-   "label": "Smeared Edge",
-   "at": [
-    2700,
-    -1622
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Docks: Trapper / Black Flock",
-   "label": "Docks: Trapper / Black Flock",
-   "at": [
-    3038,
-    -1289
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Cutpurse's Luck",
-   "label": "Cutpurse's Luck",
-   "at": [
-    3153,
-    -786
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Tumble",
-   "label": "Tumble",
-   "at": [
-    3142,
-    -220
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Cold Steel",
-   "label": "Cold Steel",
-   "at": [
-    3408,
-    -1308
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Veiled Herald",
-   "label": "Veiled Herald",
-   "at": [
-    3495,
-    -183
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Raking Hand",
-   "label": "Raking Hand",
-   "at": [
-    3681,
-    -716
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Sea Legs",
-   "label": "Sea Legs",
-   "at": [
-    3885,
-    -340
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Between Ribs",
-   "label": "Between Ribs",
-   "at": [
-    4042,
-    -1313
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Carrion Claws",
-   "label": "Carrion Claws",
-   "at": [
-    3586,
-    -1988
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Feint and Cut",
-   "label": "Feint and Cut",
-   "at": [
-    3930,
-    -980
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Rat Bite",
-   "label": "Rat Bite",
-   "at": [
-    4209,
-    -591
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Whetted Will",
-   "label": "Whetted Will",
-   "at": [
-    3600,
-    -2616
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Glint",
-   "label": "Glint",
-   "at": [
-    3854,
-    -2225
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Sleet",
-   "label": "Sleet",
-   "at": [
-    4065,
-    -1810
-   ],
-   "nodes": 0
-  },
-  {
-   "id": "Long Grudge",
-   "label": "Long Grudge",
-   "at": [
-    3091,
-    -3201
-   ],
-   "nodes": 0
-  }
- ],
- "roads": [
-  {
-   "label": "",
-   "points": [
-    [
-     1256,
-     -725
-    ],
-    [
-     1222,
-     -888
-    ]
-   ],
-   "nodes": 0,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1222,
-     -888
-    ],
-    [
-     1279,
-     -1073
-    ]
-   ],
-   "nodes": 2,
-   "ends": true
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1279,
-     -1073
-    ],
-    [
-     1168,
-     -1343
-    ],
-    [
-     800,
-     -1386
-    ]
-   ],
-   "nodes": 3,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1279,
-     -1073
-    ],
-    [
-     1531,
-     -1364
-    ],
-    [
-     2121,
-     -1978
-    ],
-    [
-     3145,
-     -2933
-    ]
-   ],
-   "nodes": 9,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     800,
-     -1386
-    ],
-    [
-     1450,
-     -2511
-    ]
-   ],
-   "nodes": 3,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     800,
-     -1386
-    ],
-    [
-     350,
-     -606
-    ]
-   ],
-   "nodes": 2,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1256,
-     -725
-    ],
-    [
-     1379,
-     -614
-    ]
-   ],
-   "nodes": 0,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1379,
-     -614
-    ],
-    [
-     1569,
-     -571
-    ]
-   ],
-   "nodes": 2,
-   "ends": true
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1569,
-     -571
-    ],
-    [
-     1747,
-     -340
-    ],
-    [
-     1600,
-     0
-    ]
-   ],
-   "nodes": 3,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1569,
-     -571
-    ],
-    [
-     1946,
-     -644
-    ],
-    [
-     2773,
-     -848
-    ],
-    [
-     4112,
-     -1257
-    ]
-   ],
-   "nodes": 9,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1600,
-     0
-    ],
-    [
-     2900,
-     0
-    ]
-   ],
-   "nodes": 3,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1600,
-     0
-    ],
-    [
-     700,
-     0
-    ]
-   ],
-   "nodes": 2,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1531,
-     -1364
-    ],
-    [
-     1775,
-     -1025
-    ],
-    [
-     1946,
-     -644
-    ]
-   ],
-   "nodes": 3,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     1450,
-     -2511
-    ],
-    [
-     2121,
-     -1978
-    ],
-    [
-     2773,
-     -848
-    ],
-    [
-     2900,
-     0
-    ]
-   ],
-   "nodes": 8,
-   "ends": false
-  },
-  {
-   "label": "",
-   "points": [
-    [
-     2150,
-     -3724
-    ],
-    [
-     3145,
-     -2933
-    ],
-    [
-     4112,
-     -1257
-    ],
-    [
-     4300,
-     0
-    ]
-   ],
-   "nodes": 12,
-   "ends": false
-  }
- ],
- "moves": [
-  {
-   "id": "start.shade",
-   "to": [
-    1256,
-    -725
-   ]
-  }
- ]
+  "title": "The Knife: plan (R-knife.md)",
+  "clusters": [
+    {
+      "id": "Keen Instinct (home hub)",
+      "label": "Keen Instinct (home hub)",
+      "at": [1775, -1025],
+      "nodes": 0
+    },
+    {
+      "id": "Spoils",
+      "label": "Spoils",
+      "at": [1414, -1685],
+      "nodes": 0
+    },
+    {
+      "id": "Soft Step",
+      "label": "Soft Step",
+      "at": [2167, -382],
+      "nodes": 0
+    },
+    {
+      "id": "Quick Wrists",
+      "label": "Quick Wrists",
+      "at": [1992, -1150],
+      "nodes": 0
+    },
+    {
+      "id": "Thick Blood",
+      "label": "Thick Blood",
+      "at": [1632, -1690],
+      "nodes": 0
+    },
+    {
+      "id": "Snakeskin",
+      "label": "Snakeskin",
+      "at": [2290, -529],
+      "nodes": 0
+    },
+    {
+      "id": "Hoarded Breath (seam: Spire)",
+      "label": "Hoarded Breath (seam: Spire)",
+      "at": [901, -1442],
+      "nodes": 0
+    },
+    {
+      "id": "Grey Cloak (seam: Bow)",
+      "label": "Grey Cloak (seam: Bow)",
+      "at": [1699, -59],
+      "nodes": 0
+    },
+    {
+      "id": "Quiet Knife",
+      "label": "Quiet Knife",
+      "at": [2063, -1499],
+      "nodes": 0
+    },
+    {
+      "id": "Rotting Word / Sapper",
+      "label": "Rotting Word / Sapper",
+      "at": [1625, -2156],
+      "nodes": 0
+    },
+    {
+      "id": "Shifting Ward",
+      "label": "Shifting Ward",
+      "at": [1334, -2055],
+      "nodes": 0
+    },
+    {
+      "id": "K Spellslip",
+      "label": "K Spellslip",
+      "at": [1552, -2390],
+      "nodes": 0
+    },
+    {
+      "id": "Rookery: Barbed Point / Shroud",
+      "label": "Rookery: Barbed Point / Shroud",
+      "at": [2196, -1655],
+      "nodes": 0
+    },
+    {
+      "id": "Bloodletter",
+      "label": "Bloodletter",
+      "at": [1982, -2448],
+      "nodes": 0
+    },
+    {
+      "id": "Second Curse",
+      "label": "Second Curse",
+      "at": [2580, -1807],
+      "nodes": 0
+    },
+    {
+      "id": "Static Edge",
+      "label": "Static Edge",
+      "at": [2603, -2108],
+      "nodes": 0
+    },
+    {
+      "id": "K Shade Leech",
+      "label": "K Shade Leech",
+      "at": [2601, -2342],
+      "nodes": 0
+    },
+    {
+      "id": "Wiry Frame",
+      "label": "Wiry Frame",
+      "at": [2008, -2867],
+      "nodes": 0
+    },
+    {
+      "id": "Ill Wish",
+      "label": "Ill Wish",
+      "at": [2953, -2145],
+      "nodes": 0
+    },
+    {
+      "id": "Athame / Long Knives",
+      "label": "Athame / Long Knives",
+      "at": [3180, -1987],
+      "nodes": 0
+    },
+    {
+      "id": "Ritual Blade",
+      "label": "Ritual Blade",
+      "at": [2677, -2973],
+      "nodes": 0
+    },
+    {
+      "id": "Thrown Voice",
+      "label": "Thrown Voice",
+      "at": [3186, -2580],
+      "nodes": 0
+    },
+    {
+      "id": "Black Powder",
+      "label": "Black Powder",
+      "at": [2293, -3399],
+      "nodes": 0
+    },
+    {
+      "id": "Salt in the Wound",
+      "label": "Salt in the Wound",
+      "at": [2988, -2507],
+      "nodes": 0
+    },
+    {
+      "id": "K Cruel Agony",
+      "label": "K Cruel Agony",
+      "at": [2872, -1725],
+      "nodes": 0
+    },
+    {
+      "id": "Fine Point",
+      "label": "Fine Point",
+      "at": [2375, -1058],
+      "nodes": 0
+    },
+    {
+      "id": "Talon",
+      "label": "Talon",
+      "at": [2631, -607],
+      "nodes": 0
+    },
+    {
+      "id": "K Nimble Gambit",
+      "label": "K Nimble Gambit",
+      "at": [2884, -303],
+      "nodes": 0
+    },
+    {
+      "id": "Quiet Shot",
+      "label": "Quiet Shot",
+      "at": [2661, -1021],
+      "nodes": 0
+    },
+    {
+      "id": "Smeared Edge",
+      "label": "Smeared Edge",
+      "at": [2700, -1622],
+      "nodes": 0
+    },
+    {
+      "id": "Docks: Trapper / Black Flock",
+      "label": "Docks: Trapper / Black Flock",
+      "at": [3038, -1289],
+      "nodes": 0
+    },
+    {
+      "id": "Cutpurse's Luck",
+      "label": "Cutpurse's Luck",
+      "at": [3153, -786],
+      "nodes": 0
+    },
+    {
+      "id": "Tumble",
+      "label": "Tumble",
+      "at": [3142, -220],
+      "nodes": 0
+    },
+    {
+      "id": "Cold Steel",
+      "label": "Cold Steel",
+      "at": [3408, -1308],
+      "nodes": 0
+    },
+    {
+      "id": "Veiled Herald",
+      "label": "Veiled Herald",
+      "at": [3495, -183],
+      "nodes": 0
+    },
+    {
+      "id": "Raking Hand",
+      "label": "Raking Hand",
+      "at": [3681, -716],
+      "nodes": 0
+    },
+    {
+      "id": "Sea Legs",
+      "label": "Sea Legs",
+      "at": [3885, -340],
+      "nodes": 0
+    },
+    {
+      "id": "Between Ribs",
+      "label": "Between Ribs",
+      "at": [4042, -1313],
+      "nodes": 0
+    },
+    {
+      "id": "Carrion Claws",
+      "label": "Carrion Claws",
+      "at": [3586, -1988],
+      "nodes": 0
+    },
+    {
+      "id": "Feint and Cut",
+      "label": "Feint and Cut",
+      "at": [3930, -980],
+      "nodes": 0
+    },
+    {
+      "id": "Rat Bite",
+      "label": "Rat Bite",
+      "at": [4209, -591],
+      "nodes": 0
+    },
+    {
+      "id": "Whetted Will",
+      "label": "Whetted Will",
+      "at": [3600, -2616],
+      "nodes": 0
+    },
+    {
+      "id": "Glint",
+      "label": "Glint",
+      "at": [3854, -2225],
+      "nodes": 0
+    },
+    {
+      "id": "Sleet",
+      "label": "Sleet",
+      "at": [4065, -1810],
+      "nodes": 0
+    },
+    {
+      "id": "Long Grudge",
+      "label": "Long Grudge",
+      "at": [3091, -3201],
+      "nodes": 0
+    }
+  ],
+  "roads": [
+    {
+      "label": "",
+      "points": [
+        [1256, -725],
+        [1222, -888]
+      ],
+      "nodes": 0,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1222, -888],
+        [1279, -1073]
+      ],
+      "nodes": 2,
+      "ends": true
+    },
+    {
+      "label": "",
+      "points": [
+        [1279, -1073],
+        [1168, -1343],
+        [800, -1386]
+      ],
+      "nodes": 3,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1279, -1073],
+        [1531, -1364],
+        [2121, -1978],
+        [3145, -2933]
+      ],
+      "nodes": 9,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [800, -1386],
+        [1450, -2511]
+      ],
+      "nodes": 3,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [800, -1386],
+        [350, -606]
+      ],
+      "nodes": 2,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1256, -725],
+        [1379, -614]
+      ],
+      "nodes": 0,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1379, -614],
+        [1569, -571]
+      ],
+      "nodes": 2,
+      "ends": true
+    },
+    {
+      "label": "",
+      "points": [
+        [1569, -571],
+        [1747, -340],
+        [1600, 0]
+      ],
+      "nodes": 3,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1569, -571],
+        [1946, -644],
+        [2773, -848],
+        [4112, -1257]
+      ],
+      "nodes": 9,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1600, 0],
+        [2900, 0]
+      ],
+      "nodes": 3,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1600, 0],
+        [700, 0]
+      ],
+      "nodes": 2,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1531, -1364],
+        [1775, -1025],
+        [1946, -644]
+      ],
+      "nodes": 3,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [1450, -2511],
+        [2121, -1978],
+        [2773, -848],
+        [2900, 0]
+      ],
+      "nodes": 8,
+      "ends": false
+    },
+    {
+      "label": "",
+      "points": [
+        [2150, -3724],
+        [3145, -2933],
+        [4112, -1257],
+        [4300, 0]
+      ],
+      "nodes": 12,
+      "ends": false
+    }
+  ],
+  "moves": [
+    {
+      "id": "start.shade",
+      "to": [1256, -725]
+    }
+  ]
 }

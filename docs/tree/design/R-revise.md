@@ -144,16 +144,16 @@ Not used, and still free for the others: wheels and resist stars were already ev
 
 **Item 1, the hung notables (8 to 0).** Each is now reached by smalls from a road as well as through its old neighbour:
 
-| Notable | Was behind | Now |
-| --- | --- | --- |
-| Quick Wrists | Keen Instinct (a wheel entered only through it) | on the blade, reached from the mid ring end too |
-| Low Tide | Spoils | the crossroads of the mana alley: Spoils, the north border road, Thick Blood |
-| Deep Reserves | Hoarded Breath | the north's mana door, off the small before Smuggler's Flasks |
-| Ward of Smoke | Grey Cloak | the south's resistance door, off the small before Deft Guard |
-| Fan of Blades | Quiet Shot | a sibling of Quiet Shot off the bow small (Quiet Shot moved aside), on to Cutpurse's Luck |
-| Twin Shadows | Tumble | on the Tumble alley, a dual-wield small after Tumble, on into Veiled Herald's run |
-| Smeared Edge | the Trapper wheel's notables | on the Gutter; and the wheel has a second entrance from Frost Snare's trap small |
-| Rust and Ruin | Carrion Claws | the Gutter's end, leading on into Carrion Claws |
+| Notable       | Was behind                                      | Now                                                                                       |
+| ------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Quick Wrists  | Keen Instinct (a wheel entered only through it) | on the blade, reached from the mid ring end too                                           |
+| Low Tide      | Spoils                                          | the crossroads of the mana alley: Spoils, the north border road, Thick Blood              |
+| Deep Reserves | Hoarded Breath                                  | the north's mana door, off the small before Smuggler's Flasks                             |
+| Ward of Smoke | Grey Cloak                                      | the south's resistance door, off the small before Deft Guard                              |
+| Fan of Blades | Quiet Shot                                      | a sibling of Quiet Shot off the bow small (Quiet Shot moved aside), on to Cutpurse's Luck |
+| Twin Shadows  | Tumble                                          | on the Tumble alley, a dual-wield small after Tumble, on into Veiled Herald's run         |
+| Smeared Edge  | the Trapper wheel's notables                    | on the Gutter; and the wheel has a second entrance from Frost Snare's trap small          |
+| Rust and Ruin | Carrion Claws                                   | the Gutter's end, leading on into Carrion Claws                                           |
 
 No notable changed cluster, so no id changed; every existing notable keeps its lines. Low Tide, Deep Reserves, Ward of
 Smoke, Quiet Shot, Twin Shadows and Second Curse moved a little to make room.
@@ -220,18 +220,18 @@ Not used, and still free: nothing new of the wheel or star kind.
 **Item 1, the hung notables (10 to 0).** Each has a way in through smalls only and leads on. None changed cluster, so
 no id changed and every notable keeps its lines (each cluster grew to hold the new smalls):
 
-| Notable | Was behind | Now |
-| --- | --- | --- |
-| Ward Renewed | Quickening | the recharge floor, three recharge smalls from the west spoke (step 7), on to Quickening |
-| Surging Tide | Siphon | the crit floor, spell crit from the east spoke (step 7), on by a shield-on-hit small into Siphon |
-| Iron Litany | Composure | the mid floor, off Composure's last small, by a shield small to Slow Burn's crossroads |
-| Hail of Sparks | Wand Volley | the mid floor, a wand small from Slow Burn's crossroads, on through Wand Volley to the east spoke |
-| Rime | Hoarfrost | off Hoarfrost's far small, on into Broad Weave (cold to area, slower than the mid ring) |
-| Conductor | Live Current | lightning's ladder, off the ring's small, on into Needlework |
-| Warm Hearth | Cinder | fire's ladder, off Cinder's far small, by a burning small into Kiln Heart |
-| Bound Host | Familiars | the border climb, minion smalls from the mid ring (Familiars' smalls made a triangle so the climb can pass it by) |
-| Moonward | High Veil | the climb's crossroads: off High Veil's small, down by mana to Bound Host, across the border |
-| Hexed Pack | Bad Company | the climb past the rim, off the ring's small, by a mana small into Overflow |
+| Notable        | Was behind   | Now                                                                                                               |
+| -------------- | ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Ward Renewed   | Quickening   | the recharge floor, three recharge smalls from the west spoke (step 7), on to Quickening                          |
+| Surging Tide   | Siphon       | the crit floor, spell crit from the east spoke (step 7), on by a shield-on-hit small into Siphon                  |
+| Iron Litany    | Composure    | the mid floor, off Composure's last small, by a shield small to Slow Burn's crossroads                            |
+| Hail of Sparks | Wand Volley  | the mid floor, a wand small from Slow Burn's crossroads, on through Wand Volley to the east spoke                 |
+| Rime           | Hoarfrost    | off Hoarfrost's far small, on into Broad Weave (cold to area, slower than the mid ring)                           |
+| Conductor      | Live Current | lightning's ladder, off the ring's small, on into Needlework                                                      |
+| Warm Hearth    | Cinder       | fire's ladder, off Cinder's far small, by a burning small into Kiln Heart                                         |
+| Bound Host     | Familiars    | the border climb, minion smalls from the mid ring (Familiars' smalls made a triangle so the climb can pass it by) |
+| Moonward       | High Veil    | the climb's crossroads: off High Veil's small, down by mana to Bound Host, across the border                      |
+| Hexed Pack     | Bad Company  | the climb past the rim, off the ring's small, by a mana small into Overflow                                       |
 
 Moved a little to make room: Moonward, Hexed Pack, Warm Hearth, Conductor, Rime, Iron Litany, Slow Burn, Quickening's
 far small, Wandwork (its chain gained a small, where Still Mind's arm comes in), Deft Wand. Still Mind and Sharp Mind
@@ -302,15 +302,15 @@ wheel; no blade, crossing or doors.
 
 **Item 1, the hung notables (7 to 0).** No notable changed cluster, so no id changed and every notable keeps its lines.
 
-| Notable | Was behind | Now |
-| --- | --- | --- |
-| Hard Target | Hawk's Eye (a room entered only through it) | the end of the middle exit's south arm (step 5), on by two life smalls into Hunter's Rush |
-| Kiting Snares | Tripwire | on a trap run from the trap room's second small to the mid ring (`ring.a`); Tripwire goes the other way, on to Frost Fletching |
-| Hunter's Fervour | Hot Pursuit | its own room of crit smalls from the rim node `q6` (Steadfast Aim's old place), on by a fervour-duration small into Hot Pursuit: fervour earned on crit in one room, spent in the other |
-| Braced Guard | Round Shield | between Round Shield's first small and Fleet Blade's room: sword and board, a way across from the shield room to the sword room |
-| Second Wind | Hardy Stock | a life small past Hardy Stock, and its own door on the south border road: the room is a way across from the mid ring to the border road |
-| Supply Line | Field Kit | a flask small past Field Kit and on by another to the rim node `q7`: a loop out past the rim between two ring nodes |
-| Grim Tally | Killing Eye | on a run of cost smalls down from Bright Shafts' room, joined to Killing Eye by its finishing small |
+| Notable          | Was behind                                  | Now                                                                                                                                                                                     |
+| ---------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hard Target      | Hawk's Eye (a room entered only through it) | the end of the middle exit's south arm (step 5), on by two life smalls into Hunter's Rush                                                                                               |
+| Kiting Snares    | Tripwire                                    | on a trap run from the trap room's second small to the mid ring (`ring.a`); Tripwire goes the other way, on to Frost Fletching                                                          |
+| Hunter's Fervour | Hot Pursuit                                 | its own room of crit smalls from the rim node `q6` (Steadfast Aim's old place), on by a fervour-duration small into Hot Pursuit: fervour earned on crit in one room, spent in the other |
+| Braced Guard     | Round Shield                                | between Round Shield's first small and Fleet Blade's room: sword and board, a way across from the shield room to the sword room                                                         |
+| Second Wind      | Hardy Stock                                 | a life small past Hardy Stock, and its own door on the south border road: the room is a way across from the mid ring to the border road                                                 |
+| Supply Line      | Field Kit                                   | a flask small past Field Kit and on by another to the rim node `q7`: a loop out past the rim between two ring nodes                                                                     |
+| Grim Tally       | Killing Eye                                 | on a run of cost smalls down from Bright Shafts' room, joined to Killing Eye by its finishing small                                                                                     |
 
 Moved to make room: the Longbow room (a little toward the spoke), Pursuit's End (out past Close Quarters' tip), Skirmisher's
 Leap and Steady Draw (their small is the parting), Wind Rider (out past the mid ring), Hard Target, Hawk's Eye, the four
@@ -392,16 +392,16 @@ No new wheel, star, blade, door, crossing, floor, ladder or parting as a form of
 **Item 1, the hung notables (8 to 0).** No notable changed cluster, so no id changed and every notable keeps its
 lines; each is reached by smalls from a road and leads on.
 
-| Notable | Was behind | Now |
-| --- | --- | --- |
-| Momentum Swing | Full Swing | the opening round, off the wheel's two-handed small (not Full Swing), on by a stun small to Measured Cut |
-| Measured Cut | Fencer's Eye | a crossroads of the opening round: Momentum Swing above, Fencer's Eye's entrance small, Shield Bash beside |
-| Crimson Reaping | Red Harvest | off Red Harvest's far small, on by a mana-leech small to Banner Guard (the blood run) |
-| Banner Guard | Standard Bearer | the blood run: up from the standard's entrance small (Standard Bearer is its sibling there), on to Crimson Reaping |
-| Duellist's Fervour | Hot Blood | the fervour run, out of Hot Blood by a fervour small and on by two dual smalls into Crossed Blades |
-| Bloodied Pursuit | Open Veins | off Open Veins' entrance small, on by a leech small into Red Thirst |
-| Wide Arc | Hewing | outside the rim, Hewing → an axe small → Wide Arc → a two-handed small into Crushing Swing's room |
-| Rally | Drill Call | off Drill Call's entrance small, on by an armour small to Hold the Line; it replaces the old Hold the Line–Drill Call link |
+| Notable            | Was behind      | Now                                                                                                                        |
+| ------------------ | --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Momentum Swing     | Full Swing      | the opening round, off the wheel's two-handed small (not Full Swing), on by a stun small to Measured Cut                   |
+| Measured Cut       | Fencer's Eye    | a crossroads of the opening round: Momentum Swing above, Fencer's Eye's entrance small, Shield Bash beside                 |
+| Crimson Reaping    | Red Harvest     | off Red Harvest's far small, on by a mana-leech small to Banner Guard (the blood run)                                      |
+| Banner Guard       | Standard Bearer | the blood run: up from the standard's entrance small (Standard Bearer is its sibling there), on to Crimson Reaping         |
+| Duellist's Fervour | Hot Blood       | the fervour run, out of Hot Blood by a fervour small and on by two dual smalls into Crossed Blades                         |
+| Bloodied Pursuit   | Open Veins      | off Open Veins' entrance small, on by a leech small into Red Thirst                                                        |
+| Wide Arc           | Hewing          | outside the rim, Hewing → an axe small → Wide Arc → a two-handed small into Crushing Swing's room                          |
+| Rally              | Drill Call      | off Drill Call's entrance small, on by an armour small to Hold the Line; it replaces the old Hold the Line–Drill Call link |
 
 Crossed Blades gained a link between its two smalls (its entrance reaches the run's small without the notable); its
 id and its entrance `yard.dual.crossedBlades.a`, where the Bow's Killing Eye link lands, are unchanged.
@@ -488,10 +488,10 @@ farther out, akin to the Spire's floors and ladders in that only, and not named 
 
 **Item 1, the hung notables (2 to 0).** No notable changed cluster, so no id changed and every notable keeps its lines.
 
-| Notable | Was behind | Now |
-| --- | --- | --- |
-| Grit and Gravel | Scar Tissue (a room entered only through it) | its own door by a small on the border road's mid ring junction (`wall.resists.radW.m`, where the keep's wheel stood), on by its smalls to Scar Tissue and the rim (q8): a run from the mid ring to the rim along the Cathedral border, spend then earn, slower than the roads round. Step 16 to 11. |
-| Aftershock | Thunderstep (one step past it, nothing beyond) | the crossroads of the stun run: in from Stagger by a stun small or from Thunderstep's area small (b), out to the mid ring (`wall.slams.ring.a`). Its link to Thunderstep's notable went. |
+| Notable         | Was behind                                     | Now                                                                                                                                                                                                                                                                                                 |
+| --------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Grit and Gravel | Scar Tissue (a room entered only through it)   | its own door by a small on the border road's mid ring junction (`wall.resists.radW.m`, where the keep's wheel stood), on by its smalls to Scar Tissue and the rim (q8): a run from the mid ring to the rim along the Cathedral border, spend then earn, slower than the roads round. Step 16 to 11. |
+| Aftershock      | Thunderstep (one step past it, nothing beyond) | the crossroads of the stun run: in from Stagger by a stun small or from Thunderstep's area small (b), out to the mid ring (`wall.slams.ring.a`). Its link to Thunderstep's notable went.                                                                                                            |
 
 **Item 2, the start.** The V is gone in shape (the two towers, above). Two exits, the strong first smalls unchanged
 (melee physical damage with life; armour with life), four nodes at step 2, six directions at step 3, nothing notable
@@ -557,6 +557,7 @@ Oathbound, Ox Hide's old door on the melee spoke, the wheel's old door on the bo
 
   Most rooms at the rim are still a row of teeth. I left them because a join there would only make a loop beside the
   rim road, with no build reason behind it.
+
 - No road was thinned: the new routes run beside roads.
 - The link into Volatile Servants' smalls is the Cathedral builder's to fix if that spur moves.
 - Steady Hands and Ox Hide sit close; their labels clear each other at the region render's scale.
@@ -590,6 +591,7 @@ building is a cross with a nave. Two forms, one at the start and one in the nave
 
   Not the Bow's three exits (two exits; the third direction is a fork of the across way), not the Wall's towers
   (nothing runs out from the hubs), not a cross-link of any kind near the start.
+
 - **The aisles** (the nave). Between the spokes inside the mid ring, two block aisles run side by side out from the
   home to the mid ring, the staff's on the Wall side and the shield's on the Spire side, since a staff and a shield are
   never held together:
@@ -623,15 +625,15 @@ out: Hallowed Ground (between the shrine and Hymn), Ember Litany (between the ri
 Judgement (between Crozier and Faith Unleashed). The owner's reason holds for them (taking the room's notable forces no
 point into them, and each is a way through), but they are valleys, not ways out.
 
-| Notable | Was behind | Now |
-| --- | --- | --- |
-| Steadfast Faith | Iron Faith | the shield aisle: Frozen Font's shield-block smalls (a bypass link past the font) into it, on into the wheel's shield small `n7`; its link to Iron Faith went |
-| Whirling Ward | Warding Staff | the staff aisle: Buttress's smalls (a bypass past Buttress) and two new staff spell-block smalls into it, on into Warding Staff and the mid ring |
-| Hallowed Ground | Reliquary | the shrine's door small runs through to its far small (a bypass past Reliquary), a totem small to Hallowed Ground, on into Hymn (lightning's first home): the caster who plants a totem and calls lightning; its link to Reliquary went |
-| Choir of Wrath | Benediction | off Procession's second aura small (its own way in from the rim, `q3`), on into Benediction and the Rimed Steel wheel |
-| Ember Litany | Kindled Steel | two new fire-attack smalls in from the rim node `n1`, on into Kindled Steel and the spoke junction: the fire striker's way between the spoke and the rim's fire (Brazier, Censer) |
-| Hymn of War | Battle Hymn | off Battle Hymn's entrance small (not the notable), on by two warcry smalls across the Wall border into the Grit and Gravel run (below); its link to Battle Hymn went |
-| Staff of Judgement | Crozier | a new staff small off Crozier's second small, on by a lightning small into Faith Unleashed; its link to Crozier stays (both ends now have other ways in), so Crozier leads on too |
+| Notable            | Was behind    | Now                                                                                                                                                                                                                                     |
+| ------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Steadfast Faith    | Iron Faith    | the shield aisle: Frozen Font's shield-block smalls (a bypass link past the font) into it, on into the wheel's shield small `n7`; its link to Iron Faith went                                                                           |
+| Whirling Ward      | Warding Staff | the staff aisle: Buttress's smalls (a bypass past Buttress) and two new staff spell-block smalls into it, on into Warding Staff and the mid ring                                                                                        |
+| Hallowed Ground    | Reliquary     | the shrine's door small runs through to its far small (a bypass past Reliquary), a totem small to Hallowed Ground, on into Hymn (lightning's first home): the caster who plants a totem and calls lightning; its link to Reliquary went |
+| Choir of Wrath     | Benediction   | off Procession's second aura small (its own way in from the rim, `q3`), on into Benediction and the Rimed Steel wheel                                                                                                                   |
+| Ember Litany       | Kindled Steel | two new fire-attack smalls in from the rim node `n1`, on into Kindled Steel and the spoke junction: the fire striker's way between the spoke and the rim's fire (Brazier, Censer)                                                       |
+| Hymn of War        | Battle Hymn   | off Battle Hymn's entrance small (not the notable), on by two warcry smalls across the Wall border into the Grit and Gravel run (below); its link to Battle Hymn went                                                                   |
+| Staff of Judgement | Crozier       | a new staff small off Crozier's second small, on by a lightning small into Faith Unleashed; its link to Crozier stays (both ends now have other ways in), so Crozier leads on too                                                       |
 
 Moved to make room (ids unchanged): Zeal (off the Wall spoke's first junction), Buttress's room, Shattering Rite's room
 (it ran back toward the start; it now runs out beside the spoke), Frozen Font (off the line of its smalls), Steadfast
@@ -713,11 +715,11 @@ Strider and the Vanguard would get a cheap way between their two junction notabl
 ring of six rooms beside the hexagon would be fair but would be the Yard's round again, a loop beside a road with no
 build reason. Both were rejected.
 
-**The forms** (item 3). The centre is the ground every class walks *into*, so its form makes every room a way inward:
+**The forms** (item 3). The centre is the ground every class walks _into_, so its form makes every room a way inward:
 
 - **The yoke.** The three junctions with no spoke (Mystic–Shade, Strider–Reaver, Vanguard–Zealot) each had a room hung
   off a dead corner of the hexagon. Each room is now a yoke: its door outside on its junction, and from the notable one
-  small of the room's own stat to *each* of the two spokes beside it (Firm Footing to s1 and s5, Waste Not to s1 and s3,
+  small of the room's own stat to _each_ of the two spokes beside it (Firm Footing to s1 and s5, Waste Not to s1 and s3,
   Quick March to s3 and s5). So every class has two ways to the middle: the road from the junction on one border, and
   the yoke through the notable at its other border. From the junction to either spoke the yoke is 4 steps against the
   road's 3.
@@ -742,15 +744,15 @@ one away would price the middle's two differently by class.
 
 **The fairness, measured** (steps from each start; before → after):
 
-| | Mystic | Shade | Strider | Reaver | Vanguard | Zealot |
-| --- | --- | --- | --- | --- | --- | --- |
-| Shelter | 10 | 12 | 14 → 12 | 14 → 12 | 12 | 10 |
-| Firm Footing | 10 | 10 | 12 → 11 | 14 → 13 | 14 → 13 | 12 → 11 |
-| Hard Living | 12 | 10 | 10 | 12 | 14 → 12 | 14 → 12 |
-| Waste Not | 14 → 13 | 12 → 11 | 10 | 10 | 12 → 11 | 14 → 13 |
-| Sound Body | 14 → 12 | 14 → 12 | 12 | 10 | 10 | 12 |
-| Quick March | 12 → 11 | 14 → 13 | 14 → 13 | 12 → 11 | 10 | 10 |
-| Well Rounded, Provisions | 12 | 12 | 12 | 12 | 12 | 12 |
+|                          | Mystic  | Shade   | Strider | Reaver  | Vanguard | Zealot  |
+| ------------------------ | ------- | ------- | ------- | ------- | -------- | ------- |
+| Shelter                  | 10      | 12      | 14 → 12 | 14 → 12 | 12       | 10      |
+| Firm Footing             | 10      | 10      | 12 → 11 | 14 → 13 | 14 → 13  | 12 → 11 |
+| Hard Living              | 12      | 10      | 10      | 12      | 14 → 12  | 14 → 12 |
+| Waste Not                | 14 → 13 | 12 → 11 | 10      | 10      | 12 → 11  | 14 → 13 |
+| Sound Body               | 14 → 12 | 14 → 12 | 12      | 10      | 10       | 12      |
+| Quick March              | 12 → 11 | 14 → 13 | 14 → 13 | 12 → 11 | 10       | 10      |
+| Well Rounded, Provisions | 12      | 12      | 12      | 12      | 12       | 12      |
 
 Every class now sees the same set of junction distances: its own two at 10, then 11, 12, 12 and 13 (before: 10, 10,
 12, 12, 14, 14). The middle's two stay 12 for everyone. The centre came a step closer to "about as far from every
@@ -768,7 +770,7 @@ under a road.
 
 The seam roads reach each of those inner road nodes at 7, for both classes of the pair. So none of the doors is a
 shortcut. None makes the centre cheaper for one partner of a pair than the other: each inner road node is 7 from both,
-with or without the door. But only Field Dressing is *slower*, as item 4 defines the trade. Old Wounds, Litany and
+with or without the door. But only Field Dressing is _slower_, as item 4 defines the trade. Old Wounds, Litany and
 Lectern are a second seam path of equal length through a different notable of the class's own. The centre's shape
 cannot fix that: lengthening an inner road would tax the seam road by the same step. The fix is on the region side: one
 more small before the door. Retargeting a door into a junction room does not fit the geometry: the rooms sit inside
@@ -835,6 +837,7 @@ held a room's entrance, the room moved to the next road node, so nothing lost it
     - each spoke junction to the next centre road node, `j2` or `j3` (road 10, 9).
 
     No other start has these yet, because only the Yard has thinned its spokes and mid ring.
+
   - **Why they appear:** thinning brought the road loop between the hubs (out one spoke, across the mid ring, back
     the other) from 12 down to 10, inside the check's window. The shorter way on each new line runs through the
     home's own smalls: the two roads in to Honed Steel (the court's V, which §8 accepts) or the path to Field
@@ -845,42 +848,42 @@ held a room's entrance, the room moved to the next road node, so nothing lost it
 **A build reason for every join.** Every join from the first pass now names its build in its `why`. None was cut;
 each had one. The two older ways across (Off-Hand Parry to Twin Fangs, Hot Blood to Open Veins) got reasons too.
 
-| Join | Build |
-| --- | --- |
-| Honed Steel → Fighting Breath | fast attacker who runs on mana from hits |
-| west cross road → Clean Break | heavy hitter who wants physical crit without the speed |
-| Field Dressing → centre | Reaver who lives on flasks |
-| Stout Heart → Mended Mail | armoured regenerator |
-| Fighting Breath → Sidestep | striker who trades blows, then slips the answer |
-| Sidestep → Four Winds | dodger who also wants resistances |
-| Clean Break → Answering Steel | blocker who answers hard |
-| Answering Steel → Four Winds | blocker who stands and takes it |
-| Momentum Swing → Measured Cut | two-handed stunner who crits |
-| Fencer's Eye → the wheel's bleed small | paired-blade bleeder who crits |
-| Measured Cut → Shield Bash | shield basher who crits the stunned |
-| Red Harvest → Banner Guard | leeching aura bearer |
-| Hot Blood → Crossed Blades | dual wielder who blocks for fervour |
-| Bloodied Pursuit → Red Thirst | bleeder who leeches |
-| Rally → Hold the Line | warcrying front-liner who stuns |
-| Wide Arc → Crushing Swing | two-handed axe |
-| Run Through → Bloodied Edge | sword that skewers and drinks |
-| Scarred Hide → the Wall's Sledge and Sinew | shieldless brawler with a mace |
+| Join                                       | Build                                                  |
+| ------------------------------------------ | ------------------------------------------------------ |
+| Honed Steel → Fighting Breath              | fast attacker who runs on mana from hits               |
+| west cross road → Clean Break              | heavy hitter who wants physical crit without the speed |
+| Field Dressing → centre                    | Reaver who lives on flasks                             |
+| Stout Heart → Mended Mail                  | armoured regenerator                                   |
+| Fighting Breath → Sidestep                 | striker who trades blows, then slips the answer        |
+| Sidestep → Four Winds                      | dodger who also wants resistances                      |
+| Clean Break → Answering Steel              | blocker who answers hard                               |
+| Answering Steel → Four Winds               | blocker who stands and takes it                        |
+| Momentum Swing → Measured Cut              | two-handed stunner who crits                           |
+| Fencer's Eye → the wheel's bleed small     | paired-blade bleeder who crits                         |
+| Measured Cut → Shield Bash                 | shield basher who crits the stunned                    |
+| Red Harvest → Banner Guard                 | leeching aura bearer                                   |
+| Hot Blood → Crossed Blades                 | dual wielder who blocks for fervour                    |
+| Bloodied Pursuit → Red Thirst              | bleeder who leeches                                    |
+| Rally → Hold the Line                      | warcrying front-liner who stuns                        |
+| Wide Arc → Crushing Swing                  | two-handed axe                                         |
+| Run Through → Bloodied Edge                | sword that skewers and drinks                          |
+| Scarred Hide → the Wall's Sledge and Sinew | shieldless brawler with a mace                         |
 
 **Rooms that hang by one entrance.** Three new joins, no new node:
 
-| Room | Nearest related cluster (about 3 steps) | Joined? |
-| --- | --- | --- |
-| Keen Edge (damage after a block) | Buckler (block, speed) | **Yes**, `keenEdge.n` → `block.b` (Buckler's block small, so the join runs through a small like every other join in the region). The sword-and-buckler duellist. Keen Edge had become a dead end within 8 steps once the spoke was thinned. |
-| Light Blades (one-handed) | Sword and Board | **Yes**, `lightBlades.b` → `board.c`. The one-handed sword with a shield. |
-| Iron Skin (armour) | Hold the Line (armour smalls, fortify) | **Yes**, `armour.n` → `fortify.s2`. The armoured stunner. |
-| Steady Guard (mana on block) | Bulwark Mending (life on block) | No. The join was tried, but the mid ring's road runs between the two rooms and the link crossed it. Its other kin, Buckler, already shares its road node. |
-| Bulwark Mending | Steady Guard | No (as above). |
-| Lasting Wounds (bleed duration) | Finishing Cut (against the bleeding), 3 road steps | No. They are already three steps apart by road, and a link would cross the spoke. |
-| Finishing Cut | Lasting Wounds; Hewing (bleed chance), 3 steps | No (as above). |
-| Elemental Edge (fire on melee) | none (Measured Cut and Shield Bash beside it are stun) | No. |
-| Spitting Blade (impale) | none near: impale's other rooms (Light Blades, Run Through) are far; Off-Hand Parry at the same road node is unrelated | No. |
-| Footwork (accuracy, reach) | Twin Fangs is near but not related (accuracy and reach are generic melee) | No. |
-| Hundred Cuts, Blood Bargain, Shieldwall (keystone spurs) | Open Veins, the leech rooms, the shields | No. A keystone stays a spur at the end of its choice. |
+| Room                                                     | Nearest related cluster (about 3 steps)                                                                                | Joined?                                                                                                                                                                                                                                     |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keen Edge (damage after a block)                         | Buckler (block, speed)                                                                                                 | **Yes**, `keenEdge.n` → `block.b` (Buckler's block small, so the join runs through a small like every other join in the region). The sword-and-buckler duellist. Keen Edge had become a dead end within 8 steps once the spoke was thinned. |
+| Light Blades (one-handed)                                | Sword and Board                                                                                                        | **Yes**, `lightBlades.b` → `board.c`. The one-handed sword with a shield.                                                                                                                                                                   |
+| Iron Skin (armour)                                       | Hold the Line (armour smalls, fortify)                                                                                 | **Yes**, `armour.n` → `fortify.s2`. The armoured stunner.                                                                                                                                                                                   |
+| Steady Guard (mana on block)                             | Bulwark Mending (life on block)                                                                                        | No. The join was tried, but the mid ring's road runs between the two rooms and the link crossed it. Its other kin, Buckler, already shares its road node.                                                                                   |
+| Bulwark Mending                                          | Steady Guard                                                                                                           | No (as above).                                                                                                                                                                                                                              |
+| Lasting Wounds (bleed duration)                          | Finishing Cut (against the bleeding), 3 road steps                                                                     | No. They are already three steps apart by road, and a link would cross the spoke.                                                                                                                                                           |
+| Finishing Cut                                            | Lasting Wounds; Hewing (bleed chance), 3 steps                                                                         | No (as above).                                                                                                                                                                                                                              |
+| Elemental Edge (fire on melee)                           | none (Measured Cut and Shield Bash beside it are stun)                                                                 | No.                                                                                                                                                                                                                                         |
+| Spitting Blade (impale)                                  | none near: impale's other rooms (Light Blades, Run Through) are far; Off-Hand Parry at the same road node is unrelated | No.                                                                                                                                                                                                                                         |
+| Footwork (accuracy, reach)                               | Twin Fangs is near but not related (accuracy and reach are generic melee)                                              | No.                                                                                                                                                                                                                                         |
+| Hundred Cuts, Blood Bargain, Shieldwall (keystone spurs) | Open Veins, the leech rooms, the shields                                                                               | No. A keystone stays a spur at the end of its choice.                                                                                                                                                                                       |
 
 Every other room has two ways in or more.
 
@@ -923,14 +926,14 @@ neighbours, the first own notable is still at step 5, and nothing is hung.
 
 What moved closer:
 
-| Notables | Steps before | Steps now |
-| --- | --- | --- |
-| Thick Blood, Snakeskin | 6 | 5 |
-| Steady Eye | 7 | 6 |
-| Swift Incantation | 8 | 7 |
-| Talon, Fine Point, Quiet Knife, Quiet Shot, Fan of Blades | 9 | 8 |
-| Shade Leech, Cruel Agony | 11 | 10 |
-| Cold Read (through the new join from Quiet Shot, below) | 10 | 9 |
+| Notables                                                  | Steps before | Steps now |
+| --------------------------------------------------------- | ------------ | --------- |
+| Thick Blood, Snakeskin                                    | 6            | 5         |
+| Steady Eye                                                | 7            | 6         |
+| Swift Incantation                                         | 8            | 7         |
+| Talon, Fine Point, Quiet Knife, Quiet Shot, Fan of Blades | 9            | 8         |
+| Shade Leech, Cruel Agony                                  | 11           | 10        |
+| Cold Read (through the new join from Quiet Shot, below)   | 10           | 9         |
 
 The blade is now four steps slower than either spoke to the mid ring (two before). Its `why` says so.
 
@@ -949,23 +952,23 @@ removed nodes. The two new joins below changed no pair.
 
 **A build reason for every join.** Each join the first pass added now names who walks it in its `why`:
 
-| Join | Who walks it |
-| --- | --- |
-| Thick Blood into Low Tide | the regenerating Shade (life regeneration, then mana regeneration) |
-| The mana run to the north border road | the caster coming along that road (Shifting Ward, Spellslip) who runs low on mana |
-| Quick Wrists' blade to Second Curse's small | the curser who attacks or casts fast |
-| The mana door (Deep Reserves) | the caster of costly spells who wants a mana pool more than flasks |
-| The flask door into Hoarded Breath | the flask user with energy shield, Shade or Mystic |
-| The resistance door (Ward of Smoke) | the build short of resistances |
-| Deft Guard into Grey Cloak | the evasion build |
-| The Gutter, both ends | the poison curser at the Ill Wish end; the poison and chaos attacker at the Rust and Ruin end |
-| Steady Eye's crit run | the precise crit attacker |
-| Fan of Blades into Cutpurse's Luck | thrown blades and arrows, which want crit multiplier |
-| Frost Snare into the Trapper wheel | the cold trapper |
-| Tumble, Twin Shadows, Veiled Herald | the dual-wielding evader |
-| Veiled Herald to Hare's Pace | the evasive attacker, Shade or Strider |
-| Quiet Knife onto the blade | the dagger caster |
-| Wiry Frame to Sharp Tongue | the evasive dagger caster |
+| Join                                        | Who walks it                                                                                  |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Thick Blood into Low Tide                   | the regenerating Shade (life regeneration, then mana regeneration)                            |
+| The mana run to the north border road       | the caster coming along that road (Shifting Ward, Spellslip) who runs low on mana             |
+| Quick Wrists' blade to Second Curse's small | the curser who attacks or casts fast                                                          |
+| The mana door (Deep Reserves)               | the caster of costly spells who wants a mana pool more than flasks                            |
+| The flask door into Hoarded Breath          | the flask user with energy shield, Shade or Mystic                                            |
+| The resistance door (Ward of Smoke)         | the build short of resistances                                                                |
+| Deft Guard into Grey Cloak                  | the evasion build                                                                             |
+| The Gutter, both ends                       | the poison curser at the Ill Wish end; the poison and chaos attacker at the Rust and Ruin end |
+| Steady Eye's crit run                       | the precise crit attacker                                                                     |
+| Fan of Blades into Cutpurse's Luck          | thrown blades and arrows, which want crit multiplier                                          |
+| Frost Snare into the Trapper wheel          | the cold trapper                                                                              |
+| Tumble, Twin Shadows, Veiled Herald         | the dual-wielding evader                                                                      |
+| Veiled Herald to Hare's Pace                | the evasive attacker, Shade or Strider                                                        |
+| Quiet Knife onto the blade                  | the dagger caster                                                                             |
+| Wiry Frame to Sharp Tongue                  | the evasive dagger caster                                                                     |
 
 None was cut: each has a build.
 
@@ -980,20 +983,20 @@ hang off different road nodes:
 Both are dearer than the road between the rooms' ways in. The 19 left, each with its nearest related room within three
 steps:
 
-| Room | Nearest related room | Why it stays apart |
-| --- | --- | --- |
-| Shade Leech, Cruel Agony, Spellslip, Nimble Gambit | (keystones) | they stay spurs; Cruel Agony's neighbour Second Curse is off the same node |
-| Black Powder, Shock Charge (mines) | each other | both off rim q1, so a link saves nothing |
-| Storm and Frost | Shock Charge (shock) | Long Grudge stands between them |
-| Ritual Blade (dagger spells) | Athame's dagger spell small | more than three steps away, across Salt and Whetted Will |
-| Salt in the Wound, Whetted Will (spells) | each other | both off q3 |
-| Split Light (elemental) | Sleet (cold) | the rim ring runs between them |
-| Hair Spring (trap crit) | none within three | Feint and Cut beside it is dual wielding |
-| Withering Word, Mercy Stroke | each other | both off q8, and the lines do not relate |
-| Honed Mind (physical spells, spell crit) | none within three | Whetted Will and Glint are at the rim |
-| Venom Snare (traps) | Tripwire (the Bow's traps) | both off `radS.b` |
-| Quick Blade (one-handed) | Raking Hand | both off `spS.c` |
-| Vampiric Verse, Lingering Malice | each other, Bloodletter | all off `hex.ring.a`; Malice's damage over time and the Rookery's poison are across the north spoke |
+| Room                                               | Nearest related room        | Why it stays apart                                                                                  |
+| -------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------- |
+| Shade Leech, Cruel Agony, Spellslip, Nimble Gambit | (keystones)                 | they stay spurs; Cruel Agony's neighbour Second Curse is off the same node                          |
+| Black Powder, Shock Charge (mines)                 | each other                  | both off rim q1, so a link saves nothing                                                            |
+| Storm and Frost                                    | Shock Charge (shock)        | Long Grudge stands between them                                                                     |
+| Ritual Blade (dagger spells)                       | Athame's dagger spell small | more than three steps away, across Salt and Whetted Will                                            |
+| Salt in the Wound, Whetted Will (spells)           | each other                  | both off q3                                                                                         |
+| Split Light (elemental)                            | Sleet (cold)                | the rim ring runs between them                                                                      |
+| Hair Spring (trap crit)                            | none within three           | Feint and Cut beside it is dual wielding                                                            |
+| Withering Word, Mercy Stroke                       | each other                  | both off q8, and the lines do not relate                                                            |
+| Honed Mind (physical spells, spell crit)           | none within three           | Whetted Will and Glint are at the rim                                                               |
+| Venom Snare (traps)                                | Tripwire (the Bow's traps)  | both off `radS.b`                                                                                   |
+| Quick Blade (one-handed)                           | Raking Hand                 | both off `spS.c`                                                                                    |
+| Vampiric Verse, Lingering Malice                   | each other, Bloodletter     | all off `hex.ring.a`; Malice's damage over time and the Rookery's poison are across the north spoke |
 
 **The forms in plain words:**
 
@@ -1038,14 +1041,14 @@ centre: 2 to 1.
 
 **Thinning** (233 nodes to 227):
 
-| Removed | Why it could go |
-| --- | --- |
-| `home.spN.a`, `home.spN.x`, `home.spS.a`, `home.spS.x` | bare spoke nodes (above). Two new smalls replace them, so net -2 |
-| `walk.ring.q6` | the rim's one bare node, between q5 and the north-east spoke. q5 moved to halve the stretch |
-| `ambulatory.tithe.c` | Alms's one-link attribute tail |
-| `home.lectern.c` | Lectern's centre door (above) |
-| `ambulatory.kindled.e1` | Ember Litany's run from the rim had two smalls where one is enough. Still six steps against the spoke's one |
-| `nave.warding.w1` | the staff aisle had two smalls between Buttress and Whirling Ward where one is enough (`w2` keeps the arcade link). Still eight steps against the spoke's three |
+| Removed                                                | Why it could go                                                                                                                                                 |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `home.spN.a`, `home.spN.x`, `home.spS.a`, `home.spS.x` | bare spoke nodes (above). Two new smalls replace them, so net -2                                                                                                |
+| `walk.ring.q6`                                         | the rim's one bare node, between q5 and the north-east spoke. q5 moved to halve the stretch                                                                     |
+| `ambulatory.tithe.c`                                   | Alms's one-link attribute tail                                                                                                                                  |
+| `home.lectern.c`                                       | Lectern's centre door (above)                                                                                                                                   |
+| `ambulatory.kindled.e1`                                | Ember Litany's run from the rim had two smalls where one is enough. Still six steps against the spoke's one                                                     |
+| `nave.warding.w1`                                      | the staff aisle had two smalls between Buttress and Whirling Ward where one is enough (`w2` keeps the arcade link). Still eight steps against the spoke's three |
 
 Added: `home.star.d`. No incoming link from another region landed on a removed node. The two incoming links that had to
 keep landing still do: the Spire's `highVeil.x` into `walk.guard.b`, and the Wall's Grave Host into `rim.volatile.a`.
@@ -1062,26 +1065,26 @@ warrior), Litany's door (the resistance capper). None was cut for lack of a reas
 
 **Rooms hanging by one entrance**, with each room's nearest related cluster:
 
-| Room | Nearest related cluster | Joined? |
-| --- | --- | --- |
-| Wake | Pilgrim's Mantle (life and defence, one tail apart) | **joined**: `wake.c` → `plate.b`, the life-and-pools defender's way to the Wall's border road; 8 steps against the road's 6 |
-| Pilgrim's Mantle | Wake | **joined** (above) |
-| Faith Aflame | Searing Avatar (its own text calls it "the road to" fire's keystone) | **joined**: Faith Aflame → `searingAvatar.a`; 5 steps between q3 and q4 against the rim's 1 |
-| Frozen Font (a valley at step 8 once the spoke shortened) | Hearthfire (fire spells), two steps on through the Iron Faith wheel | **joined**: Frozen Font → `nave.wheel.n1`, the caster of cold and fire; spoke to mid ring 5 against 3 |
-| Alms | Verger (on-hit sustain), 5+ steps along the Wall's road | no: too far |
-| Rood Screen | Buttress and Glass Wall (spell block), far; Ardour is close but unrelated | no |
-| Many Sigils, Brandwright | each other (brands), about 3 steps | no: brands are spread on purpose, so no one-stop |
-| Chorus | Lone Vow (auras), 3 steps by the spoke | no: the link crosses the spoke road |
-| Verger | Gilded Rod (sceptres), 7+ steps; Hymn of War is near but unrelated | no |
-| Sexton | Ossuary (minions), 5 steps by the rim | no: too far |
-| Thunder Peal | Hymn (lightning), already 2 steps by the same junction | no: lightning would become a one-stop |
-| Vespers | Plainsong (channellers want mana), already 2 steps by the same rim node | no: nothing to gain |
-| Censer, Brazier | each other (burning), on neighbouring rim nodes | no: a join saves no point and only loops beside the rim |
-| Procession (the notable) | Choir of Wrath, off the room's second small | already a way through |
-| Gilded Rod wheel | Warding Staff (staves), Homily (the sceptre caster) | no: either link crosses the spoke or the mid ring road |
-| Homily wheel | Twofold Guard (shield spell block), far | no |
-| Idle Hands, Lone Vow, Sigil Warden | Warding Staff, Chorus, Runecarver | no: keystone tips; the first two links would cross the spoke |
-| Searing Avatar, Volatile Servants | Faith Aflame; the Wall's Grave Host | both now have two ways in |
+| Room                                                      | Nearest related cluster                                                   | Joined?                                                                                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Wake                                                      | Pilgrim's Mantle (life and defence, one tail apart)                       | **joined**: `wake.c` → `plate.b`, the life-and-pools defender's way to the Wall's border road; 8 steps against the road's 6 |
+| Pilgrim's Mantle                                          | Wake                                                                      | **joined** (above)                                                                                                          |
+| Faith Aflame                                              | Searing Avatar (its own text calls it "the road to" fire's keystone)      | **joined**: Faith Aflame → `searingAvatar.a`; 5 steps between q3 and q4 against the rim's 1                                 |
+| Frozen Font (a valley at step 8 once the spoke shortened) | Hearthfire (fire spells), two steps on through the Iron Faith wheel       | **joined**: Frozen Font → `nave.wheel.n1`, the caster of cold and fire; spoke to mid ring 5 against 3                       |
+| Alms                                                      | Verger (on-hit sustain), 5+ steps along the Wall's road                   | no: too far                                                                                                                 |
+| Rood Screen                                               | Buttress and Glass Wall (spell block), far; Ardour is close but unrelated | no                                                                                                                          |
+| Many Sigils, Brandwright                                  | each other (brands), about 3 steps                                        | no: brands are spread on purpose, so no one-stop                                                                            |
+| Chorus                                                    | Lone Vow (auras), 3 steps by the spoke                                    | no: the link crosses the spoke road                                                                                         |
+| Verger                                                    | Gilded Rod (sceptres), 7+ steps; Hymn of War is near but unrelated        | no                                                                                                                          |
+| Sexton                                                    | Ossuary (minions), 5 steps by the rim                                     | no: too far                                                                                                                 |
+| Thunder Peal                                              | Hymn (lightning), already 2 steps by the same junction                    | no: lightning would become a one-stop                                                                                       |
+| Vespers                                                   | Plainsong (channellers want mana), already 2 steps by the same rim node   | no: nothing to gain                                                                                                         |
+| Censer, Brazier                                           | each other (burning), on neighbouring rim nodes                           | no: a join saves no point and only loops beside the rim                                                                     |
+| Procession (the notable)                                  | Choir of Wrath, off the room's second small                               | already a way through                                                                                                       |
+| Gilded Rod wheel                                          | Warding Staff (staves), Homily (the sceptre caster)                       | no: either link crosses the spoke or the mid ring road                                                                      |
+| Homily wheel                                              | Twofold Guard (shield spell block), far                                   | no                                                                                                                          |
+| Idle Hands, Lone Vow, Sigil Warden                        | Warding Staff, Chorus, Runecarver                                         | no: keystone tips; the first two links would cross the spoke                                                                |
+| Searing Avatar, Volatile Servants                         | Faith Aflame; the Wall's Grave Host                                       | both now have two ways in                                                                                                   |
 
 **The forms, in plain words.**
 
@@ -1148,15 +1151,15 @@ generalist's way out into the Meadow, the speed and accuracy ground on the axis:
 
 **Thinning (18 nodes).**
 
-| Removed | Why it could go |
-| --- | --- |
-| `home.spN.a`, `home.spS.a` | bare attribute nodes between a hub and its spoke's junction (CONSTRAINTS §16 item 9), as the Knife and the Yard did. Only one per spoke: a second would bring Steady Draw and Plated Hide inside 8 and the mid ring to 5 |
-| `rim.ring.q6`, `rim.ring.q8` | straight runs of the rim. q3 to q5 and q7 were spaced evenly again. Hot Pursuit's door moved to q4, Hunter's Fervour's to q5, Fouled Tips' to q7; no room has both doors on one node |
-| `fieldKit.b`, `fieldKit.f` | the fork above |
-| `hardyStock.b`, `hardTarget.d` | a room's second small of one stat |
-| `crit.a` | Vital Aim's second crit small. With the spoke shorter, Vital Aim had become a valley (dead end) at 6 between the path and the spoke; it is now at 5 and leads on to Long Breath |
-| `killShot.b`, `leap.d2`, `tripwire.k2`, `crystal.w1`, `killingEye.g1`, `killingEye.x1`, `hotPursuit.f1`, `deepPull.c1` | the third small of a run, or the second where one does the work. Every route shortened is still slower than the road between its two ends |
-| `roundShield.c` | the second small of a tail after Round Shield |
+| Removed                                                                                                                | Why it could go                                                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `home.spN.a`, `home.spS.a`                                                                                             | bare attribute nodes between a hub and its spoke's junction (CONSTRAINTS §16 item 9), as the Knife and the Yard did. Only one per spoke: a second would bring Steady Draw and Plated Hide inside 8 and the mid ring to 5 |
+| `rim.ring.q6`, `rim.ring.q8`                                                                                           | straight runs of the rim. q3 to q5 and q7 were spaced evenly again. Hot Pursuit's door moved to q4, Hunter's Fervour's to q5, Fouled Tips' to q7; no room has both doors on one node                                     |
+| `fieldKit.b`, `fieldKit.f`                                                                                             | the fork above                                                                                                                                                                                                           |
+| `hardyStock.b`, `hardTarget.d`                                                                                         | a room's second small of one stat                                                                                                                                                                                        |
+| `crit.a`                                                                                                               | Vital Aim's second crit small. With the spoke shorter, Vital Aim had become a valley (dead end) at 6 between the path and the spoke; it is now at 5 and leads on to Long Breath                                          |
+| `killShot.b`, `leap.d2`, `tripwire.k2`, `crystal.w1`, `killingEye.g1`, `killingEye.x1`, `hotPursuit.f1`, `deepPull.c1` | the third small of a run, or the second where one does the work. Every route shortened is still slower than the road between its two ends                                                                                |
+| `roundShield.c`                                                                                                        | the second small of a tail after Round Shield                                                                                                                                                                            |
 
 Kept: every corner and junction; the south border road (`radS.a`, `b`, `m`), `seams.s` and `rim.ring.q1`/`s0`, which
 the Yard's and the Knife's files link into; Hare's Pace's `s`, where the Knife's Veiled Herald arrives. `bows.spN.a` and
@@ -1167,27 +1170,27 @@ floor.
 
 **A build reason for every join.** Each first-pass join and each older "way across" now names its build in its `why`:
 
-| Join | Who walks it |
-| --- | --- |
-| Hawk's Eye into Sure Aim, on to the mid ring | the accuracy archer |
-| Hard Target into Hunter's Rush | the Strider who wades into packs |
-| Vital Aim into Long Breath | the crit archer who lives on recovery (life on crit, life on kill) |
-| Wayfarer into Thirsty Quiver | the kiter who wants evasion while moving and leech |
-| Quick Hands into Thirsty Quiver | the fast attacker who leeches |
-| The north parting (Steadfast Aim, Wind Rider) | the archer who plants its feet stops at the post; the kiter goes on |
-| Wind Rider into Hare's Pace | the kiting archer who shoots on the move |
-| The spoke parting, Skirmisher's Leap into Pursuit's End | the blink skirmisher, Quickened by every blink |
-| The trap run's ring door (Kiting Snares) | the trapper who kites |
-| Tripwire and Frost Fletching | the cold trapper |
-| Longbow and Ricochet | the bow user who clears packs |
-| Rapid Fire and Hunter's Rush | the fast bow user; now also the middle exit's way to the mid ring |
-| Light Hand and Deep Pull | the one-handed physical striker |
-| Second Wind's border road door | the close-fighting Strider who takes hits (above) |
-| Braced Guard into Fleet Blade | the sword-and-board Strider |
-| Pitch Arrows and Bright Shafts | the fire archer |
-| Bright Shafts to Grim Tally and Killing Eye | the elemental archer short of mana |
-| Hunter's Fervour's door and Hot Pursuit | the crit archer who wants fervour |
-| Killing Eye into the Yard's Crossed Blades | the crit Strider who dual wields, or the Reaver duellist who wants crit multiplier |
+| Join                                                    | Who walks it                                                                       |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Hawk's Eye into Sure Aim, on to the mid ring            | the accuracy archer                                                                |
+| Hard Target into Hunter's Rush                          | the Strider who wades into packs                                                   |
+| Vital Aim into Long Breath                              | the crit archer who lives on recovery (life on crit, life on kill)                 |
+| Wayfarer into Thirsty Quiver                            | the kiter who wants evasion while moving and leech                                 |
+| Quick Hands into Thirsty Quiver                         | the fast attacker who leeches                                                      |
+| The north parting (Steadfast Aim, Wind Rider)           | the archer who plants its feet stops at the post; the kiter goes on                |
+| Wind Rider into Hare's Pace                             | the kiting archer who shoots on the move                                           |
+| The spoke parting, Skirmisher's Leap into Pursuit's End | the blink skirmisher, Quickened by every blink                                     |
+| The trap run's ring door (Kiting Snares)                | the trapper who kites                                                              |
+| Tripwire and Frost Fletching                            | the cold trapper                                                                   |
+| Longbow and Ricochet                                    | the bow user who clears packs                                                      |
+| Rapid Fire and Hunter's Rush                            | the fast bow user; now also the middle exit's way to the mid ring                  |
+| Light Hand and Deep Pull                                | the one-handed physical striker                                                    |
+| Second Wind's border road door                          | the close-fighting Strider who takes hits (above)                                  |
+| Braced Guard into Fleet Blade                           | the sword-and-board Strider                                                        |
+| Pitch Arrows and Bright Shafts                          | the fire archer                                                                    |
+| Bright Shafts to Grim Tally and Killing Eye             | the elemental archer short of mana                                                 |
+| Hunter's Fervour's door and Hot Pursuit                 | the crit archer who wants fervour                                                  |
+| Killing Eye into the Yard's Crossed Blades              | the crit Strider who dual wields, or the Reaver duellist who wants crit multiplier |
 
 Supply Line's door was the one with no build; it went (above).
 
@@ -1196,27 +1199,27 @@ added, where the relation is real: **Hunter's Satchel into Hunter's Rush**, the 
 Satchel is on the mid ring, Hunter's Rush is two steps away on the middle arm, and the way between them is slower than
 the ring.
 
-| Room | Nearest related cluster (about 3 steps) | Joined? |
-| --- | --- | --- |
-| Hunter's Satchel (flask charges) | Hunter's Rush (kills) | **yes** (above) |
-| Arrow Weave, Close Quarters, Plated Hide (keystones) | Tall Grass; Far Flight; Archer's Breath | no: keystone spurs stay spurs |
-| Steadfast Aim | Wind Rider | no: the post of the north parting, by design |
-| Far Flight and Barbed Arrows (wheel) | none related within 3 (Steady Draw, Skirmisher's Leap and Sure Aim are near but unrelated); Deep Cuts (bleed) is across the axis | no |
-| Split Volley and Deep Cuts (wheel) | Close Quarters (a keystone); Barbed Arrows is far | no |
-| Elemental Fletching | Storm-Feathered (elemental attacks), far beyond the rim; Ricochet near but unrelated | no |
-| Kill Shot (bow crit) | none within 3 | no |
-| Field Kit and Supply Line | Spare Stock and Field Poultice (flasks), both far | no |
-| Live Wire, Pitch and Flame, Fouled Tips | each other (elemental arrows, poison) | no: all off q7, so a link saves nothing |
-| Field Poultice (life flasks) | Killing Eye near but unrelated; the flask rooms are far | no |
-| Tall Grass (evasion) | Arrow Weave (a keystone) | no |
-| Telling Shot (the archer who stands) | Arrow Weave (keystone); Steadfast Aim far | no |
-| Storm-Feathered | Elemental Fletching, far | no |
-| Rime Shafts (cold) | Frost Fletching, far; Hare's Pace near but unrelated | no |
-| Far Reach (projectiles) | Hare's Pace near but unrelated; Ricochet far | no |
-| Spare Stock (flasks) | Hunter's Satchel, about seven steps away | no: too far |
-| Lingering Momentum (buff duration) | Skirmisher's Leap and Pursuit's End, far; Hardy Stock near but unrelated | no |
-| Archer's Breath (mana on crit) | Grim Tally, far; Plated Hide (a keystone) | no |
-| Wanderer | Quick Sip and the Yard's Killing Pace on the same seam node | no: a link saves nothing |
+| Room                                                 | Nearest related cluster (about 3 steps)                                                                                          | Joined?                                      |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Hunter's Satchel (flask charges)                     | Hunter's Rush (kills)                                                                                                            | **yes** (above)                              |
+| Arrow Weave, Close Quarters, Plated Hide (keystones) | Tall Grass; Far Flight; Archer's Breath                                                                                          | no: keystone spurs stay spurs                |
+| Steadfast Aim                                        | Wind Rider                                                                                                                       | no: the post of the north parting, by design |
+| Far Flight and Barbed Arrows (wheel)                 | none related within 3 (Steady Draw, Skirmisher's Leap and Sure Aim are near but unrelated); Deep Cuts (bleed) is across the axis | no                                           |
+| Split Volley and Deep Cuts (wheel)                   | Close Quarters (a keystone); Barbed Arrows is far                                                                                | no                                           |
+| Elemental Fletching                                  | Storm-Feathered (elemental attacks), far beyond the rim; Ricochet near but unrelated                                             | no                                           |
+| Kill Shot (bow crit)                                 | none within 3                                                                                                                    | no                                           |
+| Field Kit and Supply Line                            | Spare Stock and Field Poultice (flasks), both far                                                                                | no                                           |
+| Live Wire, Pitch and Flame, Fouled Tips              | each other (elemental arrows, poison)                                                                                            | no: all off q7, so a link saves nothing      |
+| Field Poultice (life flasks)                         | Killing Eye near but unrelated; the flask rooms are far                                                                          | no                                           |
+| Tall Grass (evasion)                                 | Arrow Weave (a keystone)                                                                                                         | no                                           |
+| Telling Shot (the archer who stands)                 | Arrow Weave (keystone); Steadfast Aim far                                                                                        | no                                           |
+| Storm-Feathered                                      | Elemental Fletching, far                                                                                                         | no                                           |
+| Rime Shafts (cold)                                   | Frost Fletching, far; Hare's Pace near but unrelated                                                                             | no                                           |
+| Far Reach (projectiles)                              | Hare's Pace near but unrelated; Ricochet far                                                                                     | no                                           |
+| Spare Stock (flasks)                                 | Hunter's Satchel, about seven steps away                                                                                         | no: too far                                  |
+| Lingering Momentum (buff duration)                   | Skirmisher's Leap and Pursuit's End, far; Hardy Stock near but unrelated                                                         | no                                           |
+| Archer's Breath (mana on crit)                       | Grim Tally, far; Plated Hide (a keystone)                                                                                        | no                                           |
+| Wanderer                                             | Quick Sip and the Yard's Killing Pace on the same seam node                                                                      | no: a link saves nothing                     |
 
 **The forms in plain words.**
 
@@ -1259,20 +1262,20 @@ with one entrance, and it has a real second one now (below): it leads on to the 
 
 **Thinning (14 nodes).**
 
-| Removed | Why it could go |
-| --- | --- |
-| `well.radW.b` | the west border road's middle node, on a straight run, with only Pain Conduit off it. Pain Conduit now opens off `radW.a` (its spur turned to lie clear of the road). No other region links into it |
-| `rim.ring.q2` | the rim's straight run from the Cathedral border to the west spoke had two nodes; one is enough. `q1` moved to the middle of the run. Kiln Heart now opens off `q1`, Bright Wand off `w1` (the spoke's corner) |
-| `rim.ring.q5` | four nodes between the spoke corners, where the skeleton allows 1 to 3. Now three, evenly spaced (`q3`, `q4` on the axis, `q6`). Piercing Word and Blast moved to `q4` |
-| `rim.ring.q7` | the straight run from the east spoke to the Knife's border node. Needlework and Thunder's Reach moved to `q8`, side by side, so lightning's ladder still tops out at Thunder's Reach |
-| `column.ring.b` | the mid ring had three nodes between the spokes; now two (`a` and `c`, moved to ±217). Hoarfrost opens off `a`, Prism Ward off `c` |
-| `home.stillMind.d`, `home.sharpMind.d` | each crossing arm had a second small only to stay slower than the road round. The road round lost `column.ring.b`, so one small is enough: hub to the far spoke's second landing is 10 against 9 |
-| `quickening.r3` | the recharge floor had five recharge smalls. Now four. Border road to spoke is 7 against the road's 6 |
-| `composure.b`, `composure.x` | the mid floor: one of Composure's three stun smalls, and the shield small between Iron Litany and Slow Burn's crossroads. Iron Litany now meets the crossroads itself |
-| `wandVolley.z` | the mid floor's wand small: Hail of Sparks meets the crossroads itself. Spoke to spoke over the floor is 9 against the mid ring's 5 |
-| `familiars.h1` | the climb's second minion small between Familiars' room and Bound Host |
-| `badCompany.o` | the mana small between Hexed Pack and Overflow. Hexed Pack meets Overflow's mana small itself |
-| `column.star.f` | Prism Ward's chaos small, which hung toward First Light with nothing beyond it (left open in the first pass). The room is now one small per element |
+| Removed                                | Why it could go                                                                                                                                                                                                |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `well.radW.b`                          | the west border road's middle node, on a straight run, with only Pain Conduit off it. Pain Conduit now opens off `radW.a` (its spur turned to lie clear of the road). No other region links into it            |
+| `rim.ring.q2`                          | the rim's straight run from the Cathedral border to the west spoke had two nodes; one is enough. `q1` moved to the middle of the run. Kiln Heart now opens off `q1`, Bright Wand off `w1` (the spoke's corner) |
+| `rim.ring.q5`                          | four nodes between the spoke corners, where the skeleton allows 1 to 3. Now three, evenly spaced (`q3`, `q4` on the axis, `q6`). Piercing Word and Blast moved to `q4`                                         |
+| `rim.ring.q7`                          | the straight run from the east spoke to the Knife's border node. Needlework and Thunder's Reach moved to `q8`, side by side, so lightning's ladder still tops out at Thunder's Reach                           |
+| `column.ring.b`                        | the mid ring had three nodes between the spokes; now two (`a` and `c`, moved to ±217). Hoarfrost opens off `a`, Prism Ward off `c`                                                                             |
+| `home.stillMind.d`, `home.sharpMind.d` | each crossing arm had a second small only to stay slower than the road round. The road round lost `column.ring.b`, so one small is enough: hub to the far spoke's second landing is 10 against 9               |
+| `quickening.r3`                        | the recharge floor had five recharge smalls. Now four. Border road to spoke is 7 against the road's 6                                                                                                          |
+| `composure.b`, `composure.x`           | the mid floor: one of Composure's three stun smalls, and the shield small between Iron Litany and Slow Burn's crossroads. Iron Litany now meets the crossroads itself                                          |
+| `wandVolley.z`                         | the mid floor's wand small: Hail of Sparks meets the crossroads itself. Spoke to spoke over the floor is 9 against the mid ring's 5                                                                            |
+| `familiars.h1`                         | the climb's second minion small between Familiars' room and Bound Host                                                                                                                                         |
+| `badCompany.o`                         | the mana small between Hexed Pack and Overflow. Hexed Pack meets Overflow's mana small itself                                                                                                                  |
+| `column.star.f`                        | Prism Ward's chaos small, which hung toward First Light with nothing beyond it (left open in the first pass). The room is now one small per element                                                            |
 
 **Tried and put back.** The bare spoke nodes between the hubs and the first landings (`home.spW.a`, `home.spE.a`), as
 the Knife and the Cathedral did. On the Spire, each spoke a step shorter made four notables within 8 dead ends or
@@ -1289,29 +1292,29 @@ notable is at 5. Pain Conduit is now 10 steps from the start (11 before), and Mi
 **A build reason for every join.** Each join from the first pass names who walks it in its `why`. The older "a way
 across" links got one too.
 
-| Join | Who walks it |
-| --- | --- |
-| First Light onto the east arm (Still Mind) into Wandwork's smalls | the wand caster: the generalist, mana to cast with, then wand spells |
-| First Light onto the west arm (Sharp Mind) into Deft Wand's smalls | the crit caster, and the wand attacker who wants crit before Deft Wand |
-| The recharge floor (spoke, Ward Renewed, Quickening, border road) | the energy shield caster who lives on recharge |
-| The crit floor (spoke, Surging Tide, Siphon, Hexwright) | the crit caster on energy shield, cursing on the way to the Knife's road |
-| The mid floor: Iron Litany into Slow Burn's crossroads | the caster who stands in the press and burns or chills what crowds in; the wand attacker who wants to stand through stuns |
-| The mid floor: Hail of Sparks into the crossroads | the wand attacker who wants chain before speed |
-| Kindling to the mid ring (Flashpoint) | the fire caster who wants spell crit |
-| Thunderhead to the mid ring (Keen Verse, Live Current) | the lightning caster who crits |
-| Conductor into Needlework | the wand attacker who turns his damage to lightning and shocks |
-| Rime into Broad Weave | the cold area caster who chills whole packs |
-| Warm Hearth into Kiln Heart | the igniter: ignites, recovery from the burning dead, penetration |
-| The climb: Bound Host up by mana to Moonward | the spell-minion caster who stacks mana and wears energy shield |
-| The climb past the rim: Hexed Pack into Overflow | the cursing summoner whose mana becomes shield |
-| Moonward across into the Cathedral's Twofold Guard | the warded caster who carries a shield, Mystic or Zealot |
-| Deep Well's shield small into Quiet Pulse | the life and energy shield caster |
-| Composure into Steady Stream | the channeller, who must not be stunned out of the channel |
-| Living Verse into Mana Tap | the caster who pays in life and mana and leeches the mana back |
-| Siphon into Hexwright; Withering into Hexwright | the curser on energy shield; the hexer |
-| Keen Verse into Live Current | the lightning caster who crits |
-| Needlework into Mist Walk | the wand attacker who crits and dodges, Mystic or Shade |
-| Slow Burn's small into Hoarfrost | the cold caster who lets the cold linger |
+| Join                                                               | Who walks it                                                                                                              |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| First Light onto the east arm (Still Mind) into Wandwork's smalls  | the wand caster: the generalist, mana to cast with, then wand spells                                                      |
+| First Light onto the west arm (Sharp Mind) into Deft Wand's smalls | the crit caster, and the wand attacker who wants crit before Deft Wand                                                    |
+| The recharge floor (spoke, Ward Renewed, Quickening, border road)  | the energy shield caster who lives on recharge                                                                            |
+| The crit floor (spoke, Surging Tide, Siphon, Hexwright)            | the crit caster on energy shield, cursing on the way to the Knife's road                                                  |
+| The mid floor: Iron Litany into Slow Burn's crossroads             | the caster who stands in the press and burns or chills what crowds in; the wand attacker who wants to stand through stuns |
+| The mid floor: Hail of Sparks into the crossroads                  | the wand attacker who wants chain before speed                                                                            |
+| Kindling to the mid ring (Flashpoint)                              | the fire caster who wants spell crit                                                                                      |
+| Thunderhead to the mid ring (Keen Verse, Live Current)             | the lightning caster who crits                                                                                            |
+| Conductor into Needlework                                          | the wand attacker who turns his damage to lightning and shocks                                                            |
+| Rime into Broad Weave                                              | the cold area caster who chills whole packs                                                                               |
+| Warm Hearth into Kiln Heart                                        | the igniter: ignites, recovery from the burning dead, penetration                                                         |
+| The climb: Bound Host up by mana to Moonward                       | the spell-minion caster who stacks mana and wears energy shield                                                           |
+| The climb past the rim: Hexed Pack into Overflow                   | the cursing summoner whose mana becomes shield                                                                            |
+| Moonward across into the Cathedral's Twofold Guard                 | the warded caster who carries a shield, Mystic or Zealot                                                                  |
+| Deep Well's shield small into Quiet Pulse                          | the life and energy shield caster                                                                                         |
+| Composure into Steady Stream                                       | the channeller, who must not be stunned out of the channel                                                                |
+| Living Verse into Mana Tap                                         | the caster who pays in life and mana and leeches the mana back                                                            |
+| Siphon into Hexwright; Withering into Hexwright                    | the curser on energy shield; the hexer                                                                                    |
+| Keen Verse into Live Current                                       | the lightning caster who crits                                                                                            |
+| Needlework into Mist Walk                                          | the wand attacker who crits and dodges, Mystic or Shade                                                                   |
+| Slow Burn's small into Hoarfrost                                   | the cold caster who lets the cold linger                                                                                  |
 
 None of these was cut for lack of a reason. The one join cut is Wandwork into Fire and Frost (above).
 
@@ -1325,22 +1328,22 @@ and it replaces the join that was cut:
 
 The 23 left, each with its nearest related room within about three steps:
 
-| Room | Nearest related room | Why it stays apart |
-| --- | --- | --- |
-| Mind Bulwark, Mana Bastion, Pain Conduit, Prismatic Balance, Fever Pitch | (keystones) | spurs at the end of their choice |
-| Ready Wit / Warded Mind | Draught (off the same path node) | already together |
-| Warm Blood | Hale Scribe (life, off the same path node) | already together |
-| Kept Vows (reservation) | none within three; the Cathedral's Bright Omen is near but not related | no |
-| Flashpoint (fire, spell crit) | Kindling (fire's ladder ends at the same ring node) | already together |
-| Darting Bolts (spell projectiles) | none related within three (Spray of Bolts is across the rim) | no |
-| Prism Ward (resistances) | none related | no |
-| Drone (channelling) | Steady Stream (channelling), across the middle band | too far, and the mid floor runs between them |
-| Shatter, Cold Light (freeze, cold crit) | each other | both off `q4`: a link saves nothing |
-| Piercing Word, Blast | Shatter, Cold Light | all four off `q4` |
-| Harsh Weather (ailments) | Shatter (freeze), two rim steps away | the link would cross Piercing Word's and Blast's ways in |
-| Recital, Pinpoint | each other | both off `e1`, and unrelated |
-| Thunder's Reach, Spray of Bolts | Needlework (lightning's ladder), Mist Walk | all off `q8` |
-| Bright Wand (elemental wand) | Cinder | both off `w1`, and only half related |
+| Room                                                                     | Nearest related room                                                   | Why it stays apart                                       |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------- |
+| Mind Bulwark, Mana Bastion, Pain Conduit, Prismatic Balance, Fever Pitch | (keystones)                                                            | spurs at the end of their choice                         |
+| Ready Wit / Warded Mind                                                  | Draught (off the same path node)                                       | already together                                         |
+| Warm Blood                                                               | Hale Scribe (life, off the same path node)                             | already together                                         |
+| Kept Vows (reservation)                                                  | none within three; the Cathedral's Bright Omen is near but not related | no                                                       |
+| Flashpoint (fire, spell crit)                                            | Kindling (fire's ladder ends at the same ring node)                    | already together                                         |
+| Darting Bolts (spell projectiles)                                        | none related within three (Spray of Bolts is across the rim)           | no                                                       |
+| Prism Ward (resistances)                                                 | none related                                                           | no                                                       |
+| Drone (channelling)                                                      | Steady Stream (channelling), across the middle band                    | too far, and the mid floor runs between them             |
+| Shatter, Cold Light (freeze, cold crit)                                  | each other                                                             | both off `q4`: a link saves nothing                      |
+| Piercing Word, Blast                                                     | Shatter, Cold Light                                                    | all four off `q4`                                        |
+| Harsh Weather (ailments)                                                 | Shatter (freeze), two rim steps away                                   | the link would cross Piercing Word's and Blast's ways in |
+| Recital, Pinpoint                                                        | each other                                                             | both off `e1`, and unrelated                             |
+| Thunder's Reach, Spray of Bolts                                          | Needlework (lightning's ladder), Mist Walk                             | all off `q8`                                             |
+| Bright Wand (elemental wand)                                             | Cinder                                                                 | both off `w1`, and only half related                     |
 
 **The forms in plain words.**
 
@@ -1375,19 +1378,19 @@ same time.
 
 **Thinning (22 nodes).** Six road nodes, four tails, twelve smalls from rooms with more than their idea needs:
 
-| Removed | Why it could go |
-| --- | --- |
-| `home.spS.a` | a bare attribute node between the armour hub and the spoke's first junction (CONSTRAINTS §16 item 9) |
-| `maces.ring.a` | the mid ring's one bare node, between the south spoke's junction and the shields' door; the spoke now runs straight to `ring.b` |
-| `grit.ring.q4`, `q6` | the rim had four nodes between the spoke corners (the skeleton allows 1 to 3); `q3` and `q5` moved to the thirds of the stretch, Greatblade now enters at `q3`, Hammer Rhythm at `q5` |
-| `grit.ring.q7` | between the north spoke's corner and the border; `q8` moved halfway, Headsman now enters there beside Scar Tissue and Rooted Stance |
-| `crushing.b`, `groundShaker.b`, `bulwark.e` | smalls beyond a notable that led nowhere |
-| `bulwark.a` | Mortar and Stone's bare attribute door; its armour small `c` is the door now |
-| `ironVoice.c`, `heavyHands.c`, `weight.c`, `bellows.c` | four-node rings where the notable was two smalls from the door: now a chain of two smalls, the notable's price unchanged |
-| `rhythm.b`, `ram.c`, `cairns.b`, `watch.b`, `thunderstep.c` | rings whose notable stood next to the door: now a triangle, price unchanged |
-| `locked.c` | Locked Shields' ring of four smalls is a ring of three |
-| `gritPay.s2` | Grit and Gravel's run to Scar Tissue had two smalls where one is enough (the Cathedral's Hymn run still lands on `s1`) |
-| `unbroken.g3` | the keep's approach from Hammer Rhythm had two smalls, now one |
+| Removed                                                     | Why it could go                                                                                                                                                                       |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `home.spS.a`                                                | a bare attribute node between the armour hub and the spoke's first junction (CONSTRAINTS §16 item 9)                                                                                  |
+| `maces.ring.a`                                              | the mid ring's one bare node, between the south spoke's junction and the shields' door; the spoke now runs straight to `ring.b`                                                       |
+| `grit.ring.q4`, `q6`                                        | the rim had four nodes between the spoke corners (the skeleton allows 1 to 3); `q3` and `q5` moved to the thirds of the stretch, Greatblade now enters at `q3`, Hammer Rhythm at `q5` |
+| `grit.ring.q7`                                              | between the north spoke's corner and the border; `q8` moved halfway, Headsman now enters there beside Scar Tissue and Rooted Stance                                                   |
+| `crushing.b`, `groundShaker.b`, `bulwark.e`                 | smalls beyond a notable that led nowhere                                                                                                                                              |
+| `bulwark.a`                                                 | Mortar and Stone's bare attribute door; its armour small `c` is the door now                                                                                                          |
+| `ironVoice.c`, `heavyHands.c`, `weight.c`, `bellows.c`      | four-node rings where the notable was two smalls from the door: now a chain of two smalls, the notable's price unchanged                                                              |
+| `rhythm.b`, `ram.c`, `cairns.b`, `watch.b`, `thunderstep.c` | rings whose notable stood next to the door: now a triangle, price unchanged                                                                                                           |
+| `locked.c`                                                  | Locked Shields' ring of four smalls is a ring of three                                                                                                                                |
+| `gritPay.s2`                                                | Grit and Gravel's run to Scar Tissue had two smalls where one is enough (the Cathedral's Hymn run still lands on `s1`)                                                                |
+| `unbroken.g3`                                               | the keep's approach from Hammer Rhythm had two smalls, now one                                                                                                                        |
 
 Tried and undone: `home.spN.a` went too, but with the north spoke a step shorter Thunderstep, Barrow Ward, Sweeping Blow
 and Aftershock all became dead ends within 8 steps. It stays as a small of the spoke's stat (melee area, what the slams
@@ -1413,50 +1416,50 @@ from the start, `i3` is 8 steps through Old Wounds against 7 by the seam road.
 
 **A build reason for every join.** Every first-pass join's `why` now names who walks it:
 
-| Join | Who walks it |
-| --- | --- |
-| melee hub's life smalls → Oathbound | every melee Vanguard who wants life with his steel |
-| armour hub's resistances → Ox Hide | the Vanguard who stands and takes the hit |
-| Oathbound → Barrow Ward → Sweeping Blow | the striker who mends between blows and wants an extra target |
-| Ox Hide → Mortar and Stone → Locked Shields | the armour stacker, then the armoured shield bearer |
-| Weak Spot → Iron Lungs | the melee crit striker who runs on the mana his hits give back |
-| Old Wounds → centre | the Vanguard who lives on regeneration |
-| Stagger → Aftershock → mid ring | the slammer who stuns |
-| the keep's four gates | the warcrier and the mace fighter who build grit; the shield bearer and the two-hander who spend it |
-| Grit and Gravel's door | the grit fighter who wants damage per charge without going out to Scar Tissue first |
-| Warlord's Banner → Hallowed Hammer | the aura bearer with an elemental mace, Vanguard or Zealot |
-| Sledge and Sinew → Brute Force | the mace brawler who stacks strength |
-| Greatblade → Long Reach | the two-handed sword cleaver |
-| Grave Host → Volatile Servants | the summoner who wants both minion rooms of the corner |
+| Join                                        | Who walks it                                                                                        |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| melee hub's life smalls → Oathbound         | every melee Vanguard who wants life with his steel                                                  |
+| armour hub's resistances → Ox Hide          | the Vanguard who stands and takes the hit                                                           |
+| Oathbound → Barrow Ward → Sweeping Blow     | the striker who mends between blows and wants an extra target                                       |
+| Ox Hide → Mortar and Stone → Locked Shields | the armour stacker, then the armoured shield bearer                                                 |
+| Weak Spot → Iron Lungs                      | the melee crit striker who runs on the mana his hits give back                                      |
+| Old Wounds → centre                         | the Vanguard who lives on regeneration                                                              |
+| Stagger → Aftershock → mid ring             | the slammer who stuns                                                                               |
+| the keep's four gates                       | the warcrier and the mace fighter who build grit; the shield bearer and the two-hander who spend it |
+| Grit and Gravel's door                      | the grit fighter who wants damage per charge without going out to Scar Tissue first                 |
+| Warlord's Banner → Hallowed Hammer          | the aura bearer with an elemental mace, Vanguard or Zealot                                          |
+| Sledge and Sinew → Brute Force              | the mace brawler who stacks strength                                                                |
+| Greatblade → Long Reach                     | the two-handed sword cleaver                                                                        |
+| Grave Host → Volatile Servants              | the summoner who wants both minion rooms of the corner                                              |
 
 None was cut: each has a build.
 
 **Rooms that hang by one entrance.** The mace, stun and fire rooms were swept first. Five new joins, no new node:
 
-| Join | Who walks it | Through the rooms / road |
-| --- | --- | --- |
-| Hot Iron → Bellows (Hot Iron's old tail small moved out past Crushing Blow as the bridge) | the fire attacker who ignites and swings wide | 6 / 2 |
-| Greatweight → Skull Crack | the two-handed mace stunner who cracks the stunned | 7 / 1 |
-| Weight of Iron → Heavy Hands | the two-handed mace slammer who swings faster for his grit | 5 / 2 |
-| Plunder of Iron → Heavy Hands | the two-hander who earns grit on kills and spends it as speed | 5 / 1 |
-| Long Watch → Twin Cairns (its text always said it was in by Long Watch) | the totem planter | 6 / 1 |
+| Join                                                                                      | Who walks it                                                  | Through the rooms / road |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------ |
+| Hot Iron → Bellows (Hot Iron's old tail small moved out past Crushing Blow as the bridge) | the fire attacker who ignites and swings wide                 | 6 / 2                    |
+| Greatweight → Skull Crack                                                                 | the two-handed mace stunner who cracks the stunned            | 7 / 1                    |
+| Weight of Iron → Heavy Hands                                                              | the two-handed mace slammer who swings faster for his grit    | 5 / 2                    |
+| Plunder of Iron → Heavy Hands                                                             | the two-hander who earns grit on kills and spends it as speed | 5 / 1                    |
+| Long Watch → Twin Cairns (its text always said it was in by Long Watch)                   | the totem planter                                             | 6 / 1                    |
 
 The 16 left, each with its nearest related room within about three steps:
 
-| Room | Nearest related room | Why it stays apart |
-| --- | --- | --- |
-| Crushing Blow (mace crit) | Weight of Iron | already two road steps apart (`n1`, `spN.c`) |
-| Broken Guard (stun gives grit) | Locked Shields (grit on block) | one road step apart (`ring.c`, `ring.b`) |
-| Headsman (axe, grit on stun) | Scar Tissue | off the same node (`q8`); Greatweight is across the rim |
-| Steady Hands (accuracy, speed) | Weak Spot (melee crit) | one spoke step apart |
-| Standing Iron (armour while still) | Mortar and Stone, Rooted Stance | more than three steps |
-| Graven Posts (totems) | none within three: Long Watch and Twin Cairns are at the rim | |
-| Standing Cairns (totems) | none within three | |
-| Bulwark Spirit (regeneration per grit) | Grit and Gravel | off the same node (`radW.m`) |
-| Vampiric Strikes (leech) | none within three on the Wall's side | |
-| Ground Shaker (area, knockback) | Long Reach, Thunderstep | far; the link to Plunder crossed the spoke in the first pass |
-| Elemental Ward (resistances) | Ox Hide | a room on the seam path near home; a join would only loop beside the start |
-| Unerring Discipline, Unbowed Arm, Rooted Stance, Blood Rite | (keystones) | a keystone stays a spur |
+| Room                                                        | Nearest related room                                         | Why it stays apart                                                         |
+| ----------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Crushing Blow (mace crit)                                   | Weight of Iron                                               | already two road steps apart (`n1`, `spN.c`)                               |
+| Broken Guard (stun gives grit)                              | Locked Shields (grit on block)                               | one road step apart (`ring.c`, `ring.b`)                                   |
+| Headsman (axe, grit on stun)                                | Scar Tissue                                                  | off the same node (`q8`); Greatweight is across the rim                    |
+| Steady Hands (accuracy, speed)                              | Weak Spot (melee crit)                                       | one spoke step apart                                                       |
+| Standing Iron (armour while still)                          | Mortar and Stone, Rooted Stance                              | more than three steps                                                      |
+| Graven Posts (totems)                                       | none within three: Long Watch and Twin Cairns are at the rim |                                                                            |
+| Standing Cairns (totems)                                    | none within three                                            |                                                                            |
+| Bulwark Spirit (regeneration per grit)                      | Grit and Gravel                                              | off the same node (`radW.m`)                                               |
+| Vampiric Strikes (leech)                                    | none within three on the Wall's side                         |                                                                            |
+| Ground Shaker (area, knockback)                             | Long Reach, Thunderstep                                      | far; the link to Plunder crossed the spoke in the first pass               |
+| Elemental Ward (resistances)                                | Ox Hide                                                      | a room on the seam path near home; a join would only loop beside the start |
+| Unerring Discipline, Unbowed Arm, Rooted Stance, Blood Rite | (keystones)                                                  | a keystone stays a spur                                                    |
 
 Every other room has two ways in or more.
 
@@ -1489,14 +1492,14 @@ Wall's borders unchanged: zealot 8 (2 cluster to cluster), reaver 7 (1), centre 
 
 **227 nodes to 203** (24 removed, none added; 222 before the revision). 54 notables and 5 keystones, all kept.
 
-| Removed | Why it could go |
-| --- | --- |
-| `walk.ring.q3` | the rim between the two spokes (`n1`, `s1`) had three nodes; `q4` and `q5` moved to the thirds of the stretch. The procession and Faith Aflame now enter at `q4` (beside Rimed Steel's wheel), Searing Avatar at `q5` (beside Sexton) |
-| `ambulatory.tithe.b`, `verger.c`, `brand.c`, `brand.d`, `crypt.rood.c`, `pyre.sexton.c`, `choir.hymn.b`, `nave.warding.b`, `warding.c` | smalls beyond a notable that led nowhere (Hymn still leads on to Hallowed Ground, Warding Staff to Whirling Ward) |
-| `home.star.w`, `home.star.e` | Litany's cold and lightning smalls, tails beyond the notable; its fire and chaos smalls stay because the ways in and on run through them |
-| `walk.vespers.c`, `rim.brazier.c`, `pyre.procession.c` | the third small of a run where two do the work (Procession's second small still opens to Choir of Wrath) |
-| `walk.peal.b`, `walk.tomb.b`, `walk.plainsong.b`, `rim.censer.b`, `rim.ossuary.b`, `ambulatory.kindled.b`, `choir.minionSustain.s2` | the second small of a room at or past the mid ring, where one does the work |
-| `walk.lightRule.s2`, `pyre.fireRule.s2` | the two rules' second smalls |
+| Removed                                                                                                                                | Why it could go                                                                                                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `walk.ring.q3`                                                                                                                         | the rim between the two spokes (`n1`, `s1`) had three nodes; `q4` and `q5` moved to the thirds of the stretch. The procession and Faith Aflame now enter at `q4` (beside Rimed Steel's wheel), Searing Avatar at `q5` (beside Sexton) |
+| `ambulatory.tithe.b`, `verger.c`, `brand.c`, `brand.d`, `crypt.rood.c`, `pyre.sexton.c`, `choir.hymn.b`, `nave.warding.b`, `warding.c` | smalls beyond a notable that led nowhere (Hymn still leads on to Hallowed Ground, Warding Staff to Whirling Ward)                                                                                                                     |
+| `home.star.w`, `home.star.e`                                                                                                           | Litany's cold and lightning smalls, tails beyond the notable; its fire and chaos smalls stay because the ways in and on run through them                                                                                              |
+| `walk.vespers.c`, `rim.brazier.c`, `pyre.procession.c`                                                                                 | the third small of a run where two do the work (Procession's second small still opens to Choir of Wrath)                                                                                                                              |
+| `walk.peal.b`, `walk.tomb.b`, `walk.plainsong.b`, `rim.censer.b`, `rim.ossuary.b`, `ambulatory.kindled.b`, `choir.minionSustain.s2`    | the second small of a room at or past the mid ring, where one does the work                                                                                                                                                           |
+| `walk.lightRule.s2`, `pyre.fireRule.s2`                                                                                                | the two rules' second smalls                                                                                                                                                                                                          |
 
 Weighed and left, by count (no cut was undone): Hymn of War's first warcry small (`rim.hymn.w1`). Without it the way
 into the Wall's grit run would be 4 steps against the rim road's 5, a shortcut. Not touched: the keystone spurs, the
@@ -1522,11 +1525,11 @@ notables and 3 keystones unchanged. 201 before the revision.
 
 **Cut (19).**
 
-| Kind | Removed |
-| --- | --- |
-| Tails beyond a notable that led nowhere | `dual.footwork.c`, `fosse.hewing.b`, `fosse.drill.c`, `blades.lasting.c` |
-| A room's ring or wheel one small shorter, the notable's price unchanged | `dual.twinFangs.d` (Off-Hand Parry still lands on `c`), `dual.hotBlood.c` (now a triangle), `dual.openVeins.b` (now a triangle; Hot Blood still lands on `c`), `blood.swing.c` (Full Swing to Paired Steel by one small), `blades.keenEdge.c` (a chain; Keen Edge stays at 8), `blades.lightBlades.c`, `shield.steelRim.d` |
-| A room's second small of one stat, where the notable is at step 11 or more | `fosse.impalePay.s2`, `fosse.thirst.s2`, `fosse.fortify.s2` (Iron Skin's join now lands on `s1`), `fosse.stunPay.s2` (Wide Arc's join now lands on `s1`), `shield.blockMana.s2`, `shield.mending.s2`, `fosse.drill.b`, `fosse.bloodied.b` |
+| Kind                                                                       | Removed                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tails beyond a notable that led nowhere                                    | `dual.footwork.c`, `fosse.hewing.b`, `fosse.drill.c`, `blades.lasting.c`                                                                                                                                                                                                                                                   |
+| A room's ring or wheel one small shorter, the notable's price unchanged    | `dual.twinFangs.d` (Off-Hand Parry still lands on `c`), `dual.hotBlood.c` (now a triangle), `dual.openVeins.b` (now a triangle; Hot Blood still lands on `c`), `blood.swing.c` (Full Swing to Paired Steel by one small), `blades.keenEdge.c` (a chain; Keen Edge stays at 8), `blades.lightBlades.c`, `shield.steelRim.d` |
+| A room's second small of one stat, where the notable is at step 11 or more | `fosse.impalePay.s2`, `fosse.thirst.s2`, `fosse.fortify.s2` (Iron Skin's join now lands on `s1`), `fosse.stunPay.s2` (Wide Arc's join now lands on `s1`), `shield.blockMana.s2`, `shield.mending.s2`, `fosse.drill.b`, `fosse.bloodied.b`                                                                                  |
 
 **Tried and undone.** `blades.mail.c` and `dual.impale.c` (tails) and `blood.redHarvest.c` (ring to triangle): each made
 its notable (Mended Mail 7, Spitting Blade 8, Red Harvest 8) a dead end within 8 steps. All three are back.
@@ -1572,17 +1575,17 @@ The centre: **44 nodes before, 38 after** (16 road, 22 in rooms). 8 notables bef
 **A build reason in every join.** Each first-pass join's `why` now names the build that walks it. Every step count was
 redone for the thinner ring:
 
-| Join | The build that walks it |
-| --- | --- |
-| Firm Footing's arm to `s1` | the melee who lives on life on hit (Hard Living) stands in the press, where a stun costs most |
-| Firm Footing's arm to `s5` | the caster who caps resistances at Shelter and still loses casts to stuns |
-| Waste Not's arm to `s1` | the pack clearer who lives on kills: Hard Living's life on kill, Waste Not's mana on kill |
-| Waste Not's arm to `s3` | the skill spammer short of mana, on to Provisions' mana regeneration at the middle |
-| Quick March's arm to `s3` | the build that walks through poison and bleed (Sound Body) wants the legs to leave the ground |
-| Quick March's arm to `s5` | the kiting caster capping resistances at Shelter |
-| Hard Living's door to `s1` | the attacker who lives on hits and kills, on to stun protection, mana on kill or the middle |
-| Sound Body's door to `s3` | the ailment-proof build, on to movement or the middle's life and flasks |
-| Shelter's door to `s5` | the resistance capper (the Zealot in from Litany among them), on to life, chaos resistance or stun protection |
+| Join                       | The build that walks it                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Firm Footing's arm to `s1` | the melee who lives on life on hit (Hard Living) stands in the press, where a stun costs most                 |
+| Firm Footing's arm to `s5` | the caster who caps resistances at Shelter and still loses casts to stuns                                     |
+| Waste Not's arm to `s1`    | the pack clearer who lives on kills: Hard Living's life on kill, Waste Not's mana on kill                     |
+| Waste Not's arm to `s3`    | the skill spammer short of mana, on to Provisions' mana regeneration at the middle                            |
+| Quick March's arm to `s3`  | the build that walks through poison and bleed (Sound Body) wants the legs to leave the ground                 |
+| Quick March's arm to `s5`  | the kiting caster capping resistances at Shelter                                                              |
+| Hard Living's door to `s1` | the attacker who lives on hits and kills, on to stun protection, mana on kill or the middle                   |
+| Sound Body's door to `s3`  | the ailment-proof build, on to movement or the middle's life and flasks                                       |
+| Shelter's door to `s5`     | the resistance capper (the Zealot in from Litany among them), on to life, chaos resistance or stun protection |
 
 **Rooms with one entrance.** Only the middle's two:
 
@@ -1601,25 +1604,25 @@ junction rooms have two or three ways in.
 
 **The forms, in plain words.**
 
-- *The yoke:* at a junction without a spoke, the notable room is a back door to the middle. You come in from your
+- _The yoke:_ at a junction without a spoke, the notable room is a back door to the middle. You come in from your
   junction, take the notable, and leave by a short arm to either spoke beside it. It is two steps slower than the road
   round, but you get a notable on the way.
-- *The inner door:* at a junction with a spoke, the notable room opens onto that spoke and nothing else. It is a slower
+- _The inner door:_ at a junction with a spoke, the notable room opens onto that spoke and nothing else. It is a slower
   way to the middle that pays a notable.
-- *The bare hexagon:* the ring joining the six junctions is one long link per side, so a pair's junction is one step
+- _The bare hexagon:_ the ring joining the six junctions is one long link per side, so a pair's junction is one step
   from the next pair's.
 
 **The fairness, measured** (steps from each start; before → after; `--pairs` in a scratch script):
 
-| | Mystic | Shade | Strider | Reaver | Vanguard | Zealot |
-| --- | --- | --- | --- | --- | --- | --- |
-| Shelter | 10 | 12 → 11 | 12 | 12 | 12 → 11 | 10 |
-| Firm Footing | 10 | 10 | 11 | 13 → 12 | 13 → 12 | 11 |
-| Hard Living | 12 → 11 | 10 | 10 | 12 → 11 | 12 | 12 |
-| Waste Not | 13 → 12 | 11 | 10 | 10 | 11 | 13 → 12 |
-| Sound Body | 12 | 12 | 12 → 11 | 10 | 10 | 12 → 11 |
-| Quick March | 11 | 13 → 12 | 13 → 12 | 11 | 10 | 10 |
-| Well Rounded, Provisions | 12 | 12 | 12 | 12 | 12 | 12 |
+|                          | Mystic  | Shade   | Strider | Reaver  | Vanguard | Zealot  |
+| ------------------------ | ------- | ------- | ------- | ------- | -------- | ------- |
+| Shelter                  | 10      | 12 → 11 | 12      | 12      | 12 → 11  | 10      |
+| Firm Footing             | 10      | 10      | 11      | 13 → 12 | 13 → 12  | 11      |
+| Hard Living              | 12 → 11 | 10      | 10      | 12 → 11 | 12       | 12      |
+| Waste Not                | 13 → 12 | 11      | 10      | 10      | 11       | 13 → 12 |
+| Sound Body               | 12      | 12      | 12 → 11 | 10      | 10       | 12 → 11 |
+| Quick March              | 11      | 13 → 12 | 13 → 12 | 11      | 10       | 10      |
+| Well Rounded, Provisions | 12      | 12      | 12      | 12      | 12       | 12      |
 
 Every class now sees the same set of junction distances: its own two at 10, then 11, 11, 12, 12 (before: 10, 10, 11,
 12, 12, 13). The farthest centre notable is 12 for everyone, the middle's two included. Per notable, the spread between
@@ -1646,15 +1649,15 @@ unchanged. No road node went.
 
 **Cut (18 smalls):**
 
-| Removed | Why it could go |
-| --- | --- |
-| `rim.glint.c`, `roofs.feint.w1`, `snares.rake.c`, `roofs.wish.k1`, `roofs.salt.c1` | tails: one small past a notable, leading nowhere |
-| `snares.tumble.a` | Tumble had two ways in of the same length from the mid ring. It now enters through Cutpurse's Luck's first small |
-| `edge.wheel.w7`, `venom.wheel.v7`, `snares.wheel.t7` | one small from each wheel (Fine Point, Rookery, Trapper). Talon, Barbed Point and Trapper now meet the far junction small directly |
-| `roofs.athame.e1` | the dagger wheel: Long Knives now stands next to the door (`t`), and Athame is one small past it |
-| `home.breath.e1`, `home.cloak.v1` | the second small of each seam run behind the two doors |
-| `edge.steadyEye.x1` | the crit run's second small. Spoke to mid ring through Steady Eye is 4 steps against the spoke's 3 |
-| `hex.wiry.l1`, `hex.ward.e1`, `edge.frost.k1`, `roofs.ribs.d1`, `roofs.hasty.b` | a room's second (or, for Split Light, third) small of one stat |
+| Removed                                                                            | Why it could go                                                                                                                    |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `rim.glint.c`, `roofs.feint.w1`, `snares.rake.c`, `roofs.wish.k1`, `roofs.salt.c1` | tails: one small past a notable, leading nowhere                                                                                   |
+| `snares.tumble.a`                                                                  | Tumble had two ways in of the same length from the mid ring. It now enters through Cutpurse's Luck's first small                   |
+| `edge.wheel.w7`, `venom.wheel.v7`, `snares.wheel.t7`                               | one small from each wheel (Fine Point, Rookery, Trapper). Talon, Barbed Point and Trapper now meet the far junction small directly |
+| `roofs.athame.e1`                                                                  | the dagger wheel: Long Knives now stands next to the door (`t`), and Athame is one small past it                                   |
+| `home.breath.e1`, `home.cloak.v1`                                                  | the second small of each seam run behind the two doors                                                                             |
+| `edge.steadyEye.x1`                                                                | the crit run's second small. Spoke to mid ring through Steady Eye is 4 steps against the spoke's 3                                 |
+| `hex.wiry.l1`, `hex.ward.e1`, `edge.frost.k1`, `roofs.ribs.d1`, `roofs.hasty.b`    | a room's second (or, for Split Light, third) small of one stat                                                                     |
 
 What moved closer: Frost Snare and Shifting Ward 10 to 9, Wiry Frame and Between Ribs 11 to 10, Split Light 14 to 13.
 Weapon notables are all still at step 8 or later.

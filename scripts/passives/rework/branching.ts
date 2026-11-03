@@ -6,7 +6,10 @@ import fs from 'fs';
 type G = { adj: Map<number, Set<number>>; kind: Map<number, string>; starts: [string, number][] };
 const link = (g: G, a: number, b: number) => {
   if (a === b) return;
-  for (const [x, y] of [[a, b], [b, a]]) {
+  for (const [x, y] of [
+    [a, b],
+    [b, a],
+  ]) {
     if (!g.adj.has(x)) g.adj.set(x, new Set());
     g.adj.get(x)!.add(y);
   }
@@ -36,7 +39,9 @@ function measure(name: string, g: G) {
     [13, 16],
     [17, 20],
   ];
-  console.log('start | nodes per band 1-4,5-8,9-12,13-16,17-20 | notables per band | keystones (steps) | loops ≤10 / ≤15 / ≤20 | dead ends ≤15 | mean links ≤15 | other starts (steps) | notables ≤14 behind each exit');
+  console.log(
+    'start | nodes per band 1-4,5-8,9-12,13-16,17-20 | notables per band | keystones (steps) | loops ≤10 / ≤15 / ≤20 | dead ends ≤15 | mean links ≤15 | other starts (steps) | notables ≤14 behind each exit',
+  );
   const startIds = new Set(g.starts.map(([, s]) => s));
   for (const [cls, s] of g.starts) {
     const d = dist(g, s);
@@ -50,10 +55,14 @@ function measure(name: string, g: G) {
       return l - b.size + 1;
     };
     const b15 = ball(15);
-    const deg = (n: number) => [...(g.adj.get(n) ?? [])].filter((m) => !startIds.has(m) || m === s).length;
+    const deg = (n: number) =>
+      [...(g.adj.get(n) ?? [])].filter((m) => !startIds.has(m) || m === s).length;
     const dead = [...b15].filter((n) => n !== s && deg(n) === 1).length;
     const mean = [...b15].reduce((t, n) => t + deg(n), 0) / b15.size;
-    const keys = [...d].filter(([n, v]) => g.kind.get(n) === 'keystone' && v <= 20).map(([, v]) => v).sort((a, b) => a - b);
+    const keys = [...d]
+      .filter(([n, v]) => g.kind.get(n) === 'keystone' && v <= 20)
+      .map(([, v]) => v)
+      .sort((a, b) => a - b);
     // Steps to the other starts, through the tree (another start may be passed through for this one).
     const all = new Map<number, number>([[s, 0]]);
     const q = [s];
@@ -61,8 +70,13 @@ function measure(name: string, g: G) {
       const a = q.shift()!;
       for (const b of g.adj.get(a) ?? []) if (!all.has(b)) (all.set(b, all.get(a)! + 1), q.push(b));
     }
-    const others = g.starts.filter(([, x]) => x !== s).map(([, x]) => all.get(x) ?? -1).sort((a, b) => a - b);
-    const notables14 = [...d].filter(([n, v]) => g.kind.get(n) === 'notable' && v <= 14).map(([n]) => n);
+    const others = g.starts
+      .filter(([, x]) => x !== s)
+      .map(([, x]) => all.get(x) ?? -1)
+      .sort((a, b) => a - b);
+    const notables14 = [...d]
+      .filter(([n, v]) => g.kind.get(n) === 'notable' && v <= 14)
+      .map(([n]) => n);
     const exits = [...(g.adj.get(s) ?? [])].filter((m) => !startIds.has(m) && g.kind.has(m));
     const behind = exits.map((e) => {
       const dc = dist(g, s, e);
@@ -73,7 +87,12 @@ function measure(name: string, g: G) {
     );
   }
 }
-const ref = JSON.parse(fs.readFileSync('E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json', 'utf8'));
+const ref = JSON.parse(
+  fs.readFileSync(
+    'E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json',
+    'utf8',
+  ),
+);
 const refG: G = { adj: new Map(), kind: new Map(), starts: [] };
 const refStarts: [string, number, number[]][] = [
   ['str', 47175, [31628, 50904]],
@@ -106,7 +125,10 @@ nodes.forEach((n: any, i: number) => {
 });
 measure('Bob', bob);
 // The whole of each: nodes, notables, keystones, mean links.
-for (const [name, g] of [['reference', refG], ['Bob', bob]] as const) {
+for (const [name, g] of [
+  ['reference', refG],
+  ['Bob', bob],
+] as const) {
   const c: Record<string, number> = {};
   for (const k of g.kind.values()) c[k] = (c[k] ?? 0) + 1;
   let l = 0;

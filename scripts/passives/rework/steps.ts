@@ -12,7 +12,8 @@ const bfs = (s: number) => {
   const q = [s];
   while (q.length) {
     const a = q.shift()!;
-    for (const c of nodes[a].links) if (d[c] === Infinity && !nodes[c].classStart) (d[c] = d[a] + 1, q.push(c));
+    for (const c of nodes[a].links)
+      if (d[c] === Infinity && !nodes[c].classStart) ((d[c] = d[a] + 1), q.push(c));
   }
   return d;
 };
@@ -22,5 +23,6 @@ for (let i = 0; i < names.length; i++) {
     continue;
   }
   const d = bfs(idx[i]);
-  for (let j = i + 1; j < names.length; j++) if (idx[j] >= 0) console.log(`${names[i]} – ${names[j]}: ${d[idx[j]]}`);
+  for (let j = i + 1; j < names.length; j++)
+    if (idx[j] >= 0) console.log(`${names[i]} – ${names[j]}: ${d[idx[j]]}`);
 }

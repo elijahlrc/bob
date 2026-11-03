@@ -907,7 +907,8 @@ export function distanceMult(p: SkillProfile, d: number): number {
   if (p.distMore) m *= 1 + (p.distMore.more / 100) * clamp(d / p.distMore.dist, 0, 1);
   if (b.kind === 'projectile') {
     if (p.closeQuarters && p.isAttack) m *= 1.5 - (clamp(d, 1, 8) - 1) / 7;
-    if (p.farShot > 0 && p.isAttack) m *= 0.8 + (0.2 + p.farShot / 100) * ((clamp(d, 1, 8) - 1) / 7);
+    if (p.farShot > 0 && p.isAttack)
+      m *= 0.8 + (0.2 + p.farShot / 100) * ((clamp(d, 1, 8) - 1) / 7);
     if (b.falloff !== undefined && b.range) m *= 1 - (1 - b.falloff) * clamp(d / b.range, 0, 1);
   }
   return m;

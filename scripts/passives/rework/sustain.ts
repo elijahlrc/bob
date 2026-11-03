@@ -18,17 +18,31 @@ const kinds: [string, RegExp][] = [
 const tally = (lines: { kind: string; line: string }[]) => {
   const t: Record<string, { notable: number; small: number }> = {};
   for (const [k] of kinds) t[k] = { notable: 0, small: 0 };
-  for (const { kind, line } of lines) for (const [k, re] of kinds) if (re.test(line)) t[k][kind === 'notable' || kind === 'keystone' ? 'notable' : 'small']++;
+  for (const { kind, line } of lines)
+    for (const [k, re] of kinds)
+      if (re.test(line)) t[k][kind === 'notable' || kind === 'keystone' ? 'notable' : 'small']++;
   return t;
 };
-const snap = JSON.parse(fs.readFileSync(ROOT + `scripts/passives/rework/before/${folder}.json`, 'utf8'));
-const before = snap.flatMap((a: any) => a.clusters.flatMap((c: any) => c.nodes.flatMap((n: any) => n.lines.map((l: string) => ({ kind: n.kind, line: l })))));
+const snap = JSON.parse(
+  fs.readFileSync(ROOT + `scripts/passives/rework/before/${folder}.json`, 'utf8'),
+);
+const before = snap.flatMap((a: any) =>
+  a.clusters.flatMap((c: any) =>
+    c.nodes.flatMap((n: any) => n.lines.map((l: string) => ({ kind: n.kind, line: l }))),
+  ),
+);
 const b = buildAll({ allowNew: true });
 const now: { kind: string; line: string }[] = [];
 b.tree.nodes.forEach((n: any, i: number) => {
   if (b.place[i]?.region !== reg) return;
-  for (const s of b.lines[i] ?? []) now.push({ kind: n.kind, line: `${s.fn}(${s.args.map((a: unknown) => JSON.stringify(a).replace(/"/g, "'")).join(', ')})` });
+  for (const s of b.lines[i] ?? [])
+    now.push({
+      kind: n.kind,
+      line: `${s.fn}(${s.args.map((a: unknown) => JSON.stringify(a).replace(/"/g, "'")).join(', ')})`,
+    });
 });
-const tb = tally(before), tn = tally(now);
+const tb = tally(before),
+  tn = tally(now);
 console.log('kind | before (notables / smalls) | now (notables / smalls)');
-for (const [k] of kinds) console.log(`${k} | ${tb[k].notable} / ${tb[k].small} | ${tn[k].notable} / ${tn[k].small}`);
+for (const [k] of kinds)
+  console.log(`${k} | ${tb[k].notable} / ${tb[k].small} | ${tn[k].notable} / ${tn[k].small}`);

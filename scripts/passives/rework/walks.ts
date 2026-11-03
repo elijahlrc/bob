@@ -39,8 +39,12 @@ for (const [cls, s] of starts as [string, number][]) {
   console.log(`\n# ${cls} (exits: ${exits.length})`);
   exits.forEach((e: number, k: number) => {
     const firstOf = (lim: number) =>
-      nodes.filter((n: any, i: number) => n.kind === 'notable' && d[i] <= lim && viaExit[k][i] === d[i]).length;
-    console.log(`exit ${k}: ${exitName(e)} | notables first within 8: ${firstOf(8)}, within 14: ${firstOf(14)}`);
+      nodes.filter(
+        (n: any, i: number) => n.kind === 'notable' && d[i] <= lim && viaExit[k][i] === d[i],
+      ).length;
+    console.log(
+      `exit ${k}: ${exitName(e)} | notables first within 8: ${firstOf(8)}, within 14: ${firstOf(14)}`,
+    );
   });
   const near = nodes
     .map((n: any, i: number) => ({ n, i }))
@@ -48,6 +52,8 @@ for (const [cls, s] of starts as [string, number][]) {
     .sort((a: any, b: any) => d[a.i] - d[b.i]);
   for (const { n, i } of near) {
     const ex = exits.map((_: number, k: number) => k).filter((k: number) => viaExit[k][i] === d[i]);
-    console.log(`${String(d[i]).padStart(2)} ${n.kind === 'keystone' ? 'K' : 'N'} ${n.name} [${built.place[i]?.area}] exit ${ex.join('/')} | ${label(i)}`);
+    console.log(
+      `${String(d[i]).padStart(2)} ${n.kind === 'keystone' ? 'K' : 'N'} ${n.name} [${built.place[i]?.area}] exit ${ex.join('/')} | ${label(i)}`,
+    );
   }
 }

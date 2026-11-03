@@ -172,5 +172,7 @@ export function drawRelics(run: RunState, rng: Rng, n: number): RunRewardDef[] {
 export function keptRelics(run: RunState, key: string, rng: Rng, n: number): RunRewardId[] {
   const w = waysideOf(run);
   const kept = (w.relicDraws[key] ??= drawRelics(run, rng, n).map((r) => r.id));
-  return kept.filter((id): id is RunRewardId => isRelicId(id) && heldReward(run, id) < relicDef(id).max);
+  return kept.filter(
+    (id): id is RunRewardId => isRelicId(id) && heldReward(run, id) < relicDef(id).max,
+  );
 }

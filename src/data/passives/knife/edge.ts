@@ -111,7 +111,7 @@ export const edge: AreaSpec = {
           name: 'Quiet Shot',
           lines: [bowDamage(20), critMulti(20), damageVsRare(25)],
           at: [2985, -655],
-          why: "The bow notable. Since the finalization (2026-10-31) it leads on into Cold Read, so the crit archer walks on from it instead of stopping.",
+          why: 'The bow notable. Since the finalization (2026-10-31) it leads on into Cold Read, so the crit archer walks on from it instead of stopping.',
         },
         {
           id: 'n2',
@@ -119,7 +119,7 @@ export const edge: AreaSpec = {
           name: 'Fan of Blades',
           lines: [pierce(1), projectileDamage(20)],
           at: [3177, -657],
-          why: 'Thrown blades and arrows that go through. Since the revision a sibling of Quiet Shot off the bow small, not a step past it, and a way on to the crit of Cutpurse\'s Luck.',
+          why: "Thrown blades and arrows that go through. Since the revision a sibling of Quiet Shot off the bow small, not a step past it, and a way on to the crit of Cutpurse's Luck.",
         },
         {
           id: 'f',

@@ -605,7 +605,7 @@ Spell damage and spell dodge, in from the rim ring.
 - `a` 8% increased Elemental Damage (0.8 units)
 - `b` 8% increased Elemental Damage (0.8 units)
 - `c` 8% increased Elemental Damage (0.8 units)
-- `n` **notable Split Light** 20% increased Elemental Damage; Damage Penetrates 4% of Enemy Elemental  Resistance; 10% chance to Avoid Elemental Ailments (5.7 units)
+- `n` **notable Split Light** 20% increased Elemental Damage; Damage Penetrates 4% of Enemy Elemental Resistance; 10% chance to Avoid Elemental Ailments (5.7 units)
 
 ### Ritual Blade (ritual)
 

@@ -59,6 +59,7 @@ finding that ignores a mechanic, and check the engine before calling something i
 These are the recurring concerns, as questions. They are lenses, not checks; not every one applies to every region.
 
 ### The start
+
 - Is the first node out of the start **pretty good and non-prescriptive**? A strong small that every build of the class
   takes (the reference opens on an offence or defence line with life). A defence only some builds use is prescriptive.
 - Does each exit **fork again within a node or two**, so there are about six directions by the third point? Branching
@@ -73,6 +74,7 @@ These are the recurring concerns, as questions. They are lenses, not checks; not
 - Does each exit hold about **half** of what lies near the start, or is one exit the real one?
 
 ### Roads and connections
+
 - Are roads **thin**? Every node on a long straight run should earn its place; the owner crossed out mid-run nodes
   freely. Large jumps between nodes are fine.
 - Do roads between starts **bow out** into the ground beyond the starts rather than hugging an inner ring?
@@ -82,6 +84,7 @@ These are the recurring concerns, as questions. They are lenses, not checks; not
 - Is any part of the region reachable only one way, or any road leading nowhere?
 
 ### Notables
+
 - Is each notable **interesting**? Does it have a hook: a mechanic paired with its payoff, a reward for a way of
   fighting, a rule that bends? Or is it two flat lines of one idea?
 - Is anything **generic**: a line that is universally good for a whole kind of build ("double damage is just universally
@@ -92,6 +95,7 @@ These are the recurring concerns, as questions. They are lenses, not checks; not
   (conditions, counts) before calling one impossible.
 
 ### Identity against variety
+
 - Does the region have an identity, and **room to pull a build in less common directions**? "There is a tricky balance
   between a section that feels like it has an identity and a tree with everything"; the Knife's first set erred toward
   locked-in. Name the side roads a region offers.
@@ -104,6 +108,7 @@ These are the recurring concerns, as questions. They are lenses, not checks; not
   bender, the smalls to carry them?
 
 ### Offence, defence and utility
+
 - Is the region **leaning too far one way**? Sort every line on every node into offence, defence and utility by the same
   rules for the region and for the reference's matching sector, and compare, notables and smalls apart. The owner's hunch
   that the Knife leaned to offence was settled this way: it matched the reference (notables about 61% offence, 22% defence,
@@ -111,12 +116,14 @@ These are the recurring concerns, as questions. They are lenses, not checks; not
 - A hunch like that is worth measuring rather than arguing either way: say what you suspect and ask for the count.
 
 ### Size and density
+
 - How does the region's **notable count** compare with the reference's matching sector? The Knife had 45 against 72.
 - Is the **middle ground** (steps 8 to 13) dense enough, or does the region go deep and narrow where the reference opens
   wide?
 - If notables are added, are roads thinned and long clusters trimmed so the **node count stays about level**?
 
 ### Attrition (this branch's change)
+
 - Does the region offer sustain in its own voice (on kill, leech, regeneration, recharge, flasks as a generic layer), about
   as much in total as before? Numbers wait for the flask stats; structure doesn't.
 
@@ -184,18 +191,18 @@ The owner's way of engaging, which the reviewer adopts:
 
 ## 7. Worked examples from the Knife
 
-| The builder did | The owner saw | What replaced it |
-| --- | --- | --- |
-| A first skeleton drawn from formulas: every region the same, 1,100 road nodes | (The builder caught it, but the owner's rule is why: "everything should be done with intent") | Each region's skeleton written in words first, then drawn by hand |
-| Roads between starts bowed far out into the regions | "I don't like how that looks" | The gentle bow kept, and the border radials extended past the seams (the owner's own idea) |
-| Energy shield on the Shade's first node | Prescriptive: not every Shade uses it | Damage with life, and crit with life, as the reference's starts open |
-| Minion damage on the Docks wheel | Doesn't belong in the Knife; traps and mines need the room | A mine notable with one more mine out at a time |
-| One fire node for spells, one for attacks | Not an archetype; it takes a slot from one that needs it | Second homes for elemental damage and one-handed weapons |
-| Double damage on a rim notable | Universally good for attackers, generic | Physical spells with damage against bleeding enemies |
-| A flask-drunk-recently condition | Much weaker in this game than it looks | Damage if you've killed recently |
-| A curse-duration line proposed for Long Grudge | (Caught in the build: a curse lasts as long as its gem says, and nothing reads the line) | Long Grudge kept its reservation line; check the engine before proposing a line |
-| Movement speed on a road, a notable, its smalls and two more notables near the start | "Way too much movement speed near the beginning" | Resistances on the road, a defensive generalist (evasion, life, dodge), dodge and mana regeneration in place of the rest |
-| A finished region the owner suspected leaned to offence | A hunch, not a finding | Counted against the reference sector the same way: it matched; the movement slots went to defence |
+| The builder did                                                                      | The owner saw                                                                                 | What replaced it                                                                                                         |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| A first skeleton drawn from formulas: every region the same, 1,100 road nodes        | (The builder caught it, but the owner's rule is why: "everything should be done with intent") | Each region's skeleton written in words first, then drawn by hand                                                        |
+| Roads between starts bowed far out into the regions                                  | "I don't like how that looks"                                                                 | The gentle bow kept, and the border radials extended past the seams (the owner's own idea)                               |
+| Energy shield on the Shade's first node                                              | Prescriptive: not every Shade uses it                                                         | Damage with life, and crit with life, as the reference's starts open                                                     |
+| Minion damage on the Docks wheel                                                     | Doesn't belong in the Knife; traps and mines need the room                                    | A mine notable with one more mine out at a time                                                                          |
+| One fire node for spells, one for attacks                                            | Not an archetype; it takes a slot from one that needs it                                      | Second homes for elemental damage and one-handed weapons                                                                 |
+| Double damage on a rim notable                                                       | Universally good for attackers, generic                                                       | Physical spells with damage against bleeding enemies                                                                     |
+| A flask-drunk-recently condition                                                     | Much weaker in this game than it looks                                                        | Damage if you've killed recently                                                                                         |
+| A curse-duration line proposed for Long Grudge                                       | (Caught in the build: a curse lasts as long as its gem says, and nothing reads the line)      | Long Grudge kept its reservation line; check the engine before proposing a line                                          |
+| Movement speed on a road, a notable, its smalls and two more notables near the start | "Way too much movement speed near the beginning"                                              | Resistances on the road, a defensive generalist (evasion, life, dodge), dodge and mana regeneration in place of the rest |
+| A finished region the owner suspected leaned to offence                              | A hunch, not a finding                                                                        | Counted against the reference sector the same way: it matched; the movement slots went to defence                        |
 
 ## 8. Background
 

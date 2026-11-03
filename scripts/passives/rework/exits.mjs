@@ -6,9 +6,14 @@ const [file, cls, prefix] = process.argv.slice(2);
 const text = fs.readFileSync(file, 'utf8');
 const start = text.indexOf(`# ${cls} `);
 const end = text.indexOf('\n# ', start + 1);
-const rows = text.slice(start, end < 0 ? undefined : end).split('\n').filter((l) => / N /.test(l) && l.includes(`[${prefix}.`));
+const rows = text
+  .slice(start, end < 0 ? undefined : end)
+  .split('\n')
+  .filter((l) => / N /.test(l) && l.includes(`[${prefix}.`));
 for (const n of [8, 10, 14]) {
   const r = rows.filter((l) => Number(l.trim().split(' ')[0]) <= n);
   const c = (k) => r.filter((l) => l.includes(`exit ${k} `) || l.endsWith(`exit ${k}`)).length;
-  console.log(`within ${n}: exit 0 ${c('0')}, exit 1 ${c('1')}, both ${c('0/1')}, total ${r.length}`);
+  console.log(
+    `within ${n}: exit 0 ${c('0')}, exit 1 ${c('1')}, both ${c('0/1')}, total ${r.length}`,
+  );
 }

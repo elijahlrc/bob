@@ -72,7 +72,9 @@ export function flaskSpec(f: FlaskItem, charDb: ModDB): FlaskSpec {
             : 1),
     ),
     // The flask's own affix and the tree's maximum charges (docs/tree/design/F-flasks.md) both make the tank bigger.
-    maxCharges: Math.round(base.maxCharges * local.mult('flask.maxCharges') * charDb.mult('flaskMaxCharges')),
+    maxCharges: Math.round(
+      base.maxCharges * local.mult('flask.maxCharges') * charDb.mult('flaskMaxCharges'),
+    ),
     perUse:
       base.perUse *
       Math.max(

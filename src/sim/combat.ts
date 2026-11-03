@@ -106,14 +106,7 @@ import { corpseBlast, fireTriggers } from './triggers';
 import { scaleProfile } from './shots';
 import { chargedDeath, frostBite, gainVirulence, shellTakes } from './skillFx';
 import { spawnMonster } from './world';
-import {
-  afflictPlayer,
-  bossLocked,
-  flaskWards,
-  isBossSide,
-  lockBoss,
-  stunPlayer,
-} from './afflict';
+import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss, stunPlayer } from './afflict';
 import { bossHitPlayer, bossLeechShare, bossRecovery, bossVeiled } from './bosses';
 import type { Actor, Dot, World } from './types';
 import { hunted, livingEnemiesOf, MONSTERS } from './side';
@@ -1402,7 +1395,12 @@ type DotKind = 'ignite' | 'bleed' | 'poison';
  * Which ailment dealt a tick of damage over time: the largest of burning, bleeding and poison, when it is also more than the
  * skills' debuffs give; none when the skills' debuffs lead or nothing does. A hit records no kind, so a kill by a hit is by none.
  */
-function dotKind(ignite: number, bleed: number, poison: number, skills: number): DotKind | undefined {
+function dotKind(
+  ignite: number,
+  bleed: number,
+  poison: number,
+  skills: number,
+): DotKind | undefined {
   const top = Math.max(ignite, bleed, poison);
   if (top <= 0 || top < skills) return undefined;
   return top === ignite ? 'ignite' : top === bleed ? 'bleed' : 'poison';
@@ -1425,8 +1423,7 @@ function killGains(
   const kctx = playerCtx(w, fs);
   // The tree's charges for a kill by burning, poison or bleeding (docs/tree/design/F-flasks.md): 100 is a charge.
   const byDot = dot ? fs.char.db.sum('base', `flaskChargesKilledBy.${dot}`, kctx) / 100 : 0;
-  const perKill =
-    FLASK_CHARGES_PER_KILL + fs.char.db.inc('flaskCharges', kctx) + hexFlasks + byDot;
+  const perKill = FLASK_CHARGES_PER_KILL + fs.char.db.inc('flaskCharges', kctx) + hexFlasks + byDot;
   const weight = FLASK_KILL_WEIGHT[kind] * fs.char.db.more('flaskCharges', kctx);
   // A flask "of Gleaning" adds its own share to what every flask gets.
   for (const f of fs.flasks)

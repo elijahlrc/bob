@@ -7,8 +7,20 @@ const { buildAll } = await import(R + 'data/passives/index.ts');
 const { makeLine } = await import(R + 'data/passives/vocab.ts');
 const kindOf = (t: string): 'off' | 'def' | 'util' => {
   const s = t.toLowerCase();
-  if (/movement|attribute|strength|dexterity|intelligence|\bmana\b|reservation|reserved|flask|charge|cooldown|cost|light radius|duration of|skill effect duration|aura/.test(s) && !/damage|crit/.test(s)) return 'util';
-  if (/life|energy shield|evasion|armour|resist|block|dodge|avoid|stun|damage taken|recover|regenerat|leech|reduction|defences|on kill|on hit/.test(s) && !/increased damage|crit|penetrat/.test(s)) return 'def';
+  if (
+    /movement|attribute|strength|dexterity|intelligence|\bmana\b|reservation|reserved|flask|charge|cooldown|cost|light radius|duration of|skill effect duration|aura/.test(
+      s,
+    ) &&
+    !/damage|crit/.test(s)
+  )
+    return 'util';
+  if (
+    /life|energy shield|evasion|armour|resist|block|dodge|avoid|stun|damage taken|recover|regenerat|leech|reduction|defences|on kill|on hit/.test(
+      s,
+    ) &&
+    !/increased damage|crit|penetrat/.test(s)
+  )
+    return 'def';
   return 'off';
 };
 const tally = () => ({ off: 0, def: 0, util: 0 });
@@ -30,11 +42,17 @@ b.tree.nodes.forEach((n: any, i: number) => {
   }
 });
 // The reference sector.
-const ref = JSON.parse(fs.readFileSync('E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json', 'utf8'));
+const ref = JSON.parse(
+  fs.readFileSync(
+    'E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json',
+    'utf8',
+  ),
+);
 const rf = { notable: tally(), small: tally() };
 for (const n of Object.values(ref.nodes) as any[]) {
   if (n.sector !== SECTOR || !(n.kind === 'notable' || n.kind === 'small')) continue;
-  if (n.lines.length === 1 && /^\+\d+ to (Strength|Dexterity|Intelligence)/.test(n.lines[0])) continue; // bare attribute nodes are roads
+  if (n.lines.length === 1 && /^\+\d+ to (Strength|Dexterity|Intelligence)/.test(n.lines[0]))
+    continue; // bare attribute nodes are roads
   for (const l of n.lines) rf[n.kind as 'notable' | 'small'][kindOf(l)]++;
 }
 void bobNear;

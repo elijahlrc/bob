@@ -72,54 +72,54 @@ duel up close**: blood that flows (bleed, leech), the parry (block), the measure
 
 ## 5. Where every cluster goes
 
-| Cluster (notables) | Area | Road | Step | Why there |
-| --- | --- | --- | --- | --- |
-| Quickened Steel | Gate | the home hub | 5 | The generalist. |
-| Killing Pace | Gate | east path, outward | 5 | East's damage near home. |
-| Field Dressing | Gate | east path, toward the centre | 5 | The flask layer. |
-| Fighting Breath | Gate | east spoke junction | 7 | Mana near home (one). |
-| Stout Heart | Gate | west path, outward | 5 | West's defence. |
-| Guarded | Gate | west path, toward the centre | 5 | Armour and evasion. |
-| Clean Break | Gate | west spoke junction | 7 | West's damage. |
-| Footwork | Lists | the Bow's border road | 8 | Accuracy and reach for the duellist. |
-| Twin Fangs / Weaving wheel | Lists | the Bow's border road | 9-10 | Dual wielding or evasion. |
-| Hot Blood | Lists | where the Bow's border road meets the mid ring | 10 | Fervour, beside the Bow's Hot Pursuit across. |
-| Sidestep | Lists | east spoke, outer | 9 | Dodge with life on hit. |
-| Crossed Blades | Lists | east spoke, outer | 9 | Dual-wield crit. |
-| Darting Steel | Lists | east spoke, outer | 9 | Swords with speed, east. |
-| Red Harvest | Pits | the mid ring's east stretch | 10 | Leech. |
-| Wound Dance (K) | Pits | east spoke at the mid ring, a spur | 10 | The bleed keystone. |
-| Open Veins | Pits | east spoke past the mid ring | 11 | Bleed. |
-| Lasting Wounds | Pits | east spoke past the mid ring | 11 | Bleed duration. |
-| Festering | Pits | the mid ring's east stretch | 11 | Poison with bleed, beside the Knife's poison. |
-| Stormstruck | Fosse | the rim ring's east stretch | 13 | Lightning blades, beside the Bow's Live Wire. |
-| Bloodied Edge | Fosse | out from the rim ring | 14 | Sword leech. |
-| new: impale's first home | Lists | east spoke, outer or the mid ring | 10 | Impale (the reference's), a new archetype for the Yard. |
-| new: impale's payoff | Fosse | out from the rim ring | 14 | Impale with a rule. |
-| new: a dual-wield rule | Lists | east, the mid ring | 11 | Beyond flat damage (alternating hands or block while dual wielding). |
-| Paired Steel / Full Swing wheel | Pits | the mid ring at the axis | 10 | Paired blades or the two-handed swing: a choice. |
-| Four Winds | Muster | in from the mid ring at the axis | 9 | Resistances. |
-| Fencer's Eye | Pits | out from the mid ring at the axis | 11 | Crit with swords and axes. |
-| Elemental Edge | Fosse | the rim ring at the axis | 12 | Elemental attacks. |
-| Standard Bearer | Muster | the rim ring at the axis | 13 | Auras and speed. |
-| Ceaseless Blades | Fosse | out from the rim ring | 14 | Channelling attacks (a second home or cut, notables pass). |
-| Marked Prey | Fosse | out from the rim ring | 14 | Curses on a duellist (a second home or cut, notables pass). |
-| Buckler | Muster | the west border road | 8 | Shields, the Wall seam's theme. |
-| Steel Rim / Scarred Hide wheel | Muster | the west border road | 9-10 | Shield defence or stun. |
-| Shieldwall (K) | Muster | where the west border road meets the mid ring, a spur | 11 | The shield keystone. |
-| Shield Bash | Muster | where the west border road meets the mid ring | 11 | Shield attacks. |
-| Light Blades | Practice Ground | west spoke, outer | 8 | One-handed, west (the Bow's Light Hand is east). |
-| Keen Edge | Practice Ground | west spoke, outer | 9 | Swords, west. |
-| Hewing | Practice Ground | west spoke, outer | 9 | Axes with bleed, beside the Wall's axes. |
-| Sword and Board | Practice Ground | the mid ring's west stretch | 10 | Swords with a shield. |
-| Mended Mail | Practice Ground | the mid ring's west stretch | 10 | Armour and regeneration. |
-| Crimson Pact (K) | Pits | west spoke at the mid ring, a spur | 10 | The leech keystone. |
-| Finishing Cut | Pits | west spoke past the mid ring | 11 | Against the bleeding, culling. |
-| Thirsting Blade | Pits | west spoke past the mid ring | 11 | Leech and speed (re-lined or merged in the notables pass). |
-| Drill Call | Muster | the rim ring's west stretch | 13 | Warcries, beside the Wall's warcries. |
-| new: fortify | Muster | west, the rim ring | 13 | Fortify gained and paid off (a rule; the Fortify buff exists). |
-| new: armour rule | Practice Ground | west, the mid ring | 11 | Armour that does something (a rule). |
-| Iron Draw, Spellsword | cut | | | Bows are the Bow's; spells are the Spire's and the Cathedral's. |
+| Cluster (notables)              | Area            | Road                                                  | Step | Why there                                                            |
+| ------------------------------- | --------------- | ----------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| Quickened Steel                 | Gate            | the home hub                                          | 5    | The generalist.                                                      |
+| Killing Pace                    | Gate            | east path, outward                                    | 5    | East's damage near home.                                             |
+| Field Dressing                  | Gate            | east path, toward the centre                          | 5    | The flask layer.                                                     |
+| Fighting Breath                 | Gate            | east spoke junction                                   | 7    | Mana near home (one).                                                |
+| Stout Heart                     | Gate            | west path, outward                                    | 5    | West's defence.                                                      |
+| Guarded                         | Gate            | west path, toward the centre                          | 5    | Armour and evasion.                                                  |
+| Clean Break                     | Gate            | west spoke junction                                   | 7    | West's damage.                                                       |
+| Footwork                        | Lists           | the Bow's border road                                 | 8    | Accuracy and reach for the duellist.                                 |
+| Twin Fangs / Weaving wheel      | Lists           | the Bow's border road                                 | 9-10 | Dual wielding or evasion.                                            |
+| Hot Blood                       | Lists           | where the Bow's border road meets the mid ring        | 10   | Fervour, beside the Bow's Hot Pursuit across.                        |
+| Sidestep                        | Lists           | east spoke, outer                                     | 9    | Dodge with life on hit.                                              |
+| Crossed Blades                  | Lists           | east spoke, outer                                     | 9    | Dual-wield crit.                                                     |
+| Darting Steel                   | Lists           | east spoke, outer                                     | 9    | Swords with speed, east.                                             |
+| Red Harvest                     | Pits            | the mid ring's east stretch                           | 10   | Leech.                                                               |
+| Wound Dance (K)                 | Pits            | east spoke at the mid ring, a spur                    | 10   | The bleed keystone.                                                  |
+| Open Veins                      | Pits            | east spoke past the mid ring                          | 11   | Bleed.                                                               |
+| Lasting Wounds                  | Pits            | east spoke past the mid ring                          | 11   | Bleed duration.                                                      |
+| Festering                       | Pits            | the mid ring's east stretch                           | 11   | Poison with bleed, beside the Knife's poison.                        |
+| Stormstruck                     | Fosse           | the rim ring's east stretch                           | 13   | Lightning blades, beside the Bow's Live Wire.                        |
+| Bloodied Edge                   | Fosse           | out from the rim ring                                 | 14   | Sword leech.                                                         |
+| new: impale's first home        | Lists           | east spoke, outer or the mid ring                     | 10   | Impale (the reference's), a new archetype for the Yard.              |
+| new: impale's payoff            | Fosse           | out from the rim ring                                 | 14   | Impale with a rule.                                                  |
+| new: a dual-wield rule          | Lists           | east, the mid ring                                    | 11   | Beyond flat damage (alternating hands or block while dual wielding). |
+| Paired Steel / Full Swing wheel | Pits            | the mid ring at the axis                              | 10   | Paired blades or the two-handed swing: a choice.                     |
+| Four Winds                      | Muster          | in from the mid ring at the axis                      | 9    | Resistances.                                                         |
+| Fencer's Eye                    | Pits            | out from the mid ring at the axis                     | 11   | Crit with swords and axes.                                           |
+| Elemental Edge                  | Fosse           | the rim ring at the axis                              | 12   | Elemental attacks.                                                   |
+| Standard Bearer                 | Muster          | the rim ring at the axis                              | 13   | Auras and speed.                                                     |
+| Ceaseless Blades                | Fosse           | out from the rim ring                                 | 14   | Channelling attacks (a second home or cut, notables pass).           |
+| Marked Prey                     | Fosse           | out from the rim ring                                 | 14   | Curses on a duellist (a second home or cut, notables pass).          |
+| Buckler                         | Muster          | the west border road                                  | 8    | Shields, the Wall seam's theme.                                      |
+| Steel Rim / Scarred Hide wheel  | Muster          | the west border road                                  | 9-10 | Shield defence or stun.                                              |
+| Shieldwall (K)                  | Muster          | where the west border road meets the mid ring, a spur | 11   | The shield keystone.                                                 |
+| Shield Bash                     | Muster          | where the west border road meets the mid ring         | 11   | Shield attacks.                                                      |
+| Light Blades                    | Practice Ground | west spoke, outer                                     | 8    | One-handed, west (the Bow's Light Hand is east).                     |
+| Keen Edge                       | Practice Ground | west spoke, outer                                     | 9    | Swords, west.                                                        |
+| Hewing                          | Practice Ground | west spoke, outer                                     | 9    | Axes with bleed, beside the Wall's axes.                             |
+| Sword and Board                 | Practice Ground | the mid ring's west stretch                           | 10   | Swords with a shield.                                                |
+| Mended Mail                     | Practice Ground | the mid ring's west stretch                           | 10   | Armour and regeneration.                                             |
+| Crimson Pact (K)                | Pits            | west spoke at the mid ring, a spur                    | 10   | The leech keystone.                                                  |
+| Finishing Cut                   | Pits            | west spoke past the mid ring                          | 11   | Against the bleeding, culling.                                       |
+| Thirsting Blade                 | Pits            | west spoke past the mid ring                          | 11   | Leech and speed (re-lined or merged in the notables pass).           |
+| Drill Call                      | Muster          | the rim ring's west stretch                           | 13   | Warcries, beside the Wall's warcries.                                |
+| new: fortify                    | Muster          | west, the rim ring                                    | 13   | Fortify gained and paid off (a rule; the Fortify buff exists).       |
+| new: armour rule                | Practice Ground | west, the mid ring                                    | 11   | Armour that does something (a rule).                                 |
+| Iron Draw, Spellsword           | cut             |                                                       |      | Bows are the Bow's; spells are the Spire's and the Cathedral's.      |
 
 ## 6. Size
 
@@ -178,7 +178,7 @@ they differ).
   7. the dual-wield rule in plain words: a block while dual wielding gives Quickened (speed), so the off hand defends
      and quickens the next blows (east, the mid ring);
   8. damage while leeching, beside Red Harvest and Crimson Pact (the axis).
-  With about 12 second notables, each with a hook, about 56 notables.
+     With about 12 second notables, each with a hook, about 56 notables.
 - **Utility rows** (aim 17-20%): Footwork (reach), Drill Call (warcries), Standard Bearer (auras), Fighting Breath
   (mana), Field Dressing (flasks), mana on block (new), and utility lines on the second notables (durations, cost,
   reservation, flask charges).

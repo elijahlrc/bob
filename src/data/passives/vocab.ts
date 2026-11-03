@@ -7,7 +7,19 @@ import * as L from './lines';
 import type { Line, LineSpec } from './types';
 
 /** What one argument is: a number, an element, an element or chaos, a damage type, or an optional list of skill tags. */
-export type ParamKind = 'n' | 'ele' | 'ele4' | 'dmg' | 'weapon' | 'recoverEvent' | 'pool' | 'tideEvent' | 'buffEvent' | 'chargeKind' | 'ailment' | 'tags?';
+export type ParamKind =
+  | 'n'
+  | 'ele'
+  | 'ele4'
+  | 'dmg'
+  | 'weapon'
+  | 'recoverEvent'
+  | 'pool'
+  | 'tideEvent'
+  | 'buffEvent'
+  | 'chargeKind'
+  | 'ailment'
+  | 'tags?';
 
 export const CHOICES: Record<Exclude<ParamKind, 'n' | 'tags?'>, readonly string[]> = {
   ele: ['fire', 'cold', 'lightning'],

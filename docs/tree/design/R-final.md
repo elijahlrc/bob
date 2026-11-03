@@ -18,29 +18,29 @@ For the owner, after the unattended run. This report makes no changes to the tre
 
 ## The regions in a line each
 
-| Region | Class | Notables / keystones | What it is |
-| --- | --- | --- | --- |
-| The Knife | Shade | 65 / 4 | The opportunist: kill and crit tempo, evasion and dodge, trap and mine counts, dagger spells or attacks, poison, curses. |
-| The Spire | Mystic | 64 / 5 | Mana as power: spell and minion damage per 100 mana, mana as energy shield, auras on life, recharge on a kill, element ladders. |
-| The Bow | Strider | 57 / 4 | Moving against standing still: Quickened and Elusive gained on events and paid off; flask charges as the attrition lever. |
-| The Yard | Reaver | 52 / 3 | The duel up close: block feeds Quickened and fervour, the parrying sword, the stun loop, impale, bleed. |
-| The Wall | Vanguard | 49 / 4 | Standing ground: the grit loop, gained on block, stun, kill, mace hits, warcries, hits taken; spent on block, damage, speed, regeneration. |
-| The Cathedral | Zealot | 54 / 5 | Consecrated ground: what the Zealot plants works for it (one more brand, regeneration and damage per aura, payoffs while a minion or a totem stands); faith turned to fire and lightning. |
-| The centre | none | 8 / 0 | Neutral ground: a junction notable for each pair of neighbours (10-11 steps from both), two at the middle (12 from every start). |
+| Region        | Class    | Notables / keystones | What it is                                                                                                                                                                                |
+| ------------- | -------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The Knife     | Shade    | 65 / 4               | The opportunist: kill and crit tempo, evasion and dodge, trap and mine counts, dagger spells or attacks, poison, curses.                                                                  |
+| The Spire     | Mystic   | 64 / 5               | Mana as power: spell and minion damage per 100 mana, mana as energy shield, auras on life, recharge on a kill, element ladders.                                                           |
+| The Bow       | Strider  | 57 / 4               | Moving against standing still: Quickened and Elusive gained on events and paid off; flask charges as the attrition lever.                                                                 |
+| The Yard      | Reaver   | 52 / 3               | The duel up close: block feeds Quickened and fervour, the parrying sword, the stun loop, impale, bleed.                                                                                   |
+| The Wall      | Vanguard | 49 / 4               | Standing ground: the grit loop, gained on block, stun, kill, mace hits, warcries, hits taken; spent on block, damage, speed, regeneration.                                                |
+| The Cathedral | Zealot   | 54 / 5               | Consecrated ground: what the Zealot plants works for it (one more brand, regeneration and damage per aura, payoffs while a minion or a totem stands); faith turned to fire and lightning. |
+| The centre    | none     | 8 / 0                | Neutral ground: a junction notable for each pair of neighbours (10-11 steps from both), two at the middle (12 from every start).                                                          |
 
 ## Whole-tree measures
 
 1,383 live nodes (1,396 before), 349 notables, 25 keystones. 0 crossings, 0 nodes drawn over, 0 unreachable, 0 build
 problems. No reference names (`ref-names.ts`); `ip.test.ts` green.
 
-| Class | Notables | Own within 8 / 14 | Any within 14 | Keystones within 14 | Offence / defence / utility (reference) | Sustain lines |
-| --- | --- | --- | --- | --- | --- | --- |
-| Shade | 65 | 12 / 63 | 97 | 6 | 62/22/17 (61/22/17) | 20 |
-| Mystic | 64 | 11 / 61 | 98 | 7 | 59/25/16 (55/23/22) | 25 |
-| Strider | 57 | 10 / 54 | 94 | 6 | 58/23/18 (55/24/21) | 27 |
-| Reaver | 52 | 9 / 51 | 85 | 5 | 50/35/15 (56/27/17) | 19 |
-| Vanguard | 49 | 10 / 46 | 75 | 7 | 45/35/20 (53/33/14) | 11 |
-| Zealot | 54 | 9 / 52 | 91 | 8 | 52/28/19 (53/26/21) | 13 |
+| Class    | Notables | Own within 8 / 14 | Any within 14 | Keystones within 14 | Offence / defence / utility (reference) | Sustain lines |
+| -------- | -------- | ----------------- | ------------- | ------------------- | --------------------------------------- | ------------- |
+| Shade    | 65       | 12 / 63           | 97            | 6                   | 62/22/17 (61/22/17)                     | 20            |
+| Mystic   | 64       | 11 / 61           | 98            | 7                   | 59/25/16 (55/23/22)                     | 25            |
+| Strider  | 57       | 10 / 54           | 94            | 6                   | 58/23/18 (55/24/21)                     | 27            |
+| Reaver   | 52       | 9 / 51            | 85            | 5                   | 50/35/15 (56/27/17)                     | 19            |
+| Vanguard | 49       | 10 / 46           | 75            | 7                   | 45/35/20 (53/33/14)                     | 11            |
+| Zealot   | 54       | 9 / 52            | 91            | 8                   | 52/28/19 (53/26/21)                     | 13            |
 
 - **Starts:** neighbours 12 apart everywhere (the reference 12); two apart 18 (22); opposite 20 (26). Every class reaches
   its first own notable at step 5. No weapon pick within 8 steps. Every path to a seam is two nodes and runs through a
@@ -151,36 +151,36 @@ problems. No reference names (`ref-names.ts`); `ip.test.ts` green.
 
 Ranked by how much each shapes the tree.
 
-1. **Loops against side rooms.** The tree has a third of the reference's loops. *Taken:* the skeleton's side rooms, as
+1. **Loops against side rooms.** The tree has a third of the reference's loops. _Taken:_ the skeleton's side rooms, as
    built. Decide before the bake.
 2. **Border roads inward of the mid ring: seam themes, or generic notables only?** The first five regions used the
-   skeleton's seam themes; the Cathedral was held to generic only. *Taken:* seam themes stand; Honed Mind and Standing
+   skeleton's seam themes; the Cathedral was held to generic only. _Taken:_ seam themes stand; Honed Mind and Standing
    Cairns were not moved. Switching would move about 16 placements and 4 keystones.
-3. **Insight for casters.** *Taken:* insight lives in the Knife and the Cathedral (staff block, warcry), 17 steps from the
+3. **Insight for casters.** _Taken:_ insight lives in the Knife and the Cathedral (staff block, warcry), 17 steps from the
    Mystic; no engine work.
-4. **Minion homes.** *Taken:* the Spire's west faces the Cathedral; the Cathedral is one minion partner among three, not
+4. **Minion homes.** _Taken:_ the Spire's west faces the Cathedral; the Cathedral is one minion partner among three, not
    "the main minion region"; Grave Host stays every summoner's farthest notable (your ruling of 2026-10-20).
-5. **The centre.** *Taken:*
+5. **The centre.** _Taken:_
    - notables per pair of classes, not all eight equally far;
    - the hexagon and three spokes kept (beyond the skeleton's six inner roads);
    - eight notables;
    - CONSTRAINTS §3 item 8 not yet amended, though the old centre ring is gone.
-6. **The strength classes' reach** (warcries 13-14, curses 15+, cold and lightning 16+). *Taken:* left as is.
-7. **Two-handers and elemental melee in the Yard.** *Taken:* both kept (a fork between paired steel and full swing;
+6. **The strength classes' reach** (warcries 13-14, curses 15+, cold and lightning 16+). _Taken:_ left as is.
+7. **Two-handers and elemental melee in the Yard.** _Taken:_ both kept (a fork between paired steel and full swing;
    Elemental Edge only with a melee hook).
-8. **Axes.** *Taken:* a second home, the Wall's Headsman (axes otherwise only on the Yard's rim).
-9. **Start sides that differ from the skeleton.** *Taken:* as built: the Yard's west gives global defences with life,
+8. **Axes.** _Taken:_ a second home, the Wall's Headsman (axes otherwise only on the Yard's rim).
+9. **Start sides that differ from the skeleton.** _Taken:_ as built: the Yard's west gives global defences with life,
    and the Cathedral's give mana regeneration with life and damage with life.
-10. **Cold arrows in the Bow.** *Taken:* kept.
-11. **The Mystic's spell block with a shield.** *Taken:* sent to the Cathedral's shields.
-12. **The sustain split.** *Taken:* the Yard leans on leech and block; kill recovery goes to the Bow and the Knife.
+10. **Cold arrows in the Bow.** _Taken:_ kept.
+11. **The Mystic's spell block with a shield.** _Taken:_ sent to the Cathedral's shields.
+12. **The sustain split.** _Taken:_ the Yard leans on leech and block; kill recovery goes to the Bow and the Knife.
     Settle in the flask-stats pass.
-13. **The Wall at 45/35/20 and the Yard at 50/35/15.** *Taken:* accepted as identity (candidates to shave: Four Winds,
+13. **The Wall at 45/35/20 and the Yard at 50/35/15.** _Taken:_ accepted as identity (candidates to shave: Four Winds,
     Scarred Hide).
-14. **Unbowed Arm (renamed from a reference keystone's name), and a fifth Wall keystone.** *Taken:* kept, four
+14. **Unbowed Arm (renamed from a reference keystone's name), and a fifth Wall keystone.** _Taken:_ kept, four
     keystones.
-15. **4 to 6 links between regions per border** (7-9 before, the reference 10-13). *Taken:* left as is.
+15. **4 to 6 links between regions per border** (7-9 before, the reference 10-13). _Taken:_ left as is.
 16. **One small taken from each of the Knife's, the Wall's and the Cathedral's paths to their seams** (to make every
-    neighbouring pair 12 apart). *Taken:* done, reversible.
+    neighbouring pair 12 apart). _Taken:_ done, reversible.
 17. **Copies left in place:** Light Hand against Light Blades, the Bow's shields against the Yard's, Ember Litany against
-    Warm Hearth (18 steps apart). *Taken:* left as is.
+    Warm Hearth (18 steps apart). _Taken:_ left as is.

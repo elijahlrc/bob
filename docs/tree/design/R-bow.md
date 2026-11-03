@@ -78,63 +78,63 @@ Step is the notable's, approximate. Areas: the Gate (home), the Hedgerows (north
 mid ring), the High Moor and the Thicket (the axis at the mid ring), the Ford (south spoke), the Far Pasture (north
 toward the rim), the Water Meadows (south toward the rim).
 
-| Cluster (notables) | Area | Road | Step | Why there |
-| --- | --- | --- | --- | --- |
-| Hawk's Eye | Gate | the home hub | 5 | The generalist, passed through. |
-| Vital Aim | Gate | north path, outward | 5 | North's damage near home. |
-| Clear Head | Gate | north path, toward the centre | 5 | Mana and reservation, one mana notable near home. |
-| Long Breath | Gate | north spoke junction | 7 | North's defence. |
-| Wayfarer | Gate | south path, outward | 5 | South's defence. |
-| Quick Sip | Gate | south path, toward the centre | 5 | The flask layer near home (movement removed). |
-| Quick Hands | Gate | south spoke junction | 7 | South's damage. |
-| Hard Target | Gate | on out from Hawk's Eye | 7 | Evasion and life on the axis. |
-| Hedge Magic | Hedgerows | the Knife's seam, toward the centre | 6 | Spells with dexterity, shared with the Shade. |
-| Hardy Stock | Hedgerows | the Knife's border road | 8 | Life and resistances. |
-| Tripwire | Hedgerows | the Knife's border road | 9 | Traps beside the Knife's. |
-| Longbow / Fleet Blade wheel → Longbow | Hedgerows | north spoke, outer | 9 | The first bows. Fleet Blade (swords) leaves the wheel for the south seam. |
-| Elemental Fletching | Hedgerows | north spoke, outer | 9 | Elemental attacks in general, beyond the first ring. |
-| new: accuracy | Hedgerows | north spoke, outer | 8 | Accuracy as a theme (the reference's). |
-| Steady Draw (K) | Hedgerows | north spoke at the mid ring, a spur | 10 | Today at 7; now past 8. |
-| Venom Fletching | Hedgerows | the mid ring's north stretch | 10 | Poisoned attacks. |
-| Ricochet | Hedgerows | north spoke past the mid ring | 10 | Chain. |
-| Hair Trigger | Far Pasture | the rim ring's north stretch | 12 | Traps' second home, by the Knife border. |
-| Kill Shot | Far Pasture | the rim ring at the north spoke | 13 | Bow crit. |
-| Hare's Pace | Far Pasture | the rim ring's north stretch | 12 | Evasion and attack speed. |
-| new: the long shot | Far Pasture | out from the rim ring | 14 | Projectiles hit harder the farther they fly: the counterpart of Close Quarters (★engine). |
-| Far Flight / Barbed Arrows wheel | High Moor | the mid ring west of the axis | 10 | Projectiles or bleeding arrows. |
-| Close Quarters (K) | High Moor | out from the mid ring | 11 | The close-range keystone, apart from the long shot. |
-| Split Volley wheel | Thicket | the mid ring east of the axis | 10 | More projectiles. |
-| Rapid Fire | Meadow | in from the mid ring at the axis | 10 | Bow speed (movement removed). |
-| Skewer | Thicket | out from the mid ring | 11 | Pierce. |
-| Arrow Weave (K) | Meadow | the axis, in from the mid ring | 11 | The evasion keystone. |
-| new: onslaught on kill | Meadow | the axis | 11 | A speed buff from killing (the reference's), a rule. |
-| Hot Pursuit | Thicket | out from the mid ring | 12 | Fervour on kill, beside the Knife's fervour. |
-| new: fervour's second home | Thicket | the rim ring at the axis | 13 | One more fervour charge. |
-| Telling Shot | Thicket | out from the rim ring at the axis | 14 | Bows with double damage. |
-| Tall Grass | Meadow | the rim ring at the axis | 13 | Evasion and regeneration. |
-| new: Elusive on crit | Meadow | the rim ring | 13 | Evasion's rule bender. |
-| new: elemental attack payoff | Thicket | out from the rim ring | 14 | Penetration with weapons. |
-| Wanderer | Ford | the south seam, toward the centre | 6 | Attributes and life, shared with the Reaver. |
-| Thirsty Quiver | Ford | the south border road | 7-8 | Leech, the attacker's sustain. |
-| Light Hand | Ford | the south border road | 9 | One-handed, the Yard seam's theme. |
-| Fleet Blade | Ford | the south border road | 10 | Swords beside the Yard's. |
-| Round Shield | Ford | where the south border road meets the mid ring | 10 | Shield attacks, shared with the Yard. |
-| new: dual wielding | Ford | where the south border road meets the mid ring | 11 | Dual wielding's Bow home, beside the Yard's Lists. |
-| Hatchet Work | Ford | south spoke, outer | 9 | Axes. |
-| Deep Pull / Deep Cuts wheel | Ford | south spoke, outer | 9-10 | Physical attacks or bleed. |
-| Pitch Arrows | Ford | the mid ring's south stretch | 10 | Fire attacks' first home. |
-| Plated Hide (K) | Ford | south spoke at the mid ring, a spur | 10 | The armour keystone. |
-| new: mana from attacks | Ford | south spoke past the mid ring | 11 | Mana leech and mana on hit for attackers. |
-| Bright Shafts | Water Meadows | south spoke past the mid ring | 11 | Elemental arrows. |
-| new: fire attacks' second home | Water Meadows | the rim ring's south stretch | 13 | Ignite with attacks. |
-| Live Wire | Water Meadows | the rim ring's south stretch | 12 | Lightning attacks' first home. |
-| new: lightning attacks' second home | Water Meadows | out from the rim ring | 14 | Shock with attacks. |
-| Field Kit | Water Meadows | the rim ring at the south spoke | 12 | Evasion and flasks. |
-| Fouled Tips | Water Meadows | out from the rim ring | 13 | Poisoned bows. |
-| Killing Eye | Water Meadows | out from the rim ring by the border | 13 | Crit and executing. |
-| new: life flasks | Water Meadows | the rim ring | 13 | The flask sector's life side. |
-| Weathered, Shaped Charge, Sentry Post | cut | | | A flat third resistance notable; mines are the Knife's; totems the Wall's and the Cathedral's. |
-| Fleet Foot | cut or redone in the notables pass | | | Movement and evasion: the movement goes. |
+| Cluster (notables)                    | Area                               | Road                                           | Step | Why there                                                                                      |
+| ------------------------------------- | ---------------------------------- | ---------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------- |
+| Hawk's Eye                            | Gate                               | the home hub                                   | 5    | The generalist, passed through.                                                                |
+| Vital Aim                             | Gate                               | north path, outward                            | 5    | North's damage near home.                                                                      |
+| Clear Head                            | Gate                               | north path, toward the centre                  | 5    | Mana and reservation, one mana notable near home.                                              |
+| Long Breath                           | Gate                               | north spoke junction                           | 7    | North's defence.                                                                               |
+| Wayfarer                              | Gate                               | south path, outward                            | 5    | South's defence.                                                                               |
+| Quick Sip                             | Gate                               | south path, toward the centre                  | 5    | The flask layer near home (movement removed).                                                  |
+| Quick Hands                           | Gate                               | south spoke junction                           | 7    | South's damage.                                                                                |
+| Hard Target                           | Gate                               | on out from Hawk's Eye                         | 7    | Evasion and life on the axis.                                                                  |
+| Hedge Magic                           | Hedgerows                          | the Knife's seam, toward the centre            | 6    | Spells with dexterity, shared with the Shade.                                                  |
+| Hardy Stock                           | Hedgerows                          | the Knife's border road                        | 8    | Life and resistances.                                                                          |
+| Tripwire                              | Hedgerows                          | the Knife's border road                        | 9    | Traps beside the Knife's.                                                                      |
+| Longbow / Fleet Blade wheel → Longbow | Hedgerows                          | north spoke, outer                             | 9    | The first bows. Fleet Blade (swords) leaves the wheel for the south seam.                      |
+| Elemental Fletching                   | Hedgerows                          | north spoke, outer                             | 9    | Elemental attacks in general, beyond the first ring.                                           |
+| new: accuracy                         | Hedgerows                          | north spoke, outer                             | 8    | Accuracy as a theme (the reference's).                                                         |
+| Steady Draw (K)                       | Hedgerows                          | north spoke at the mid ring, a spur            | 10   | Today at 7; now past 8.                                                                        |
+| Venom Fletching                       | Hedgerows                          | the mid ring's north stretch                   | 10   | Poisoned attacks.                                                                              |
+| Ricochet                              | Hedgerows                          | north spoke past the mid ring                  | 10   | Chain.                                                                                         |
+| Hair Trigger                          | Far Pasture                        | the rim ring's north stretch                   | 12   | Traps' second home, by the Knife border.                                                       |
+| Kill Shot                             | Far Pasture                        | the rim ring at the north spoke                | 13   | Bow crit.                                                                                      |
+| Hare's Pace                           | Far Pasture                        | the rim ring's north stretch                   | 12   | Evasion and attack speed.                                                                      |
+| new: the long shot                    | Far Pasture                        | out from the rim ring                          | 14   | Projectiles hit harder the farther they fly: the counterpart of Close Quarters (★engine).      |
+| Far Flight / Barbed Arrows wheel      | High Moor                          | the mid ring west of the axis                  | 10   | Projectiles or bleeding arrows.                                                                |
+| Close Quarters (K)                    | High Moor                          | out from the mid ring                          | 11   | The close-range keystone, apart from the long shot.                                            |
+| Split Volley wheel                    | Thicket                            | the mid ring east of the axis                  | 10   | More projectiles.                                                                              |
+| Rapid Fire                            | Meadow                             | in from the mid ring at the axis               | 10   | Bow speed (movement removed).                                                                  |
+| Skewer                                | Thicket                            | out from the mid ring                          | 11   | Pierce.                                                                                        |
+| Arrow Weave (K)                       | Meadow                             | the axis, in from the mid ring                 | 11   | The evasion keystone.                                                                          |
+| new: onslaught on kill                | Meadow                             | the axis                                       | 11   | A speed buff from killing (the reference's), a rule.                                           |
+| Hot Pursuit                           | Thicket                            | out from the mid ring                          | 12   | Fervour on kill, beside the Knife's fervour.                                                   |
+| new: fervour's second home            | Thicket                            | the rim ring at the axis                       | 13   | One more fervour charge.                                                                       |
+| Telling Shot                          | Thicket                            | out from the rim ring at the axis              | 14   | Bows with double damage.                                                                       |
+| Tall Grass                            | Meadow                             | the rim ring at the axis                       | 13   | Evasion and regeneration.                                                                      |
+| new: Elusive on crit                  | Meadow                             | the rim ring                                   | 13   | Evasion's rule bender.                                                                         |
+| new: elemental attack payoff          | Thicket                            | out from the rim ring                          | 14   | Penetration with weapons.                                                                      |
+| Wanderer                              | Ford                               | the south seam, toward the centre              | 6    | Attributes and life, shared with the Reaver.                                                   |
+| Thirsty Quiver                        | Ford                               | the south border road                          | 7-8  | Leech, the attacker's sustain.                                                                 |
+| Light Hand                            | Ford                               | the south border road                          | 9    | One-handed, the Yard seam's theme.                                                             |
+| Fleet Blade                           | Ford                               | the south border road                          | 10   | Swords beside the Yard's.                                                                      |
+| Round Shield                          | Ford                               | where the south border road meets the mid ring | 10   | Shield attacks, shared with the Yard.                                                          |
+| new: dual wielding                    | Ford                               | where the south border road meets the mid ring | 11   | Dual wielding's Bow home, beside the Yard's Lists.                                             |
+| Hatchet Work                          | Ford                               | south spoke, outer                             | 9    | Axes.                                                                                          |
+| Deep Pull / Deep Cuts wheel           | Ford                               | south spoke, outer                             | 9-10 | Physical attacks or bleed.                                                                     |
+| Pitch Arrows                          | Ford                               | the mid ring's south stretch                   | 10   | Fire attacks' first home.                                                                      |
+| Plated Hide (K)                       | Ford                               | south spoke at the mid ring, a spur            | 10   | The armour keystone.                                                                           |
+| new: mana from attacks                | Ford                               | south spoke past the mid ring                  | 11   | Mana leech and mana on hit for attackers.                                                      |
+| Bright Shafts                         | Water Meadows                      | south spoke past the mid ring                  | 11   | Elemental arrows.                                                                              |
+| new: fire attacks' second home        | Water Meadows                      | the rim ring's south stretch                   | 13   | Ignite with attacks.                                                                           |
+| Live Wire                             | Water Meadows                      | the rim ring's south stretch                   | 12   | Lightning attacks' first home.                                                                 |
+| new: lightning attacks' second home   | Water Meadows                      | out from the rim ring                          | 14   | Shock with attacks.                                                                            |
+| Field Kit                             | Water Meadows                      | the rim ring at the south spoke                | 12   | Evasion and flasks.                                                                            |
+| Fouled Tips                           | Water Meadows                      | out from the rim ring                          | 13   | Poisoned bows.                                                                                 |
+| Killing Eye                           | Water Meadows                      | out from the rim ring by the border            | 13   | Crit and executing.                                                                            |
+| new: life flasks                      | Water Meadows                      | the rim ring                                   | 13   | The flask sector's life side.                                                                  |
+| Weathered, Shaped Charge, Sentry Post | cut                                |                                                |      | A flat third resistance notable; mines are the Knife's; totems the Wall's and the Cathedral's. |
+| Fleet Foot                            | cut or redone in the notables pass |                                                |      | Movement and evasion: the movement goes.                                                       |
 
 **Bows:** Longbow 9 (north), Rapid Fire 10 (axis), Kill Shot 13 (north rim), Telling Shot 14 (axis rim), Bright Shafts
 11 and Fouled Tips 13 (south): a bow build can go north, the axis or south. **Projectiles** on the axis (Far Flight,

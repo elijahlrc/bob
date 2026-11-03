@@ -91,64 +91,64 @@ Step is the notable's, approximate. Area names: the Gate (home), the Cloister (w
 (the axis at the mid ring), the Lantern (west toward the rim), the Gallery (east toward the rim), the Belfry (the axis
 toward the rim), the Parapet (the rim ring).
 
-| Cluster (notables) | Area | Road | Step | Why there |
-| --- | --- | --- | --- | --- |
-| First Light | Gate | the home hub | 5 | The generalist, passed through. |
-| Ready Wit / Warded Mind | Gate | west path, run through | 4-5 | West's damage and defence near home. |
-| Still Mind | Gate | west spoke junction | 6 | The one mana notable near home. |
-| Draught | Gate | west path, toward the centre | 5 | The flask layer near home. |
-| Warm Blood | Gate | east path, run through | 4-5 | East's defence near home (the life caster). |
-| Sharp Mind | Gate | east spoke junction | 6 | Spell crit, east's damage near home. |
-| Hale Scribe | Gate | east path, toward the centre | 5 | Life near home, a side room. |
-| Kept Vows | Cloister | the west seam, toward the centre | 7 | Reservation and energy shield shared with the Cathedral. |
-| Quickening | Cloister | west border road | 8 | Energy shield recharge, the seam's theme. |
-| Pain Conduit (K) | Cloister | west border road, a spur | 10 | Low life beside reservation and energy shield; its spur's smalls feed low life. |
-| Familiars | Cloister | where the border road meets the mid ring | 10 | Spell minions, the Cathedral's minions' near end. |
-| Deep Well / Glass Skin | Cloister | west spoke, outer | 7-8 | Mana and energy shield. |
-| Wandwork | Cloister | west spoke, outer | 9 | Wand spells, the first wand home on the west. |
-| new: fire's first rung | Cloister | west spoke, outer | 9 | Fire with cast speed and fire resistance: West's damage before the rim. |
-| Mind Bulwark (K) | Cloister | west spoke at the mid ring | 9 | Mana as the defence. |
-| Quiet Pulse | Cloister | the mid ring's west stretch | 10 | Life and regeneration. |
-| Spirit Ward | Cloister | the mid ring's west stretch | 10 | Spell block with a shield (kept or sent to the Cathedral in the notables pass). |
-| Flashpoint | Cloister | the mid ring's west stretch | 11 | Fire's second rung, with spell crit: moves west to join fire. |
-| Composure | Cloister | west spoke past the mid ring | 10 | Energy shield and casting through stuns. |
-| Living Verse | Cloister | west spoke past the mid ring | 10 | Spells with life. |
-| Mana Tap | Lantern | the rim ring's west stretch | 12 | Mana leech. |
-| Bright Wand | Lantern | the rim ring's west stretch | 12 | Elemental wand attacks and wand spells: the wands' west home, beside fire. |
-| Cinder | Lantern | the rim ring at the west spoke | 13 | Fire's ignite payoff. |
-| new: fire's payoff | Lantern | out from the rim ring | 14 | Fire penetration with a rule. |
-| Bad Company | Lantern | out from the rim ring by the border | 13 | Minions with curses, the second minion home. |
-| High Veil | Lantern | the rim ring's west vertex | 13 | Energy shield and resistances. |
-| Siphon | Scriptorium | east spoke, outer | 7-8 | Energy shield leech and on hit: the region's sustain, near home on the offence side. |
-| Deft Wand | Scriptorium | east spoke, outer | 8 | Wand attacks, the first wand on the east, past step 8. |
-| Thunderhead | Scriptorium | east spoke, outer | 9 | Lightning's first rung. |
-| Frugal | Scriptorium | east spoke, outer | 9 | Mana cost. |
-| Withering / Hexwright | Scriptorium | the Knife's border road, side rooms | 9 | Chaos over time and curses, beside the Knife's chaos spells and curses. |
-| Sharp Tongue | Scriptorium | the Knife's border road | 10 | Dagger spells beside the Knife's. |
-| Flashes of Insight | Scriptorium | the Knife's border road | 10 | Insight, with the Knife's Cold Read and Glint across the border. |
-| Mana Bastion (K) | Scriptorium | east spoke at the mid ring | 9 | Mana as the defence, opposite Mind Bulwark. |
-| Live Current | Scriptorium | the mid ring's east stretch | 10 | Lightning's second rung (shock). |
-| Keen Verse | Scriptorium | the mid ring's east stretch | 11 | Spell crit multiplier. |
-| new: channelling's second home | Scriptorium | the mid ring's east stretch | 11 | With Steady Stream on the axis. |
-| Wand Volley | Gallery | east spoke past the mid ring | 10 | Wand attack speed. |
-| Mist Walk | Gallery | the rim ring's east stretch | 12 | Dodge, beside the Knife's dodge. |
-| new: lightning's payoff | Gallery | out from the rim ring | 14 | Lightning penetration with a rule. |
-| Pinpoint / Needlework | Gallery | out from the rim ring | 13-14 | Wand crit. |
-| new: projectiles' second home | Gallery | out from the rim ring | 13 | With Darting Bolts. |
-| Prism Ward | Column | the mid ring at the axis | 9 | Resistances. |
-| Hoarfrost | Column | the mid ring at the axis | 10 | Cold's first rung. |
-| new: fire and cold | Column | the mid ring's west half | 10 | The two-element path between fire's road and the axis. |
-| Broad Weave / Darting Bolts | Column | the mid ring, both sides of the axis | 10 | Area and projectiles. |
-| Lingering | Column | out from the mid ring | 11 | Duration and damage over time. |
-| Shatter | Belfry | the rim ring at the axis | 12 | Cold's second rung (freeze). |
-| Piercing Word / Harsh Weather | Belfry | the rim ring at the axis | 12-13 | Any element: penetration, ailments. |
-| Steady Stream | Belfry | the rim ring | 13 | Channelling. |
-| Long Chant | Belfry | the rim ring | 13 | Spells with mana regeneration. |
-| Cold Light | Belfry | out from the rim ring | 14 | Cold's payoff, with spell crit. |
-| new: area's second home | Belfry | out from the rim ring | 13 | With Broad Weave. |
-| Prismatic Balance, Fever Pitch (K) | Belfry | tips past the rim ring | 15 | The element keystones, the farthest. |
-| Snare Line | cut | | | Traps are the Knife's and the Bow's. |
-| Deft Wand's old spot, the old roads | cut | | | Replaced by the skeleton's roads. |
+| Cluster (notables)                  | Area        | Road                                     | Step  | Why there                                                                            |
+| ----------------------------------- | ----------- | ---------------------------------------- | ----- | ------------------------------------------------------------------------------------ |
+| First Light                         | Gate        | the home hub                             | 5     | The generalist, passed through.                                                      |
+| Ready Wit / Warded Mind             | Gate        | west path, run through                   | 4-5   | West's damage and defence near home.                                                 |
+| Still Mind                          | Gate        | west spoke junction                      | 6     | The one mana notable near home.                                                      |
+| Draught                             | Gate        | west path, toward the centre             | 5     | The flask layer near home.                                                           |
+| Warm Blood                          | Gate        | east path, run through                   | 4-5   | East's defence near home (the life caster).                                          |
+| Sharp Mind                          | Gate        | east spoke junction                      | 6     | Spell crit, east's damage near home.                                                 |
+| Hale Scribe                         | Gate        | east path, toward the centre             | 5     | Life near home, a side room.                                                         |
+| Kept Vows                           | Cloister    | the west seam, toward the centre         | 7     | Reservation and energy shield shared with the Cathedral.                             |
+| Quickening                          | Cloister    | west border road                         | 8     | Energy shield recharge, the seam's theme.                                            |
+| Pain Conduit (K)                    | Cloister    | west border road, a spur                 | 10    | Low life beside reservation and energy shield; its spur's smalls feed low life.      |
+| Familiars                           | Cloister    | where the border road meets the mid ring | 10    | Spell minions, the Cathedral's minions' near end.                                    |
+| Deep Well / Glass Skin              | Cloister    | west spoke, outer                        | 7-8   | Mana and energy shield.                                                              |
+| Wandwork                            | Cloister    | west spoke, outer                        | 9     | Wand spells, the first wand home on the west.                                        |
+| new: fire's first rung              | Cloister    | west spoke, outer                        | 9     | Fire with cast speed and fire resistance: West's damage before the rim.              |
+| Mind Bulwark (K)                    | Cloister    | west spoke at the mid ring               | 9     | Mana as the defence.                                                                 |
+| Quiet Pulse                         | Cloister    | the mid ring's west stretch              | 10    | Life and regeneration.                                                               |
+| Spirit Ward                         | Cloister    | the mid ring's west stretch              | 10    | Spell block with a shield (kept or sent to the Cathedral in the notables pass).      |
+| Flashpoint                          | Cloister    | the mid ring's west stretch              | 11    | Fire's second rung, with spell crit: moves west to join fire.                        |
+| Composure                           | Cloister    | west spoke past the mid ring             | 10    | Energy shield and casting through stuns.                                             |
+| Living Verse                        | Cloister    | west spoke past the mid ring             | 10    | Spells with life.                                                                    |
+| Mana Tap                            | Lantern     | the rim ring's west stretch              | 12    | Mana leech.                                                                          |
+| Bright Wand                         | Lantern     | the rim ring's west stretch              | 12    | Elemental wand attacks and wand spells: the wands' west home, beside fire.           |
+| Cinder                              | Lantern     | the rim ring at the west spoke           | 13    | Fire's ignite payoff.                                                                |
+| new: fire's payoff                  | Lantern     | out from the rim ring                    | 14    | Fire penetration with a rule.                                                        |
+| Bad Company                         | Lantern     | out from the rim ring by the border      | 13    | Minions with curses, the second minion home.                                         |
+| High Veil                           | Lantern     | the rim ring's west vertex               | 13    | Energy shield and resistances.                                                       |
+| Siphon                              | Scriptorium | east spoke, outer                        | 7-8   | Energy shield leech and on hit: the region's sustain, near home on the offence side. |
+| Deft Wand                           | Scriptorium | east spoke, outer                        | 8     | Wand attacks, the first wand on the east, past step 8.                               |
+| Thunderhead                         | Scriptorium | east spoke, outer                        | 9     | Lightning's first rung.                                                              |
+| Frugal                              | Scriptorium | east spoke, outer                        | 9     | Mana cost.                                                                           |
+| Withering / Hexwright               | Scriptorium | the Knife's border road, side rooms      | 9     | Chaos over time and curses, beside the Knife's chaos spells and curses.              |
+| Sharp Tongue                        | Scriptorium | the Knife's border road                  | 10    | Dagger spells beside the Knife's.                                                    |
+| Flashes of Insight                  | Scriptorium | the Knife's border road                  | 10    | Insight, with the Knife's Cold Read and Glint across the border.                     |
+| Mana Bastion (K)                    | Scriptorium | east spoke at the mid ring               | 9     | Mana as the defence, opposite Mind Bulwark.                                          |
+| Live Current                        | Scriptorium | the mid ring's east stretch              | 10    | Lightning's second rung (shock).                                                     |
+| Keen Verse                          | Scriptorium | the mid ring's east stretch              | 11    | Spell crit multiplier.                                                               |
+| new: channelling's second home      | Scriptorium | the mid ring's east stretch              | 11    | With Steady Stream on the axis.                                                      |
+| Wand Volley                         | Gallery     | east spoke past the mid ring             | 10    | Wand attack speed.                                                                   |
+| Mist Walk                           | Gallery     | the rim ring's east stretch              | 12    | Dodge, beside the Knife's dodge.                                                     |
+| new: lightning's payoff             | Gallery     | out from the rim ring                    | 14    | Lightning penetration with a rule.                                                   |
+| Pinpoint / Needlework               | Gallery     | out from the rim ring                    | 13-14 | Wand crit.                                                                           |
+| new: projectiles' second home       | Gallery     | out from the rim ring                    | 13    | With Darting Bolts.                                                                  |
+| Prism Ward                          | Column      | the mid ring at the axis                 | 9     | Resistances.                                                                         |
+| Hoarfrost                           | Column      | the mid ring at the axis                 | 10    | Cold's first rung.                                                                   |
+| new: fire and cold                  | Column      | the mid ring's west half                 | 10    | The two-element path between fire's road and the axis.                               |
+| Broad Weave / Darting Bolts         | Column      | the mid ring, both sides of the axis     | 10    | Area and projectiles.                                                                |
+| Lingering                           | Column      | out from the mid ring                    | 11    | Duration and damage over time.                                                       |
+| Shatter                             | Belfry      | the rim ring at the axis                 | 12    | Cold's second rung (freeze).                                                         |
+| Piercing Word / Harsh Weather       | Belfry      | the rim ring at the axis                 | 12-13 | Any element: penetration, ailments.                                                  |
+| Steady Stream                       | Belfry      | the rim ring                             | 13    | Channelling.                                                                         |
+| Long Chant                          | Belfry      | the rim ring                             | 13    | Spells with mana regeneration.                                                       |
+| Cold Light                          | Belfry      | out from the rim ring                    | 14    | Cold's payoff, with spell crit.                                                      |
+| new: area's second home             | Belfry      | out from the rim ring                    | 13    | With Broad Weave.                                                                    |
+| Prismatic Balance, Fever Pitch (K)  | Belfry      | tips past the rim ring                   | 15    | The element keystones, the farthest.                                                 |
+| Snare Line                          | cut         |                                          |       | Traps are the Knife's and the Bow's.                                                 |
+| Deft Wand's old spot, the old roads | cut         |                                          |       | Replaced by the skeleton's roads.                                                    |
 
 **Elements:** fire west (first rung 9, Flashpoint 11, Cinder 13, payoff 14), cold on the axis (Hoarfrost 10, Shatter 12,
 Cold Light 14), lightning east (Thunderhead 9, Live Current 10, payoff 14); each spread along one road, so an elemental

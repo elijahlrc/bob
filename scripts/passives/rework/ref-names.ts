@@ -5,12 +5,26 @@
 import fs from 'fs';
 const R = 'file:///E:/Proj/Auto/.claude/worktrees/flask-scarcity/src/';
 const { buildAll } = await import(R + 'data/passives/index.ts');
-const ref = JSON.parse(fs.readFileSync('E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json', 'utf8'));
-const norm = (s: string) => s.toLowerCase().replace(/^the /, '').replace(/[^a-z]/g, '');
-const refNames = new Set(Object.values(ref.nodes).filter((n: any) => n.kind === 'notable' || n.kind === 'keystone').map((n: any) => norm(n.name)));
+const ref = JSON.parse(
+  fs.readFileSync(
+    'E:/Proj/Auto/.claude/worktrees/flask-scarcity/reference/tree/ref-tree.json',
+    'utf8',
+  ),
+);
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/^the /, '')
+    .replace(/[^a-z]/g, '');
+const refNames = new Set(
+  Object.values(ref.nodes)
+    .filter((n: any) => n.kind === 'notable' || n.kind === 'keystone')
+    .map((n: any) => norm(n.name)),
+);
 const b = buildAll({ allowNew: true });
 const hits: string[] = [];
 b.tree.nodes.forEach((n: any, i: number) => {
-  if ((n.kind === 'notable' || n.kind === 'keystone') && n.name && refNames.has(norm(n.name))) hits.push(`${b.place[i]?.region}: ${n.name}`);
+  if ((n.kind === 'notable' || n.kind === 'keystone') && n.name && refNames.has(norm(n.name)))
+    hits.push(`${b.place[i]?.region}: ${n.name}`);
 });
 console.log(hits.length ? hits.join('\n') : 'no matches');

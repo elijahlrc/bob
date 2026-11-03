@@ -242,7 +242,8 @@ if (args.measureXp) {
     out[l] = Math.round(xs.reduce((a, b) => a + b, 0) / xs.length);
   console.log('\nMEASURED_XP ' + JSON.stringify(out));
   // The level curve is no longer measured by the bot (2026-10-30): `npm run xp:emit` builds it from the generated maps.
-  if (args.writeXp) console.log('--write-xp writes nothing now: the level curve is `npm run xp:emit`.');
+  if (args.writeXp)
+    console.log('--write-xp writes nothing now: the level curve is `npm run xp:emit`.');
 }
 if (args.json)
   console.log(JSON.stringify(results.map(({ maps, ...r }) => ({ ...r, maps: maps.length }))));

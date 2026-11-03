@@ -124,7 +124,10 @@ function valueOf(c: Compiled, ctx: ModCtx, top: ModDB): number {
   const m = c.mod;
   if (!m.per) return m.value;
   const v = m.per.stat.startsWith(LIVE_INC)
-    ? Math.max(0, top.sum('inc', m.per.stat.slice(LIVE_INC.length), { ...ctx, tags: 0, ancestry: 0 }))
+    ? Math.max(
+        0,
+        top.sum('inc', m.per.stat.slice(LIVE_INC.length), { ...ctx, tags: 0, ancestry: 0 }),
+      )
     : ctx.statValue
       ? ctx.statValue(m.per.stat)
       : 0;

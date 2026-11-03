@@ -80,13 +80,16 @@ export function modText(m: Mod): string {
   if (m.stat === 'flask.chargesPerKill') return `+${fmt(m.value / 100)} Charges per kill${sfx}`;
   // The tree's flask lines (docs/tree/design/F-flasks.md).
   if (m.stat.startsWith('flaskChargesKilledBy.')) {
-    const by = { ignite: 'Burning', bleed: 'Bleeding', poison: 'Poison' }[m.stat.slice('flaskChargesKilledBy.'.length)];
+    const by = { ignite: 'Burning', bleed: 'Bleeding', poison: 'Poison' }[
+      m.stat.slice('flaskChargesKilledBy.'.length)
+    ];
     return `+${fmt(m.value / 100)} Flask Charges when an enemy is killed by ${by}${sfx}`;
   }
   if (m.stat === 'flaskMaxCharges') return `${v}% increased maximum Flask Charges${sfx}`;
   if (m.stat === 'flaskLastSlotRecovery')
     return `${v}% increased Life recovered by the Flask in your last belt slot${sfx}`;
-  if (m.stat === 'flaskLowLifeRecovery') return `${v}% increased Life recovered by Flasks drunk below 30% Life${sfx}`;
+  if (m.stat === 'flaskLowLifeRecovery')
+    return `${v}% increased Life recovered by Flasks drunk below 30% Life${sfx}`;
   // "of Physical Attack Damage Leeched as Life": leech from attacks names the attacks before the damage.
   if ((m.stat === 'leech.life' || m.stat === 'leech.mana') && m.tags?.includes('attack')) {
     const tp = typesPhrase(m.damageTypes);
