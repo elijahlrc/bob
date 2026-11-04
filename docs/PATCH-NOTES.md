@@ -54,6 +54,7 @@ This patch is still not well playtested, so I expect major balance issues that n
 - Glacier Wall blocks walkers but not shots, and monsters stuck behind it are set back on the floor instead of dying.
 - Minions no longer push monsters aside, and bosses push through minions.
 - In duels, the extra life against a higher-level opponent is about a third of what it was.
+- About half the monster types now move much faster, so more of them reach you past minions, and bosses are a bit faster too.
 
 ### Interface
 
