@@ -4,6 +4,15 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-11-04
+
+- Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
+- Sentinels hit about 10% less hard.
+- The Siege Marshal brings about half as many archers and mages and more warriors, with more still as he weakens.
+- Flasks pulse when drunk.
+- Fixed a character with an attribute below 0 keeping skill gems at level 1 and being unable to equip some items.
+- The Surgeon no longer allows a trade that would take an attribute below 0.
+
 ## 2026-11-03
 
 This patch is a real doozy! It substantially diverges from more standard ARPG mechanical balance in order to make better use of its roguelike format. It also adds a bunch of **unique Relics** (buffs which last through the whole run and have radical impacts on gameplay) and new stops along your journey. At the highest level of abstraction, the balance changes make the game much more focused on sustaining your character across multiple levels. If all goes well you will find it much harder to keep your character's health and flasks up, and will need to take Respite stops in order to recharge and continue your journey.
