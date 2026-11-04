@@ -473,7 +473,8 @@ the changes after three playtests.
     level 6. A boss offers three relics the run can still take; a run holds one of each.
   - **The Surgeon**: four trades a visit from fourteen (the owner's two, six attribute trades of 10 for 20, speed for
     defences and back, resistances for life and back, damage for life, energy shield for life). A trade may be taken
-    again; each after the first gives 15% less of its gain, the price whole. Trades are permanent mods on the build.
+    again; each after the first gives 15% less of its gain, the price whole. Trades are permanent mods on the build. A
+    trade that would leave an attribute it lowers below 0 cannot be taken (the owner, 2026-11-03; `surgeonBlocker`).
   - **The Knucklebone Man**: a throw costs 15 Bone Dust, 1.6 times more for each throw of the visit, raised by the item's
     level as wares are. Among the throws an item allows: add an affix 3, take one away 2, a tier up 3, a tier down 2,
     another base's implicit 1. Not on uniques or sealed items. After a throw the level is spent, as at the Respite.

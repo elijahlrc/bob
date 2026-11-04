@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DUEL_DAMAGE_SCALE,
   DUEL_LIFE_MULT_TOP,
+  DUEL_LIFE_MULT_STAGES,
   DUEL_LIFE_STAGES,
   DUEL_REPRIEVES,
 } from '../data/constants';
@@ -117,7 +118,10 @@ describe('the lives of a duel', () => {
     const base = { damageScale: DUEL_DAMAGE_SCALE, lifeMult: duelLifeMult(60) };
     const seen: { scale: number; mult: number }[] = [];
     for (let i = 0; i <= DUEL_REPRIEVES; i++) {
-      const want = duelStage({ ...base, stages: DUEL_LIFE_STAGES }, i);
+      const want = duelStage(
+        { ...base, stages: DUEL_LIFE_STAGES, lifeStages: DUEL_LIFE_MULT_STAGES },
+        i,
+      );
       expect(sa.damageScale).toBeCloseTo(want.damageScale, 9);
       expect(sa.lifeMult).toBeCloseTo(want.lifeMult, 9);
       expect(Math.abs(sa.player.def.maxLife - sheet * sa.lifeMult)).toBeLessThanOrEqual(
@@ -141,7 +145,6 @@ describe('the lives of a duel', () => {
 describe('the life curve', () => {
   it('runs on a straight line from 1 at level 1 to its top at level 100', () => {
     // A bonus over 1 of 9, cut to a third by the sustain pass, which doubled life (docs/SUSTAIN.md).
-    expect(DUEL_LIFE_MULT_TOP).toBeCloseTo(1 + 9 * 0.33, 9);
     expect(duelLifeMult(1)).toBe(1);
     expect(duelLifeMult(100)).toBeCloseTo(DUEL_LIFE_MULT_TOP, 9);
     expect(duelLifeMult(50)).toBeCloseTo(1 + ((DUEL_LIFE_MULT_TOP - 1) * 49) / 99, 9);
@@ -197,10 +200,10 @@ describe('the life curve', () => {
     const [sa] = w.sides;
     fell(w, sa);
     expect(sa.player.life).toBeCloseTo(0.5 * sa.player.def.maxLife, 6);
-    // The larger pool: the second life's share of the curve's bonus (`DUEL_LIFE_STAGES`).
-    const k = 1 + DUEL_LIFE_STAGES[1] * (duelLifeMult(70) - 1);
+    // The larger pool: the second life's share of the curve's bonus (`DUEL_LIFE_MULT_STAGES`).
+    const k = 1 + DUEL_LIFE_MULT_STAGES[1] * (duelLifeMult(70) - 1);
     expect(Math.abs(sa.player.def.maxLife - k * sa.char.defence().maxLife)).toBeLessThanOrEqual(k);
-    expect(sa.player.def.maxLife).toBeGreaterThan(2 * sa.char.defence().maxLife);
+    expect(sa.player.def.maxLife).toBeGreaterThan(1.2 * sa.char.defence().maxLife);
   });
 
   it('does not reach the minions: a minion has the same life with the curve on or off', () => {
@@ -221,7 +224,7 @@ describe('the life curve', () => {
       duelLifeMult(90),
       9,
     );
-    expect(duelLifeMult(90)).toBeGreaterThan(3);
+    expect(duelLifeMult(90)).toBeGreaterThan(2);
   });
 });
 

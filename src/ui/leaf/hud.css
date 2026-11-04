@@ -440,6 +440,38 @@ html.leaf .flask[data-st~='sealed'] {
   filter: grayscale(1) brightness(0.5);
   animation: none;
 }
+/* A drink: a ring of the flask's liquid swells from the glass and fades (`Quaff`, Hud.tsx). */
+html.leaf .flask-quaff {
+  position: absolute;
+  left: 6px;
+  top: 26px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  pointer-events: none;
+  /* Lighter than the liquid, or it is lost against the bottle of the same colour. */
+  --ring: color-mix(in srgb, var(--surf), #fff6dc 55%);
+  box-shadow:
+    0 0 0 3px var(--ring),
+    0 0 10px 3px var(--surf);
+  opacity: 0;
+  animation: leaf-flask-quaff 0.45s steps(5) both;
+}
+@keyframes leaf-flask-quaff {
+  from {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.leaf .flask-quaff {
+    display: none;
+  }
+}
 @keyframes leaf-flask-pulse {
   from {
     filter: brightness(1);

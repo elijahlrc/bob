@@ -34,6 +34,13 @@ Loose ends to come back to. Plans with milestones live in `docs/`; this is the s
   (`src/ui/leaf/painter.ts`, kept between sessions) by palette; add a setting. Item rarity and damage-type colours are
   the bulk of the cleanup. The base theme (backgrounds, gold, text) swaps cheaply.
 
+## Sound
+
+- **Plan more item drop sounds** (asked 2026-11-03). Today only a rare or unique drop sounds (Find, sound 9 in
+  docs/AUDIO.md, from the sim's `drop` event); plain and magic drops were left silent (J13 there). Write a plan for more
+  drop sounds during play, then build it the way AUDIO.md asks: recipes in `src/ui/sound/recipes.ts` approved by ear,
+  wired in `hooks.ts`, with caps so a burst of drops does not pile up.
+
 ## Passive tree
 
 - **Rework the Shade's start** (the Knife region, `src/data/passives/knife/`; asked 2026-10-28). Too many weapon-specific

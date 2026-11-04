@@ -18,6 +18,7 @@ import {
   knuckleProblem,
   knuckleThrow,
   openShade,
+  surgeonBlocker,
   surgeonMods,
   surgeonTrades,
   visitLocked,
@@ -692,16 +693,18 @@ function Surgeon({
       <div class="stop-list">
         {offered.map((id) => {
           const { gain, price } = tradeLines(id, trades.length);
+          const blocked = surgeonBlocker(run, [...trades, id]);
           return (
             <button
               key={id}
               class="stop-item"
               {...plaque(false)}
-              disabled={full}
+              disabled={full || !!blocked}
               onClick={() => onTrades([...trades, id])}
             >
               <span class="stop-item-name">{gain.join(', ')}</span>
               <span class="muted">Price: {price.join(', ')}</span>
+              {blocked && <span class="muted">{blocked}</span>}
             </button>
           );
         })}

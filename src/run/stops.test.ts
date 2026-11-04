@@ -1,11 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { HOARD_TAKE, STOP_FROM, STOPS, type StopId } from '../data/stops';
+import { HOARD_TAKE, STOP_FROM, STOPS, SURGEON_TRADES, type StopId } from '../data/stops';
 import type { Item } from '../data/types';
 import { botRun } from './bot';
 import { botStopChoice } from './botStop';
 import { makeStop, respiteSlot, rollOffers, stopAt } from './offers';
 import { newRun, setMap, type RunState } from './run';
-import { awlsmithCost, awlsmithItems, hoardGems, hoardKinds, stopProblem, takeStop } from './stops';
+import { Character } from '../calc/character';
+import {
+  awlsmithCost,
+  awlsmithItems,
+  hoardGems,
+  hoardKinds,
+  stopProblem,
+  surgeonBlocker,
+  takeStop,
+} from './stops';
 import { waysideOf } from './wayside';
 
 /**
@@ -184,4 +193,21 @@ describe('the bot at a stop', () => {
     }
     expect(stops).toBeGreaterThan(0);
   }, 180000);
+});
+
+describe('the Surgeon', () => {
+  it('will not take an attribute below 0, and says which', () => {
+    const run = newRun('vanguard', 1);
+    const a = new Character(run.build).attrs;
+    let blocked = 0;
+    for (const t of SURGEON_TRADES) {
+      const lost = t.price.find((m) => m.stat === 'str' || m.stat === 'dex' || m.stat === 'int');
+      const goes = lost ? a[lost.stat as 'str' | 'dex' | 'int'] + lost.value < 0 : false;
+      expect(!!surgeonBlocker(run, [t.id])).toBe(goes);
+      if (goes) blocked++;
+    }
+    // A starting Vanguard has strength to spare and little else.
+    expect(blocked).toBeGreaterThan(0);
+    expect(surgeonBlocker(run, ['intForStr'])).toMatch(/Intelligence below 0/);
+  });
 });

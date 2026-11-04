@@ -33,10 +33,11 @@ export function duelStage(
   const lifeMult = d?.lifeMult ?? 1;
   const stages = d?.stages;
   if (!stages?.length) return { damageScale, lifeMult };
-  const k = stages[Math.min(fired, stages.length - 1)];
+  const share = (s: readonly number[]) => s[Math.min(fired, s.length - 1)];
+  const k = share(stages);
   return {
     damageScale: 1 / (1 + k * (1 / damageScale - 1)),
-    lifeMult: 1 + k * (lifeMult - 1),
+    lifeMult: 1 + share(d?.lifeStages?.length ? d.lifeStages : stages) * (lifeMult - 1),
   };
 }
 

@@ -108,7 +108,8 @@ export function naturalGemLevel(def: GemDef, charLevel: number, attrs: Attrs): n
   for (let l = 1; l <= 20; l++) {
     if (gemLevelReq(def, l) > charLevel) break;
     const r = gemAttrReq(def.attr, scaleLevel(def, l));
-    if (attrs.str < r.str || attrs.dex < r.dex || attrs.int < r.int) break;
+    // A requirement of 0 is none: an attribute below 0 (traded away on the tree) does not hold every gem at level 1.
+    if ((['str', 'dex', 'int'] as const).some((k) => r[k] > 0 && attrs[k] < r[k])) break;
     best = l;
   }
   return best;

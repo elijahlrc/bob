@@ -67,8 +67,9 @@ export function canEquip(run: RunState, item: Item, slot: EquipSlot): EquipCheck
   const base = itemBase(item.baseId);
   if (base.level > run.build.level) return { ok: false, reason: `Requires level ${base.level}` };
   const a = attrsWithout(run, slot);
+  // A requirement of 0 is none, whatever the attribute (it can fall below 0).
   for (const k of ['str', 'dex', 'int'] as const)
-    if (a[k] < itemReq(item)[k])
+    if (itemReq(item)[k] > 0 && a[k] < itemReq(item)[k])
       return {
         ok: false,
         reason: `Requires ${itemReq(item)[k]} ${k}`,

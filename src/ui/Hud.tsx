@@ -25,7 +25,7 @@ import { reservedLife } from '../sim/reserve';
 import { SPEEDS, type Controller } from '../run/controller';
 import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { autoAbandonAt, canAbandon } from '../sim/abandon';
 import { ask } from './Confirm';
 import { COLLAPSE_START, CRESCENDO_STEP_BONUS, HOLDOUT_WAVES, mapTypeDef } from '../data/mapTypes';
@@ -379,6 +379,19 @@ function playerDebuffs(w: World): { name: string; text: string }[] {
 }
 
 /** Pips for each kind of charge the character can gain (EXPANSION 5.6). */
+/** A flask's pulse when it is drunk: keyed by the flask's uses, so it mounts, and plays, once a drink. */
+function Quaff() {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    ref.current?.parentElement?.animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }],
+      { duration: 280, easing: 'ease-out' },
+    );
+  }, []);
+  return <span ref={ref} class="flask-quaff" data-nopaint />;
+}
+
 function Charges({ w }: { w: World }) {
   const ch = w.sides[0].char;
   const kinds = CHARGE_KINDS.filter((k) => ch.chargeSource[k] || ch.charges[k] > 0);
@@ -758,6 +771,7 @@ export function Hud({ c }: { c: Controller }) {
                       <span class="flask-count" data-nopaint>
                         {Math.floor(f.charges)}
                       </span>
+                      {f.uses > 0 && <Quaff key={f.uses} />}
                     </div>
                   );
                 })}

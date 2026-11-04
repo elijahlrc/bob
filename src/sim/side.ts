@@ -54,6 +54,8 @@ export type DuelSideOpts = {
    * (`DUEL_LIFE_STAGES`, `duelStage`); absent, all of them on every life.
    */
   stages?: readonly number[];
+  /** The life multiplier's own shares, in place of `stages` for it (`DUEL_LIFE_MULT_STAGES`). */
+  lifeStages?: readonly number[];
 };
 
 /** What a character brings to a map (what the map decides is `WorldOpts`). */

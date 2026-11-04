@@ -228,21 +228,31 @@ export const COMMAND_MAX = 0.6;
  */
 export const ROUTED_SECONDS = 6;
 export const ROUTED_TAKEN = 0.2;
-/** The regiments by wave: type and number. */
+/**
+ * The regiments by wave: type and number. About half as many archers and mages as before 2026-11-03, the rest warriors (the
+ * owner): a build whose strategy holds it on the Marshal left them standing, and they shot it down behind his command.
+ */
 export const REGIMENTS: { type: MonsterTypeId; n: number }[][] = [
   [
     { type: 'shieldbearer', n: 3 },
     { type: 'warrior', n: 2 },
   ],
   [
-    { type: 'archer', n: 4 },
+    { type: 'archer', n: 2 },
     { type: 'shieldbearer', n: 1 },
-  ],
-  [
-    { type: 'mage', n: 3 },
     { type: 'warrior', n: 2 },
   ],
+  [
+    { type: 'mage', n: 2 },
+    { type: 'warrior', n: 3 },
+  ],
 ];
+/**
+ * As he weakens, more warriors march with each regiment, so the battle ends in a rush (the owner, 2026-11-03): one more for
+ * each fifth of his life gone, up to this many.
+ */
+export const RALLY_TYPE: MonsterTypeId = 'warrior';
+export const RALLY_MAX = 4;
 
 /**
  * Each regiment marches under a banner (docs/ATTRITION.md, 2026-10-29): one mod its soldiers share, in turn, each a probe

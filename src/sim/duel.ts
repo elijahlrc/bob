@@ -6,6 +6,7 @@ import { clamp } from '../core/math';
 import {
   DUEL_DAMAGE_SCALE,
   DUEL_LIFE_MULT_TOP,
+  DUEL_LIFE_MULT_STAGES,
   DUEL_LIFE_STAGES,
   DUEL_REPRIEVES,
 } from '../data/constants';
@@ -56,8 +57,8 @@ export type DuelOpts = {
   /** Multiply each side's life and energy shield by the curve of the other side's level (default true; `duelLifeMult`). */
   lifeCurve?: boolean;
   /**
-   * The share of the damage scale and the life multiplier a side has on each of its lives (default `DUEL_LIFE_STAGES`); null for
-   * all of them on every life.
+   * The share of the damage scale a side has on each of its lives (default `DUEL_LIFE_STAGES`, and `DUEL_LIFE_MULT_STAGES` for the
+   * life multiplier); null for all of both on every life.
    */
   stages?: readonly number[] | null;
   /** What the two characters are called on the screen (default: their classes). It changes nothing in the fight. */
@@ -163,12 +164,13 @@ export function createDuelWorld(a: Build, b: Build, seed: number, opts: DuelOpts
   const damageScale = opts.damageScale ?? DUEL_DAMAGE_SCALE;
   const curve = opts.lifeCurve ?? true;
   // Each side's life is multiplied by the curve of the other's level; both carry the same reprieves, and each life takes its
-  // share of the two modifiers (weakest on the first, strongest on the last).
+  // share of the two modifiers (weakest on the first, strongest on the last; the life curve none on the first).
   const stages = opts.stages === undefined ? DUEL_LIFE_STAGES : (opts.stages ?? undefined);
   const duelOf = (other: Build) => ({
     damageScale,
     lifeMult: curve ? duelLifeMult(other.level) : 1,
     stages,
+    lifeStages: stages && DUEL_LIFE_MULT_STAGES,
   });
   const reprieves = new Array<string>(opts.reprieves ?? DUEL_REPRIEVES).fill(DUEL_REPRIEVE);
   // The floor is symmetric about the middle of the room's middle tile.

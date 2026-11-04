@@ -36,6 +36,8 @@ describe('gems (§11.5)', () => {
     expect(naturalGemLevel(d, 1, { str: 999, dex: 0, int: 0 })).toBe(1);
     expect(naturalGemLevel(d, 70, { str: 999, dex: 0, int: 0 })).toBe(20);
     expect(naturalGemLevel(d, 70, { str: 10, dex: 0, int: 0 })).toBe(1);
+    // An attribute the gem does not ask for may be below 0 (traded away on the tree).
+    expect(naturalGemLevel(d, 70, { str: 999, dex: -1, int: -5 })).toBe(20);
   });
 
   it('+level of socketed gems goes past 20 up to 25', () => {

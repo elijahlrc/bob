@@ -49,6 +49,8 @@ import {
   LANE_WIDTH,
   PLATED_LESS,
   PRISM_PATTERN_EVERY,
+  RALLY_MAX,
+  RALLY_TYPE,
   REGIMENTS,
   REGIMENT_BANNERS,
   ROT_PATCH_EVERY,
@@ -1046,7 +1048,9 @@ function marchIn(w: World, m: Actor, st: BossState): void {
   const cx = room ? room.cx + 0.5 : m.x;
   const cy = room ? room.cy + 0.5 : m.y;
   const r = room ? Math.min(room.rect.w, room.rect.h) / 2 - 2.5 : 6;
-  const ranks = REGIMENTS[st.wave % REGIMENTS.length];
+  const rally = Math.min(RALLY_MAX, Math.floor((1 - m.life / m.def.maxLife) * 5));
+  const ranks = [...REGIMENTS[st.wave % REGIMENTS.length]];
+  if (rally > 0) ranks.push({ type: RALLY_TYPE, n: rally });
   // Each regiment marches under a banner: a mod its soldiers share, in turn (docs/ATTRITION.md).
   const banner = REGIMENT_BANNERS[st.wave % REGIMENT_BANNERS.length];
   const total = ranks.reduce((n, g) => n + g.n, 0);

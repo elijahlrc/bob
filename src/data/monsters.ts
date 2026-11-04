@@ -631,7 +631,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     shape: { id: 'nova', radius: 2.2, mult: 1.3 },
     innate: true,
     lifeMult: 2,
-    dmgMult: 1.1,
+    // 1.1 until 2026-11-03: slow and hard-hitting, but a little too dangerous (the owner).
+    dmgMult: 1,
     range: 1.5,
     attack: 'melee',
     speed: 1.8,

@@ -179,15 +179,21 @@ export const DUEL_REPRIEVES = 3;
 /**
  * What a character's life and energy shield are multiplied by in a duel against an opponent of level 100 (docs/DUEL-BALANCE.md 4):
  * the factor runs on a straight line from 1 at level 1 to this at level 100, and each side's is read from the other side's level.
- * The bonus over 1 was 9; a third of that since the sustain pass doubled life (the owner, 2026-11-02, docs/SUSTAIN.md).
+ * The bonus over 1 was 9, then a third of that once the sustain pass doubled life (the owner, 2026-11-02, docs/SUSTAIN.md); 1.5
+ * since the first life went back to the character's own (the owner, 2026-11-03), so the last life is ×2.5 at level 100.
  */
-export const DUEL_LIFE_MULT_TOP = 1 + 9 * 0.33;
+export const DUEL_LIFE_MULT_TOP = 2.5;
 /**
- * How much of the duel's modifiers (the damage scale and the life multiplier) a character has on each of its lives: the first
- * life, then after each Bargain Coin (the owner, 2026-10-24). Weakest on the first and strongest on the last, so a fight swings
- * back and forth; a share is of the bonus over 1 (`duelStage`). Past the end of the list the last share holds.
+ * How much of the duel's damage scale a character has on each of its lives: the first life, then after each Bargain Coin (the
+ * owner, 2026-10-24). Weakest on the first and strongest on the last, so a fight swings back and forth; a share is of the bonus
+ * over 1 (`duelStage`). Past the end of the list the last share holds.
  */
 export const DUEL_LIFE_STAGES: readonly number[] = [0.5, 5 / 6, 7 / 6, 1.5];
+/**
+ * The same for the life multiplier: none on the first life, so a duel starts at the character's own life, then a third more of
+ * it with each Bargain Coin up to all of it on the last (the owner, 2026-11-03): ×1, ×1.5, ×2 and ×2.5 at level 100.
+ */
+export const DUEL_LIFE_MULT_STAGES: readonly number[] = [0, 1 / 3, 2 / 3, 1];
 
 // §13 AI.
 export const ENGAGE_RANGE = 9;

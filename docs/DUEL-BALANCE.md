@@ -178,6 +178,11 @@ A share is taken of the bonus over 1, of both modifiers (`duelStage`, `src/sim/r
 - the damage scale is read as what damage is divided by: ÷3.33 (×0.3) is ÷2.17 (×0.46) on the first life and ÷4.5 (×0.22) on
   the last. A share of a 70% reduction could not grow by half.
 
+Since 2026-11-03 (the owner) the life multiplier has its own shares (`DUEL_LIFE_MULT_STAGES`): none on the first life, so a
+duel starts at the character's own life, then 1/3, 2/3 and all of it, and the curve's top (`DUEL_LIFE_MULT_TOP`) is ×2.5. So
+against a level 100 opponent the four lives are ×1, ×1.5, ×2 and ×2.5; against level 60 about ×1, ×1.3, ×1.6 and ×1.9. The
+damage scale keeps its shares, 0.5 on the first life.
+
 A coin sets the next life's modifiers before it stands the character up, so it rises at half of the new pool. The trailer's
 staged duel keeps the old single life (`stages: null`).
 

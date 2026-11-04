@@ -813,8 +813,10 @@ section 2.
 clock, only attrition.
 
 - He stands at the middle of the arena and **commands**. A horn sounds (a 1.6 s tell), then a regiment marches in from the
-  arena's edge: **three regiments** (shieldbearers and warriors; archers and a shieldbearer; mages and warriors), and then
-  the same three again, **for as long as the fight lasts**. They are his, not rolled: no experience, no loot, and they leave
+  arena's edge: **three regiments** (shieldbearers and warriors; two archers, a shieldbearer and warriors; two mages and
+  warriors), and then the same three again, **for as long as the fight lasts**. As he weakens, **one more warrior** marches
+  with each regiment for every fifth of his life gone, up to four, so the battle ends in a rush (the owner, 2026-11-03: half
+  as many archers and mages as before, because a build whose strategy held it on him left them standing and was shot down). They are his, not rolled: no experience, no loot, and they leave
   with him.
 - **Command.** While his soldiers stand he takes **6% less** from every hit for each, up to 60%. It applies to every damage
   type alike, so no build is favoured by it. When the last soldier of a regiment falls he **comes down himself**, and for

@@ -6,6 +6,7 @@ import {
   hoardGems,
   hoardKinds,
   saleStock,
+  surgeonBlocker,
   surgeonTrades,
   shrineBlessings,
   stopProblem,
@@ -79,7 +80,8 @@ export function botStopChoice(run: RunState, slot: number): StopChoice | null {
     // One trade, the first of these on offer: life and defences before anything else (a first guess).
     const offered = surgeonTrades(run, offer);
     const order = ['manaForLife', 'wardForLife', 'speedForGuard', 'lifeForWard', 'lifeForWrath'];
-    const pick = order.find((id) => offered.includes(id)) ?? offered[0];
+    const can = offered.filter((id) => !surgeonBlocker(run, [id]));
+    const pick = order.find((id) => can.includes(id)) ?? can[0];
     if (pick) choice = { stop: 'surgeon', trades: [pick] };
   } else if (offer.stop === 'knucklebone') {
     // The bot throws no bones: it only passes through (so the stopper meets the stop).

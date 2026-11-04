@@ -16,6 +16,7 @@ import {
   type StopId,
 } from '../data/stops';
 import { EQUIP_SLOTS, type Item } from '../data/types';
+import { Character } from '../calc/character';
 import { gemStart } from '../calc/gems';
 import { gemWeight } from '../gen/loot';
 import { restAtCamp } from './camp';
@@ -195,6 +196,22 @@ export function surgeonMods(trades: readonly string[]): Mod[] {
   });
 }
 
+const ATTR_WORD = { str: 'Strength', dex: 'Dexterity', int: 'Intelligence' } as const;
+
+/**
+ * Why a run of trades cannot be taken: it would leave an attribute it lowers below 0 (the owner, 2026-11-03: a negative
+ * attribute was janky and error-prone). An attribute that is below 0 already and is not lowered further does not block.
+ */
+export function surgeonBlocker(run: RunState, trades: readonly string[]): string | null {
+  const before = new Character(run.build).attrs;
+  const after = new Character({
+    ...run.build,
+    grafts: [...(run.build.grafts ?? []), ...surgeonMods(trades)],
+  }).attrs;
+  const k = (['str', 'dex', 'int'] as const).find((a) => after[a] < 0 && after[a] < before[a]);
+  return k ? `Would take your ${ATTR_WORD[k]} below 0` : null;
+}
+
 // ---- The Knucklebone Man ---------------------------------------------------------------------------
 
 /** The items the bones can be thrown over: worn or carried, neither unique nor sealed, with something a throw could change. */
@@ -339,7 +356,7 @@ export function stopProblem(run: RunState, slot: number, choice: StopChoice): st
       if (choice.trades.length < 1) return 'Choose a trade';
       if (choice.trades.length > SURGEON_MAX) return `At most ${SURGEON_MAX} trades`;
       if (!choice.trades.every((t) => offered.includes(t))) return 'That trade is not offered';
-      return null;
+      return surgeonBlocker(run, choice.trades);
     }
     case 'knucklebone': {
       const v = waysideOf(run).stopVisit;
