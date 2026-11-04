@@ -6,14 +6,28 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-11-04
 
-- Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
+### Monsters and combat
+
+- Far more of what monsters deal is now elemental or chaos damage, each faction with types of its own and more chaos late in a run, so resistances matter more and armour less.
+- More monsters attack from range or with warned area blows, and Bloaters and Cinderlings burst into flame.
+- A new monster curse, the Mire, slows your character heavily for a few seconds.
 - Sentinels hit about 10% less hard.
 - The Siege Marshal brings about half as many archers and mages and more warriors, with more still as he weakens.
-- Flasks pulse when drunk.
-- Fixed a character with an attribute below 0 keeping skill gems at level 1 and being unable to equip some items.
-- The Surgeon no longer allows a trade that would take an attribute below 0.
+- Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
+
+### Skills and items
+
 - The same aura can no longer be socketed twice; a second copy does nothing.
+- Fixed characters with an attribute below 0 keeping skill gems at level 1 and failing to equip some items; the Surgeon no longer allows such trades.
+
+### Interface
+
+- Flasks pulse when drunk.
 - Fixed resistances sometimes showing long decimals.
+
+### Known issues
+
+- The new monster damage mix is still being balance-tested.
 
 ## 2026-11-03
 
