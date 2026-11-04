@@ -2,15 +2,16 @@ import { Character } from '../calc/character';
 import { itemHasRule, itemReq } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
-import { isGem } from '../data/gems';
-import type {
-  InventoryItem,
-  Attrs,
-  Build,
-  EquipSlot,
-  FlaskItem,
-  GemItem,
-  Item,
+import { gemDef, isGem } from '../data/gems';
+import {
+  EQUIP_SLOTS,
+  type InventoryItem,
+  type Attrs,
+  type Build,
+  type EquipSlot,
+  type FlaskItem,
+  type GemItem,
+  type Item,
 } from '../data/types';
 import type { RunState } from './run';
 
@@ -376,11 +377,29 @@ export function putBack(run: RunState, uid: number): boolean {
   return true;
 }
 
-/** Put an inventory gem into a socket (the previous gem returns to the inventory). */
+/**
+ * Whether the gem is an aura that is socketed already, somewhere other than `at` (the socket it would go into, whose gem would
+ * leave): the same aura cannot be socketed twice (the owner, 2026-11-04).
+ */
+export function auraSocketed(
+  build: Build,
+  gemId: string,
+  at?: { slot: EquipSlot; socket: number },
+): boolean {
+  if (gemDef(gemId).kind !== 'aura') return false;
+  return EQUIP_SLOTS.some((slot) =>
+    build.equipment[slot]?.sockets.some(
+      (g, i) => g?.gemId === gemId && !(at?.slot === slot && at.socket === i),
+    ),
+  );
+}
+
+/** Put an inventory gem into a socket (the previous gem returns to the inventory); never a second copy of an aura. */
 export function socketGem(run: RunState, slot: EquipSlot, socket: number, gemUid: number): boolean {
   const item = run.build.equipment[slot];
   const gem = run.inventory.find((x) => x.uid === gemUid);
   if (!item || !gem || gem.kind !== 'gem' || socket >= item.sockets.length) return false;
+  if (auraSocketed(run.build, gem.gemId, { slot, socket })) return false;
   take(run, gemUid);
   const sockets = [...item.sockets];
   const old = sockets[socket];

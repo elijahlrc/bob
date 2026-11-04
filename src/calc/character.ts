@@ -1084,6 +1084,9 @@ export class Character {
     for (const sg of this.gems) {
       if (sg.def.kind !== 'aura') continue;
       const def = sg.def;
+      // The same aura twice stands once (the owner, 2026-11-04): a second copy (on an item put on with it socketed, or in an
+      // older save) reserves nothing and does nothing.
+      const again = this.auras.some((a) => a.def.id === def.id);
       // The tree's Kept Vows: every aura reserves life instead of mana.
       const life = usesLife(sg.slot) || db0.flag('auraReserveLife', ctx0);
       const pool = life ? pre.maxLife : pre.maxMana;
@@ -1093,8 +1096,9 @@ export class Character {
       // Global reduced reservation, plus any this gem's item gives its own socketed gems.
       const itemRed = socketedReservationReduction(build.equipment[sg.slot]!) / 100;
       // Lone Vow: the first aura stands, reserves nothing, and no other aura does.
-      const r = loneVow ? 0 : Math.ceil(base * (1 - Math.min(0.95, red + itemRed)));
-      const active = loneVow ? aurasOn === 0 : (life ? reservedLife : reservedMana) + r <= pool;
+      const r = loneVow || again ? 0 : Math.ceil(base * (1 - Math.min(0.95, red + itemRed)));
+      const active =
+        !again && (loneVow ? aurasOn === 0 : (life ? reservedLife : reservedMana) + r <= pool);
       if (active) aurasOn++;
       if (active) {
         if (life) reservedLife += r;
@@ -1134,7 +1138,11 @@ export class Character {
           })),
         );
       } else {
-        this.warnings.push(`${def.name} is inactive: not enough ${life ? 'life' : 'mana'}`);
+        this.warnings.push(
+          again
+            ? `${def.name} is socketed twice: the second does nothing`
+            : `${def.name} is inactive: not enough ${life ? 'life' : 'mana'}`,
+        );
       }
       this.auras.push({ gem: sg, def, reserved: r, active });
       if (active)

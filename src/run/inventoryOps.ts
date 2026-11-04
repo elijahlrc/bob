@@ -25,6 +25,7 @@ import {
   type Build,
 } from '../data/types';
 import {
+  auraSocketed,
   dryEquip,
   equip,
   equipFlask,
@@ -354,8 +355,11 @@ export function quickEquip(
 ): { ok: boolean; reason?: string; slot?: EquipSlot; flask?: number } {
   const it = run.inventory.find((x) => x.uid === uid);
   if (!it) return { ok: false, reason: 'Not in the inventory' };
-  if (it.kind === 'gem')
+  if (it.kind === 'gem') {
+    if (auraSocketed(run.build, it.gemId))
+      return { ok: false, reason: 'That aura is socketed already' };
     return quickSocket(run, uid) ? { ok: true } : { ok: false, reason: 'No free socket' };
+  }
   if (it.kind === 'flask') {
     const b = flaskBase(it.baseId);
     if (b.level > run.build.level) return { ok: false, reason: `Requires level ${b.level}` };
@@ -441,6 +445,8 @@ export function placementsFor(
       : spots;
   const out: Placement[] = [];
   for (const { slot, it, socket, cur } of wanted) {
+    // An aura already socketed elsewhere has nowhere to go: the same aura twice is refused.
+    if (auraSocketed(run.build, gem.gemId, { slot, socket })) continue;
     const replaces = cur ? gemDef(cur.gemId).name : undefined;
     // A support in an empty socket of an item with no skill to support changes nothing: no need to work the sheet out.
     if (kind === 'support' && !cur && !hasActiveSkill(it)) {

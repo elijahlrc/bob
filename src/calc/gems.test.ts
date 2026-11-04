@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { gemDef } from '../data/gems';
 import { makeGem, makeItem } from '../gen/items';
 import { mod } from '../mods/types';
+import { socketGem } from '../run/inventory';
+import { placementsFor } from '../run/inventoryOps';
 import { newRun } from '../run/run';
 import { Character } from './character';
 import { levelValue, naturalGemLevel, spellDamageAt } from './gems';
@@ -96,6 +98,26 @@ describe('gems (§11.5)', () => {
       buildWith('mystic', 10, ['flameBolt', 'stormHalo'], [mod('reducedReservation', 'base', 20)]),
     );
     expect(b.reservedMana).toBeLessThan(a.reservedMana);
+  });
+
+  it('the same aura twice stands once, and a second copy cannot be socketed', () => {
+    const once = new Character(buildWith('mystic', 10, ['flameBolt', 'stormHalo']));
+    const twice = new Character(buildWith('mystic', 10, ['flameBolt', 'stormHalo', 'stormHalo']));
+    expect(twice.auras.map((a) => a.active)).toEqual([true, false]);
+    expect(twice.reservedMana).toBe(once.reservedMana);
+    expect(twice.sheet().warnings.join()).toMatch(/Storm Halo is socketed twice/);
+    // Socketing a second copy from the bag is refused.
+    const run = newRun('mystic', 1);
+    const uid = () => run.nextUid++;
+    const body = makeItem(uid, 'body_ar_1', 10, 3);
+    body.sockets = [makeGem(uid, 'flameBolt'), makeGem(uid, 'stormHalo'), null];
+    run.build.equipment.body = body;
+    const copy = makeGem(uid, 'stormHalo');
+    run.inventory.push(copy);
+    expect(socketGem(run, 'body', 2, copy.uid)).toBe(false);
+    expect(placementsFor(run, copy.uid).map((p) => p.socket)).toEqual([1]);
+    // In the socket of the first copy it is a plain swap.
+    expect(socketGem(run, 'body', 1, copy.uid)).toBe(true);
   });
 });
 

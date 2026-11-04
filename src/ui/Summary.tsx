@@ -67,7 +67,7 @@ function Recap({ r }: { r: DeathRecap }) {
     const below = r.res[k] < r.maxRes[k];
     return (
       <span key={k} class={below ? 'warn' : ''}>
-        {cap(k)} {r.res[k]}% / {r.maxRes[k]}%{k === 'chaos' ? '' : ' · '}
+        {cap(k)} {Math.round(r.res[k])}% / {Math.round(r.maxRes[k])}%{k === 'chaos' ? '' : ' · '}
       </span>
     );
   });

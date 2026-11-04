@@ -96,7 +96,10 @@ export function attrTip(ch: Character, key: 'str' | 'dex' | 'int', lead: string)
 }
 
 /** A resistance: damage of its type taken times (1 − resistance), up to its maximum. */
-export function resistTip(name: string, res: number, max: number, lead: string): string {
+export function resistTip(name: string, rawRes: number, rawMax: number, lead: string): string {
+  // Whole percents: a sum of lines can come out as 60.099999...
+  const res = Math.round(rawRes);
+  const max = Math.round(rawMax);
   const eff = Math.min(res, max);
   return lines(
     lead,

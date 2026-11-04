@@ -397,8 +397,8 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
           {RES.map(([i, name, cls]) =>
             tile(
               name,
-              `${s.res[i]}%`,
-              [`max ${s.maxRes[i]}%`],
+              `${f0(s.res[i])}%`,
+              [`max ${f0(s.maxRes[i])}%`],
               `cs-res-${cls}${s.res[i] < s.maxRes[i] ? ' cs-under' : ''}`,
               resistTip(
                 name,
