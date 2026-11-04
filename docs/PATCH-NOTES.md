@@ -12,6 +12,8 @@ change, and our own names only. Dash bullets under plain headings.
 - Flasks pulse when drunk.
 - Fixed a character with an attribute below 0 keeping skill gems at level 1 and being unable to equip some items.
 - The Surgeon no longer allows a trade that would take an attribute below 0.
+- The same aura can no longer be socketed twice; a second copy does nothing.
+- Fixed resistances sometimes showing long decimals.
 
 ## 2026-11-03
 
