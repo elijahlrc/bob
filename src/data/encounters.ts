@@ -221,7 +221,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   warrior: {
     name: 'Bone spear',
     shape: { id: 'orb', speed: 0.55, mult: 0.9 },
-    every: 8,
+    every: 4,
     from: 4,
     to: 9,
     time: 1.1,
@@ -231,7 +231,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   shambler: {
     name: 'Bile retch',
     shape: { id: 'lob', radius: 1.3, zone: 'caustic', seconds: 3, dps: 0.2, mult: 0.4, lock: 0.3 },
-    every: 9,
+    every: 4.5,
     from: 3,
     to: 8,
     time: 1.2,
@@ -248,17 +248,17 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   brute: {
     name: 'Stamp',
     shape: { id: 'slam', radius: 2, mult: 1.3, lock: 0.35 },
-    every: 10,
+    every: 5,
     from: 3,
     to: 6,
     time: 1.4,
-    minLevel: 10,
+    minLevel: 4,
     stance: 'strike',
   },
   gorger: {
     name: 'Gobbet',
     shape: { id: 'orb', speed: 0.6, mult: 0.7 },
-    every: 8,
+    every: 5,
     from: 3,
     to: 8,
     time: 1.1,
@@ -269,7 +269,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   gloomstalker: {
     name: 'Shade',
     shape: { id: 'orb', speed: 0.5, mult: 0.5 },
-    every: 10,
+    every: 4,
     from: 4,
     to: 10,
     time: 1,
@@ -281,7 +281,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   censer: {
     name: 'Coals',
     shape: { id: 'lob', radius: 1.4, zone: 'burning', seconds: 3, dps: 0.25, mult: 0.4, lock: 0.3 },
-    every: 8,
+    every: 5,
     from: 3,
     to: 7,
     time: 1.2,
@@ -290,7 +290,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   flagellant: {
     name: 'Lash',
     shape: { id: 'lance', length: 5, width: 0.8, mult: 0.8, lock: 0.5 },
-    every: 5,
+    every: 3,
     from: 2.2,
     to: 5,
     time: 0.9,
@@ -325,7 +325,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   guard: {
     name: 'Weighted chain',
     shape: { id: 'orb', speed: 0.6, mult: 0.6 },
-    every: 9,
+    every: 4,
     from: 3,
     to: 7,
     time: 1.2,
@@ -335,7 +335,7 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
   wrack: {
     name: 'Brine clot',
     shape: { id: 'orb', speed: 0.6, mult: 0.7 },
-    every: 8,
+    every: 5,
     from: 3,
     to: 7,
     time: 1.1,
@@ -368,6 +368,15 @@ export const TYPE_SIDEARMS: Partial<Record<MonsterTypeId, SidearmSpec>> = {
     from: 3,
     to: 8,
     time: 0.9,
+  },
+  leech: {
+    name: 'Brine spit',
+    shape: { id: 'orb', speed: 0.7, mult: 0.6 },
+    every: 5,
+    from: 2.5,
+    to: 7,
+    time: 0.8,
+    look: 'clot',
   },
   // Patterns, on the ranged and support types: a second, bigger thing to read beside their bolt.
   spitter: { name: 'Mortar', pattern: 'mortar', every: 10, from: 3, to: 9, time: 1.4 },

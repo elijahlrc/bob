@@ -30,7 +30,7 @@ import {
 } from '../data/constants';
 import { MONSTER_TYPES } from '../data/monsters';
 import { actorById, segmentDist, startAction } from './actions';
-import { bloaterBurst, corpseNear, isZone, moveMult, shieldedByPylon } from './factions';
+import { BURSTS, bloaterBurst, corpseNear, isZone, moveMult, shieldedByPylon } from './factions';
 import { flaskMask, monsterConds, playerConds } from './combat';
 import { skillReady, useSkill } from './cooldowns';
 import { canPay, payCost } from './cost';
@@ -1142,8 +1142,8 @@ export function monsterAI(w: World, m: Actor, dt: number): void {
   }
   if (dtg <= range + tg.r + m.r) {
     m.chase.blockT = 0;
-    // A Bloater does not strike: it bursts on contact.
-    if (m.mon!.spec.type === 'bloater') bloaterBurst(w, m);
+    // A Bloater or a Cinderling does not strike: it bursts on contact.
+    if (BURSTS[m.mon!.spec.type]) bloaterBurst(w, m);
     else startAction(w, m, 'monster', prof, tg);
     return;
   }

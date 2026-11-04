@@ -102,7 +102,7 @@ export function monsterHexesPlayer(
   if (flaskWards(p.side!, 'curse')) return;
   const mult = Math.max(0, s.char.db.mult('curseEffectOnSelf'));
   const renew = p.alive && p.hexes.some((h) => h.id === id);
-  applyHex(w, p, id, effect * mult, BASE_HEX_LIMIT, 10, HEX_SECONDS);
+  applyHex(w, p, id, effect * mult, BASE_HEX_LIMIT, 10, HEXES[id].monsterSeconds ?? HEX_SECONDS);
   // The caster's tell and the hex's own sign (a renewal too: `applyHex` is silent about one).
   if (p.alive && !p.modIds.includes('hexWarded'))
     w.events.push({ t: 'hexCast', from: from?.id ?? -1, to: p.id, hex: id, renew });
@@ -179,4 +179,5 @@ export function recompute(a: Actor): void {
   a.hex.vulnAll = t.vulnAll;
   a.hex.dmg = t.damageMult;
   a.hex.speed = t.speedMult;
+  a.hex.move = t.moveMult;
 }

@@ -298,8 +298,8 @@ describe('the moments are events, each drawn and each gone again', () => {
 describe('hex glyphs', () => {
   it('each hex has a glyph of its own, in a colour of its own', () => {
     const ids = Object.keys(HEX_TINT);
-    expect(ids).toHaveLength(4);
-    expect(new Set(Object.values(HEX_TINT)).size).toBe(4);
+    expect(ids).toHaveLength(5);
+    expect(new Set(Object.values(HEX_TINT)).size).toBe(5);
     const counts = ids.map((id) => {
       const g = gfx();
       hexGlyph(g as never, id, 0, 0, 5, 0xffffff, 1);

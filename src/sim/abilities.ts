@@ -312,6 +312,27 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
   suppress({ p, d, ab }) {
     if (d <= ab.range!) p.suppressT = 0.25;
   },
+  stasis({ w, m, dt, d, ab, i }) {
+    // A warned pulse round the Pylon that mires the character in it (docs/ENEMY-DAMAGE.md).
+    m.abT[i] = (m.abT[i] ?? ab.interval! * w.rngAi.float(0.3, 1)) - dt;
+    if (m.abT[i] > 0 || d > ab.range! + 3) return;
+    m.abT[i] = ab.interval!;
+    w.effects.push({
+      id: w.nextId++,
+      x: m.x,
+      y: m.y,
+      radius: ab.range!,
+      t: 1,
+      total: 1,
+      kind: 'slam',
+      label: 'Stasis pulse',
+      damage: ab.amount! * monsterHitOf(m),
+      dtype: 1,
+      team: 1,
+      owner: m.id,
+      mire: true,
+    });
+  },
   tithe({ w, m, p, dt, d, ab, i }) {
     // A beam that drains the character's life into the Bursar while it can see the character (docs/ENCOUNTERS.md 7).
     const on = d <= ab.range! && w.grid.los(m.x, m.y, p.x, p.y);

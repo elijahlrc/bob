@@ -87,7 +87,13 @@ import {
   statusTaken,
   tickStatuses,
 } from './statuses';
-import { damageMult, hexPlayerAtRandom, onMonsterDeath, shieldedByPylon } from './factions';
+import {
+  damageMult,
+  hexPlayerAtRandom,
+  mirePlayer,
+  onMonsterDeath,
+  shieldedByPylon,
+} from './factions';
 import {
   counterBlow,
   markedMult,
@@ -1163,6 +1169,7 @@ function onMonsterHitPlayer(w: World, src: Actor, dst: Actor, prof: SkillProfile
   const hobbles = src.modIds.includes('hobbling') || src.mon?.kind.hobbles || debuff === 'hobble';
   // A hobble is a chill: whatever keeps a chill off keeps it off (docs/BOSSES.md 11.2).
   if (hobbles) afflictPlayer(w, dst.side!, 'chill', 0.3, 2);
+  if (src.mon?.kind.mires) mirePlayer(w, dst.side!, src);
   // Emergencies for builds that sustain themselves (docs/ATTRITION.md): a withering or scarring hit stops life
   // regeneration (Scarred), a shield-breaking one holds the energy shield recharge off longer (the recharge waits on the
   // time since a hit).

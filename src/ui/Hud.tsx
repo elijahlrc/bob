@@ -177,6 +177,7 @@ function Inspect({ a, c }: { a: Actor; c: Controller }) {
           !boss &&
           [
             shapeText(MONSTER_TYPES[spec.type].shape),
+            MONSTER_TYPES[spec.type].mires && 'Its attacks mire you: a curse that slows your walk.',
             ...encounterTexts(spec.type),
             ...abilityTexts(abilitiesOf(spec.type)),
             ...movementTexts(MONSTER_TYPES[spec.type].movement),

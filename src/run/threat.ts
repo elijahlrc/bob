@@ -12,11 +12,17 @@ import {
   affixRarePacks,
   mapAffixDef,
 } from '../data/mapAffixes';
-import { MONSTER_TYPES, type FactionId, type MonsterTypeId, type Variant } from '../data/monsters';
+import {
+  MONSTER_TYPES,
+  VARIANT_CONVERSION,
+  type FactionId,
+  type MonsterTypeId,
+  type Variant,
+} from '../data/monsters';
 import type { ThemeDef } from '../data/themes';
 import { TYPE_SIDEARMS } from '../data/encounters';
 import { STEPS } from '../data/steps';
-import { ELEMENT_WEIGHTS, neverPlain, typeShares } from '../gen/population';
+import { ELEMENT_WEIGHTS, typeShares, variantWeights } from '../gen/population';
 
 /**
  * What a map theme asks of a build (EXPANSION 5.10 and section 9). The first version works from the
@@ -31,17 +37,25 @@ export type ThemeThreat = {
   pressure: number;
 };
 
-const ELEMENT_INDEX: Record<Variant, number> = { none: 0, lightning: 1, cold: 2, fire: 3 };
+const ELEMENT_INDEX: Record<Variant, number> = {
+  none: 0,
+  lightning: 1,
+  cold: 2,
+  fire: 3,
+  chaos: 4,
+};
 const CONVERT_TARGET: Record<string, number> = { lightning: 1, cold: 2, fire: 3, chaos: 4 };
 
-/** The share of a type's physical damage that it converts by nature (the Rot to chaos, the Hollow to cold). */
-function innateConversion(id: MonsterTypeId): { to: number; share: number } | null {
+/** The shares of a type's physical damage that it converts by nature (the Rot to chaos, the Hollow to cold), at most all of it. */
+function innateConversion(id: MonsterTypeId): { to: number; share: number }[] {
+  const out: { to: number; share: number }[] = [];
   for (const m of MONSTER_TYPES[id].mods) {
     const [kind, from, to] = m.stat.split('.');
     if (kind === 'convert' && from === 'physical' && CONVERT_TARGET[to])
-      return { to: CONVERT_TARGET[to], share: m.value / 100 };
+      out.push({ to: CONVERT_TARGET[to], share: m.value / 100 });
   }
-  return null;
+  const total = out.reduce((s, c) => s + c.share, 0);
+  return total > 1 ? out.map((c) => ({ ...c, share: c.share / total })) : out;
 }
 /** What a faction's behaviours add to its raw numbers (zones, raising, blinking), as a multiplier. */
 const FACTION_PRESSURE: Record<FactionId, number> = {
@@ -75,31 +89,30 @@ function sidearmRate(id: MonsterTypeId): number {
 
 function rawThreat(
   theme: Pick<ThemeDef, 'typeWeights' | 'elementWeights' | 'factions'>,
+  level = 1,
 ): ThemeThreat {
   const mix = [0, 0, 0, 0, 0];
-  const variants: Record<Variant, number> = { none: 0, fire: 0, cold: 0, lightning: 0 };
+  const variants: Record<Variant, number> = { none: 0, fire: 0, cold: 0, lightning: 0, chaos: 0 };
   let pressure = 0;
   let total = 0;
   for (const [id, typeShare] of typeShares(theme)) {
     const t = MONSTER_TYPES[id];
-    const innate = t.innate ? innateConversion(id) : null;
-    const vs = t.innate
-      ? (['none'] as Variant[])
-      : ALL_VARIANTS.filter((v) => !neverPlain(id) || v !== 'none');
-    const weight = (v: Variant) => ELEMENT_WEIGHTS[v] * (theme.elementWeights[v] ?? 1);
-    const vTotal = vs.reduce((s, v) => s + weight(v), 0);
-    for (const v of vs) {
-      const share = (typeShare * weight(v)) / vTotal;
-      // Variants turn part of the physical damage into their element (mages all of it).
-      const conv = v === 'none' ? 0 : id === 'mage' ? 1 : 0.6;
+    const own = innateConversion(id);
+    const ws = variantWeights(id, theme, level);
+    const vTotal = ws.reduce((s, [, w]) => s + w, 0);
+    for (const [v, w] of ws) {
+      const share = (typeShare * w) / vTotal;
+      // Variants turn part of the physical damage into their element (mages all of it), beside the type's own conversion.
+      const conv =
+        v === 'none'
+          ? []
+          : [{ to: ELEMENT_INDEX[v], share: id === 'mage' ? 1 : VARIANT_CONVERSION / 100 }];
+      const all = [...own, ...conv];
+      const turned = all.reduce((s, c) => s + c.share, 0);
+      const k = turned > 1 ? 1 / turned : 1;
       const dmg = share * t.dmgMult;
-      if (innate) {
-        mix[0] += dmg * (1 - innate.share);
-        mix[innate.to] += dmg * innate.share;
-      } else {
-        mix[0] += dmg * (1 - conv);
-        mix[ELEMENT_INDEX[v]] += dmg * conv;
-      }
+      mix[0] += dmg * (1 - turned * k);
+      for (const c of all) mix[c.to] += dmg * c.share * k;
       variants[v] += share;
       pressure += share * t.dmgMult * t.lifeMult * (1 / t.attackTime + sidearmRate(id));
       total += share;
@@ -113,8 +126,8 @@ function rawThreat(
 
 const BASE_PRESSURE = rawThreat({ typeWeights: {}, elementWeights: {} }).pressure;
 
-export function themeThreat(theme: ThemeDef): ThemeThreat {
-  const t = rawThreat(theme);
+export function themeThreat(theme: ThemeDef, level = 1): ThemeThreat {
+  const t = rawThreat(theme, level);
   return { ...t, pressure: t.pressure / BASE_PRESSURE };
 }
 
@@ -225,8 +238,8 @@ export function scoreTheme(
   /** The level offers are compared at (the map number): a higher offer is harder and pays more XP. Default: its own. */
   refLevel?: number,
 ): ThemeScore {
-  const threat = themeThreat(theme);
   const level = ch.config.areaLevel;
+  const threat = themeThreat(theme, level);
   const hard = refLevel === undefined ? 1 : levelHardness(level, refLevel, ch.config.difficulty);
   const pay = refLevel === undefined ? 1 : Math.sqrt(baseXp(level) / baseXp(refLevel));
   // A Throng's monsters carry its hidden affix (fewer hit points and weaker blows, and a much bigger crowd).

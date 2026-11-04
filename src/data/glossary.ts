@@ -42,6 +42,7 @@ export const GLOSSARY = {
     'Ignite burns, chill slows, freeze stops, shock makes the target take more damage; poison and bleeding hurt over time.',
   dot: 'Damage over time: dealt little by little, not in one hit.',
   hexes: 'Curses your character puts on enemies.',
+  mire: 'A curse some monsters put on you: you walk much slower for a few seconds. What wards off curses wards it off.',
   minions: 'What your summoned allies, totems and lasting effects do.',
   move: 'How fast your character walks.',
   mult: 'A value of ×1.10 indicates a 10% increase to the value provided by your gear.',

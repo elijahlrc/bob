@@ -89,8 +89,18 @@ export function speedMult(a: Actor): number {
 
 /** The speed an actor walks at: all of that, and hindering, maiming, shackles and snares (docs/SPIRIT.md S3). */
 export function moveMult(a: Actor): number {
-  return speedMult(a) * moveFactor(a);
+  return speedMult(a) * moveFactor(a) * a.hex.move;
 }
+
+/** A monster's attack mires the character (docs/ENEMY-DAMAGE.md): the Mire curse, renewed by each hit. */
+export function mirePlayer(w: World, s: Side, from?: Actor): void {
+  // Standing in a pool renews it as it runs low, not every tick.
+  const have = s.player.hexes.find((h) => h.id === 'mire');
+  if (have && have.t > MIRE_RENEW) return;
+  hexPlayer(w, s, 'mire', from);
+}
+/** A Mire with more than this many seconds left is not renewed by a pool. */
+const MIRE_RENEW = 2;
 
 /** Everything that raises or lowers the damage an actor deals. */
 export function damageMult(a: Actor): number {
@@ -283,6 +293,8 @@ export function openZone(
   seconds: number,
   kind: ZoneKind,
   dps: number,
+  /** It mires the character standing in it (a Spitter's pool, a Silkspinner's web). */
+  mire = false,
 ): void {
   w.effects.push({
     id: w.nextId++,
@@ -293,6 +305,7 @@ export function openZone(
     total: seconds,
     kind,
     damage: dps,
+    ...(mire ? { mire: true } : {}),
     dtype:
       kind === 'caustic' || kind === 'sigil'
         ? 4
@@ -408,10 +421,27 @@ export function onMonsterDeath(w: World, a: Actor): void {
   // A Brood monster splits into Gnawers.
   if (a.modIds.includes('brood'))
     for (let i = 0; i < BROOD_SPLIT; i++) spawnBeside(w, a, 'gnawer', 0.8);
-  if (type === 'bloater' || a.modIds.includes('putrid'))
-    openZone(w, a.x, a.y, 2, 4, 'caustic', monsterHitOf(a) * 0.8);
-  // A Cinderling burns out where it falls.
-  if (type === 'cinderling') openZone(w, a.x, a.y, 1.3, 3, 'burning', monsterHitOf(a) * 0.5);
+  // A burster goes up in flame where it falls (docs/ENEMY-DAMAGE.md): a warned blast, then burning ground. The Bloater's gas
+  // ignites (it was a caustic cloud until 2026-11-04); a Cinderling burns out.
+  const burst = BURSTS[type];
+  if (burst) {
+    const hit = monsterHitOf(a);
+    w.effects.push({
+      id: w.nextId++,
+      x: a.x,
+      y: a.y,
+      radius: burst.radius,
+      t: BURST_WARN,
+      total: BURST_WARN,
+      kind: 'volatile',
+      label: 'Burst',
+      damage: burst.mult * hit,
+      dtype: 3,
+      team: 1,
+    });
+    openZone(w, a.x, a.y, burst.radius, burst.seconds, 'burning', hit * burst.dps);
+  }
+  if (a.modIds.includes('putrid')) openZone(w, a.x, a.y, 2, 4, 'caustic', monsterHitOf(a) * 0.8);
   if (type === 'wisp') {
     // A nova that drains a fifth of the mana of the player.
     w.events.push({ t: 'explode', x: a.x, y: a.y, r: 2.5, dtype: 2 });
@@ -492,8 +522,12 @@ export function tickZones(w: World, dt: number): void {
     }
     if (caught.length === 0) continue;
     for (const a of caught) {
+      // A miring pool or web curses the character standing in it; it does not chill as well.
+      if (e.mire) {
+        if (a.isPlayer && a.side) mirePlayer(w, a.side, undefined);
+      }
       // Ground that chills or shocks does nothing to what cannot be (an immunity, a cleansing flask running).
-      if (e.kind === 'chilling' && !zoneWarded(a, 'chill')) {
+      else if (e.kind === 'chilling' && !zoneWarded(a, 'chill')) {
         a.ail.chill = Math.max(a.ail.chill, 0.3);
         a.ail.chillT = Math.max(a.ail.chillT, 0.5);
       } else if (e.kind === 'shocking' && !zoneWarded(a, 'shock')) {
@@ -765,7 +799,17 @@ export function tickFactionBehaviour(w: World, m: Actor, dt: number): void {
   if (m.rarity === 'miniboss') tickChampion(w, m, dt);
 }
 
-/** A Bloater that reaches the player bursts: it is gone and its cloud opens where it stood. */
+/** The types that burst on contact or on death: the blast (radius, a multiple of a hit) and the burning ground after. */
+export const BURSTS: Partial<
+  Record<string, { radius: number; mult: number; seconds: number; dps: number }>
+> = {
+  bloater: { radius: 2, mult: 2, seconds: 4, dps: 0.6 },
+  cinderling: { radius: 1.4, mult: 1.5, seconds: 3, dps: 0.5 },
+};
+/** Seconds between a burst's warning and its blast. */
+export const BURST_WARN = 0.6;
+
+/** A Bloater or a Cinderling that reaches the player bursts: it is gone and its blast and fire open where it stood. */
 export function bloaterBurst(w: World, m: Actor): void {
   m.noReward = true;
   m.life = 0;

@@ -126,7 +126,7 @@ export function themeInfo(
     .map(([t]) => t)
     .sort((a, b) => TAG_ORDER.indexOf(a) - TAG_ORDER.indexOf(b));
   // The damage mix: the types' own, with the damage the map's affixes add on top.
-  const t = themeThreat(theme);
+  const t = themeThreat(theme, level);
   const a = affixThreat(type === 'throng' ? [...affixes, THRONG_AFFIX] : affixes, level);
   const g = a.gain.reduce((s, x) => s + x, 0);
   const monsters = g > 0 ? t.mix.map((x, i) => (x + a.gain[i]) / (1 + g)) : t.mix;

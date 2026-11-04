@@ -196,6 +196,8 @@ export type MonsterTypeDef = {
   minLevel?: number;
   /** Its hits slow the character by 30% for 2 seconds (the Hobbling mod, as a trait of the type). */
   hobbles?: boolean;
+  /** Its hits, and the pools its attack leaves, put the Mire on the character: a heavy slow (docs/ENEMY-DAMAGE.md). */
+  mires?: boolean;
   /** Its hits scar: no life regeneration for a few seconds (docs/ATTRITION.md; the Withering mod, as a trait of the type). */
   scars?: boolean;
   /** What it drops is this many times the usual (a chest that is found pays). */
@@ -340,7 +342,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.2,
     attackTime: 1.4,
     radius: 0.5,
-    mods: [mod('convert.physical.chaos', 'base', 30)],
+    mods: [mod('convert.physical.chaos', 'base', 40)],
   },
   bloater: {
     id: 'bloater',
@@ -370,6 +372,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     archetype: 'artillery',
     shape: { id: 'lob', radius: 1.6, zone: 'caustic', seconds: 3, dps: 0.2, mult: 0.5, lock: 0.3 },
     stance: 'throw',
+    // Its bile mires: a hit or its pool (docs/ENEMY-DAMAGE.md).
+    mires: true,
     innate: true,
     lifeMult: 0.7,
     dmgMult: 0.75,
@@ -378,7 +382,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2,
     attackTime: 1.5,
     radius: 0.4,
-    mods: [mod('convert.physical.chaos', 'base', 50), mod('chance.poison', 'base', 40)],
+    mods: [mod('convert.physical.chaos', 'base', 85), mod('chance.poison', 'base', 40)],
   },
   hag: {
     id: 'hag',
@@ -398,7 +402,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.4,
     attackTime: 1.6,
     radius: 0.4,
-    mods: [mod('convert.physical.chaos', 'base', 50)],
+    mods: [mod('convert.physical.chaos', 'base', 85)],
   },
   gloomstalker: {
     id: 'gloomstalker',
@@ -418,7 +422,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.1,
     radius: 0.4,
     // Twice the normal evasion.
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 60), mod('convert.physical.cold', 'base', 25)],
   },
   wailer: {
     id: 'wailer',
@@ -457,7 +461,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 7.3,
     attackTime: 1.0,
     radius: 0.3,
-    mods: [mod('manaDrain', 'base', 8)],
+    mods: [mod('manaDrain', 'base', 8), mod('convert.physical.lightning', 'base', 75)],
   },
   hexer: {
     id: 'hexer',
@@ -475,7 +479,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.8,
     attackTime: 1.6,
     radius: 0.4,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 90)],
   },
   censer: {
     id: 'censer',
@@ -494,7 +498,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2,
     attackTime: 1.3,
     radius: 0.45,
-    mods: [],
+    mods: [mod('convert.physical.fire', 'base', 70)],
   },
   flagellant: {
     id: 'flagellant',
@@ -517,7 +521,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.4,
     radius: 0.5,
     scars: true,
-    mods: [],
+    mods: [mod('convert.physical.fire', 'base', 60)],
   },
   choirmaster: {
     id: 'choirmaster',
@@ -536,7 +540,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.4,
     attackTime: 1.7,
     radius: 0.45,
-    mods: [],
+    mods: [mod('convert.physical.lightning', 'base', 80)],
   },
   gnawer: {
     id: 'gnawer',
@@ -577,7 +581,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 5.9,
     attackTime: 1.1,
     radius: 0.3,
-    mods: [mod('convert.physical.chaos', 'base', 40)],
+    mods: [mod('convert.physical.chaos', 'base', 55)],
   },
   beetle: {
     id: 'beetle',
@@ -640,7 +644,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     radius: 0.65,
     // x2 armour (x4 was a wall for physical builds), x3 stun threshold.
     scars: true,
-    mods: [],
+    mods: [mod('convert.physical.lightning', 'base', 90)],
   },
   arbalest: {
     id: 'arbalest',
@@ -661,7 +665,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 2.0,
     radius: 0.5,
     // The bolt pierces everything in its line.
-    mods: [],
+    mods: [mod('convert.physical.lightning', 'base', 35)],
   },
   golem: {
     id: 'golem',
@@ -672,6 +676,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     archetype: 'bruiser',
     movement: [{ id: 'momentum', from: 0.5, to: 1.5, seconds: 3 }],
     defence: { stun: 100 },
+    // Its blow is a slam on the ground, warned (docs/ENEMY-DAMAGE.md, 2026-11-04: fewer melee blows).
+    shape: { id: 'slam', radius: 1.8, mult: 1.1, lock: 0.3 },
     elemental: true,
     lifeMult: 1.6,
     dmgMult: 1,
@@ -716,7 +722,6 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     movement: [{ id: 'swoop', back: 3 }],
     senses: { leash: 0, target: 'minions' },
     defence: { evasion: 30 },
-    innate: true,
     lifeMult: 0.45,
     dmgMult: 0.6,
     range: 1,
@@ -815,7 +820,6 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     archetype: 'bulwark',
     movement: [{ id: 'tether', anchors: ['bursar'], radius: 6 }],
     defence: { armour: 100 },
-    innate: true,
     lifeMult: 1.8,
     dmgMult: 0.95,
     range: 1.4,
@@ -865,7 +869,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 6,
     attackTime: 1.3,
     radius: 0.4,
-    mods: [],
+    mods: [mod('convert.physical.fire', 'base', 60)],
   },
   wight: {
     id: 'wight',
@@ -927,7 +931,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 1.4,
     attackTime: 2.4,
     radius: 0.8,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 65)],
   },
   gorger: {
     id: 'gorger',
@@ -947,7 +951,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 1.8,
     radius: 0.7,
     scars: true,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 80)],
   },
   watcher: {
     id: 'watcher',
@@ -969,7 +973,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 1.2,
     attackTime: 2.2,
     radius: 0.4,
-    mods: [],
+    mods: [mod('convert.physical.chaos', 'base', 70), mod('convert.physical.cold', 'base', 20)],
   },
   bell: {
     id: 'bell',
@@ -992,7 +996,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 0,
     attackTime: 4,
     radius: 0.6,
-    mods: [mod('stunDamage', 'inc', 200)],
+    mods: [mod('stunDamage', 'inc', 200), mod('convert.physical.lightning', 'base', 80)],
   },
   spinner: {
     id: 'spinner',
@@ -1007,12 +1011,14 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
       id: 'lob',
       radius: 1.7,
       zone: 'chilling',
-      zoneName: 'web',
+      zoneName: 'web that mires',
       seconds: 4,
       dps: 0.12,
       mult: 0.4,
       lock: 0.3,
     },
+    // Its web mires, in place of the chill it had (docs/ENEMY-DAMAGE.md).
+    mires: true,
     innate: true,
     minLevel: 12,
     lifeMult: 0.9,
@@ -1022,7 +1028,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 5.2,
     attackTime: 1.8,
     radius: 0.45,
-    mods: [mod('convert.physical.chaos', 'base', 50)],
+    mods: [mod('convert.physical.cold', 'base', 60), mod('convert.physical.chaos', 'base', 30)],
   },
   coffer: {
     id: 'coffer',
@@ -1064,7 +1070,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2.4,
     attackTime: 2.6,
     radius: 0.4,
-    mods: [],
+    mods: [mod('convert.physical.lightning', 'base', 75)],
   },
   wrack: {
     id: 'wrack',
@@ -1087,7 +1093,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     attackTime: 2,
     radius: 0.6,
     scars: true,
-    mods: [],
+    mods: [mod('convert.physical.cold', 'base', 35), mod('convert.physical.chaos', 'base', 45)],
   },
   leech: {
     id: 'leech',
@@ -1098,7 +1104,8 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     archetype: 'skirmisher',
     movement: [{ id: 'hop', go: 0.8, pace: 2.2, stop: 0.5 }],
     defence: { evasion: 40 },
-    hobbles: true,
+    // Its bite mires (a chill until 2026-11-04; docs/ENEMY-DAMAGE.md).
+    mires: true,
     innate: true,
     minLevel: 20,
     lifeMult: 0.3,
@@ -1108,7 +1115,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 5.1,
     attackTime: 1,
     radius: 0.3,
-    mods: [mod('convert.physical.chaos', 'base', 40), mod('leech.life', 'base', 8)],
+    mods: [mod('convert.physical.chaos', 'base', 80), mod('leech.life', 'base', 8)],
   },
   drowner: {
     id: 'drowner',
@@ -1129,7 +1136,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 6.4,
     attackTime: 1.4,
     radius: 0.5,
-    mods: [],
+    mods: [mod('convert.physical.cold', 'base', 70)],
   },
 
   // The Emberborn (docs/ROSTER.md 7.3): fire, and ground that burns.
@@ -1193,7 +1200,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 2,
     attackTime: 2.2,
     radius: 0.4,
-    mods: [mod('convert.physical.fire', 'base', 100)],
+    mods: [mod('convert.physical.fire', 'base', 60), mod('convert.physical.chaos', 'base', 40)],
   },
   slagworm: {
     id: 'slagworm',
@@ -1214,7 +1221,7 @@ export const MONSTER_TYPES: Record<MonsterTypeId, MonsterTypeDef> = {
     speed: 6,
     attackTime: 1.4,
     radius: 0.55,
-    mods: [mod('convert.physical.fire', 'base', 100)],
+    mods: [mod('convert.physical.fire', 'base', 55)],
   },
   // The bosses (docs/BOSSES.md). Their life is the boss rarity's times `lifeMult`; their fights are `sim/bosses.ts`.
   tollkeeper: {
@@ -1512,25 +1519,34 @@ export function factionOfSpec(spec: { type: MonsterTypeId }): FactionId {
   return MONSTER_TYPES[spec.type].faction;
 }
 
-export type Variant = 'none' | Element;
+/** An element, or chaos: the plague variant comes from `CHAOS_VARIANT_FROM` (docs/ENEMY-DAMAGE.md). */
+export type Variant = 'none' | Element | 'chaos';
 
 export const VARIANT_NAMES: Record<Variant, string> = {
   none: '',
   fire: 'Burning',
   cold: 'Frozen',
   lightning: 'Storm',
+  chaos: 'Plague',
 };
+
+/** The area level the plague (chaos) variant is met from: chaos grows as energy shield builds do (docs/ENEMY-DAMAGE.md). */
+export const CHAOS_VARIANT_FROM = 41;
+/** The share of a variant's damage turned to its type (a mage turns all of it). 60 until 2026-11-04 (docs/ENEMY-DAMAGE.md). */
+export const VARIANT_CONVERSION = 75;
 
 /** §12.4 variant mods. Mages convert 100%. */
 export function variantMods(v: Variant, isMage: boolean): Mod[] {
   if (v === 'none') return [];
-  const conv = isMage ? 100 : 60;
+  const conv = isMage ? 100 : VARIANT_CONVERSION;
   const ailment: Mod =
     v === 'fire'
       ? mod('chance.ignite', 'base', 15)
       : v === 'cold'
         ? mod('chance.freeze', 'base', 20)
-        : mod('chance.shock', 'base', 20);
+        : v === 'chaos'
+          ? mod('chance.poison', 'base', 20)
+          : mod('chance.shock', 'base', 20);
   return [mod(`convert.physical.${v}`, 'base', conv), mod(`resist.${v}`, 'base', 40), ailment];
 }
 

@@ -21,7 +21,8 @@ export type HexId =
   | 'critMark'
   | 'flaskMark'
   | 'huntMark'
-  | 'stunMark';
+  | 'stunMark'
+  | 'mire';
 
 /** The hexes monsters put on the player, and the ones a unique grants through `hexOnHit.*`. */
 export const HEX_IDS: HexId[] = ['brittleDoom', 'leadenLimbs', 'feebleGrip', 'openWounds'];
@@ -38,6 +39,7 @@ export const ALL_HEX_IDS: HexId[] = [
   'flaskMark',
   'huntMark',
   'stunMark',
+  'mire',
 ];
 
 export const HEX_SECONDS = 6;
@@ -58,6 +60,8 @@ export type HexFx = {
   dmg?: boolean;
   /** Reduced action and movement speed. */
   speed?: boolean;
+  /** Less movement speed only: the effect, in percent (the Mire). */
+  move?: boolean;
   /** The share of the effect that rare and unique enemies take (Feeble Grip and Leaden Limbs: half). */
   rarityShare?: number;
   /** Increased physical damage over time taken, as a multiple of the effect. */
@@ -115,6 +119,8 @@ export type HexDef = {
   seconds?: [number, number];
   /** The condition that is true while the target carries this hex: what `selfMods` wait for (default: any hex). */
   selfCond?: CondId;
+  /** Seconds it lasts when a monster puts it on the character (default `HEX_SECONDS`). */
+  monsterSeconds?: number;
   /** What the character gets when it kills an enemy under this hex. */
   onKill?: HexKill;
   /** A melee hit against an enemy under this hex grants the character this buff (Penance). */
@@ -274,6 +280,17 @@ export const HEXES: Record<HexId, HexDef> = {
     onKill: { charge: { kind: 'grit', chance: [21, 30] } },
     seconds: [6, 9.8],
   },
+  // A monster's curse only (docs/ENEMY-DAMAGE.md, 2026-11-04): a heavy slow that is not a chill, so what answers a curse
+  // answers it. Out of HEX_IDS, so the Hexer and the sigils never cast it; the attacks that slow put it on.
+  mire: {
+    id: 'mire',
+    name: 'Mire',
+    low: 40,
+    high: 50,
+    text: 'less movement speed',
+    fx: { move: true },
+    monsterSeconds: 3,
+  },
 };
 
 /** The effect of a hex at a gem level, before curse effect: a straight line from level 1 to level 20. */
@@ -303,6 +320,8 @@ export type HexTotals = {
   vulnAll: number;
   damageMult: number;
   speedMult: number;
+  /** Movement speed alone (the Mire). */
+  moveMult: number;
   /** Increased damage over time taken, as fractions: physical, and of every type. */
   dotPhys: number;
   dotAll: number;
@@ -336,6 +355,7 @@ export function hexTotals(
     vulnAll: 0,
     damageMult: 1,
     speedMult: 1,
+    moveMult: 1,
     dotPhys: 0,
     dotAll: 0,
     acc: 0,
@@ -357,6 +377,7 @@ export function hexTotals(
     if (fx.vulnAll) vulnAll += h.effect / 100;
     if (fx.dmg) damageMult *= 1 - e / 100;
     if (fx.speed) speedMult *= 1 - Math.min(75, e) / 100;
+    if (fx.move) t.moveMult *= 1 - Math.min(75, e) / 100;
     if (fx.dotPhys) t.dotPhys += (h.effect * fx.dotPhys) / 100;
     if (fx.dotAll) t.dotAll += (h.effect * fx.dotAll) / 100;
     if (fx.acc) t.acc += Math.min(75, h.effect * fx.acc) / 100;

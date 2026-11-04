@@ -42,6 +42,7 @@ export const HEX_TINT: Record<string, number> = {
   leadenLimbs: 0x88aee8,
   feebleGrip: 0xc898f4,
   openWounds: 0xff6272,
+  mire: 0x9aa860,
 };
 const HEX_DEFAULT = 0xc090ff;
 const FLASK_TINT: Record<FlaskKind, number> = {
@@ -676,6 +677,19 @@ export function hexGlyph(
       }
       g.strokePath();
       g.lineBetween(x - s * 0.5, y + s * 0.5, x + s * 0.5, y - s * 0.5);
+      break;
+    }
+    case 'mire': {
+      // Mud: two sagging waves.
+      for (const dy of [-0.4, 0.4]) {
+        g.beginPath();
+        g.moveTo(x - s, y + s * dy);
+        g.lineTo(x - s * 0.5, y + s * (dy + 0.35));
+        g.lineTo(x, y + s * dy);
+        g.lineTo(x + s * 0.5, y + s * (dy + 0.35));
+        g.lineTo(x + s, y + s * dy);
+        g.strokePath();
+      }
       break;
     }
     case 'openWounds': {

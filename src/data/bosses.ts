@@ -73,7 +73,9 @@ export const BOSSES: Record<BossId, BossDef> = {
     says: ['“Take this shade back to its cell.”'],
     stunMult: 4,
     curseEffect: 0.67,
-    fightMix: [1, 0, 0, 0, 0],
+    // His soldiers roll elements since 2026-11-04 (docs/ENEMY-DAMAGE.md): measured 30% physical in a theme of no element,
+    // the rest split evenly between the elements (which one leads is the map's theme's).
+    fightMix: [0.3, 0.23, 0.23, 0.24, 0],
   },
   courser: {
     id: 'courser',

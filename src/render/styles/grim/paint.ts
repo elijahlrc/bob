@@ -238,6 +238,7 @@ const ELEMENT_ACCENT: Record<
     accent: hex(0xc890ff),
     wash: hex(0xc8a0ff),
   },
+  chaos: { eye: hex(0xb8f060), glow: hex(0xa0e050), accent: hex(0x78b838), wash: hex(0x98c870) },
 };
 
 const blend = (a: RGB, b: RGB, k: number): RGB => [

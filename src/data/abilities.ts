@@ -27,6 +27,7 @@ export type AbilityId =
   | 'trail'
   | 'tithe'
   | 'sigil'
+  | 'stasis'
   // Passive: applied where the rule lives.
   | 'rise'
   | 'burst'
@@ -86,6 +87,13 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
     tag: 'spawners',
     text: (a) =>
       `Every ${s(a.interval)} s spawns ${s(a.amount)} ${a.spawns ?? 'monsters'} (up to ${s(a.max)} at once).`,
+  },
+  stasis: {
+    name: 'Stasis pulse',
+    active: true,
+    tag: 'holders',
+    text: (a) =>
+      `Every ${s(a.interval)} s sends out a pulse ${s(a.range)} tiles round it, after a warning: it puts the Mire on you.`,
   },
   slam: {
     name: 'Slam',
@@ -202,8 +210,8 @@ export const ABILITY_INFO: Record<AbilityId, AbilityInfo> = {
   burst: {
     name: 'Burst',
     active: false,
-    tag: 'clouds',
-    text: () => 'Bursts on contact or on death into a caustic cloud.',
+    tag: 'ground',
+    text: () => 'Bursts into flame on contact or on death.',
   },
   curl: {
     name: 'Curl up',
@@ -279,6 +287,9 @@ export const NEST_INTERVAL = 4;
 export const NEST_SPAWN = 2;
 export const NEST_MAX_ALIVE = 8;
 export const SENTINEL_SLAM_INTERVAL = 4;
+/** The Warden Pylon's stasis pulse: seconds between pulses, and its reach in tiles. */
+export const PYLON_PULSE_INTERVAL = 5;
+export const PYLON_PULSE_RADIUS = 4;
 export const SENTINEL_SLAM_RADIUS = 2;
 export const PYLON_RANGE = 5;
 /** A Warden Pylon's ward holds this many seconds, then drops for PYLON_OFF (every pylon on the same clock), so what it guards
@@ -292,6 +303,7 @@ export const RIME_AURA_RANGE = 3;
 export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
   shambler: [{ id: 'rise' }],
   bloater: [{ id: 'burst' }],
+  cinderling: [{ id: 'burst' }],
   shieldbearer: [{ id: 'shield' }],
   hag: [
     {
@@ -331,7 +343,11 @@ export const TYPE_ABILITIES: Partial<Record<string, AbilityDef[]>> = {
     { id: 'slam', interval: SENTINEL_SLAM_INTERVAL, range: SENTINEL_SLAM_RADIUS, amount: 2 },
   ],
   golem: [{ id: 'deathZone' }],
-  pylon: [{ id: 'protect', range: PYLON_RANGE }],
+  // Its pulse mires whoever comes for what it shields (docs/ENEMY-DAMAGE.md, 2026-11-04: it had no attack).
+  pylon: [
+    { id: 'protect', range: PYLON_RANGE },
+    { id: 'stasis', interval: PYLON_PULSE_INTERVAL, range: PYLON_PULSE_RADIUS, amount: 2 },
+  ],
   hound: [{ id: 'leap', interval: 5, range: 7, telegraph: 0.5 }],
   boar: [{ id: 'charge', interval: 7, range: 10, telegraph: 0.6 }],
   handler: [{ id: 'whistle', interval: 8, range: 8, amount: 0.2 }, { id: 'kite' }],

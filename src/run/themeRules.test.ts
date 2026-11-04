@@ -42,11 +42,14 @@ describe('the offer set rules (docs/ENEMIES.md 4.2)', () => {
     }
   });
 
-  it('skeleton themes thin out, and only they', () => {
+  it('skeleton themes thin out, the Rot comes in force late, and the rest weigh the same', () => {
     const crypt = themeDef('ashenCrypt');
     const rot = themeDef('charnelPits');
+    const hollow = themeDef('hollowVigil');
     expect(themeWeight(crypt, 10)).toBeLessThan(themeWeight(crypt, 5));
-    for (const m of [1, 10, 60]) expect(themeWeight(rot, m)).toBe(1);
+    expect(themeWeight(rot, 10)).toBeLessThan(1);
+    expect(themeWeight(rot, 90)).toBeGreaterThan(1);
+    for (const m of [1, 10, 60]) expect(themeWeight(hollow, m)).toBe(1);
   });
 
   it("a faction theme's chief is of its leading faction", () => {

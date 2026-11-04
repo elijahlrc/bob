@@ -101,6 +101,7 @@ export function newActor(id: number, isPlayer: boolean, x: number, y: number, r:
       vuln: 0,
       dmg: 1,
       speed: 1,
+      move: 1,
       more: hexTotals([]),
       cd: 0,
     },

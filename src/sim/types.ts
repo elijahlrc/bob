@@ -171,6 +171,8 @@ export type Actor = {
     vulnAll: number;
     dmg: number;
     speed: number;
+    /** Movement speed alone (the Mire). */
+    move: number;
     /** The rest of what the hexes on this actor do (damage over time taken, accuracy, evasion, chances to be bled or maimed...). */
     more: HexTotals;
     /** Seconds before a Hexcaller can hex again. */
@@ -342,6 +344,8 @@ export type GroundEffect = {
   afflict?: { kind: 'shock' | 'chill' | 'freeze' | 'ignite'; value: number; seconds: number };
   /** Drinks' worth of charges it knocks out of every worn flask of the character it lands on (the Courser's trample). */
   trample?: number;
+  /** It puts the Mire on the character it catches (a Warden Pylon's pulse, a Spitter's pool, a web). */
+  mire?: boolean;
 };
 
 /**

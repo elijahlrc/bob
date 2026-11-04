@@ -535,10 +535,39 @@ export const OSSUARY_LOW_WEIGHT = 0.25;
 export const OSSUARY_CAP_FROM = 4;
 
 /**
+ * The Rot comes in force later, as energy shield builds grow (docs/ENEMY-DAMAGE.md, 2026-11-04): its themes weigh
+ * ROT_EARLY_WEIGHT until ROT_EARLY_UNTIL, 1 by ROT_EVEN_MAP and ROT_LATE_WEIGHT by ROT_LATE_MAP, in proportion to the Rot's
+ * share of the theme (a mixed theme moves half as far).
+ */
+export const ROT_EARLY_UNTIL = 20;
+export const ROT_EARLY_WEIGHT = 0.5;
+export const ROT_EVEN_MAP = 40;
+export const ROT_LATE_MAP = 80;
+export const ROT_LATE_WEIGHT = 2;
+
+function rotWeight(map: number): number {
+  if (map <= ROT_EARLY_UNTIL) return ROT_EARLY_WEIGHT;
+  if (map <= ROT_EVEN_MAP)
+    return (
+      ROT_EARLY_WEIGHT +
+      ((1 - ROT_EARLY_WEIGHT) * (map - ROT_EARLY_UNTIL)) / (ROT_EVEN_MAP - ROT_EARLY_UNTIL)
+    );
+  return (
+    1 + (ROT_LATE_WEIGHT - 1) * Math.min(1, (map - ROT_EVEN_MAP) / (ROT_LATE_MAP - ROT_EVEN_MAP))
+  );
+}
+
+/**
  * How likely a theme is to be drawn into an offer set on this map (docs/ENEMIES.md 4.2, rule 1). Themes led by a faction
- * weigh 1. Ossuary-led themes thin out as the run goes on, so a skeleton map is still possible at map 60 but is rare.
+ * weigh 1. Ossuary-led themes thin out as the run goes on, so a skeleton map is still possible at map 60 but is rare; Rot-led
+ * themes are rarer early and commoner late.
  */
 export function themeWeight(t: Pick<ThemeDef, 'factions'>, map: number): number {
+  if (leaderOf(t) === 'rot') {
+    const share =
+      (t.factions?.rot ?? 0) / Object.values(t.factions ?? {}).reduce((a, b) => a + b, 0);
+    return 1 + (rotWeight(map) - 1) * Math.min(1, share / 0.85);
+  }
   if (!ossuaryLed(t) || map <= OSSUARY_FULL_UNTIL) return 1;
   if (map >= OSSUARY_LOW_MAP) return OSSUARY_LOW_WEIGHT;
   if (map <= OSSUARY_MID_MAP) {

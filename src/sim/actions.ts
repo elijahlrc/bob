@@ -785,7 +785,16 @@ export function fireEffect(w: World, a: Actor, act: Action): void {
       hit(w, a, e, p, act.hand, Math.hypot(e.x - a.x, e.y - a.y));
     // A monster's lob leaves a zone where it landed: a ground effect, which the character can see and step out of.
     if (b.zone && !a.isPlayer)
-      openZone(w, cx, cy, radius, b.zone.seconds, b.zone.kind, monsterHitOf(a) * b.zone.dps);
+      openZone(
+        w,
+        cx,
+        cy,
+        radius,
+        b.zone.seconds,
+        b.zone.kind,
+        monsterHitOf(a) * b.zone.dps,
+        !!a.mon?.kind.mires,
+      );
     return;
   }
   if (b.kind === 'beam') {

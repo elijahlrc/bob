@@ -25,6 +25,7 @@ import { cue, healed } from './cues';
 import { tickAbilities, tickChargingMod } from './abilities';
 import {
   isZone,
+  mirePlayer,
   openZone,
   pullPlayer,
   tickCorpses,
@@ -683,8 +684,10 @@ function tickEffects(w: World, dt: number): void {
             r: e.radius,
           });
       }
-      if (e.damage > 0 && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r)
+      const inside = p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r;
+      if (e.damage > 0 && inside)
         rawHit(w, p, e.damage, e.dtype, null, label, 'player', viaOf(w, e));
+      if (e.mire && inside && p.alive) mirePlayer(w, s, actorById(w, e.owner ?? 0) ?? undefined);
       // The character's minions standing in a monster's blast are hurt too.
       if (e.team === 1)
         for (const m of s.minions)

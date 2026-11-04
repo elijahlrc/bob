@@ -1,4 +1,5 @@
 import { mapPlayerMods } from './mapMods';
+import { rollVariant } from '../gen/population';
 import { Character, scenarioDps } from '../calc/character';
 import { buildMonster } from '../calc/monster';
 import { MONSTER_ATTACK_SPEED } from '../data/constants';
@@ -100,6 +101,7 @@ import {
 } from '../data/bosses';
 import { HEX_IDS } from '../data/hexes';
 import {
+  MONSTER_TYPES,
   monsterModDef,
   type MonsterModId,
   type MonsterTypeId,
@@ -578,7 +580,13 @@ function bring(
   y: number,
   mods: MonsterModId[] = [],
 ): Actor {
-  const spec = { ...m.mon!.spec, type, rarity: 'normal' as const, mods };
+  // A boss's soldiers carry the map's elements like any of their kind (they were all plain until 2026-11-04: a plain mage is
+  // half physical; docs/ENEMY-DAMAGE.md).
+  // (A boss's own pieces, a witness or a shard, stay as they are: an element would change their fight.)
+  const variant = MONSTER_TYPES[type].bossOnly
+    ? m.mon!.spec.variant
+    : rollVariant(w.rngAi, type, w.plan.theme, w.plan.areaLevel);
+  const spec = { ...m.mon!.spec, type, variant, rarity: 'normal' as const, mods };
   const a = spawnMonster(w, spec, x, y, m.room, m.pack, '');
   a.name = a.mon!.kind.name;
   a.noReward = true;

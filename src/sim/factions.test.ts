@@ -14,6 +14,7 @@ import {
   CORPSE_LIFE,
   HAG_RAISE_INTERVAL,
   isZone,
+  moveMult,
   registerBlast,
   shieldBlocks,
   SHAMBLER_RISE_TIME,
@@ -147,22 +148,23 @@ describe('the factions (EXPANSION 7.3)', () => {
     expect(w.corpses).toHaveLength(0);
   });
 
-  it('a Bloater bursts on contact into a caustic cloud that hurts for four seconds', () => {
+  it('a Bloater bursts on contact: its gas ignites, a warned blast and burning ground for four seconds', () => {
     const w = arena();
     const m = put(w, 'bloater', 1.4);
     run(w, 0.5);
     expect(m.alive).toBe(false);
     expect(m.noReward).toBe(true);
+    expect(w.effects.some((e) => e.kind === 'volatile' && e.dtype === 3)).toBe(true);
     const zones = w.effects.filter(isZone);
     expect(zones).toHaveLength(1);
-    expect(zones[0].kind).toBe('caustic');
-    expect(zones[0].dtype).toBe(4);
-    // The player stands inside it: pulses of chaos damage land (the arena refills life each tick).
+    expect(zones[0].kind).toBe('burning');
+    expect(zones[0].dtype).toBe(3);
+    // The player stands inside it: pulses of fire damage land (the arena refills life each tick).
     let pulses = 0;
     for (let k = 0; k < 60; k++) {
       stepWorld(w);
       pulses += w.events.filter(
-        (e) => e.t === 'hit' && e.dst === w.sides[0].player.id && e.dtype === 4,
+        (e) => e.t === 'hit' && e.dst === w.sides[0].player.id && e.dtype === 3,
       ).length;
     }
     expect(pulses).toBeGreaterThanOrEqual(3);
@@ -170,7 +172,7 @@ describe('the factions (EXPANSION 7.3)', () => {
     expect(w.effects.filter(isZone)).toHaveLength(0);
   });
 
-  it('a Bloater killed from afar also leaves its cloud', () => {
+  it('a Bloater killed from afar also leaves its fire', () => {
     const w = arena();
     const m = put(w, 'bloater', 8);
     applyDamage(w, m, [m.def.maxLife * 2, 0, 0, 0, 0]);
@@ -335,6 +337,18 @@ describe('the factions (EXPANSION 7.3)', () => {
             (id) => id === 'carrionMother' || id === 'unremembered',
           ),
         ).toBe(false);
+  });
+
+  it('a Brine Leech bite and a Warden Pylon pulse put the Mire on: a heavy slow, not a chill', () => {
+    for (const type of ['leech', 'pylon'] as const) {
+      const w = arena();
+      const p = w.sides[0].player;
+      put(w, type, 1.6);
+      for (let k = 0; k < 900 && !p.hexes.some((h) => h.id === 'mire'); k++) stepWorld(w);
+      expect(p.hexes.map((h) => h.id)).toContain('mire');
+      expect(moveMult(p)).toBeLessThan(0.65);
+      expect(p.ail.chill).toBe(0);
+    }
   });
 
   for (const theme of ['charnelPits', 'hollowVigil']) {

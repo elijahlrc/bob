@@ -6,10 +6,13 @@ import { themeInfo } from './themeInfo';
 /** A boss map's card counts the boss's damage (docs/NEWPLAYER.md N12). */
 describe('the damage mix on a boss map’s card', () => {
   it('shows the Tollkeeper’s lightning whatever the theme', () => {
+    const fight = BOSSES.tollkeeper.fightMix[1];
     for (const theme of THEMES) {
       const plain = themeInfo(theme, [], 'plain', 10).mix;
       const boss = themeInfo(theme, [], 'plain', 10, 'tollkeeper').mix;
-      expect(boss[1], theme.id).toBeGreaterThan(Math.max(0.15, plain[1]));
+      // The card leans to the fight's lightning (a storm crypt has as much of its own).
+      expect(boss[1], theme.id).toBeGreaterThan(0.15);
+      expect(Math.abs(boss[1] - fight), theme.id).toBeLessThan(Math.abs(plain[1] - fight) + 1e-9);
     }
   });
 

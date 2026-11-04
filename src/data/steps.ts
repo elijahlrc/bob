@@ -74,6 +74,7 @@ export const STEP_OF_VARIANT: Record<Variant, StepId> = {
   fire: 'cinder',
   cold: 'rime',
   lightning: 'bolt',
+  chaos: 'quick',
 };
 
 /** A Blinking monster steps about this often (the first after a random part of it), from at least this far and no further. */

@@ -10,6 +10,7 @@ import {
   RARE_MONSTER_FIRST,
   RARE_MONSTER_SECOND,
   VARIANT_NAMES,
+  CHAOS_VARIANT_FROM,
   type FactionId,
   type MonsterModId,
   type MonsterRarity,
@@ -58,15 +59,16 @@ const AREA_MIN = 0.55;
 const AREA_MAX = 1.6;
 
 /** How common each type is within its faction. */
+/** How common each type is within its faction (2026-11-04: more archers, mages and spitters, fewer brawlers; docs/ENEMY-DAMAGE.md). */
 export const TYPE_WEIGHTS: Record<MonsterTypeId, number> = {
-  warrior: 50,
+  warrior: 40,
   brute: 15,
-  archer: 20,
-  mage: 15,
+  archer: 28,
+  mage: 18,
   shieldbearer: 8,
-  shambler: 40,
+  shambler: 34,
   bloater: 25,
-  spitter: 20,
+  spitter: 26,
   hag: 10,
   gloomstalker: 35,
   wailer: 25,
@@ -166,11 +168,13 @@ export function typeShares(
   }
   return out;
 }
+/** How often each variant rolls (55 plain until 2026-11-04; the plague variant only from `CHAOS_VARIANT_FROM`; docs/ENEMY-DAMAGE.md). */
 export const ELEMENT_WEIGHTS: Record<Variant, number> = {
-  none: 55,
+  none: 35,
   fire: 15,
   cold: 15,
   lightning: 15,
+  chaos: 25,
 };
 
 export function rollType(
@@ -188,13 +192,32 @@ export function rollType(
 export const neverPlain = (type: MonsterTypeId): boolean =>
   type === 'mage' || !!MONSTER_TYPES[type].elemental;
 
-export function rollVariant(rng: Rng, type: MonsterTypeId, theme: ThemeDef): Variant {
+/** The variants a type can roll on a map of this level, with their weights (the threat preview reads the same). */
+export function variantWeights(
+  type: MonsterTypeId,
+  theme: Pick<ThemeDef, 'elementWeights'>,
+  level: number,
+): [Variant, number][] {
   // Casters of the Rot and the Hollow have an element of their own.
-  if (MONSTER_TYPES[type].innate) return 'none';
-  const vs = (Object.keys(ELEMENT_WEIGHTS) as Variant[]).filter(
-    (v) => !neverPlain(type) || v !== 'none',
+  if (MONSTER_TYPES[type].innate) return [['none', 1]];
+  return (Object.keys(ELEMENT_WEIGHTS) as Variant[])
+    .filter((v) => !neverPlain(type) || v !== 'none')
+    .filter((v) => v !== 'chaos' || (level >= CHAOS_VARIANT_FROM && !MONSTER_TYPES[type].elemental))
+    .map((v) => [v, ELEMENT_WEIGHTS[v] * (theme.elementWeights[v] ?? 1)]);
+}
+
+export function rollVariant(
+  rng: Rng,
+  type: MonsterTypeId,
+  theme: ThemeDef,
+  level: number,
+): Variant {
+  const ws = variantWeights(type, theme, level);
+  if (ws.length === 1) return ws[0][0];
+  return rng.weighted(
+    ws.map(([v]) => v),
+    (v) => ws.find(([x]) => x === v)![1],
   );
-  return rng.weighted(vs, (v) => ELEMENT_WEIGHTS[v] * (theme.elementWeights[v] ?? 1));
 }
 
 /** Mods held back on early maps (tunable; bot-balanced, see Appendix A). */
@@ -403,7 +426,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
     const type = forced ?? rollType(rng, mix);
     return {
       type,
-      variant: rollVariant(rng, type, opts.theme),
+      variant: rollVariant(rng, type, opts.theme, opts.areaLevel),
       rarity,
       level,
       mods: rollMonsterMods(rng, rarity, level),
@@ -567,7 +590,7 @@ function populateRaw(rng: Rng, lab: Labyrinth, opts: PopulateOpts): Population {
             type: champ.type,
             variant:
               MONSTER_TYPES[champ.type].elemental || champ.mod === 'boneWarden'
-                ? rollVariant(rng, champ.type, opts.theme)
+                ? rollVariant(rng, champ.type, opts.theme, opts.areaLevel)
                 : 'none',
             mods: [...leader.mods.slice(0, 3), champ.mod].sort(),
           };

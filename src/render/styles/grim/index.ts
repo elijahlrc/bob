@@ -84,6 +84,7 @@ const ELEMENT_LIGHT: Record<string, number> = {
   fire: 0xff7a2a,
   cold: 0x5aa8ff,
   lightning: 0xb070ff,
+  chaos: 0x8ad040,
 };
 /** What a monster looks like: its type (the kit), faction (the palette) and element (the accent); heroes have none. */
 function lookOf(a: Actor): MonsterLook | undefined {
