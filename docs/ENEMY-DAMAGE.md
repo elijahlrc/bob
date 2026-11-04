@@ -225,7 +225,7 @@ The damage types land on the targets. Where it differs from section 4:
 
 - **Conversions** as in 4, by mods on the types. The Sentinel's nova turns 90% to lightning and its slam stays physical,
   so it is 58% physical in all (the slam is a big part of what it deals).
-- **Variants:** skeletons, Kennel Hounds and Gilded Guards roll them; 35 plain in 95 (was 55 in 100), converting 75% (was
+- **Variants:** skeletons, Kennel Hounds and Gilded Guards roll them; 35 plain in 80, in 105 from area level 41 (was 55 in 100), converting 75% (was
   60%). **Plague**, the chaos variant, rolls from area level 41 (weight 25; `CHAOS_VARIANT_FROM`).
 - **The Rot later:** its themes weigh 0.5 until map 20, 1 by map 40, 2 by map 80, in proportion to the Rot's share of the
   theme (`themeWeight`). The Rot is in nearly every offer set from map 4 anyway (an offer set prefers three leading

@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 import { Rng } from './core/rng';
-import { MONSTER_TYPES, type MonsterTypeId } from './data/monsters';
+import { MONSTER_TYPES, type MonsterTypeId, type Variant } from './data/monsters';
 import { BOSSES, type BossId } from './data/bosses';
 import { spawnMonster } from './sim/world';
 import { ITEM_BASES, itemBase } from './data/bases';
@@ -78,7 +78,14 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
      */
     async monsters(
       ids: MonsterTypeId[] = Object.keys(MONSTER_TYPES) as MonsterTypeId[],
-      opts: { level?: number; fight?: boolean; warm?: number; cols?: number; ring?: number } = {},
+      opts: {
+        level?: number;
+        fight?: boolean;
+        warm?: number;
+        cols?: number;
+        ring?: number;
+        variant?: Variant;
+      } = {},
     ): Promise<number> {
       controller.startShowcase(false);
       controller.setSpeed(1);
@@ -102,7 +109,7 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
         const y = spot.y;
         const spec = {
           type: id,
-          variant: 'none' as const,
+          variant: opts.variant ?? ('none' as const),
           rarity: 'normal' as const,
           level: opts.level ?? 30,
           mods: [],
