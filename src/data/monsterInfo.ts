@@ -26,11 +26,11 @@ export const FACTION_RULES: Partial<Record<FactionId, string>> = {
   kennel: 'Hounds leap from a distance; Handlers speed the pack up.',
   gilded: 'Cutpurses steal flask charges; Bursars stop your recovery.',
   drowned:
-    'Tidecallers hook you and drag you in; Wracks and Leeches slow you; Drowners come up under you.',
+    'Tidecallers hook you and drag you in; Wracks slow you and Leeches mire you; Drowners come up under you.',
   emberborn:
-    'Slag Brutes leave burning ground; Pyre Priests set fire to where you stand; Cinderlings burn out where they fall.',
+    'Slag Brutes leave burning ground; Pyre Priests set fire to where you stand; Cinderlings burst into flame.',
   swarm: 'Gnawers come in packs of a dozen or more.',
-  rot: 'Dead Shamblers rise again; Bloaters leave clouds.',
+  rot: 'Dead Shamblers rise again; Bloaters burst into flame; Spitters mire you.',
 };
 
 /** The colour a faction is drawn in (the chips on the camp card and the monsters on the map), and a glyph that does not need it. */
