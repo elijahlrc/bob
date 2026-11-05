@@ -14,6 +14,8 @@ change, and our own names only. Dash bullets under plain headings.
 - Sentinels hit about 10% less hard.
 - The Siege Marshal brings about half as many archers and mages and more warriors, with more still as he weakens.
 - Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
+- Monsters notice your character from about 30% farther away.
+- In duels, the Rares first target setting now goes for the other character before any of its minions.
 
 ### Skills and items
 
@@ -24,6 +26,7 @@ change, and our own names only. Dash bullets under plain headings.
 
 - Flasks pulse when drunk.
 - Fixed resistances sometimes showing long decimals.
+- Picking a socketed skill on the Skills tab shows its critical strike chance and damage.
 
 ### Known issues
 
