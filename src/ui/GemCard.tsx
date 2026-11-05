@@ -6,7 +6,18 @@ import { TAG_GLOSSARY } from '../data/glossary';
 import { infoProps } from './info';
 
 /** What a gem does at a given level: type, tags, stats, effects, requirements. */
-export function GemCard({ gemId, level, tip }: { gemId: string; level: number; tip?: boolean }) {
+export function GemCard({
+  gemId,
+  level,
+  tip,
+  extra,
+}: {
+  gemId: string;
+  level: number;
+  tip?: boolean;
+  /** A line about the gem where it stands (a socketed skill's crit chance), under its effects. */
+  extra?: string;
+}) {
   const d = gemCardData(gemDef(gemId), level);
   const kind = gemDef(gemId).kind;
   return (
@@ -37,6 +48,7 @@ export function GemCard({ gemId, level, tip }: { gemId: string; level: number; t
           {l}
         </div>
       ))}
+      {extra && <div class="ic-mod">{extra}</div>}
       <div class="ic-base">{d.description}</div>
       <div class="muted">Requires {d.requires}</div>
     </div>
@@ -49,11 +61,13 @@ export function GemTip({
   level,
   x,
   y,
+  extra,
 }: {
   gemId: string;
   level: number;
   x: number;
   y: number;
+  extra?: string;
 }) {
   // By the cursor (or the tap), in interface pixels (uiScale.ts), and always wholly on screen: the card is measured once
   // drawn, then put below the point if it fits there, above it if it fits there, else as near as the window allows. A
@@ -88,7 +102,7 @@ export function GemTip({
     // A phone turned on its side moves the window's edges: placed again.
     window.addEventListener('resize', place);
     return () => window.removeEventListener('resize', place);
-  }, [gemId, level, x, y]);
+  }, [gemId, level, x, y, extra]);
   return (
     // Hidden until placed, so it never shows a frame in the wrong spot.
     <div
@@ -96,7 +110,7 @@ export function GemTip({
       ref={ref}
       style={{ visibility: 'hidden', left: '0px', top: '0px' }}
     >
-      <GemCard gemId={gemId} level={level} tip />
+      <GemCard gemId={gemId} level={level} tip extra={extra} />
     </div>
   );
 }

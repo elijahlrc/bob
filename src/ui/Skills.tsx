@@ -176,15 +176,35 @@ export function Skills({
       document.querySelector(`[data-slot="${focusSlot}"]`)?.scrollIntoView({ block: 'center' });
   }, [focusSlot]);
   const [q, setQ] = useState(() => loadPref('gemSearch', ''));
-  const [tip, setTip] = useState<{ gemId: string; level: number; x: number; y: number } | null>(
-    null,
-  );
-  const hoverGem = (gemId: string, level: number) =>
+  const [tip, setTip] = useState<{
+    gemId: string;
+    level: number;
+    x: number;
+    y: number;
+    extra?: string;
+  } | null>(null);
+  // A socketed skill's own critical strike chance and damage, on its card: the tab shows them nowhere else (the owner,
+  // 2026-11-04). Worked out when the card opens, not on every move of the pointer.
+  const critOf = (uid: number | undefined): string | undefined => {
+    const a = uid === undefined ? undefined : ch.actives.find((x) => x.gemUid === uid);
+    if (!a?.usable || a.skill.utility) return undefined;
+    const s = ch.skillSheet(a);
+    return s.avgHit > 0
+      ? `Your crit chance ${Math.round(s.critChance * 1000) / 10}%, crit damage ${Math.round(s.critMulti * 100)}%`
+      : undefined;
+  };
+  const hoverGem = (gemId: string, level: number, uid?: number) =>
     coarse
       ? {}
       : {
-          onMouseEnter: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
-          onMouseMove: (e: MouseEvent) => setTip({ gemId, level, x: e.clientX, y: e.clientY }),
+          onMouseEnter: (e: MouseEvent) =>
+            setTip({ gemId, level, x: e.clientX, y: e.clientY, extra: critOf(uid) }),
+          onMouseMove: (e: MouseEvent) =>
+            setTip((t) =>
+              t && t.gemId === gemId
+                ? { ...t, x: e.clientX, y: e.clientY }
+                : { gemId, level, x: e.clientX, y: e.clientY, extra: critOf(uid) },
+            ),
           onMouseLeave: () => setTip(null),
         };
   // Socketing and unsocketing edit the inventory array in place, so its identity says nothing about what is in it: key the list
@@ -387,7 +407,13 @@ export function Skills({
   useEffect(() => {
     if (!card || !picked) return;
     const r = barRef.current?.getBoundingClientRect();
-    setTip({ gemId: picked.d.id, level: picked.level, x: r ? r.left + 8 : 8, y: r ? r.top : 0 });
+    setTip({
+      gemId: picked.d.id,
+      level: picked.level,
+      x: r ? r.left + 8 : 8,
+      y: r ? r.top : 0,
+      extra: pick?.from === 'socket' ? critOf(picked.uid) : undefined,
+    });
   }, [card]);
   useEffect(() => {
     if (!coarse) return;
@@ -471,17 +497,6 @@ export function Skills({
     return { acts: null };
   })();
   const note = msg || bar.note;
-  // A picked socketed skill's own critical strike chance and damage, which the tab shows nowhere else (the owner, 2026-11-04).
-  const critLine = (() => {
-    if (pick?.from !== 'socket' || !picked || picked.d.kind !== 'active' || picked.d.utility)
-      return null;
-    const a = ch.actives.find((x) => x.gemUid === picked.uid);
-    if (!a?.usable) return null;
-    const s = ch.skillSheet(a);
-    return s.avgHit > 0
-      ? `Crit chance ${Math.round(s.critChance * 1000) / 10}%, crit damage ${Math.round(s.critMulti * 100)}%`
-      : null;
-  })();
 
   const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
@@ -677,7 +692,7 @@ export function Skills({
                                 setOver(null);
                               }}
                               {...common}
-                              {...hoverGem(g.gemId, levelOf(g.uid))}
+                              {...hoverGem(g.gemId, levelOf(g.uid), g.uid)}
                               onClick={() => onSocketTap(ref, true)}
                             >
                               <Stone
@@ -848,8 +863,6 @@ export function Skills({
           <span class="sk-barsub sk-bad" title={note}>
             {note}
           </span>
-        ) : critLine ? (
-          <span class="sk-barsub">{critLine}</span>
         ) : (
           !pick && <span class="sk-barsub">{tap} a gem or a socket</span>
         )}
