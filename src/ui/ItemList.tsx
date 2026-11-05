@@ -5,16 +5,25 @@ import { slotsFor } from '../run/inventory';
 import {
   slotName,
   SORT_LABELS,
-  type FilterKey,
+  type ItemGroup,
   type ItemInfo,
   type SortKey,
 } from '../run/inventoryOps';
+import { GLOSSARY } from '../data/glossary';
 import { itemTitle, rarityClass } from './ItemCard';
 import { infoProps } from './info';
+import { introSeen, seeIntro } from './intro';
 
-/** What kind of thing (one at a time) and which view of the bag (one at a time); the two combine. */
-export type What = Extract<FilterKey, 'all' | 'weapon' | 'armour' | 'jewellery' | 'flask' | 'gem'>;
-export type View = 'all' | 'new' | 'upgrades' | 'last' | 'fav' | 'discarded';
+/** A mark the bag can be narrowed to: new, an upgrade, from the last map, a favourite. */
+export type Mark = 'new' | 'upgrades' | 'last' | 'fav';
+/**
+ * The bag's filters, combined freely (the owner, 2026-11-04): any of the kinds turned on (none is every kind), every mark turned
+ * on, and the discarded pile in place of the bag.
+ */
+export type Filters = { kinds: ItemGroup[]; marks: Mark[]; pile: boolean };
+export const NO_FILTERS: Filters = { kinds: [], marks: [], pile: false };
+/** A kind, or every kind (the first glyph button). */
+type What = ItemGroup | 'all';
 /** The bag's order: the run's sorts, or favourites first (newest first inside both groups). */
 export type ListSort = SortKey | 'fav';
 
@@ -28,13 +37,11 @@ const WHATS: [What, string, string][] = [
   ['gem', 'Gems', 'gem'],
 ];
 
-const VIEWS: [View, string][] = [
-  ['all', 'All'],
+const MARKS: [Mark, string][] = [
   ['new', 'New'],
   ['upgrades', 'Upgrades'],
   ['last', 'Last map'],
   ['fav', '★'],
-  ['discarded', 'Discarded'],
 ];
 
 const SORTS: [ListSort, string][] = [
@@ -152,10 +159,8 @@ type Props = {
   setSort: (s: ListSort) => void;
   desc: boolean;
   setDesc: (d: boolean) => void;
-  what: What;
-  setWhat: (w: What) => void;
-  view: View;
-  setView: (v: View) => void;
+  filters: Filters;
+  setFilters: (f: Filters) => void;
   unseenCount: number;
   junkCount: number;
   onMarkSeen: () => void;
@@ -169,13 +174,15 @@ type Props = {
   dragFromSlot: boolean;
 };
 
-/** Whether the list is narrowed by anything the player set: a kind, a view, or words in the search box (the sort is an order). */
-export function isFiltered(what: What, view: View, search: string): boolean {
-  return what !== 'all' || view !== 'all' || search.trim() !== '';
+/** Whether the list is narrowed by anything the player set: a kind, a mark, the pile, or words in the search box (the sort is an order). */
+export function isFiltered(f: Filters, search: string): boolean {
+  return f.kinds.length > 0 || f.marks.length > 0 || f.pile || search.trim() !== '';
 }
 
 const kindLabel = (k: What) => WHATS.find(([w]) => w === k)![1];
-const viewLabel = (v: View) => VIEWS.find(([w]) => w === v)![1];
+const markLabel = (m: Mark) => MARKS.find(([w]) => w === m)![1];
+const toggle = <T,>(xs: T[], x: T): T[] =>
+  xs.includes(x) ? xs.filter((y) => y !== x) : [...xs, x];
 
 /**
  * The bag (docs/mockups/style/STYLE-GUIDE.md section 10): the views as tabs, the kinds as glyph buttons, search and
@@ -184,13 +191,28 @@ const viewLabel = (v: View) => VIEWS.find(([w]) => w === v)![1];
  */
 export function ItemList(p: Props) {
   const [sheet, setSheet] = useState(false);
-  const filtered = isFiltered(p.what, p.view, p.search);
+  const f = p.filters;
+  const filtered = isFiltered(f, p.search);
+  // The tip on what the filters and an upgrade are: once per device, the first time the Filter sheet opens or Upgrades is
+  // turned on.
+  const [tip, setTip] = useState(false);
+  const meetFilters = () => {
+    if (!introSeen('filters')) setTip(true);
+  };
+  const tipSeen = () => {
+    seeIntro('filters');
+    setTip(false);
+  };
   const clear = () => {
-    p.setWhat('all');
-    p.setView('all');
+    p.setFilters(NO_FILTERS);
     p.setSearch('');
   };
-  const count = (v: View) => (v === 'all' ? 0 : p.counts[v]);
+  const setMarks = (marks: Mark[]) => p.setFilters({ ...f, marks });
+  const flipMark = (m: Mark) => {
+    if (m === 'upgrades' && !f.marks.includes(m)) meetFilters();
+    setMarks(toggle(f.marks, m));
+  };
+  const setKinds = (kinds: ItemGroup[]) => p.setFilters({ ...f, kinds });
   const search = (
     <input
       class="ix-search"
@@ -228,41 +250,81 @@ export function ItemList(p: Props) {
   );
   const views = (
     <div class="ix-views" role="group" aria-label="Show">
-      {VIEWS.map(([k, label]) => (
-        <button
-          key={k}
-          class={'ix-view' + (p.view === k ? ' on' : '')}
-          data-paint={p.view === k ? 'panel' : 'none'}
-          data-thin
-          data-field="gold"
-          aria-pressed={p.view === k}
-          aria-label={k === 'fav' ? 'Favourites' : undefined}
-          onClick={() => p.setView(k)}
-        >
-          {label}
-          {count(k) > 0 && <span class="n"> {count(k)}</span>}
-        </button>
-      ))}
+      <button
+        class={'ix-view' + (!f.marks.length && !f.pile ? ' on' : '')}
+        data-paint={!f.marks.length && !f.pile ? 'panel' : 'none'}
+        data-thin
+        data-field="gold"
+        aria-pressed={!f.marks.length && !f.pile}
+        onClick={() => p.setFilters({ ...f, marks: [], pile: false })}
+      >
+        All
+      </button>
+      {MARKS.map(([k, label]) => {
+        const on = f.marks.includes(k);
+        return (
+          <button
+            key={k}
+            class={'ix-view' + (on ? ' on' : '')}
+            data-paint={on ? 'panel' : 'none'}
+            data-thin
+            data-field="gold"
+            aria-pressed={on}
+            aria-label={k === 'fav' ? 'Favourites' : undefined}
+            {...(k === 'upgrades' ? infoProps(GLOSSARY.upgrade) : {})}
+            onClick={() => flipMark(k)}
+          >
+            {label}
+            {p.counts[k] > 0 && <span class="n"> {p.counts[k]}</span>}
+          </button>
+        );
+      })}
+      <button
+        class={'ix-view' + (f.pile ? ' on' : '')}
+        data-paint={f.pile ? 'panel' : 'none'}
+        data-thin
+        data-field="gold"
+        aria-pressed={f.pile}
+        onClick={() => p.setFilters({ ...f, pile: !f.pile })}
+      >
+        Discarded
+        {p.counts.discarded > 0 && <span class="n"> {p.counts.discarded}</span>}
+      </button>
     </div>
   );
   const kinds = (
     <div class="ix-kinds" role="group" aria-label="Kind">
-      {WHATS.map(([k, label, glyph]) => (
-        <button
-          key={k}
-          class={'ix-kind' + (p.what === k ? ' on' : '')}
-          data-paint="panel"
-          data-thin
-          data-field={p.what === k ? 'gold' : 'lapis'}
-          data-pk={p.what === k ? 'on' : 'off'}
-          aria-pressed={p.what === k}
-          aria-label={label}
-          {...infoProps(label)}
-          onClick={() => p.setWhat(k)}
-        >
-          <i data-paint="glyph" data-glyph={glyph} data-pk={`${glyph}${p.what === k}`} />
-        </button>
-      ))}
+      {WHATS.map(([k, label, glyph]) => {
+        const on = k === 'all' ? !f.kinds.length : f.kinds.includes(k);
+        return (
+          <button
+            key={k}
+            class={'ix-kind' + (on ? ' on' : '')}
+            data-paint="panel"
+            data-thin
+            data-field={on ? 'gold' : 'lapis'}
+            data-pk={on ? 'on' : 'off'}
+            aria-pressed={on}
+            aria-label={label}
+            {...infoProps(label)}
+            onClick={() => setKinds(k === 'all' ? [] : toggle(f.kinds, k))}
+          >
+            <i data-paint="glyph" data-glyph={glyph} data-pk={`${glyph}${on}`} />
+          </button>
+        );
+      })}
+    </div>
+  );
+  // The once-only tip: filters combine, and what makes an upgrade.
+  const tipBox = tip && (
+    <div class="tip ix-ftip" data-paint="panel" data-thin>
+      <div class="tip-text">
+        Filters combine: turn on several and the bag shows what matches them all (any one of the
+        kinds you pick). Upgrades: {GLOSSARY.upgrade}
+      </div>
+      <button class="btn small" onClick={tipSeen}>
+        Got it
+      </button>
     </div>
   );
   // The housekeeping, always in sight at the foot of the bag: the two salvages share a line.
@@ -296,8 +358,8 @@ export function ItemList(p: Props) {
       Clear filters
     </button>
   );
-  // How many of the two filters are set: what the Filter button counts.
-  const active = (p.what !== 'all' ? 1 : 0) + (p.view !== 'all' ? 1 : 0);
+  // How many filters are set: what the Filter button counts.
+  const active = f.kinds.length + f.marks.length + (f.pile ? 1 : 0);
   return (
     <div
       class={'ix-list-col' + (p.dragFromSlot ? ' drop' : '')}
@@ -313,33 +375,52 @@ export function ItemList(p: Props) {
         <>
           <div class="ix-tools phone">
             {search}
-            <button class="btn small ix-fbtn" aria-expanded={sheet} onClick={() => setSheet(true)}>
+            <button
+              class="btn small ix-fbtn"
+              aria-expanded={sheet}
+              onClick={() => {
+                setSheet(true);
+                meetFilters();
+              }}
+            >
               Filter{active > 0 && <span class="n"> {active}</span>} ▾
             </button>
           </div>
-          {(p.what !== 'all' || p.view !== 'all' || filtered) && (
+          {filtered && (
             <div class="ix-chips">
-              {p.what !== 'all' && (
+              {f.kinds.map((k) => (
+                <button
+                  key={k}
+                  class="ix-rm"
+                  aria-label={`Remove the ${kindLabel(k)} filter`}
+                  onClick={() => setKinds(f.kinds.filter((x) => x !== k))}
+                >
+                  {kindLabel(k)} <i>×</i>
+                </button>
+              ))}
+              {f.marks.map((m) => (
+                <button
+                  key={m}
+                  class="ix-rm"
+                  aria-label={`Remove the ${markLabel(m)} filter`}
+                  onClick={() => setMarks(f.marks.filter((x) => x !== m))}
+                >
+                  {markLabel(m)} ({p.counts[m]}) <i>×</i>
+                </button>
+              ))}
+              {f.pile && (
                 <button
                   class="ix-rm"
-                  aria-label={`Remove the ${kindLabel(p.what)} filter`}
-                  onClick={() => p.setWhat('all')}
+                  aria-label="Remove the Discarded filter"
+                  onClick={() => p.setFilters({ ...f, pile: false })}
                 >
-                  {kindLabel(p.what)} <i>×</i>
+                  Discarded ({p.counts.discarded}) <i>×</i>
                 </button>
               )}
-              {p.view !== 'all' && (
-                <button
-                  class="ix-rm"
-                  aria-label={`Remove the ${viewLabel(p.view)} filter`}
-                  onClick={() => p.setView('all')}
-                >
-                  {viewLabel(p.view)} ({count(p.view)}) <i>×</i>
-                </button>
-              )}
-              {filtered && clearButton('ix-rm clr')}
+              {clearButton('ix-rm clr')}
             </div>
           )}
+          {!sheet && tipBox}
           {sheet && (
             <>
               <div class="ix-tidy-veil" onClick={() => setSheet(false)} />
@@ -354,6 +435,7 @@ export function ItemList(p: Props) {
                     ×
                   </button>
                 </div>
+                {tipBox}
                 {views}
                 {kinds}
                 <div class="ix-fsort">
@@ -381,20 +463,19 @@ export function ItemList(p: Props) {
             {reverse}
           </div>
           {kinds}
-          {(p.what !== 'all' || p.search.trim() !== '') && (
-            <div class="ix-chips">{clearButton('ix-rm clr')}</div>
-          )}
+          {filtered && <div class="ix-chips">{clearButton('ix-rm clr')}</div>}
+          {tipBox}
         </>
       )}
       <div class="ix-list">
         {p.rows.length === 0 && (
           <div class="muted ix-nothing">
-            {p.view === 'discarded' && p.what === 'all' && !p.search.trim()
+            {f.pile && !f.kinds.length && !f.marks.length && !p.search.trim()
               ? 'Nothing is discarded.'
               : p.total === 0 && !filtered
                 ? 'The bag is empty.'
                 : 'Nothing matches. '}
-            {(p.what !== 'all' || p.search.trim() !== '') && (
+            {filtered && !(f.pile && !f.kinds.length && !f.marks.length && !p.search.trim()) && (
               <button class="link" onClick={clear}>
                 Clear filters
               </button>

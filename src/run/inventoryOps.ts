@@ -122,10 +122,16 @@ function naturalLabel(it: InventoryItem): string {
 
 const pct = (a: number, b: number) => (a > 0 ? ((b - a) / a) * 100 : 0);
 
+/**
+ * What the bag weighs an item by: DPS × effective HP, with mana left out (the owner, 2026-11-04: what mana can pay for is too
+ * hard to read for this to mean anything). The bot weighs its own choices with mana (`score` in bot.ts).
+ */
+const bagScore = (s: CharacterSheet): number => Math.max(0.1, sheetDps(s)) * Math.max(1, s.ehp);
+
 /** Upgrade information for every inventory item (computed once per build/inventory change). */
 export function itemInfos(run: RunState): Map<number, ItemInfo> {
   const base = sheetOf(run);
-  const baseScore = score(base);
+  const baseScore = bagScore(base);
   const out = new Map<number, ItemInfo>();
   let now: Character | undefined;
   for (const it of run.inventory) {
@@ -156,7 +162,7 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
           continue;
         }
         const s = sheetOf(run, dry.build);
-        const sc = score(s);
+        const sc = bagScore(s);
         if (sc > best) {
           best = sc;
           info.slot = slot;
@@ -227,7 +233,11 @@ function name(it: InventoryItem): string {
   return it.kind === 'gem' ? gemDef(it.gemId).name : it.name;
 }
 
-/** Whether an item is an upgrade worth highlighting. */
+/**
+ * Whether an item is an upgrade: worn in its best slot, it raises DPS × effective HP by more than 0.5% (mana
+ * left out since 2026-11-04, the owner), so a big gain in one can outweigh a small loss in the other. A flask is one if it fills
+ * an empty flask slot or beats a worn one of its kind.
+ */
 export function isUpgrade(info: ItemInfo): boolean {
   return (
     info.group !== 'gem' &&
@@ -887,7 +897,7 @@ export function compareSlots(run: RunState, uid: number): SlotCompare[] {
   const it = run.inventory.find((x) => x.uid === uid);
   if (!it || it.kind !== 'item') return [];
   const base = sheetOf(run);
-  const baseScore = score(base);
+  const baseScore = bagScore(base);
   let ch: Character | undefined;
   const before = () => (ch ??= new Character(run.build, cfgFor(run)));
   const out: SlotCompare[] = slotsFor(it).map((slot) => {
@@ -913,7 +923,7 @@ export function compareSlots(run: RunState, uid: number): SlotCompare[] {
       c.delta = diffSheets(base, s);
       c.dpsPct = pct(sheetDps(base), sheetDps(s));
       c.ehpPct = pct(base.ehp, s.ehp);
-      c.scorePct = pct(baseScore, score(s));
+      c.scorePct = pct(baseScore, bagScore(s));
     }
     return c;
   });

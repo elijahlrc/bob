@@ -23,6 +23,7 @@ import {
   skillsLost,
   swapSockets,
   sortItems,
+  type ItemGroup,
 } from '../run/inventoryOps';
 import { Character } from '../calc/character';
 import { gemDef } from '../data/gems';
@@ -32,7 +33,7 @@ import { CleanUp } from './CleanUp';
 import { useViewport } from './device';
 import { Gear, gearSummary, type SlotMark } from './Gear';
 import { ItemDetail, type Sel } from './ItemDetail';
-import { ItemList, type ListSort, type View, type What } from './ItemList';
+import { ItemList, NO_FILTERS, type Filters, type ListSort, type Mark } from './ItemList';
 import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
@@ -41,17 +42,28 @@ import { sfx } from './sound/engine';
 
 type Drag = { kind: 'inv'; uid: number } | { kind: 'slot'; slot: EquipSlot } | null;
 
-const WHATS: What[] = ['all', 'weapon', 'armour', 'jewellery', 'flask', 'gem'];
-const VIEWS: View[] = ['all', 'new', 'upgrades', 'last', 'fav', 'discarded'];
+const KINDS: ItemGroup[] = ['weapon', 'armour', 'jewellery', 'flask', 'gem'];
+const MARKS: Mark[] = ['new', 'upgrades', 'last', 'fav'];
 
-/** The filters were one row of chips once (`inv.filter`); a saved value from then is read as either half. */
-function loadWhat(): What {
+/**
+ * The saved filters (`inv.filters`). Before they combined (2026-11-04) they were a kind and a view, one of each (`inv.what`,
+ * `inv.view`), and before that one row of chips (`inv.filter`); a value saved then is read as the filters it was.
+ */
+function loadFilters(): Filters {
+  const saved = loadPref<Filters | null>('inv.filters', null);
+  if (saved && Array.isArray(saved.kinds) && Array.isArray(saved.marks))
+    return {
+      kinds: saved.kinds.filter((k) => KINDS.includes(k)),
+      marks: saved.marks.filter((m) => MARKS.includes(m)),
+      pile: !!saved.pile,
+    };
   const w = loadPref<string>('inv.what', loadPref<string>('inv.filter', 'all'));
-  return WHATS.includes(w as What) ? (w as What) : 'all';
-}
-function loadView(): View {
   const v = loadPref<string>('inv.view', loadPref<string>('inv.filter', 'all'));
-  return VIEWS.includes(v as View) ? (v as View) : 'all';
+  return {
+    kinds: KINDS.includes(w as ItemGroup) ? [w as ItemGroup] : [],
+    marks: MARKS.includes(v as Mark) ? [v as Mark] : [],
+    pile: v === 'discarded',
+  };
 }
 
 /**
@@ -83,7 +95,7 @@ export function Items({
    * Open on this view with every kind of item shown, for this visit only: the player's own filters are not overwritten
    * (the camp opens on the last map's drops after a map, docs/STREAMLINE.md S2).
    */
-  startView?: View;
+  startView?: Mark;
 }) {
   const run = c.run!;
   const { layout, coarse } = useViewport();
@@ -94,11 +106,12 @@ export function Items({
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<ListSort>(() => loadPref<ListSort>('inv.sort', 'newest'));
   const [desc, setDesc] = useState<boolean>(() => loadPref<boolean>('inv.desc', false));
-  const [what, setWhat] = useState<What>(() => (startView ? 'all' : loadWhat()));
-  const [view, setView] = useState<View>(() => startView ?? loadView());
+  const [filters, setFilters] = useState<Filters>(() =>
+    startView ? { ...NO_FILTERS, marks: [startView] } : loadFilters(),
+  );
+  const pileOn = filters.pile;
   // A visit opened on `startView` saves the filters only once the player changes them.
-  const keepWhat = useRef(startView !== undefined);
-  const keepView = useRef(startView !== undefined);
+  const keepFilters = useRef(startView !== undefined);
   const [cleaning, setCleaning] = useState(false);
   // The worn gear is open, but on a phone the tab opens scrolled past it, on the bag (docs/ITEM-SLOTS.md 2.1).
   const [gearOpen, setGearOpen] = useState(true);
@@ -113,13 +126,9 @@ export function Items({
   useEffect(() => savePref('inv.sort', sort), [sort]);
   useEffect(() => savePref('inv.desc', desc), [desc]);
   useEffect(() => {
-    if (keepWhat.current) keepWhat.current = false;
-    else savePref('inv.what', what);
-  }, [what]);
-  useEffect(() => {
-    if (keepView.current) keepView.current = false;
-    else savePref('inv.view', view);
-  }, [view]);
+    if (keepFilters.current) keepFilters.current = false;
+    else savePref('inv.filters', filters);
+  }, [filters]);
 
   // An item stays NEW until the player looks at it (selects it) or marks everything seen.
   const unseen = useMemo(() => new Set(run.unseen), [run.unseen]);
@@ -151,17 +160,24 @@ export function Items({
   );
   // Opened on the upgrades after a level: with none, the last map's drops (or everything) instead of an empty list.
   useEffect(() => {
-    if (startView === 'upgrades' && view === 'upgrades' && counts.upgrades === 0)
-      setView(counts.last ? 'last' : 'all');
+    if (startView === 'upgrades' && counts.upgrades === 0)
+      setFilters({ ...NO_FILTERS, marks: counts.last ? ['last'] : [] });
   }, []);
   const terms = searchTerms(search);
   const visible = useMemo(() => {
-    let pool: InventoryItem[] = view === 'discarded' ? pile : run.inventory;
-    if (view === 'new') pool = pool.filter((x) => unseen.has(x.uid));
-    else if (view === 'last') pool = pool.filter((x) => lastDrops.has(x.uid));
-    else if (view === 'fav') pool = pool.filter((x) => favs.has(x.uid));
-    else if (view === 'upgrades') pool = filterItems(pool, infos, 'upgrades');
-    if (what !== 'all') pool = filterItems(pool, listInfos, what);
+    let pool: InventoryItem[] = pileOn ? pile : run.inventory;
+    // Every mark turned on, and any of the kinds (docs/ITEM-SLOTS.md; the owner, 2026-11-04).
+    for (const m of filters.marks)
+      pool =
+        m === 'new'
+          ? pool.filter((x) => unseen.has(x.uid))
+          : m === 'last'
+            ? pool.filter((x) => lastDrops.has(x.uid))
+            : m === 'fav'
+              ? pool.filter((x) => favs.has(x.uid))
+              : filterItems(pool, listInfos, 'upgrades');
+    if (filters.kinds.length)
+      pool = pool.filter((x) => filters.kinds.includes(listInfos.get(x.uid)!.group));
     if (terms.length) pool = pool.filter((x) => matchesTerms(searchText(x), terms));
     const sorted = sortItems(pool, listInfos, sort === 'fav' ? 'newest' : sort, desc);
     // Sorted by favourites: the starred ones first, newest first inside both groups.
@@ -175,8 +191,7 @@ export function Items({
     listInfos,
     sort,
     desc,
-    what,
-    view,
+    filters,
     search,
     lastDrops,
     unseen,
@@ -214,8 +229,7 @@ export function Items({
       if (slot) setSel({ from: 'slot', slot });
     }
     setSearch('');
-    setWhat('all');
-    setView('all');
+    setFilters(NO_FILTERS);
   }, [focus?.n]);
 
   const after = (r: { ok: boolean; reason?: string } | void, ok: () => void) => {
@@ -343,7 +357,7 @@ export function Items({
     c.craft((r) => salvageDiscarded(r));
     sfx('dust', pile.length > 1 ? 'many' : 'one');
     setSel(null);
-    if (view === 'discarded') setView('all');
+    if (pileOn) setFilters({ ...filters, pile: false });
   };
   const salvageJunk = async () => {
     if (!junk.length) return;
@@ -361,7 +375,7 @@ export function Items({
     setSel(null);
   };
   const step = (dir: -1 | 1) => {
-    const from = view === 'discarded' ? 'pile' : 'inv';
+    const from = pileOn ? 'pile' : 'inv';
     const cur = sel?.from === from ? visible.findIndex((x) => x.uid === sel.uid) : -1;
     const n = Math.max(0, Math.min(visible.length - 1, cur + dir));
     if (visible[n]) setSel({ from, uid: visible[n].uid });
@@ -369,8 +383,7 @@ export function Items({
   /** Filter the bag to its upgrades, best first, and bring the bag into view (docs/ITEM-SLOTS.md 2.5). */
   const showUpgrades = () => {
     setSearch('');
-    setWhat('all');
-    setView('upgrades');
+    setFilters({ ...NO_FILTERS, marks: ['upgrades'] });
     setSort('upgrade');
     setDesc(false);
     setSel(null);
@@ -548,7 +561,7 @@ export function Items({
         />
       </section>
       <section class="ix-listcol" aria-label="Bag">
-        {counts.upgrades > 0 && view !== 'upgrades' && (
+        {counts.upgrades > 0 && !filters.marks.includes('upgrades') && (
           <button class="btn primary ix-cta" onClick={showUpgrades}>
             {counts.upgrades} upgrade{counts.upgrades > 1 ? 's' : ''} in the bag: show them
           </button>
@@ -571,16 +584,14 @@ export function Items({
           setSort={setSort}
           desc={desc}
           setDesc={setDesc}
-          what={what}
-          setWhat={setWhat}
-          view={view}
-          setView={setView}
+          filters={filters}
+          setFilters={setFilters}
           unseenCount={counts.new}
           junkCount={junk.length}
           onMarkSeen={() => c.act((r) => markSeen(r, 'all'))}
           onCleanUp={() => setCleaning(true)}
           onSalvageJunk={() => void salvageJunk()}
-          onSelect={(uid) => setSel({ from: view === 'discarded' ? 'pile' : 'inv', uid })}
+          onSelect={(uid) => setSel({ from: pileOn ? 'pile' : 'inv', uid })}
           onQuick={doQuick}
           onPeek={setPeek}
           onDrag={(uid) => setDrag(uid === null ? null : { kind: 'inv', uid })}

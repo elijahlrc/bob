@@ -4,7 +4,7 @@ import { loadPref, savePref } from './prefs';
  * What a new player is shown once on this device (docs/NEWPLAYER.md, second pass), unlike the per-run tips (`Tip.tsx`): a
  * second run starts without them. "Show the tips again" clears them all.
  */
-export const INTRO_IDS = ['map', 'run', 'tree', 'support'] as const;
+export const INTRO_IDS = ['map', 'run', 'tree', 'support', 'filters'] as const;
 export type IntroId = (typeof INTRO_IDS)[number];
 
 export const introSeen = (id: IntroId): boolean => loadPref<boolean>(`intro.${id}`, false);
