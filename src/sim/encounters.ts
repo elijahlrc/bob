@@ -297,6 +297,7 @@ export function tickEncounter(w: World, m: Actor, dt: number): void {
         shape: 'circle',
         label: 'Last rites',
         owner: m.id,
+        blockedBy: 'spell',
       });
   }
   if (e.ritesT > 0) {

@@ -1,5 +1,5 @@
 import { abilitiesOf, type AbilityDef } from '../data/abilities';
-import { monsterHitOf, rawHit } from './combat';
+import { monsterAccuracyOf, monsterHitOf, rawHit } from './combat';
 import {
   blinkBehind,
   hexPlayerAtRandom,
@@ -239,6 +239,8 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
         dtype: 0,
         team: 1,
         owner: m.id,
+        blockedBy: 'attack',
+        accuracy: monsterAccuracyOf(m),
       });
     }
   },
@@ -330,6 +332,7 @@ const ACTIVE: Partial<Record<AbilityDef['id'], (c: Ctx) => void>> = {
       dtype: 1,
       team: 1,
       owner: m.id,
+      blockedBy: 'spell',
       mire: true,
     });
   },

@@ -93,6 +93,8 @@ export function castPattern(w: World, a: Actor, act: Action, id: PatternId): voi
       label: spec.name,
       owner: a.id,
       pull: s.pull,
+      blockedBy: act.profile.isAttack ? 'attack' : 'spell',
+      ...(act.profile.isAttack ? { accuracy: act.profile.hands[0]?.accuracy ?? 0 } : {}),
     };
     if (s.shape === 'lane') {
       const end = laneEnd(w, x, y, ang, s.length ?? 8);

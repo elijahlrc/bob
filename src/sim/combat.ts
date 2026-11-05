@@ -15,6 +15,8 @@ import {
 import type { StatusId } from '../data/statuses';
 import {
   AILMENT_NAMES,
+  attackHitChanceOf,
+  blockChanceOf,
   resolveHit,
   shockTaken,
   takenAs,
@@ -122,7 +124,8 @@ import { spawnMonster } from './world';
 import { afflictPlayer, bossLocked, flaskWards, isBossSide, lockBoss, stunPlayer } from './afflict';
 import { bossHitPlayer, bossLeechShare, bossRecovery, bossVeiled } from './bosses';
 import { noteLifeLost, replenish, replenishes, replenishing, replenishTick } from './replenish';
-import type { Actor, Dot, World } from './types';
+import type { Actor, Dot, GroundEffect, World } from './types';
+import { actorById } from './actions';
 import { hunted, livingEnemiesOf, MONSTERS } from './side';
 import type { Side } from './side';
 
@@ -646,38 +649,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
     res.total = res.dmg[0] + res.dmg[1] + res.dmg[2] + res.dmg[3] + res.dmg[4];
   }
   if (res.outcome === 'block') {
-    w.events.push({ t: 'block', src: src.id, dst: dst.id });
-    if (how) noteMiss(w, dst, how, true);
-    dst.since.block = 0;
-    if (dst.isPlayer) {
-      rollCharges(w, dst.side!, 'block');
-      rollGains(w, dst.side!, 'block');
-    }
-    if (dst.def.lifeOnBlockPct > 0 || dst.def.lifeOnBlock > 0)
-      dst.life = Math.min(
-        lifeCap(dst),
-        dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct + dst.def.lifeOnBlock,
-      );
-    if (dst.isPlayer && dst.def.manaOnBlock > 0)
-      dst.mana = Math.min(
-        Math.max(0, dst.def.maxMana - reservedMana(dst.side!)),
-        dst.mana + dst.def.manaOnBlock,
-      );
-    // Blocking staggers the character for a moment (the reference game's block recovery), once it has recovered from the last stagger.
-    if (
-      dst.isPlayer &&
-      dst.def.blockStagger > 0 &&
-      dst.stunT <= 0 &&
-      dst.graceT <= 0 &&
-      !dst.side!.channel?.profile.skill.channel?.stunImmune
-    ) {
-      dst.stunT = dst.def.blockStagger;
-      dst.action = null;
-      w.events.push({ t: 'stun', dst: dst.id, dur: dst.def.blockStagger });
-    }
-    wake(w, dst);
-    if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
-    if (dst.isPlayer && p.isAttack && src.team !== dst.team) rebuke(w, dst.side!, src);
+    blocked(w, src, dst, p.isAttack, how);
     // A skill that wears blocking down leaves a blocking enemy Overpowered.
     if (src.isPlayer && dst.team !== src.team) rollStatuses(w, dst, p, true);
     return;
@@ -1259,6 +1231,85 @@ function recordImpale(w: World, s: Side, dst: Actor, p: SkillProfile, res: HitRe
 }
 
 /**
+ * What a block does, for a hit or a monster's blast: no damage and nothing of the hit, but the block's own gains (charges, life and
+ * mana on block, the triggers), the stagger of block recovery, and the Shield's Rebuke on an attacker. `src` is absent for a blast
+ * whose monster is gone.
+ */
+function blocked(
+  w: World,
+  src: Actor | undefined,
+  dst: Actor,
+  isAttack: boolean,
+  how: DmgSrc | undefined,
+): void {
+  w.events.push({ t: 'block', src: src?.id ?? 0, dst: dst.id });
+  if (how) noteMiss(w, dst, how, true);
+  dst.since.block = 0;
+  if (dst.isPlayer) {
+    rollCharges(w, dst.side!, 'block');
+    rollGains(w, dst.side!, 'block');
+  }
+  if (dst.def.lifeOnBlockPct > 0 || dst.def.lifeOnBlock > 0)
+    dst.life = Math.min(
+      lifeCap(dst),
+      dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct + dst.def.lifeOnBlock,
+    );
+  if (dst.isPlayer && dst.def.manaOnBlock > 0)
+    dst.mana = Math.min(
+      Math.max(0, dst.def.maxMana - reservedMana(dst.side!)),
+      dst.mana + dst.def.manaOnBlock,
+    );
+  // Blocking staggers the character for a moment (the reference game's block recovery), once it has recovered from the last stagger.
+  if (
+    dst.isPlayer &&
+    dst.def.blockStagger > 0 &&
+    dst.stunT <= 0 &&
+    dst.graceT <= 0 &&
+    !dst.side!.channel?.profile.skill.channel?.stunImmune
+  ) {
+    dst.stunT = dst.def.blockStagger;
+    dst.action = null;
+    w.events.push({ t: 'stun', dst: dst.id, dur: dst.def.blockStagger });
+  }
+  wake(w, dst);
+  if (dst.isPlayer) fireTriggers(w, dst.side!, { on: 'block' });
+  if (dst.isPlayer && isAttack && src && src.team !== dst.team) rebuke(w, dst.side!, src);
+}
+
+/**
+ * Whether what a monster's blast lands on avoids it, as it would the same hit (docs/ENCOUNTERS.md 4): a blast that is one of the
+ * monster's attacks must beat the target's evasion (with its accuracy, `GroundEffect.accuracy`), and one that is an attack or a
+ * spell (`GroundEffect.blockedBy`) can then be blocked. An avoided blast does what an evade or a block does, and none of what the
+ * blast does.
+ */
+export function blastAvoided(w: World, e: GroundEffect, dst: Actor, label: string): boolean {
+  if (!e.blockedBy) return false;
+  const attack = e.blockedBy === 'attack';
+  const owner = e.owner !== undefined ? actorById(w, e.owner) : undefined;
+  const src = owner?.alive ? owner : undefined;
+  const how: DmgSrc = dst.isPlayer
+    ? { name: label, kind: 'effect' }
+    : { name: label, kind: 'skill' };
+  if (attack && e.accuracy !== undefined) {
+    // A blinded or enfeebled monster misses more, as with its blows.
+    const mult = src ? hitChanceFactor(src) * (1 - src.hex.more.acc * 0.5) : 1;
+    const hc = attackHitChanceOf(e.accuracy, dst.def, false, mult, dst.hex.more.evasion);
+    // Rolled only when the blast can miss, so a build with nothing to avoid it draws the same numbers as before.
+    if (hc < 1 && !w.rngCombat.chance(hc)) {
+      w.events.push({ t: 'miss', src: src?.id ?? 0, dst: dst.id });
+      noteMiss(w, dst, how, false);
+      if (dst.isPlayer) evaded(w, dst.side!);
+      wake(w, dst);
+      return true;
+    }
+  }
+  const chance = blockChanceOf(dst.def, attack, false, blockLessOf(dst));
+  if (chance <= 0 || !w.rngCombat.chance(chance)) return false;
+  blocked(w, src, dst, attack, how);
+  return true;
+}
+
+/**
  * Damage of one type that ignores evasion and block (explosions, slams, auras, a minion's blow). `owner` is the side whose damage it
  * is, and is credited with it (its ledger, its `damageDealt`, the kill); it is `null` on purpose for what is nobody's or a
  * monster's (the ground, a drain, a monster's blast) and for damage a side deals to itself (Searing Mantle, a minion's own burn,
@@ -1644,6 +1695,11 @@ function splitInTwo(w: World, a: Actor): void {
     c.state = 'chase';
     w.events.push({ t: 'summon', id: c.id });
   }
+}
+
+/** The accuracy of a monster's attack, for a blast that is one (`GroundEffect.accuracy`). */
+export function monsterAccuracyOf(a: Actor): number {
+  return a.mon?.profile(0).hands[0].accuracy ?? 0;
 }
 
 export function monsterHitOf(a: Actor): number {

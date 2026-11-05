@@ -346,6 +346,13 @@ export type GroundEffect = {
   trample?: number;
   /** It puts the Mire on the character it catches (a Warden Pylon's pulse, a Spitter's pool, a web). */
   mire?: boolean;
+  /**
+   * A blast that is one of its monster's attacks or spells: what it lands on evades an attack and blocks it with its attack or
+   * spell block, as in the reference game. Absent, nothing avoids it (a death explosion, the ground).
+   */
+  blockedBy?: 'attack' | 'spell';
+  /** An attack's accuracy, taken when it is laid: what it lands on must beat it with its evasion. */
+  accuracy?: number;
 };
 
 /**

@@ -173,6 +173,12 @@ That needs two engine pieces:
    Casting a pattern is a monster action (a wind-up, then all its steps are pushed as shaped blasts with their delays). The
    steps then run on their own, so the monster may move or die while they land.
 
+   A blast that is one of the monster's attacks or spells (`GroundEffect.blockedBy`; a pattern's from the cast, which is an
+   attack or a spell) is avoided as that hit would be (2026-11-04): an attack must beat the target's evasion with the
+   accuracy the monster had when it laid it, then either can be blocked, by attack or spell block. An evaded or blocked blast
+   deals nothing and does nothing besides: no stun, ailment, pull, push, trample or Mire. Death explosions, ground and the
+   Magistrate's Sentence (docs/BOSSES.md 6) cannot be evaded or blocked.
+
 Patterns built from it:
 
 | Pattern          | What the player sees                                                                 | Steps                                | Asks of the build                               |

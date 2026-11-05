@@ -69,11 +69,12 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
     evasion = db.calc('evasion', ctx);
   }
 
+  // Block chance: the flat chances (a shield's own block among them) × (1 + increased) × more, as in the reference game.
   const blockCap = BLOCK_CAP + db.sum('base', 'blockCap', ctx);
   const blockAttack =
-    clamp(db.sum('base', 'blockAttack', ctx) * db.more('blockAttack', ctx), 0, blockCap) / 100;
+    clamp(db.sum('base', 'blockAttack', ctx) * db.mult('blockAttack', ctx), 0, blockCap) / 100;
   const blockSpell =
-    clamp(db.sum('base', 'blockSpell', ctx) * db.more('blockSpell', ctx), 0, blockCap) / 100;
+    clamp(db.sum('base', 'blockSpell', ctx) * db.mult('blockSpell', ctx), 0, blockCap) / 100;
 
   const res: number[] = [];
   const maxRes: number[] = [];
@@ -126,8 +127,12 @@ export function defenceFromDb(db: ModDB, ctx: ModCtx, opts: DefenceOpts): Defenc
       : BLOCK_STAGGER /
         Math.max(
           0.1,
+          // Item lines write increased recovery as a base number; the tree's line writes it as increased.
           1 +
-            (db.sum('base', 'stunBlockRecovery', ctx) + db.sum('base', 'blockRecovery', ctx)) / 100,
+            (db.sum('base', 'stunBlockRecovery', ctx) +
+              db.sum('base', 'blockRecovery', ctx) +
+              db.sum('inc', 'blockRecovery', ctx)) /
+              100,
         ),
     esRegen: (db.sum('base', 'esRegenPct', ctx) / 100) * maxEs,
     res,

@@ -4,7 +4,7 @@ import { HEX_IDS, hexEffect, type HexId } from '../data/hexes';
 import { PYLON_OFF, PYLON_ON, PYLON_RANGE } from '../data/abilities';
 import { MONSTER_TYPES, leavesBody } from '../data/monsters';
 import { ENRAGE_DAMAGE, ENRAGE_SPEED } from '../data/phases';
-import { monsterHitOf, rawHit } from './combat';
+import { monsterAccuracyOf, monsterHitOf, rawHit } from './combat';
 import { cue, healed } from './cues';
 import { rally } from './packs';
 import { monsterHexesPlayer } from './hexes';
@@ -645,6 +645,8 @@ function tickChampion(w: World, m: Actor, dt: number): void {
           dtype: 0,
           team: 1,
           owner: m.id,
+          blockedBy: 'attack',
+          accuracy: monsterAccuracyOf(m),
         });
       }
     }
@@ -686,6 +688,7 @@ function tickChampion(w: World, m: Actor, dt: number): void {
         dtype: 3,
         team: 1,
         owner: m.id,
+        blockedBy: 'spell',
       });
     }
     if (m.bossPhase === 0 && frac <= 0.5) {

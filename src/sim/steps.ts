@@ -51,6 +51,8 @@ function mark(
     team: 1,
     label: s.name,
     owner: m.id,
+    // A step is one of the travel spells (data/steps.ts).
+    blockedBy: 'spell',
   };
   if (landing && s.leaves) e.leaves = { ...s.leaves, dps: s.leaves.dps * hit };
   w.effects.push(e);

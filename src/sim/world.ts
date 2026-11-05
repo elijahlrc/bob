@@ -17,7 +17,14 @@ import type { MapPlan } from '../gen/mapPlan';
 import { monsterName } from '../gen/population';
 import { actorById, tickSkillZones, updateAction, updateProjectiles } from './actions';
 import { monsterAI, playerAI, separate } from './ai';
-import { lifeCap, monsterHitOf, rawHit, refreshPlayerDefence, tickActor } from './combat';
+import {
+  blastAvoided,
+  lifeCap,
+  monsterHitOf,
+  rawHit,
+  refreshPlayerDefence,
+  tickActor,
+} from './combat';
 import { drinkLifeMult } from './flaskDrink';
 import { autoFlaskPolicy, type FlaskPolicy } from './flaskPolicy';
 import { abilitiesOf, RIME_AURA_RANGE } from '../data/abilities';
@@ -630,7 +637,9 @@ function tickEffects(w: World, dt: number): void {
       for (const s of w.sides) {
         if (s.team === e.team) continue;
         const p = s.player;
-        const caught = p.alive && inBlast(e, p.x, p.y, p.r);
+        // An evaded or blocked blast deals nothing and does nothing besides (docs/ENCOUNTERS.md 4).
+        const caught =
+          p.alive && inBlast(e, p.x, p.y, p.r) && !blastAvoided(w, e, p, e.label ?? 'Blast');
         if (caught && e.damage > 0)
           rawHit(w, p, e.damage, e.dtype, null, e.label ?? 'Blast', 'player', viaOf(w, e));
         // What a boss's blast does besides damage (docs/BOSSES.md): a Sentence stuns, a toll shocks.
@@ -642,7 +651,7 @@ function tickEffects(w: World, dt: number): void {
         const owner = e.pull && caught ? actorById(w, e.owner ?? 0) : undefined;
         if (owner?.alive) pullPlayer(w, s, owner, e.pull!);
         for (const m of s.minions)
-          if (m.alive && inBlast(e, m.x, m.y, m.r))
+          if (m.alive && inBlast(e, m.x, m.y, m.r) && !blastAvoided(w, e, m, e.label ?? 'Blast'))
             rawHit(w, m, e.damage, e.dtype, null, e.label ?? 'Blast');
       }
       if (e.leaves) openZone(w, e.x, e.y, e.radius, e.leaves.seconds, e.leaves.kind, e.leaves.dps);
@@ -662,8 +671,11 @@ function tickEffects(w: World, dt: number): void {
     for (const s of w.sides) {
       if (s.team === e.team) continue;
       const p = s.player;
+      const near = p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r;
+      // An evaded or blocked blast deals nothing and does nothing besides (docs/ENCOUNTERS.md 4).
+      const stopped = near && e.damage > 0 && blastAvoided(w, e, p, label);
       // A warding pulse throws the character back, away from where it went off.
-      if (e.push && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r) {
+      if (e.push && near && !stopped) {
         const ang = Math.atan2(p.y - e.y, p.x - e.x);
         const to = w.grid.collide(p.x + Math.cos(ang) * e.push, p.y + Math.sin(ang) * e.push, p.r);
         const x0 = p.x;
@@ -684,14 +696,18 @@ function tickEffects(w: World, dt: number): void {
             r: e.radius,
           });
       }
-      const inside = p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r;
+      const inside = !stopped && p.alive && Math.hypot(p.x - e.x, p.y - e.y) <= e.radius + p.r;
       if (e.damage > 0 && inside)
         rawHit(w, p, e.damage, e.dtype, null, label, 'player', viaOf(w, e));
       if (e.mire && inside && p.alive) mirePlayer(w, s, actorById(w, e.owner ?? 0) ?? undefined);
       // The character's minions standing in a monster's blast are hurt too.
       if (e.team === 1)
         for (const m of s.minions)
-          if (m.alive && Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r)
+          if (
+            m.alive &&
+            Math.hypot(m.x - e.x, m.y - e.y) <= e.radius + m.r &&
+            !blastAvoided(w, e, m, label)
+          )
             rawHit(w, m, e.damage, e.dtype, null, label);
     }
   }
@@ -732,6 +748,7 @@ function tickMonsterMods(w: World, m: Actor, dt: number): void {
         team: 1,
         owner: m.id,
         push: 3,
+        blockedBy: 'spell',
       });
     }
   }

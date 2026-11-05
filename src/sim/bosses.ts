@@ -110,7 +110,7 @@ import {
 import { afflictPlayer, stunPlayer } from './afflict';
 import { castPattern } from './blasts';
 import { rebuildForTheft } from './charges';
-import { hit, monsterConds, monsterHitOf, refreshPlayerDefence } from './combat';
+import { hit, monsterConds, monsterAccuracyOf, monsterHitOf, refreshPlayerDefence } from './combat';
 import { monsterHexEffect, openZone, speedMult } from './factions';
 import { monsterHexesPlayer } from './hexes';
 import { setTheft, theftBuild, theftOf, type Theft } from './theft';
@@ -644,6 +644,7 @@ function toll(w: World, m: Actor, st: BossState): void {
       delay: i > 0 ? i * TOLL_RING_DELAY : undefined,
       label: 'Toll',
       owner: m.id,
+      blockedBy: 'spell',
       afflict: { kind: 'shock', value: TOLL_SHOCK, seconds: 2 },
     });
   }
@@ -723,6 +724,8 @@ function showLane(
     shape: 'lane',
     label: trample ? 'Trample' : 'Gallop',
     owner: m.id,
+    blockedBy: 'attack',
+    accuracy: monsterAccuracyOf(m),
     ...(trample ? { trample: TRAMPLE_DRINKS } : {}),
   };
   st.laneId = e.id;
@@ -939,6 +942,7 @@ function pronounce(w: World, m: Actor, st: BossState): void {
     shape: 'circle',
     label: 'Sentence',
     owner: m.id,
+    // It cannot be evaded or blocked, only endured (docs/BOSSES.md 6), so it is neither an attack nor a spell to the defences.
     follow: true,
     unavoidable: true,
     stun: SENTENCE_STUN,
@@ -1162,6 +1166,8 @@ function flurry(w: World, m: Actor, st: BossState): void {
       shape: 'lane',
       label: 'Flurry',
       owner: m.id,
+      blockedBy: 'attack',
+      accuracy: monsterAccuracyOf(m),
     });
   }
   w.events.push({ t: 'window', id: m.id, kind: 'flurry' });

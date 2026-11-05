@@ -223,10 +223,25 @@ export function attackHitChance(
   mult = 1,
   evasionLess = 0,
 ): number {
-  if (!p.isAttack || p.alwaysHit || def.cannotEvade) return 1;
-  let c = hitChance(hand.accuracy, def.evasion * (1 - evasionLess));
+  if (!p.isAttack || p.alwaysHit) return 1;
   const isProj = p.skill.behaviour.kind === 'projectile';
-  const bonus = isProj ? def.evadeProj : def.evadeMelee;
+  return attackHitChanceOf(hand.accuracy, def, isProj, mult, evasionLess);
+}
+
+/**
+ * Chance that an attack of this accuracy hits: evasion, the evade bonus against projectiles or against the rest, and dodge. A
+ * monster's blast that is an attack (`GroundEffect.blockedBy`) is met by it as a blow is.
+ */
+export function attackHitChanceOf(
+  accuracy: number,
+  def: Defence,
+  projectile: boolean,
+  mult = 1,
+  evasionLess = 0,
+): number {
+  if (def.cannotEvade) return 1;
+  let c = hitChance(accuracy, def.evasion * (1 - evasionLess));
+  const bonus = projectile ? def.evadeProj : def.evadeMelee;
   if (bonus) c = Math.min(1, Math.max(0.05, c * (1 - bonus)));
   return c * (1 - def.dodgeAttack) * mult;
 }
@@ -234,12 +249,26 @@ export function attackHitChance(
 /** The chance to block a hit of this skill: less for a skill that wears blocking down, and for each Overpowered stack. */
 export function blockChance(p: SkillProfile, def: Defence, less = 0): number {
   const projectile = p.isAttack && p.skill.behaviour.kind === 'projectile';
-  const base = !p.isAttack
+  return blockChanceOf(def, p.isAttack, projectile, less, p.enemyBlockLess);
+}
+
+/**
+ * The chance to block a hit by what it is (an attack, a projectile attack, a spell): a projectile attack adds the projectile block
+ * to the attack block, under the cap. `enemyLess` is the hitter's own share off, `less` what the Overpowered stacks take off.
+ */
+export function blockChanceOf(
+  def: Defence,
+  isAttack: boolean,
+  projectile: boolean,
+  less = 0,
+  enemyLess = 0,
+): number {
+  const base = !isAttack
     ? def.blockSpell
     : projectile && def.blockProjectile > 0
       ? Math.min(def.blockCap, def.blockAttack + def.blockProjectile)
       : def.blockAttack;
-  return Math.max(0, base * (1 - p.enemyBlockLess) - less);
+  return Math.max(0, base * (1 - enemyLess) - less);
 }
 
 /** Move the "taken as" share of a physical hit into other types, before mitigation. Mutates `dmg`. */
