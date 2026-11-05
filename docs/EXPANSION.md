@@ -427,11 +427,11 @@ skill, and every other equipped active skill is cast whenever it is ready.**
 
 ### 5.6 Charges (cost S; needs D6 reopened)
 
-| Charge (ours) | Per charge                                                      | Modelled on        |
-| ------------- | --------------------------------------------------------------- | ------------------ |
-| Grit          | +4% physical damage reduction; +4% to all elemental resistances | (Endurance charge) |
-| Fervour       | 4% increased attack, cast and movement speed; 4% more damage    | (Frenzy charge)    |
-| Insight       | 40% increased critical strike chance                            | (Power charge)     |
+| Charge  | Per charge                                                      |
+| ------- | --------------------------------------------------------------- |
+| Grit    | +4% physical damage reduction; +4% to all elemental resistances |
+| Fervour | 4% increased attack, cast and movement speed; 4% more damage    |
+| Insight | 40% increased critical strike chance                            |
 
 - **Limits:** at most 3 of each, raised by items and the tree. Charges last 10 s, and all charges of a kind refresh
   when one is gained.

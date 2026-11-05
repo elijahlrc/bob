@@ -612,7 +612,7 @@ export function applyHit(w: World, src: Actor, dst: Actor, p: SkillProfile, res:
       res.total *= 1 - far.less;
     }
   }
-  // Deathless Call: the endurance spent makes the physical part of a hit smaller while the guard stands.
+  // Deathless Call: the grit spent makes the physical part of a hit smaller while the guard stands.
   const guard = dst.isPlayer ? dst.side!.guard : null;
   if (guard && dst.side!.buffT[guard.buff] > 0 && res.outcome !== 'block') {
     res.total -= res.dmg[0] * (1 - guard.physMult);

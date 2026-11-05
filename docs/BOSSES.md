@@ -240,7 +240,7 @@ each tied to the Magistrate by a chain of light.
 
 - **The Sentence.** Every **15 s** the Magistrate points the axe at the character. An hourglass appears over it and a ring
   closes on the floor for **3 s**, then a physical blow lands. It **cannot be evaded or blocked**, only endured: armour,
-  physical damage reduction, endurance charges, guards, life and energy shield all count. A Sentence that lands **stuns**
+  physical damage reduction, grit charges, guards, life and energy shield all count. A Sentence that lands **stuns**
   unless the character avoids the stun, and the Magistrate's next swing comes straight after.
 - **Witnesses weigh the Sentence.** Each living Witness adds **+15%** to the Sentence's damage. Its chain glows brighter
   as the countdown runs, and the hourglass shows the weight.
@@ -271,7 +271,7 @@ each tied to the Magistrate by a chain of light.
 
 | Build                      | How it goes                                                                                                                                                                                                              |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Armour, life, endurance    | The best: the Sentence is what they are built for.                                                                                                                                                                       |
+| Armour, life, grit         | The best: the Sentence is what they are built for.                                                                                                                                                                       |
 | Evasion, block             | Harder: those defences do nothing against the Sentence. Their answers are the pool, killing Witnesses, and a life flask before the blow (the new reflex, section 11). Guard: rule 5's 70% with all four Witnesses alive. |
 | Low-life energy shield     | Neutral: energy shield counts in full; the Sentence is physical, not chaos.                                                                                                                                              |
 | Attacks                    | Unaffected by its defences.                                                                                                                                                                                              |

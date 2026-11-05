@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { hasReference, loadDenyList } from '../../scripts/coverage/reference';
 import { ALL_GEMS } from '../data/gems';
+import { ipViolations } from '../data/ipScan';
 import { gemCardData } from './gemText';
 
 describe('gemCardData', () => {
@@ -60,5 +62,16 @@ describe('gemCardData', () => {
     const lo = gemCardData(def, 1).stats.join('|');
     const hi = gemCardData(def, 20).stats.join('|');
     expect(hi).not.toBe(lo);
+  });
+
+  // The cards build their text at run time (a charge's name in a template), which the scan of src/data never sees.
+  it.skipIf(!hasReference())('a card names nothing from the reference deny list', () => {
+    const deny = loadDenyList();
+    for (const def of ALL_GEMS)
+      for (const level of [1, 20]) {
+        const d = gemCardData(def, level);
+        const text = [d.name, d.description, ...d.stats, ...d.effects];
+        expect(ipViolations(text, deny), `${def.id} at level ${level}`).toEqual([]);
+      }
   });
 });

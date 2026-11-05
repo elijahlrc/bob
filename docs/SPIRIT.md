@@ -447,7 +447,7 @@ The once-per-target rule for projectiles fired together stays (D1). What is buil
 - **Stance state.** Two stances on one gem (Dune Stance, Stone Stance), a current stance on the character, swapped by the
   policy of section 5; each stance's mods and costs.
 - **Absorb pools.** Damage taken first drains a pool with the reference rule for how it is consumed and what it does
-  afterwards (Iron Hide's absorb with its reduction; Slag Carapace's absorb and reflection; Deathless Call's endurance
+  afterwards (Iron Hide's absorb with its reduction; Slag Carapace's absorb and reflection; Deathless Call's grit
   consumption). A `release` can follow (a burst of the absorbed amount).
 - **Rage.** Rampage Call needs rage and spends it; its effects scale with rage held; Surge of Blood's life drain and its frenzy gain on
   kill; "refresh on kill".

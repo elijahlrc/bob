@@ -1,3 +1,4 @@
+import { CHARGE_NAMES as CHARGE } from '../calc/charges';
 import { levelValue } from '../calc/gems';
 import type { ActiveGemDef, AuraGemDef, DotSpec, UtilityDef } from '../data/gems';
 import { BUFFS } from '../data/buffs';
@@ -9,7 +10,6 @@ import { BUFFS } from '../data/buffs';
  */
 
 const num = (v: number) => String(Math.round(v * 10) / 10);
-const CHARGE = { grit: 'Endurance', fervour: 'Frenzy', insight: 'Power' } as const;
 const lv = levelValue;
 
 function dotLine(d: DotSpec, level: number): string {

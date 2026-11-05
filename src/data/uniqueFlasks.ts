@@ -203,7 +203,7 @@ const DEFS: UniqueFlaskDef[] = [
       m('chargeOn.crit.fervour', 'base', 15),
     ],
     notes: {
-      pairsWith: ['frenzy and speed builds', 'clearing runs'],
+      pairsWith: ['fervour and speed builds', 'clearing runs'],
       weakAgainst: ['slow boss fights, where the speed is wasted'],
     },
     flavour: 'Better not to ask what is in it.',

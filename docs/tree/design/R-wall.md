@@ -34,7 +34,7 @@ Measured on today's tree (`region-map.ts vanguard`, `walks.ts`, `offdef.ts vangu
 - **What the Yard put at the shared border (do not copy):** shields and block (Buckler, Steady Guard, Steel Rim, Bulwark
   Mending, Shieldwall), warcries (Drill Call, Rally), axes (Hewing, Wide Arc), the two-handed stun payoff (Crushing Swing,
   Hold the Line's Fortified on stun), Iron Skin's armour against elemental hits, Sword and Board.
-- **What the reference sector has that the Wall lacks:** endurance-style charges with a payoff (the Wall has grit with
+- **What the reference sector has that the Wall lacks:** grit-style charges with a payoff (the Wall has grit with
   no payoff); a totem count rule; armour with a rule; strikes that hit an extra enemy; rule-bending notables.
 
 ## 2. What the Wall is for

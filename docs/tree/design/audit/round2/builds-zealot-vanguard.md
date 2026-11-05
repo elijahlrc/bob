@@ -443,7 +443,7 @@ The Battle Hymn `why` also claims War Drums "sells the charges", which it does n
 **Fix:**
 
 - Iron Faith → block with energy shield or spell block (the Zealot's two pools). Bracing keeps block with stun.
-- War Drums → warcries with endurance or grit charges, or with warcry cooldown. Battle Hymn → warcries with elemental damage with attacks.
+- War Drums → warcries with grit charges, or with warcry cooldown. Battle Hymn → warcries with elemental damage with attacks.
 - Broad Back → life with two-handed stun threshold or life with armour.
 - Drop the stun line from Greatweight; stun stays on Weight of Iron, Stagger and Headsman.
 

@@ -21,7 +21,7 @@ import type { Side } from './side';
 /**
  * Lasting ground the player's skills leave, and the things that stand in the world and do their work from there
  * (docs/SPIRIT.md S6): consecrated ground (life back for the character in it, a better chance to crit what stands on it), chilling
- * ground that burns with cold and gives a Frenzy charge to a kill inside it, a frost crystal that exposes what is near and then
+ * ground that burns with cold and gives a Fervour charge to a kill inside it, a frost crystal that exposes what is near and then
  * bursts, a storm of bolts that follows the character, a wall of ice that blocks the way.
  */
 

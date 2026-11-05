@@ -4047,7 +4047,7 @@ export const GEN_ACTIVE_GEMS: ActiveGemDef[] = [
     },
     baseMult: [222, 260],
     cost: [6, 6],
-    requiresWeapon: ['sword', 'axe', 'mace', 'staff'],
+    requiresWeapon: ['sword', 'axe', 'mace', 'sceptre', 'staff', 'dagger', 'claw'],
     cooldown: 4,
     bypass: {
       charge: 'grit',

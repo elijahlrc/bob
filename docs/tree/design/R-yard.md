@@ -31,7 +31,7 @@ Measured on today's tree (`region-map.ts reaver`, `walks.ts`, `offdef.ts reaver`
 - **What the Bow already put at the shared border:** Wanderer (attributes, life), Thirsty Quiver (leech), Light Hand
   (one-handed), Fleet Blade (swords), Round Shield and Braced Guard (shields), Hardy Stock and Second Wind (life). The
   Yard's east border must not copy these.
-- **What the reference sector has that the Yard lacks:** impale; fortify with a payoff; endurance-style charges with a
+- **What the reference sector has that the Yard lacks:** impale; fortify with a payoff; grit-style charges with a
   payoff; a dual-wield rule beyond flat damage; and rule-bending notables (none today).
 
 ## 2. What the Yard is for
