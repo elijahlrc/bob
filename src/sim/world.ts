@@ -276,6 +276,7 @@ function makeSide(plan: MapPlan, id: number, inp: SideInput): Side {
       draining: false,
     },
     secondaryReady: {},
+    periodicReady: {},
     guard: null,
     cooldowns: {},
     utilityReady: {},

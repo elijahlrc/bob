@@ -13,7 +13,7 @@ export type RotationEntry<C> = {
   choice: C;
   role: SkillRole;
   when: SkillWhen;
-  /** Seconds between uses of a periodic skill without a cooldown of its own (undefined: the usual pause). */
+  /** Seconds between uses of a periodic skill, set on the Strategy tab (undefined: its cooldown, or the usual pause). */
   every?: number;
   /** The share of life below which an emergency or escape skill is used. */
   life: number;
@@ -85,7 +85,7 @@ export function entryOf<C>(
     choice,
     role,
     when,
-    every: skill.cooldown === undefined ? t.every : undefined,
+    every: t.every,
     life: t.life ?? (role === 'escape' ? ESCAPE_LIFE : EMERGENCY_LIFE),
     lowLife: t.lowLife !== false,
     surrounded: t.surrounded !== false,

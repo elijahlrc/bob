@@ -127,7 +127,8 @@ Each time it is free to act and has a target, the character goes down this list:
 2. **The main skills, in their order.** It uses the first whose condition holds and that it can use, and walks
    into its reach if it has to.
 3. **A periodic skill that is ready early.** If no main skill can be used, for example because it is on cooldown or
-   unaffordable, a periodic skill that is in reach and off its own cooldown is used, ignoring its pause.
+   unaffordable, a periodic skill that is in reach and off its own cooldown is used, ignoring its usual pause. A pause
+   you set on the Strategy tab still holds.
 4. **The weapon.** Otherwise it uses its **default weapon attack** (a bow shot with a bow, a basic strike
    otherwise). This attack costs nothing, so the character never stops attacking because it ran out of mana. It
    just hits much weaker until the mana returns.
@@ -149,7 +150,10 @@ A main skill that is a **renewable debuff** (like Creeping Plague) also waits wh
 - A periodic skill with a **cooldown of its own** is used whenever a use (or a charge that stands in for one) is
   ready.
 - One **without** a cooldown waits a pause after each use: by default **6 of its own use times, and at least 3
-  seconds**. On the Strategy tab you can set the pause to 1.5, 3, 5, 8 or 12 seconds.
+  seconds**.
+- On the Strategy tab you can set the pause of any periodic skill to 1.5, 3, 5, 8, 12, 20 or 30 seconds. On a skill with
+  a cooldown of its own, it waits for both: the pause you set, and a use of its cooldown. A pause shorter than the
+  cooldown matters when something shortens the cooldown in a fight.
 - A periodic skill can have **less reach than the main skill**. It is then used whenever an enemy happens to be
   within its reach, for example a melee skill on a bow character when something closes in. The character won't walk
   in for it, and the sheet doesn't count its damage.

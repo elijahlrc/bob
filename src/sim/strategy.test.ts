@@ -138,6 +138,31 @@ describe('the strategy: roles and order', () => {
     expect(uses(world, 20).flameBolt).toBeLessThanOrEqual(3);
   });
 
+  it('a pause set on a skill with a cooldown of its own makes it wait longer than the cooldown', () => {
+    const base = build(['flameBolt', 'suddenFrost'], 'staff_3', 'mystic');
+    const free = withStrategy(base, { 1: { role: 'periodic' } });
+    const held = withStrategy(base, { 1: { role: 'periodic', every: 12 } });
+    const c = new Character(held, {});
+    expect(c.secondaries[0].skill.cooldown).toBeDefined();
+    expect(c.cooldownOf(c.secondaries[0])).toBe(12);
+    const n = (b: Build) =>
+      uses(createDummyWorld(b, { distance: 3, maxTime: 60 }).world, 20).suddenFrost ?? 0;
+    // Twenty seconds: at once and after 12 s, where its cooldown alone allows more.
+    expect(n(held)).toBeLessThanOrEqual(2);
+    expect(n(free)).toBeGreaterThan(2);
+  });
+
+  it('a pause set on a periodic skill holds when it would stand in for a main skill on its cooldown', () => {
+    const b = withStrategy(build(['suddenFrost', 'flameBolt'], 'staff_3', 'mystic'), {
+      1: { every: 8 },
+    });
+    const { world } = createDummyWorld(b, { distance: 3, maxTime: 60 });
+    const u = uses(world, 20);
+    // At most three uses (at once, after 8 s and after 16 s); the weapon fills the rest of the gaps.
+    expect(u.flameBolt).toBeLessThanOrEqual(3);
+    expect(u.defaultAttack ?? 0).toBeGreaterThan(0);
+  });
+
   it('an opener is used once a fight', () => {
     const b = withStrategy(build(['crushingBlow', 'flameBolt']), { 1: { role: 'opener' } });
     const { world } = createDummyWorld(b, { distance: 1.6, maxTime: 60 });

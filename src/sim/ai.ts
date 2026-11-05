@@ -328,11 +328,20 @@ function standingHolds(s: Side, prof: SkillProfile, target: Actor): boolean {
   return false;
 }
 
+/** A periodic skill waiting out a pause the player set on the Strategy tab. */
+const pausedByPlayer = (
+  w: World,
+  s: Side,
+  e: { role: string; every?: number; choice: SkillChoice },
+): boolean =>
+  e.role === 'periodic' && e.every !== undefined && (s.periodicReady[e.choice.key] ?? 0) > w.t;
+
 /**
  * What the character does now against its target (the Strategy tab, docs/PLAYER-AI.md): the first of its skills, in the order the
  * strategy gives, whose role and condition call for it and that it can use from where it stands; then the first main skill it can
  * use (it walks into reach for it); then, with no main skill to use, a periodic one that is ready early; and last the weapon.
  */
+
 function chooseSkill(w: World, s: Side, target: Actor): Pick {
   const conds = playerConds(w, s, target);
   const p = s.player;
@@ -364,6 +373,7 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
       (s.secondaryReady[c.key] ?? 0) > w.t
     )
       continue;
+    if (pausedByPlayer(w, s, e)) continue;
     if (e.role === 'opener' && !openerDue(s, c.key, target)) continue;
     if (e.role === 'emergency' && p.life >= p.def.maxLife * e.life) continue;
     const prof = s.char.profile(c, conds, flaskMask(s));
@@ -402,6 +412,8 @@ function chooseSkill(w: World, s: Side, target: Actor): Pick {
     for (const e of s.char.rotation) {
       const c = e.choice;
       if (c.skill.utility || e.role !== 'periodic' || !whenHolds(w, s, e.when, target)) continue;
+      // Ready early, whatever its usual pause; not before a pause the player set.
+      if (pausedByPlayer(w, s, e)) continue;
       const prof = s.char.profile(c, conds, flaskMask(s));
       if (!usable(c, prof) || !inReach(w, s, prof, target)) continue;
       return { which: 'secondary', prof, costsLife: c.costsLife, choice: c, entry: e, cd: 0 };
@@ -738,6 +750,10 @@ export function playerAI(w: World, s: Side, dt: number): void {
       if (which === 'primary' || which === 'secondary') payCost(s, costsLife, prof.cost);
       if (entry?.role === 'periodic' && choice.skill.cooldown === undefined)
         s.secondaryReady[choice.key] = w.t + s.char.cooldownOf(choice, playerConds(w, s, target));
+      // A pause the player set: from this use, whatever the skill's own cooldown does (a cooldown cut short by its
+      // surroundings lets it come back as soon as the pause allows).
+      if (entry?.role === 'periodic' && entry.every !== undefined)
+        s.periodicReady[choice.key] = w.t + Math.max(entry.every, prof.useTime);
       if (which === 'primary' || which === 'secondary') useSkill(w, s, choice);
       if (entry?.role === 'opener') markOpened(s, choice.key, target);
       startAction(w, p, which, prof, target);

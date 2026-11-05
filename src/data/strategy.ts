@@ -30,7 +30,10 @@ export type SkillWhen = 'any' | 'pack' | 'single' | 'rare' | 'boss';
 export type SkillTactic = {
   role?: SkillRole;
   when?: SkillWhen;
-  /** A periodic skill without a cooldown of its own: seconds between uses (unset: six of its use times, at least 3 s). */
+  /**
+   * A periodic skill: seconds between uses (unset: its cooldown, or with none six of its use times, at least 3 s). A pause
+   * set here is kept even when a cooldown of the skill's own would allow it sooner (the owner, 2026-11-05).
+   */
   every?: number;
   /** An emergency or escape skill: the share of life below which it is used. */
   life?: number;
@@ -126,8 +129,8 @@ export const PACK_SIZE = 3;
 /** The share of the fights that are packs, for the single DPS figure that comparisons use. */
 export const PACK_WEIGHT = 0.7;
 
-/** The pauses a periodic skill without a cooldown of its own can be given, in seconds. */
-export const EVERY_CHOICES = [1.5, 3, 5, 8, 12];
+/** The pauses a periodic skill can be given, in seconds (one with a cooldown of its own is offered those longer than it). */
+export const EVERY_CHOICES = [1.5, 3, 5, 8, 12, 20, 30];
 /** The life thresholds an emergency skill can be given. */
 export const LIFE_CHOICES = [0.3, 0.4, 0.5, 0.6, 0.7];
 /** The life thresholds an escape skill can be given: a wider range, since a blink can wait until the last moment or go early. */

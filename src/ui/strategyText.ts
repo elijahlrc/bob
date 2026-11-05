@@ -105,9 +105,13 @@ export function describeEntry(ch: Character, e: RotationEntry<SkillChoice>): str
       return autoText(c) + when;
     case 'periodic': {
       const own = c.skill.cooldown !== undefined;
-      const base = own
-        ? `Whenever its cooldown allows (every ${secs(ch.cooldownOf(c))})`
-        : `Every ${secs(ch.cooldownOf(c))}`;
+      // A pause set on a skill with a cooldown of its own: the pause, or the cooldown when that is longer.
+      const base =
+        own && e.every !== undefined
+          ? `Every ${secs(e.every)}, or as its cooldown allows if later`
+          : own
+            ? `Whenever its cooldown allows (every ${ownCooldown(ch, c)})`
+            : `Every ${secs(ch.cooldownOf(c))}`;
       const short =
         !c.skill.utility &&
         skillRange(ch.profile(c, ch.configConds)) <
@@ -141,6 +145,12 @@ export function mainsWarning(ch: Character): string | null {
  * The pause a periodic skill without a cooldown of its own waits when none is set (what `cooldownOf` falls back to), shown
  * inside the Every menu ("Usual pause (3.2 s)").
  */
+/** A skill's own cooldown as the character has it (with the charges that skip it), in seconds, written out. */
+export function ownCooldown(ch: Character, c: SkillChoice): string {
+  const rate = ch.cooldownRate(c);
+  return rate === undefined ? '' : secs(1 / rate);
+}
+
 export function usualPause(ch: Character, c: SkillChoice): string {
   return secs(
     Math.max(

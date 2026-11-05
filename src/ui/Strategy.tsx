@@ -31,7 +31,7 @@ import {
 } from '../run/strategy';
 import { DpsDetails } from './DpsDetails';
 import { hoverInfo, infoProps } from './info';
-import { entryNote, mainsWarning, usualPause } from './strategyText';
+import { entryNote, mainsWarning, ownCooldown as cooldownText, usualPause } from './strategyText';
 
 const f0 = (v: number) => Math.round(v).toLocaleString();
 const pct = (v: number) => `${Math.round(v * 100)}%`;
@@ -163,12 +163,17 @@ function SkillRow(p: {
               onChange={(when) => set({ when: when === 'any' ? undefined : when })}
             />
           )}
-          {e.role === 'periodic' && !ownCooldown && (
+          {e.role === 'periodic' && (
             <Pick<number>
               label="Every"
               value={e.every ?? 0}
               options={[
-                [0, `Usual pause (${usualPause(ch, choice)})`],
+                [
+                  0,
+                  ownCooldown
+                    ? `Its cooldown (${cooldownText(ch, choice)})`
+                    : `Usual pause (${usualPause(ch, choice)})`,
+                ],
                 ...EVERY_CHOICES.map((s): [number, string] => [s, `${s} s`]),
               ]}
               onChange={(v) => set({ every: v === 0 ? undefined : v })}

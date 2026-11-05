@@ -3,9 +3,9 @@
  *
  * The sim's character chooses what to do each time it is free (`chooseSkill`, src/sim/ai.ts, docs/PLAYER-AI.md 4.1):
  *   1. the first of the other skills, in their order, whose moment has come (a utility skill after its pause, a periodic one
- *      after its pause or when its cooldown has a use ready);
+ *      after its pause or when its cooldown has a use ready, and after a pause the player set even then);
  *   2. else the first main skill that can be used (its cooldown has a use ready, and its totems are not all standing);
- *   3. else, with no main skill to use, a periodic skill that is ready, whatever its pause;
+ *   3. else, with no main skill to use, a periodic skill that is ready, whatever its usual pause (a pause the player set holds);
  *   4. else the weapon.
  * An action takes the skill's use time and is never cut short.
  *
@@ -23,6 +23,11 @@ export type PlanSkill = {
   useTime: number;
   /** Seconds before it is used again, for a skill with no cooldown of its own (a periodic skill's pause, a utility skill's interval). */
   pause: number;
+  /**
+   * A pause the player set (a periodic skill's on the Strategy tab): kept even with a cooldown of its own, and when the skill
+   * fills a gap with no main skill to use.
+   */
+  held?: boolean;
   /** A cooldown of its own: the seconds a use takes to come back, and how many uses it holds. */
   cooldown?: { seconds: number; uses: number };
   /**
@@ -133,7 +138,8 @@ function playRotation(input: PlanInput): Plan {
     if (s.cooldown) {
       if (st.stock >= s.cooldown.uses) st.refillAt = t + s.cooldown.seconds;
       st.stock--;
-    } else if (byPause) st.readyAt = t + Math.max(s.pause, s.useTime);
+    }
+    if (byPause && (!s.cooldown || s.held)) st.readyAt = t + Math.max(s.pause, s.useTime);
     if (s.standing) {
       const st0 = t + LANDS_AT * s.useTime;
       const end = st0 + s.standing.seconds;
@@ -154,7 +160,7 @@ function playRotation(input: PlanInput): Plan {
     let byPause = false;
     // 1. The other skills, in order.
     for (const { st } of rot) {
-      if (!st.s.cooldown && st.readyAt > t) continue;
+      if ((!st.s.cooldown || st.s.held) && st.readyAt > t) continue;
       if (!ready(st, t)) continue;
       picked = st;
       byPause = true;
@@ -167,10 +173,10 @@ function playRotation(input: PlanInput): Plan {
           picked = m;
           break;
         }
-    // 3. With no main skill to use, a periodic skill that is ready, whatever its pause.
+    // 3. With no main skill to use, a periodic skill that is ready, whatever its usual pause (not one the player set).
     if (!picked)
       for (const { st, utility } of rot)
-        if (!utility && ready(st, t)) {
+        if (!utility && ready(st, t) && !(st.s.held && st.readyAt > t)) {
           picked = st;
           byPause = true;
           break;

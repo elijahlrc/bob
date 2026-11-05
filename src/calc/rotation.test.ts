@@ -73,6 +73,29 @@ describe('the rotation plan (docs/SHEET-AUDIT.md)', () => {
     expect(p.acts.p).toBeCloseTo(0.5, 1);
   });
 
+  it('a pause the player sets on a skill with a cooldown of its own makes it wait longer than the cooldown', () => {
+    const p = planRotation({
+      rotation: [
+        periodic(skill('p', 0.5, { pause: 6, held: true, cooldown: { seconds: 2, uses: 1 } })),
+      ],
+      mains: [skill('a', 0.5)],
+      weapon: 1,
+    });
+    // Ready every 2 s, but held to one use in about every 6.
+    expect(p.acts.p).toBeCloseTo(1 / 6, 1);
+  });
+
+  it('a pause the player sets holds even when the skill would fill a gap', () => {
+    const held = planRotation({
+      rotation: [periodic(skill('p', 0.5, { pause: 5, held: true }))],
+      mains: [skill('a', 0.5, { cooldown: { seconds: 2.5, uses: 1 } })],
+      weapon: 1,
+    });
+    // The usual pause gives way to the gaps (the test above); one the player set does not, so the weapon fills them.
+    expect(held.acts.p).toBeCloseTo(1 / 5, 1);
+    expect(held.weapon).toBeGreaterThan(0.5);
+  });
+
   it('a utility skill is cast on its own interval and takes its time', () => {
     const p = planRotation({
       rotation: [utility(skill('u', 1, { pause: 10 }))],

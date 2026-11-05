@@ -2182,9 +2182,14 @@ export class Character {
   /** Seconds before a secondary skill can be cast again (EXPANSION 5.5a). */
   cooldownOf(choice: SkillChoice, conds: number = this.configConds): number {
     const rate = this.cooldownRate(choice, conds);
-    // The pause the strategy sets on a periodic skill without a cooldown of its own.
-    const every = rate === undefined ? this.entryOf(choice)?.every : undefined;
-    if (every !== undefined) return Math.max(every, this.profile(choice, conds).useTime);
+    // The pause the strategy sets on a periodic skill: kept even when its own cooldown would allow it sooner.
+    const every = this.entryOf(choice)?.every;
+    if (every !== undefined)
+      return Math.max(
+        every,
+        rate === undefined ? 0 : 1 / rate,
+        this.profile(choice, conds).useTime,
+      );
     return (
       (rate === undefined ? undefined : 1 / rate) ??
       Math.max(
@@ -2261,7 +2266,11 @@ export class Character {
       } else if (e.role === 'periodic' || e.role === 'keepUp') {
         if (skillRange(this.profile(c, conds)) < reach - 0.05) continue;
         if (e.role === 'periodic') {
-          rotation.push({ ...this.planSkill(c, conds, this.cooldownOf(c, conds)), utility: false });
+          rotation.push({
+            ...this.planSkill(c, conds, this.cooldownOf(c, conds)),
+            held: e.every !== undefined,
+            utility: false,
+          });
           continue;
         }
         // A skill kept up is cast again as what it keeps runs low: what it leaves standing (src/sim/ai.ts), or a debuff renewed

@@ -1514,6 +1514,8 @@ _(Filled in during implementation: date, decision, reason.)_
 
 | 2026-11-05 | The Awlsmith stop is removed from the code (the owner): it was cut on 2026-10-29 and its socket is the Respite's socket craft (`addSocket`, `socketableItems`). A save that still offers one gets that level's offers rolled again on load, and leaves any stop visit (`dropCutStops`, `src/run/save.ts`). | Dead code for a stop that is never offered. |
 
+| 2026-11-05 | Any periodic skill can be given a pause on the Strategy tab (the owner), one with a cooldown of its own too: it then waits for both, the pause and a use of its cooldown, so it can be used less often than the cooldown allows, and a pause shorter than the cooldown counts when the cooldown is shortened in a fight (Rime Step). A pause the player set also holds when the skill stands in for a main skill that cannot be used; the usual pause still gives way there. Pauses run to 20 and 30 s. | The pause menu was hidden for skills with a cooldown, so they could only be used as often as the cooldown allowed. |
+
 ## Appendix B — Glossary
 
 - **Increased / reduced:** additive percentage modifiers, summed together.
