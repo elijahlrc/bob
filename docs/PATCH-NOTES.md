@@ -4,6 +4,12 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-11-05
+
+- Buttons, menus and boxes are redrawn with worn painted edges, and their words and icons no longer spill over the frames.
+- A picked choice is now gold with a dark outline, and a ticked box shows a check mark.
+- The Respite lists your worn items first and shows what raising each affix would give.
+
 ## 2026-11-04
 
 ### Monsters and combat
