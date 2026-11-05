@@ -3,6 +3,7 @@ import { askAgain, asksSkipped, MAP_CONFIRM } from './Confirm';
 import { useViewport } from './device';
 import { SoundSettings } from './SoundSettings';
 import { offeredScales, setUiScale, uiScale } from './uiScale';
+import { ringProps } from './leaf/ring';
 
 /** Shown only after "Don't ask me again" on the map question: the way to be asked again. */
 function MapConfirmSetting() {
@@ -37,6 +38,7 @@ export function UiScalePicker() {
           <button
             key={s}
             class={'btn small' + (s === scale ? ' on' : '')}
+            {...ringProps(s === scale)}
             aria-pressed={s === scale}
             onClick={() => {
               setUiScale(s);

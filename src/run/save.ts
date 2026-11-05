@@ -4,6 +4,8 @@ import { LEGACY } from '../data/difficulty';
 import { resetTree } from '../data/tree/rules';
 import { pack, unpack } from './pack';
 import { SAVE_VERSION, type RunState } from './run';
+import { STOPS } from '../data/stops';
+import { rollOffers } from './offers';
 
 /** The subset of the Web Storage API the game needs (injected so `run/` stays headless). */
 export type KeyValueStore = {
@@ -48,10 +50,22 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
     if (run) releaseStrandedGems(run);
     // A gem since removed from the game (Refine Gem and Exalted Focus, 2026-10-28) is taken out of the run.
     if (run) dropRetiredGems(run);
+    // A stop since removed from the game (the Awlsmith, 2026-11-05) is no longer on offer.
+    if (run) dropCutStops(run);
     return run ? { status: 'ok', run } : { status: 'incompatible' };
   } catch {
     return { status: 'incompatible' };
   }
+}
+
+/**
+ * A save offering a stop the game no longer has (the Awlsmith, cut 2026-11-05) gets its level's offers rolled again, as
+ * the level would roll them now, and leaves any visit it was in.
+ */
+export function dropCutStops(run: RunState): void {
+  if (!run.offers.some((o) => o.kind === 'stop' && !STOPS.some((s) => s.id === o.stop))) return;
+  run.offers = rollOffers(run.seed, run.map);
+  if (run.wayside) run.wayside.stopVisit = null;
 }
 
 /**

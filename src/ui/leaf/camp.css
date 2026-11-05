@@ -152,6 +152,13 @@ html.leaf .theme-name {
   color: var(--gold-hi);
   text-shadow: var(--text-shadow);
 }
+/* A name under an arch wraps inside its curve, which is narrower near the top than the panel (docs/UI-FRAMES.md). */
+html.leaf .btn.theme .theme-name,
+html.leaf .stop .stop-name {
+  max-width: 66%;
+  margin-inline: auto;
+  text-wrap: balance;
+}
 html.leaf .theme > .muted {
   text-align: center;
   color: var(--muted);
@@ -266,8 +273,7 @@ html.leaf .camp-foot .ui-scale {
   color: #2e2010;
   font-weight: 600;
 }
-html.leaf .camp-foot .ui-scale > .muted,
-html.leaf .camp-foot .ui-scale .btn.on {
+html.leaf .camp-foot .ui-scale > .muted {
   color: var(--pearl);
   text-shadow: var(--text-shadow);
 }

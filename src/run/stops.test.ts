@@ -1,26 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { HOARD_TAKE, STOP_FROM, STOPS, SURGEON_TRADES, type StopId } from '../data/stops';
-import type { Item } from '../data/types';
+import { HOARD_TAKE, STOP_FROM, SURGEON_TRADES, type StopId } from '../data/stops';
 import { botRun } from './bot';
 import { botStopChoice } from './botStop';
-import { makeStop, respiteSlot, rollOffers, stopAt } from './offers';
+import { respiteSlot, rollOffers, stopAt } from './offers';
 import { newRun, setMap, type RunState } from './run';
 import { Character } from '../calc/character';
-import {
-  awlsmithCost,
-  awlsmithItems,
-  hoardGems,
-  hoardKinds,
-  stopProblem,
-  surgeonBlocker,
-  takeStop,
-} from './stops';
-import { waysideOf } from './wayside';
+import { hoardGems, hoardKinds, stopProblem, surgeonBlocker, takeStop } from './stops';
 
-/**
- * A run standing at the first level where the schedule puts the given stop (or any stop). A stop no longer scheduled (the
- * Awlsmith) is put in the second slot of the first level that may hold one, as an older save may hold it.
- */
+/** A run standing at the first level where the schedule puts the given stop (or any stop). */
 function atStop(seed: number, want?: StopId): { run: RunState; slot: number } {
   for (let map = STOP_FROM; map < 100; map++) {
     const s = stopAt(seed, map);
@@ -29,11 +16,7 @@ function atStop(seed: number, want?: StopId): { run: RunState; slot: number } {
     setMap(run, map);
     return { run, slot: run.offers.findIndex((o) => o.kind === 'stop') };
   }
-  if (!want || STOPS.find((s) => s.id === want)!.weight > 0) throw new Error('no such stop');
-  const run = newRun('vanguard', seed);
-  setMap(run, STOP_FROM);
-  run.offers[1] = makeStop(STOP_FROM, 1, want);
-  return { run, slot: 1 };
+  throw new Error('no such stop');
 }
 
 describe('the stop schedule (docs/WAYSIDE.md 5.1)', () => {
@@ -85,53 +68,6 @@ describe('a stop in a set of offers', () => {
   });
 });
 
-describe('the Awlsmith', () => {
-  it('bores the next socket free, passes the level, and records a stop', () => {
-    const { run, slot } = atStop(11, 'awlsmith');
-    // The starting armour is level 1, which allows few sockets: let it be an item that can hold more.
-    run.build.equipment.body = { ...run.build.equipment.body!, ilvl: 80 };
-    const item = run.build.equipment.body as Item;
-    const before = item.sockets.length;
-    const level = run.map;
-    const res = takeStop(run, slot, { stop: 'awlsmith', itemUid: item.uid });
-    expect(res).toEqual({ ok: true });
-    expect(run.build.equipment.body!.sockets).toHaveLength(before + 1);
-    expect(run.map).toBe(level + 1);
-    expect(run.history.at(-1)).toMatchObject({ map: level, status: 'stop', stop: 'awlsmith' });
-    expect(run.reward).toBeNull();
-    expect(waysideOf(run).stops).toBe(1);
-  });
-
-  it('charges Bone Dust for the sockets after the first, and refuses what cannot be paid', () => {
-    const { run, slot } = atStop(11, 'awlsmith');
-    run.build.equipment.body = { ...run.build.equipment.body!, ilvl: 80 };
-    const item = run.build.equipment.body!;
-    // Give the item two sockets, so the new one is its third and one more is its fourth.
-    run.build.equipment.body = { ...item, sockets: [null, null] };
-    const uid = item.uid;
-    expect(awlsmithItems(run).find((x) => x.uid === uid)).toBeDefined();
-    const price = awlsmithCost(run.build.equipment.body!, 2);
-    expect(price).toBeGreaterThan(0);
-    const choice = { stop: 'awlsmith' as const, itemUid: uid, extra: 1 };
-    run.dust = price - 1;
-    expect(stopProblem(run, slot, choice)).not.toBeNull();
-    run.dust = price + 15;
-    expect(stopProblem(run, slot, choice)).toBeNull();
-    const map = run.map;
-    expect(takeStop(run, slot, choice).ok).toBe(true);
-    expect(run.dust).toBe(15);
-    expect(run.map).toBe(map + 1);
-  });
-
-  it('changes nothing when the choice is not valid', () => {
-    const { run, slot } = atStop(11, 'awlsmith');
-    const snapshot = JSON.stringify(run);
-    expect(takeStop(run, slot, { stop: 'awlsmith', itemUid: 999999 }).ok).toBe(false);
-    expect(takeStop(run, slot, { stop: 'gemHoard', tag: 'fire', picks: [] }).ok).toBe(false);
-    expect(JSON.stringify(run)).toBe(snapshot);
-  });
-});
-
 describe('the Gem Hoard', () => {
   it('lays out the same gems of a kind every time, each once, and the same kinds to choose from', () => {
     const { run, slot } = atStop(11, 'gemHoard');
@@ -173,7 +109,7 @@ describe('the Gem Hoard', () => {
 describe('the bot at a stop', () => {
   it('has something valid to do at each stop', () => {
     for (const seed of [11, 12, 13]) {
-      for (const want of ['awlsmith', 'gemHoard'] as const) {
+      for (const want of ['gemHoard'] as const) {
         const { run, slot } = atStop(seed, want);
         const choice = botStopChoice(run, slot);
         expect(choice).not.toBeNull();

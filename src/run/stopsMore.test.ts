@@ -38,11 +38,8 @@ describe('the Shrine', () => {
     const { run, slot } = withStop('shrine', 12);
     const first = shrineBlessings(run, run.offers[slot])[0];
     takeStop(run, slot, { stop: 'shrine', blessing: first });
-    run.offers[1] = makeStop(run.map, 1, 'awlsmith');
-    run.build.equipment.body = { ...run.build.equipment.body!, ilvl: 80 };
-    expect(takeStop(run, 1, { stop: 'awlsmith', itemUid: run.build.equipment.body!.uid }).ok).toBe(
-      true,
-    );
+    run.offers[1] = makeStop(run.map, 1, 'knucklebone');
+    expect(takeStop(run, 1, { stop: 'knucklebone' }).ok).toBe(true);
     expect(waysideOf(run).blessing).toBe(first);
     run.offers[1] = makeStop(run.map, 1, 'shrine');
     const next = shrineBlessings(run, run.offers[1])[0];

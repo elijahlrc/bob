@@ -2,19 +2,19 @@ import { priceAt } from '../data/sale';
 import { EQUIP_SLOTS, type Item } from '../data/types';
 import {
   addableFamilies,
-  awlsmithSockets,
+  addSocket,
   addRandomAffix,
   nextTier,
   raiseTier,
+  socketCeiling,
   type CraftResult,
 } from './craft';
 import { takeRespite, TOTAL_MAPS, type RunState } from './run';
-import { awlsmithItems } from './stops';
 import { heldReward, waysideOf } from './wayside';
 
 /**
  * The Respite (docs/ATTRITION.md): craft, then rest. Craft works on an item: a random affix, an affix a tier up, or a socket
- * (the Awlsmith's old service). Each craft shows its result at once; the first of a visit is free and the next cost Bone Dust
+ * (the cut Awlsmith stop's old service). Each craft shows its result at once; the first of a visit is free and the next cost Bone Dust
  * by the item's level. Resting refills everything and passes the level; once a craft is made, resting is the only way out.
  */
 export type RespiteCraft =
@@ -52,9 +52,18 @@ export function respiteCraftCost(run: RunState, it: Item, kind: RespiteCraft['ki
   return heldReward(run, 'thriftyHands') > 0 ? Math.ceil(dust / 2) : dust;
 }
 
+/** The items with room for one more socket, worn or carried (the socket craft's). */
+export function socketableItems(run: RunState): Item[] {
+  const worn = EQUIP_SLOTS.map((s) => run.build.equipment[s]).filter((x): x is Item => !!x);
+  const carried = run.inventory.filter((x): x is Item => x.kind === 'item');
+  return [...worn, ...carried].filter(
+    (it) => !it.sealed && !it.fixedSockets && it.sockets.length < socketCeiling(it),
+  );
+}
+
 /** The items a craft can work on: worn items for the affix crafts, worn or carried ones with room for a socket. */
 export function respiteItems(run: RunState, kind: RespiteCraft['kind']): Item[] {
-  if (kind === 'socket') return awlsmithItems(run);
+  if (kind === 'socket') return socketableItems(run);
   if (kind === 'affix') return worn(run).filter((it) => addableFamilies(it).length > 0);
   return worn(run).filter((it) => it.affixes.some((a) => nextTier(it, a.family, run.map)));
 }
@@ -94,7 +103,7 @@ export function craftAtRespite(run: RunState, slot: number, craft: RespiteCraft)
       ? addRandomAffix(run, craft.itemUid)
       : craft.kind === 'tier'
         ? raiseTier(run, craft.itemUid, craft.family)
-        : awlsmithSockets(run, craft.itemUid, 0);
+        : addSocket(run, craft.itemUid);
   if (!res.ok) return res;
   run.dust -= cost;
   const way = waysideOf(run);

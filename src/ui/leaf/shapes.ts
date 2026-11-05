@@ -119,6 +119,16 @@ export type PanelOpts = {
   foot?: boolean;
   /** Where a frieze starts under each heading, in art pixels from the top of the panel. */
   friezes?: number[];
+  /**
+   * The light frame of a compact control (docs/UI-FRAMES.md): a one-pixel rim, worn uneven, straight round the field,
+   * with no ink line and no room kept above or left of it (its shadow falls below and right). Needs `rand`.
+   */
+  ring?: boolean;
+  /** A ring holds a check mark in ink (a ticked checkbox). */
+  tick?: boolean;
+  /** The field's brightest step, when not the ramp's usual one. */
+  from?: number;
+  rand?: Rand;
 };
 
 /**
@@ -126,10 +136,83 @@ export type PanelOpts = {
  * little inside its box, so the shadow the aging adds has room.
  */
 export function panel(W0: number, H0: number, o: PanelOpts): HTMLCanvasElement {
+  if (o.ring) return ringPanel(W0, H0, o);
   const m = o.thin ? 2 : 3;
   const out = canvas(W0, H0);
   if (W0 > 2 * m + 2 && H0 > 2 * m + 2)
     ctx2d(out).drawImage(panelCore(W0 - 2 * m, H0 - 2 * m, o), m, m);
+  return out;
+}
+/**
+ * A ringed field: two art pixels kept free on the right and below for the shadow; the rim one pixel wide, its
+ * steps varied, thickened inward here and there and chipped at the corners and in a few places along it, so it reads
+ * as painted by hand.
+ */
+function ringPanel(W0: number, H0: number, o: PanelOpts): HTMLCanvasElement {
+  const out = canvas(W0, H0);
+  const W = W0 - 2;
+  const H = H0 - 2;
+  if (W < 4 || H < 4) return out;
+  const ctx = ctx2d(out);
+  const r = o.rand ?? (() => 0.5);
+  const rim = o.rim ?? 'gold';
+  const base = rim === 'ink' ? 0 : 5;
+  ctx.fillStyle = col(rim, base);
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = lit(
+    ctx,
+    o.field,
+    W * 0.3,
+    H * 0.1,
+    Math.max(W, H) * 1.1,
+    o.from ?? (o.field === 'gold' ? 5 : 4),
+  );
+  ctx.fillRect(1, 1, W - 2, H - 2);
+  const px = (x: number, y: number, c: string | null) => {
+    if (c === null) ctx.clearRect(x, y, 1, 1);
+    else {
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  };
+  // A ring this small (a checkbox) is nearly all rim: chipped, it reads as a dashed line, so it stays whole.
+  const whole = W < 16 || H < 16;
+  // Every pixel of the rim, clockwise, with the way inward.
+  const edge: [number, number, number, number][] = [];
+  for (let x = 0; x < W; x++) edge.push([x, 0, 0, 1]);
+  for (let y = 1; y < H; y++) edge.push([W - 1, y, -1, 0]);
+  for (let x = W - 2; x >= 0; x--) edge.push([x, H - 1, 0, -1]);
+  for (let y = H - 2; y > 0; y--) edge.push([0, y, 1, 0]);
+  for (const [x, y, dx, dy] of edge) {
+    const v = r();
+    if (v < 0.12) px(x, y, col(rim, base - 1));
+    else if (v < 0.2 && rim !== 'ink') px(x, y, col(rim, base + 1));
+    if (r() < 0.07) px(x + dx, y + dy, col(rim, rim === 'ink' ? base : base - 1));
+    else if (r() < 0.025 && whole === false) px(x, y, null);
+  }
+  for (const [x, y] of [
+    [0, 0],
+    [W - 1, 0],
+    [0, H - 1],
+    [W - 1, H - 1],
+  ])
+    if (r() < 0.6 && whole === false) px(x, y, null);
+  if (o.tick) {
+    // A check mark two pixels thick across the field: down to the left foot, then up to the top right.
+    const f = W - 2;
+    const s = f / 8;
+    const pts: [number, number][] = [
+      [1.2, 4],
+      [3, 6],
+      [6.8, 1.6],
+    ];
+    ctx.strokeStyle = col('ink', 0);
+    ctx.lineWidth = Math.max(1.6, 1.7 * s);
+    ctx.lineCap = 'square';
+    ctx.beginPath();
+    pts.forEach(([x, y], i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, 1 + x * s, 1 + y * s));
+    ctx.stroke();
+  }
   return out;
 }
 function panelCore(W: number, H: number, o: PanelOpts): HTMLCanvasElement {

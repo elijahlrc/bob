@@ -39,6 +39,7 @@ import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
 import { useRehearsal } from './rehearsal';
 import { sfx } from './sound/engine';
+import { ringProps } from './leaf/ring';
 
 type Drag = { kind: 'inv'; uid: number } | { kind: 'slot'; slot: EquipSlot } | null;
 
@@ -501,6 +502,7 @@ export function Items({
         {phone && (
           <button
             class="ix-gear-toggle"
+            {...ringProps(false)}
             aria-expanded={gearOpen}
             onClick={() => setGearOpen(!gearOpen)}
           >

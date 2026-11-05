@@ -42,19 +42,29 @@ const JOBS: Job[] = [
   ],
   ['.btn.primary', 'panel', { field: 'vermilion', thin: true, loss: 0.05, cracks: 1 }],
   ['.btn.danger', 'panel', { field: 'bitumen', thin: true, loss: 0.03, cracks: 1 }],
-  // The settings at the camp's foot: each row's name on green, the picked choice on porphyry.
+  // The settings at the camp's foot: each row's name on green.
   ['.camp-foot .ui-scale > .muted', 'panel', { field: 'green', thin: true, loss: 0.03, cracks: 0 }],
-  [
-    '.camp-foot .ui-scale .btn.on',
-    'panel',
-    { field: 'porphyry', thin: true, loss: 0, cracks: 0, texture: 0.45, goldLoss: 0 },
-  ],
+  // A picked button: clean gold in an ink rim, so it never runs into a gold rim beside it (docs/UI-FRAMES.md).
   [
     '.btn.on',
     'panel',
-    { field: 'gold', thin: true, loss: 0, cracks: 0, texture: 0.45, goldLoss: 0 },
+    { field: 'gold', rim: 'ink', thin: true, loss: 0, cracks: 0, texture: 0.45, goldLoss: 0 },
   ],
   ['.btn', 'panel', { field: 'lapis', thin: true, loss: 0.05, cracks: 1 }],
+  // Checkboxes, fields and menus: a dark lapis well in the worn ring (docs/UI-FRAMES.md), not a clean CSS line; a
+  // ticked box is gold in an ink ring, as a picked control is, with a check mark (the owner: readable at a glance).
+  [
+    "input[type='checkbox']:checked",
+    'panel',
+    { field: 'gold', rim: 'ink', ring: true, tick: true, loss: 0 },
+  ],
+  // A box this small has rim all over: no flaking, or its ring reads as a dashed line.
+  ["input[type='checkbox']", 'panel', { field: 'lapis', ring: true, from: 2, loss: 0 }],
+  [
+    "input:not([type='checkbox'], [type='radio'], [type='range'], [type='color']), select, textarea",
+    'panel',
+    { field: 'lapis', ring: true, from: 2 },
+  ],
   ['.modal-card', 'panel', { field: 'lapis', loss: 0.03, cracks: 4 }],
 ];
 
@@ -326,11 +336,19 @@ function draw(
     }).toDataURL();
   }
   if (kind === 'panel') {
-    const [field] = rampOf(d.field, [(o.field as Ramp) ?? 'lapis', 4]);
+    const [field, from] = rampOf(d.field, [
+      (o.field as Ramp) ?? 'lapis',
+      (o.from as number | undefined) ?? -1,
+    ]);
     const rim = isRamp(d.rim) ? d.rim : (o.rim as Ramp | undefined);
+    const ring = 'ring' in d || !!o.ring;
     const opts: PanelOpts = {
       field,
       rim,
+      ring,
+      tick: !!o.tick,
+      rand: r,
+      ...(from >= 0 ? { from } : {}),
       thin: 'thin' in d || !!o.thin,
       arch: 'arch' in d || !!o.arch,
       pearls: 'pearls' in d || !!o.pearls,
@@ -346,6 +364,8 @@ function draw(
       loss: dark ? 0.016 : 0.035,
       cracks: Math.min(8, Math.round((W * H) / 6000)),
       ...(dark ? { dark: true, texture: 0.5 } : {}),
+      // A ringed control is small: a little wear at its edge, no cracks across its word.
+      ...(ring ? { loss: 0.02, cracks: 0, edgeReach: 3 } : {}),
       ...(o as AgeOpts),
       ...(d.loss !== undefined ? { loss: num('loss', 0) } : {}),
     }).toDataURL();
@@ -560,6 +580,8 @@ function watch() {
     ],
   });
   window.addEventListener('resize', schedule);
+  // Ticking a box changes no attribute, so the observer above does not see it.
+  document.addEventListener('change', soon);
   document.fonts?.ready.then(schedule);
   document.fonts?.addEventListener?.('loadingdone', schedule);
   schedule();

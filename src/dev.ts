@@ -13,6 +13,7 @@ import type { Controller } from './run/controller';
 import { uidSource } from './run/run';
 import { rollOffers } from './run/offers';
 import { setNewBuild } from './update';
+import { frameAudit } from './ui/leaf/frameAudit';
 
 /**
  * Dev-only helpers on `window.__dev` for driving the game from the browser console or an automation
@@ -29,6 +30,8 @@ export function installDevTools(controller: Controller, game: Phaser.Game): void
   const dev = {
     controller,
     game,
+    /** What crosses onto a painted frame on this screen (docs/UI-FRAMES.md). */
+    frames: frameAudit,
     /** Advance `n` rendered frames of `dtMs` each. */
     async step(n: number, dtMs = 16.7): Promise<void> {
       for (let i = 0; i < n; i++) {

@@ -7,6 +7,7 @@ import {
   soundVolume,
   VOLUMES,
 } from './sound/engine';
+import { ringProps } from './leaf/ring';
 
 const NAMES: Record<number, string> = { 0: 'Off', 0.4: 'Quiet', 0.7: 'Normal', 1: 'Loud' };
 
@@ -27,6 +28,7 @@ function VolumeRow({
         <button
           key={v}
           class={'btn small' + (v === vol ? ' on' : '')}
+          {...ringProps(v === vol)}
           aria-pressed={v === vol}
           onClick={() => {
             set(v);

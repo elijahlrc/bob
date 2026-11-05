@@ -13,6 +13,7 @@ import { GLOSSARY } from '../data/glossary';
 import { itemTitle, rarityClass } from './ItemCard';
 import { infoProps } from './info';
 import { introSeen, seeIntro } from './intro';
+import { ringProps } from './leaf/ring';
 
 /** A mark the bag can be narrowed to: new, an upgrade, from the last map, a favourite. */
 export type Mark = 'new' | 'upgrades' | 'last' | 'fav';
@@ -242,6 +243,7 @@ export function ItemList(p: Props) {
   const reverse = (
     <button
       class={'btn small ix-rev' + (p.desc ? ' on' : '')}
+      {...ringProps(p.desc)}
       aria-pressed={p.desc}
       aria-label="Turn the sort the other way round"
       title="Turn the sort the other way round"
@@ -254,9 +256,7 @@ export function ItemList(p: Props) {
     <div class="ix-views" role="group" aria-label="Show">
       <button
         class={'ix-view' + (!f.marks.length && !f.pile ? ' on' : '')}
-        data-paint={!f.marks.length && !f.pile ? 'panel' : 'none'}
-        data-thin
-        data-field="gold"
+        {...ringProps(!f.marks.length && !f.pile)}
         aria-pressed={!f.marks.length && !f.pile}
         onClick={() => p.setFilters({ ...f, marks: [], pile: false })}
       >
@@ -268,9 +268,7 @@ export function ItemList(p: Props) {
           <button
             key={k}
             class={'ix-view' + (on ? ' on' : '')}
-            data-paint={on ? 'panel' : 'none'}
-            data-thin
-            data-field="gold"
+            {...ringProps(on)}
             aria-pressed={on}
             aria-label={k === 'fav' ? 'Favourites' : undefined}
             {...(k === 'upgrades' ? infoProps(GLOSSARY.upgrade) : {})}
@@ -283,9 +281,7 @@ export function ItemList(p: Props) {
       })}
       <button
         class={'ix-view' + (f.pile ? ' on' : '')}
-        data-paint={f.pile ? 'panel' : 'none'}
-        data-thin
-        data-field="gold"
+        {...ringProps(f.pile)}
         aria-pressed={f.pile}
         onClick={() => p.setFilters({ ...f, pile: !f.pile })}
       >
@@ -302,10 +298,7 @@ export function ItemList(p: Props) {
           <button
             key={k}
             class={'ix-kind' + (on ? ' on' : '')}
-            data-paint="panel"
-            data-thin
-            data-field={on ? 'gold' : 'lapis'}
-            data-pk={on ? 'on' : 'off'}
+            {...ringProps(on)}
             aria-pressed={on}
             aria-label={label}
             {...infoProps(label)}
@@ -356,7 +349,7 @@ export function ItemList(p: Props) {
     </div>
   );
   const clearButton = (cls: string) => (
-    <button class={cls} onClick={clear}>
+    <button class={cls} {...(cls.startsWith('ix-rm') ? ringProps(false) : {})} onClick={clear}>
       Clear filters
     </button>
   );
@@ -394,6 +387,7 @@ export function ItemList(p: Props) {
                 <button
                   key={k}
                   class="ix-rm"
+                  {...ringProps(false)}
                   aria-label={`Remove the ${kindLabel(k)} filter`}
                   onClick={() => setKinds(f.kinds.filter((x) => x !== k))}
                 >
@@ -404,6 +398,7 @@ export function ItemList(p: Props) {
                 <button
                   key={m}
                   class="ix-rm"
+                  {...ringProps(false)}
                   aria-label={`Remove the ${markLabel(m)} filter`}
                   onClick={() => setMarks(f.marks.filter((x) => x !== m))}
                 >
@@ -413,6 +408,7 @@ export function ItemList(p: Props) {
               {f.pile && (
                 <button
                   class="ix-rm"
+                  {...ringProps(false)}
                   aria-label="Remove the Discarded filter"
                   onClick={() => p.setFilters({ ...f, pile: false })}
                 >

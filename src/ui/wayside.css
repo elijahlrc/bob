@@ -342,7 +342,8 @@ html.leaf .tip {
   width: fit-content;
   max-width: min(100%, 760px);
   min-width: 0;
-  padding: 12px 20px 13px;
+  /* Clear of the thin frame's 12 px, so "Got it" keeps a little of the field around it (docs/UI-FRAMES.md). */
+  padding: 14px 20px 15px;
   font-size: var(--size);
   text-align: center;
   color: var(--pearl);
@@ -422,4 +423,89 @@ html.leaf .effects-bar .effects-relics li:hover,
 html.leaf .effects-bar .effects-relics li:focus-visible {
   background: #4a2438;
   outline: none;
+}
+
+/* ---- The Respite: worn items by slot, the bag folded away, the affix choices set apart ---- */
+html.leaf .respite-slot {
+  font-size: 0.85em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+html.leaf .respite-bag-toggle {
+  align-self: flex-start;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--gold-hi);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+html.leaf .respite-bag-toggle:hover {
+  filter: brightness(1.15);
+}
+html.leaf .respite-arrow {
+  display: inline-block;
+  width: 1em;
+}
+html.leaf .respite-changes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 2px solid var(--gold-hi);
+}
+html.leaf .respite-changes-head {
+  font-weight: 600;
+  color: var(--gold-hi);
+}
+html.leaf .respite-changes-head .muted {
+  font-weight: 400;
+  color: var(--muted);
+}
+html.leaf .respite-affixes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+html.leaf .respite-affix {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 22px 14px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font: inherit;
+  font-size: var(--size);
+  line-height: 1.3;
+  text-align: left;
+  color: var(--pearl);
+  text-shadow: var(--text-shadow);
+  cursor: pointer;
+}
+html.leaf .respite-affix:hover:not(.sel) {
+  filter: brightness(1.15);
+}
+html.leaf .respite-affix-kind {
+  font-weight: 600;
+  color: var(--gold-hi);
+}
+html.leaf .respite-affix-row {
+  display: grid;
+  grid-template-columns: 4em 1fr;
+  gap: 8px;
+}
+html.leaf .respite-affix-row > :last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+html.leaf .respite-affix .muted {
+  color: var(--muted);
+}
+html.leaf .respite-affix-new {
+  color: #c8f0b0;
 }

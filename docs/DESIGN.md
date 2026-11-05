@@ -1510,6 +1510,10 @@ _(Filled in during implementation: date, decision, reason.)_
 
 | 2026-11-04 | Flask upgrades go by what the flasks hold now (the owner): a worn flask with no drink left is like an empty slot, so any bag flask with a drink in it is an upgrade for it ("replaces empty flask N") and Equip puts it there, one of its own kind first; a bag flask with no drink is never an upgrade (`drinksIn`, `src/run/inventoryOps.ts`). | A drained flask stayed worn while full ones sat in the bag unmarked. |
 
+| 2026-11-05 | Content sits inside its painted frame (the owner, docs/UI-FRAMES.md): a framed box's padding clears its frame (thin 12 px, full 18 px, under an arch its curve); compact controls that a full frame would make too tall (rows of choices, filter toggles, one-glyph buttons, fields, menus, checkboxes) take the ring, a textured field in a worn one-pixel gold rim; anything picked is gold in an ink rim with dark text. `window.__dev.frames()` and `scripts/ui-sweep.mjs` check every screen at 1920×1080, 1440×900 and a 390×844 phone. | Text ran over button borders, controls sat on panel rims, a picked button's gold met the panel's gold rim, and CSS outlines looked digital beside the painted ones. |
+
+| 2026-11-05 | The Awlsmith stop is removed from the code (the owner): it was cut on 2026-10-29 and its socket is the Respite's socket craft (`addSocket`, `socketableItems`). A save that still offers one gets that level's offers rolled again on load, and leaves any stop visit (`dropCutStops`, `src/run/save.ts`). | Dead code for a stop that is never offered. |
+
 ## Appendix B — Glossary
 
 - **Increased / reduced:** additive percentage modifiers, summed together.

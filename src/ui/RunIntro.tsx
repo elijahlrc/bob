@@ -24,7 +24,7 @@ export function RunIntro({ onDone }: { onDone: () => void }) {
     <div class="run-intro" role="dialog" aria-modal="true" aria-labelledby="run-intro-head">
       <div class="run-intro-card" data-paint="panel">
         <h2 id="run-intro-head" class="lf-h">
-          The road through the hundred maps
+          A hundred maps stand between you and escape
         </h2>
         <p>Your character fights each map on its own. Between maps, you make it stronger.</p>
         <p>Clear 100 maps to win. If your character dies, the run is over.</p>

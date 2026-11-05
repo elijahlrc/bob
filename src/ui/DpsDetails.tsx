@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { dpsBreakdown, type BreakdownRole, type BreakdownRow } from '../calc/breakdown';
 import type { Character, Scenario } from '../calc/character';
 import { TypeBar } from './TypeBar';
+import { ringProps } from './leaf/ring';
 
 const ROLE_NAMES: Record<BreakdownRole, string> = {
   main: 'Main',
@@ -59,6 +60,7 @@ export function DpsDetails({ ch }: { ch: Character }) {
                 <button
                   key={s}
                   class={'btn small' + (s === shown ? ' on' : '')}
+                  {...ringProps(s === shown)}
                   onClick={() => setScenario(s)}
                 >
                   {SCENARIO_NAMES[s]}

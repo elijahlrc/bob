@@ -191,7 +191,7 @@ html.leaf .rivals-block .duel-cta {
 .hs-older-check {
   display: inline-flex;
   align-items: center;
-  padding: 9px 18px 10px;
+  padding: 12px 18px;
   color: var(--pearl);
   text-shadow: var(--text-shadow);
   cursor: pointer;

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { getTree } from '../data/tree';
-import { newRun, SAVE_VERSION } from './run';
-import { migrate } from './save';
+import type { StopId } from '../data/stops';
+import { makeStop, rollOffers } from './offers';
+import { newRun, SAVE_VERSION, setMap } from './run';
+import { loadRun, migrate, saveRun } from './save';
 import { waysideOf } from './wayside';
 
 describe('migrating a save of the passive tree before the district layout (docs/TREE-REDESIGN.md)', () => {
@@ -72,5 +74,35 @@ describe('the Wayside state (docs/WAYSIDE.md)', () => {
     expect(w.pouch).toEqual({ whettedPowder: 2 });
     expect(w.curses).toEqual([]);
     expect(w.seen).toEqual({});
+  });
+});
+
+describe('a stop cut from the game (the Awlsmith, 2026-11-05)', () => {
+  it('a save offering one loads with its level offered as it would be now', () => {
+    const run = newRun('vanguard', 7);
+    setMap(run, 12);
+    const now = JSON.stringify(rollOffers(run.seed, run.map));
+    // As a save from before the cut may hold it: a stop the game no longer knows in the second slot, with a visit open.
+    run.offers[1] = { ...makeStop(run.map, 1, 'gemHoard'), stop: 'awlsmith' as StopId };
+    waysideOf(run).stopVisit = { slot: 1 };
+    const store = new Map<string, string>();
+    saveRun(
+      {
+        getItem: (k) => store.get(k) ?? null,
+        setItem: (k, v) => void store.set(k, v),
+        removeItem: (k) => void store.delete(k),
+      },
+      run,
+    );
+    const loaded = loadRun({
+      getItem: (k) => store.get(k) ?? null,
+      setItem: (k, v) => void store.set(k, v),
+      removeItem: (k) => void store.delete(k),
+    });
+    expect(loaded.status).toBe('ok');
+    const out = (loaded as { run: typeof run }).run;
+    expect(out.offers.some((o) => (o.stop as string) === 'awlsmith')).toBe(false);
+    expect(JSON.stringify(out.offers)).toBe(now);
+    expect(waysideOf(out).stopVisit).toBeNull();
   });
 });

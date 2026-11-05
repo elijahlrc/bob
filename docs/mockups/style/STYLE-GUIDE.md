@@ -126,7 +126,12 @@ its pattern's periods.
   faint gold hairlines; values that are at their default dimmed.
 - **Offers:** arched niches of equal height in a row (one column on a phone); the map name in Jacquard in the arch; a
   stop is a porphyry niche. The warning is a vermilion plaque. Faction names are plain coloured text (no pills).
-- **Buttons:** thin-rimmed lapis panels (vermilion for the primary one); hover brightens.
+- **Buttons:** thin-rimmed lapis panels (vermilion for the primary one); hover brightens. A picked one is gold in an ink
+  rim. Content stays on the field: the thin frame takes 12 px of the box (4 of shadow room, 6 of gold, 2 of ink), a full
+  one 18 px, so a one-line button is at least about 37 px tall (docs/UI-FRAMES.md; `window.__dev.frames()` checks it).
+- **The ring** (2026-11-05, docs/UI-FRAMES.md): compact controls (rows of choices, filter toggles, one-glyph buttons,
+  fields, menus, checkboxes) are a textured field in a worn one-pixel gold rim with a pixel shadow; picked, gold in an
+  ink rim with dark text. Never a clean CSS line: the owner found it too digital.
 - **Small bars** (life, mana, XP, flasks): lapis texture, a gold ring, a hard offset shadow (CSS box-shadow, no ink
   outline).
 - **Tooltips:** a dotted gold underline marks a word with a tip; the tip is a lapis box with a gold ring, shown on hover

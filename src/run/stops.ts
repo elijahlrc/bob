@@ -20,7 +20,7 @@ import { Character } from '../calc/character';
 import { gemStart } from '../calc/gems';
 import { gemWeight } from '../gen/loot';
 import { restAtCamp } from './camp';
-import { awlsmithDust, awlsmithSockets, socketCeiling, type CraftResult } from './craft';
+import { type CraftResult } from './craft';
 import { noteFound } from './found';
 import type { MapOffer } from './offers';
 import { advanceLevel, TOTAL_MAPS, uidSource, type RunState } from './run';
@@ -45,7 +45,6 @@ import { acquireReprieve, addCurse, reprieveBlocker } from './reprieves';
 
 /** What the player decided at a stop. The stop's screen builds one and `takeStop` applies it all at once, so nothing is half done. */
 export type StopChoice =
-  | { stop: 'awlsmith'; itemUid: number; extra?: number }
   | { stop: 'gemHoard'; tag: string; picks: string[] }
   | { stop: 'shrine'; blessing: string }
   | { stop: 'quartermaster'; buy: string[]; refill?: boolean }
@@ -56,25 +55,6 @@ export type StopChoice =
   | { stop: 'remains'; itemUid: number };
 
 const fail = (reason: string): CraftResult => ({ ok: false, reason });
-
-// ---- The Awlsmith ----------------------------------------------------------------------------------
-
-/** The items the Awlsmith can bore into: worn or carried, with room for a socket. */
-export function awlsmithItems(run: RunState): Item[] {
-  const worn = EQUIP_SLOTS.map((s) => run.build.equipment[s]).filter((x): x is Item => !!x);
-  const carried = run.inventory.filter((x): x is Item => x.kind === 'item');
-  return [...worn, ...carried].filter(
-    (it) => !it.sealed && !it.fixedSockets && it.sockets.length < socketCeiling(it),
-  );
-}
-
-/** The most sockets one visit can add to an item, and the Bone Dust a given number costs (the first is free). */
-export function awlsmithRoom(it: Item): number {
-  return Math.max(0, socketCeiling(it) - it.sockets.length);
-}
-export function awlsmithCost(it: Item, added: number): number {
-  return added <= 1 ? 0 : awlsmithDust(it.sockets.length + 1, it.sockets.length + added);
-}
 
 // ---- The Gem Hoard ---------------------------------------------------------------------------------
 
@@ -322,15 +302,6 @@ export function stopProblem(run: RunState, slot: number, choice: StopChoice): st
   if (run.phase !== 'camp') return 'not in camp';
   if (!offer || offer.kind !== 'stop' || offer.stop !== choice.stop) return 'no such stop';
   switch (choice.stop) {
-    case 'awlsmith': {
-      const it = awlsmithItems(run).find((x) => x.uid === choice.itemUid);
-      if (!it) return 'That item has no room for a socket';
-      const extra = Math.max(0, Math.floor(choice.extra ?? 0));
-      if (extra + 1 > awlsmithRoom(it)) return 'This item cannot have that many sockets';
-      const need = awlsmithCost(it, extra + 1);
-      if (run.dust < need) return `That needs ${need} Bone Dust`;
-      return null;
-    }
     case 'gemHoard': {
       const kinds = hoardKinds(run, offer).map((k) => k.tag);
       if (!kinds.includes(choice.tag)) return 'Name one of the four kinds';
@@ -402,11 +373,6 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
   const way = waysideOf(run);
   let refill = false;
   switch (choice.stop) {
-    case 'awlsmith': {
-      const res = awlsmithSockets(run, choice.itemUid, choice.extra ?? 0);
-      if (!res.ok) return res;
-      break;
-    }
     case 'gemHoard': {
       const uid = uidSource(run);
       for (const gemId of choice.picks) {

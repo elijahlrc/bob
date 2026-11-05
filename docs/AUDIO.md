@@ -229,7 +229,7 @@ or bigger cases), or **off**.
 
 | #   | Moment                                     | Sound idea                     | Priority |
 | --- | ------------------------------------------ | ------------------------------ | -------- |
-| F1  | Arrive at the Awlsmith                     | Hammer taps on an anvil        | Good     |
+| F1  | Arrive at the Awlsmith (stop removed)      | Hammer taps on an anvil        | Good     |
 | F2  | Arrive at the Gem Hoard                    | Gems rattling in a dish        | Good     |
 | F3  | Arrive at a Shrine                         | Low bell and a breath of choir | Good     |
 | F4  | Arrive at the Quartermaster                | Crates shifting, a latch       | Good     |

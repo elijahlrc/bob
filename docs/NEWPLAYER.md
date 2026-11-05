@@ -168,7 +168,7 @@ follows the concise-text rule and the voice rule (plain rules text, overwrought 
   every layout: above each orb, the speed tag beside a row of speed buttons when there is room and to the left of the
   phone's column of them (the card then sits below the column). The biome banner waits until it is gone. On a mouse
   the words are "Hover over icons", on a touch screen "Tap icons".
-- N10: as planned (`src/ui/RunIntro.tsx`), headed "The road through the hundred maps". On a phone a tab's name and its
+- N10: as planned (`src/ui/RunIntro.tsx`), headed "A hundred maps stand between you and escape" (renamed 2026-11-05 from a heading that read too gentle). On a phone a tab's name and its
   line run on one line. "Show the tips again" on the title brings back N9 to N11, the first-support note and the Skills
   tab's note.
 - N11: the rings are drawn in the tree's word layer, so they pan and zoom with it; the words are a plaque at the foot of

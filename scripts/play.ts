@@ -386,9 +386,6 @@ function look(run: RunState, i: number): void {
       for (const r of REPRIEVES.filter((x) => x.from <= run.map))
         console.log(`  ${r.id}: ${r.name}, ${r.text}`);
       break;
-    case 'awlsmith':
-      console.log('  (the Awlsmith is no longer scheduled)');
-      break;
     case 'surgeon':
       for (const id of surgeonTrades(run, o))
         console.log(`  ${id}: ${modsText(surgeonMods([id])).join(', ')}`);

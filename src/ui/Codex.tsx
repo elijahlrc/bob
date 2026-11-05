@@ -19,6 +19,7 @@ import {
 } from '../calc/skillLook';
 import { gemCardData } from './gemText';
 import { matchesTerms, searchTerms } from './search';
+import { ringProps } from './leaf/ring';
 
 type Tab = 'gems' | 'uniques' | 'look';
 
@@ -92,6 +93,7 @@ export function Codex({ c }: { c: Controller }) {
       <div class="menu row">
         <button
           class={tab === 'gems' ? 'btn on' : 'btn'}
+          {...ringProps(tab === 'gems')}
           aria-pressed={tab === 'gems'}
           onClick={() => setTab('gems')}
         >
@@ -99,6 +101,7 @@ export function Codex({ c }: { c: Controller }) {
         </button>
         <button
           class={tab === 'uniques' ? 'btn on' : 'btn'}
+          {...ringProps(tab === 'uniques')}
           aria-pressed={tab === 'uniques'}
           onClick={() => setTab('uniques')}
         >
@@ -106,6 +109,7 @@ export function Codex({ c }: { c: Controller }) {
         </button>
         <button
           class={tab === 'look' ? 'btn on' : 'btn'}
+          {...ringProps(tab === 'look')}
           aria-pressed={tab === 'look'}
           onClick={() => setTab('look')}
         >

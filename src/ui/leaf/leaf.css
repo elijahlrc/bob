@@ -93,6 +93,11 @@ html.leaf .btn.on {
   color: var(--on-gold);
   text-shadow: none;
 }
+/* A choice in a row of choices, in the ring frame (ringProps, docs/UI-FRAMES.md): compact, its label centred in the
+   ring, whose painting keeps 4 px free on the right and below for its shadow. */
+html.leaf .btn[data-ring] {
+  padding: 5px 14px 9px 10px;
+}
 html.leaf .btn:disabled {
   opacity: 0.45;
   cursor: default;
@@ -226,6 +231,15 @@ html.leaf textarea {
   padding: 8px 12px;
   text-shadow: var(--text-shadow);
 }
+/* Painted (painter.ts): the worn ring and its shadow are the painting; the padding is 4 px more on the right and below,
+   where the shadow is, so the text sits in the middle of the well. */
+html.leaf input[data-painted],
+html.leaf select[data-painted],
+html.leaf textarea[data-painted] {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 8px 16px 12px 12px;
+}
 html.leaf input::placeholder {
   color: var(--dim);
 }
@@ -242,6 +256,19 @@ html.leaf input[type='checkbox'] {
   background: var(--lapis-d);
   box-shadow: var(--ring);
   cursor: pointer;
+}
+/* Painted (painter.ts): a dark well in the worn ring, gold in an ink ring when ticked; the box grows by the ring's shadow. */
+html.leaf input[type='checkbox'][data-painted] {
+  width: 24px;
+  height: 24px;
+  margin: 0 4px 0 2px;
+  vertical-align: -6px;
+  background-color: transparent;
+  box-shadow: none;
+}
+html.leaf input[type='checkbox'][data-painted]:checked {
+  background-color: transparent;
+  box-shadow: none;
 }
 /* Ticked: a gold square set in the well (a dot would read as a radio button). */
 html.leaf input[type='checkbox']:checked {

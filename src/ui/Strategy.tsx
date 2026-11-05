@@ -71,6 +71,7 @@ function Pick<T extends string | number>(p: {
       <span class="st-lbl">{p.label}</span>
       <span class="st-sel" data-paint="panel" data-thin>
         <select
+          data-paint="none"
           disabled={p.disabled}
           value={String(p.value)}
           onChange={(e) => {
@@ -500,6 +501,7 @@ function FlaskBelt({ c, ch }: { c: Controller; ch: Character }) {
               {kind === 'utility' && (
                 <span class="st-sel" data-paint="panel" data-thin>
                   <select
+                    data-paint="none"
                     aria-label={`When ${f!.name} is drunk`}
                     value={rules[slot].use}
                     onChange={(e) =>

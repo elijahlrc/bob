@@ -5,7 +5,6 @@ import { mod, type Mod } from '../mods/types';
  * counter advances) and gives a service a map cannot. Every name and text is ours.
  */
 export type StopId =
-  | 'awlsmith'
   | 'gemHoard'
   | 'shrine'
   | 'quartermaster'
@@ -34,15 +33,6 @@ export type StopDef = {
 
 /** The stops that are built (a stop is only scheduled if it is listed here). */
 export const STOPS: StopDef[] = [
-  {
-    id: 'awlsmith',
-    name: 'The Awlsmith',
-    text: 'A free socket in one item.',
-    how: 'Choose an item. More sockets cost Bone Dust.',
-    // Its sockets are a Respite craft since 2026-10-29 (docs/ATTRITION.md): no longer scheduled; a save that holds one still works.
-    weight: 0,
-    from: 6,
-  },
   {
     id: 'gemHoard',
     name: 'The Gem Hoard',
@@ -123,11 +113,6 @@ export const stopDef = (id: StopId): StopDef => STOPS.find((s) => s.id === id)!;
 
 /** The first level a stop can be on (the schedule is `stopSchedule`, run/offers.ts). */
 export const STOP_FROM = 6;
-
-/** What the Awlsmith charges, in Bone Dust, for the nth socket of an item beyond the free one (the first three sockets of an item cost nothing). */
-export function awlsmithPrice(nth: number): number {
-  return nth <= 3 ? 0 : nth === 4 ? 40 : nth === 5 ? 120 : 300;
-}
 
 /** The kinds of gem the Gem Hoard offers to name (each has at least five active gems), and what each is called. */
 export const HOARD_TAGS: { tag: string; name: string }[] = [

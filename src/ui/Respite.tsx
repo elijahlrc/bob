@@ -1,10 +1,12 @@
 import { useState } from 'preact/hooks';
-import type { Item } from '../data/types';
+import { family as affixFamily, familyMods } from '../data/affixes';
+import { EQUIP_SLOTS, type EquipSlot, type Item } from '../data/types';
 import { Character } from '../calc/character';
 import type { RunState } from '../run/run';
-import { affixLabel } from '../run/affixText';
 import type { Controller } from '../run/controller';
 import { nextTier } from '../run/craft';
+import { slotName } from '../run/inventoryOps';
+import { modsText } from '../mods/text';
 import {
   respiteCraftCost,
   respiteItems,
@@ -35,6 +37,32 @@ function carried(run: RunState): string {
   return `You carry life ${pct(v.life)}, mana ${pct(v.mana)}${flasks.length ? `; ${flasks.join(', ')}` : ''}.`;
 }
 
+/** An affix's lines at a tier, its numbers as ranges: "+120–139 to maximum Life". */
+function tierLines(familyId: string, tier: { ranges: [number, number][] }): string[] {
+  const f = affixFamily(familyId);
+  const lo = modsText(
+    familyMods(
+      f,
+      tier.ranges.map((r) => r[0]),
+    ),
+  );
+  const hi = modsText(
+    familyMods(
+      f,
+      tier.ranges.map((r) => r[1]),
+    ),
+  );
+  const num = /\d+(?:\.\d+)?/g;
+  return lo.map((line, i) => {
+    const his = hi[i]?.match(num) ?? [];
+    let k = 0;
+    return line.replace(num, (n) => {
+      const h = his[k++];
+      return h && h !== n ? `${n}–${h}` : n;
+    });
+  });
+}
+
 const plaque = (on: boolean) => ({
   'data-paint': 'panel',
   'data-thin': on ? undefined : '',
@@ -62,8 +90,22 @@ export function RespiteScreen({
   const [itemUid, setItemUid] = useState<number | null>(null);
   const [family, setFamily] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [bagOpen, setBagOpen] = useState(false);
   if (!offer || offer.kind !== 'respite') return null;
   const items = kind ? respiteItems(run, kind) : [];
+  // Worn items first, in slot order and named by slot; carried ones stay folded away until asked for.
+  const slotOf = new Map<number, EquipSlot>();
+  for (const s of EQUIP_SLOTS) {
+    const it = run.build.equipment[s];
+    if (it) slotOf.set(it.uid, s);
+  }
+  const wornItems = items
+    .filter((it) => slotOf.has(it.uid))
+    .sort(
+      (a, b) => EQUIP_SLOTS.indexOf(slotOf.get(a.uid)!) - EQUIP_SLOTS.indexOf(slotOf.get(b.uid)!),
+    );
+  const bagItems = items.filter((it) => !slotOf.has(it.uid));
+  const showBag = bagOpen || bagItems.some((it) => it.uid === itemUid);
   const chosen =
     itemUid === null
       ? undefined
@@ -75,6 +117,31 @@ export function RespiteScreen({
     craft = kind === 'tier' ? (family ? { kind, itemUid, family } : null) : { kind, itemUid };
   const problem = craft ? respiteProblem(run, slot, craft) : 'Choose first';
   const cost = chosen && kind ? respiteCraftCost(run, chosen, kind) : 0;
+
+  const itemButton = (it: Item) => {
+    const s = slotOf.get(it.uid);
+    const price = kind ? respiteCraftCost(run, it, kind) : 0;
+    return (
+      <button
+        key={it.uid}
+        class={'stop-item' + (it.uid === itemUid ? ' sel' : '')}
+        {...plaque(it.uid === itemUid)}
+        onClick={() => {
+          setItemUid(it.uid);
+          setFamily(null);
+        }}
+      >
+        {s && <span class="muted respite-slot">{slotName(s)}</span>}
+        <span class={'stop-item-name ' + rarityClass(it)}>{itemTitle(it)}</span>
+        <span class="muted">
+          {kind === 'socket'
+            ? `${it.sockets.length} → ${it.sockets.length + 1} sockets`
+            : `${it.affixes.length} affix${it.affixes.length === 1 ? '' : 'es'}`}
+          {price ? ` · ${price} Bone Dust` : ''}
+        </span>
+      </button>
+    );
+  };
 
   const make = () => {
     if (!craft) return;
@@ -125,48 +192,57 @@ export function RespiteScreen({
                 : 'No affix on your worn items can go up a tier.'}
           </div>
         )}
-        {kind && items.length > 0 && (
-          <div class="stop-list">
-            {items.map((it) => (
-              <button
-                key={it.uid}
-                class={'stop-item' + (it.uid === itemUid ? ' sel' : '')}
-                {...plaque(it.uid === itemUid)}
-                onClick={() => {
-                  setItemUid(it.uid);
-                  setFamily(null);
-                }}
-              >
-                <span class={'stop-item-name ' + rarityClass(it)}>{itemTitle(it)}</span>
-                <span class="muted">
-                  {kind === 'socket'
-                    ? `${it.sockets.length} → ${it.sockets.length + 1} sockets`
-                    : `${it.affixes.length} affix${it.affixes.length === 1 ? '' : 'es'}`}
-                  {respiteCraftCost(run, it, kind)
-                    ? ` · ${respiteCraftCost(run, it, kind)} Bone Dust`
-                    : ''}
-                </span>
-              </button>
-            ))}
-          </div>
+        {kind && wornItems.length > 0 && <div class="stop-list">{wornItems.map(itemButton)}</div>}
+        {kind && bagItems.length > 0 && (
+          <button
+            class="respite-bag-toggle"
+            aria-expanded={showBag}
+            onClick={() => setBagOpen(!showBag)}
+          >
+            <span class="respite-arrow">{showBag ? '▾' : '▸'}</span> In your bag ({bagItems.length})
+          </button>
+        )}
+        {kind && showBag && bagItems.length > 0 && (
+          <div class="stop-list">{bagItems.map(itemButton)}</div>
         )}
         {kind === 'tier' && chosen && (
-          <div class="stop-list">
-            {chosen.affixes
-              .filter((a) => nextTier(chosen, a.family, run.map))
-              .map((a) => (
-                <button
-                  key={a.family}
-                  class={'stop-item' + (a.family === family ? ' sel' : '')}
-                  {...plaque(a.family === family)}
-                  onClick={() => setFamily(a.family)}
-                >
-                  <span class="stop-item-name">{affixLabel(a.family)}</span>
-                  <span class="muted">
-                    Tier {a.tier} → {nextTier(chosen, a.family, run.map)!.tier}
-                  </span>
-                </button>
-              ))}
+          <div class="respite-changes">
+            <div class="respite-changes-head">
+              Raise an affix on <span class={rarityClass(chosen)}>{itemTitle(chosen)}</span>
+              <span class="muted"> · it is rolled again within the new tier</span>
+            </div>
+            <div class="respite-affixes">
+              {chosen.affixes
+                .filter((a) => nextTier(chosen, a.family, run.map))
+                .map((a) => {
+                  const up = nextTier(chosen, a.family, run.map)!;
+                  const on = a.family === family;
+                  return (
+                    <button
+                      key={a.family}
+                      class={'respite-affix' + (on ? ' sel' : '')}
+                      data-paint="panel"
+                      data-field="porphyry"
+                      data-thin={on ? undefined : ''}
+                      data-pk={on ? 'on' : ''}
+                      onClick={() => setFamily(a.family)}
+                    >
+                      <span class="respite-affix-kind">
+                        {affixFamily(a.family).type === 'prefix' ? 'Prefix' : 'Suffix'} · Tier{' '}
+                        {a.tier} → {up.tier}
+                      </span>
+                      <span class="respite-affix-row">
+                        <span class="muted">Now</span>
+                        <span>{modsText(a.mods).join(', ')}</span>
+                      </span>
+                      <span class="respite-affix-row">
+                        <span class="muted">After</span>
+                        <span class="respite-affix-new">{tierLines(a.family, up).join(', ')}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+            </div>
           </div>
         )}
         {chosen && (

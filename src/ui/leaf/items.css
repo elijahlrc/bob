@@ -158,14 +158,14 @@ html.leaf .ix-gear-toggle {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 12px 18px;
+  /* In the ring frame (ringProps): 4 px more on the right and below, where its shadow is. */
+  padding: 12px 22px 16px 18px;
   font: inherit;
   color: var(--pearl);
   text-shadow: var(--text-shadow);
   border: 0;
   border-radius: 0;
-  background: #172049;
-  box-shadow: var(--ring);
+  background: none;
   cursor: pointer;
 }
 
@@ -379,9 +379,10 @@ html.leaf .item-card {
   box-shadow: none;
   text-shadow: var(--text-shadow);
 }
+/* Its capitals start at the top of their box (Jacquard): the padding keeps them a few pixels inside the thin frame. */
 html.leaf .item-card .ic-name {
   margin: 0 -6px 10px;
-  padding: 9px 14px 10px;
+  padding: 11px 18px;
   font-size: 24px;
   line-height: 1.05;
   color: var(--on-gold);
@@ -474,21 +475,23 @@ html.leaf .ix-list-col {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 22px 18px 22px;
+  padding: 22px;
   background-color: transparent;
 }
 html.leaf .ix-list-col.drop {
   filter: brightness(1.12);
 }
+/* The views, the kinds and the sort arrow are compact controls in the ring frame (ringProps, docs/UI-FRAMES.md). Its
+   painting keeps 4 px on the right and below for the shadow, so the padding there is 4 px more to centre the label. */
 html.leaf .ix-views {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 4px;
+  gap: 4px;
 }
 html.leaf .ix-view {
-  padding: 6px 10px 7px;
+  padding: 6px 14px 11px 10px;
   font: inherit;
-  color: var(--muted);
+  color: var(--pearl);
   text-shadow: var(--text-shadow);
   background: none;
   border: 0;
@@ -502,22 +505,27 @@ html.leaf .ix-view.on .n {
   color: var(--on-gold);
   text-shadow: none;
 }
+/* The kinds share their row evenly; the icon is centred in the ring (the 4 px of shadow off its right and foot). */
 html.leaf .ix-kinds {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
 }
 html.leaf .ix-kind {
   position: relative;
-  width: 48px;
   height: 48px;
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
+  --glyph: 28px;
 }
 html.leaf .ix-kind i {
   position: absolute;
-  inset: 8px;
+  top: calc((100% - 4px - var(--glyph)) / 2);
+  left: calc((100% - 4px - var(--glyph)) / 2);
+  width: var(--glyph);
+  height: var(--glyph);
 }
 html.leaf .ix-tools {
   display: flex;
@@ -534,25 +542,30 @@ html.leaf .ix-sort {
   width: 130px;
   flex: none;
 }
-html.leaf .ix-rev {
+html.leaf .btn.ix-rev {
   flex: none;
-  width: 40px;
-  padding: 8px 0 9px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0 4px 4px 0;
+  line-height: 1;
 }
 html.leaf .ix-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
+/* A filter in force, in the ring frame (ringProps). */
 html.leaf .ix-rm {
-  padding: 4px 10px;
+  padding: 4px 14px 8px 10px;
   font: inherit;
   color: var(--pearl);
   text-shadow: var(--text-shadow);
-  background: #172049;
+  background: none;
   border: 0;
   border-radius: 0;
-  box-shadow: var(--ring);
   cursor: pointer;
 }
 html.leaf .ix-rm.clr {
@@ -760,7 +773,7 @@ html.leaf .clean-group {
     font-size: 32px;
   }
   html.leaf .ix-fsheet {
-    padding: 22px 18px 20px;
+    padding: 22px 22px 20px;
     color: var(--pearl);
     text-shadow: var(--text-shadow);
     background-color: transparent;
@@ -959,13 +972,13 @@ html.leaf .ix-why {
      it fits, so the list keeps most of the column. The views show the upgrades' count, so the upgrades button goes. */
   html.leaf .ix-list-col {
     gap: 6px;
-    padding: 14px 14px 12px;
+    padding: 20px;
   }
   html.leaf .ix-listcol > .ix-cta {
     display: none;
   }
   html.leaf .ix-view {
-    padding: 2px 8px 3px;
+    padding: 3px 12px 7px 8px;
   }
   html.leaf .ix-tools {
     gap: 6px;
@@ -974,20 +987,15 @@ html.leaf .ix-why {
     height: 32px;
     min-height: 0;
     padding-top: 0;
-    padding-bottom: 0;
+    padding-bottom: 4px;
   }
-  html.leaf .ix-rev {
+  html.leaf .btn.ix-rev {
     width: 32px;
     height: 32px;
-    min-height: 0;
-    padding: 0;
   }
   html.leaf .ix-kind {
-    width: 34px;
     height: 34px;
-  }
-  html.leaf .ix-kind i {
-    inset: 5px;
+    --glyph: 22px;
   }
   html.leaf .ix-tidy {
     flex-direction: row;
@@ -999,9 +1007,10 @@ html.leaf .ix-why {
     flex: 1 1 auto;
     gap: 6px;
   }
+  /* Painted like every other button, so tall enough for the label to sit inside the frame (docs/UI-FRAMES.md). */
   html.leaf .ix-tidy-row .btn {
     min-height: 0;
-    padding: 4px 8px 5px;
+    padding: 8px 12px 9px;
   }
 }
 @media (max-width: 600px) {
@@ -1033,7 +1042,7 @@ html.leaf .ix-sheet {
 }
 html.leaf .ix-sheet > .ic-name {
   margin: 0;
-  padding: 9px 14px 10px;
+  padding: 11px 18px;
   font-size: 24px;
   line-height: 1.05;
   color: var(--on-gold);

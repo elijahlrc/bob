@@ -754,9 +754,10 @@ html.leaf .speeds {
   gap: 6px;
   pointer-events: auto;
 }
+/* In the ring frame (ringProps): 4 px more on the right and below, where its shadow is. */
 html.leaf .speeds .btn.small {
   min-width: 48px;
-  padding: 6px 10px 7px;
+  padding: 5px 14px 9px 10px;
 }
 
 /* ---- Phone: the speed buttons are a column down the right edge, the head and the abandon or showcase row keep to
@@ -792,7 +793,7 @@ html.leaf .speeds .btn.small {
   }
   html.leaf .speeds .btn.small {
     min-width: 48px;
-    padding: 6px 4px 7px;
+    padding: 5px 8px 9px 4px;
   }
   html.leaf .hud-abandon {
     top: calc(8px + var(--xp-h) + var(--safe-top, 0px));

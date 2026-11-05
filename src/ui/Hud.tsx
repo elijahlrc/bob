@@ -36,6 +36,7 @@ import { SkillBar } from './SkillBar';
 import { manaStarved } from './skillStatus';
 import { FirstMap } from './FirstMap';
 import { introSeen } from './intro';
+import { ringProps } from './leaf/ring';
 
 /**
  * A resource orb: a painted medallion whose field is the liquid, with the empty part covered from the top down (so the
@@ -781,13 +782,18 @@ export function Hud({ c }: { c: Controller }) {
             <SkillBar w={w} />
           </div>
           <div class="speeds">
-            <button class={'btn small' + (c.paused ? ' on' : '')} onClick={() => c.togglePause()}>
+            <button
+              class={'btn small' + (c.paused ? ' on' : '')}
+              {...ringProps(c.paused)}
+              onClick={() => c.togglePause()}
+            >
               ❚❚
             </button>
             {[...(c.gallery ? [0.25] : []), ...SPEEDS].map((s) => (
               <button
                 key={s}
                 class={'btn small' + (!c.paused && c.speed === s ? ' on' : '')}
+                {...ringProps(!c.paused && c.speed === s)}
                 onClick={() => c.setSpeed(s)}
               >
                 {s}×
