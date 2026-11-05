@@ -114,6 +114,30 @@ describe('a flask that upgrades a worn one is an upgrade', () => {
     run.inventory.push(f);
     expect(quickEquip(run, f.uid)).toMatchObject({ ok: true, flask: 1 });
   });
+
+  it('any flask with a drink in it upgrades a worn one with none left, and Equip puts it there', () => {
+    const { run, uid } = setup();
+    // A worn mana flask (slot 2) is dry; the bag's life flask is of another kind and no better than anything.
+    wear(run, makeFlask(uid, 'flask_life_l12', 20));
+    const dry = run.build.flasks[2]!;
+    run.vitals.flasks[dry.uid] = 0;
+    const f = makeFlask(uid, 'flask_life_l3', 20);
+    run.inventory.push(f);
+    const info = itemInfos(run).get(f.uid)!;
+    expect(info).toMatchObject({ flaskSlot: 2, dryFlask: true });
+    expect(isUpgrade(info)).toBe(true);
+    expect(quickEquip(run, f.uid)).toMatchObject({ ok: true, flask: 2 });
+  });
+
+  it('a flask in the bag with no drink in it is no upgrade', () => {
+    const { run, uid } = setup();
+    wear(run, makeFlask(uid, 'flask_life_l3', 20));
+    run.vitals.flasks[run.build.flasks[2]!.uid] = 0;
+    const better = makeFlask(uid, 'flask_life_l12', 20);
+    run.inventory.push(better);
+    run.vitals.flasks[better.uid] = 0;
+    expect(isUpgrade(itemInfos(run).get(better.uid)!)).toBe(false);
+  });
 });
 
 describe('upgrade hints and quick equip', () => {

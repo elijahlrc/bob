@@ -1508,6 +1508,8 @@ _(Filled in during implementation: date, decision, reason.)_
 
 | 2026-11-04 | A support that works only with some weapons (`limitWeapon`: Knife Range, Twin Shadow, Veil Cut, Shattering Blows) does nothing to its skill under another weapon, and the skill is used without it: the Skills tab shows the support idle with the reason (the owner). It made the skill unusable. | A mace in hand left Guarded Strike linked to Knife Range unusable. |
 
+| 2026-11-04 | Flask upgrades go by what the flasks hold now (the owner): a worn flask with no drink left is like an empty slot, so any bag flask with a drink in it is an upgrade for it ("replaces empty flask N") and Equip puts it there, one of its own kind first; a bag flask with no drink is never an upgrade (`drinksIn`, `src/run/inventoryOps.ts`). | A drained flask stayed worn while full ones sat in the bag unmarked. |
+
 ## Appendix B — Glossary
 
 - **Increased / reduced:** additive percentage modifiers, summed together.

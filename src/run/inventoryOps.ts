@@ -6,6 +6,7 @@ import {
   type SheetDiff,
 } from '../calc/character';
 import { flaskUpgradesOver } from '../calc/flaskUpgrade';
+import { flaskSpec } from '../calc/flasks';
 import { itemMods } from '../calc/items';
 import { itemBase, isWeaponClass } from '../data/bases';
 import { flaskBase } from '../data/flasks';
@@ -65,8 +66,13 @@ export type ItemInfo = {
   skillsIdle: GemItem[];
   /** A flask that would fill an empty flask slot (one of the best few, as many as there are empty slots). */
   fillsFlask?: boolean;
-  /** The worn flask slot this flask is an upgrade for (strictly better, or a higher tier of the same type). */
+  /**
+   * The worn flask slot this flask is an upgrade for: one with no drink left in it (`dryFlask`), else one it is strictly better
+   * than or a higher tier of the same type.
+   */
   flaskSlot?: number;
+  /** The slot of `flaskSlot` holds a flask with no drink left in it. */
+  dryFlask?: boolean;
 };
 
 const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -186,21 +192,48 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
     }
     out.set(it.uid, info);
   }
+  // Flasks go by what they hold now (the owner, 2026-11-04): a bag flask with no drink in it is no upgrade, and a worn one with
+  // none left is replaced by any that has one.
+  const bagFlasks = run.inventory.filter(
+    (x): x is FlaskItem => x.kind === 'flask' && out.get(x.uid)!.equippable,
+  );
+  if (bagFlasks.length === 0) return out;
+  const ch = now ?? new Character(run.build, cfgFor(run));
+  const usable = bagFlasks.filter((f) => drinksIn(run, ch, f) > 0);
   // An empty flask slot is filled by the best usable flasks in the bag, as many as there are empty slots.
   const empty = run.build.flasks.filter((f) => !f).length;
-  if (empty > 0) {
-    const flasks = run.inventory
-      .filter((x) => x.kind === 'flask' && out.get(x.uid)!.equippable)
-      .sort((a, b) => flaskRank(b) - flaskRank(a));
-    for (const f of flasks.slice(0, empty)) out.get(f.uid)!.fillsFlask = true;
-  }
-  for (const it of run.inventory) {
+  if (empty > 0)
+    for (const f of [...usable].sort((a, b) => flaskRank(b) - flaskRank(a)).slice(0, empty))
+      out.get(f.uid)!.fillsFlask = true;
+  for (const it of usable) {
     const info = out.get(it.uid)!;
-    if (it.kind !== 'flask' || !info.equippable) continue;
-    const slot = flaskUpgradeSlot(run, it);
+    const dry = drySlotFor(run, ch, it);
+    const slot = dry >= 0 ? dry : flaskUpgradeSlot(run, it);
     if (slot >= 0) info.flaskSlot = slot;
+    if (dry >= 0) info.dryFlask = true;
   }
   return out;
+}
+
+/** The drinks a flask holds now, worn or in the bag (it keeps its charges off; one never worn is full), as the flask bar counts. */
+export function drinksIn(run: RunState, ch: Character, f: FlaskItem): number {
+  const s = ch.flasks.find((x) => x.uid === f.uid) ?? flaskSpec(f, ch.db);
+  return Math.floor(Math.floor(s.maxCharges * (run.vitals.flasks[f.uid] ?? 1)) / s.perUse);
+}
+
+/** The worn flask with no drink left that `f` should replace: one of its own kind first, else the first; -1 when none is dry. */
+function drySlotFor(run: RunState, ch: Character, f: FlaskItem): number {
+  const kind = flaskBase(f.baseId).kind;
+  let pick = -1;
+  run.build.flasks.forEach((x, i) => {
+    if (!x || x.uid === f.uid || drinksIn(run, ch, x) > 0) return;
+    if (
+      pick < 0 ||
+      (flaskBase(x.baseId).kind === kind && flaskBase(run.build.flasks[pick]!.baseId).kind !== kind)
+    )
+      pick = i;
+  });
+  return pick;
 }
 
 export type SortKey = 'newest' | 'slot' | 'rarity' | 'ilvl' | 'dps' | 'ehp' | 'upgrade' | 'name';
@@ -321,16 +354,21 @@ export function flaskUpgradeSlot(run: RunState, f: FlaskItem): number {
 }
 
 /**
- * The flask slot a flask goes into: an empty one; for a life, mana or hybrid flask, the worn one of those with the least
- * recovery left in it (life and mana a drink, times the drinks its charges hold now); else the one it upgrades, else the
- * lowest-level flask of the same kind, else the lowest-level one.
+ * The flask slot a flask goes into: an empty one; one with no drink left (when this one has a drink: its own kind first); for a
+ * life, mana or hybrid flask, the worn one of those with the least recovery left in it (life and mana a drink, times the drinks
+ * its charges hold now); else the one it upgrades, else the lowest-level flask of the same kind, else the lowest-level one.
  */
 export function flaskTarget(run: RunState, f: FlaskItem): number {
   const flasks = run.build.flasks;
   const empty = flasks.findIndex((x) => !x);
   if (empty >= 0) return empty;
+  const ch = new Character(run.build, cfgFor(run));
+  if (drinksIn(run, ch, f) > 0) {
+    const dry = drySlotFor(run, ch, f);
+    if (dry >= 0) return dry;
+  }
   if (flaskBase(f.baseId).kind !== 'utility') {
-    const specs = new Character(run.build, cfgFor(run)).flasks;
+    const specs = ch.flasks;
     let least = -1;
     let leastLeft = Infinity;
     flasks.forEach((x, i) => {

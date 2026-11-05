@@ -379,7 +379,11 @@ function Verdict({ it, info }: { it: InventoryItem; info: ItemInfo }) {
   if (it.kind === 'flask') {
     if (info.fillsFlask) return <span class="ix-where ix-verdict up">▲ empty flask slot</span>;
     if (info.flaskSlot !== undefined)
-      return <span class="ix-where ix-verdict up">▲ upgrades flask {info.flaskSlot + 1}</span>;
+      return (
+        <span class="ix-where ix-verdict up">
+          ▲ {info.dryFlask ? 'replaces empty flask' : 'upgrades flask'} {info.flaskSlot + 1}
+        </span>
+      );
     return <span class="ix-where" />;
   }
   if (!info.equippable)
