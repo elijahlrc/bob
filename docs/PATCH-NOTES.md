@@ -16,17 +16,24 @@ change, and our own names only. Dash bullets under plain headings.
 - Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
 - Monsters notice your character from about 30% farther away.
 - In duels, the Rares first target setting now goes for the other character before any of its minions.
+- Monsters' area attacks can now be evaded and blocked, and their area spells blocked.
+- Fixed increased and reduced block chance, and block recovery from the passive tree, having no effect.
 
 ### Skills and items
 
 - The same aura can no longer be socketed twice; a second copy does nothing.
 - Fixed characters with an attribute below 0 keeping skill gems at level 1 and failing to equip some items; the Surgeon no longer allows such trades.
+- Guarded Strike now works with any melee weapon.
+- A support that needs a different weapon is now skipped instead of making its skill unusable.
+- Fixed some gem cards calling Grit, Fervour and Insight charges by the wrong names.
 
 ### Interface
 
 - Flasks pulse when drunk.
 - Fixed resistances sometimes showing long decimals.
-- Picking a socketed skill on the Skills tab shows its critical strike chance and damage.
+- A socketed skill's card on the Skills tab shows its critical strike chance and damage.
+- Item filters now combine, such as new armour that is also an upgrade, and an item's mana no longer counts toward whether it is an upgrade.
+- A flask with drinks left now counts as an upgrade over an empty one you wear, and equipping it puts it in that slot.
 
 ### Known issues
 
