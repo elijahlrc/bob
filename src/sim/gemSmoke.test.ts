@@ -96,8 +96,13 @@ describe('every support gem', () => {
       const ok = actives.filter((a) => typesAllow(s, new Set(resolveActive(a, 1).types)));
       // A support nothing can use is a data mistake (unless it is a trigger or hex support that needs others).
       expect(ok.length).toBeGreaterThan(0);
-      const a = ok[0];
-      const b = buildFor([a.id, s.id], weaponFor(a), ATTR_CLASS(a.attr));
+      // A support that works only with some weapons is tried on a skill that takes one of them, holding it.
+      const fits = (x: (typeof ok)[number]) =>
+        !s.limitWeapon ||
+        !x.requiresWeapon ||
+        s.limitWeapon.some((t) => x.requiresWeapon!.includes(t));
+      const a = ok.find(fits) ?? ok[0];
+      const b = buildFor([a.id, s.id], weaponFor(a, s.limitWeapon), ATTR_CLASS(a.attr));
       const c = new Character(b, { areaLevel: 50 });
       expect(finite(c.sheet().skill.totalDps)).toBe(true);
       if (s.curseAura) {

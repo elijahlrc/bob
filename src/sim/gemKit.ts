@@ -54,8 +54,15 @@ export const classFor = (a: GemDef['attr']): string =>
 let n = 20000;
 const uid = () => n++;
 
-/** A weapon the gem can be used with. */
-export function weaponFor(def: ActiveGemDef): string {
+/** A weapon the gem can be used with; with `limit` (a support's weapons), one of those when the gem takes one. */
+export function weaponFor(def: ActiveGemDef, limit?: readonly string[]): string {
+  const fit = limit?.find(
+    (t) =>
+      WEAPON_FOR[t] &&
+      (!def.requiresWeapon || (def.requiresWeapon as readonly string[]).includes(t)) &&
+      (!def.needsTwoHand || t === 'staff'),
+  );
+  if (fit) return WEAPON_FOR[fit];
   if (def.needsTwoHand) return TWO_HANDER;
   const req = def.requiresWeapon?.find((t) => WEAPON_FOR[t]);
   if (req) return WEAPON_FOR[req];

@@ -58,12 +58,17 @@ describe('strength and weapons (firmHold, steelResolve, knifeRange, veilCut, sha
     expect(maxHit(will)).toBeGreaterThan(maxHit(sp));
   });
 
-  it('a support that limits the weapon makes the skill unusable with another', () => {
+  it('a support that limits the weapon sits idle with another, and the skill is used without it', () => {
     const { world: ok } = world(['crushingBlow', 'knifeRange'], 3, 'sword_3', STR);
-    expect(ok.sides[0].char.primary.usable).toBe(true);
-    const { world: bad } = world(['crushingBlow', 'knifeRange'], 3, 'mace_3', STR);
-    expect(bad.sides[0].char.warnings.some((x) => x.includes('limits'))).toBe(true);
-    expect(bad.sides[0].char.primary.skill.id).not.toBe('crushingBlow');
+    expect(ok.sides[0].char.primary.supports.map((x) => x.def.id)).toContain('knifeRange');
+    const { world: off } = world(['crushingBlow', 'knifeRange'], 3, 'mace_3', STR);
+    const p = off.sides[0].char.primary;
+    expect(p.skill.id).toBe('crushingBlow');
+    expect(p.usable).toBe(true);
+    expect(p.supports.map((x) => x.def.id)).not.toContain('knifeRange');
+    expect(
+      p.inert?.some((x) => x.gem.def.id === 'knifeRange' && x.why.includes('works only with')),
+    ).toBe(true);
   });
 
   it('Knife Range: more melee damage near, none at five tiles', () => {
