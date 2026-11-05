@@ -103,7 +103,7 @@ export const MOVEMENT_INFO: Record<MovementId, MovementInfo> = {
 
 /** What a type notices, and whom it goes for. Anything not set is as it always was (docs/ROSTER.md 6.4). */
 export type Senses = {
-  /** Tiles at which it notices the character (default 10). */
+  /** Tiles at which it notices the character (default `MONSTER_AGGRO`, 13). */
   aggro?: number;
   /** Tiles within which it wakes its sleeping pack when it notices (default 6). */
   alert?: number;
@@ -126,8 +126,8 @@ export function senseText(s: Senses | undefined): string[] {
   if (s.leash === 0) out.push('Never gives up the chase.');
   else if (s.leash !== undefined && s.leash < 6)
     out.push(`Loses interest ${6 - s.leash} s sooner than most.`);
-  if (s.aggro !== undefined && s.aggro >= 12) out.push(`Notices you from ${s.aggro} tiles.`);
-  else if (s.aggro !== undefined && s.aggro <= 7)
+  if (s.aggro !== undefined && s.aggro >= 16) out.push(`Notices you from ${s.aggro} tiles.`);
+  else if (s.aggro !== undefined && s.aggro <= 9)
     out.push('Short-sighted: notices you only from close by.');
   if (s.alert !== undefined && s.alert >= 10)
     out.push('Wakes its whole pack the moment it sees you.');

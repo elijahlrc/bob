@@ -176,8 +176,9 @@ Each side runs `playerAI(w, s, dt)`: its own `Strategy` (roles, order, `target`,
 own flask policy, kiting, telegraph dodging, openers and escapes. Nothing in the AI knows which side is the player's. A duel
 option on the side (`s.opts.duel`) changes only what a labyrinth assumed: the character engages the nearest enemy at any
 distance (no `advance` along waypoints), never loots, never seeks an exit, and a stall (section 4.3) ends the duel instead of
-skipping the target. Its enemies are the other character and that character's minions, and the other character counts as a
-boss for the `rares` priority (F4, Appendix A).
+skipping the target. Its enemies are the other character and that character's minions, and with the `rares` priority it goes for the
+other character before any of its minions, while it can see it (F4, Appendix A; always first since 2026-11-04, the owner: it
+counted as a boss, 4 tiles nearer, and a character fighting a summoner could spend the whole duel on the summons).
 
 Totems, brands, traps and mines are not actors and cannot be attacked by anyone, today as in a duel (monsters never attack
 them either); a later plan may give them life.

@@ -435,13 +435,16 @@ describe('what a character goes for', () => {
     expect(findTargetForTest(weakest.w, weakest.sa)).toBe(weakest.m);
   });
 
-  it('counts the other character as a boss for the `rares` priority', () => {
+  it('goes for the other character before its minions with the `rares` priority, however near they are', () => {
     const { w, sa, sb, m } = screened('rares');
-    // It is 3 tiles farther than the minion, and the rare's 4 tiles of advantage put it first.
     expect(Math.hypot(sb.player.x - sa.player.x, sb.player.y - sa.player.y)).toBeGreaterThan(
       Math.hypot(m.x - sa.player.x, m.y - sa.player.y),
     );
     expect(findTargetForTest(w, sa)).toBe(sb.player);
+    // A minion right beside A, far nearer than the 4 tiles a rare is worth on a map, still comes second.
+    const close = minionOf(w, sb, 'callBonewalkers', sa.player.x + 1.2, sa.player.y);
+    expect(findTargetForTest(w, sa)).toBe(sb.player);
+    expect(close.alive).toBe(true);
   });
 
   it('kills a screen of minions and then the character behind it, and does not give the fight up', () => {

@@ -451,7 +451,8 @@ const BLIND_FURY = 'Blind Fury: attacks go at the nearest enemy, whatever it is.
 
 const TARGET_TEXT: Record<TargetPriority, string> = {
   nearest: 'Fights the nearest enemy, switching as others come nearer; nests and pylons first.',
-  rares: 'Rares, champions and bosses count as 4 tiles nearer: it breaks off for them.',
+  rares:
+    'Rares, champions and bosses count as 4 tiles nearer: it breaks off for them. In a duel it goes for the other character first.',
   lowest:
     'Goes for the enemy with the least life left, so small fry fall before a boss; nests and pylons first.',
   stick: 'Keeps its target until it falls or gets away, whatever comes nearer.',

@@ -180,6 +180,8 @@ const SUPPORT_PRIORITY = 4;
 
 /** How much nearer a rare, champion or boss enemy counts with the `rares` target priority, in tiles. */
 const RARE_PRIORITY = 4;
+/** In a duel, how much nearer the other character counts with the `rares` priority: always first. */
+const DUEL_FOE_FIRST = 1e6;
 
 /** Whom the character fights first: the strategy's choice, or the default under Blind Fury (relic 18). */
 export function targetPriority(b: Build): TargetPriority {
@@ -209,13 +211,15 @@ function findTarget(w: World, s: Side): Actor | null {
     const support = !!m.mon && SUPPORT_TYPES.has(m.mon.spec.type);
     // The target priority (Strategy tab): rares count as nearer, or the weakest goes first (distance breaks a tie). Weakest is
     // the least life left in points, not as a share: by share a boss with a scratch on it outranks its whole fresh escort.
-    // (The other character counts as a boss: the one a `rares` priority goes for first, and never one to give up on.)
+    // (The other character counts as a boss, never one to give up on; in a duel a `rares` priority goes for it before any of its
+    // minions, wherever they stand, while it can be seen (the owner, 2026-11-04).)
     const d =
       prio === 'lowest'
         ? (support ? -1e9 : 0) + m.life + real * 1e-6
         : real -
           (support ? SUPPORT_PRIORITY : 0) -
-          (prio === 'rares' && (m.isPlayer || isBig(m)) ? RARE_PRIORITY : 0);
+          (prio === 'rares' && (m.isPlayer || isBig(m)) ? RARE_PRIORITY : 0) -
+          (duel && prio === 'rares' && m.isPlayer ? DUEL_FOE_FIRST : 0);
     if (d > bd + 1e-9) continue;
     if (Math.abs(d - bd) <= 1e-9 && best && m.life >= best.life) continue;
     // Out of sight is no reason to ignore a pylon: everything around it is untouchable until it falls.

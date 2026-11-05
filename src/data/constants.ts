@@ -198,8 +198,11 @@ export const DUEL_LIFE_MULT_STAGES: readonly number[] = [0, 1 / 3, 2 / 3, 1];
 // §13 AI.
 export const ENGAGE_RANGE = 9;
 export const LOOT_RANGE = 6;
-/** Monsters notice the player within this range (line of sight); above ENGAGE_RANGE so nothing is shot at unaware. */
-export const MONSTER_AGGRO = 10;
+/**
+ * Monsters notice the player within this range (line of sight); above ENGAGE_RANGE so nothing is shot at unaware. 10 until
+ * 2026-11-04, when every type's notice range rose by about 30% (the owner).
+ */
+export const MONSTER_AGGRO = 13;
 /** Idle monsters this close to a player who starts an attack come running (they hear it). */
 export const SHOT_ALERT = 10;
 /** The player gives up on a target it has not damaged for this long (seconds), for SKIP_TIME. */

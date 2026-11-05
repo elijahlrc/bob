@@ -471,6 +471,17 @@ export function Skills({
     return { acts: null };
   })();
   const note = msg || bar.note;
+  // A picked socketed skill's own critical strike chance and damage, which the tab shows nowhere else (the owner, 2026-11-04).
+  const critLine = (() => {
+    if (pick?.from !== 'socket' || !picked || picked.d.kind !== 'active' || picked.d.utility)
+      return null;
+    const a = ch.actives.find((x) => x.gemUid === picked.uid);
+    if (!a?.usable) return null;
+    const s = ch.skillSheet(a);
+    return s.avgHit > 0
+      ? `Crit chance ${Math.round(s.critChance * 1000) / 10}%, crit damage ${Math.round(s.critMulti * 100)}%`
+      : null;
+  })();
 
   const summary = ch.mainSheet();
   const secondary = ch.secondarySheets();
@@ -837,6 +848,8 @@ export function Skills({
           <span class="sk-barsub sk-bad" title={note}>
             {note}
           </span>
+        ) : critLine ? (
+          <span class="sk-barsub">{critLine}</span>
         ) : (
           !pick && <span class="sk-barsub">{tap} a gem or a socket</span>
         )}
