@@ -784,7 +784,7 @@ export type SupportGemDef = {
   extraTriggers?: TriggerDef[];
   /** Standing Curse: the supported curse is always on every enemy the character hits, and reserves mana instead of being cast. */
   curseAura?: { reservePct: number };
-  /** The supported skill can be used only with weapons of these kinds. */
+  /** It works only with weapons of these kinds: with others it does nothing, and the skill is used without it. */
   limitWeapon?: SkillTag[];
   description: string;
 };

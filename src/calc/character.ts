@@ -856,7 +856,13 @@ export class Character {
         const k = keep.get(o.def.id);
         if (!k || o.level > k.level) keep.set(o.def.id, o);
       }
-      const linked = linkedAll.filter((o) => keep.get(o.def.id) === o);
+      // A support that works only with other weapons does nothing to the skill, which is used without it (the owner,
+      // 2026-11-04): it neither adds its types nor costs anything.
+      const offWeapon = (o: SocketedGem) => {
+        const lw = (o.def as SupportGemDef).limitWeapon;
+        return !!lw && !lw.some((t) => weaponTags.has(t));
+      };
+      const linked = linkedAll.filter((o) => keep.get(o.def.id) === o && !offWeapon(o));
       const resolved = resolveSupports(
         skill.types,
         linked.map((o) => ({ ...(o.def as SupportGemDef), gem: o })),
@@ -883,6 +889,10 @@ export class Character {
             why: `${o.def.name} is already linked here, and only one of each support works`,
             dup: true,
           });
+        else if (offWeapon(o)) {
+          const lw = (o.def as SupportGemDef).limitWeapon!;
+          inert.push({ gem: o, why: `${o.def.name} works only with ${lw.join(' or ')} weapons` });
+        }
       // A support the skill fits but is barred from (a melee support that does not take a channelled skill) says so, rather than
       // looking as if the item had no skill for it.
       for (const o of linked) {
@@ -907,13 +917,6 @@ export class Character {
       for (const s of supports) costMult *= (s.def as SupportGemDef).costMult;
       let usable = true;
       let reason: string | undefined;
-      for (const s of supports) {
-        const lw = (s.def as SupportGemDef).limitWeapon;
-        if (lw && !lw.some((t) => weaponTags.has(t))) {
-          usable = false;
-          reason = `${s.def.name} limits ${skill.name} to ${lw.join(' or ')} weapons`;
-        }
-      }
       const barred = weaponBar(
         {
           id: skill.id,

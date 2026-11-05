@@ -1506,6 +1506,8 @@ _(Filled in during implementation: date, decision, reason.)_
 
 | 2026-11-04 | Block follows the reference (the owner): increased and reduced block chance scale the flat chances (they were ignored), and a monster's blast that is one of its attacks or spells is avoided as the hit would be: an attack must beat evasion (with the monster's accuracy, `GroundEffect.accuracy`), then either can be blocked by attack or spell block, with nothing of the blast on an evade or a block (`GroundEffect.blockedBy`, docs/ENCOUNTERS.md 4). Attacks: slams, the Queen's burrow, Gallop and Trample, the Flurry, a pattern cast as an attack. Spells: Toll, Stasis pulse, the Cinder Tyrant's ring, the warding pulse, steps, Last rites, a pattern cast as a spell. Death explosions (volatile, bursts, Shatter), ground and the Magistrate's Sentence (endured by design, docs/BOSSES.md 6) can be neither. | Bellmetal Cuirass's reduced block did nothing, and boss blows ignored a shield and evasion while armour met them. |
 
+| 2026-11-04 | A support that works only with some weapons (`limitWeapon`: Knife Range, Twin Shadow, Veil Cut, Shattering Blows) does nothing to its skill under another weapon, and the skill is used without it: the Skills tab shows the support idle with the reason (the owner). It made the skill unusable. | A mace in hand left Guarded Strike linked to Knife Range unusable. |
+
 ## Appendix B — Glossary
 
 - **Increased / reduced:** additive percentage modifiers, summed together.
