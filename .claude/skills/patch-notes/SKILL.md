@@ -97,10 +97,15 @@ high level are all they want. When in doubt, cut; then cut again.
 
 ## 5. Audit (Opus)
 
+**One or two new bullets: no agent.** Check them yourself once against step 3 and the commits, fix what breaks a rule, and go
+on. The agent below is for three or more.
+
 Before anything is committed, have a fresh reviewer read the new notes. Launch one agent with the Agent tool, `model: "opus"`,
 `subagent_type: "general-purpose"`, `run_in_background: false`, and a prompt that contains, verbatim: the new bullets (and
 their `###` headings), the full text of step 3 above (the style rules), and the commit range from step 1 (it may read the
-commits and code to confirm a claim). Tell it to change nothing and to answer with one verdict per bullet:
+commits and code to confirm a claim, but only where a bullet's claim is in doubt). Tell it to change nothing, to answer in one
+line per bullet with no preamble and no account of what it checked, and to add a whole-list remark only when there is a
+problem. The verdicts:
 
 - **PASS**, or **FIX** with the specific rule it breaks and a replacement wording;
 - **CUT** for a bullet a player would not notice, that duplicates another, or that is not true of the commits;
@@ -112,16 +117,20 @@ commits and code to confirm a claim). Tell it to change nothing and to answer wi
   affected).
 
 Apply every FIX and CUT yourself (re-run prettier), unless you can show the auditor is wrong; then keep the bullet and note why
-in the report. If more than a couple of bullets changed, run the audit once more on the result. Stop after two rounds: what is
-left over goes to the user in the report, not into a third loop. Do not skip the audit for a short list.
+in the report. One round is the norm: run it once more only if three or more bullets changed, and never a third time; what
+is left over goes to the user in the report.
 
 If the user said `draft`: show the notes and stop here, with the file written but **not committed**, and tell the user that
 `/patch-notes` with no argument will submit them (hand edits to the file are kept; the audit runs once more on them).
 
 ## 6. Check and commit
 
-- `npm run check` and `npm run build` must both be green (project rule). A flaky timing test (the speed check `x9`) that passes
-  when run alone does not block; any other failure does: report it and stop without pushing. Do not weaken tests.
+- The notes commit changes one Markdown file, and every code commit in the range already passed check and build when it was
+  made (project rule), so run only `npx prettier --check docs/PATCH-NOTES.md` (the owner, 2026-11-05: the full check made a
+  one-line release take minutes). GitHub Actions runs the full check and build on the push, and step 9 builds for itch.io.
+  Run `npm run check` and `npm run build` only when the range holds a commit you have reason to think was not checked (a
+  merge, a hand commit, a red CI run); a flaky timing test (the speed check `x9`) that passes alone does not block, any other
+  failure does: report it and stop without pushing. Do not weaken tests.
 - Commit only the notes file, so other sessions' staged or unstaged work is left where it is:
   `git commit -m "Patch notes YYYY-MM-DD" -m "<attribution line from the session>" -- docs/PATCH-NOTES.md`.
 
@@ -144,9 +153,13 @@ GitHub alone is sometimes used as a staging deploy). Find the commit itch.io pla
   moves it). If neither exists, say so and ask which commit is live rather than guessing.
 
 Then `git diff <live>..HEAD -- docs/PATCH-NOTES.md`: every bullet added or reworded since then, as it reads now, under its date
-and `###` heading. That includes notes already pushed to GitHub but never uploaded to itch.io; say in one line which of them are
-already on GitHub (`git diff <live>..origin/main -- docs/PATCH-NOTES.md`). Bullets that are live already are not shown, even
-under today's heading.
+and `###` heading. Bullets that are live already are not shown, even under today's heading. Bullets already pushed to GitHub
+but never uploaded to itch.io (`git diff <live>..origin/main -- docs/PATCH-NOTES.md`) were seen when they were pushed: do not
+repeat them; say in one line which dates they are under and how many (the owner, 2026-11-05: a stale itch.io build made the
+block pages long). Show in full only the bullets not yet on GitHub.
+
+Keep the whole run's chat output short: the notes, the commit count and the question. No restating of the steps, no account
+of what passed.
 
 **Present the notes before asking, and make sure they were seen.** The user wants to read the notes before choosing
 (2026-10-20, twice: a fenced block and option previews in the same turn as the dialog were not enough, the dialog covers

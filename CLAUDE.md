@@ -111,7 +111,8 @@
   - `core`, `data`, `mods`, `calc`, `gen`, `sim` and `run` are headless: no Phaser, Preact or DOM.
   - No `Math.random`, `Date.now` or `performance.now` outside `render` and `ui`.
   - Use the seeded RNG in `src/core/rng.ts`.
-- **Before every commit:** `npm run check` and `npm run build` must both be green. Never weaken tests to pass.
+- **Before every commit:** `npm run check` and `npm run build` must both be green. Never weaken tests to pass. The one
+  exception is the notes-only commit of `/patch-notes`, which needs only a prettier check of the notes file (its SKILL.md).
 - **Git:** commit at milestone ends. Don't push by default; push when the user asks. Never add a remote.
 - **Environment:**
   - Windows, Node 24.
