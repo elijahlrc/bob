@@ -1,6 +1,7 @@
 /**
- * Replenish (the owner, 2026-11-02, docs/SUSTAIN.md): a character's life leech, life on hit and life on kill win
- * back at most a share (`Defence.replenishShare`) of the life it lost in the last few seconds (`replenishWindow`), less
+ * Replenish (the owner, 2026-11-02, docs/SUSTAIN.md): the life a character wins back in a fight (leech, on hit, on kill,
+ * on block, on any event, curses, skills that mend, triggered heals; since 2026-11-06 all of it but flasks, regeneration
+ * and the Tithe of the Servants) wins back at most a share (`Defence.replenishShare`) of the life it lost in the last few seconds (`replenishWindow`), less
  * what they already won back in that time. So a character can recover much of what it just took, but never heals to
  * full unless it was full when that damage landed. Life lost to its own costs and burning counts; damage to energy shield does not, unless life
  * leech goes to the shield instead (the Shade Leech keystone). What a hit leeches past the room left is lost.
@@ -68,6 +69,12 @@ export function replenishRoom(a: Actor): number {
 export function replenish(a: Actor, amount: number): number {
   if (!replenishes(a) || amount <= 0) return Math.max(0, amount);
   const take = Math.min(amount, replenishRoom(a));
+  // The map report's line (docs/REPLENISH.md): what replenish won back, and what the limit held back.
+  const ledger = a.side?.ledger;
+  if (ledger) {
+    ledger.replenished += take;
+    ledger.heldBack += amount - take;
+  }
   if (take > 0) {
     const l = ledgerOf(a);
     l.got.push([l.now, take]);

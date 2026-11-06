@@ -134,7 +134,7 @@ export const CURRENCIES: CurrencyDef[] = [
   {
     id: 'chitin',
     name: 'Chitin',
-    text: 'Add an affix of your choice: attack speed or life on hit.',
+    text: 'Add an affix of your choice: attack speed or replenish life on hit.',
     minMap: 12,
     weight: 0,
     families: [...grp('aspdGlobal', 'lifeOnHitGear'), 'aspdLocal', 'aspdLocalRanged', 'lifeOnHit'],

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { noteLifeLost } from './replenish';
 import { DYN_SHIFT } from '../data/buffs';
 import { Character } from '../calc/character';
 import { distanceMult } from '../calc/skill';
@@ -721,11 +722,16 @@ describe('auras, traps and guards (rimePlate, sourHerald, drainTrap, whirringMot
     w.sides[0].opts.godMode = false;
     w.sides[0].opts.freeResources = false;
     w.sides[0].player.life = 10;
+    // Life won back in a fight is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(w.sides[0].player, w.sides[0].player.def.maxLife, w.t);
     let got = 0;
     for (let i = 0; i < 60 * 8; i++) {
       stepWorld(w);
       got = Math.max(got, w.sides[0].player.life);
-      if (i % 60 === 0) w.sides[0].player.life = Math.min(w.sides[0].player.life, 10);
+      if (i % 60 === 0) {
+        noteLifeLost(w.sides[0].player, Math.max(0, w.sides[0].player.life - 10), w.t);
+        w.sides[0].player.life = Math.min(w.sides[0].player.life, 10);
+      }
     }
     expect(got).toBeGreaterThan(10);
     expect(

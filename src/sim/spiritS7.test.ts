@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { noteLifeLost } from './replenish';
 import { mitigate } from '../calc/combat';
 import type { Build } from '../data/types';
 import { buildFor, classFor } from './gemKit';
@@ -137,6 +138,8 @@ describe('Sap Bolt (sapBolt)', () => {
     expect(next.sdots.some((d) => d.src === 'sapBolt')).toBe(true);
     w.sides[0].opts.freeResources = false;
     w.sides[0].player.life = 1;
+    // Life won back in a fight is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(w.sides[0].player, w.sides[0].player.def.maxLife, w.t);
     const l0 = w.sides[0].player.life;
     run(w, 1);
     expect(w.sides[0].player.life).toBeGreaterThan(l0 + 1);

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { noteLifeLost } from './replenish';
 import { Character } from '../calc/character';
 import { blockChance } from '../calc/combat';
 import { flaskSpec } from '../calc/flasks';
@@ -84,6 +85,8 @@ describe('block, in the engine', () => {
     );
     const p = world.sides[0].player;
     p.life = p.def.maxLife * 0.5;
+    // Life won back in a fight is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(p, p.def.maxLife * 0.5, world.t);
     p.mana = 0;
     expect(p.def.lifeOnBlock).toBe(30);
     applyHit(world, dummy, p, world.sides[0].char.profile(world.sides[0].char.primary), blocked);

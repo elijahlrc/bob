@@ -1,4 +1,4 @@
-import { noteLifeLost } from './replenish';
+import { noteLifeLost, replenish } from './replenish';
 import type { SkillChoice } from '../calc/character';
 import { reservedMana } from './reserve';
 import type { TriggerDef, TriggerEffect } from '../data/triggers';
@@ -308,7 +308,8 @@ function recover(s: Side, e: Extract<TriggerEffect, { kind: 'recover' }>): boole
   const amount = (e.value / 100) * (e.pctOf === 'armour' ? p.def.armour : p.def.maxLife);
   if (amount <= 0) return false;
   const before = p[e.pool];
-  if (e.pool === 'life') p.life = Math.min(lifeCap(p), p.life + amount);
+  // A triggered heal of life is replenish (src/sim/replenish.ts).
+  if (e.pool === 'life') p.life += replenish(p, Math.min(Math.max(0, lifeCap(p) - p.life), amount));
   else if (e.pool === 'es') p.es = Math.min(p.def.maxEs, p.es + amount);
   else p.mana = Math.min(p.def.maxMana - reservedMana(s), p.mana + amount);
   noteRecover(p, e.pool, p[e.pool] - before);

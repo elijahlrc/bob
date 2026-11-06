@@ -370,7 +370,7 @@ describe('how weapon affixes read', () => {
     );
     expect(modText(mod('damage', 'inc', 40, { tags: ['spell', 'fire'] }))).toMatch(/with Spells/);
     expect(modText(mod('lifeOnHit', 'base', 3, { tags: ['attack'] }))).toBe(
-      'Gain 3 Life per Enemy Hit with Attacks',
+      'Replenish 3 Life on Hit with Attacks',
     );
     expect(modText(mod('dotMulti', 'base', 20, { damageTypes: ['fire'] }))).toBe(
       '20% to the Fire Damage over Time Multiplier',

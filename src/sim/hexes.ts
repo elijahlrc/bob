@@ -13,6 +13,7 @@ import { reservedMana } from './reserve';
 import { gainBuff } from './buffs';
 import { gainCharge } from './charges';
 import { lifeCap } from './combat';
+import { replenish } from './replenish';
 import { noteRecover } from './recovery';
 import { bossOfType } from '../data/bosses';
 import { flaskWards } from './afflict';
@@ -119,7 +120,12 @@ export function hexHit(w: World, s: Side, dst: Actor, melee = false): void {
     if (melee && def.meleeBuff) gainBuff(w, s, def.meleeBuff);
     const give = def.onHit;
     if (!give) continue;
-    if (give.life) p.life = Math.min(lifeCap(p), p.life + atLevel(give.life, h.level));
+    // A curse's life is replenish (src/sim/replenish.ts).
+    if (give.life)
+      p.life += replenish(
+        p,
+        Math.min(Math.max(0, lifeCap(p) - p.life), atLevel(give.life, h.level)),
+      );
     if (give.mana)
       p.mana = Math.min(
         Math.max(0, p.def.maxMana - reservedMana(s)),
@@ -142,7 +148,11 @@ export function hexKill(w: World, dead: Actor): number {
   for (const h of dead.hexes) {
     const give = HEXES[h.id].onKill;
     if (!give) continue;
-    if (give.life) p.life = Math.min(lifeCap(p), p.life + atLevel(give.life, h.level));
+    if (give.life)
+      p.life += replenish(
+        p,
+        Math.min(Math.max(0, lifeCap(p) - p.life), atLevel(give.life, h.level)),
+      );
     if (give.mana)
       p.mana = Math.min(
         Math.max(0, p.def.maxMana - reservedMana(hunted(w, dead).side!)),

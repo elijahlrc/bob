@@ -339,7 +339,7 @@ export const RUN_REWARDS: RunRewardDef[] = [
   {
     id: 'servantsTithe',
     name: 'Tithe of the Servants',
-    text: 'A minion of yours that is slain heals you for 5% of its life; one whose time runs out, 1.25%.',
+    text: 'A minion of yours that is slain heals you for 2.5% of its life; one whose time runs out, 0.6%.',
     base: 40,
     max: 1,
     from: 6,
@@ -605,9 +605,10 @@ export const MARKSMAN_ACCURACY = 4;
 /** The share of chaos damage that energy shield takes. */
 export const ROT_VEIL_SHARE = 0.5;
 /** Life healed when a minion is slain, and when its time runs out (mine: about a quarter, so twenty Call Furies spirits heal
- * a few percent of life a second, not a tenth). */
-export const TITHE_SLAIN = 0.05;
-export const TITHE_EXPIRED = 0.0125;
+ * a few percent of life a second, not a tenth). Halved 2026-11-06 (docs/REPLENISH.md step 4): it is the one in-fight heal outside
+ * the replenish limit, and on the high scores it healed half or more of what a build with a few minions lost. */
+export const TITHE_SLAIN = 0.025;
+export const TITHE_EXPIRED = 0.006;
 /** Increased attack speed with two-handed weapons, and the share of each attack hit reflected. */
 export const FLAYING_SPEED = 75;
 export const FLAYING_REFLECT = 0.01;

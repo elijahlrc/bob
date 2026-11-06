@@ -22,6 +22,7 @@ import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc
 import type { Side } from '../sim/side';
 import type { Actor, World } from '../sim/types';
 import { reservedLife } from '../sim/reserve';
+import { replenishRoom } from '../sim/replenish';
 import { SPEEDS, type Controller } from '../run/controller';
 import { DELIVERY_NAME, ELEMENT_NAME } from '../calc/skillLook';
 import { useTicks } from './hooks';
@@ -53,12 +54,16 @@ function Orb(props: {
   reserved?: number;
   /** Flash: the main skill has wanted more than the orb holds for a while (docs/NEWPLAYER.md N12). */
   flash?: boolean;
+  /** Life replenish can still win back (docs/REPLENISH.md): a band above the liquid, never into the reserved part. */
+  replenish?: number;
 }) {
   const { value, max, kind, label } = props;
   const reserved = Math.max(0, Math.min(max, props.reserved ?? 0));
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
   const resPct = max > 0 ? (reserved / max) * 100 : 0;
   const esPct = props.esMax ? Math.max(0, Math.min(100, ((props.es ?? 0) / props.esMax) * 100)) : 0;
+  const room = Math.max(0, Math.min(props.replenish ?? 0, max - reserved - value));
+  const roomPct = max > 0 ? Math.min(100 - pct, (room / max) * 100) : 0;
   return (
     <div
       class={`orb ${kind}`}
@@ -69,7 +74,7 @@ function Orb(props: {
       {...infoProps(
         `${label} ${Math.round(value)} / ${Math.round(max - reserved)}${
           reserved > 0 ? ` (${Math.round(reserved)} of ${Math.round(max)} reserved by auras)` : ''
-        }${
+        }${room >= 1 ? ` · Replenish can win back ${Math.round(room)} more` : ''}${
           // The life orb carries energy shield as a film over it: its numbers are in the same tip.
           props.esMax
             ? ` · Energy shield ${Math.round(props.es ?? 0)} / ${Math.round(props.esMax)}`
@@ -80,6 +85,9 @@ function Orb(props: {
       <div class="orb-glass" data-nopaint>
         {/* Its top edge is the level line: none on a full orb. */}
         {pct < 100 && <div class="orb-empty" style={{ height: `${100 - pct}%` }} />}
+        {roomPct > 0.5 && (
+          <div class="orb-replenish" style={{ bottom: `${pct}%`, height: `${roomPct}%` }} />
+        )}
         {esPct > 0 && <div class="orb-es" style={{ height: `${esPct}%` }} />}
         {resPct > 0 && <div class="orb-reserved" style={{ height: `${resPct}%` }} />}
       </div>
@@ -728,6 +736,7 @@ export function Hud({ c }: { c: Controller }) {
           label="Life"
           es={p.es}
           esMax={p.def.maxEs}
+          replenish={replenishRoom(p)}
         />
         <div class="hud-center">
           <Charges w={w} />

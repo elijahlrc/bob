@@ -1,6 +1,7 @@
 import type { SkillDotProfile, SkillProfile } from '../calc/skill';
 import { effectiveRes } from '../calc/formulas';
 import { noteRecover } from './recovery';
+import { replenish } from './replenish';
 import { statusTaken } from './statuses';
 import { applyStatus } from './statuses';
 import type { Actor, World } from './types';
@@ -210,7 +211,11 @@ export function sumSkillDots(w: World, a: Actor, out: number[], dt: number): voi
     const p = d.by?.player ?? hunted(w, a);
     if (p.alive && p.team !== a.team) {
       const l0 = p.life;
-      p.life = Math.min(p.def.maxLife, p.life + (d.raw * d.regen * dt) / 100);
+      // What the skill mends is replenish (src/sim/replenish.ts).
+      p.life += replenish(
+        p,
+        Math.min(Math.max(0, p.def.maxLife - p.life), (d.raw * d.regen * dt) / 100),
+      );
       noteRecover(p, 'life', p.life - l0);
     }
   }

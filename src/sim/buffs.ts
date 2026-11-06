@@ -83,10 +83,8 @@ export function rollGains(w: World, s: Side, event: BuffEvent, extra: readonly M
     const max = pool === 'life' ? p.def.maxLife : pool === 'mana' ? p.def.maxMana : p.def.maxEs;
     const amount = flat + (pct / 100) * max;
     const before = p[pool];
-    // Life on a kill is replenish (src/sim/replenish.ts): it wins back only life lost recently.
-    if (pool === 'life' && (event === 'kill' || event === 'killIgnited'))
-      p.life += replenish(p, Math.max(0, Math.min(amount, lifeCap(p) - p.life)));
-    else if (pool === 'life') p.life = Math.min(lifeCap(p), p.life + amount);
+    // Life won back on any event is replenish (src/sim/replenish.ts): it wins back only life lost recently.
+    if (pool === 'life') p.life += replenish(p, Math.max(0, Math.min(amount, lifeCap(p) - p.life)));
     else if (pool === 'mana')
       p.mana = Math.min(Math.max(0, p.def.maxMana - reservedMana(s)), p.mana + amount);
     else p.es = Math.min(p.def.maxEs, p.es + amount);

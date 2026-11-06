@@ -69,12 +69,12 @@ export const ITEM_RECOVERY_SCALE = 0.25;
 /** "While leeching" lines, which since replenish hold only while it recovers, are this many times as strong. */
 export const WHILE_LEECHING_SCALE = 1.35;
 /**
- * Replenish (docs/SUSTAIN.md): the character's life leech, life on hit and life on kill recover at most this share
- * (%) of the life lost in the last `REPLENISH_WINDOW` seconds, less what they recovered in that time. Stats raise the share up to the
- * cap and stretch or shorten the window within its limits. 45 since 2026-11-05 (was 50; the owner, after the leaderboard
- * recovery audit).
+ * Replenish (docs/SUSTAIN.md): all life won back in a fight but flasks and regeneration recovers at most this share
+ * (%) of the life lost in the last `REPLENISH_WINDOW` seconds, less what it recovered in that time. Stats raise the share up to the
+ * cap and stretch or shorten the window within its limits. 45 on 2026-11-05 after the leaderboard recovery audit, back to
+ * 50 on 2026-11-06 when block, crit, curse and other life gains joined it (the owner).
  */
-export const REPLENISH_SHARE = 45;
+export const REPLENISH_SHARE = 50;
 export const REPLENISH_SHARE_CAP = 95;
 export const REPLENISH_WINDOW = 5;
 export const REPLENISH_WINDOW_MIN = 2;

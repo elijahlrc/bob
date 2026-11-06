@@ -713,6 +713,13 @@ svg.tree {
   border-bottom: 1px solid #8a7ac0;
   z-index: 1;
 }
+/* What replenish can still win back: a ghost band above the life (docs/REPLENISH.md). */
+.orb-replenish {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #c8725750;
+}
 .orb-es {
   position: absolute;
   left: 0;

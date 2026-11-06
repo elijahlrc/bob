@@ -1249,11 +1249,16 @@ function blocked(
     rollCharges(w, dst.side!, 'block');
     rollGains(w, dst.side!, 'block');
   }
-  if (dst.def.lifeOnBlockPct > 0 || dst.def.lifeOnBlock > 0)
-    dst.life = Math.min(
-      lifeCap(dst),
-      dst.life + dst.def.maxLife * dst.def.lifeOnBlockPct + dst.def.lifeOnBlock,
+  // Life on block is replenish for a character (src/sim/replenish.ts).
+  if (dst.def.lifeOnBlockPct > 0 || dst.def.lifeOnBlock > 0) {
+    const l0 = dst.life;
+    const room = Math.max(0, lifeCap(dst) - dst.life);
+    dst.life += replenish(
+      dst,
+      Math.min(room, dst.def.maxLife * dst.def.lifeOnBlockPct + dst.def.lifeOnBlock),
     );
+    if (dst.isPlayer) noteRecover(dst, 'life', dst.life - l0);
+  }
   if (dst.isPlayer && dst.def.manaOnBlock > 0)
     dst.mana = Math.min(
       Math.max(0, dst.def.maxMana - reservedMana(dst.side!)),

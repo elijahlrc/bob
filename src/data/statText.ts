@@ -86,12 +86,12 @@ export const STAT_TEXT: Record<string, StatText> = {
     pct: true,
     base: '{v}% of {types}Damage Leeched as Mana',
   },
-  lifeOnHit: { base: 'Gain {v} Life per Enemy Hit' },
-  lifeOnKill: { base: 'Gain {v} Life per Enemy Killed' },
-  lifeOnKillPct: { base: 'Recover {v}% of Life on Kill' },
+  lifeOnHit: { base: 'Replenish {v} Life on Hit' },
+  lifeOnKill: { base: 'Replenish {v} Life on Kill' },
+  lifeOnKillPct: { base: 'Replenish {v}% of Life on Kill' },
   manaOnKill: { base: 'Gain {v} Mana per Enemy Killed' },
-  lifeOnBlockPct: { base: 'Recover {v}% of Life when you Block' },
-  lifeOnBlock: { base: '+{v} Life gained when you Block' },
+  lifeOnBlockPct: { base: 'Replenish {v}% of Life when you Block' },
+  lifeOnBlock: { base: 'Replenish {v} Life when you Block' },
   manaOnBlock: { base: '+{v} Mana gained when you Block' },
   blockProjectile: { base: '+{v}% Chance to Block Projectile Attack Damage' },
   stunBlockRecovery: { base: '{v}% increased Stun and Block Recovery' },
@@ -473,6 +473,9 @@ STAT_TEXT['status.flee.chance'] = { base: '{v}% chance to cause Monsters to Flee
 STAT_TEXT.statusDuration = { name: 'Duration of Statuses you inflict' };
 STAT_TEXT.enemyBlockReduction = { base: 'Enemies have {v}% reduced Chance to Block your Hits' };
 
+// Life won back in a fight is replenish (src/sim/replenish.ts), and says so (the owner, 2026-11-06); mana and energy shield are gained.
+const gainVerb = (pool: string): string => (pool === 'life' ? 'Replenish' : 'Gain');
+const pctVerb = (pool: string): string => (pool === 'life' ? 'Replenish' : 'Recover');
 const RECOVER_POOL_TEXT: Record<string, string> = {
   life: 'Life',
   mana: 'Mana',
@@ -488,9 +491,9 @@ for (const [event, phrase] of Object.entries({
   flask: 'when you use a Flask',
 }))
   for (const [pool, label] of Object.entries(RECOVER_POOL_TEXT)) {
-    STAT_TEXT[`recover.${event}.${pool}`] = { base: `Gain {v} ${label} ${phrase}` };
+    STAT_TEXT[`recover.${event}.${pool}`] = { base: `${gainVerb(pool)} {v} ${label} ${phrase}` };
     STAT_TEXT[`recoverPct.${event}.${pool}`] = {
-      base: `Recover {v}% of maximum ${label} ${phrase}`,
+      base: `${pctVerb(pool)} {v}% of maximum ${label} ${phrase}`,
     };
   }
 for (const [event, phrase] of Object.entries({
@@ -694,9 +697,9 @@ for (const [event, phrase] of Object.entries(MORE_EVENTS)) {
       base: `{v}% chance to gain ${an(CHARGE_NAMES[k])} ${CHARGE_NAMES[k]} Charge ${phrase}`,
     };
   for (const [pool, label] of Object.entries({ life: 'Life', mana: 'Mana', es: 'Energy Shield' })) {
-    STAT_TEXT[`recover.${event}.${pool}`] ??= { base: `Gain {v} ${label} ${phrase}` };
+    STAT_TEXT[`recover.${event}.${pool}`] ??= { base: `${gainVerb(pool)} {v} ${label} ${phrase}` };
     STAT_TEXT[`recoverPct.${event}.${pool}`] ??= {
-      base: `Recover {v}% of maximum ${label} ${phrase}`,
+      base: `${pctVerb(pool)} {v}% of maximum ${label} ${phrase}`,
     };
   }
 }

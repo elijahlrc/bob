@@ -44,6 +44,9 @@ export type Ledger = {
   /** Hits aimed at the character that missed it (evaded) or that it blocked. */
   evaded: number;
   blocked: number;
+  /** Life replenish won back, and life it was offered past its limit (docs/REPLENISH.md). */
+  replenished: number;
+  heldBack: number;
 };
 
 /** The finished report of a map (or a whole Crawl), biggest first. */
@@ -54,6 +57,8 @@ export type MapReport = {
   pools: { es: number; life: number; mana: number };
   evaded: number;
   blocked: number;
+  /** Life replenish won back and held back (none in reports from before 2026-11-06). */
+  replenish?: { won: number; held: number };
 };
 
 export function newLedger(): Ledger {
@@ -63,6 +68,8 @@ export function newLedger(): Ledger {
     pools: { es: 0, life: 0, mana: 0 },
     evaded: 0,
     blocked: 0,
+    replenished: 0,
+    heldBack: 0,
   };
 }
 
@@ -271,6 +278,7 @@ export function buildReport(w: World, s: Side): MapReport {
     pools: { ...l.pools },
     evaded: l.evaded,
     blocked: l.blocked,
+    replenish: { won: l.replenished, held: l.heldBack },
   };
 }
 
@@ -302,5 +310,9 @@ export function combineReports(parts: MapReport[]): MapReport {
     },
     evaded: parts.reduce((s, r) => s + r.evaded, 0),
     blocked: parts.reduce((s, r) => s + r.blocked, 0),
+    replenish: {
+      won: parts.reduce((s, r) => s + (r.replenish?.won ?? 0), 0),
+      held: parts.reduce((s, r) => s + (r.replenish?.held ?? 0), 0),
+    },
   };
 }

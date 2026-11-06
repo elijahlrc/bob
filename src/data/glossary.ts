@@ -21,11 +21,10 @@ export const GLOSSARY = {
   stun: 'A stun stops a fighter for a moment. Big hits stun.',
   regen: 'Refills by itself every second.',
   leech: 'Part of the damage you deal comes back to you as mana or energy shield.',
-  replenish: `Your hits win back life you lost, up to ${REPLENISH_SHARE}% of what you lost in the last ${REPLENISH_WINDOW} seconds to begin with. It never heals past that.`,
+  replenish: `Life won back in a fight (not flasks or regeneration): at most ${REPLENISH_SHARE}% of life lost in the last ${REPLENISH_WINDOW} seconds, more with gear or passives.`,
   onHit: 'Every hit that lands gives you a little mana, or life it can replenish.',
-  onKill:
-    'Every kill gives back a little life or mana. Life on kill only wins back life lost recently.',
-  onBlock: 'Every hit your character blocks gives back a little life or mana.',
+  onKill: 'Every kill gives back a little mana, or life it can replenish.',
+  onBlock: 'Every hit your character blocks gives back a little mana, or life it can replenish.',
   flask:
     'Flasks are drunk by themselves (the Strategy tab says when). A Respite, a fallen boss, or gear that says so refills them.',
   relic: 'Kept for the rest of the run. It changes how the game plays, not just a number.',
@@ -66,7 +65,10 @@ const BY_STAT: [RegExp, Term][] = [
   [/^evasion/, 'evasion'],
   [/^block/, 'block'],
   [/^(stun|avoid)/, 'stun'],
-  [/^(replenish|leech\.life|leechRate|lifeOnHit|lifeOnKill$)/, 'replenish'],
+  [
+    /^(replenish|leech\.life|leechRate|lifeOnHit|lifeOnKill|lifeOnBlock|recover(Pct)?\.\w+\.life$)/,
+    'replenish',
+  ],
   [/^(lifeRegen|manaRegen|esRecharge|recover|lifeOn|manaOn)/, 'regen'],
   [/^leech/, 'leech'],
   [/^flask/, 'flask'],

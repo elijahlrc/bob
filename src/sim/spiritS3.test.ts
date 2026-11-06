@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { noteLifeLost } from './replenish';
 import { attackHitChance, blockChance } from '../calc/combat';
 import { Character } from '../calc/character';
 import type { Build } from '../data/types';
@@ -209,6 +210,8 @@ describe('the curses and marks with their reference effects', () => {
   it('the marks give back when their enemy is killed, and Mark of Plenty fills flasks', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
     world.sides[0].player.life = 1;
+    // Life won back in a fight is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+    noteLifeLost(world.sides[0].player, world.sides[0].player.def.maxLife, world.t);
     world.sides[0].player.mana = 0;
     applyHex(world, dummy, 'critMark', 2, 1, 20);
     expect(hexKill(world, dummy)).toBe(0);
@@ -222,6 +225,7 @@ describe('the curses and marks with their reference effects', () => {
   it('a hit on Mark of Plenty gives life and mana, and its evasion is lower', () => {
     const { world, dummy } = createDummyWorld(holding(['crushingBlow']), { distance: 3 });
     world.sides[0].player.life = 1;
+    noteLifeLost(world.sides[0].player, world.sides[0].player.def.maxLife, world.t);
     applyHex(world, dummy, 'flaskMark', 40, 1, 10);
     hexHit(world, world.sides[0], dummy);
     expect(world.sides[0].player.life).toBeGreaterThan(5);

@@ -199,6 +199,14 @@ cluster chaos spell crit. Reward picks and the Quartermaster's flasks still arri
 kept apart from the save version (`TREE_REVISION`, `refundOldTree` in `src/run/save.ts`). The save version stays at 25, so
 the high scores and the rivals are untouched; a rival's build keeps its nodes, which now carry the new lines.
 
+## 8. All life won back in a fight is replenish (the owner, 2026-11-06)
+
+Life on block, life won back on any event, curses that give life, skills that mend the character and triggered heals on
+uniques now draw on the replenish pool too, and every life line that does says "Replenish". Flasks, regeneration and the
+Tithe of the Servants do not; energy shield gains are unchanged. With more drawing on it, the replenish share goes back
+from 45% to 50% (`REPLENISH_SHARE`). What is covered, and the plan to show the limit to the
+player (a band on the life orb, a map report line, a sheet section), is docs/REPLENISH.md.
+
 **Measured again** (the same nine builds, the same two chains): about 1.2 flasks dropped a map at level 100, 0.4 of them
 life or hybrid, each partly full, against 3.3 and 2.0 full before. The build that healed from consecrated ground drank more
 and died at the end of its second chain with an empty belt; the Mystic that lost its shield nodes died on a map it had

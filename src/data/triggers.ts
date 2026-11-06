@@ -118,7 +118,9 @@ function effectText(e: TriggerEffect): string {
     case 'sacrifice':
       return `sacrifice ${e.pctOfLife}% of life to gain that much ${e.pool === 'es' ? 'energy shield' : e.pool}`;
     case 'recover':
-      return `recover ${e.value}% of ${e.pctOf === 'armour' ? 'armour' : 'maximum life'} as ${e.pool === 'es' ? 'energy shield' : e.pool}`;
+      return e.pool === 'life'
+        ? `replenish ${e.value}% of ${e.pctOf === 'armour' ? 'armour' : 'maximum life'} as life`
+        : `recover ${e.value}% of ${e.pctOf === 'armour' ? 'armour' : 'maximum life'} as ${e.pool === 'es' ? 'energy shield' : e.pool}`;
   }
 }
 

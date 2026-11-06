@@ -9,6 +9,7 @@ import { actorById, enemiesOf } from './actions';
 import { flaskMask, hit, lifeCap, playerConds, rawHit } from './combat';
 import { corpseBlast } from './triggers';
 import { noteRecover } from './recovery';
+import { replenish } from './replenish';
 import { MINIONS, MINION_ENEMY_RES } from '../data/minions';
 import { spellBaseDamage } from '../data/constants';
 import { applySkillDot } from './skillDots';
@@ -726,7 +727,8 @@ function tickSiphon(w: World, s: Side, dt: number): void {
     const mana = levelValue(sp.mana, lv) + n * levelValue(sp.manaEach, lv);
     const l0 = p.life;
     const m0 = p.mana;
-    p.life = Math.min(lifeCap(p), p.life + life * dt);
+    // The siphon's life is replenish (src/sim/replenish.ts).
+    p.life += replenish(p, Math.min(Math.max(0, lifeCap(p) - p.life), life * dt));
     p.mana = Math.min(p.def.maxMana - s.char.reservedMana, p.mana + mana * dt);
     noteRecover(p, 'life', p.life - l0);
     noteRecover(p, 'mana', p.mana - m0);

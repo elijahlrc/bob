@@ -339,13 +339,13 @@ export const replenishWindow = def('replenishWindow', (v: number): Line =>
 );
 export const lifeOnHit = def('lifeOnHit', (v: number, tags?: SkillTag[]): Line =>
   line(
-    `+${v} life on ${tagWords(tags)}hit`,
+    `replenish ${v} life on ${tagWords(tags)}hit`,
     v / 4,
     mod('lifeOnHit', 'base', v, tags ? { tags } : undefined),
   ),
 );
 export const lifeOnKill = def('lifeOnKill', (v: number): Line =>
-  line(`+${v} life on kill`, v / 10, mod('lifeOnKill', 'base', v)),
+  line(`replenish ${v} life on kill`, v / 10, mod('lifeOnKill', 'base', v)),
 );
 
 // ---- Flags that keystones use (their mods come from src/data/tree/keystones.ts) ----
@@ -396,7 +396,7 @@ export const shieldDef = def('shieldDef', (v: number): Line =>
   line(`${v}% defences from your shield`, v / 15, mod('shieldDefences', 'inc', v)),
 );
 export const lifeOnBlock = def('lifeOnBlock', (v: number): Line =>
-  line(`+${v} life on block`, v / 15, mod('lifeOnBlock', 'base', v)),
+  line(`replenish ${v} life on block`, v / 15, mod('lifeOnBlock', 'base', v)),
 );
 export const shieldStunAvoid = def('shieldStunAvoid', (v: number): Line =>
   line(
@@ -1083,7 +1083,7 @@ export const recoverOn = def(
     v: number,
   ): Line =>
     line(
-      `recover ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
+      `${pool === 'life' ? 'replenish' : 'recover'} ${v}% of ${pool === 'es' ? 'energy shield' : pool} ${{ kill: 'on kill', killIgnited: 'when you kill an ignited enemy', crit: 'on crit', hitTaken: 'when hit', evade: 'when you evade an attack', blink: 'when you blink', block: 'when you block' }[event]}`,
       v * (event === 'kill' || event === 'killIgnited' ? 0.8 : 1.2),
       mod(`recoverPct.${event}.${pool}`, 'base', v),
     ),

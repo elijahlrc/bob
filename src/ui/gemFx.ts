@@ -27,7 +27,8 @@ function dotLine(d: DotSpec, level: number): string {
   if (d.maxTargets) parts.push(`on the ${d.maxTargets} nearest enemies`);
   if (d.splash) parts.push(`and on enemies within ${num(d.splash)} of the target`);
   if (d.spread) parts.push(', passed on when the enemy dies');
-  if (d.regen) parts.push(`; you mend ${num(d.regen)}% of it for each enemy that carries it`);
+  if (d.regen)
+    parts.push(`; you replenish ${num(d.regen)}% of it as life for each enemy that carries it`);
   if (d.hinder) parts.push(`; slows them by ${num(d.hinder.v)}%`);
   // A part that starts with its own punctuation sits right after the one before it.
   return parts.reduce((s, p) => (/^[,;]/.test(p) ? s + p : `${s} ${p}`));
@@ -197,7 +198,7 @@ export function fxLines(def: ActiveGemDef, level: number): string[] {
     );
   if (def.siphon)
     out.push(
-      `While enemies carry the beams you regain ${num(lv(def.siphon.life, level))} life and ${num(lv(def.siphon.mana, level))} mana a second, and ${num(lv(def.siphon.lifeEach, level))} life and ${num(lv(def.siphon.manaEach, level))} mana more for each`,
+      `While enemies carry the beams you replenish ${num(lv(def.siphon.life, level))} life and regain ${num(lv(def.siphon.mana, level))} mana a second, and ${num(lv(def.siphon.lifeEach, level))} life and ${num(lv(def.siphon.manaEach, level))} mana more for each`,
     );
   if (def.dot) out.push(dotLine(def.dot, level));
   if (def.burning)

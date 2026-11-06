@@ -2,7 +2,8 @@ import { toChildArray, type ComponentChildren } from 'preact';
 import { useMemo } from 'preact/hooks';
 import { scenarioDps, type Character, type CharacterSheet } from '../calc/character';
 import { statBaseLines, statTotals, type StatTotal, type TotalSection } from '../calc/statTotals';
-import { CONDITION_TEXT, TAG_TEXT } from '../data/statText';
+import { CONDITION_TEXT, STAT_TEXT, TAG_TEXT } from '../data/statText';
+import { BUFF_EVENTS, recoverPctStat, recoverStat } from '../data/buffs';
 import { CHARGE_KINDS, CHARGE_NAMES, CHARGE_SECONDS, CHARGE_TEXT } from '../calc/charges';
 import { hitChance, monsterEvasion } from '../calc/formulas';
 import { BASE_CRIT_MULTI } from '../data/constants';
@@ -150,6 +151,13 @@ const AILMENTS: ['ignite' | 'shock' | 'chill' | 'freeze' | 'bleed' | 'poison', s
   ['poison', 'Poison'],
 ];
 
+/** When a life line on an event replenishes, as its text says it: "on Critical Strike", "when you Block". */
+const eventPhrase = (stat: string): string =>
+  (STAT_TEXT[stat]?.base ?? '').replace(/^Replenish \{v\}%? (of maximum )?Life /, '');
+
+/** A total that belongs with replenish (its share, window and speed), shown in its own section. */
+const isReplenish = (t: StatTotal) => glossFor(t.mod.stat) === GLOSSARY.replenish;
+
 /** A leech line's value, after the character's increases to leech: "0.5%", "2% of Physical Damage". */
 const leechValue = (m: Mod | null, mult: number): string => {
   const v = `${Math.round((m?.value ?? 0) * mult * 100) / 100}%`;
@@ -272,6 +280,12 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
       manaOnKill: of('manaOnKill'),
       lifeOnBlock: of('lifeOnBlock'),
       lifeOnBlockPct: of('lifeOnBlockPct'),
+      // Life on any other event the character's gear and tree give (docs/REPLENISH.md): curses, skills and uniques' triggers
+      // are not listed here.
+      lifeOnEvent: BUFF_EVENTS.flatMap((e) => [
+        ...of(recoverStat(e, 'life')),
+        ...of(recoverPctStat(e, 'life')),
+      ]),
       manaOnBlock: of('manaOnBlock'),
       critMulti: of('critMulti'),
       penetration: of('penetration'),
@@ -493,28 +507,10 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               />
             )}
             {flatRows(
-              'Replenish',
-              flat.lifeLeech,
-              (m) => leechValue(m, flat.lifeMult),
-              leechTip('life', flat.def.leechRate),
-            )}
-            <Row
-              label="Replenish Limit"
-              value={`${Math.round(flat.def.replenishShare * 100)}%`}
-              raw={`of life lost in ${f1(flat.def.replenishWindow)}s`}
-              tip={GLOSSARY.replenish}
-            />
-            {flatRows(
               'Mana Leech',
               flat.manaLeech,
               (m) => leechValue(m, flat.manaMult),
               leechTip('mana', flat.def.leechRate),
-            )}
-            {flatRows(
-              'Life Gained on Hit',
-              flat.lifeOnHit,
-              (m) => `+${f1(m?.value ?? 0)}`,
-              GLOSSARY.onHit,
             )}
             {flatRows(
               'Mana Gained on Hit',
@@ -522,19 +518,40 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               (m) => `+${f1(m?.value ?? 0)}`,
               GLOSSARY.onHit,
             )}
-            {flatRows('Life Gained on Kill', flat.lifeOnKill, plus, GLOSSARY.onKill)}
-            {flatRows('Life Recovered on Kill', flat.lifeOnKillPct, share, GLOSSARY.onKill, false)}
             {flatRows('Mana Gained on Kill', flat.manaOnKill, plus, GLOSSARY.onKill)}
-            {flatRows('Life Gained on Block', flat.lifeOnBlock, plus, GLOSSARY.onBlock)}
-            {flatRows(
-              'Life Recovered on Block',
-              flat.lifeOnBlockPct,
-              share,
-              GLOSSARY.onBlock,
-              false,
-            )}
             {flatRows('Mana Gained on Block', flat.manaOnBlock, plus, GLOSSARY.onBlock)}
-            {recovery.filter((t) => t !== lifeRate && t !== manaRate).map(totalRow)}
+            {recovery
+              .filter((t) => t !== lifeRate && t !== manaRate && !isReplenish(t))
+              .map(totalRow)}
+          </Section>
+          <Section title="Replenish" tip={GLOSSARY.replenish}>
+            <Row
+              label="Limit"
+              value={`${Math.round(flat.def.replenishShare * 100)}%`}
+              raw={`of life lost in ${f1(flat.def.replenishWindow)}s`}
+              tip={GLOSSARY.replenish}
+            />
+            {flatRows(
+              'From Damage',
+              flat.lifeLeech,
+              (m) => leechValue(m, flat.lifeMult),
+              leechTip('life', flat.def.leechRate),
+            )}
+            {flatRows('On Hit', flat.lifeOnHit, plus, GLOSSARY.onHit)}
+            {flatRows('On Kill', flat.lifeOnKill, plus, GLOSSARY.onKill)}
+            {flatRows('% of Life on Kill', flat.lifeOnKillPct, share, GLOSSARY.onKill, false)}
+            {flatRows('On Block', flat.lifeOnBlock, plus, GLOSSARY.onBlock, false)}
+            {flatRows('% of Life on Block', flat.lifeOnBlockPct, share, GLOSSARY.onBlock, false)}
+            {flat.lifeOnEvent.map((m) =>
+              flatRows(
+                (m.stat.startsWith('recoverPct') ? '% of Life ' : '') + eventPhrase(m.stat),
+                [m],
+                m.stat.startsWith('recoverPct') ? share : plus,
+                GLOSSARY.replenish,
+                false,
+              ),
+            )}
+            {[...recovery, ...other].filter(isReplenish).map(totalRow)}
           </Section>
         </div>
         <div class="cs-col lf-panel" data-paint="panel">
@@ -616,7 +633,7 @@ export function Sheet({ s, ch }: { s: CharacterSheet; ch: Character }) {
               raw={times(move?.mult ?? 1)}
               tip={moveTip(s, move)}
             />
-            {other.filter((t) => t !== move).map(totalRow)}
+            {other.filter((t) => t !== move && !isReplenish(t)).map(totalRow)}
           </Section>
         </div>
       </div>

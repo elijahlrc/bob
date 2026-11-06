@@ -247,7 +247,7 @@ export const HEXES: Record<HexId, HexDef> = {
     name: 'Mark of Plenty',
     low: 30,
     high: 49,
-    text: 'less evasion; hitting it restores life and mana, and killing it fills flasks',
+    text: 'less evasion; hitting it replenishes life and restores mana, and killing it fills flasks',
     fx: { evasion: true },
     onHit: { life: [5, 24], mana: [5, 12] },
     onKill: { flasks: 1, charge: { kind: 'fervour', chance: [21, 30] } },

@@ -9163,7 +9163,7 @@ export const GEN_SUPPORT_GEMS: SupportGemDef[] = [
         value: [3, 22],
       },
     ],
-    description: 'Attacks restore life for each enemy they hit.',
+    description: 'Attacks replenish life for each enemy they hit.',
   },
   {
     kind: 'support',

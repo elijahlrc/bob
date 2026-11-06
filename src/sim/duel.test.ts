@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { noteLifeLost } from './replenish';
 import type { SkillDotProfile, SkillProfile } from '../calc/skill';
 import { DT } from '../data/constants';
 import type { Build } from '../data/types';
@@ -428,6 +429,8 @@ describe('what a hit does to a character, as it does to a monster', () => {
         { skillDot: debuff(regen) },
       );
       sa.player.life = 1;
+      // Life won back in a fight is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+      noteLifeLost(sa.player, sa.player.def.maxLife, w.t);
       sb.player.stunT = 1e6;
       sa.player.stunT = 1e6;
       for (let i = 0; i < 30; i++) stepWorld(w);

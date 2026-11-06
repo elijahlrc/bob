@@ -328,6 +328,22 @@ html.leaf .orb-es {
   background: #b7c4d150;
   box-shadow: inset 0 2px 0 #d3dce5;
 }
+/* Life replenish can still win back (docs/REPLENISH.md): a ghost of the liquid above it, striped, with a pale top edge. */
+html.leaf .orb-replenish {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: repeating-linear-gradient(-45deg, #c87257a0 0 3px, #c8725740 3px 6px);
+  box-shadow: inset 0 2px 0 #f0b49c;
+  transition:
+    height 0.25s linear,
+    bottom 0.1s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.leaf .orb-replenish {
+    transition: none;
+  }
+}
 html.leaf .orb-reserved {
   border: 0;
   background: #0c1129;

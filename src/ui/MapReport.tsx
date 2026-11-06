@@ -118,6 +118,14 @@ function Dealt({ r }: { r: MapReport }) {
   );
 }
 
+/** Life replenish won back on the map and what its limit held back (docs/REPLENISH.md); empty when it did nothing. */
+function replenishLine(r: MapReport): string {
+  const won = r.replenish?.won ?? 0;
+  const held = r.replenish?.held ?? 0;
+  if (won < 1 && held < 1) return '';
+  return `Replenish won back ${f0(won)} life${held >= 1 ? `; its limit held back ${f0(held)} more` : ''}.`;
+}
+
 /** What the character took, one row per monster kind or effect, and what it came out of. `who` is what it is called ("you"). */
 function Taken({ r, who }: { r: MapReport; who: string }) {
   const rows = r.taken;
@@ -144,6 +152,7 @@ function Taken({ r, who }: { r: MapReport; who: string }) {
                 .join(', ')}.`}
         </p>
       )}
+      {replenishLine(r) && <p class="muted mr-line">{replenishLine(r)}</p>}
       {aimed > 0 && (
         <p class="muted mr-line">
           {f0(aimed)} attacks were aimed at {who}: {f0(hitsTaken)} landed, {f0(r.evaded)} missed{' '}

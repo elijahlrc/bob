@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { noteLifeLost } from './replenish';
 import type { FlaskSpec } from '../calc/flasks';
 import { resolveHit } from '../calc/combat';
 import { Rng } from '../core/rng';
@@ -54,6 +55,8 @@ function dummyEvents(build: Build, seconds: number, lifeShare = 1): { w: World; 
   // (A dummy world refills the character each tick unless told not to.)
   world.sides[0].opts.freeResources = false;
   p.life = p.def.maxLife * lifeShare;
+  // Life won back in a fight is replenish (src/sim/replenish.ts): it wins back only life lost in the window.
+  noteLifeLost(p, p.def.maxLife * (1 - lifeShare), world.t);
   const out: SimEvent[] = [];
   while (world.status === 'running') {
     stepWorld(world);

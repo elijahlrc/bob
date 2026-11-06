@@ -121,9 +121,10 @@
   - Dev server: `npm run dev` on http://localhost:5173 (strict port).
 - **Sustain pass** (2026-11-02): [docs/SUSTAIN.md](docs/SUSTAIN.md). Life ×2 and mana ×1.5 at the source, self-recovery
   that heals to full cut by where it comes from, energy shield at 40% of main; the levers are in `data/constants.ts` and
-  `data/sustain.ts` applies them where the data is made (a new source of life or recovery lines goes through it). Life
-  leech and life on hit are **replenish** (`src/sim/replenish.ts`): capped by a share of the life lost in the last few
-  seconds.
+  `data/sustain.ts` applies them where the data is made (a new source of life or recovery lines goes through it). All life
+  won back in a fight but flasks, regeneration and the Tithe of the Servants is **replenish** (`src/sim/replenish.ts`):
+  capped by a share of the life lost in the last few seconds; a new source of it goes through `replenish()` and its text
+  says "Replenish" (2026-11-06). Showing the limit to the player: [docs/REPLENISH.md](docs/REPLENISH.md).
 - **Enemy damage** (2026-11-04): [docs/ENEMY-DAMAGE.md](docs/ENEMY-DAMAGE.md). Each faction has a damage identity (conversion mods on the
   types, variants incl. the chaos Plague from area level 41), the Rot comes in force later (`themeWeight`), and the Mire is a monster
   curse that slows walking (not a chill). `npx tsx scripts/damage-mix.ts [--types] [--proposal file]` measures what monsters deal by
