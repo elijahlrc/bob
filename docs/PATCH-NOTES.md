@@ -10,6 +10,9 @@ change, and our own names only. Dash bullets under plain headings.
 - A picked choice is now gold with a dark outline, and a ticked box shows a check mark.
 - The Respite lists your worn items first and shows what raising each affix would give.
 - On the Strategy tab, skills with a cooldown can now be given a pause between uses too, and longer pauses are offered.
+- On the Items tab, picking an empty gear or flask slot shows only what fits it, best upgrades first.
+- Bag rows now show each item's picture, a flask's bottle filled to what it holds, and Best upgrade ranks flasks by how much they have left.
+- Item comparisons and upgrades no longer count gems that would not fit in the new item as lost; a warning says which come out.
 
 ## 2026-11-04
 
