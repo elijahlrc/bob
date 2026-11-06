@@ -19,6 +19,7 @@ change, and our own names only. Dash bullets under plain headings.
 ### Items and combat
 
 - Flasks drop about a quarter as often, and a dropped flask holds a random amount of its charges.
+- A Respite, a fallen boss or a flask refill at a stop now fills only the flasks you wear, not the ones you carry.
 - Consecrated ground heals far less, about as much as strong life regeneration.
 - Life leech, life on hit and life on kill win back slightly less of the damage you just took.
 - Energy shield is weaker: items give less, and four of its passive tree clusters now give crit or burning instead.
