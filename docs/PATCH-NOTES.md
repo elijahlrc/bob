@@ -9,6 +9,7 @@ change, and our own names only. Dash bullets under plain headings.
 - Buttons, menus and boxes are redrawn with worn painted edges, and their words and icons no longer spill over the frames.
 - A picked choice is now gold with a dark outline, and a ticked box shows a check mark.
 - The Respite lists your worn items first and shows what raising each affix would give.
+- On the Strategy tab, skills with a cooldown can now be given a pause between uses too, and longer pauses are offered.
 
 ## 2026-11-04
 
