@@ -4,6 +4,10 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
+## 2026-11-06
+
+- About twenty skills now look like what they describe: thrown blades and weapons spin, and spears, icicles, shards, sparks, bones and a twister replace plain orbs and arrows.
+
 ## 2026-11-05
 
 ### Interface
