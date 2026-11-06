@@ -19,7 +19,7 @@ import { EQUIP_SLOTS, type Item } from '../data/types';
 import { Character } from '../calc/character';
 import { gemStart } from '../calc/gems';
 import { gemWeight } from '../gen/loot';
-import { restAtCamp } from './camp';
+import { refillWorn, restAtCamp } from './camp';
 import { type CraftResult } from './craft';
 import { noteFound } from './found';
 import type { MapOffer } from './offers';
@@ -441,7 +441,8 @@ export function takeStop(run: RunState, slot: number, choice: StopChoice): Craft
   way.stops++;
   run.vitals = restAtCamp(run.build, run.map, run.vitals);
   // A Waystation Cup refills them at every stop (docs/ATTRITION.md).
-  if (refill || heldReward(run, 'waystationCup') > 0) run.vitals = { ...run.vitals, flasks: {} };
+  if (refill || heldReward(run, 'waystationCup') > 0)
+    run.vitals = { ...run.vitals, flasks: refillWorn(run.build, run.vitals.flasks) };
   advanceLevel(run);
   return { ok: true };
 }

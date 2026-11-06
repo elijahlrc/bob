@@ -39,3 +39,14 @@ export function restAtCamp(
     flasks: { ...from.flasks },
   };
 }
+
+/**
+ * The flask charges after a refill (a Respite, a fallen boss, a stop's refill): the worn flasks full, the carried ones as
+ * they were (the owner, 2026-11-05: a refill of the whole bag made spare flasks a store of charges, and found flasks arrive
+ * partly filled). A flask the vitals do not name counts as full.
+ */
+export function refillWorn(build: Build, flasks: Vitals['flasks']): Vitals['flasks'] {
+  const out = { ...flasks };
+  for (const f of build.flasks) if (f) delete out[f.uid];
+  return out;
+}

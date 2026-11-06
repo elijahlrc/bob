@@ -42,7 +42,7 @@ import { offerNoise } from '../gen/population';
 import { flaskMask, playerCtx } from '../sim/combat';
 import { fullVitals, type DeathRecap, type Vitals, type MapOpts, type World } from '../sim/types';
 import type { MapResult } from '../sim/runMap';
-import { restAtCamp } from './camp';
+import { refillWorn, restAtCamp } from './camp';
 import { noteFound, stampAll } from './found';
 import { makeOffer, rollOffers, type MapOffer } from './offers';
 import { grantRelic, heldReward, waysideOf, type Wayside } from './wayside';
@@ -424,7 +424,8 @@ export function finishMap(run: RunState, res: MapResult): void {
   if (res.status === 'cleared') {
     run.refundPoints += 1;
     // A boss that falls refills every flask (docs/ATTRITION.md).
-    if (bossForMap(run.map)) run.vitals = { ...run.vitals, flasks: {} };
+    if (bossForMap(run.map))
+      run.vitals = { ...run.vitals, flasks: refillWorn(run.build, run.vitals.flasks) };
     // A cleared map may leave a provision in the pouch (docs/WAYSIDE.md 6.1); camp says so after the level advances.
     found = forage(run);
     if (run.map % 10 === 0 && run.map <= 80) run.bonusPoints += 3;
@@ -466,7 +467,7 @@ function keptFlasks(run: RunState, now: Vitals): Vitals['flasks'] {
 }
 
 /**
- * Take the Respite offer (docs/MAPS.md 9.3): no map is played, life, mana, energy shield and flasks are full again,
+ * Take the Respite offer (docs/MAPS.md 9.3): no map is played, life, mana, energy shield and the worn flasks are full again,
  * and the level counts as passed with no XP, loot or clear rewards.
  */
 export function takeRespite(run: RunState): void {
@@ -480,7 +481,7 @@ export function takeRespite(run: RunState): void {
     kills: 0,
     stuck: 0,
   });
-  run.vitals = fullVitals();
+  run.vitals = { ...fullVitals(), flasks: refillWorn(run.build, run.vitals.flasks) };
   advanceLevel(run);
 }
 

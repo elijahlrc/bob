@@ -447,7 +447,7 @@ function Quartermaster({
       </div>
       <div class="stop-kinds">
         <button class={'btn small' + (refill ? ' on' : '')} onClick={() => onRefill(!refill)}>
-          {refill ? 'Flask refill in the cart' : `Refill every flask: ${refillCost} Bone Dust`}
+          {refill ? 'Flask refill in the cart' : `Refill your worn flasks: ${refillCost} Bone Dust`}
         </button>
         <button class="btn small" disabled={run.dust < restockCost} onClick={restock}>
           Restock: {restockCost} Bone Dust

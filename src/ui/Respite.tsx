@@ -71,7 +71,7 @@ const plaque = (on: boolean) => ({
 
 /**
  * The Respite (docs/ATTRITION.md): craft on items, then rest. A craft is made and shown at once; the first of a visit is free,
- * the next cost Bone Dust by the item's level. Resting refills everything and passes the level; before any craft, Back
+ * the next cost Bone Dust by the item's level. Resting refills life, mana, shield and the worn flasks, and passes the level; before any craft, Back
  * returns to camp.
  */
 export function RespiteScreen({

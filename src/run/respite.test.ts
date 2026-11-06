@@ -64,7 +64,9 @@ describe('taking a Respite', () => {
     const run = newRun('vanguard', 6);
     const map = restLevel(run.seed, 12);
     setMap(run, map);
-    run.vitals = { life: 0.2, mana: 0.3, es: 0.1, flasks: { 1: 0.1 } };
+    // A worn flask nearly dry, and a carried one (uid 9999, not on the belt) half full.
+    const worn = run.build.flasks.find((f) => f !== null)!.uid;
+    run.vitals = { life: 0.2, mana: 0.3, es: 0.1, flasks: { [worn]: 0.1, 9999: 0.5 } };
     expect(run.offers.some((o) => o.kind === 'respite')).toBe(true);
     const before = {
       refund: run.refundPoints,
@@ -73,7 +75,8 @@ describe('taking a Respite', () => {
       inv: run.inventory.length,
     };
     takeRespite(run);
-    expect(run.vitals).toEqual(fullVitals());
+    // The worn flasks are full again; a carried flask keeps what it held (the owner, 2026-11-05).
+    expect(run.vitals).toEqual({ ...fullVitals(), flasks: { 9999: 0.5 } });
     expect(run.map).toBe(map + 1);
     expect(run.history.at(-1)).toMatchObject({ map, status: 'respite', kills: 0 });
     expect(run.refundPoints).toBe(before.refund);
@@ -114,7 +117,8 @@ describe('taking a Respite', () => {
     expect(c.screen).toBe('camp');
     expect(c.world).toBeNull();
     expect(run.map).toBe(map + 1);
-    expect(run.vitals).toEqual(fullVitals());
+    expect(run.vitals).toMatchObject({ life: 1, mana: 1, es: 1 });
+    for (const f of run.build.flasks) if (f) expect(run.vitals.flasks[f.uid] ?? 1).toBe(1);
   });
 });
 

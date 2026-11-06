@@ -28,7 +28,7 @@ that later design work starts from it.
 - Flasks are bigger, so the first maps don't kill: four or five drinks to a flask at the start.
 - A newly found flask arrives full. Changed 2026-11-05 (the owner): a dropped flask holds a random share of its charges,
   evenly from empty to full, and flasks drop a quarter as often (docs/SUSTAIN.md section 7). Reward picks and the
-  Quartermaster's flasks still arrive full.
+  Quartermaster's flasks still arrive full. A refill (a Respite, a fallen boss, a stop) fills only the worn flasks (2026-11-05).
 - Life and flask charges both carry over from level to level. Camp's 10 seconds of rest stay, as a lever. No other
   recovery between maps for now (2026-10-29).
 - Every unique flask and flask affix gets re-thought: many won't make sense with rare use, or will need to be much
