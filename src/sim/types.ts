@@ -293,6 +293,8 @@ export type Projectile = {
   /** Where it changes form (Frost Lance), and whether it has. */
   formAt?: number;
   formed?: boolean;
+  /** The middle one of a fan, the one the others fly beside (drawn as the main blade of Hurled Steel). Only the picture reads it. */
+  lead?: boolean;
 };
 
 export type GroundEffect = {

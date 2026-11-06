@@ -30,6 +30,7 @@ export const MOTIFS = [
   'flameLine',
   'lava',
   'splat',
+  'gobs',
   'strike',
   'storm',
   'pillar',
@@ -43,6 +44,7 @@ export const MOTIFS = [
   'drain',
   'blades',
   'swingNova',
+  'boneNova',
   'whirlBlades',
   'forceWave',
   'breath',
@@ -76,6 +78,7 @@ export const MOTIF_LOOK: Record<Motif, string> = {
   flameLine: 'A line of flame tongues rolls along the band.',
   lava: 'The ground splits into glowing fissures that run out from the point of the blow, bubble, and cool.',
   splat: 'Blobs of molten metal are flung out, land, spread glowing and cool.',
+  gobs: 'As a splat, in the colour of the damage: gobs are flung out, land, spread and fade.',
   strike: 'A jagged bolt comes down from the sky onto the spot and arcs run out over the ground.',
   storm: 'Several bolts come down on the area one after another, with arcs between them.',
   pillar: 'A thin spire of lightning stands up from the spot and the ground about it crackles.',
@@ -90,6 +93,8 @@ export const MOTIF_LOOK: Record<Motif, string> = {
   drain: 'Motes are drawn in from the edge to the centre in curving trails.',
   blades: 'Blades of steel come down on the area and stand in the ground a moment.',
   swingNova: 'A bright crescent sweeps all the way round the caster and a ring of dust follows it.',
+  boneNova:
+    'Bones burst out of the ground about the caster and fly outward, tumbling, to the edge of the ring.',
   whirlBlades: 'Blades turn round the caster in a ring, trailing light.',
   forceWave:
     'A front of force runs down the band, throwing dust up before it and flattening the ground behind.',
@@ -145,6 +150,7 @@ export const SKILL_MOTIF: Readonly<Record<string, Motif>> = {
   slagLob: 'splat',
   slagBlow: 'splat',
   slagCarapace: 'splat',
+  slagSpray: 'gobs',
   // Lightning: from the sky, or along the ground.
   skyfall: 'strike',
   thunderRebuke: 'strike',
@@ -176,6 +182,7 @@ export const SKILL_MOTIF: Readonly<Record<string, Motif>> = {
   jawsTrap: 'jaws',
   // Spins and sweeps.
   haloSweep: 'swingNova',
+  marrowNova: 'boneNova',
   whirlwindCleave: 'whirlBlades',
   twisterBlade: 'whirlBlades',
   orbitingBlades: 'whirlBlades',

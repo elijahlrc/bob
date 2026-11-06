@@ -82,7 +82,11 @@ ellipse of the view; a wedge (a melee sweep) and a lane (a beam, a strip, a wall
 
 Every projectile is drawn by `projectileFx.ts`: an **attack flies as an arrow** (shaft, bright head, fletching, dark rim), a **spell as an orb**
 (coloured core, white heart, a halo that breathes); a larger slow orb throws arcs; and the odd flights are themselves: a hexagonal **shield**, a turning
-**tornado**, a **skull**, a mirrored pair of arrows. Each rides a hand's height over the floor with a **shadow where it truly is** and leaves a tapered
+**tornado**, a **skull**, a mirrored pair of arrows. **A skill whose description names what flies is drawn as that thing** (`SKILL_BODY` in
+`projectileFx.ts`, 2026-11-06): knives (Ghost Blades), a saw disc (Spirit Saw, Toxin Circle), a copy of the held weapon (Phantom Toss, see-through; the
+middle blade of Hurled Steel, whose fan is shards), steel shards (Splinter Volley, Ghost Shard's shards), an ice spear (Frost Lance), icicles (Icicle
+Charge), sparks (Skitter Flash), zigzag bolts (Bolt Cleave), streaks of force (Mind Drain) and a funnel standing on the ground (Gale Twister). **A blade or
+a thrown weapon spins as it flies** (the owner: the motion should match the words), a shard tumbles. Each rides a hand's height over the floor with a **shadow where it truly is** and leaves a tapered
 **trail** (not a spray of particles). A flight the description calls a lob (a mortar shell, the arrow of a nova) **rises and falls**; only the picture
 lifts, the sim's flight is flat. What a monster sends wears a **red rim**. Things that fall (a rain of arrows, a hail of embers: `FALLING_SKILLS` in
 `skillLook.ts`) are drawn coming down and splashing where they land (so are the smaller bursts a mine rains: their `explode` carries `fall`). The balls a

@@ -321,16 +321,26 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
     if (mode.parallel) {
       // Side by side, all the same way (Volley): the front is wider, the cone is not.
       const off = (i - (n - 1) / 2) * LANE;
-      launch(w, a, p, act.hand, a.x - Math.sin(base) * off, a.y + Math.cos(base) * off, base, {
-        hitIds: list(),
-        aimId: act.targetId,
-        range,
-        explode,
-        fork,
-        chain,
-      });
+      const pr = launch(
+        w,
+        a,
+        p,
+        act.hand,
+        a.x - Math.sin(base) * off,
+        a.y + Math.cos(base) * off,
+        base,
+        {
+          hitIds: list(),
+          aimId: act.targetId,
+          range,
+          explode,
+          fork,
+          chain,
+        },
+      );
+      if (i === Math.floor((n - 1) / 2)) pr.lead = true;
     } else {
-      launch(w, a, p, act.hand, a.x, a.y, fan(base, i, n, step, w.tick), {
+      const pr = launch(w, a, p, act.hand, a.x, a.y, fan(base, i, n, step, w.tick), {
         hitIds: list(),
         aimId: act.targetId,
         range,
@@ -338,6 +348,7 @@ export function fireProjectiles(w: World, a: Actor, act: Action): void {
         fork,
         chain,
       });
+      if (i === Math.floor((n - 1) / 2)) pr.lead = true;
     }
   }
 }

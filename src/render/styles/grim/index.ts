@@ -17,7 +17,7 @@ import type {
   World,
 } from '../../../sim/types';
 import { StyleBase, AnimTrack, figureOf, heroColor, type ActorView } from '../../style/base';
-import { holdsWand, isViewer } from '../../style/who';
+import { heldWeaponClass, holdsWand, isViewer } from '../../style/who';
 import type { Side } from '../../../sim/side';
 import type { MarkTheme } from '../../style/marks';
 import { HERO_SIDE, isHero, type AnimName, type FigureKind } from '../../style/figure';
@@ -66,6 +66,7 @@ import {
   isLob,
   lobHeight,
   newProjectileState,
+  weaponShapeOf,
   ProjectileFx,
   type ProjectileState,
 } from './projectileFx';
@@ -1034,6 +1035,7 @@ export class GrimStyle extends StyleBase {
     const state = newProjectileState(
       p,
       p.profile.skill.type === 'attack' && holdsWand(this.world, p.owner),
+      weaponShapeOf(heldWeaponClass(this.world, p.owner)),
     );
     // A thrown thing of a monster's sidearm (docs/ENCOUNTERS.md 3) flies as itself, with a halo so it is seen coming.
     const look = p.profile.skill.look;

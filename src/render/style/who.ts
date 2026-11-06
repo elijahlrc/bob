@@ -40,6 +40,14 @@ export function holdsWand(w: World, id: number): boolean {
   return !!mh && itemBase(mh.baseId).itemClass === 'wand';
 }
 
+/** The class of the weapon a character holds in the main hand (null for a monster or an empty hand). */
+export function heldWeaponClass(w: World, id: number): string | null {
+  const a = w.actors.find((x) => x.id === id);
+  if (!a?.isPlayer) return null;
+  const mh = sideOf(w, a).build.equipment.mainHand;
+  return mh ? itemBase(mh.baseId).itemClass : null;
+}
+
 /** The colour of a character's class: the rival in a duel is drawn in its own. */
 export function heroColor(w: World, a: Actor): number {
   return classDef(sideOf(w, a).build.classId).color;

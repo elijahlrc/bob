@@ -720,8 +720,15 @@ function lava(m: MotifHost, a: MotifArea): void {
   });
 }
 
-/** Blobs of molten metal are flung out, land, spread glowing and cool. */
-function splat(m: MotifHost, a: MotifArea): void {
+/**
+ * Blobs of molten metal are flung out, land, spread glowing and cool. Given a colour (the gobs motif), they are drawn in it: the damage's
+ * colour of a skill whose slag is not fire (Slag Spray).
+ */
+function splat(m: MotifHost, a: MotifArea, tint?: number): void {
+  const hot = tint ?? 0xffb040;
+  const core = tint === undefined ? 0xffe080 : lighten(tint, 0.6);
+  const pool = tint ?? 0xff5a10;
+  const mid = tint === undefined ? 0xffa030 : lighten(tint, 0.3);
   const f = frameOf(m.host, a);
   const seed = a.x * 5.9 + a.y * 3.7;
   const n = a.light ? 3 : 7;
@@ -731,32 +738,32 @@ function splat(m: MotifHost, a: MotifArea): void {
     size: (2.5 + 2 * rnd(seed, i + 90)) * f.s,
   }));
   m.host.em.spark.explode(a.light ? 2 : 8, f.p.x, f.p.y);
-  if (!a.light) flash(m, a, 0xff8a30, 1.8, 0.45);
+  if (!a.light) flash(m, a, tint ?? 0xff8a30, 1.8, 0.45);
   m.add(0.95, true, (g, k) => {
     for (const b of blobs) {
       const fly = clamp01(k / 0.32);
       if (fly < 1) {
         const x = f.p.x + (b.to.x - f.p.x) * fly;
         const y = f.p.y + (b.to.y - f.p.y) * fly - b.up * arch(fly) * f.s;
-        g.fillStyle(0xffb040, 0.95).fillCircle(x, y, b.size);
-        g.fillStyle(0xffe080, 0.9).fillCircle(x, y, b.size * 0.5);
+        g.fillStyle(hot, 0.95).fillCircle(x, y, b.size);
+        g.fillStyle(core, 0.9).fillCircle(x, y, b.size * 0.5);
       } else {
         const t = clamp01((k - 0.32) / 0.63);
         const spread = out(t * 3);
         const cool = 1 - t;
-        g.fillStyle(0xff5a10, 0.55 * cool).fillEllipse(
+        g.fillStyle(pool, 0.55 * cool).fillEllipse(
           b.to.x,
           b.to.y,
           b.size * 4.4 * spread,
           b.size * 2.2 * spread,
         );
-        g.fillStyle(0xffa030, 0.8 * cool).fillEllipse(
+        g.fillStyle(mid, 0.8 * cool).fillEllipse(
           b.to.x,
           b.to.y,
           b.size * 3 * spread,
           b.size * 1.5 * spread,
         );
-        g.fillStyle(0xffe080, 0.9 * cool * cool).fillEllipse(
+        g.fillStyle(core, 0.9 * cool * cool).fillEllipse(
           b.to.x,
           b.to.y,
           b.size * 1.4 * spread,
@@ -1235,6 +1242,59 @@ function swingNova(m: MotifHost, a: MotifArea): void {
   });
 }
 
+/** A bone in the air: a shaft with two knobs at each end, turned by `a`, in a dark rim. */
+function bone(g: Gfx, c: Pt, len: number, a: number, alpha: number): void {
+  const ux = Math.cos(a) * len * 0.5;
+  const uy = Math.sin(a) * len * 0.5;
+  const px = -Math.sin(a) * 1.3;
+  const py = Math.cos(a) * 1.3;
+  const ends = [
+    { x: c.x + ux, y: c.y + uy },
+    { x: c.x - ux, y: c.y - uy },
+  ];
+  g.lineStyle(4, 0x1a120a, 0.85 * alpha).lineBetween(ends[0].x, ends[0].y, ends[1].x, ends[1].y);
+  for (const e of ends) {
+    g.fillStyle(0x1a120a, 0.85 * alpha).fillCircle(e.x + px, e.y + py, 2.4);
+    g.fillCircle(e.x - px, e.y - py, 2.4);
+  }
+  g.lineStyle(2, 0xeee4cc, alpha).lineBetween(ends[0].x, ends[0].y, ends[1].x, ends[1].y);
+  for (const e of ends) {
+    g.fillStyle(0xeee4cc, alpha).fillCircle(e.x + px, e.y + py, 1.5);
+    g.fillCircle(e.x - px, e.y - py, 1.5);
+  }
+}
+
+/** Bones burst up out of the ground about the caster and fly outward in a ring, tumbling, then clatter down at the edge. */
+function boneNova(m: MotifHost, a: MotifArea): void {
+  const f = frameOf(m.host, a);
+  const seed = a.x * 4.3 + a.y * 7.7;
+  const n = a.light ? 6 : 14;
+  const bones = Array.from({ length: n }, (_, i) => ({
+    ang: ((i + 0.5 * rnd(seed, i)) / n) * TAU,
+    reach: 0.75 + 0.22 * rnd(seed, i + 20),
+    up: (14 + 14 * rnd(seed, i + 40)) * f.s,
+    spin: (rnd(seed, i + 60) < 0.5 ? -1 : 1) * (9 + 7 * rnd(seed, i + 80)),
+    len: (7 + 4 * rnd(seed, i + 100)) * f.s,
+  }));
+  m.host.em.dust.explode(a.light ? 3 : 10, f.p.x, f.p.y);
+  if (!a.light) m.host.shake(2);
+  m.add(0.75, true, (g, k) => {
+    const fly = out(k / 0.42);
+    const fade = 1 - clamp01((k - 0.5) / 0.25);
+    for (const b of bones) {
+      const at = f.at(b.ang, 0.12 + (b.reach - 0.12) * fly);
+      const lift = b.up * arch(Math.min(1, k / 0.42));
+      bone(g, { x: at.x, y: at.y - lift }, b.len, b.ang + b.spin * Math.min(k, 0.42), fade);
+    }
+  });
+  // A ring of dust kicked up where they land.
+  m.add(0.6, false, (g, k) => {
+    const ring = out(k / 0.5);
+    g.lineStyle(3 * f.s, 0x8a7a68, 0.35 * (1 - k));
+    g.strokeEllipse(f.p.x, f.p.y, f.rx * 2 * ring, f.rx * 2 * ring * f.sq);
+  });
+}
+
 /** A front of force runs down a band, throwing dust up before it and flattening the ground behind. */
 function forceWave(m: MotifHost, a: MotifArea): void {
   const s = a.strip ?? [a.x - a.r, a.y, a.x + a.r, a.y];
@@ -1362,7 +1422,8 @@ const PLAYERS: Record<Motif, (m: MotifHost, a: MotifArea) => void> = {
   fireNova,
   flameLine,
   lava,
-  splat,
+  splat: (m, a) => splat(m, a),
+  gobs: (m, a) => splat(m, a, a.color),
   strike: (m, a) => strike(m, a, 1),
   storm: (m, a) => strike(m, a, 4),
   pillar,
@@ -1376,6 +1437,7 @@ const PLAYERS: Record<Motif, (m: MotifHost, a: MotifArea) => void> = {
   drain,
   blades,
   swingNova,
+  boneNova,
   whirlBlades: (m, a) => whirl(m, a, 0xe6e0d4, true),
   forceWave,
   breath,

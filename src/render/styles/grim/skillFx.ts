@@ -148,6 +148,11 @@ export class SkillFx {
   private lastHex = new Map<number, number>();
   /** A minion's melee blow in the last moments: when, and which way it leaned (the body lunges at what it strikes). */
   private lunge = new Map<number, { at: number; ux: number; uy: number }>();
+  /** Where each storm orb is drawn: it hops from the spot it left to the one the sim moved it to, and when it last did. */
+  private zapHop = new Map<
+    number,
+    { fx: number; fy: number; tx: number; ty: number; at: number; seen: number }
+  >();
   private now = 0;
   /** Ids of the mines thrown by a blink (negative, so none is a deployable's). */
   private thrown = 0;
@@ -172,6 +177,7 @@ export class SkillFx {
     this.list = [];
     this.flights.clear();
     this.lunge.clear();
+    this.zapHop.clear();
   }
 
   // ---- Primitives -----------------------------------------------------------------------------
@@ -1374,9 +1380,8 @@ export class SkillFx {
           break;
         }
         case 'crystal': {
-          // A shard of ice standing where it will burst; it flickers as the burst comes.
+          // A cluster of ice crystals standing where it will burst, glowing cold; it flickers as the burst comes.
           const o = this.host.project(f.x, f.y);
-          const h = 22 * born;
           const soon = f.t < 0.5 ? 0.5 + 0.5 * Math.sin(time * 30) : 1;
           outlineArea(
             ground,
@@ -1386,16 +1391,37 @@ export class SkillFx {
             0.6 * fade,
             1,
           );
-          ground.fillStyle(0x000000, 0.3).fillEllipse(o.x, o.y + 1, 12, 5);
-          ground
-            .fillStyle(shade(el, 0.55), 0.95 * fade)
-            .fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y + 3);
-          ground
-            .fillStyle(shade(el, 0.8), 0.95 * fade)
-            .fillTriangle(o.x - 5, o.y, o.x + 5, o.y, o.x, o.y - h);
-          air
-            .fillStyle(0xffffff, 0.55 * soon * fade)
-            .fillTriangle(o.x - 1, o.y - 2, o.x + 5, o.y, o.x, o.y - h);
+          air.fillStyle(el, 0.12 * fade * soon).fillCircle(o.x, o.y - 14 * born, 20);
+          air.fillStyle(el, 0.15 * fade).fillEllipse(o.x, o.y, 40, 14);
+          ground.fillStyle(0x000000, 0.35 * fade).fillEllipse(o.x, o.y + 1, 22, 8);
+          // Two leaning side crystals, then the tall one in front of them.
+          const facet = (x: number, w: number, h: number, lean: number): void => {
+            const top = { x: x + lean, y: o.y - h * born };
+            const pts = [
+              { x: x - w, y: o.y },
+              { x: top.x, y: top.y },
+              { x: x + w, y: o.y },
+              { x, y: o.y + w * 0.45 },
+            ];
+            const rim = pts.map((p) => ({ x: x + (p.x - x) * 1.2, y: o.y + (p.y - o.y) * 1.08 }));
+            ground.fillStyle(0x000000, 0.85 * fade).fillPoints(rim as Phaser.Math.Vector2[], true);
+            ground
+              .fillStyle(shade(el, 0.75), fade)
+              .fillTriangle(x - w, o.y, top.x, top.y, x, o.y + w * 0.45);
+            ground
+              .fillStyle(lighten(el, 0.35), fade)
+              .fillTriangle(x + w, o.y, top.x, top.y, x, o.y + w * 0.45);
+            // Its edges again in light, over whatever stands on it (the crystal is cast on an enemy).
+            air
+              .lineStyle(1.4, lighten(el, 0.4), 0.85 * soon * fade)
+              .strokePoints(pts as Phaser.Math.Vector2[], true, true);
+            air
+              .fillStyle(0xffffff, 0.6 * soon * fade)
+              .fillTriangle(x + w * 0.2, o.y - 2, top.x, top.y, x + w * 0.7, o.y - 1);
+          };
+          facet(o.x - 7, 4, 16, -4);
+          facet(o.x + 7, 4, 13, 4);
+          facet(o.x, 6.5, 32, 0);
           break;
         }
         case 'storm': {
@@ -1427,17 +1453,57 @@ export class SkillFx {
           break;
         }
         case 'zap': {
-          // A bead of lightning that jumps from spot to spot.
-          const o = this.lifted(f.x, f.y, 10);
-          this.ring(ground, f.x, f.y, f.radius, el, 0.3 * fade, 1);
-          air.fillStyle(el, 0.3 * fade).fillCircle(o.x, o.y, 6);
-          air.fillStyle(0xffffff, 0.95 * fade).fillCircle(o.x, o.y, 2.5);
-          for (let i = 0; i < 3; i++) {
-            const a = time * 9 + i * 2.1;
-            air
-              .lineStyle(1, 0xffffff, 0.8 * fade)
-              .lineBetween(o.x, o.y, o.x + Math.cos(a) * 8, o.y + Math.sin(a) * 6);
+          // An orb of lightning that jumps from spot to spot: it hops in an arc to each new spot the sim gives it.
+          let hop = this.zapHop.get(f.id);
+          if (!hop) {
+            hop = { fx: f.x, fy: f.y, tx: f.x, ty: f.y, at: -1, seen: time };
+            this.zapHop.set(f.id, hop);
           }
+          hop.seen = time;
+          const HOP = 0.16;
+          if (hop.tx !== f.x || hop.ty !== f.y) {
+            const u0 = hop.at < 0 ? 1 : Math.min(1, (time - hop.at) / HOP);
+            hop.fx = hop.fx + (hop.tx - hop.fx) * u0;
+            hop.fy = hop.fy + (hop.ty - hop.fy) * u0;
+            hop.tx = f.x;
+            hop.ty = f.y;
+            hop.at = time;
+          }
+          const u = hop.at < 0 ? 1 : Math.min(1, (time - hop.at) / HOP);
+          const wx = hop.fx + (hop.tx - hop.fx) * u;
+          const wy = hop.fy + (hop.ty - hop.fy) * u;
+          const o = this.lifted(wx, wy, 12 + Math.sin(Math.PI * u) * 22);
+          this.ring(ground, f.x, f.y, f.radius, el, 0.3 * fade, 1);
+          if (u < 1) {
+            // The arc of the hop behind it.
+            const pts: Pt[] = [];
+            for (let i = 0; i <= 6; i++) {
+              const s0 = (u * i) / 6;
+              pts.push(
+                this.lifted(
+                  hop.fx + (hop.tx - hop.fx) * s0,
+                  hop.fy + (hop.ty - hop.fy) * s0,
+                  12 + Math.sin(Math.PI * s0) * 22,
+                ),
+              );
+            }
+            air.lineStyle(4, el, 0.35 * fade).strokePoints(pts as Phaser.Math.Vector2[]);
+            air.lineStyle(1.4, 0xffffff, 0.8 * fade).strokePoints(pts as Phaser.Math.Vector2[]);
+          }
+          air.fillStyle(el, 0.28 * fade).fillCircle(o.x, o.y, 13);
+          air.fillStyle(el, 0.9 * fade).fillCircle(o.x, o.y, 6);
+          air.fillStyle(lighten(el, 0.5), fade).fillCircle(o.x, o.y, 4);
+          air.fillStyle(0xffffff, fade).fillCircle(o.x, o.y, 2.2);
+          for (let i = 0; i < 4; i++) {
+            const a = time * 11 + i * 1.7 + Math.sin(time * 37 + i) * 0.6;
+            const mid = { x: o.x + Math.cos(a + 0.4) * 6, y: o.y + Math.sin(a + 0.4) * 5 };
+            const end = { x: o.x + Math.cos(a) * 11, y: o.y + Math.sin(a) * 8 };
+            air
+              .lineStyle(1.2, 0xffffff, 0.85 * fade)
+              .lineBetween(o.x, o.y, mid.x, mid.y)
+              .lineBetween(mid.x, mid.y, end.x, end.y);
+          }
+          for (const [id, h] of this.zapHop) if (time - h.seen > 1) this.zapHop.delete(id);
           break;
         }
         case 'trail': {
