@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import type { Difficulty } from '../data/difficulty';
 import { Character, diffSheets, type SheetDiff } from '../calc/character';
 import { armourStats, itemReq, weaponStats } from '../calc/items';
@@ -36,10 +37,25 @@ export function rarityField(it: InventoryItem): string {
 }
 
 /** An item's name on its rarity's plaque, at the head of its card. */
-export function NamePlaque({ it, name }: { it: InventoryItem; name: string }) {
+export function NamePlaque({
+  it,
+  name,
+  children,
+}: {
+  it: InventoryItem;
+  name: string;
+  /** A picture at the plaque's right end (a flask's bottle). */
+  children?: ComponentChildren;
+}) {
   return (
-    <div class="ic-name" data-paint="panel" data-thin data-field={rarityField(it)}>
-      {name}
+    <div
+      class={'ic-name' + (children ? ' with-pic' : '')}
+      data-paint="panel"
+      data-thin
+      data-field={rarityField(it)}
+    >
+      {children ? <span class="ic-name-text">{name}</span> : name}
+      {children}
     </div>
   );
 }

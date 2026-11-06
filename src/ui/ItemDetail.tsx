@@ -1,13 +1,14 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { Character, SheetDiff } from '../calc/character';
+import { flaskSpec } from '../calc/flasks';
 import { isWeaponClass, itemBase, WEAPON_TYPE_NAME } from '../data/bases';
 import { CRAFTING_OPEN } from '../data/constants';
 import { flaskBase } from '../data/flasks';
 import { gemDef } from '../data/gems';
 import type { EquipSlot, FlaskItem, GemItem, InventoryItem, Item } from '../data/types';
 import { salvageValue } from '../run/craft';
-import { slotsFor, type EquipCheck, type SocketOutcome } from '../run/inventory';
+import { canEquip, slotsFor, type EquipCheck, type SocketOutcome } from '../run/inventory';
 import {
   compareFlasks,
   compareSlots,
@@ -138,6 +139,9 @@ type Props = Actions & {
   /** Where the picked bag item is compared (a lit slot on the reliquary, or a tab); unset, the best one. */
   aimSlot: EquipSlot | null;
   aimFlask: number | null;
+  /** The empty slot the bag is narrowed to, when the picked item can go in it: its Wear button goes straight there. */
+  fitSlot: EquipSlot | null;
+  fitFlask: number | null;
   onAim: (slot: EquipSlot | undefined, idx: number | undefined) => void;
   coarse: boolean;
   phone: boolean;
@@ -294,16 +298,16 @@ function ItemSheet({
     );
   }
   if (it.kind === 'flask') {
-    // A worn flask says what it holds now, counted as the flask bar counts it (it carries its charges from map to map).
-    const spec = worn ? ch?.flasks.find((f) => f.uid === it.uid) : undefined;
-    const have = spec ? Math.floor(spec.maxCharges * (run.vitals.flasks[it.uid] ?? 1)) : 0;
+    // What it holds now, worn or in the bag, counted as the flask bar counts it (it keeps its charges from map to map; one
+    // never worn is full).
+    const spec = ch && (ch.flasks.find((f) => f.uid === it.uid) ?? flaskSpec(it, ch.db));
+    const full = run.vitals.flasks[it.uid] ?? 1;
+    const have = spec ? Math.floor(spec.maxCharges * full) : 0;
     const drinks = spec ? Math.floor(have / spec.perUse) : 0;
-    const full = spec ? (run.vitals.flasks[it.uid] ?? 1) : 1;
     return (
       <div class="ix-sheet">
-        <NamePlaque it={it} name={it.name} />
-        {/* A small bottle as the flask bar paints it, and what it holds. */}
-        <div class="ix-flask-head">
+        {/* The name, with a small bottle as the flask bar paints it at its right end (the owner, 2026-11-05). */}
+        <NamePlaque it={it} name={it.name}>
           <span class="ix-flask-pic">
             <i
               class="ix-bottle-art"
@@ -313,12 +317,12 @@ function ItemSheet({
               data-pk={`${it.uid}:${full.toFixed(2)}`}
             />
           </span>
-          {spec && (
-            <span>
-              {have}/{spec.maxCharges} charges · {drinks} drink{drinks === 1 ? '' : 's'} left
-            </span>
-          )}
-        </div>
+        </NamePlaque>
+        {spec && (
+          <div class={drinks ? '' : 'down'}>
+            {have}/{spec.maxCharges} charges · {drinks} drink{drinks === 1 ? '' : 's'} left
+          </div>
+        )}
         <div class="muted">{flaskSummary(it)}</div>
         <Lines lines={flaskBaseLines(it)} cls="implicit" />
         <Lines lines={it.affixes.flatMap((a) => modsText(a.mods))} cls="explicit" />
@@ -555,18 +559,24 @@ function ItemCompare({
   run,
   item,
   aim,
+  fit,
   onAim,
   a,
 }: {
   run: RunState;
   item: Item;
   aim: EquipSlot | null;
+  /** The empty slot the bag is narrowed to: the tab open first. */
+  fit: EquipSlot | null;
   onAim: (slot: EquipSlot) => void;
   a: Actions;
 }) {
   const slots = useMemo(() => compareSlots(run, item.uid), [run.build, run.inventory, item.uid]);
   const best = slots.find((s) => s.best) ?? slots[0];
-  const active = (aim && slots.find((s) => s.slot === aim)) || best;
+  const active =
+    (aim && slots.find((s) => s.slot === aim)) ||
+    (fit && slots.find((s) => s.slot === fit)) ||
+    best;
   if (!active) return null;
   const ok = active.check.ok;
   return (
@@ -615,18 +625,24 @@ function FlaskCompareView({
   run,
   flask,
   aim,
+  fit,
   onAim,
   a,
 }: {
   run: RunState;
   flask: FlaskItem;
   aim: number | null;
+  /** The empty flask slot the bag is narrowed to: the tab open first. */
+  fit: number | null;
   onAim: (idx: number) => void;
   a: Actions;
 }) {
   const slots = useMemo(() => compareFlasks(run, flask.uid), [run.build, run.inventory, flask.uid]);
   const chosen = slots.find((s) => s.chosen) ?? slots[0];
-  const active: FlaskCompare = (aim !== null && slots.find((s) => s.idx === aim)) || chosen;
+  const active: FlaskCompare =
+    (aim !== null && slots.find((s) => s.idx === aim)) ||
+    (fit !== null && slots.find((s) => s.idx === fit)) ||
+    chosen;
   const label = `Flask ${active.idx + 1}`;
   return (
     <Page
@@ -741,6 +757,7 @@ export function ItemDetail(p: Props) {
         run={run}
         item={selected}
         aim={p.aimSlot}
+        fit={p.fitSlot}
         onAim={(slot) => p.onAim(slot, undefined)}
         a={{ ...a, onBack: () => setCompare(false) } as Actions}
       />
@@ -751,6 +768,7 @@ export function ItemDetail(p: Props) {
         run={run}
         flask={selected}
         aim={p.aimFlask}
+        fit={p.fitFlask}
         onAim={(idx) => p.onAim(undefined, idx)}
         a={{ ...a, onBack: () => setCompare(false) } as Actions}
       />
@@ -826,16 +844,37 @@ export function ItemDetail(p: Props) {
         {discard}
       </>
     );
-  else
+  else {
+    // The bag narrowed to an empty slot this item can go in: nothing there to compare with, so it goes straight in.
+    const into =
+      selected.kind === 'flask'
+        ? p.fitFlask !== null && p.info?.equippable
+          ? {
+              label: `Carry as Flask ${p.fitFlask + 1}`,
+              go: () => a.onEquipFlask(selected.uid, p.fitFlask!),
+            }
+          : null
+        : p.fitSlot && canEquip(run, selected, p.fitSlot).ok
+          ? {
+              label: wearLabel(slotName(p.fitSlot), false),
+              go: () => a.onEquip(selected.uid, p.fitSlot!),
+            }
+          : null;
     bar = (
       <>
-        <button class="btn primary" onClick={() => setCompare(true)}>
+        {into && (
+          <button class="btn primary" onClick={into.go}>
+            {into.label}
+          </button>
+        )}
+        <button class={into ? 'btn small' : 'btn primary'} onClick={() => setCompare(true)}>
           Compare
         </button>
         {craft}
         {discard}
       </>
     );
+  }
   // Why a bag item cannot be worn, beside its requirements: the check of the slot it would go in.
   const bad =
     inBag && selected.kind === 'item' && p.info && !p.info.equippable

@@ -135,11 +135,19 @@ html.leaf .ix-bottle-art {
   position: absolute;
   inset: 0;
 }
-/* A flask's page: a small bottle beside what it holds. */
-html.leaf .ix-flask-head {
+/* A flask's name plaque carries its bottle at the right end. */
+html.leaf .ic-name.with-pic {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
+}
+/* A hard shadow, as the painted boxes cast, so the dark glass stands off the pale plaque. */
+html.leaf .ix-sheet > .ic-name.with-pic {
+  padding-right: 26px;
+}
+html.leaf .ic-name.with-pic .ix-flask-pic {
+  filter: drop-shadow(2px 2px 0 #0b0805) drop-shadow(1px 1px 0 #0b080588);
 }
 html.leaf .ix-flask-pic {
   position: relative;
@@ -604,6 +612,43 @@ html.leaf .ix-row {
   box-shadow: none;
   cursor: pointer;
 }
+/* Its picture at the right end, the full height of the row (the owner, 2026-11-05): the name and the line under it at the left. */
+html.leaf .ix-row:has(> .ix-row-icon) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 8px;
+  align-items: center;
+}
+html.leaf .ix-row > .ix-row-main,
+html.leaf .ix-row > .ix-row-sub {
+  grid-column: 1;
+}
+html.leaf .ix-row-icon {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: -4px 0;
+}
+/* The roundel's rim is a fixed few pixels: much smaller than this and the glyph inside is lost. */
+html.leaf .ix-row-icon > i {
+  display: block;
+  width: 46px;
+  height: 46px;
+}
+html.leaf .ix-row-icon.ix-ri-flask > i {
+  position: relative;
+  inset: auto;
+  width: 26px;
+  height: 40px;
+}
+html.leaf .ix-row-icon.ix-ri-gem > i {
+  width: 32px;
+  height: 32px;
+}
 html.leaf .ix-row:hover:not(.sel) {
   background-color: #ffffff0d;
 }
@@ -655,10 +700,13 @@ html.leaf .ix-favmark {
   margin-right: 6px;
   color: var(--gold-hi);
 }
+/* One line: what does not fit beside the picture drops out whole, never half a badge. */
 html.leaf .ix-row-sub {
   display: flex;
   flex-wrap: wrap;
   gap: 0 10px;
+  max-height: 1.2em;
+  overflow: hidden;
   font-size: var(--size);
 }
 html.leaf .ix-best {

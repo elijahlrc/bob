@@ -183,10 +183,22 @@ export function dropRetiredGems(run: RunState): number {
   return n;
 }
 
-/** The build with `item` placed in `slot` (gems carried over), for compare deltas. */
+/**
+ * `item` holding every gem `old` held, past its own socket count if it must: what a swap is priced by. A swap is weighed by
+ * the items, never by the gems that would not fit, which a player (or the bot) moves somewhere after (the owner, 2026-11-05).
+ */
+function keepingGems(old: Item | undefined, item: Item, extra: GemItem[] = []): Item {
+  const { next, prev } = transferGems(old, item);
+  const left = [...gemsOf(prev), ...extra];
+  return left.length ? { ...next, sockets: [...next.sockets, ...left] } : next;
+}
+
+/** The build with `item` placed in `slot` and every gem still worn (`keepingGems`), for compare deltas and the bot's score. */
 export function withEquipped(build: Build, item: Item, slot: EquipSlot): Build {
-  const { next } = transferGems(build.equipment[slot], item);
-  return { ...build, equipment: { ...build.equipment, [slot]: next } };
+  return {
+    ...build,
+    equipment: { ...build.equipment, [slot]: keepingGems(build.equipment[slot], item) },
+  };
 }
 
 function take(run: RunState, uid: number): InventoryItem | undefined {
@@ -275,7 +287,14 @@ export function dryEquip(
   run: RunState,
   uid: number,
   slot: EquipSlot,
-): { check: EquipCheck; build: Build; toBag: Item[]; sockets: SocketOutcome } {
+): {
+  check: EquipCheck;
+  build: Build;
+  /** `build` with every gem still worn, the cleared off hand's in the new item too: what the swap's numbers are taken from. */
+  kept: Build;
+  toBag: Item[];
+  sockets: SocketOutcome;
+} {
   const copy: RunState = {
     ...run,
     inventory: [...run.inventory],
@@ -289,6 +308,7 @@ export function dryEquip(
     return {
       check,
       build: run.build,
+      kept: run.build,
       toBag: [],
       sockets: {
         before: none,
@@ -310,9 +330,18 @@ export function dryEquip(
   const offHand = run.build.equipment.offHand;
   const offUids = new Set(slot === 'offHand' ? [] : gemsOf(offHand).map((g) => g.uid));
   const after = countOf(now);
+  const item = run.inventory.find((x) => x.uid === uid) as Item;
+  const cleared =
+    slot === 'mainHand' && offHand && !copy.build.equipment.offHand ? gemsOf(offHand) : [];
+  const kept: Build = {
+    ...copy.build,
+    equipment: { ...copy.build.equipment, [slot]: keepingGems(old, item, cleared) },
+    primaryGem: run.build.primaryGem,
+  };
   return {
     check,
     build: copy.build,
+    kept,
     toBag: added.filter((x): x is Item => x.kind === 'item'),
     sockets: {
       before: countOf(old),

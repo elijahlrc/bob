@@ -35,7 +35,7 @@ import {
   type EquipCheck,
   type SocketOutcome,
 } from './inventory';
-import { cfgFor, flaskRank, score, sheetOf } from './bot';
+import { cfgFor, score, sheetOf } from './bot';
 import { gemIdle } from './gemStatus';
 import { settlePrimary } from './primary';
 import { isFavourite } from './found';
@@ -73,6 +73,12 @@ export type ItemInfo = {
   flaskSlot?: number;
   /** The slot of `flaskSlot` holds a flask with no drink left in it. */
   dryFlask?: boolean;
+  /** A flask's drinks left now (it keeps its charges in the bag; one never worn is full). */
+  drinks?: number;
+  /** A flask's charges now, as a share of its most (0..1). */
+  fill?: number;
+  /** A life, mana or hybrid flask's recovery left now: what a drink recovers (life and mana) times its drinks left. */
+  recovery?: number;
 };
 
 const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -167,7 +173,8 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
           info.reason ??= dry.check.reason;
           continue;
         }
-        const s = sheetOf(run, dry.build);
+        // Priced with every gem still worn: the gems that would not fit are the player's to move (`dryEquip`'s `kept`).
+        const s = sheetOf(run, dry.kept);
         const sc = bagScore(s);
         if (sc > best) {
           best = sc;
@@ -194,17 +201,20 @@ export function itemInfos(run: RunState): Map<number, ItemInfo> {
   }
   // Flasks go by what they hold now (the owner, 2026-11-04): a bag flask with no drink in it is no upgrade, and a worn one with
   // none left is replaced by any that has one.
-  const bagFlasks = run.inventory.filter(
-    (x): x is FlaskItem => x.kind === 'flask' && out.get(x.uid)!.equippable,
-  );
-  if (bagFlasks.length === 0) return out;
+  const allFlasks = run.inventory.filter((x): x is FlaskItem => x.kind === 'flask');
+  if (allFlasks.length === 0) return out;
   const ch = now ?? new Character(run.build, cfgFor(run));
-  const usable = bagFlasks.filter((f) => drinksIn(run, ch, f) > 0);
-  // An empty flask slot is filled by the best usable flasks in the bag, as many as there are empty slots.
-  const empty = run.build.flasks.filter((f) => !f).length;
-  if (empty > 0)
-    for (const f of [...usable].sort((a, b) => flaskRank(b) - flaskRank(a)).slice(0, empty))
-      out.get(f.uid)!.fillsFlask = true;
+  for (const f of allFlasks) {
+    const info = out.get(f.uid)!;
+    const s = ch.flasks.find((x) => x.uid === f.uid) ?? flaskSpec(f, ch.db);
+    info.drinks = drinksIn(run, ch, f);
+    info.fill = run.vitals.flasks[f.uid] ?? 1;
+    if (s.kind !== 'utility') info.recovery = (s.life + s.mana) * info.drinks;
+  }
+  const usable = allFlasks.filter((f) => out.get(f.uid)!.equippable && out.get(f.uid)!.drinks! > 0);
+  // With a flask slot empty, every usable flask in the bag with a drink left fills it (the owner, 2026-11-05: the best few
+  // by a fixed rank hid the ones the player was looking for).
+  if (run.build.flasks.some((f) => !f)) for (const f of usable) out.get(f.uid)!.fillsFlask = true;
   for (const it of usable) {
     const info = out.get(it.uid)!;
     const dry = drySlotFor(run, ch, it);
@@ -296,6 +306,33 @@ export function filterItems(
   }
 }
 
+/**
+ * What Best upgrade weighs an item by: the change to DPS × effective HP. A flask changes neither, so one that is an upgrade
+ * weighs just under the least gear upgrade (it follows the gear upgrades, above everything else), and other flasks weigh nothing.
+ */
+function upgradeValue(info: ItemInfo): number {
+  if (info.group !== 'flask') return info.scorePct;
+  return isUpgrade(info) ? 0.5 : 0;
+}
+
+/**
+ * Two flasks by what they hold now (positive: `a` first): a usable one before one the character cannot carry, one with a drink
+ * left before a dry one, a life or mana flask before a utility flask, then the most recovery left (a utility flask: the most
+ * drinks left).
+ */
+function compareFlaskHold(a: ItemInfo, b: ItemInfo): number {
+  const key = (i: ItemInfo) => [
+    i.equippable ? 1 : 0,
+    (i.drinks ?? 0) > 0 ? 1 : 0,
+    i.recovery !== undefined ? 1 : 0,
+    i.recovery ?? i.drinks ?? 0,
+  ];
+  const ka = key(a);
+  const kb = key(b);
+  for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return ka[i] - kb[i];
+  return 0;
+}
+
 /** Sort a copy of `items`. `desc` flips the natural direction of the key. */
 export function sortItems(
   items: InventoryItem[],
@@ -319,7 +356,7 @@ export function sortItems(
       case 'ehp':
         return info(x).ehpPct;
       case 'upgrade':
-        return info(x).scorePct;
+        return upgradeValue(info(x));
       case 'name':
         return name(x).toLowerCase();
     }
@@ -332,6 +369,11 @@ export function sortItems(
     const vb = val(b);
     if (va < vb) return -dir;
     if (va > vb) return dir;
+    // Two flasks that weigh the same as upgrades go by what they hold now.
+    if (key === 'upgrade' && a.kind === 'flask' && b.kind === 'flask') {
+      const d = compareFlaskHold(info(a), info(b));
+      if (d) return d * dir;
+    }
     // Stable, useful tie-breakers: group the slot, better rarity, better upgrade, newest.
     return (
       info(a).slotOrder - info(b).slotOrder ||
@@ -957,7 +999,7 @@ export function compareSlots(run: RunState, uid: number): SlotCompare[] {
     };
     if (dry.check.ok) {
       c.sockets = { ...dry.sockets, idle: idleAfter(run, before(), dry.build) };
-      const s = sheetOf(run, dry.build);
+      const s = sheetOf(run, dry.kept);
       c.delta = diffSheets(base, s);
       c.dpsPct = pct(sheetDps(base), sheetDps(s));
       c.ehpPct = pct(base.ehp, s.ehp);

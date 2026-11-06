@@ -28,7 +28,7 @@ const SLOTS = Object.keys(PLACE) as EquipSlot[];
 const ROWS = '0.214,0.343,0.471,0.6,0.729';
 
 /** The glyph a slot shows: its kind, or for the off hand what is held there. */
-function glyphOf(slot: EquipSlot, it: Item | undefined): string {
+export function glyphOf(slot: EquipSlot, it: Item | undefined): string {
   if (slot === 'mainHand') return 'blade';
   if (slot === 'offHand')
     return !it || itemBase(it.baseId).itemClass === 'shield' ? 'shield' : 'blade';

@@ -20,7 +20,7 @@ import {
 import { resistPenaltyForMap } from '../gen/mapPlan';
 import { woundedAbandonPolicy } from '../sim/abandon';
 import { runMap, type MapResult } from '../sim/runMap';
-import { canEquip, equip, equipFlask, slotsFor, unsocketGem, withEquipped } from './inventory';
+import { canEquip, equip, equipFlask, slotsFor, withEquipped } from './inventory';
 import type { MapOffer } from './offers';
 import { playOffer } from './play';
 import {
@@ -410,30 +410,9 @@ export function botRegem(run: RunState): void {
 
 // ---- Items --------------------------------------------------------------------------------
 
-/** Whether the item in `slot` holds more gems than a replacement with `sockets` sockets could take. */
-function wouldStrand(run: RunState, slot: EquipSlot, sockets: number): boolean {
-  const old = run.build.equipment[slot];
-  return !!old && old.sockets.filter(Boolean).length > sockets;
-}
-
-/** Take every gem out of the item in `slot`, into the inventory, so a new layout can place them. */
-function stripGems(run: RunState, slot: EquipSlot): void {
-  const it = run.build.equipment[slot];
-  if (!it) return;
-  for (let i = 0; i < it.sockets.length; i++) unsocketGem(run, slot, i);
-}
-
-/** A two-step plan: move the gem group to the best other host, then wear the item. */
-function equipAndRegem(run: RunState, uid: number, slot: EquipSlot): void {
-  stripGems(run, slot);
-  equip(run, uid, slot);
-  botRegem(run);
-}
-
 /**
- * Equip any inventory item that improves the score (gems carried over). An item that would strand
- * gems (fewer sockets than the one it replaces) is also tried as the two-step plan of moving the
- * gem group elsewhere first (EXPANSION 10.1 item 3), which is how a socketless unique gets worn.
+ * Equip any inventory item that improves the score. An item is weighed with every gem still worn (`withEquipped`), never by
+ * the gems that would not fit in it; those are re-socketed after the swap, as a player would (the owner, 2026-11-05).
  */
 export function botEquip(run: RunState): void {
   // How each (item, slot) fared the first time through the bag: after something is worn, only the ones that were close
@@ -442,7 +421,7 @@ export function botEquip(run: RunState): void {
   const first = new Map<string, number>();
   for (let guard = 0; guard < 20; guard++) {
     const base = scoreOf(run, run.build);
-    let best: { uid: number; slot: EquipSlot; s: number; viaRegem: boolean } | null = null;
+    let best: { uid: number; slot: EquipSlot; s: number } | null = null;
     for (const it of run.inventory) {
       if (it.kind !== 'item') continue;
       for (const slot of slotsFor(it)) {
@@ -453,30 +432,24 @@ export function botEquip(run: RunState): void {
           first.set(fk, 0);
           continue;
         }
-        let s = scoreOf(run, withEquipped(run.build, it, slot));
+        const s = scoreOf(run, withEquipped(run.build, it, slot));
         if (guard === 0) first.set(fk, s / base);
-        let viaRegem = false;
-        // Only for uniques that a plain swap rejects: the plan costs a trial run, and uniques are the
-        // items that break the socket plan on purpose.
-        if (
-          it.rarity === 'unique' &&
-          s <= base * 1.005 &&
-          wouldStrand(run, slot, it.sockets.length)
-        ) {
-          const trial: RunState = JSON.parse(JSON.stringify(run));
-          equipAndRegem(trial, it.uid, slot);
-          const s2 = scoreOf(trial, trial.build);
-          if (s2 > s) {
-            s = s2;
-            viaRegem = true;
-          }
-        }
-        if (s > base * 1.005 && (!best || s > best.s)) best = { uid: it.uid, slot, s, viaRegem };
+        if (s > base * 1.005 && (!best || s > best.s)) best = { uid: it.uid, slot, s };
       }
     }
     if (!best) break;
-    if (best.viaRegem) equipAndRegem(run, best.uid, best.slot);
-    else equip(run, best.uid, best.slot);
+    const saved = { build: run.build, inventory: [...run.inventory] };
+    const bagGems = saved.inventory.filter((x) => x.kind === 'gem').length;
+    equip(run, best.uid, best.slot);
+    if (run.inventory.filter((x) => x.kind === 'gem').length > bagGems) {
+      botRegem(run);
+      // The gems found no room worth having (a socketless piece with every other socket full): take it off again.
+      if (scoreOf(run, run.build) < base) {
+        run.build = saved.build;
+        run.inventory = saved.inventory;
+        first.set(`${best.uid}:${best.slot}`, 0);
+      }
+    }
   }
 }
 

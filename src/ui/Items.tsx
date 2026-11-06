@@ -33,7 +33,15 @@ import { CleanUp } from './CleanUp';
 import { useViewport } from './device';
 import { Gear, gearSummary, type SlotMark } from './Gear';
 import { ItemDetail, type Sel } from './ItemDetail';
-import { ItemList, NO_FILTERS, type Filters, type ListSort, type Mark } from './ItemList';
+import {
+  fits,
+  ItemList,
+  NO_FILTERS,
+  type Filters,
+  type Fit,
+  type ListSort,
+  type Mark,
+} from './ItemList';
 import { itemTitle } from './ItemCard';
 import { loadPref, savePref } from './prefs';
 import { matchesTerms, searchTerms } from './search';
@@ -124,11 +132,23 @@ export function Items({
   const [aim, setAim] = useState<{ uid: number; slot?: EquipSlot; idx?: number } | null>(null);
   // A new pick starts aimed at the best slot again.
   useEffect(() => setAim(null), [sel]);
-  useEffect(() => savePref('inv.sort', sort), [sort]);
-  useEffect(() => savePref('inv.desc', desc), [desc]);
+  // While the bag is narrowed to an empty slot, the player's own filters and sort wait in `beforeFit`, unsaved.
+  const fit = filters.fit;
+  const beforeFit = useRef<{
+    filters: Filters;
+    search: string;
+    sort: ListSort;
+    desc: boolean;
+  } | null>(null);
+  useEffect(() => {
+    if (!fit) savePref('inv.sort', sort);
+  }, [sort]);
+  useEffect(() => {
+    if (!fit) savePref('inv.desc', desc);
+  }, [desc]);
   useEffect(() => {
     if (keepFilters.current) keepFilters.current = false;
-    else savePref('inv.filters', filters);
+    else if (!fit) savePref('inv.filters', filters);
   }, [filters]);
 
   // An item stays NEW until the player looks at it (selects it) or marks everything seen.
@@ -167,6 +187,7 @@ export function Items({
   const terms = searchTerms(search);
   const visible = useMemo(() => {
     let pool: InventoryItem[] = pileOn ? pile : run.inventory;
+    if (filters.fit) pool = pool.filter((x) => fits(x, filters.fit!));
     // Every mark turned on, and any of the kinds (docs/ITEM-SLOTS.md; the owner, 2026-11-04).
     for (const m of filters.marks)
       pool =
@@ -215,8 +236,9 @@ export function Items({
   };
   const selected = lookup(sel);
   // The selection can vanish under us (an undo, a salvage): then there is nothing selected.
+  // A selected slot may be empty: it is the slot the bag is narrowed to.
   useEffect(() => {
-    if (sel && !selected) setSel(null);
+    if (sel && !selected && (sel.from === 'inv' || sel.from === 'pile')) setSel(null);
   }, [sel, selected]);
 
   // "Show in Items" from the Workbench.
@@ -282,6 +304,14 @@ export function Items({
   const doQuick = (uid: number) => {
     const it = run.inventory.find((x) => x.uid === uid);
     if (!it) return;
+    // Narrowed to an empty slot, an item that fits goes there.
+    if (fit && fits(it, fit)) {
+      if ('flask' in fit) {
+        if (!infos.get(uid)?.equippable) return sfx('denied');
+        return equipFlaskTo(uid, fit.flask);
+      }
+      if (it.kind === 'item' && canEquip(run, it, fit.slot).ok) return equipTo(uid, fit.slot);
+    }
     if (it.kind === 'item') {
       const slot = infos.get(uid)?.slot;
       if (!slot) return sfx('denied');
@@ -297,19 +327,49 @@ export function Items({
       setSel(null);
     });
   };
+  /**
+   * Narrow the bag to what can go in an empty slot, best first (the owner, 2026-11-05). The player's filters and sort are kept
+   * aside and come back when the slot is filled or the filter is removed.
+   */
+  const startFit = (f: Fit) => {
+    if (!filters.fit) beforeFit.current = { filters, search, sort, desc };
+    setFilters({ ...NO_FILTERS, fit: f });
+    setSearch('');
+    setSort('upgrade');
+    setDesc(false);
+    if (phone)
+      requestAnimationFrame(() =>
+        rootRef.current
+          ?.querySelector('.ix-listcol')
+          ?.scrollIntoView({ block: 'start', behavior: 'smooth' }),
+      );
+  };
+  const endFit = () => {
+    const b = beforeFit.current;
+    beforeFit.current = null;
+    if (!b) return setFilters({ ...filters, fit: undefined });
+    setFilters({ ...b.filters, fit: undefined });
+    setSearch(b.search);
+    setSort(b.sort);
+    setDesc(b.desc);
+  };
+  // The narrowed-to slot filled (a swap, a drag, an undo): the bag goes back to the player's own filters.
+  useEffect(() => {
+    if (!fit) return;
+    if ('flask' in fit ? run.build.flasks[fit.flask] : run.build.equipment[fit.slot]) endFit();
+  }, [run.build]);
+  /** Taking an item off leaves its slot selected, empty, with the bag narrowed to what can go in it. */
   const unequipSlot = (slot: EquipSlot) => {
-    const it = run.build.equipment[slot];
+    if (!run.build.equipment[slot]) return;
     c.act((r) => unequip(r, slot));
-    if (it) {
-      setSel({ from: 'inv', uid: it.uid });
-    }
+    setSel({ from: 'slot', slot });
+    startFit({ slot });
   };
   const unequipFlaskAt = (idx: number) => {
-    const f = run.build.flasks[idx];
+    if (!run.build.flasks[idx]) return;
     c.act((r) => unequipFlask(r, idx));
-    if (f) {
-      setSel({ from: 'inv', uid: f.uid });
-    }
+    setSel({ from: 'flask', idx });
+    startFit({ flask: idx });
   };
   const star = (uid: number) => c.act((r) => toggleFavourite(r, uid));
   /** Keep the selection moving through the list so repeated removals are quick. */
@@ -478,21 +538,30 @@ export function Items({
   // shows what is worn there.
   const onSlot = (slot: EquipSlot) => {
     if (sel?.from === 'inv' && targets.get(slot)) setAim({ uid: sel.uid, slot });
-    else setSel({ from: 'slot', slot });
+    else {
+      setSel({ from: 'slot', slot });
+      if (!run.build.equipment[slot]) startFit({ slot });
+    }
   };
   const onFlask = (idx: number) => {
     if (sel?.from === 'inv' && flaskTargets) setAim({ uid: sel.uid, idx });
-    else setSel({ from: 'flask', idx });
+    else {
+      setSel({ from: 'flask', idx });
+      if (!run.build.flasks[idx]) startFit({ flask: idx });
+    }
   };
 
   const info = sel?.from === 'inv' ? infos.get(sel.uid) : undefined;
   const aimed = sel?.from === 'inv' && aim?.uid === sel.uid ? aim : null;
+  // The bag narrowed to an empty slot: a picked item that fits is aimed there.
+  const fitSlot = fit && 'slot' in fit && targets.has(fit.slot) ? fit.slot : null;
+  const fitFlask = fit && 'flask' in fit ? fit.flask : null;
   const aimSlot =
-    aimed?.slot ?? (sel?.from === 'inv' && targets.size ? (info?.slot ?? null) : null);
+    aimed?.slot ?? (sel?.from === 'inv' && targets.size ? (fitSlot ?? info?.slot ?? null) : null);
   const aimFlask =
     aimed?.idx ??
     (sel?.from === 'inv' && flaskTargets && selected?.kind === 'flask'
-      ? flaskTarget(run, selected)
+      ? (fitFlask ?? flaskTarget(run, selected))
       : null);
   const showGear = !phone || gearOpen;
   return (
@@ -545,6 +614,8 @@ export function Items({
           favourite={selected ? favs.has(selected.uid) : false}
           aimSlot={aimed?.slot ?? null}
           aimFlask={aimed?.idx ?? null}
+          fitSlot={fitSlot}
+          fitFlask={fitFlask}
           onAim={(slot, idx) => sel?.from === 'inv' && setAim({ uid: sel.uid, slot, idx })}
           coarse={coarse}
           phone={phone}
@@ -602,6 +673,7 @@ export function Items({
             setDrag(null);
           }}
           dragFromSlot={drag?.kind === 'slot'}
+          onEndFit={endFit}
         />
       </section>
     </div>

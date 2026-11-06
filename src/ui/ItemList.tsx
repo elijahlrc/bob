@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { gemDef } from '../data/gems';
 import type { EquipSlot, InventoryItem } from '../data/types';
+import { flaskBase } from '../data/flasks';
 import { slotsFor } from '../run/inventory';
 import {
   slotName,
@@ -10,6 +11,7 @@ import {
   type SortKey,
 } from '../run/inventoryOps';
 import { GLOSSARY } from '../data/glossary';
+import { glyphOf } from './Gear';
 import { itemTitle, rarityClass } from './ItemCard';
 import { infoProps } from './info';
 import { introSeen, seeIntro } from './intro';
@@ -21,7 +23,18 @@ export type Mark = 'new' | 'upgrades' | 'last' | 'fav';
  * The bag's filters, combined freely (the owner, 2026-11-04): any of the kinds turned on (none is every kind), every mark turned
  * on, and the discarded pile in place of the bag.
  */
-export type Filters = { kinds: ItemGroup[]; marks: Mark[]; pile: boolean };
+export type Filters = { kinds: ItemGroup[]; marks: Mark[]; pile: boolean; fit?: Fit };
+/**
+ * An empty slot the bag is narrowed to (the owner, 2026-11-05): what can go in it, best first. It lasts until the slot is
+ * filled or the filter is removed, and is never saved.
+ */
+export type Fit = { slot: EquipSlot } | { flask: number };
+export const fitLabel = (f: Fit) =>
+  `Fits ${'flask' in f ? `Flask ${f.flask + 1}` : slotName(f.slot)}`;
+/** Whether a bag item can go in the slot `f`. */
+export function fits(it: InventoryItem, f: Fit): boolean {
+  return 'flask' in f ? it.kind === 'flask' : it.kind === 'item' && slotsFor(it).includes(f.slot);
+}
 export const NO_FILTERS: Filters = { kinds: [], marks: [], pile: false };
 /** A kind, or every kind (the first glyph button). */
 type What = ItemGroup | 'all';
@@ -77,6 +90,54 @@ type RowProps = {
 };
 
 /**
+ * A row's picture at its right end (the owner, 2026-11-05): a worn item's roundel as the reliquary paints its slot, a flask's
+ * bottle filled to what it holds now, a gem's stone.
+ */
+function RowIcon({ it, info }: { it: InventoryItem; info: ItemInfo }) {
+  if (it.kind === 'flask') {
+    const fill = (info.fill ?? 1).toFixed(2);
+    const left = `${info.drinks ?? 0} drink${info.drinks === 1 ? '' : 's'} left`;
+    return (
+      <span class="ix-row-icon ix-ri-flask" title={left} aria-label={left}>
+        <i
+          class="ix-bottle-art"
+          data-paint="bottle"
+          data-liquid={flaskBase(it.baseId).kind}
+          data-fill={fill}
+          data-pk={`${it.uid}:${fill}`}
+        />
+      </span>
+    );
+  }
+  if (it.kind === 'gem') {
+    const g = gemDef(it.gemId);
+    return (
+      <span class="ix-row-icon ix-ri-gem" aria-hidden="true">
+        <i
+          data-paint="gem"
+          data-gem={g.attr}
+          data-shape={g.kind === 'support' ? 'support' : 'skill'}
+          data-pk={it.gemId}
+        />
+      </span>
+    );
+  }
+  const slot = slotsFor(it)[0];
+  return (
+    <span class="ix-row-icon" aria-hidden="true">
+      <i
+        data-paint="slot"
+        data-rar={it.rarity}
+        data-glyph={glyphOf(slot, it)}
+        data-sockets=""
+        data-state=""
+        data-pk={`${it.uid}:${slot}`}
+      />
+    </span>
+  );
+}
+
+/**
  * One item of the bag, a tight row of the bag's panel: its name in its rarity's colour, a gold mark while it is new, then
  * where it goes and what it would change.
  */
@@ -104,6 +165,7 @@ export function ItemRow(p: RowProps) {
         {p.favourite && <span class="ix-favmark">★</span>}
         <span class="ix-row-name">{itemTitle(it)}</span>
       </span>
+      <RowIcon it={it} info={info} />
       <span class="ix-row-sub">
         <span class="muted">{info.slotLabel}</span>
         {slots.length > 1 && info.slot && <span class="ix-best">→ {slotName(info.slot)}</span>}
@@ -175,11 +237,13 @@ type Props = {
   onDrag: (uid: number | null) => void;
   onDropOnList: () => void;
   dragFromSlot: boolean;
+  /** Remove the empty-slot filter, giving back the filters there were before it. */
+  onEndFit: () => void;
 };
 
 /** Whether the list is narrowed by anything the player set: a kind, a mark, the pile, or words in the search box (the sort is an order). */
 export function isFiltered(f: Filters, search: string): boolean {
-  return f.kinds.length > 0 || f.marks.length > 0 || f.pile || search.trim() !== '';
+  return f.kinds.length > 0 || f.marks.length > 0 || f.pile || !!f.fit || search.trim() !== '';
 }
 
 const kindLabel = (k: What) => WHATS.find(([w]) => w === k)![1];
@@ -354,7 +418,17 @@ export function ItemList(p: Props) {
     </button>
   );
   // How many filters are set: what the Filter button counts.
-  const active = f.kinds.length + f.marks.length + (f.pile ? 1 : 0);
+  const active = f.kinds.length + f.marks.length + (f.pile ? 1 : 0) + (f.fit ? 1 : 0);
+  const fitChip = f.fit && (
+    <button
+      class="ix-rm"
+      {...ringProps(false)}
+      aria-label={`Remove the ${fitLabel(f.fit)} filter`}
+      onClick={p.onEndFit}
+    >
+      {fitLabel(f.fit)} <i>×</i>
+    </button>
+  );
   return (
     <div
       class={'ix-list-col' + (p.dragFromSlot ? ' drop' : '')}
@@ -383,6 +457,7 @@ export function ItemList(p: Props) {
           </div>
           {filtered && (
             <div class="ix-chips">
+              {fitChip}
               {f.kinds.map((k) => (
                 <button
                   key={k}
@@ -461,7 +536,12 @@ export function ItemList(p: Props) {
             {reverse}
           </div>
           {kinds}
-          {filtered && <div class="ix-chips">{clearButton('ix-rm clr')}</div>}
+          {filtered && (
+            <div class="ix-chips">
+              {fitChip}
+              {clearButton('ix-rm clr')}
+            </div>
+          )}
           {tipBox}
         </>
       )}

@@ -330,18 +330,40 @@ const bottle: Kind = (el, W, H) => {
   const r = Math.min(W / 2 - 2, H * 0.32);
   const cy = H - r - 2;
   const [ramp, from] = LIQUID[el.dataset.liquid ?? ''] ?? LIQUID.util;
+  const neckH = Math.max(1, Math.round(cy - r - 2));
+  // An ink edge round the glass and the neck, so the pale glass reads on a pale plaque as well as on the dark (the owner,
+  // 2026-11-05).
+  ctx.fillStyle = col('ink', 0);
+  ctx.fillRect(Math.round(cx - 3), 0, 6, 5);
+  ctx.fillRect(Math.round(cx - 4), 3, 8, neckH + 2);
+  disc(ctx, cx, cy, r + 2, col('ink', 0));
   ctx.fillStyle = col('gold', 3);
   ctx.fillRect(Math.round(cx - 2), 1, 4, 3);
   ctx.fillStyle = col('pearl', 2);
-  ctx.fillRect(Math.round(cx - 3), 4, 6, Math.max(1, Math.round(cy - r - 2)));
+  ctx.fillRect(Math.round(cx - 3), 4, 6, neckH);
   disc(ctx, cx, cy, r + 1, col('pearl', 2));
   disc(ctx, cx, cy, r, col('ink', 1));
+  // The neck is glass round a dark inside, open into the bulb, as the bulb is (the owner, 2026-11-05: a pale neck on a dark
+  // bulb read as two things).
+  ctx.fillStyle = col('ink', 1);
+  ctx.fillRect(Math.round(cx - 2), 4, 4, Math.round(cy) - 4);
+  const f = el.dataset.fill !== undefined ? Number(el.dataset.fill) : 0.8;
+  // The liquid, lit as one body from the bulb up into the neck.
+  const liquid = lit(ctx, ramp, cx - r * 0.4, cy - r * 0.2, r * 1.6, from);
+  // A full flask's liquid rises a little into the neck, everywhere (the owner, 2026-11-05: a full flask should look different
+  // from a nearly full one, without hiding the stopper). Where a cover over the bulb shows the level (the HUD, the camp), the
+  // bottle is painted full and data-full="0" says it is not.
+  if (f >= 0.995 && el.dataset.full !== '0') {
+    const rise = Math.max(1, Math.floor(neckH / 3));
+    const top = Math.round(cy - r) - rise;
+    ctx.fillStyle = liquid;
+    ctx.fillRect(Math.round(cx - 2), top, 4, Math.round(cy) - top);
+  }
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, Math.max(0.5, r - 1), 0, Math.PI * 2);
   ctx.clip();
-  ctx.fillStyle = lit(ctx, ramp, cx - r * 0.4, cy - r * 0.2, r * 1.6, from);
-  const f = el.dataset.fill !== undefined ? Number(el.dataset.fill) : 0.8;
+  ctx.fillStyle = liquid;
   const top = cy + r - f * 2 * r;
   ctx.fillRect(0, top, W, H);
   ctx.restore();

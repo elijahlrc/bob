@@ -9,8 +9,8 @@ import { withEquipped } from './inventory';
 import { newRun, type RunState, setMap } from './run';
 
 /**
- * Bot lookahead for stranded gems (EXPANSION 10.1 item 3): The Walled Heart has no sockets, so
- * wearing it naively strands the main skill. The two-step plan moves the gems to the weapon first.
+ * Stranded gems (the owner, 2026-11-05): The Walled Heart has no sockets. A swap is weighed with every gem still worn, and
+ * the bot re-sockets what did not fit after it (here, into the weapon).
  */
 function setup(): { run: RunState; heart: ReturnType<typeof rollUnique> } {
   const run = newRun('vanguard', 3);
@@ -33,13 +33,14 @@ function setup(): { run: RunState; heart: ReturnType<typeof rollUnique> } {
 }
 
 describe('the bot moves gems before wearing a socketless unique', () => {
-  it('a naive swap strands the main skill and scores worse', () => {
+  it('a swap is weighed with the gems that do not fit still worn', () => {
     const { run, heart } = setup();
-    const before = scoreBuild(run, run.build);
-    const naive = scoreBuild(run, withEquipped(run.build, heart, 'body'));
-    // With only 3 sockets on the maul and none on the Heart, the gems move to... nowhere in a naive swap.
     expect(heart.sockets).toHaveLength(0);
-    expect(naive).toBeLessThan(before);
+    const kept = withEquipped(run.build, heart, 'body').equipment.body!;
+    expect(kept.sockets.filter(Boolean).map((g) => g!.gemId)).toEqual([
+      'crushingBlow',
+      'bruteForce',
+    ]);
   });
 
   it('botEquip wears The Walled Heart anyway, with the gems moved to the weapon', () => {

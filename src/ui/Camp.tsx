@@ -222,6 +222,7 @@ function Arriving({ run, ch }: { run: RunState; ch: Character }) {
                   data-paint="bottle"
                   data-liquid={flaskBase(f!.baseId).kind}
                   data-fill="1"
+                  data-full={fill >= 100 ? '1' : '0'}
                 />
                 {fill < 100 && (
                   <div class="flask-glass" data-nopaint>

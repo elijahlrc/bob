@@ -44,18 +44,40 @@ function setup(classId = 'reaver'): { run: RunState; uid: () => number } {
 const ids = (xs: { uid: number }[]) => xs.map((x) => x.uid);
 
 describe('a flask for an empty flask slot is an upgrade', () => {
-  it('as many of the best flasks as there are empty slots, and none when the slots are full', () => {
+  it('every usable flask with a drink left while a slot is empty, and none when the slots are full', () => {
     const { run, uid } = setup();
     const empty = run.build.flasks.filter((f) => !f).length;
     expect(empty).toBeGreaterThan(0);
     const bag = Array.from({ length: empty + 2 }, () => makeFlask(uid, 'flask_life_1', 20));
-    run.inventory.push(...bag);
+    const dry = makeFlask(uid, 'flask_life_1', 20);
+    run.inventory.push(...bag, dry);
+    run.vitals.flasks[dry.uid] = 0;
     let infos = itemInfos(run);
-    expect(bag.filter((f) => infos.get(f.uid)!.fillsFlask)).toHaveLength(empty);
-    expect(filterItems(run.inventory, infos, 'upgrades').length).toBeGreaterThanOrEqual(empty);
+    expect(bag.every((f) => infos.get(f.uid)!.fillsFlask)).toBe(true);
+    expect(infos.get(dry.uid)!.fillsFlask).toBeFalsy();
+    expect(filterItems(run.inventory, infos, 'upgrades').length).toBeGreaterThanOrEqual(bag.length);
     run.build = { ...run.build, flasks: run.build.flasks.map((f) => f ?? bag[0]) };
     infos = itemInfos(run);
     expect(bag.some((f) => infos.get(f.uid)!.fillsFlask)).toBe(false);
+  });
+});
+
+describe('Best upgrade orders flasks by what they hold now', () => {
+  it('more recovery left first, a dry flask last', () => {
+    const { run, uid } = setup();
+    const dry = makeFlask(uid, 'flask_life_1', 20);
+    const half = makeFlask(uid, 'flask_life_1', 20);
+    const full = makeFlask(uid, 'flask_life_1', 20);
+    run.inventory.push(dry, half, full);
+    run.vitals.flasks[dry.uid] = 0;
+    run.vitals.flasks[half.uid] = 0.5;
+    const infos = itemInfos(run);
+    expect(ids(sortItems([dry, half, full], infos, 'upgrade', false))).toEqual(
+      ids([full, half, dry]),
+    );
+    expect(ids(sortItems([dry, half, full], infos, 'upgrade', true))).toEqual(
+      ids([dry, half, full]),
+    );
   });
 });
 

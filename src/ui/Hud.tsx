@@ -766,6 +766,7 @@ export function Hud({ c }: { c: Controller }) {
                         data-paint="bottle"
                         data-liquid={f.spec.kind}
                         data-fill="1"
+                        data-full={pct >= 100 ? '1' : '0'}
                       />
                       <div class="flask-glass" data-nopaint>
                         <div class="flask-empty" style={{ height: `${100 - pct}%` }} />
