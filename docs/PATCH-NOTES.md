@@ -6,6 +6,8 @@ change, and our own names only. Dash bullets under plain headings.
 
 ## 2026-11-05
 
+### Interface
+
 - Buttons, menus and boxes are redrawn with worn painted edges, and their words and icons no longer spill over the frames.
 - A picked choice is now gold with a dark outline, and a ticked box shows a check mark.
 - The Respite lists your worn items first and shows what raising each affix would give.
@@ -13,6 +15,14 @@ change, and our own names only. Dash bullets under plain headings.
 - On the Items tab, picking an empty gear or flask slot shows only what fits it, best upgrades first.
 - Bag rows now show each item's picture, a flask's bottle filled to what it holds, and Best upgrade ranks flasks by how much they have left.
 - Item comparisons and upgrades no longer count gems that would not fit in the new item as lost; a warning says which come out.
+
+### Items and combat
+
+- Flasks drop about a quarter as often, and a dropped flask holds a random amount of its charges.
+- Consecrated ground heals far less, about as much as strong life regeneration.
+- Life leech, life on hit and life on kill win back slightly less of the damage you just took.
+- Energy shield is weaker: items give less, and four of its passive tree clusters now give crit or burning instead.
+- The passive tree changed, so runs in progress get all their passive points back to spend once.
 
 ## 2026-11-04
 
