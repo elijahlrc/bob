@@ -4,73 +4,9 @@ Player-facing notes, newest first, shown on the Patch notes screen of the main m
 would notice. Plain text: no markdown emphasis or code, no first person, no file names or internal terms, nothing that did not
 change, and our own names only. Dash bullets under plain headings.
 
-## 2026-11-06
+## Battle of Builds version .2 — 2026-11-06
 
-- About twenty skills now look like what they describe: thrown blades and weapons spin, and spears, icicles, shards, sparks, bones and a twister replace plain orbs and arrows.
-
-## 2026-11-05
-
-### Interface
-
-- Buttons, menus and boxes are redrawn with worn painted edges, and their words and icons no longer spill over the frames.
-- A picked choice is now gold with a dark outline, and a ticked box shows a check mark.
-- The Respite lists your worn items first and shows what raising each affix would give.
-- On the Strategy tab, skills with a cooldown can now be given a pause between uses too, and longer pauses are offered.
-- On the Items tab, picking an empty gear or flask slot shows only what fits it, best upgrades first.
-- Bag rows now show each item's picture, a flask's bottle filled to what it holds, and Best upgrade ranks flasks by how much they have left.
-- Item comparisons and upgrades no longer count gems that would not fit in the new item as lost; a warning says which come out.
-
-### Items and combat
-
-- Flasks drop about a quarter as often, and a dropped flask holds a random amount of its charges.
-- A Respite, a fallen boss or a flask refill at a stop now fills only the flasks you wear, not the ones you carry.
-- Consecrated ground heals far less, about as much as strong life regeneration.
-- Life leech, life on hit and life on kill win back slightly less of the damage you just took.
-- Energy shield is weaker: items give less, and four of its passive tree clusters now give crit or burning instead.
-- The passive tree changed, so runs in progress get all their passive points back to spend once.
-
-## 2026-11-04
-
-### Monsters and combat
-
-- Far more of what monsters deal is now elemental or chaos damage, each faction with types of its own and more chaos late in a run, so resistances matter more and armour less.
-- More monsters attack from range or with warned area blows, and Bloaters and Cinderlings burst into flame.
-- A new monster curse, the Mire, slows your character heavily for a few seconds.
-- Sentinels hit about 10% less hard.
-- The Siege Marshal brings about half as many archers and mages and more warriors, with more still as he weakens.
-- Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
-- Monsters notice your character from about 30% farther away.
-- In duels, the Rares first target setting now goes for the other character before any of its minions.
-- Monsters' area attacks can now be evaded and blocked, and their area spells blocked.
-- Fixed increased and reduced block chance, and block recovery from the passive tree, having no effect.
-
-### Skills and items
-
-- The same aura can no longer be socketed twice; a second copy does nothing.
-- Fixed characters with an attribute below 0 keeping skill gems at level 1 and failing to equip some items; the Surgeon no longer allows such trades.
-- Guarded Strike now works with any melee weapon.
-- A support that needs a different weapon is now skipped instead of making its skill unusable.
-- Fixed some gem cards calling Grit, Fervour and Insight charges by the wrong names.
-
-### Interface
-
-- Flasks pulse when drunk.
-- Fixed resistances sometimes showing long decimals.
-- A socketed skill's card on the Skills tab shows its critical strike chance and damage.
-- Item filters now combine, such as new armour that is also an upgrade, and an item's mana no longer counts toward whether it is an upgrade.
-- A flask with drinks left now counts as an upgrade over an empty one you wear, and equipping it puts it in that slot.
-
-### Known issues
-
-- The new monster damage mix is still being balance-tested.
-
-## 2026-11-03
-
-This patch is a real doozy! It substantially diverges from more standard ARPG mechanical balance in order to make better use of its roguelike format. It also adds a bunch of **unique Relics** (buffs which last through the whole run and have radical impacts on gameplay) and new stops along your journey. At the highest level of abstraction, the balance changes make the game much more focused on sustaining your character across multiple levels. If all goes well you will find it much harder to keep your character's health and flasks up, and will need to take Respite stops in order to recharge and continue your journey.
-
-**Kills no longer refill your flasks.** Flasks hold far more, and charges come back at a Respite, when a boss falls, at a few stops, from provisions and from what you invest in: the passive tree, flask affixes and uniques. **Healing that can return your health to full is much weaker**. Life leech becomes Replenish, which wins back part of the damage you just took but never heals past it. **Life and mana pools are much larger** to make up for it, so the challenge moves from the single fight to the run. **Monsters have much less life**, **hit harder** and **swing slower**.
-
-**The passive tree is redesigned**, with flask paths in every region. Runs in progress get their passive points reset.
+This update makes major changes to emphasize the role of attrition within and between levels. That means there is much less health regen across the board. Kills no longer refill flasks, and healing which can top your character up to full is much weaker: life leech, life on hit and other healing in a fight become Replenish, which wins back part of the damage just taken but never more. Your health and mana pools are much larger to make up for it. Respites, stops and relics (That's right, this build also adds relics, see the end of this paragraph!) also act to mitigate this difficulty. Monsters have under half their life, hit harder and swing slower, and far more of their damage is now elemental or chaos, so resistances matter more. Energy shield is much weaker, flasks drop less often, and the passive tree is redesigned from scratch, with every run's passive points handed back. Relics are game altering rewards gained from killing bosses & in other rare events. As usual, see the full patch notes for details.
 
 The stops along your journey are still not developed to the point where I would like them to be. A big part of the motivation for this change was to make opportunities for interesting decision-making regarding which map to enter next, and non-combat stops are a key part of that. That said, I have only created a couple of them, and I will be adding more in the future.
 
@@ -78,23 +14,28 @@ This patch is still not well playtested, so I expect major balance issues that n
 
 ### Flasks
 
-- Kills refill flasks only through the passive tree, flask affixes and uniques; flasks hold far more, keep their charges when taken off, and a fallen boss refills them all.
+- Kills refill flasks only through the passive tree, flask affixes and uniques; flasks hold far more and keep their charges when taken off.
+- A Respite, a fallen boss or a flask refill at a stop fills the flasks you wear, not the ones you carry.
+- Flasks drop about a quarter as often, and a dropped flask holds a random amount of its charges.
 - Life flasks heal 20% more.
 - The new provision Tapper's Brine starts a map with your flasks at least half full.
 - Life and mana flasks are drunk by belt slot, each at a lower share of life or mana, and utility flasks are now kept for bosses unless the Strategy tab says otherwise.
 - New flask affixes Thrifty and of Gleaning, utility flasks last half again as long, and the weaker unique flasks are stronger.
-- A run starts with a second life flask, and flask bottles show their charges left.
+- A run starts with a second life flask, flask bottles show their charges left, and flasks pulse when drunk.
 
 ### Life and recovery
 
 - Life is about doubled and mana raised by half, while life regeneration and other healing from the tree, gems and items is much weaker.
-- Life leech, life on hit and life on kill become Replenish, which wins back part of the life you recently lost but never heals past it; Ebbing Cincture no longer drops.
+- Life leech, life on hit, life on kill, life on block, on crits and other events, from curses and from healing skills become Replenish, which wins back part of the life you recently lost but never heals past it; Ebbing Cincture no longer drops.
+- The life orb shows how much Replenish can still win back.
 - New passives, a weapon suffix and eight uniques raise how much Replenish wins back or how long it remembers.
-- Energy shield on item bases and affixes is less than half what it was.
+- Consecrated ground heals far less, about as much as strong life regeneration.
+- Energy shield is much weaker: items give less than half what they did, and four of its passive tree clusters now give crit or burning instead.
 
 ### Respites, stops and relics
 
 - At a Respite you can craft on your items before a full rest; it turns up by chance rather than when you are worn down, and always comes before a boss.
+- The Respite lists your worn items first and shows what raising each affix would give.
 - Stops come at random and about half as often, and camp shows your Bone Dust and when the next Respite comes.
 - New stops: the Surgeon, the Knucklebone Man, the Envious Dead and Another's Remains; the Ferryman is now the Bloodletter, who also fills your flasks, and the Awlsmith's sockets are a Respite craft.
 - The Shrine's blessing lasts longer, the Gem Hoard offers more, and the Quartermaster also sells a flask refill and relics.
@@ -108,22 +49,51 @@ This patch is still not well playtested, so I expect major balance issues that n
 ### Monsters and combat
 
 - Monsters have under half their life and hit 30% harder, but swing 25% slower.
+- Far more of what monsters deal is now elemental or chaos damage, each faction with types of its own and more chaos late in a run, so resistances matter more and armour less.
+- More monsters attack from range or with warned area blows, and Bloaters and Cinderlings burst into flame.
+- A new monster curse, the Mire, slows your character heavily for a few seconds.
 - Early maps have many more monsters.
-- Several melee skills that took any weapon now need a fitting melee weapon.
-- A kiting ranged character uses its blink to step away.
+- About half the monster types now move much faster, so more of them reach you past minions, and bosses are a bit faster too.
+- Monsters notice your character from about 30% farther away.
+- Sentinels hit about 10% less hard, and the Siege Marshal brings about half as many archers and mages and more warriors, with more still as he weakens.
+- Monsters' area attacks can now be evaded and blocked, and their area spells blocked.
+- Fixed increased and reduced block chance, and block recovery from the passive tree, having no effect.
 - Glacier Wall blocks walkers but not shots, and monsters stuck behind it are set back on the floor instead of dying.
 - Minions no longer push monsters aside, and bosses push through minions.
-- In duels, the extra life against a higher-level opponent is about a third of what it was.
-- About half the monster types now move much faster, so more of them reach you past minions, and bosses are a bit faster too.
+- A kiting ranged character uses its blink to step away.
+- Duels start at your normal life; the life bonus now grows with each Bargain Coin, up to a lower peak than before.
+- In duels, the Rares first target setting now goes for the other character before any of its minions.
+
+### Skills and items
+
+- About twenty skills now look like what they describe: thrown blades and weapons spin, and spears, icicles, shards, sparks, bones and a twister replace plain orbs and arrows.
+- Several melee skills that took any weapon now need a fitting melee weapon, and Guarded Strike works with any melee weapon.
+- A support that needs a different weapon is now skipped instead of making its skill unusable.
+- The same aura can no longer be socketed twice; a second copy does nothing.
+- Fixed characters with an attribute below 0 keeping skill gems at level 1 and failing to equip some items.
+- Fixed some gem cards calling Grit, Fervour and Insight charges by the wrong names.
+- Skinner's Knife is now Thin Mercy, Votive Hauberk is Candlewound Mail and Dusk Sceptre is Long Dusk, and maps once called the Shrine are now the Ruined Chapel.
 
 ### Interface
 
+- Buttons, menus and boxes are redrawn with worn painted edges, and their words and icons no longer spill over the frames.
+- A picked choice is now gold with a dark outline, and a ticked box shows a check mark.
 - The Character tab shows more of your stats and lets you tick the situations your build counts on.
-- A skill socketed twice with different supports counts as two skills on the Strategy tab.
+- A socketed skill's card on the Skills tab shows its critical strike chance and damage.
+- On the Strategy tab, a skill socketed twice with different supports counts as two skills, and skills with a cooldown can be given a pause between uses, with longer pauses offered.
+- On the Items tab, picking an empty gear or flask slot shows only what fits it, best upgrades first.
+- Bag rows show each item's picture and a flask's bottle filled to what it holds, and Best upgrade ranks flasks by how much they have left.
+- Item filters now combine, such as new armour that is also an upgrade, and an item's mana no longer counts toward whether it is an upgrade.
+- A flask with drinks left counts as an upgrade over an empty one you wear, and equipping it puts it in that slot.
+- Item comparisons and upgrades no longer count gems that would not fit in the new item as lost; a warning says which come out.
 - Item cards no longer show a stat twice, and numbers raised by an item's mods show in blue.
+- Fixed resistances sometimes showing long decimals.
 - Reward picks open as a pop-up over the camp, and the picks after the first four maps offer skill gems, then flasks, then supports, then one of each.
 - The exit portal is no longer hidden behind walls.
-- Skinner's Knife is now Thin Mercy, Votive Hauberk is Candlewound Mail and Dusk Sceptre is Long Dusk, and maps once called the Shrine are now the Ruined Chapel.
+
+### Known issues
+
+- The new monster damage mix is still being balance-tested.
 
 ## 2026-10-30
 
