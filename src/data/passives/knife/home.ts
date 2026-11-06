@@ -523,7 +523,7 @@ export const home: AreaSpec = {
     {
       from: 'knife.home.spoils.t2',
       to: 'knife.hex.radN.a',
-      why: "For the caster coming along the north border road (Shifting Ward's energy shield, Spellslip), who runs low on mana: the mana run reaches the road, so Low Tide is taken without Spoils (the revision, 2026-10-31).",
+      why: "For the caster coming along the north border road (Vile Epiphany's chaos spell crit, Spellslip), who runs low on mana: the mana run reaches the road, so Low Tide is taken without Spoils (the revision, 2026-10-31).",
     },
     {
       from: 'knife.home.quick.d',

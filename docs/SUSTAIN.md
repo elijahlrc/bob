@@ -164,3 +164,43 @@ and `replenishShare2h` in `data/affixes.ts`; the eight uniques through their dec
 (`reference/coverage/uniques/`, then `npm run coverage:emit`). Owned items keep what they rolled. The decision files sit
 in the local `reference/` folder, which this worktree shares with the main checkout: an emit on main before this branch
 is merged would pick up these lines and the "replenish" gem text.
+
+## 7. After the leaderboard recovery audit (the owner, 2026-11-05)
+
+**What was measured.** The top 15 characters on the save-version-25 high scores were played headless through the same
+four level-100 maps (the map-99 layout, which ends on a rare; no affixes; default difficulty) from 60% life, with every
+point of life recovered traced to its source; then the nine that survive a level-100 map played two chains of five maps,
+carrying life, shield and flask charges with the camp's rest between maps. What it showed:
+
+- Life regeneration is at most 0.5% of maximum life a second and under 10% of the healing for 14 of the 15.
+- The Mystics heal mostly from flasks (69 to 89% of their healing) but are hit little; their shield soaks about half of
+  what reaches them on hard maps.
+- The melee builds heal mostly from replenish (leech, life on hit); one got half its healing from consecrated ground at
+  6% of maximum life a second and hardly drank.
+- Flask charges run down over three to five maps and do not come back on their own, but about two full life flasks (3.3
+  flasks in all) dropped a map at level 100, so a drained flask could be swapped for a fresh one.
+
+**Decided.**
+
+| What                       | Was        | Now                 | Lever                                 |
+| -------------------------- | ---------- | ------------------- | ------------------------------------- |
+| Flasks among item drops    | 15%        | 3.75%               | `FLASK_DROP_CHANCE`                   |
+| A dropped flask's charges  | full       | even, empty to full | `FlaskItem.fill`                      |
+| Consecrated ground         | 6% life/s  | 0.5% life/s         | `REGEN_CONSECRATED` (`sim/fields.ts`) |
+| Replenish share            | 50%        | 45%                 | `REPLENISH_SHARE`                     |
+| Flat energy shield (items) | 0.4        | 0.3                 | `ENERGY_SHIELD_SCALE`                 |
+| Energy shield on the tree  | 4 clusters | replaced            | the area files (below)                |
+
+The four shield clusters replaced on the tree: the Cloister's recharge cluster becomes wand crit, the Lantern's High
+Veil cluster fire penetration and burning, the Cathedral Gate's Wake cluster spell crit, and the Stair's Shifting Ward
+cluster chaos spell crit. Reward picks and the Quartermaster's flasks still arrive full.
+
+**Refund.** Every run in progress gets its whole tree back as unspent points when it next loads, through a tree revision
+kept apart from the save version (`TREE_REVISION`, `refundOldTree` in `src/run/save.ts`). The save version stays at 25, so
+the high scores and the rivals are untouched; a rival's build keeps its nodes, which now carry the new lines.
+
+**Measured again** (the same nine builds, the same two chains): about 1.2 flasks dropped a map at level 100, 0.4 of them
+life or hybrid, each partly full, against 3.3 and 2.0 full before. The build that healed from consecrated ground drank more
+and died at the end of its second chain with an empty belt; the Mystic that lost its shield nodes died on a map it had
+cleared; the rest changed little. Deaths went from 6 to 7 over the eighteen chains. The bot does not swap flasks, so the
+chains do not show the drop change itself.

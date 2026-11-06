@@ -9,6 +9,7 @@ import {
   type SlotTag,
 } from '../data/affixes';
 import { isWeaponClass, ITEM_BASES, itemBase } from '../data/bases';
+import { FLASK_DROP_CHANCE } from '../data/constants';
 import { FLASK_AFFIXES, FLASK_BASES, type FlaskKind } from '../data/flasks';
 import { classDef } from '../data/classes';
 import { ALL_GEMS, type GemDef } from '../data/gems';
@@ -580,14 +581,18 @@ export function rarityWeights(
   };
 }
 
-/** Roll a single item drop (15% flasks). */
+/** Roll a single item drop (`FLASK_DROP_CHANCE` of them flasks, each holding a random share of its charges). */
 export function rollDrop(
   rng: Rng,
   uid: UidSource,
   ctx: DropContext,
   forceRare = false,
 ): InventoryItem {
-  if (!forceRare && rng.chance(0.15)) return rollFlask(rng, uid, ctx.ilvl);
+  if (!forceRare && rng.chance(FLASK_DROP_CHANCE)) {
+    const flask = rollFlask(rng, uid, ctx.ilvl);
+    flask.fill = rng.next();
+    return flask;
+  }
   const w = rarityWeights(ctx.monster, ctx.theme?.rareWeightMult ?? 1, ctx.playerRarity ?? 1);
   let rarity: Rarity = forceRare
     ? 'rare'

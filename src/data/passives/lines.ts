@@ -533,6 +533,24 @@ export const daggerSpellCrit = def('daggerSpellCrit', (v: number): Line =>
     mod('critChance', 'inc', v, { tags: ['spell'], condition: DAGGER }),
   ),
 );
+/**
+ * Crit for chaos spells: a skill tagged both spell and chaos (tags are a subset test). A spell that deals chaos only by
+ * conversion carries no chaos tag and gets nothing. Priced as spell crit.
+ */
+export const chaosSpellCrit = def('chaosSpellCrit', (v: number): Line =>
+  line(
+    `${v}% crit chance with chaos spells`,
+    v / UNIT.critChance,
+    mod('critChance', 'inc', v, { tags: ['spell', 'chaos'] }),
+  ),
+);
+export const chaosSpellCritMulti = def('chaosSpellCritMulti', (v: number): Line =>
+  line(
+    `+${v}% crit multiplier with chaos spells`,
+    v / UNIT.critMulti,
+    mod('critMulti', 'base', v, { tags: ['spell', 'chaos'] }),
+  ),
+);
 export const channelDamage = def('channelDamage', (v: number): Line =>
   damage(v, { tags: ['channelling'], unit: 10, label: `${v}% damage with channelling skills` }),
 );

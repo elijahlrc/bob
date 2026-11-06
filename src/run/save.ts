@@ -3,7 +3,7 @@ import { dropRetiredGems, releaseStrandedGems } from './inventory';
 import { LEGACY } from '../data/difficulty';
 import { resetTree } from '../data/tree/rules';
 import { pack, unpack } from './pack';
-import { SAVE_VERSION, type RunState } from './run';
+import { SAVE_VERSION, TREE_REVISION, type RunState } from './run';
 import { STOPS } from '../data/stops';
 import { rollOffers } from './offers';
 
@@ -52,10 +52,22 @@ export function loadRun(store: KeyValueStore, key: string = SAVE_KEY): LoadResul
     if (run) dropRetiredGems(run);
     // A stop since removed from the game (the Awlsmith, 2026-11-05) is no longer on offer.
     if (run) dropCutStops(run);
+    // A run whose passives were spent on an older tree revision gets them back to spend.
+    if (run) refundOldTree(run);
     return run ? { status: 'ok', run } : { status: 'incompatible' };
   } catch {
     return { status: 'incompatible' };
   }
+}
+
+/**
+ * A run in progress whose passives were spent on an older tree revision (`TREE_REVISION`) gets every allocated passive back
+ * as unspent points, once. Kept apart from the save version, so the high scores and the rivals' builds are not touched.
+ */
+export function refundOldTree(run: RunState): void {
+  if ((run.treeRevision ?? 0) >= TREE_REVISION) return;
+  run.build = resetTree(run.build);
+  run.treeRevision = TREE_REVISION;
 }
 
 /**

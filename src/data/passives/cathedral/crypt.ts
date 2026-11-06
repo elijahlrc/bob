@@ -38,7 +38,7 @@ export const crypt: AreaSpec = {
           name: 'Rood Screen',
           lines: [spellBlock(6), es(6)],
           at: [-1237, -1655],
-          why: "Spell block first, a little energy shield (the Spire's Quickening sells recharge close by): 3 + 1.2 units.",
+          why: 'Spell block first, a little energy shield (the Spire sells wand crit close by, at Damning Point, since 2026-11-05): 3 + 1.2 units.',
         },
       ],
       links: [

@@ -68,6 +68,13 @@ import { bossForMap } from '../data/bosses';
 export { rollThemes } from './offers';
 
 export const SAVE_VERSION = 25;
+/**
+ * The passive tree's revision for runs in progress, apart from `SAVE_VERSION` (which also sorts the high scores and rivals):
+ * a saved run of an older revision gets its passives back as unspent points when it loads (`refundOldTree` in save.ts), and
+ * the rivals' builds are left as they are. 1 since 2026-11-05 (the owner): four energy shield clusters became crit and
+ * burning clusters (docs/SUSTAIN.md section 7).
+ */
+export const TREE_REVISION = 1;
 export const TOTAL_MAPS = 100;
 
 export type MapRecord = {
@@ -99,6 +106,8 @@ export type PendingCraft = { itemUid: number; pinned: string[]; options: Item[] 
 
 export type RunState = {
   version: number;
+  /** The tree revision the run's passives were spent on (`TREE_REVISION`); absent before revision 1. */
+  treeRevision?: number;
   seed: number;
   classId: string;
   /** The next map to play (1-based). */
@@ -164,6 +173,7 @@ export function newRun(classId: string, seed: number, difficulty: Difficulty = D
   const cls = classDef(classId);
   const run: RunState = {
     version: SAVE_VERSION,
+    treeRevision: TREE_REVISION,
     seed,
     classId,
     map: 1,

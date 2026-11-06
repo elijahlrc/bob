@@ -101,7 +101,7 @@ toward the rim), the Parapet (the rim ring).
 | Sharp Mind                          | Gate        | east spoke junction                      | 6     | Spell crit, east's damage near home.                                                 |
 | Hale Scribe                         | Gate        | east path, toward the centre             | 5     | Life near home, a side room.                                                         |
 | Kept Vows                           | Cloister    | the west seam, toward the centre         | 7     | Reservation and energy shield shared with the Cathedral.                             |
-| Quickening                          | Cloister    | west border road                         | 8     | Energy shield recharge, the seam's theme.                                            |
+| Damning Point (was Quickening)      | Cloister    | west border road                         | 8     | Wand crit, energy shield recharge until 2026-11-05.                                  |
 | Pain Conduit (K)                    | Cloister    | west border road, a spur                 | 10    | Low life beside reservation and energy shield; its spur's smalls feed low life.      |
 | Familiars                           | Cloister    | where the border road meets the mid ring | 10    | Spell minions, the Cathedral's minions' near end.                                    |
 | Deep Well / Glass Skin              | Cloister    | west spoke, outer                        | 7-8   | Mana and energy shield.                                                              |
@@ -118,7 +118,7 @@ toward the rim), the Parapet (the rim ring).
 | Cinder                              | Lantern     | the rim ring at the west spoke           | 13    | Fire's ignite payoff.                                                                |
 | new: fire's payoff                  | Lantern     | out from the rim ring                    | 14    | Fire penetration with a rule.                                                        |
 | Bad Company                         | Lantern     | out from the rim ring by the border      | 13    | Minions with curses, the second minion home.                                         |
-| High Veil                           | Lantern     | the rim ring's west vertex               | 13    | Energy shield and resistances.                                                       |
+| Searing Writ (was High Veil)        | Lantern     | the rim ring's west vertex               | 13    | Burning and fire penetration, energy shield until 2026-11-05.                        |
 | Siphon                              | Scriptorium | east spoke, outer                        | 7-8   | Energy shield leech and on hit: the region's sustain, near home on the offence side. |
 | Deft Wand                           | Scriptorium | east spoke, outer                        | 8     | Wand attacks, the first wand on the east, past step 8.                               |
 | Thunderhead                         | Scriptorium | east spoke, outer                        | 9     | Lightning's first rung.                                                              |
@@ -149,6 +149,12 @@ toward the rim), the Parapet (the rim ring).
 | Prismatic Balance, Fever Pitch (K)  | Belfry      | tips past the rim ring                   | 15    | The element keystones, the farthest.                                                 |
 | Snare Line                          | cut         |                                          |       | Traps are the Knife's and the Bow's.                                                 |
 | Deft Wand's old spot, the old roads | cut         |                                          |       | Replaced by the skeleton's roads.                                                    |
+
+**2026-11-05:** the owner judged energy shield too strong on the tree and replaced two of these clusters with kinds the
+tree lacked, in place (same nodes, links and steps). Quickening and Ward Renewed became Damning Point and Hastening Malefice,
+wand crit with Quickened on crit, the wand attacker's west home apart from Pinpoint's. High Veil and Moonward became
+Searing Writ and Witchfire, burning with fire penetration and a faster burn: fire's third room past the rim, the burn's
+own, beside Smoulder's ignite and Kiln Heart's piercing hits.
 
 **Elements:** fire west (first rung 9, Flashpoint 11, Cinder 13, payoff 14), cold on the axis (Hoarfrost 10, Shatter 12,
 Cold Light 14), lightning east (Thunderhead 9, Live Current 10, payoff 14); each spread along one road, so an elemental

@@ -71,9 +71,10 @@ export const WHILE_LEECHING_SCALE = 1.35;
 /**
  * Replenish (docs/SUSTAIN.md): the character's life leech, life on hit and life on kill recover at most this share
  * (%) of the life lost in the last `REPLENISH_WINDOW` seconds, less what they recovered in that time. Stats raise the share up to the
- * cap and stretch or shorten the window within its limits.
+ * cap and stretch or shorten the window within its limits. 45 since 2026-11-05 (was 50; the owner, after the leaderboard
+ * recovery audit).
  */
-export const REPLENISH_SHARE = 50;
+export const REPLENISH_SHARE = 45;
 export const REPLENISH_SHARE_CAP = 95;
 export const REPLENISH_WINDOW = 5;
 export const REPLENISH_WINDOW_MIN = 2;
@@ -150,6 +151,12 @@ export const FLASK_KILL_WEIGHT = { normal: 1, magic: 3.5, rare: 6, unique: 11 } 
  * instead of multiplying it.
  */
 export const FLASK_CHARGES_PER_KILL = 0;
+/**
+ * The share of item drops (monsters and chests) that are flasks. 0.0375 since 2026-11-05 (was 0.15; the owner, after the
+ * leaderboard recovery audit: about two full life flasks a map at level 100 made swapping a free refill). A dropped flask
+ * holds a random share of its charges, evenly from empty to full (`FlaskItem.fill`).
+ */
+export const FLASK_DROP_CHANCE = 0.0375;
 /** Every flask base holds this many times the reference game's charges (2026-10-28: five drinks of the first life flask, not three). */
 export const FLASK_CAPACITY_SCALE = 1.75;
 /** A mana flask holds this many times instead (2026-10-29: the playtests' casters ran dry by map 8; mana pays for every skill). */
@@ -162,9 +169,9 @@ export const FLASK_LIFE_SCALE = 1.2;
  * Energy shield, as a multiple of the reference numbers: every item base's, and every affix's flat energy shield (its rolls,
  * so items found before a change keep theirs). A moderate cut since 2026-10-29 (the owner, docs/ATTRITION.md): with kills no
  * longer refilling flasks, a shield that recharges in full between fights was the strongest way to last a run. 0.4 since
- * 2026-11-02 (the sustain pass, docs/SUSTAIN.md).
+ * 2026-11-02 (the sustain pass, docs/SUSTAIN.md). 0.3 since 2026-11-05 (the owner, after the leaderboard recovery audit).
  */
-export const ENERGY_SHIELD_SCALE = 0.4;
+export const ENERGY_SHIELD_SCALE = 0.3;
 
 // Duels (docs/DUEL.md 4.4).
 /**

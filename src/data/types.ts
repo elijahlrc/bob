@@ -124,6 +124,11 @@ export type FlaskItem = {
   affixes: AffixRoll[];
   /** Set on unique flasks. Their fixed mods are in `affixes`. */
   uniqueId?: string;
+  /**
+   * The share of its charges a dropped flask holds when found (0 to 1; absent, full). Read once, when the run takes the
+   * flask (`noteFound`), into `RunState.vitals.flasks`; from then on the vitals are what it holds.
+   */
+  fill?: number;
 };
 
 /**

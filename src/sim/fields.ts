@@ -89,7 +89,11 @@ export type Field = {
   ty?: number;
 };
 
-const REGEN_CONSECRATED = 0.06;
+/**
+ * The share of maximum life consecrated ground restores a second. 0.005 since 2026-11-05 (was 0.06; the owner, after the
+ * leaderboard recovery audit): in line with the best life regeneration of the top builds, as the sustain pass cut regeneration.
+ */
+const REGEN_CONSECRATED = 0.005;
 const CRIT_ON_CONSECRATED = 2;
 
 const dominantType = (p: SkillProfile): number => profileElement(p);

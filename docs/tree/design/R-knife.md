@@ -28,7 +28,7 @@ angle of -30; negative is the Spire's side). Steps are counted from the Shade's 
 | Seam  | Hoarded Breath                          | (1,700, -28)              | 6      | Energy shield and mana for both the Shade and the Mystic.      |
 | Seam  | Grey Cloak                              | (1,700, 28)               | 6      | Evasion and energy shield for both the Shade and the Strider.  |
 | North | Quiet Knife                             | (2,550, -6)               | 9      | The first dagger spells, between the north spoke and the axis. |
-| North | Shifting Ward                           | (2,450, -27)              | 8      | Energy shield and spell dodge, off the north border radial.    |
+| North | Vile Epiphany (was Shifting Ward)       | (2,450, -27)              | 8      | Crit for chaos spells (energy shield until 2026-11-05).        |
 | North | Rotting Word / Sapper                   | (2,700, -23)              | 10     | Chaos spells and mines, the Stair's wheel.                     |
 | North | Spellslip                               | (2,850, -27)              | 11     | Keystone at a tip off the border radial.                       |
 | North | Barbed Point / Shroud                   | (2,750, -7)               | 10     | The Rookery wheel: poison and energy shield.                   |
@@ -60,6 +60,9 @@ angle of -30; negative is the Spire's side). Steps are counted from the Shade's 
 | South | Between Ribs                            | (4,250, 12)               | 15     | Dagger crit, apart from Long Knives.                           |
 | South | Rat Bite                                | (4,250, 22)               | 15     | Poison and attack speed.                                       |
 | Rim   | Whetted Will, Glint, Sleet, Long Grudge | (4,450, -6 / 0 / 6 / -16) | 16     | Physical spells, spell crit, cold spells, curses.              |
+
+**2026-11-05:** the owner judged energy shield too strong on the tree. Shifting Ward became Vile Epiphany in place (same
+nodes and links): crit chance and multiplier for spells tagged chaos, a wheel away from Rotting Word's chaos damage.
 
 Removed: Hollow Vessel (its spur goes). The old roads (the blade road, roadN, roadS, the rings toward the centre, the
 junctions j1, j2, jN, j5, jT, jH, the walk, the ridge, the wall) are replaced by the skeleton's roads.

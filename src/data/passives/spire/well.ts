@@ -1,5 +1,5 @@
 /**
- * The Cloister: The west: energy shield, mana and life.
+ * The Cloister: The west: energy shield, mana and life, and wand crit off the border road (2026-11-05).
  * Written for the attrition rework from docs/tree/design/R-spire.md (2026-10-31).
  */
 import {
@@ -11,9 +11,6 @@ import {
   damageWhileEsFull,
   eleDamage,
   es,
-  esRecharge,
-  esRechargeDelay,
-  esRechargeOnKill,
   flaskEffect,
   igniteChance,
   int,
@@ -24,6 +21,7 @@ import {
   minionDamagePerMana,
   minionLife,
   minionSpeed,
+  quickenedOn,
   reducedReservation,
   resOne,
   skillDuration,
@@ -34,6 +32,8 @@ import {
   stunAvoid,
   wandCastSpeed,
   wandSpellDamage,
+  weaponCrit,
+  weaponCritMulti,
 } from '../lines';
 import type { AreaSpec } from '../types';
 
@@ -41,7 +41,7 @@ export const well: AreaSpec = {
   id: 'spire.well',
   region: 'mystic',
   name: 'The Cloister',
-  why: 'The west: energy shield, mana and life.',
+  why: 'The west: energy shield, mana and life, and wand crit off the border road (2026-11-05).',
   at: [-1011, -2503],
   clusters: [
     {
@@ -124,31 +124,37 @@ export const well: AreaSpec = {
     },
     {
       id: 'quickening',
-      name: 'Quickening',
-      why: "Energy shield recharge, the seam theme, off the west border road. Since the revision (2026-10-31) it is a floor across the west cell: its recharge run goes on east past Ward Renewed to the west spoke's first landing, so the shield caster crosses from the border road to the spoke through recharge (slower than the roads, richer), and Ward Renewed has a way in of its own from the spoke instead of hanging off Quickening.",
+      name: 'Damning Point',
+      why: "Wand crit, off the west border road: the wand attacker's west home, apart from Pinpoint's wand damage with crit at the east rim (2026-11-05: it was energy shield recharge, which the owner judged too strong on the tree). A floor across the west cell: the crit run goes on east past Hastening Malefice to the west spoke's first landing, so the wand attacker crosses from the border road to the spoke through crit (slower than the roads, richer), and Hastening Malefice has a way in of its own from the spoke. Its partner is speed on crit and the border road's low life and reservation, not wand damage.",
       at: [-919, -1844],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'a', kind: 'small', lines: [esRecharge(15)], at: [-946, -1822] },
+        { id: 'a', kind: 'small', lines: [weaponCrit('wand', 15)], at: [-946, -1822] },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Quickening',
-          lines: [esRechargeDelay(30), esRecharge(15), es(5)],
+          name: 'Damning Point',
+          lines: [weaponCrit('wand', 40), weaponCritMulti('wand', 20)],
           at: [-920, -1887],
-          why: '3 + 1 + 1 units; the faster start is the half the sheet shows least and the fight feels most.',
+          why: "2.67 + 1.67 units: the chance first, as the dagger's crit notable. Crit with wands is the wand's attacks only; the wand caster's spells are Wandwork's.",
         },
-        { id: 'b', kind: 'small', lines: [esRecharge(15)], at: [-835, -1960] },
+        { id: 'b', kind: 'small', lines: [weaponCrit('wand', 15)], at: [-835, -1960] },
         {
           id: 'n2',
           kind: 'notable',
-          name: 'Ward Renewed',
-          lines: [esRechargeOnKill(), esRecharge(15)],
+          name: 'Hastening Malefice',
+          lines: [weaponCritMulti('wand', 30), quickenedOn('crit', 15)],
           at: [-750, -2060],
-          why: 'The shield comes back with every kill: the Spire’s sustain voice under attrition. On the recharge floor between the spoke and Quickening (step 7 from the start by the spoke).',
+          why: 'The multiplier, and crits that hasten the wand attacker: 2.5 + 0.9 units, the rule priced as the bow’s crit-and-Quickened notable prices it. On the crit floor between the spoke and Damning Point (step 7 from the start by the spoke).',
         },
-        { id: 'r2', kind: 'small', lines: [esRecharge(15)], at: [-640, -2100] },
-        { id: 'r1', kind: 'small', lines: [esRecharge(15)], at: [-525, -2060] },
+        {
+          id: 'r2',
+          kind: 'small',
+          lines: [weaponCritMulti('wand', 12)],
+          at: [-640, -2100],
+          why: "The run to the spoke is the multiplier's side, as the run from the border road is the chance's.",
+        },
+        { id: 'r1', kind: 'small', lines: [weaponCritMulti('wand', 12)], at: [-525, -2060] },
       ],
       links: [
         ['a', 'n'],
@@ -161,7 +167,7 @@ export const well: AreaSpec = {
     {
       id: 'painConduit',
       name: 'Pain Conduit',
-      why: 'Keystone, a spur off the west border road beside reservation and recharge (step 10).',
+      why: 'Keystone, a spur off the west border road beside reservation and wand crit (step 10).',
       at: [-1117, -2147],
       shape: { kind: 'hand' },
       nodes: [
@@ -177,7 +183,7 @@ export const well: AreaSpec = {
     {
       id: 'familiars',
       name: 'Familiars',
-      why: "Spell minions, out from where the border road meets the mid ring: the Cathedral's minions' near end. Since the revision (2026-10-31) it is the foot of the west border's climb: past the mid ring no road runs along the border, and the climb goes up it through rooms, Familiars, Bound Host, a mana small, Moonward and High Veil to the rim, then Bad Company, Hexed Pack and Overflow beyond: the spell-minion caster's way out, mana feeding the minions at the foot and the shield at the top.",
+      why: "Spell minions, out from where the border road meets the mid ring: the Cathedral's minions' near end. Since the revision (2026-10-31) it is the foot of the west border's climb: past the mid ring no road runs along the border, and the climb goes up it through rooms, Familiars, Bound Host, a mana small, Witchfire and Searing Writ to the rim, then Bad Company, Hexed Pack and Overflow beyond: the spell-minion caster's way out, mana feeding the minions at the foot. Since 2026-11-05 the rooms near the top are fire (burning and penetration) where they were energy shield, so the summoner passes them by on the rim or pays for a fire spell's room.",
       at: [-1431, -2750],
       shape: { kind: 'hand' },
       nodes: [
@@ -449,12 +455,12 @@ export const well: AreaSpec = {
     {
       from: 'spire.well.quickening.r1',
       to: 'spire.home.spW.x',
-      why: "The recharge floor's east end, at the west spoke's first landing (the revision, 2026-10-31). Walked by the energy shield caster who lives on recharge: Ward Renewed from the spoke, then Quickening and the border road (7 steps against the road's 6).",
+      why: "The crit floor's east end, at the west spoke's first landing (the revision, 2026-10-31; wand crit since 2026-11-05). Walked by the wand attacker who lives on crit: Hastening Malefice from the spoke, then Damning Point and the border road (7 steps against the road's 6).",
     },
     {
       from: 'spire.well.familiars.m',
       to: 'spire.fire.highVeil.n2',
-      why: 'The border climb (the revision, 2026-10-31): from the minion rooms up by mana into Moonward and High Veil. Walked by the spell-minion caster who stacks mana (Familiars pays by mana) and protects himself with energy shield: Bound Host, then Moonward, toward the rim and the minion rooms past it.',
+      why: 'The border climb (the revision, 2026-10-31): from the minion rooms up by mana into Witchfire and Searing Writ (energy shield until 2026-11-05). Walked by the fire caster who keeps spell minions (Familiars pays by mana): Bound Host, then Witchfire’s burning, toward the rim and the minion rooms past it.',
     },
     {
       from: 'spire.well.composure.n2',

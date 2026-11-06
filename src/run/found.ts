@@ -10,6 +10,9 @@ import type { RunState } from './run';
 /** Record a new item, gem or flask: when it was found, and that the player has not seen it yet. Currency has no uid. */
 export function noteFound(run: RunState, it: AnyItem): void {
   if (it.kind === 'currency') return;
+  // A dropped flask is found holding part of its charges (`FlaskItem.fill`); a flask the vitals already know keeps its own.
+  if (it.kind === 'flask' && it.fill !== undefined && run.vitals.flasks[it.uid] === undefined)
+    run.vitals.flasks[it.uid] = it.fill;
   run.acquired[it.uid] = run.map;
   if (!run.unseen.includes(it.uid)) run.unseen.push(it.uid);
 }

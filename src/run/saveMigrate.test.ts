@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getTree } from '../data/tree';
 import type { StopId } from '../data/stops';
 import { makeStop, rollOffers } from './offers';
-import { newRun, SAVE_VERSION, setMap } from './run';
+import { newRun, SAVE_VERSION, setMap, TREE_REVISION } from './run';
 import { loadRun, migrate, saveRun } from './save';
 import { waysideOf } from './wayside';
 
@@ -104,5 +104,39 @@ describe('a stop cut from the game (the Awlsmith, 2026-11-05)', () => {
     expect(out.offers.some((o) => (o.stop as string) === 'awlsmith')).toBe(false);
     expect(JSON.stringify(out.offers)).toBe(now);
     expect(waysideOf(out).stopVisit).toBeNull();
+  });
+});
+
+describe('a run in progress on an older tree revision (2026-11-05)', () => {
+  const store = () => {
+    const m = new Map<string, string>();
+    return {
+      getItem: (k: string) => m.get(k) ?? null,
+      setItem: (k: string, v: string) => void m.set(k, v),
+      removeItem: (k: string) => void m.delete(k),
+    };
+  };
+
+  it('gets its passives back when it loads, once, and keeps the save version', () => {
+    const run = newRun('mystic', 3);
+    run.build.allocated = getTree().nodes[getTree().starts[run.classId]].links.slice(0, 2);
+    delete run.treeRevision;
+    const s = store();
+    saveRun(s, run);
+    const first = loadRun(s);
+    if (first.status !== 'ok') throw new Error(first.status);
+    expect(first.run.build.allocated).toEqual([]);
+    expect(first.run.treeRevision).toBe(TREE_REVISION);
+    expect(first.run.version).toBe(SAVE_VERSION);
+    // Spent again on the current tree, the passives stay through the next load.
+    first.run.build.allocated = getTree().nodes[getTree().starts[run.classId]].links.slice(0, 1);
+    saveRun(s, first.run);
+    const second = loadRun(s);
+    if (second.status !== 'ok') throw new Error(second.status);
+    expect(second.run.build.allocated).toHaveLength(1);
+  });
+
+  it('a new run is on the current revision', () => {
+    expect(newRun('zealot', 1).treeRevision).toBe(TREE_REVISION);
   });
 });

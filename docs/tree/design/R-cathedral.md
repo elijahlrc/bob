@@ -119,7 +119,7 @@ it fights, and its faith turns damage into an element. Side roads:
 | Brazier                            | Churchyard | out from the rim ring                            | 14   | Sceptre fire.                                                     |
 | Procession                         | Churchyard | the rim ring                                     | 13   | Auras (its movement line goes).                                   |
 | Buttress                           | Churchyard | the rim ring                                     | 13   | Spell block and resistances.                                      |
-| Wake                               | Churchyard | out from the rim ring by the Wall border         | 14   | Energy shield and life.                                           |
+| Wake, now Sermon of the Last Day   | Churchyard | out from the rim ring by the Wall border         | 14   | Spell crit, energy shield and life until 2026-11-05.              |
 | Living Ward (K)                    | cut        |                                                  |      | Removed (the skeleton).                                           |
 | new: fire's rule                   | Churchyard | out from the rim ring                            | 14   | Faith turned to fire (gain as extra fire for spells and attacks). |
 | new: lightning's rule              | Lychway    | out from the rim ring                            | 14   | Faith turned to lightning.                                        |
@@ -128,6 +128,10 @@ it fights, and its faith turns damage into an element. Side roads:
 | new: a channelling defence         | Lychway    | the rim ring                                     | 13   | Damage reduction while channelling.                               |
 | new: staff crit with a payoff      | Vestry     | SW, past the mid ring                            | 12   | Staff crit and block.                                             |
 | new: aura per aura                 | Choir      | NE, the rim ring                                 | 13   | Something for every aura held.                                    |
+
+**2026-11-05:** the owner judged energy shield too strong on the tree. Wake became Sermon of the Last Day in place
+(same nodes and links): spell crit with cast speed, which the Zealot had none of; the cast speed is what the Spire's Sharp
+Mind lacks.
 
 ## 6. Size
 

@@ -238,7 +238,7 @@ export const clusters: AreaSpec = {
           name: 'Shelter',
           lines: [resAll(12), life(8)],
           at: [-163, -567],
-          why: 'Resistances, which neither home sells by this seam (Still Water, Bright Omen, Kept Vows and Quickening sell flasks, damage, auras and recharge): priced as a home generalist (it sits 10 to 12 steps from every start).',
+          why: 'Resistances, which neither home sells by this seam (Still Water, Bright Omen, Kept Vows and Damning Point sell flasks, damage, auras and wand crit): priced as a home generalist (it sits 10 to 12 steps from every start).',
         },
       ],
       links: [['a', 'n']],

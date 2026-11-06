@@ -44,7 +44,7 @@ export const frost: AreaSpec = {
           name: 'Steady Stream',
           lines: [channelDamage(20), costReduction(6)],
           at: [-587, -3851],
-          why: '2 + 1.5 units. The far end of the pocket, which leads on to High Veil: linked in G3 round 1, cut in round 2 (the classic caster took the far shield a step off the climb), linked again in G4 fix 2 (audit/growth-2 network finding 3) now that the loop widens choice.',
+          why: '2 + 1.5 units. The far end of the pocket, which leads on to Searing Writ (High Veil until 2026-11-05): linked in G3 round 1, cut in round 2 (the classic caster took the far shield a step off the climb), linked again in G4 fix 2 (audit/growth-2 network finding 3) now that the loop widens choice.',
         },
       ],
       links: [

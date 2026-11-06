@@ -1,5 +1,5 @@
 /**
- * The Stair: The north border's ground: chaos spells and mines, energy shield and spell dodge, leech, life and evasion, Spellslip, and mines at the rim.
+ * The Stair: The north border's ground: chaos spells and their crit, mines, spell dodge, leech, life and evasion, Spellslip, and mines at the rim.
  * Written for the attrition rework from docs/tree/design/R-knife.md (2026-10-30).
  */
 import {
@@ -7,13 +7,13 @@ import {
   aoe,
   chaosDot,
   chaosSpell,
+  chaosSpellCrit,
+  chaosSpellCritMulti,
   critChance,
   critMulti,
   dex,
   dodgeSpell,
   dotDamage,
-  es,
-  esOnHit,
   evasion,
   int,
   leechLife,
@@ -35,7 +35,7 @@ export const hex: AreaSpec = {
   id: 'knife.hex',
   region: 'shade',
   name: 'The Stair',
-  why: "The north border's ground: chaos spells and mines, energy shield and spell dodge, leech, life and evasion, Spellslip, and mines at the rim.",
+  why: "The north border's ground: chaos spells and their crit, mines, spell dodge, leech, life and evasion, Spellslip, and mines at the rim.",
   at: [1606, -2294],
   clusters: [
     {
@@ -65,20 +65,21 @@ export const hex: AreaSpec = {
     },
     {
       id: 'ward',
-      name: 'Shifting Ward',
-      why: 'Energy shield and spell dodge, off the north border road.',
+      name: 'Vile Epiphany',
+      why: "Crit for chaos spells, off the north border road. Energy shield and spell dodge (Shifting Ward) until 2026-11-05, when the owner judged energy shield too strong on the tree. Rotting Word's chaos damage is a wheel away, through Sapper's side or the mid ring: the chaos caster who wants both pays the crossing, and one who lives on damage over time leaves this for the hits.",
       at: [1342, -1990],
       shape: { kind: 'hand' },
       nodes: [
-        { id: 'e2', kind: 'small', lines: [es(5)], at: [1265, -1935] },
+        { id: 'e2', kind: 'small', lines: [chaosSpellCrit(15)], at: [1265, -1935] },
         {
           id: 'n',
           kind: 'notable',
-          name: 'Shifting Ward',
-          lines: [es(12), dodgeSpell(8), esOnHit(6)],
+          name: 'Vile Epiphany',
+          lines: [chaosSpellCrit(40), chaosSpellCritMulti(25)],
           at: [1342, -1990],
+          why: "2.67 + 2.08 units, priced as the Knife's trap and mine crit notables. Only a spell tagged chaos crits by it; one that deals chaos by conversion does not.",
         },
-        { id: 's1', kind: 'small', lines: [dodgeSpell(3)], at: [1399, -2030] },
+        { id: 's1', kind: 'small', lines: [chaosSpellCrit(15)], at: [1399, -2030] },
       ],
       links: [
         ['e2', 'n'],
